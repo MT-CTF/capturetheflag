@@ -1,0 +1,3 @@
+[submodule "mods/ctf_pvp_engine"]
+	path = mods/ctf_pvp_engine
+	url = https://github.com/rubenwardy/ctf_pvp_engine
