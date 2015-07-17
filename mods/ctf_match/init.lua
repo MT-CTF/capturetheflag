@@ -110,13 +110,7 @@ ctf.register_on_new_game(function()
 			ctf.join(name, team)
 		end
 
-		team = ctf.player(name).team
-		if ctf.team(team) then
-			local spawn = ctf.get_spawn(team)
-			if spawn then
-				player:moveto(spawn, false)
-			end
-		end
+		ctf.move_to_spawn(name)
 
 		if ctf.setting("match.clear_inv") then
 			local inv = player:get_inventory()
