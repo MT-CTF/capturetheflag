@@ -72,20 +72,11 @@ function vote.end_vote(voteset)
 	elseif voteset.results.yes and voteset.results.no then
 		local total = #voteset.results.yes + #voteset.results.no
 		local perc_needed = voteset.perc_needed or 0.5
-		local unanimous = voteset.unanimous or 0
 
-		if total <= unanimous then
-			if #voteset.results.no == 0 then
-				result = "yes"
-			else
-				result = "no"
-			end
+		if #voteset.results.yes / total > perc_needed then
+			result = "yes"
 		else
-			if #voteset.results.yes / total > perc_needed then
-				result = "yes"
-			else
-				result = "no"
-			end
+			result = "no"
 		end
 	end
 
@@ -284,41 +275,44 @@ minetest.register_chatcommand("abstain", {
 	end
 })
 
-minetest.register_chatcommand("vote_kick", {
-	privs = {
-		interact = true
-	},
-	func = function(name, param)
-		if not minetest.get_player_by_name(param) then
-			minetest.chat_send_player(name, "There is no player called '" ..
-					param .. "'")
-			return
-		end
-
-		vote.new_vote(name, {
-			description = "Kick " .. param,
-			help = "/yes,  /no  or  /abstain",
-			name = param,
-			duration = 60,
-			perc_needed = 0.8,
-
-			on_result = function(self, result, results)
-				if result == "yes" then
-					minetest.chat_send_all("Vote passed, " ..
-							#results.yes .. " to " .. #results.no .. ", " ..
-							self.name .. " will be kicked.")
-					minetest.kick_player(self.name, "The vote to kick you passed")
-				else
-					minetest.chat_send_all("Vote failed, " ..
-							#results.yes .. " to " .. #results.no .. ", " ..
-							self.name .. " remains ingame.")
-				end
-			end,
-
-			on_vote = function(self, name, value)
-				minetest.chat_send_all(name .. " voted " .. value .. " to '" ..
-						self.description .. "'")
+local set = minetest.setting_get("vote.kick_vote")
+if set == nil or minetest.is_yes(set) then
+	minetest.register_chatcommand("vote_kick", {
+		privs = {
+			interact = true
+		},
+		func = function(name, param)
+			if not minetest.get_player_by_name(param) then
+				minetest.chat_send_player(name, "There is no player called '" ..
+						param .. "'")
+				return
 			end
-		})
-	end
-})
+
+			vote.new_vote(name, {
+				description = "Kick " .. param,
+				help = "/yes,  /no  or  /abstain",
+				name = param,
+				duration = 60,
+				perc_needed = 0.8,
+
+				on_result = function(self, result, results)
+					if result == "yes" then
+						minetest.chat_send_all("Vote passed, " ..
+								#results.yes .. " to " .. #results.no .. ", " ..
+								self.name .. " will be kicked.")
+						minetest.kick_player(self.name, "The vote to kick you passed")
+					else
+						minetest.chat_send_all("Vote failed, " ..
+								#results.yes .. " to " .. #results.no .. ", " ..
+								self.name .. " remains ingame.")
+					end
+				end,
+
+				on_vote = function(self, name, value)
+					minetest.chat_send_all(name .. " voted " .. value .. " to '" ..
+							self.description .. "'")
+				end
+			})
+		end
+	})
+end
