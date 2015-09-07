@@ -116,7 +116,6 @@ default:torch
 
 default:bookshelf
 
-default:sign_wall
 default:ladder
 default:fence_wood
 
