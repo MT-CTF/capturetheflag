@@ -1,0 +1,81 @@
+-- Simple Shooter config example
+
+-- Global Constants (defaults)
+
+-- Enable admin super weapons
+-- This lets admins shoot guns automatically after 2 seconds without munition.
+SHOOTER_ADMIN_WEAPONS = false
+
+-- Enable node destruction with explosives
+SHOOTER_ENABLE_BLASTING = true
+
+-- Enable Crossbow
+SHOOTER_ENABLE_CROSSBOW = true
+
+-- Enable basic guns (Pistol, Rifle, Shotgun, Machine Gun)
+SHOOTER_ENABLE_GUNS = true
+
+-- Enable Flare Gun
+SHOOTER_ENABLE_FLARES = true
+
+-- Enable Grappling Hook
+SHOOTER_ENABLE_HOOK = true
+
+-- Enable Grenades
+SHOOTER_ENABLE_GRENADES = true
+
+-- Enable Rocket Gun
+SHOOTER_ENABLE_ROCKETS = true
+
+-- Enable Turrret Gun
+SHOOTER_ENABLE_TURRETS = true
+
+-- Enable Crafting
+SHOOTER_ENABLE_CRAFTING = true
+
+-- Enable particle effects
+SHOOTER_ENABLE_PARTICLE_FX = true
+
+-- Enable protection mod support, requires a protection mod that utilizes
+-- minetest.is_protected(), tested with TenPlus1's version of [protector]
+SHOOTER_ENABLE_PROTECTION = false
+
+-- Particle texture used when a player or entity is hit
+SHOOTER_EXPLOSION_TEXTURE = "shooter_hit.png"
+
+-- Allow node destruction
+SHOOTER_ALLOW_NODES = true
+
+-- Allow entities in multiplayer mode
+SHOOTER_ALLOW_ENTITIES = false
+
+-- Allow players in multiplayer mode
+SHOOTER_ALLOW_PLAYERS = true
+
+-- How often objects are fully reloaded
+SHOOTER_OBJECT_RELOAD_TIME = 1
+
+-- How often object positions are updated
+SHOOTER_OBJECT_UPDATE_TIME = 0.25
+
+-- How often rounds are processed
+SHOOTER_ROUNDS_UPDATE_TIME = 0.4
+
+-- Player collision box offset (may require adjustment for some games)
+SHOOTER_PLAYER_OFFSET = {x=0, y=1, z=0}
+
+-- Entity collision box offset (may require adjustment for other mobs)
+SHOOTER_ENTITY_OFFSET = {x=0, y=0, z=0}
+
+-- Shootable entities (default support for Simple Mobs)
+SHOOTER_ENTITIES = {
+	"mobs:dirt_monster",
+	"mobs:stone_monster",
+	"mobs:sand_monster",
+	"mobs:tree_monster",
+	"mobs:sheep",
+	"mobs:rat",
+	"mobs:oerkki",
+	"mobs:dungeon_master",
+}
+

@@ -1,0 +1,1 @@
+A framework which manages treasures which helps other mods to register and distribute treasures around the world.

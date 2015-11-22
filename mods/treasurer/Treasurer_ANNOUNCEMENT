@@ -1,0 +1,48 @@
+== Treasurer [treasurer] ==
+
+With Treasurer I want to introduce a new way to define and distribute random treasures into the world. Treasurer itself does neither define any items nor does it attempt to distribute them.
+
+Instead Treasurer provides two interfaces.
+
+To actually get a game with treasures using Treasurer running, you need at least the following: 
+[list]
+[*]Treasurer
+[*]at least one treasure registration mod
+[*]at least one treasure spawning mod
+[/list]
+
+A treasure is basically just a fancy ItemStack. It consists of:
+- name of item
+- relative rarity
+- a preciousness
+- the amount of item (can be randomized)
+- a wear (can be randomized)
+
+
+A TRM does nothing more than telling Treasurer a bunch of treasures it has to offer. Note, however, that a TRM should really do nothing more than just that. The actual mods where the items originate from does most likely NOT have to be changed in order to register its items as treasures. TRMs are simple,
+
+A TSM distributes (“spawns”) treasures, where it has to ask Treasurer for some treasures. Treasurer then chooses some treasures out of the pool of available treasures and returns a list of ItemStacks. The TSM also may ask Treasurer to filter out treasures which have an either too high or too low preciousness (“preciousness” is defined by the TRMs). Be warned: Treasurer may return no treasures at all, either because no TRM is activated or no treasure that matches the filter exists.
+“Spawning” here means to put the treasures into the world somehow. How a TSM does the task of spawning is up to the TSM. Treasurer
+
+Recap: The TSMs will spawn treasures into the world out of a pool of treasures which is offered by TRMs. Treasurer manages the pool.
+
+Examples for TRMs are:
+- registering bronze, gold, iron ingots and possibly other items of default (see trm_default_example)
+- registering bread, wheat, seeds, etc. of farming
+- registering super cool item X from awesome mod Y, where X could normally only obtained by “/give” or with creative mode.
+- registering the … bla bla bla, you get the idea
+
+Examples for TSMs are:
+- let a mob drop a not mob-specific, random treasure on death
+- give a random treasure as a “welcome gift” to joining and respawning players (see tsm_gift_example)
+- placing chests around the world and spawning treasures into them (see tsm_chests_example)
+
+Some of the above example have been implemented into already working mods, which are distributed with Treasurer
+as seperate mods.
+
+
+Dependencies of Treasurer: None!
+Minimal dependencies of all TRMs: treasurer and all mods that define the registered items
+Minimal dependency of all TSMs: treasurer
+
+License: WTFPL

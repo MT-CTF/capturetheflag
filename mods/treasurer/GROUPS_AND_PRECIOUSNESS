@@ -1,0 +1,83 @@
+
+If you wish to register treasures to Treasurer, it is recommended to assign the treasurer to a Treasurer group.
+
+It is not possible to assign a treasure to multiple groups. If you think a treasure fits into two groups, create
+two seperate treasure definitions instead. But try to keep it as an exception.
+
+Think of treasurer groups as categories for treasurers to put into.
+
+This file contains some guidelines for Treasurer groups and there are even guidelines for preciousness levels.
+Keep in mind these are only guidelines.
+
+Treasurer suggests to use the following standard Treasurer groups:
+
+crafting_component:
+	Generic group for components in crafting recipes. If it is primarily a component for food, use raw_food instead.
+	Preciousness is based roughly on the preciousness of items it can create.
+
+fuel:
+	Fuel for furnaces.
+	Preciousness is based on burning time.
+
+food:
+	Can be eaten and restores health.
+	Preciousness should equal the number of hearts restored (restored HP divided by 2), but not higher than 7.
+
+raw_food:
+	Food which is not fully processed and is not (quite) ready to be eaten.
+
+melee_weapon:
+	Primarily used to damage close foes, i.e. a sword.
+	Preciousness is based on attack speed and damage.
+
+ranged_weapon:
+	Primarily used to damage far away foes, 
+	Preciousness is based on attack speed, damage and range.
+
+tool:
+	A tool for other uses.
+	Preciousness is hard to determine; at least is should base on the number of uses.
+	
+
+minetool:
+	A tool to destroy blocks. Includes pickaxes, axes, shovels, …
+	Preciousness is based on power, number of uses and speed.
+
+deco:
+	Primarily just a decorational thing to place.
+	Preciousness is based on beauty, highly subjective.
+
+light:
+	Is a light source.
+	Preciousness is based on the brightness. For the maximum brightness (before sun brightness), preciousness should be 3.
+
+building_block:
+	A block for buildings. Includes stairs, slabs, fences and similar things.
+	Excludes all natural blocks.
+	Preciousness should be roughly based on the “cost” to craft the block.
+
+seed:
+	Seeds and saplings.
+	Preciousness is based on the percieved “usefulness” of what can grow from the seed.
+
+transport_vehicle
+	A vehicle to transport players and stuff, i.e. a cart or a boat.
+	Preciousness is hard to determine, maybe speed?
+
+transport_structure
+	A fixed structure which is neccessary for a transport vehicle to operate, i.e. rails.
+	Preciousness is hard to dertermine …
+
+ladder
+	A ladder.
+
+default:
+	This is the group your treasure get assigned to if you don’t specify a group.
+
+
+Do you miss a group? Feel free to invent your own!
+
+
+Note that Treasurer groups differ from the groups as defined by the Minetest API. These groups are handled differently.
+
+

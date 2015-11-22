@@ -1,0 +1,52 @@
+# You can disable or disable any bow and arrow by writing lines like these inside throwing.conf
+#
+# DISABLE_WOODEN_BOW = true
+#
+#
+# DISABLE_LONGBOW = true
+#
+#
+# DISABLE_COMPOSITE_BOW = true
+#
+#
+# DISABLE_STEEL_BOW = true
+#
+#
+# DISABLE_ROYAL_BOW = true
+#
+#
+# DISABLE_CROSSBOW = true
+#
+#
+# DISABLE_BUILD_ARROW = false
+#
+#
+# DISABLE_DIG_ARROW = false
+#
+#
+# DISABLE_DIAMOND_ARROW = true
+#
+#
+# DISABLE_OBSIDIAN_ARROW = true
+#
+#
+# DISABLE_SHELL_ARROW = true
+#
+#
+# DISABLE_STEEL_ARROW = true
+#
+#
+# DISABLE_STONE_ARROW = false
+#
+#
+# DISABLE_TELEPORT_ARROW = false
+#
+#
+# DISABLE_FIRE_ARROW = false
+#
+#
+# DISABLE_TNT_ARROW = false
+#
+#
+# DISABLE_TORCH_ARROW = true
+#

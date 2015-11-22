@@ -1,0 +1,32 @@
+Minetest Mod - Simple Shooter [shooter]
+=======================================
+
+License Source Code: 2013 Stuart Jones - LGPL v2.1
+
+Additional credit for code ideas taken from other mods.
+
+PilzAdam [throwing] for the throwing physics
+ShadowNinja [nuke] for the vm explosion routine
+
+License Textures: Stuart Jones - WTFPL
+
+Licence Models: Stuart Jones - CC-BY-SA 3.0
+
+License Sounds: freesound.org
+
+	flobert1_20070728.wav by Nonoo - Attribution 3.0 Unported (CC BY 3.0)
+	
+	shot.wav by Sergenious - Attribution 3.0 Unported (CC BY 3.0)
+
+	GUNSHOT.WAV by erkanozan - CC0 1.0 Universal (CC0 1.0)
+
+	winchester-rifle-cock-reload.wav by MentalSanityOff - CC0 1.0 Universal (CC0 1.0)
+
+	trigger-with-hammer-fall.wav by Nanashi - CC0 1.0 Universal (CC0 1.0)
+
+	woosh.wav by ReadeOnly - CC0 1.0 Universal (CC0 1.0)
+
+	AGM-114 Hellfire Rocket Missile Launch.flac by qubodup - CC0 1.0 Universal (CC0 1.0)
+
+	Sparkler.aif by Ned Bouhalassa - CC0 1.0 Universal (CC0 1.0)
+
