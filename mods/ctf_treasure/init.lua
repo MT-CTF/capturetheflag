@@ -26,9 +26,7 @@ treasurer.register_treasure("throwing:bow_wood",0.9,5,{1,12})
 treasurer.register_treasure("throwing:longbow",0.4,5,1)
 treasurer.register_treasure("throwing:bow_steel",0.1,5,1)
 
-
-
-
-
-
-
+treasurer.register_treasure("default:pick_steel",0.3,5,{1,10})
+treasurer.register_treasure("default:pick_mese",0.005,5,1)
+treasurer.register_treasure("default:cobble",0.8,5,{1,99})
+treasurer.register_treasure("default:sword_steel",0.8,5,{1,10})
