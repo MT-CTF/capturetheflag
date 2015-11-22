@@ -5,7 +5,7 @@
 
 	A TSM’s task is to somehow bring treasures (which are ItemStacks) into the world.
 	This is also called “spawning treasures”.
-	How it does this task is completely free to the programmer of the TSM. 
+	How it does this task is completely free to the programmer of the TSM.
 
 	This TSM spawns the treasures by placing chests (default:chest) between 20 and 200 node lengths below the water surface. This cau
 	The chests are provided by the default mod, therefore this TSM depends on the default mod.
@@ -93,6 +93,11 @@ minetest.register_node(":default:chest", {
     on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		minetest.log("action", player:get_player_name() ..
 			" takes stuff from chest at " .. minetest.pos_to_string(pos))
+		local inv = minetest.get_inventory({type = "node", pos=pos})
+		if not inv or inv:is_empty("main") then
+			minetest.set_node(pos, {name="air"})
+			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
+		end
 	end,
 })
 
@@ -117,12 +122,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	-- chests minimum and maximum spawn height
-	local height_min = water_level + h_min 
+	local height_min = water_level + h_min
 	local height_max = water_level + h_max
 
 	if(maxp.y < height_min or minp.y > height_max) then
 		return
-	end	
+	end
 	local y_min = math.max(minp.y, height_min)
 	local y_max = math.min(maxp.y, height_max)
 	local get_node = minetest.get_node
@@ -140,7 +145,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				top = y
 				break
 			end
-		end		
+		end
 		for y=top,y_min,-1 do
 			local p = {x=pos.x,y=y,z=pos.z}
                         local name = get_node(p).name
@@ -212,7 +217,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				-- Get the inventory of the chest to place the treasures in
 				local meta = minetest.get_meta(chest_pos)
 				local inv = meta:get_inventory()
-				
+
 				--[[ Now that we got both our treasures and the chest’s inventory,
 				let’s place the treasures one for one into it. ]]
 				for i=1,#treasures do
