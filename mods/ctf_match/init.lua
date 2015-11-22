@@ -94,9 +94,25 @@ ctf.register_on_new_game(function()
 	end
 
 	minetest.after(0, function()
-		for name, p in pairs(pos) do
-			safe_place(p, {name = "ctf_flag:flag"})
-			ctf_flag.update(p)
+		for name, flag in pairs(pos) do
+			safe_place(flag, {name = "ctf_flag:flag"})
+			ctf_flag.update(flag)
+			local function base_at(flag, dx, dz)
+				safe_place({
+					x = flag.x + dx,
+					y = flag.y - 1,
+					z = flag.z + dz,
+				}, { name = "ctf_flag:ind_base"})
+			end
+			base_at(flag, -1, -1)
+			base_at(flag, -1,  0)
+			base_at(flag, -1,  1)
+			base_at(flag,  0, -1)
+			base_at(flag,  0,  0)
+			base_at(flag,  0,  1)
+			base_at(flag,  1, -1)
+			base_at(flag,  1,  0)
+			base_at(flag,  1,  1)
 		end
 	end)
 
