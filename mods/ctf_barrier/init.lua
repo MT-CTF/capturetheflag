@@ -10,9 +10,12 @@ minetest.register_node("ctf_barrier:ind_glass", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
-
+local lim = ctf.setting("match.map_reset_limit")
+local c_glass  = minetest.get_content_id("ctf_barrier:ind_glass")
+local c_stone  = minetest.get_content_id("ctf_flag:ind_base")
+local c_air  = minetest.get_content_id("air")
 minetest.register_on_generated(function(minp, maxp, seed)
-	local r = ctf.setting("match.map_reset_limit") - 4
+	local r = lim - 4
 
 	if not ((minp.x < -r and maxp.x > -r)
 			or (minp.x < r and maxp.x > r)
@@ -31,9 +34,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			MaxEdge={x=emax.x, y=emax.y, z=emax.z},
 	}
 	local data = vm:get_data()
-	local c_glass  = minetest.get_content_id("ctf_barrier:ind_glass")
-	local c_stone  = minetest.get_content_id("ctf_flag:ind_base")
-	local c_air  = minetest.get_content_id("air")
 	local dist = 3
 
 	-- Left
