@@ -14,9 +14,8 @@ local lim = ctf.setting("match.map_reset_limit")
 local c_glass  = minetest.get_content_id("ctf_barrier:ind_glass")
 local c_stone  = minetest.get_content_id("ctf_flag:ind_base")
 local c_air  = minetest.get_content_id("air")
+local r = tonumber(minetest.setting_get("barrier"))
 minetest.register_on_generated(function(minp, maxp, seed)
-	local r = lim - 4
-
 	if not ((minp.x < -r and maxp.x > -r)
 			or (minp.x < r and maxp.x > r)
 			or (minp.y < -r and maxp.x > -r)
