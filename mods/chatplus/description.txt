@@ -1,0 +1,1 @@
+Adds advanced chat features such as ignoring and inboxing.
