@@ -11,6 +11,7 @@
 "flag.capture_mode"   "take"
 "flag.capture_take"   true
 "flag.names"   true
+"flag.nobuild_radius"   3
 "flag.protect_distance"   25
 "flag.waypoints"   true
 "friendly_fire"   false
