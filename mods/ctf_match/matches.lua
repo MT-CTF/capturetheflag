@@ -38,7 +38,6 @@ ctf.register_on_new_game(function()
 	ctf.log("match", "Setting up new game!")
 
 	teams = teams:split(";")
-	local pos = {}
 	for i, v in pairs(teams) do
 		local team = v:split(",")
 		if #team == 5 then
@@ -47,7 +46,7 @@ ctf.register_on_new_game(function()
 			local x     = tonumber(team[3]:trim())
 			local y     = tonumber(team[4]:trim())
 			local z     = tonumber(team[5]:trim())
-			pos[name] = {
+			local flag  = {
 				x = x,
 				y = y,
 				z = z
@@ -59,7 +58,8 @@ ctf.register_on_new_game(function()
 				add_team = true
 			})
 
-			ctf_flag.add(name, pos[name])
+			ctf_flag.add(name, flag)
+			ctf_flag.assert_flag(flag)
 		else
 			ctf.warning("match", "Invalid team setup: " .. dump(v))
 		end
