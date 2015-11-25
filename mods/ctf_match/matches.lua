@@ -31,18 +31,6 @@ function ctf_match.check_for_winner()
 end
 
 ctf.register_on_new_game(function()
-	local function safe_place(pos, node)
-		ctf.log("match", "attempting to place...")
-		minetest.get_voxel_manip(pos, { x = pos.x + 1, y = pos.y + 1, z = pos.z + 1})
-		minetest.set_node(pos, node)
-		if minetest.get_node(pos).name ~= node.name then
-			ctf.error("match", "failed to place node, retrying...")
-			minetest.after(0.5, function()
-				safe_place(pos, node)
-			end)
-		end
-	end
-
 	local teams = ctf.setting("match.teams")
 	if teams:trim() == "" then
 		return
@@ -77,29 +65,6 @@ ctf.register_on_new_game(function()
 		end
 	end
 
-	minetest.after(0, function()
-		for name, flag in pairs(pos) do
-			safe_place(flag, {name = "ctf_flag:flag"})
-			ctf_flag.update(flag)
-			local function base_at(flag, dx, dz)
-				safe_place({
-					x = flag.x + dx,
-					y = flag.y - 1,
-					z = flag.z + dz,
-				}, { name = "ctf_flag:ind_base"})
-			end
-			base_at(flag, -1, -1)
-			base_at(flag, -1,  0)
-			base_at(flag, -1,  1)
-			base_at(flag,  0, -1)
-			base_at(flag,  0,  0)
-			base_at(flag,  0,  1)
-			base_at(flag,  1, -1)
-			base_at(flag,  1,  0)
-			base_at(flag,  1,  1)
-		end
-	end)
-
 	for i, player in pairs(minetest.get_connected_players()) do
 		local name       = player:get_player_name()
 		local alloc_mode = tonumber(ctf.setting("allocate_mode"))
@@ -121,6 +86,7 @@ ctf.register_on_new_game(function()
 
 		player:set_hp(20)
 	end
+
 	minetest.chat_send_all("Next round!")
 end)
 
