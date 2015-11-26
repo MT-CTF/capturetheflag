@@ -41,7 +41,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air then
+
+				if data[vi] == c_air or data[vi] == c_glass then
 					data[vi] = c_glass
 				else
 					data[vi] = c_stone
@@ -56,7 +57,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air then
+				if data[vi] == c_air or data[vi] == c_glass then
 					data[vi] = c_glass
 				else
 					data[vi] = c_stone
@@ -71,7 +72,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air then
+				if data[vi] == c_air or data[vi] == c_glass then
 					data[vi] = c_glass
 				else
 					data[vi] = c_stone
@@ -86,7 +87,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air then
+				if data[vi] == c_air or data[vi] == c_glass then
 					data[vi] = c_glass
 				else
 					data[vi] = c_stone
