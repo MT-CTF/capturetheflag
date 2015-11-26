@@ -59,7 +59,10 @@ ctf.register_on_new_game(function()
 			})
 
 			ctf_flag.add(name, flag)
-			ctf_flag.assert_flag(flag)
+
+			minetest.after(0, function()
+				ctf_flag.assert_flag(flag)
+			end)
 		else
 			ctf.warning("match", "Invalid team setup: " .. dump(v))
 		end
