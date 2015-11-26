@@ -106,8 +106,8 @@ minetest.register_node(":default:chest", {
 local chests_per_chunk = 5	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
 local h_min = 0  		-- minimum chest spawning height, relative to water_level
 local h_max = 15		-- maximum chest spawning height, relative to water_level
-local t_min = 2			-- minimum amount of treasures found in a chest
-local t_max = 6			-- maximum amount of treasures found in a chest
+local t_min = 3			-- minimum amount of treasures found in a chest
+local t_max = 7			-- maximum amount of treasures found in a chest
 
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
