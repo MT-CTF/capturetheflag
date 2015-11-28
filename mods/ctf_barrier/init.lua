@@ -187,3 +187,19 @@ end)
 		minetest.set_node(pos, {name = "air"})
 	end
 })]]
+
+local old_is_protected = minetest.is_protected
+function minetest.is_protected(pos, name)
+	if ctf_match.build_timer <= 0 then
+		return old_is_protected(pos, name)
+	end
+
+	local tname, distsq = ctf_flag.get_nearest(pos)
+	local tname = ctf.player(name).team
+	if tname and (tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
+		minetest.chat_send_player(name, "Can't dig beyond the barrier!")
+		return true
+	else
+		return old_is_protected(pos, name)
+	end
+end
