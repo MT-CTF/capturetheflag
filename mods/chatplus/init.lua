@@ -37,6 +37,11 @@ function chatplus.setting(name)
 	end
 end
 
+function chatplus.log(msg)
+	chatplus.log_handle:write(os.date("%d/%m/%Y %I:%M%p") .. " " .. msg .. "\r\n")
+	chatplus.log_handle:flush()
+end
+
 function chatplus.load()
 	-- Initialize the log
 	if chatplus.setting("log") then
@@ -46,6 +51,7 @@ function chatplus.load()
 		else
 			minetest.log("action","Logging chat plus to: "..chatplus.log_file)
 		end
+		chatplus.log("*** SERVER STARTED ***")
 	end
 
 	-- Load player data
@@ -142,13 +148,8 @@ function chatplus.send(from, msg)
 
 	-- Log chat message
 	if chatplus.log_handle ~= nil then
-		chatplus.log_handle:write(
-			os.date("%Y/%m/%d %I:%M%p")..
-			" <"..from.."> "..
-			msg..
-			"\r\n"
-		)
-		chatplus.log_handle:flush()
+		local tname = ctf.player(from).team or ""
+		chatplus.log(tname .. "<" .. from .. "> " .. msg)
 	end
 
 	-- Loop through senders
@@ -165,7 +166,7 @@ function chatplus.send(from, msg)
 				end
 			end
 			if res == nil or res == true then
-				minetest.chat_send_player(key,"<"..from.."> "..msg,false)
+				minetest.chat_send_player(key, "<"..from.."> "..msg,false)
 			end
 		end
 	end
