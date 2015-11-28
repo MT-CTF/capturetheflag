@@ -194,12 +194,37 @@ function minetest.is_protected(pos, name)
 		return old_is_protected(pos, name)
 	end
 
-	local tname, distsq = ctf_flag.get_nearest(pos)
 	local tname = ctf.player(name).team
-	if tname and (tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
+	if tname and
+			(tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
 		minetest.chat_send_player(name, "Can't dig beyond the barrier!")
 		return true
 	else
 		return old_is_protected(pos, name)
 	end
 end
+
+local function pos_check()
+	if ctf_match.build_timer <= 0 then
+		return
+	end
+
+	for _, player in pairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+		local tname = ctf.player(name).team
+		local pos = player:getpos()
+		if tname and
+				(tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
+			minetest.chat_send_player(name, "Match hasn't started yet!")
+			ctf.move_to_spawn(name)
+		end
+	end
+
+	if ctf_match.build_timer > 0.2 then
+		minetest.after(0.2, pos_check)
+	end
+end
+
+ctf_match.register_on_build_time_start(function()
+	minetest.after(0.2, pos_check)
+end)
