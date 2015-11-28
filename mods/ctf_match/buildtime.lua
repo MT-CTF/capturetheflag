@@ -1,5 +1,5 @@
 ctf.register_on_init(function()
-	ctf._set("match.build_time",         10)
+	ctf._set("match.build_time",         60)
 end)
 
 ctf_match.registered_on_build_time_start = {}
