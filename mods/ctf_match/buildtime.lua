@@ -24,6 +24,9 @@ function ctf_match.is_in_build_time()
 	return ctf_match.build_timer > 0
 end
 
+ctf_match.register_on_new_match(function()
+	ctf_match.build_timer = ctf.setting("match.build_time")
+end)
 ctf.register_on_new_game(function()
 	ctf_match.build_timer = ctf.setting("match.build_time")
 	if ctf_match.build_timer > 0 then

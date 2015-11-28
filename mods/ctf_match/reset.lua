@@ -2,8 +2,11 @@ ctf.register_on_init(function()
 	ctf._set("match.map_reset_limit",    0)
 end)
 
-local old = ctf_match.next
 function ctf_match.next()
+	for i = 1, #ctf_match.registered_on_new_match do
+		ctf_match.registered_on_new_match[i]()
+	end
+
 	local r = ctf.setting("match.map_reset_limit")
 	if r > 0 then
 		minetest.chat_send_all("Resetting the map, this may take a few moments...")
@@ -11,10 +14,10 @@ function ctf_match.next()
 			minetest.delete_area(vector.new(-r, -r, -r), vector.new(r, r, r))
 
 			minetest.after(1, function()
-				old()
+				ctf.reset()
 			end)
 		end)
 	else
-		old()
+		ctf.reset()
 	end
 end
