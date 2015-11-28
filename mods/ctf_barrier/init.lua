@@ -170,8 +170,6 @@ ctf_match.register_on_build_time_end(function()
 		end
 	end
 
-	print(n .. " invalid nodes out of " .. t .. " (" .. (t-n) .. " valid)")
-
 	vm:set_data(data)
 	vm:write_to_map(data)
 	vm:update_map()
