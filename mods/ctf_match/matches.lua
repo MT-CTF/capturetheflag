@@ -104,6 +104,9 @@ ctf.register_on_new_game(function()
 	end
 
 	minetest.chat_send_all("Next round!")
+	if minetest.global_exists("chatplus") then
+		chatplus.log("Next round!")
+	end
 end)
 
 ctf_flag.register_on_capture(function(attname, flag)

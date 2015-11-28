@@ -62,6 +62,9 @@ ctf_match.register_on_build_time_start(function()
 end)
 
 ctf_match.register_on_build_time_end(function()
+	if minetest.global_exists("chatplus") then
+		chatplus.log("Build time over!")
+	end
 	minetest.chat_send_all("Build time over! Attack and defend!")
 	minetest.setting_set("enable_pvp", "true")
 	for _, player in pairs(minetest.get_connected_players()) do
