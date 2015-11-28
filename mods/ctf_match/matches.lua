@@ -6,8 +6,21 @@ ctf.register_on_init(function()
 	ctf._set("match.clear_inv",          false)
 end)
 
+ctf_match.registered_on_new_match = {}
+function ctf_match.register_on_new_match(func)
+	if ctf._mt_loaded then
+		error("You can't register callbacks at game time!")
+	end
+	table.insert(ctf_match.registered_on_new_match, func)
+end
+
+
 -- Load next match. May be overrided
 function ctf_match.next()
+	for i = 1, #ctf_match.registered_on_new_match do
+		ctf_match.registered_on_new_match[i]()
+	end
+
 	ctf.reset()
 	-- Note: ctf.reset calls register_on_new_game, below.
 end

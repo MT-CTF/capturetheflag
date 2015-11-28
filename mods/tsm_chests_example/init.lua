@@ -157,6 +157,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 		if ground~=nil then
 			local chest_pos = {x=pos.x,y=ground+1, z=pos.z}
+			if chest_pos.z == 0 then
+				chest_pos.z = -1
+			end
 			local nn = minetest.get_node(chest_pos).name	-- chest node name (before it becomes a chest)
 			if nn == "air" or nn == "default:water_source" then
 				-->>>> chest spawning starts here <<<<--

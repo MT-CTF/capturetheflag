@@ -7,21 +7,45 @@ minetest.register_node("ctf_barrier:ind_glass", {
 	sunlight_propagates = true,
 	is_ground_content = false,
 	walkable = true,
+	buildable_to = false,
+	pointable = false,
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
+
+minetest.register_node("ctf_barrier:ind_glass_red", {
+	description = "You cheater you!",
+	drawtype = "glasslike",
+	tiles = {"ctf_barrier_red.png"},
+	inventory_image = minetest.inventorycube("default_glass.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = false,
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+
 local lim = ctf.setting("match.map_reset_limit")
 local c_glass  = minetest.get_content_id("ctf_barrier:ind_glass")
+local c_glass_red  = minetest.get_content_id("ctf_barrier:ind_glass_red")
+local c_water  = minetest.get_content_id("default:water_source")
+local c_water_f  = minetest.get_content_id("default:water_flowing")
 local c_stone  = minetest.get_content_id("ctf_flag:ind_base")
 local c_air  = minetest.get_content_id("air")
 local r = tonumber(minetest.setting_get("barrier"))
 minetest.register_on_generated(function(minp, maxp, seed)
-	if not ((minp.x < -r and maxp.x > -r)
-			or (minp.x < r and maxp.x > r)
-			or (minp.y < -r and maxp.x > -r)
-			or (minp.y < r and maxp.x > r)
-			or (minp.z < -r and maxp.z > -r)
-			or (minp.z < r and maxp.z > r)) then
+	if not ((minp.x <= -r and maxp.x >= -r)
+			or (minp.x <= r and maxp.x >= r)
+			or (minp.y <= -r and maxp.x >= -r)
+			or (minp.y <= r and maxp.x >= r)
+			or (minp.z <= -r and maxp.z >= -r)
+			or (minp.z <= 0 and maxp.z >= 0)
+			or (minp.z <= r and maxp.z >= r and ctf_match.build_timer > 0)) then
 		return
 	end
 
@@ -33,10 +57,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			MaxEdge={x=emax.x, y=emax.y, z=emax.z},
 	}
 	local data = vm:get_data()
-	local dist = 3
 
 	-- Left
-	if minp.x < -r and maxp.x > -r then
+	if minp.x <= -r and maxp.x >= -r then
 		local x = -r
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
@@ -52,7 +75,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	-- Right
-	if minp.x < r and maxp.x > r then
+	if minp.x <= r and maxp.x >= r then
 		local x = r
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
@@ -67,7 +90,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	-- Front
-	if minp.z < -r and maxp.z > -r then
+	if minp.z <= -r and maxp.z >= -r then
 		local z = -r
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
@@ -82,7 +105,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	-- Back
-	if minp.z < r and maxp.z > r then
+	if minp.z <= r and maxp.z >= r then
 		local z = r
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
@@ -96,6 +119,73 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 
+	-- Barrier
+	if minp.z <= 0 and maxp.z >= 0 and ctf_match.build_timer > 0 then
+		local z = 0
+		local x1 = minp.x
+		if x1 < -r then x1 = -r end
+		local x2 = maxp.x
+		if x2 > r then x2 = r end
+		for x = x1, x2 do
+			for y = minp.y, maxp.y do
+				local vi = a:index(x, y, z)
+				local node = data[vi]
+				if node == c_air or node == c_glass_red or
+						node == c_water or node == c_water_f then
+					data[vi] = c_glass_red
+				end
+			end
+		end
+	end
+
 	vm:set_data(data)
 	vm:write_to_map(data)
 end)
+
+ctf_match.register_on_build_time_end(function()
+	local min = {
+		x = -r + 1,
+		y = -r,
+		z = -1
+	}
+	local max = {
+		x = r - 1,
+		y = r,
+		z = 1
+	}
+
+	local vm = minetest.get_voxel_manip()
+	local emin, emax = vm:read_from_map(min, max)
+	local a = VoxelArea:new{
+		MinEdge = emin,
+		MaxEdge = emax
+	}
+	local data = vm:get_data()
+	for x = min.x, max.x do
+		for y = min.y, max.y do
+			local vi = a:index(x, y, 0)
+			if data[vi] == c_glass_red then
+				data[vi] = c_air
+			end
+		end
+	end
+
+	print(n .. " invalid nodes out of " .. t .. " (" .. (t-n) .. " valid)")
+
+	vm:set_data(data)
+	vm:write_to_map(data)
+	vm:update_map()
+end)
+
+--[[minetest.register_abm({
+	nodenames = {"ctf_barrier:ind_glass_red"},
+	interval = 10.0, -- Run every 10 seconds
+	chance = 2, -- Select every 1 in 50 nodes
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		if ctf_match.build_timer > 0 then
+			return
+		end
+
+		minetest.set_node(pos, {name = "air"})
+	end
+})]]

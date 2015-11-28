@@ -158,7 +158,7 @@ function chatplus.send(from, msg)
 			for i=1, #chatplus._handlers do
 				if chatplus._handlers[i] then
 					res = chatplus._handlers[i](from,key,msg)
-	
+
 					if res ~= nil then
 						break
 					end

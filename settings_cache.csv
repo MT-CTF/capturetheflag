@@ -29,7 +29,7 @@
 "match.break_alliances"   true
 "match.clear_inv"   true
 "match.destroy_team"   true
-"match.map_reset_limit"   60
+"match.map_reset_limit"   200
 "match.remove_player_on_leave"   true
 "match.teams"   "red, red, 15, 7, 39; blue, blue, -9, 9, -43"
 "maximum_in_team"   -1

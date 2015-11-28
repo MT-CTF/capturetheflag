@@ -6,6 +6,7 @@ for i, flag in pairs(claimed) do
 end
 
 dofile(minetest.get_modpath("ctf_match") .. "/matches.lua")
+dofile(minetest.get_modpath("ctf_match") .. "/buildtime.lua")
 dofile(minetest.get_modpath("ctf_match") .. "/reset.lua")
 dofile(minetest.get_modpath("ctf_match") .. "/chat.lua")
 dofile(minetest.get_modpath("ctf_match") .. "/vote.lua")
