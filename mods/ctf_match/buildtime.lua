@@ -66,6 +66,16 @@ ctf_match.register_on_build_time_end(function()
 	end
 end)
 
+ctf_flag.register_on_prepick_up(function(name, flag)
+	if ctf_match.is_in_build_time() then
+		minetest.chat_send_player(name, "Match hasn't started yet!")
+		ctf.move_to_spawn(name)
+		return false
+	else
+		return true
+	end
+end)
+
 ctf.hud.register_part(function(player, name, tplayer)
 	if ctf_match.build_timer <= 0 then
 		ctf.hud:remove(player, "ctf_match:countdown")
