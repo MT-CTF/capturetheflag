@@ -778,12 +778,6 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "fuel",
-	recipe = "default:sapling",
-	burntime = 10,
-})
-
-minetest.register_craft({
-	type = "fuel",
 	recipe = "default:apple",
 	burntime = 3,
 })
@@ -802,18 +796,6 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "fuel",
-	recipe = "default:junglesapling",
-	burntime = 10,
-})
-
-minetest.register_craft({
-	type = "fuel",
 	recipe = "default:grass_1",
 	burntime = 2,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:pine_sapling",
-	burntime = 10,
 })

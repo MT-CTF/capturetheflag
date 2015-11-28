@@ -170,27 +170,6 @@ function default.grow_papyrus(pos, node)
 	return true
 end
 
-minetest.register_abm({
-	nodenames = {"default:cactus"},
-	neighbors = {"group:sand"},
-	interval = 50,
-	chance = 20,
-	action = function(...)
-		default.grow_cactus(...)
-	end
-})
-
-minetest.register_abm({
-	nodenames = {"default:papyrus"},
-	neighbors = {"default:dirt", "default:dirt_with_grass"},
-	interval = 50,
-	chance = 20,
-	action = function(...)
-		default.grow_papyrus(...)
-	end
-})
-
-
 --
 -- dig upwards
 --
@@ -342,4 +321,3 @@ minetest.register_abm({
 		end
 	end
 })
-

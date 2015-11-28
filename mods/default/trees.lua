@@ -17,53 +17,6 @@ local function can_grow(pos)
 	return true
 end
 
--- Sapling ABMs
-
-minetest.register_abm({
-	nodenames = {"default:sapling"},
-	interval = 10,
-	chance = 50,
-	action = function(pos, node)
-		if not can_grow(pos) then
-			return
-		end
-
-		minetest.log("action", "A sapling grows into a tree at "..
-				minetest.pos_to_string(pos))
-		default.grow_tree(pos, random(1, 4) == 1)
-	end
-})
-
-minetest.register_abm({
-	nodenames = {"default:junglesapling"},
-	interval = 11,
-	chance = 50,
-	action = function(pos, node)
-		if not can_grow(pos) then
-			return
-		end
-
-		minetest.log("action", "A jungle sapling grows into a tree at "..
-				minetest.pos_to_string(pos))
-		default.grow_jungle_tree(pos)
-	end
-})
-
-minetest.register_abm({
-	nodenames = {"default:pine_sapling"},
-	interval = 12,
-	chance = 50,
-	action = function(pos, node)
-		if not can_grow(pos) then
-			return
-		end
-
-		minetest.log("action", "A pine sapling grows into a tree at "..
-				minetest.pos_to_string(pos))
-		default.grow_pine_tree(pos)
-	end
-})
-
 -- Appletree, jungletree function
 
 local function add_trunk_and_leaves(data, a, pos, tree_cid, leaves_cid,
@@ -345,4 +298,3 @@ function default.grow_pine_tree(pos)
 	vm:write_to_map()
 	vm:update_map()
 end
-

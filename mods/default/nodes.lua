@@ -388,24 +388,6 @@ minetest.register_node("default:wood", {
 	sounds = default.node_sound_wood_defaults(),
 })
 
-minetest.register_node("default:sapling", {
-	description = "Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"default_sapling.png"},
-	inventory_image = "default_sapling.png",
-	wield_image = "default_sapling.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
-	},
-	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
-	sounds = default.node_sound_leaves_defaults(),
-})
-
 minetest.register_node("default:leaves", {
 	description = "Leaves",
 	drawtype = "allfaces_optional",
@@ -418,11 +400,6 @@ minetest.register_node("default:leaves", {
 	drop = {
 		max_items = 1,
 		items = {
-			{
-				-- player will get sapling with 1/20 chance
-				items = {'default:sapling'},
-				rarity = 20,
-			},
 			{
 				-- player will get leaves only if he get no saplings,
 				-- this is because max_items is 1
@@ -494,11 +471,6 @@ minetest.register_node("default:jungleleaves", {
 		max_items = 1,
 		items = {
 			{
-				-- player will get sapling with 1/20 chance
-				items = {'default:junglesapling'},
-				rarity = 20,
-			},
-			{
 				-- player will get leaves only if he get no saplings,
 				-- this is because max_items is 1
 				items = {'default:jungleleaves'},
@@ -509,25 +481,6 @@ minetest.register_node("default:jungleleaves", {
 
 	after_place_node = default.after_place_leaves,
 })
-
-minetest.register_node("default:junglesapling", {
-	description = "Jungle Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"default_junglesapling.png"},
-	inventory_image = "default_junglesapling.png",
-	wield_image = "default_junglesapling.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
-	},
-	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
-	sounds = default.node_sound_leaves_defaults(),
-})
-
 
 
 minetest.register_node("default:pinetree", {
@@ -562,11 +515,6 @@ minetest.register_node("default:pine_needles",{
 		max_items = 1,
 		items = {
 			{
-				-- player will get sapling with 1/20 chance
-				items = {"default:pine_sapling"},
-				rarity = 20,
-			},
-			{
 				-- player will get leaves only if he get no saplings,
 				-- this is because max_items is 1
 				items = {"default:pine_needles"},
@@ -576,23 +524,6 @@ minetest.register_node("default:pine_needles",{
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
-})
-
-minetest.register_node("default:pine_sapling", {
-	description = "Pine Sapling",
-	drawtype = "plantlike",
-	visual_scale = 1.0,
-	tiles = {"default_pine_sapling.png"},
-	inventory_image = "default_pine_sapling.png",
-	wield_image = "default_pine_sapling.png",
-	paramtype = "light",
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.3, -0.5, -0.3, 0.3, 0.35, 0.3}
-	},
-	groups = {snappy=2,dig_immediate=3,flammable=2,attached_node=1,sapling=1},
-	sounds = default.node_sound_leaves_defaults(),
 })
 
 --
