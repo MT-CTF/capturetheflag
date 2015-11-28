@@ -27,7 +27,7 @@
 "hud"   true
 "match"   true
 "match.break_alliances"   true
-"match.build_time"   60
+"match.build_time"   120
 "match.clear_inv"   true
 "match.destroy_team"   true
 "match.map_reset_limit"   200
