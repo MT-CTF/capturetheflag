@@ -1,3 +1,7 @@
+ctf.register_on_init(function()
+	ctf._set("inventory",             false)
+end)
+
 local fs = "size[8,8.5]" ..
 	"bgcolor[#080808BB;true]" ..
 	"background[5,5;1,1;gui_formbg.png;true]" ..
@@ -39,5 +43,7 @@ fs = fs ..
 	"image[7,4.25;1,1;gui_hb_bg.png]"
 
 minetest.register_on_joinplayer(function(player)
-	player:set_inventory_formspec(fs)
+	if ctf.setting("inventory") then
+		player:set_inventory_formspec(fs)
+	end
 end)
