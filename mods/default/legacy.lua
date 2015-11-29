@@ -18,7 +18,6 @@ end
 -- Liquids
 WATER_ALPHA = minetest.registered_nodes["default:water_source"].alpha
 WATER_VISC = minetest.registered_nodes["default:water_source"].liquid_viscosity
-LAVA_VISC = minetest.registered_nodes["default:lava_source"].liquid_viscosity
 LIGHT_MAX = default.LIGHT_MAX
 
 -- Formspecs

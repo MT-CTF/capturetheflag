@@ -965,7 +965,7 @@ minetest.register_node("default:river_water_flowing", {
 
 
 
-minetest.register_node("default:lava_source", {
+--[[minetest.register_node("default:lava_source", {
 	description = "Lava Source",
 	inventory_image = minetest.inventorycube("default_lava.png"),
 	drawtype = "liquid",
@@ -1057,7 +1057,7 @@ minetest.register_node("default:lava_flowing", {
 	damage_per_second = 4 * 2,
 	post_effect_color = {a=192, r=255, g=64, b=0},
 	groups = {lava=3, liquid=2, hot=3, igniter=1, not_in_creative_inventory=1},
-})
+})]]
 
 --
 -- Tools / "Advanced" crafting / Non-"natural"
