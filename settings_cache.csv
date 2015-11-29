@@ -25,6 +25,7 @@
 "gui.team.teleport_to_flag"   false
 "gui.team.teleport_to_spawn"   false
 "hud"   true
+"inventory"   false
 "match"   true
 "match.break_alliances"   true
 "match.build_time"   120
