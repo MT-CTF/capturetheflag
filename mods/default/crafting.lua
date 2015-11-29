@@ -333,15 +333,6 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = 'default:furnace',
-	recipe = {
-		{'group:stone', 'group:stone', 'group:stone'},
-		{'group:stone', '', 'group:stone'},
-		{'group:stone', 'group:stone', 'group:stone'},
-	}
-})
-
-minetest.register_craft({
 	type = "shapeless",
 	output = "default:bronze_ingot",
 	recipe = {"default:steel_ingot", "default:copper_ingot"},

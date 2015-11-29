@@ -14,6 +14,14 @@ function ctf_match.register_on_new_match(func)
 	table.insert(ctf_match.registered_on_new_match, func)
 end
 
+ctf_match.registered_on_winner = {}
+function ctf_match.register_on_winner(func)
+	if ctf._mt_loaded then
+		error("You can't register callbacks at game time!")
+	end
+	table.insert(ctf_match.registered_on_winner, func)
+end
+
 
 -- Load next match. May be overrided
 function ctf_match.next()
@@ -38,6 +46,9 @@ function ctf_match.check_for_winner()
 	-- There is a winner!
 	ctf.action("match", winner .. " won!")
 	minetest.chat_send_all("Team " .. winner .. " won!")
+	for i = 1, #ctf_match.registered_on_winner do
+		ctf_match.registered_on_winner[i](winner)
+	end
 	if ctf.setting("match") then
 		ctf_match.next()
 	end
