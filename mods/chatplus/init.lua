@@ -316,8 +316,7 @@ minetest.register_chatcommand("mail", {
 
 		minetest.log("To: "..to..", From: "..name..", MSG: "..msg)
 		if chatplus.log_handle ~= nil then
-			chatplus.log_handle:write(os.date("%d/%m/%Y %I:%M%p").." To: "..to..", From: "..name..", MSG: "..msg)
-			chatplus.log_handle:flush()
+			chatplus.log("To: "..to..", From: "..name..", MSG: "..msg)
 		end
 		if chatplus.players[to] then
 			table.insert(chatplus.players[to].inbox,os.date("%d/%m").." <"..name..">: "..msg)
