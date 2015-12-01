@@ -33,7 +33,7 @@
 "match.destroy_team"   true
 "match.map_reset_limit"   200
 "match.remove_player_on_leave"   true
-"match.teams"   "red, red, 15, 7, 39; blue, blue, -9, 9, -43"
+"match.teams"   "red, red, -64, 16, 85; blue, blue, 23, 14, -77"
 "maximum_in_team"   -1
 "node_ownership"   false
 "players_can_change_team"   false
