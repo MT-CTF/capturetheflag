@@ -69,7 +69,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					{name = "ctf_barrier:ind_stone"})
 
 				-- Check for trees
-				for y = flag.y, flag.y + 2 do
+				for y = flag.y, flag.y + 3 do
 					for x = flag.x - 3, flag.x + 3 do
 						for z = flag.z - 3, flag.z + 3 do
 							local pos = {x=x, y=y, z=z}
