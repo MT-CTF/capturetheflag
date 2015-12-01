@@ -122,8 +122,6 @@ default:fence_wood
 default:glass
 default:obsidian_glass
 
-default:rail
-
 default:brick
 
 default:meselamp
@@ -131,8 +129,6 @@ default:meselamp
 Misc
 ----
 default:cloud
-default:nyancat
-default:nyancat_rainbow
 
 --]]
 
@@ -302,18 +298,6 @@ minetest.register_node("default:gravel", {
 		dug = {name="default_gravel_footstep", gain=1.0},
 	}),
 })
-
-
-
-minetest.register_node("default:clay", {
-	description = "Clay",
-	tiles = {"default_clay.png"},
-	groups = {crumbly=3},
-	drop = 'default:clay_lump 4',
-	sounds = default.node_sound_dirt_defaults(),
-})
-
-
 
 minetest.register_node("default:snow", {
 	description = "Snow",
@@ -963,102 +947,6 @@ minetest.register_node("default:river_water_flowing", {
 	groups = {water=3, liquid=3, puts_out_fire=1, not_in_creative_inventory=1},
 })
 
-
-
---[[minetest.register_node("default:lava_source", {
-	description = "Lava Source",
-	inventory_image = minetest.inventorycube("default_lava.png"),
-	drawtype = "liquid",
-	tiles = {
-		{
-			name = "default_lava_source_animated.png",
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.0,
-			},
-		},
-	},
-	special_tiles = {
-		-- New-style lava source material (mostly unused)
-		{
-			name = "default_lava_source_animated.png",
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.0,
-			},
-			backface_culling = false,
-		},
-	},
-	paramtype = "light",
-	light_source = default.LIGHT_MAX - 1,
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true,
-	is_ground_content = false,
-	drop = "",
-	drowning = 1,
-	liquidtype = "source",
-	liquid_alternative_flowing = "default:lava_flowing",
-	liquid_alternative_source = "default:lava_source",
-	liquid_viscosity = 7,
-	liquid_renewable = false,
-	damage_per_second = 4 * 2,
-	post_effect_color = {a=192, r=255, g=64, b=0},
-	groups = {lava=3, liquid=2, hot=3, igniter=1},
-})
-
-minetest.register_node("default:lava_flowing", {
-	description = "Flowing Lava",
-	inventory_image = minetest.inventorycube("default_lava.png"),
-	drawtype = "flowingliquid",
-	tiles = {"default_lava.png"},
-	special_tiles = {
-		{
-			name = "default_lava_flowing_animated.png",
-			backface_culling = false,
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.3,
-			},
-		},
-		{
-			name = "default_lava_flowing_animated.png",
-			backface_culling = true,
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.3,
-			},
-		},
-	},
-	paramtype = "light",
-	paramtype2 = "flowingliquid",
-	light_source = default.LIGHT_MAX - 1,
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true,
-	is_ground_content = false,
-	drop = "",
-	drowning = 1,
-	liquidtype = "flowing",
-	liquid_alternative_flowing = "default:lava_flowing",
-	liquid_alternative_source = "default:lava_source",
-	liquid_viscosity = 7,
-	liquid_renewable = false,
-	damage_per_second = 4 * 2,
-	post_effect_color = {a=192, r=255, g=64, b=0},
-	groups = {lava=3, liquid=2, hot=3, igniter=1, not_in_creative_inventory=1},
-})]]
-
 --
 -- Tools / "Advanced" crafting / Non-"natural"
 --
@@ -1112,81 +1000,6 @@ minetest.register_node("default:torch", {
 	groups = {choppy=2,dig_immediate=3,flammable=1,attached_node=1},
 	legacy_wallmounted = true,
 	sounds = default.node_sound_defaults(),
-})
-
-
-local bookshelf_formspec =
-	"size[8,7;]"..
-	default.gui_bg..
-	default.gui_bg_img..
-	default.gui_slots..
-	"list[context;books;0,0.3;8,2;]"..
-	"list[current_player;main;0,2.85;8,1;]"..
-	"list[current_player;main;0,4.08;8,3;8]"..
-	"listring[context;books]"..
-	"listring[current_player;main]"..
-	default.get_hotbar_bg(0,2.85)
-
-minetest.register_node("default:bookshelf", {
-	description = "Bookshelf",
-	tiles = {"default_wood.png", "default_wood.png", "default_bookshelf.png"},
-	is_ground_content = false,
-	groups = {choppy=3,oddly_breakable_by_hand=2,flammable=3},
-	sounds = default.node_sound_wood_defaults(),
-
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_string("formspec", bookshelf_formspec)
-		local inv = meta:get_inventory()
-		inv:set_size("books", 8*2)
-	end,
-	can_dig = function(pos,player)
-		local meta = minetest.get_meta(pos);
-		local inv = meta:get_inventory()
-		return inv:is_empty("books")
-	end,
-
-	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		local to_stack = inv:get_stack(listname, index)
-		if listname == "books" then
-			if minetest.get_item_group(stack:get_name(), "book") ~= 0
-					and to_stack:is_empty() then
-				return 1
-			else
-				return 0
-			end
-		end
-	end,
-
-	allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		local stack = inv:get_stack(from_list, from_index)
-		local to_stack = inv:get_stack(to_list, to_index)
-		if to_list == "books" then
-			if minetest.get_item_group(stack:get_name(), "book") ~= 0
-					and to_stack:is_empty() then
-				return 1
-			else
-				return 0
-			end
-		end
-	end,
-
-	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name()..
-			   " moves stuff in bookshelf at "..minetest.pos_to_string(pos))
-	end,
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name()..
-			   " moves stuff to bookshelf at "..minetest.pos_to_string(pos))
-	end,
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name()..
-			   " takes stuff from bookshelf at "..minetest.pos_to_string(pos))
-	end,
 })
 
 minetest.register_node("default:ladder", {
@@ -1255,37 +1068,6 @@ minetest.register_node("default:obsidian_glass", {
 	groups = {cracky=3,oddly_breakable_by_hand=3},
 })
 
-
-
-minetest.register_node("default:rail", {
-	description = "Rail",
-	drawtype = "raillike",
-	tiles = {"default_rail.png", "default_rail_curved.png", "default_rail_t_junction.png", "default_rail_crossing.png"},
-	inventory_image = "default_rail.png",
-	wield_image = "default_rail.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	is_ground_content = false,
-	selection_box = {
-		type = "fixed",
-                -- but how to specify the dimensions for curved and sideways rails?
-                fixed = {-1/2, -1/2, -1/2, 1/2, -1/2+1/16, 1/2},
-	},
-	groups = {bendy=2,dig_immediate=2,attached_node=1,connect_to_raillike=minetest.raillike_group("rail")},
-})
-
-
-
-minetest.register_node("default:brick", {
-	description = "Brick Block",
-	tiles = {"default_brick.png"},
-	is_ground_content = false,
-	groups = {cracky=3},
-	sounds = default.node_sound_stone_defaults(),
-})
-
-
 minetest.register_node("default:meselamp", {
 	description = "Mese Lamp",
 	drawtype = "glasslike",
@@ -1308,27 +1090,4 @@ minetest.register_node("default:cloud", {
 	is_ground_content = false,
 	sounds = default.node_sound_defaults(),
 	groups = {not_in_creative_inventory=1},
-})
-
-minetest.register_node("default:nyancat", {
-	description = "Nyan Cat",
-	tiles = {"default_nc_side.png", "default_nc_side.png", "default_nc_side.png",
-		"default_nc_side.png", "default_nc_back.png", "default_nc_front.png"},
-	paramtype2 = "facedir",
-	groups = {cracky=2},
-	is_ground_content = false,
-	legacy_facedir_simple = true,
-	sounds = default.node_sound_defaults(),
-})
-
-minetest.register_node("default:nyancat_rainbow", {
-	description = "Nyan Cat Rainbow",
-	tiles = {
-		"default_nc_rb.png^[transformR90", "default_nc_rb.png^[transformR90",
-		"default_nc_rb.png", "default_nc_rb.png"
-	},
-	paramtype2 = "facedir",
-	groups = {cracky=2},
-	is_ground_content = false,
-	sounds = default.node_sound_defaults(),
 })

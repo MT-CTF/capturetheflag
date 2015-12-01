@@ -39,8 +39,8 @@ minetest.register_alias("locked_chest", "default:chest_locked")
 minetest.register_alias("cobble", "default:cobble")
 minetest.register_alias("mossycobble", "default:mossycobble")
 minetest.register_alias("steelblock", "default:steelblock")
-minetest.register_alias("nyancat", "default:nyancat")
-minetest.register_alias("nyancat_rainbow", "default:nyancat_rainbow")
+minetest.register_alias("nyancat", "air")
+minetest.register_alias("nyancat_rainbow", "air")
 minetest.register_alias("apple", "default:apple")
 
 minetest.register_alias("WPick", "default:pick_wood")
@@ -66,6 +66,3 @@ minetest.register_alias("lump_of_clay", "default:clay_lump")
 minetest.register_alias("steel_ingot", "default:steel_ingot")
 minetest.register_alias("clay_brick", "default:clay_brick")
 minetest.register_alias("snow", "default:snow")
-
--- Mese now comes in the form of blocks, ore, crystal and fragments
-minetest.register_alias("default:mese", "default:mese_block")

@@ -37,15 +37,6 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = 'default:sign_wall',
-	recipe = {
-		{'group:wood', 'group:wood', 'group:wood'},
-		{'group:wood', 'group:wood', 'group:wood'},
-		{'', 'group:stick', ''},
-	}
-})
-
-minetest.register_craft({
 	output = 'default:torch 4',
 	recipe = {
 		{'default:coal_lump'},
@@ -324,15 +315,6 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = 'default:rail 24',
-	recipe = {
-		{'default:steel_ingot', '', 'default:steel_ingot'},
-		{'default:steel_ingot', 'group:stick', 'default:steel_ingot'},
-		{'default:steel_ingot', '', 'default:steel_ingot'},
-	}
-})
-
-minetest.register_craft({
 	type = "shapeless",
 	output = "default:bronze_ingot",
 	recipe = {"default:steel_ingot", "default:copper_ingot"},
@@ -454,54 +436,6 @@ minetest.register_craft({
 	recipe = {
 		{'default:sandstone', 'default:sandstone'},
 		{'default:sandstone', 'default:sandstone'},
-	}
-})
-
-minetest.register_craft({
-	output = 'default:clay',
-	recipe = {
-		{'default:clay_lump', 'default:clay_lump'},
-		{'default:clay_lump', 'default:clay_lump'},
-	}
-})
-
-minetest.register_craft({
-	output = 'default:brick',
-	recipe = {
-		{'default:clay_brick', 'default:clay_brick'},
-		{'default:clay_brick', 'default:clay_brick'},
-	}
-})
-
-minetest.register_craft({
-	output = 'default:clay_brick 4',
-	recipe = {
-		{'default:brick'},
-	}
-})
-
-minetest.register_craft({
-	output = 'default:paper',
-	recipe = {
-		{'default:papyrus', 'default:papyrus', 'default:papyrus'},
-	}
-})
-
-minetest.register_craft({
-	output = 'default:book',
-	recipe = {
-		{'default:paper'},
-		{'default:paper'},
-		{'default:paper'},
-	}
-})
-
-minetest.register_craft({
-	output = 'default:bookshelf',
-	recipe = {
-		{'group:wood', 'group:wood', 'group:wood'},
-		{'default:book', 'default:book', 'default:book'},
-		{'group:wood', 'group:wood', 'group:wood'},
 	}
 })
 
@@ -661,11 +595,6 @@ minetest.register_craft({
 	recipe = "default:gold_lump",
 })
 
-minetest.register_craft({
-	type = "cooking",
-	output = "default:clay_brick",
-	recipe = "default:clay_lump",
-})
 
 --
 -- Fuels
@@ -703,12 +632,6 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "fuel",
-	recipe = "default:bookshelf",
-	burntime = 30,
-})
-
-minetest.register_craft({
-	type = "fuel",
 	recipe = "default:fence_wood",
 	burntime = 15,
 })
@@ -735,36 +658,6 @@ minetest.register_craft({
 	type = "fuel",
 	recipe = "default:torch",
 	burntime = 4,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:sign_wall",
-	burntime = 10,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:chest",
-	burntime = 30,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:chest_locked",
-	burntime = 30,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:nyancat",
-	burntime = 1,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:nyancat_rainbow",
-	burntime = 1,
 })
 
 minetest.register_craft({
