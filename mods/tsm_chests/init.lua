@@ -7,7 +7,7 @@
 	This is also called “spawning treasures”.
 	How it does this task is completely free to the programmer of the TSM.
 
-	This TSM spawns the treasures by placing chests (default:chest) between 20 and 200 node lengths below the water surface. This cau
+	This TSM spawns the treasures by placing chests (tsm_chests:chest) between 20 and 200 node lengths below the water surface. This cau
 	The chests are provided by the default mod, therefore this TSM depends on the default mod.
 	The treasures are requested from the treasurer mod. The TSM asks the treasurer mod for some treasures.
 
@@ -28,30 +28,7 @@ local chest_formspec =
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
 
-local function get_locked_chest_formspec(pos)
-	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
-	local formspec =
-		"size[8,9]" ..
-		default.gui_bg ..
-		default.gui_bg_img ..
-		default.gui_slots ..
-		"list[nodemeta:" .. spos .. ";main;0,0.3;8,4;]" ..
-		"list[current_player;main;0,4.85;8,1;]" ..
-		"list[current_player;main;0,6.08;8,3;8]" ..
-		"listring[nodemeta:" .. spos .. ";main]" ..
-		"listring[current_player;main]" ..
-		default.get_hotbar_bg(0,4.85)
- return formspec
-end
-
-local function has_locked_chest_privilege(meta, player)
-	if player:get_player_name() ~= meta:get_string("owner") then
-		return false
-	end
-	return true
-end
-
-minetest.register_node(":default:chest", {
+minetest.register_node("tsm_chests:chest", {
 	description = "Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
@@ -104,10 +81,10 @@ minetest.register_node(":default:chest", {
 --[[ here are some configuration variables ]]
 
 local chests_per_chunk = 5	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
-local h_min = 0  		-- minimum chest spawning height, relative to water_level
+local h_min = -1  		-- minimum chest spawning height, relative to water_level
 local h_max = 15		-- maximum chest spawning height, relative to water_level
 local t_min = 3			-- minimum amount of treasures found in a chest
-local t_max = 7			-- maximum amount of treasures found in a chest
+local t_max = 6			-- maximum amount of treasures found in a chest
 
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
@@ -165,7 +142,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				-->>>> chest spawning starts here <<<<--
 
 				-- first: spawn the chest
-				local chest = {name = "default:chest"}
+				local chest = {name = "tsm_chests:chest"}
 
 				-- secondly: rotate the chest
 				-- find possible faces
