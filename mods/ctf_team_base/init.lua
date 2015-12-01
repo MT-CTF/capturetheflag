@@ -59,12 +59,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					minp.y <= flag.y and maxp.y >= flag.y and
 					minp.z <= flag.z and maxp.z >= flag.z then
 				-- Spawn ind base
-				--for x = flag.x - 2, flag.x + 2 do
-				--	for z = flag.z - 2, flag.z + 2 do
+				for x = flag.x - 2, flag.x + 2 do
+					for z = flag.z - 2, flag.z + 2 do
+						minetest.set_node({ x = x, y = flag.y - 1, z = z},
+							{name = "default:stone"})
+					end
+				end
 				minetest.set_node({ x = flag.x, y = flag.y - 1, z = flag.z},
 					{name = "ctf_barrier:ind_stone"})
-				--	end
-				--end
 
 				-- Check for trees
 				for y = flag.y, flag.y + 2 do
@@ -92,8 +94,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				}
 				minetest.set_node(pos, chest)
 				local inv = minetest.get_inventory({type = "node", pos=pos})
-				inv:add_item("main", ItemStack("default:stone 99"))
-				inv:add_item("main", ItemStack("default:stone 99"))
+				inv:add_item("main", ItemStack("default:cobble 99"))
+				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:glass 10"))
 				inv:add_item("main", ItemStack("default:torch 10"))
 			end
