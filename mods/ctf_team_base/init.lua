@@ -62,7 +62,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				for x = flag.x - 2, flag.x + 2 do
 					for z = flag.z - 2, flag.z + 2 do
 						minetest.set_node({ x = x, y = flag.y - 1, z = z},
-							{name = "default:stone"})
+							{name = "default:cobble"})
 					end
 				end
 				minetest.set_node({ x = flag.x, y = flag.y - 1, z = flag.z},
