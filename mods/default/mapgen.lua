@@ -45,25 +45,6 @@ minetest.register_alias("mapgen_stair_sandstonebrick", "stairs:stair_sandstonebr
 function default.register_ores()
 	minetest.register_ore({
 		ore_type         = "blob",
-		ore              = "default:clay",
-		wherein          = {"default:sand"},
-		clust_scarcity   = 24 * 24 * 24,
-		clust_size       = 7,
-		y_min            = -15,
-		y_max            = 0,
-		noise_threshhold = 0,
-		noise_params     = {
-			offset = 0.35,
-			scale = 0.2,
-			spread = {x = 5, y = 5, z = 5},
-			seed = -316,
-			octaves = 1,
-			persist = 0.5
-		},
-	})
-
-	minetest.register_ore({
-		ore_type         = "blob",
 		ore              = "default:sand",
 		wherein          = {"default:stone"},
 		clust_scarcity   = 24 * 24 * 24,
