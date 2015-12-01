@@ -22,7 +22,7 @@ for _, color in pairs(colors) do
 			"default_chest_side_" .. color .. ".png",
 			"default_chest_front_" .. color .. ".png"},
 		paramtype2 = "facedir",
-		groups = {choppy = 2, oddly_breakable_by_hand = 2},
+		groups = {immortal = 1},
 		legacy_facedir_simple = true,
 		is_ground_content = false,
 		sounds = default.node_sound_wood_defaults(),
@@ -59,12 +59,12 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					minp.y <= flag.y and maxp.y >= flag.y and
 					minp.z <= flag.z and maxp.z >= flag.z then
 				-- Spawn ind base
-				for x = flag.x - 2, flag.x + 2 do
-					for z = flag.z - 2, flag.z + 2 do
-						minetest.set_node({ x = x, y = flag.y - 1, z = z},
-							{name = "ctf_barrier:ind_stone"})
-					end
-				end
+				--for x = flag.x - 2, flag.x + 2 do
+				--	for z = flag.z - 2, flag.z + 2 do
+				minetest.set_node({ x = flag.x, y = flag.y - 1, z = flag.z},
+					{name = "ctf_barrier:ind_stone"})
+				--	end
+				--end
 
 				-- Check for trees
 				for y = flag.y, flag.y + 2 do
