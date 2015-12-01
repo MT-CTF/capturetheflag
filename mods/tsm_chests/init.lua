@@ -39,11 +39,9 @@ minetest.register_node("tsm_chests:chest", {
 	sounds = default.node_sound_wood_defaults(),
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
-			minetest.chat_send_player(player:get_player_name(), "You're not allowed to put things in chests!")
+			minetest.chat_send_player(player:get_player_name(),
+				"You're not allowed to put things in treasure chests!")
 			return 0
-		else
-			--minetest.chat_send_all("Error! Non player putting things in chests")
-			return -1
 		end
 	end,
 	on_construct = function(pos)

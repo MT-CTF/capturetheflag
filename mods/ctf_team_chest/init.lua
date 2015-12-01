@@ -10,40 +10,47 @@ local chest_formspec =
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
 
-minetest.register_node("ctf_team_chest:chest", {
-	description = "Chest",
-	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
-		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
-	paramtype2 = "facedir",
-	groups = {choppy = 2, oddly_breakable_by_hand = 2},
-	legacy_facedir_simple = true,
-	is_ground_content = false,
-	sounds = default.node_sound_wood_defaults(),
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_string("formspec", chest_formspec)
-		meta:set_string("infotext", "Chest")
-		local inv = meta:get_inventory()
-		inv:set_size("main", 8*4)
-	end,
-	can_dig = function(pos,player)
-		return false
-	end,
-	on_metadata_inventory_move = function(pos, from_list, from_index,
-			to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff in chest at " .. minetest.pos_to_string(pos))
-	end,
-    on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff to chest at " .. minetest.pos_to_string(pos))
-	end,
-    on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" takes stuff from chest at " .. minetest.pos_to_string(pos))
-	end
-})
-
+local colors = {"red", "blue"}
+for _, color in pairs(colors) do
+	minetest.register_node("ctf_team_chest:chest_" .. color, {
+		description = "Chest",
+		tiles = {
+			"default_chest_top_" .. color .. ".png",
+			"default_chest_top_" .. color .. ".png",
+			"default_chest_side_" .. color .. ".png",
+			"default_chest_side_" .. color .. ".png",
+			"default_chest_side_" .. color .. ".png",
+			"default_chest_front_" .. color .. ".png"},
+		paramtype2 = "facedir",
+		groups = {choppy = 2, oddly_breakable_by_hand = 2},
+		legacy_facedir_simple = true,
+		is_ground_content = false,
+		sounds = default.node_sound_wood_defaults(),
+		on_construct = function(pos)
+			local meta = minetest.get_meta(pos)
+			meta:set_string("formspec", chest_formspec)
+			meta:set_string("infotext", "Chest")
+			local inv = meta:get_inventory()
+			inv:set_size("main", 8*4)
+		end,
+		can_dig = function(pos,player)
+			return false
+		end,
+		on_metadata_inventory_move = function(pos, from_list, from_index,
+				to_list, to_index, count, player)
+			minetest.log("action", player:get_player_name() ..
+				" moves stuff in chest at " .. minetest.pos_to_string(pos))
+		end,
+	    on_metadata_inventory_put = function(pos, listname, index, stack, player)
+			minetest.log("action", player:get_player_name() ..
+				" moves stuff to chest at " .. minetest.pos_to_string(pos))
+		end,
+	    on_metadata_inventory_take = function(pos, listname, index, stack, player)
+			minetest.log("action", player:get_player_name() ..
+				" takes stuff from chest at " .. minetest.pos_to_string(pos))
+		end
+	})
+end
 
 minetest.register_on_generated(function(minp, maxp, seed)
 	for tname, team in pairs(ctf.teams) do
@@ -52,7 +59,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					minp.y <= flag.y and maxp.y >= flag.y and
 					minp.z <= flag.z and maxp.z >= flag.z then
 
-				local chest = {name = "ctf_team_chest:chest"}
+				local chest = {name = "ctf_team_chest:chest_" .. team.data.color}
 				local dz = 2
 				if flag.z < 0 then
 					dz = -2
