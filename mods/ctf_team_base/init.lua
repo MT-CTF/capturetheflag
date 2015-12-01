@@ -12,7 +12,7 @@ local chest_formspec =
 
 local colors = {"red", "blue"}
 for _, color in pairs(colors) do
-	minetest.register_node("ctf_team_chest:chest_" .. color, {
+	minetest.register_node("ctf_team_base:chest_" .. color, {
 		description = "Chest",
 		tiles = {
 			"default_chest_top_" .. color .. ".png",
@@ -58,8 +58,28 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			if minp.x <= flag.x and maxp.x >= flag.x and
 					minp.y <= flag.y and maxp.y >= flag.y and
 					minp.z <= flag.z and maxp.z >= flag.z then
+				-- Spawn ind base
+				for x = flag.x - 2, flag.x + 2 do
+					for z = flag.z - 2, flag.z + 2 do
+						minetest.set_node({ x = x, y = flag.y - 1, z = z},
+							{name = "ctf_barrier:ind_stone"})
+					end
+				end
 
-				local chest = {name = "ctf_team_chest:chest_" .. team.data.color}
+				-- Check for trees
+				for y = flag.y, flag.y + 2 do
+					for x = flag.x - 3, flag.x + 3 do
+						for z = flag.z - 3, flag.z + 3 do
+							local pos = {x=x, y=y, z=z}
+							if minetest.get_node(pos).name == "default:tree" then
+								minetest.set_node(pos, {name="air"})
+							end
+						end
+					end
+				end
+
+				-- Spawn chest
+				local chest = {name = "ctf_team_base:chest_" .. team.data.color}
 				local dz = 2
 				if flag.z < 0 then
 					dz = -2
@@ -70,10 +90,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					y = flag.y,
 					z = flag.z + dz
 				}
-
 				minetest.set_node(pos, chest)
-				print("Flag " .. dump(flag))
-
 				local inv = minetest.get_inventory({type = "node", pos=pos})
 				inv:add_item("main", ItemStack("default:stone 99"))
 				inv:add_item("main", ItemStack("default:stone 99"))

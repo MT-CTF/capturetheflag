@@ -13,6 +13,13 @@ minetest.register_node("ctf_barrier:ind_glass", {
 	sounds = default.node_sound_glass_defaults()
 })
 
+minetest.register_node("ctf_barrier:ind_stone", {
+	description = "Cheater!",
+	groups = {immortal = 1},
+	tiles = {"default_stone.png"},
+	is_ground_content = false
+})
+
 minetest.register_node("ctf_barrier:ind_glass_red", {
 	description = "You cheater you!",
 	drawtype = "glasslike",
@@ -30,14 +37,13 @@ minetest.register_node("ctf_barrier:ind_glass_red", {
 	sounds = default.node_sound_glass_defaults()
 })
 
-local lim = ctf.setting("match.map_reset_limit")
-local c_glass  = minetest.get_content_id("ctf_barrier:ind_glass")
+local c_stone      = minetest.get_content_id("ctf_barrier:ind_stone")
+local c_glass      = minetest.get_content_id("ctf_barrier:ind_glass")
 local c_glass_red  = minetest.get_content_id("ctf_barrier:ind_glass_red")
-local c_water  = minetest.get_content_id("default:water_source")
-local c_water_f  = minetest.get_content_id("default:water_flowing")
-local c_stone  = minetest.get_content_id("ctf_flag:ind_base")
-local c_air  = minetest.get_content_id("air")
-local r = tonumber(minetest.setting_get("barrier"))
+local c_water      = minetest.get_content_id("default:water_source")
+local c_water_f    = minetest.get_content_id("default:water_flowing")
+local c_air        = minetest.get_content_id("air")
+local r            = tonumber(minetest.setting_get("barrier"))
 minetest.register_on_generated(function(minp, maxp, seed)
 	if not ((minp.x <= -r and maxp.x >= -r)
 			or (minp.x <= r and maxp.x >= r)
