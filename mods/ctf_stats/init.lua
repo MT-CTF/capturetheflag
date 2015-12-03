@@ -47,10 +47,12 @@ function ctf_stats.player(name)
 	local player = ctf_stats.players[name]
 	if not player then
 		player = {
+			name = name,
 			red_wins = 0,
 			blue_wins = 0,
 			kills = 0,
 			deaths = 0,
+			captures = 0,
 			attempts = 0
 		}
 		ctf_stats.players[name] = player
@@ -72,18 +74,21 @@ ctf.register_on_join_team(function(name, tname)
 end)
 
 ctf_match.register_on_skip_map(function()
+	ctf.needs_save = true
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 end)
 
 ctf_flag.register_on_capture(function(name, flag)
-	local tname = ctf.player(name).team
-	if ctf_stats.current[tname] and ctf_stats.current[tname][name] then
-		ctf_stats.current[tname][name].captures =
-			ctf_stats.current[tname][name].captures + 1
+	local main, match = ctf_stats.player(name)
+	if main and match then
+		main.captures = main.captures + 1
+		match.captures = match.captures + 1
+		ctf.needs_save = true
 	end
 end)
 
 ctf_match.register_on_winner(function(winner)
+	ctf.needs_save = true
 	ctf_stats.matches[winner .. "_wins"] = ctf_stats.matches[winner .. "_wins"] + 1
 end)
 
@@ -98,6 +103,7 @@ ctf_match.register_on_new_match(function()
 		red = {},
 		blue = {}
 	}
+	ctf.needs_save = true
 end)
 
 ctf_flag.register_on_pick_up(function(name, flag)
@@ -105,6 +111,7 @@ ctf_flag.register_on_pick_up(function(name, flag)
 	if main and match then
 		main.attempts = main.attempts + 1
 		match.attempts = match.attempts + 1
+		ctf.needs_save = true
 	end
 end)
 
@@ -113,6 +120,7 @@ ctf_flag.register_on_precapture(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main then
 		main[tplayer.team .. "_wins"] = main[tplayer.team .. "_wins"] + 1
+		ctf.needs_save = true
 	end
 	return true
 end)
@@ -122,6 +130,7 @@ minetest.register_on_dieplayer(function(player)
 	if main and match then
 		main.deaths = main.deaths + 1
 		match.deaths = match.deaths + 1
+		ctf.needs_save = true
 	end
 end)
 
