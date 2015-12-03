@@ -34,6 +34,7 @@ function ctf_match.next()
 end
 
 -- Check for winner
+local game_won = false
 function ctf_match.check_for_winner()
 	local winner
 	for name, team in pairs(ctf.teams) do
@@ -44,13 +45,19 @@ function ctf_match.check_for_winner()
 	end
 
 	-- There is a winner!
-	ctf.action("match", winner .. " won!")
-	minetest.chat_send_all("Team " .. winner .. " won!")
-	for i = 1, #ctf_match.registered_on_winner do
-		ctf_match.registered_on_winner[i](winner)
-	end
-	if ctf.setting("match") then
-		ctf_match.next()
+	if not game_won then
+		game_won = true
+		ctf.action("match", winner .. " won!")
+		minetest.chat_send_all("Team " .. winner .. " won!")
+		for i = 1, #ctf_match.registered_on_winner do
+			ctf_match.registered_on_winner[i](winner)
+		end
+		minetest.after(2, function()
+			game_won = false
+			if ctf.setting("match") then
+				ctf_match.next()
+			end
+		end)
 	end
 end
 
