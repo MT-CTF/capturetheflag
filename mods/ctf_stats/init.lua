@@ -66,7 +66,8 @@ ctf.register_on_join_team(function(name, tname)
 	ctf_stats.current[tname][name] = {
 		kills = 0,
 		deaths = 0,
-		attempts = 0
+		attempts = 0,
+		captures = 0
 	}
 end)
 
@@ -74,12 +75,24 @@ ctf_match.register_on_skip_map(function()
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 end)
 
+ctf_flag.register_on_capture(function(name, flag)
+	local tname = ctf.player(name).team
+	if ctf_stats.current[tname] and ctf_stats.current[tname][name] then
+		ctf_stats.current[tname][name].captures =
+			ctf_stats.current[tname][name].captures + 1
+	end
+end)
+
 ctf_match.register_on_winner(function(winner)
 	ctf_stats.matches[winner .. "_wins"] = ctf_stats.matches[winner .. "_wins"] + 1
 end)
 
 ctf_match.register_on_new_match(function()
-	-- TODO: create and show match report
+	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current)
+	local players = minetest.get_connected_players()
+	for _, player in pairs(players) do
+		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
+	end
 
 	ctf_stats.current = {
 		red = {},
@@ -113,3 +126,5 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 ctf_stats.load()
+
+dofile(minetest.get_modpath("ctf_stats").."/gui.lua")
