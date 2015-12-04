@@ -16,7 +16,7 @@ function ctf_stats.get_formspec_match_summary(stats)
 end
 
 function ctf_stats.get_formspec(title, players)
-	for i = 1 in #players do
+	for i = 1, #players do
 		local pstat = players[i]
 		pstat.kills = pstat.kills or 0
 		pstat.deaths = pstat.deaths or 0
@@ -36,7 +36,7 @@ function ctf_stats.get_formspec(title, players)
 	ret = ret .. "table[0.5,0;8.25,6;scores;"
 	ret = ret .. "#ffffff,,username,kills,deaths,K/D ratio,captures,attempts,score"
 
-	for i = 1 in #players do
+	for i = 1, #players do
 		local pstat = players[i]
 		local color = pstat.color or "#ffffff"
 		ret = ret ..
