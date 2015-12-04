@@ -16,14 +16,17 @@ function ctf_stats.get_formspec_match_summary(stats)
 end
 
 function ctf_stats.get_formspec(title, players)
-	for i, pstat in pairs(players) do
-		pstat.score = pstat.captures + 0.2 * pstat.attempts + 7 * pstat.kills / (pstat.deaths + 1)
-		if i > 40 then
-			break
-		end
+	for i = 1 in #players do
+		local pstat = players[i]
+		pstat.kills = pstat.kills or 0
+		pstat.deaths = pstat.deaths or 0
+		pstat.captures = pstat.captures or 0
+		pstat.attempts = pstat.attempts or 0
+		pstat.score = pstat.kills + 10 * pstat.captures +
+				5 * pstat.attempts + pstat.kills / (pstat.deaths + 1)
 	end
 	table.sort(players, function(one, two)
-		return (one.score > two.score)
+		return one.score > two.score
 	end)
 
 	local ret = "size[9,6.5]"
@@ -33,7 +36,8 @@ function ctf_stats.get_formspec(title, players)
 	ret = ret .. "table[0.5,0;8.25,6;scores;"
 	ret = ret .. "#ffffff,,username,kills,deaths,K/D ratio,captures,attempts,score"
 
-	for i, pstat in pairs(players) do
+	for i = 1 in #players do
+		local pstat = players[i]
 		local color = pstat.color or "#ffffff"
 		ret = ret ..
 			"," .. string.gsub(color, "0x", "#") ..
