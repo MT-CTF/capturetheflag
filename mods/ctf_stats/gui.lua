@@ -23,7 +23,7 @@ function ctf_stats.get_formspec(title, players)
 		pstat.captures = pstat.captures or 0
 		pstat.attempts = pstat.attempts or 0
 		pstat.score = 0.1 * pstat.kills + 10 * pstat.captures +
-				5 * pstat.attempts + pstat.kills / (pstat.deaths + 1)
+				5 * pstat.attempts + 5 * pstat.kills / (pstat.deaths + 1)
 	end
 	table.sort(players, function(one, two)
 		return one.score > two.score
