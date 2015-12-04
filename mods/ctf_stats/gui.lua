@@ -29,11 +29,11 @@ function ctf_stats.get_formspec(title, players)
 		return one.score > two.score
 	end)
 
-	local ret = "size[9,6.5]"
+	local ret = "size[11,6.5]"
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
 	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text]"
 	ret = ret .. "tableoptions[highlight=#00000000]"
-	ret = ret .. "table[0.5,0;8.25,6;scores;"
+	ret = ret .. "table[0.5,0;10.25,6;scores;"
 	ret = ret .. "#ffffff,,username,kills,deaths,K/D ratio,captures,attempts,score"
 
 	for i = 1, #players do
