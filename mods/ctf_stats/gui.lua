@@ -65,6 +65,6 @@ minetest.register_chatcommand("rankings", {
 			table.insert(players, pstat)
 		end
 		local fs = ctf_stats.get_formspec("Player Rankings", players)
-		minetest.show_formspec(name, "a", fs)
+		minetest.show_formspec(name, "ctf_stats:rankings", fs)
 	end
 })
