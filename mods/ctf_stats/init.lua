@@ -125,6 +125,15 @@ ctf_flag.register_on_precapture(function(name, flag)
 	return true
 end)
 
+ctf.register_on_killedplayer(function(victim, killer)
+	local main, match = ctf_stats.player(killer)
+	if main and match then
+		main.kills = main.kills + 1
+		match.kills = match.kills + 1
+		ctf.needs_save = true
+	end
+end)
+
 minetest.register_on_dieplayer(function(player)
 	local main, match = ctf_stats.player(player:get_player_name())
 	if main and match then
