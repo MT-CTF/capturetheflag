@@ -83,7 +83,7 @@ minetest.register_globalstep(function(dtime)
 
 			--Lower the player's stamina by dtime if he/she is sprinting and set his/her state to 0 if stamina is zero
 			if playerInfo["sprinting"] == true then
-				playerInfo["stamina"] = playerInfo["stamina"] - dtime
+				playerInfo["stamina"] = playerInfo["stamina"] - dtime * 2
 				if playerInfo["stamina"] <= 0 then
 					playerInfo["stamina"] = 0
 					setSprinting(playerName, false)
