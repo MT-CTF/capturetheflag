@@ -48,7 +48,7 @@ function ctf_stats.get_formspec(title, players)
 			"," .. math.floor(pstat.kills / (pstat.deaths + 1)*10)/10 ..
 			"," .. pstat.captures ..
 			"," .. pstat.attempts ..
-			"," .. pstat.score
+			"," .. math.floor(pstat.score*10)/10
 		if i > 40 then
 			break
 		end
