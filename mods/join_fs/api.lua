@@ -50,7 +50,7 @@ end
 function join_fs.show_next_slide(player)
 	for _, def in pairs(join_fs.slides) do
 		local pids = join_fs.players[player:get_player_name()] or {}
-		if not pids[def.name] and def.should_show(player) then
+		if def.should_show(player, pids[def.name]) then
 			def.show(player)
 			break
 		end

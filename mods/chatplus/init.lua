@@ -94,13 +94,17 @@ function chatplus.clean_players()
 			(not value.inbox or #value.inbox==0) and
 			(not value.ignore or #value.ignore==0)
 		) then
-			minetest.log("Deleting blank player "..key)
 			value[key] = nil
 		end
 	end
 	chatplus.save()
-	minetest.log("[Chatplus] Clean complete")
 end
+
+function cp_tick()
+	chatplus.clean_players()
+	minetest.after(30*60, cp_tick)
+end
+minetest.after(30*60, cp_tick)
 
 function chatplus.poke(name,player)
 	local function check(name,value)
@@ -364,7 +368,7 @@ minetest.register_globalstep(function(dtime)
 						hud_elem_type = "text",
 						name = "MailText",
 						position = {x=0.55, y=0.52},
-						text=#value.inbox,
+						text=#value.inbox .. " /inbox",
 						scale = {x=1,y=1},
 						alignment = {x=0.5, y=0.5},
 					})

@@ -4,7 +4,7 @@ dofile(minetest.get_modpath("join_fs") .. "/api.lua")
 
 join_fs.register_slide({
 	name = "rules",
-	should_show = function(player)
+	should_show = function(player, has_been_shown_before)
 		return not minetest.check_player_privs(player:get_player_name(), {interact=true})
 	end,
 	show = function(player)
@@ -59,42 +59,6 @@ minetest.register_on_player_receive_fields(function(player, form, fields)
 		minetest.chat_send_player(name, "Welcome "..name.."! You have now permission to play!")
 
 		join_fs.confirm(name, "rules")
-		join_fs.show_next_slide(player)
-	end
-end)
-
-join_fs.register_slide({
-	name = "blood",
-	should_show = function(player)
-		return true
-	end,
-	show = function(player)
-		local fs = "size[8,1.75]label[0,0;Would you like to see blood splatters when using a gun?]"
-		fs = fs .. " button_exit[0.5,0.5;3.5,2;yes;" ..
-			minetest.formspec_escape("Yes: Enable blood") .. "]"
-		fs = fs .. " button_exit[4,0.5;3.5,2;no;" ..
-			minetest.formspec_escape("No: Disable blood") .. "]"
-		minetest.show_formspec(player:get_player_name(), "join_fs:blood", fs)
-	end
-})
-
-minetest.register_on_player_receive_fields(function(player, form, fields)
-	if form == "join_fs:blood" then
-		local name  = player:get_player_name()
-
-		if fields.yes then
-			shooter:enable_blood(name)
-			minetest.chat_send_player(name, "You have choosen to see blood!")
-		elseif fields.no then
-			shooter:disable_blood(name)
-			minetest.chat_send_player(name, "You will no longer see blood!")
-		else
-			minetest.chat_send_player(name, "You need to choose an option!")
-			join_fs.show_next_slide(player)
-			return true
-		end
-
-		join_fs.confirm(name, "blood")
 		join_fs.show_next_slide(player)
 	end
 end)

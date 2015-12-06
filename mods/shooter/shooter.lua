@@ -4,8 +4,7 @@ shooter = {
 	rounds = {},
 	shots = {},
 	update_time = 0,
-	reload_time = 0,
-	players_enabled_blood = {}
+	reload_time = 0
 }
 
 SHOOTER_ADMIN_WEAPONS = false
@@ -71,43 +70,6 @@ local function get_particle_pos(p, v, d)
 	return vector.add(p, vector.multiply(v, {x=d, y=d, z=d}))
 end
 
-function shooter:load_player_config()
-	local filepath = minetest.get_worldpath() .. "/shooter_player_config.txt"
-	local file = io.open(filepath, "r")
-	if file then
-		local table = minetest.deserialize(file:read("*all"))
-		if type(table) == "table" then
-			self.players_enabled_blood = table.eblood
-			return
-		end
-	end
-end
-
-function shooter:save_player_config()
-	local filepath = minetest.get_worldpath() .. "/shooter_player_config.txt"
-	local file = io.open(filepath, "w")
-	if file then
-		file:write(minetest.serialize({
-			eblood = self.players_enabled_blood
-		}))
-		file:close()
-	else
-		minetest.log("warning", "Failed to save shooter player config!")
-	end
-end
-
-minetest.register_on_shutdown(function()
-	shooter:save_player_config()
-end)
-
-function shooter:enable_blood(name)
-	self.players_enabled_blood[name] = true
-end
-
-function shooter:disable_blood(name)
-	self.players_enabled_blood[name] = nil
-end
-
 function shooter:spawn_particles(pos, texture)
 	if not SHOOTER_ENABLE_PARTICLE_FX then
 		return
@@ -117,47 +79,22 @@ function shooter:spawn_particles(pos, texture)
 		texture = SHOOTER_EXPLOSION_TEXTURE
 	end
 	local spread = {x=0.1, y=0.1, z=0.1}
-	if texture == SHOOTER_EXPLOSION_TEXTURE then
-		for _, player in pairs(minetest.get_connected_players()) do
-			local name = player:get_player_name()
-			if shooter.players_enabled_blood[name] then
-				minetest.add_particlespawner({
-				    amount = 15,
-				    time = 0.3,
-				    minpos = vector.subtract(pos, spread),
-				    maxpos = vector.add(pos, spread),
-				    minvel = {x=-1, y=1, z=-1},
-				    maxvel = {x=1, y=2, z=1},
-				    minacc = {x=-2, y=-2, z=-2},
-				    maxacc = {x=2, y=-2, z=2},
-				    minexptime = 0.1,
-				    maxexptime = 0.75,
-				    minsize = 1,
-				    maxsize = 2,
-				    collisiondetection = false,
-				    texture = texture,
-				    playername = name
-				})
-			end
-		end
-	else
-		minetest.add_particlespawner({
-		    amount = 15,
-		    time = 0.3,
-		    minpos = vector.subtract(pos, spread),
-		    maxpos = vector.add(pos, spread),
-		    minvel = {x=-1, y=1, z=-1},
-		    maxvel = {x=1, y=2, z=1},
-		    minacc = {x=-2, y=-2, z=-2},
-		    maxacc = {x=2, y=-2, z=2},
-		    minexptime = 0.1,
-		    maxexptime = 0.75,
-		    minsize = 1,
-		    maxsize = 2,
-		    collisiondetection = false,
-		    texture = texture
-		})
-	end
+	minetest.add_particlespawner({
+	    amount = 15,
+	    time = 0.3,
+	    minpos = vector.subtract(pos, spread),
+	    maxpos = vector.add(pos, spread),
+	    minvel = {x=-1, y=1, z=-1},
+	    maxvel = {x=1, y=2, z=1},
+	    minacc = {x=-2, y=-2, z=-2},
+	    maxacc = {x=2, y=-2, z=2},
+	    minexptime = 0.1,
+	    maxexptime = 0.75,
+	    minsize = 1,
+	    maxsize = 2,
+	    collisiondetection = false,
+	    texture = texture
+	})
 end
 
 function shooter:play_node_sound(node, pos)
