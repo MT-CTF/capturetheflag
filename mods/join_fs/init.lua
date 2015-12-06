@@ -63,7 +63,7 @@ minetest.register_on_player_receive_fields(function(player, form, fields)
 	end
 end)
 
-local slide_blood = join_fs.register_slide({
+join_fs.register_slide({
 	name = "blood",
 	should_show = function(player)
 		return true
