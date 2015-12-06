@@ -23,3 +23,5 @@ end
 if SHOOTER_ENABLE_TURRETS == true then
 	dofile(modpath.."/turret.lua")
 end
+
+shooter:load_player_config()
