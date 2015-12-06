@@ -283,7 +283,7 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 	hudtable.default_start_max = default_start_max
 
 	hb.hudbars_count= hb.hudbars_count + 1
-	
+
 	hb.hudtables[identifier] = hudtable
 end
 
@@ -422,44 +422,32 @@ end
 
 
 local function custom_hud(player)
-	if minetest.setting_getbool("enable_damage") or hb.settings.forceload_default_hudbars then
-		local hide
-		if minetest.setting_getbool("enable_damage") then
-			hide = false
-		else
-			hide = true
-		end
-		hb.init_hudbar(player, "health", player:get_hp(), nil, hide)
-		local breath = player:get_breath()
-		local hide_breath
-		if breath == 11 and hb.settings.autohide_breath == true then hide_breath = true else hide_breath = false end
-		hb.init_hudbar(player, "breath", math.min(breath, 10), nil, hide_breath or hide)
-	end
+	local hide = false
+	hb.init_hudbar(player, "health", player:get_hp(), nil, hide)
+	local breath = player:get_breath()
+	local hide_breath
+	if breath == 11 and hb.settings.autohide_breath == true then hide_breath = true else hide_breath = false end
+	hb.init_hudbar(player, "breath", math.min(breath, 10), nil, hide_breath or hide)
 end
 
 
 -- update built-in HUD bars
 local function update_hud(player)
-	if minetest.setting_getbool("enable_damage") then
-		if hb.settings.forceload_default_hudbars then
-			hb.unhide_hudbar(player, "health")
-		end
-		--air
-		local breath = player:get_breath()
-		
-		if breath == 11 and hb.settings.autohide_breath == true then
-			hb.hide_hudbar(player, "breath")
-		else
-			hb.unhide_hudbar(player, "breath")
-			hb.change_hudbar(player, "breath", math.min(breath, 10))
-		end
-		
-		--health
-		hb.change_hudbar(player, "health", player:get_hp())
-	elseif hb.settings.forceload_default_hudbars then
-		hb.hide_hudbar(player, "health")
-		hb.hide_hudbar(player, "breath")
+	if hb.settings.forceload_default_hudbars then
+		hb.unhide_hudbar(player, "health")
 	end
+	--air
+	local breath = player:get_breath()
+
+	if breath == 11 and hb.settings.autohide_breath == true then
+		hb.hide_hudbar(player, "breath")
+	else
+		hb.unhide_hudbar(player, "breath")
+		hb.change_hudbar(player, "breath", math.min(breath, 10))
+	end
+
+	--health
+	hb.change_hudbar(player, "health", player:get_hp())
 end
 
 minetest.register_on_joinplayer(function(player)
@@ -480,11 +468,9 @@ minetest.register_globalstep(function(dtime)
 	if main_timer > hb.settings.tick or timer > 4 then
 		if main_timer > hb.settings.tick then main_timer = 0 end
 		-- only proceed if damage is enabled
-		if minetest.setting_getbool("enable_damage") or hb.settings.forceload_default_hudbars then
-			for playername, player in pairs(hb.players) do
-				-- update all hud elements
-				update_hud(player)
-			end
+		for playername, player in pairs(hb.players) do
+			-- update all hud elements
+			update_hud(player)
 		end
 	end
 	if timer > 4 then timer = 0 end
