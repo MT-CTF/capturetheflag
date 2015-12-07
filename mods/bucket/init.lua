@@ -57,7 +57,7 @@ function bucket.register_liquid(source, flowing, itemname, inventory_image, name
 				if pointed_thing.type ~= "node" then
 					return
 				end
-				
+
 				local node = minetest.get_node_or_nil(pointed_thing.under)
 				local ndef
 				if node then
@@ -174,19 +174,3 @@ bucket.register_liquid(
 	"River Water Bucket",
 	{water_bucket = 1}
 )
-
-bucket.register_liquid(
-	"default:lava_source",
-	"default:lava_flowing",
-	"bucket:bucket_lava",
-	"bucket_lava.png",
-	"Lava Bucket"
-)
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "bucket:bucket_lava",
-	burntime = 60,
-	replacements = {{"bucket:bucket_lava", "bucket:bucket_empty"}},
-})
-
