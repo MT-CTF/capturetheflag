@@ -4,14 +4,12 @@ local drop = function(pos, itemstack)
 	local obj = core.add_item(pos, it)
 
 	if obj then
+		obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
 
-	obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
-
-	local remi = minetest.setting_get("remove_items")
-
-	if remi and remi == "true" then
-		obj:remove()
-	end
+		local remi = minetest.setting_get("remove_items")
+		if minetest.is_yes(remi) then
+			obj:remove()
+		end
 
 	end
 	return itemstack
@@ -25,8 +23,6 @@ minetest.register_on_dieplayer(function(player)
 
 	local pos = player:getpos()
 	pos.y = math.floor(pos.y + 0.5)
-
-	minetest.chat_send_player(player:get_player_name(), 'at '..math.floor(pos.x)..','..math.floor(pos.y)..','..math.floor(pos.z))
 
 	local player_inv = player:get_inventory()
 

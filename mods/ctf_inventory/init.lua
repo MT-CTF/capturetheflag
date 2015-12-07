@@ -47,3 +47,5 @@ minetest.register_on_joinplayer(function(player)
 		player:set_inventory_formspec(fs)
 	end
 end)
+
+dofile(minetest.get_modpath("ctf_inventory") .. "/give_initial_stuff.lua")

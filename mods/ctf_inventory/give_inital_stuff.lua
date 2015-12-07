@@ -10,5 +10,5 @@ function give_initial_stuff(player)
 	end
 end
 
-minetest.register_on_newplayer(give_initial_stuff)
+minetest.register_on_joinplayer(give_initial_stuff)
 minetest.register_on_respawnplayer(give_initial_stuff)
