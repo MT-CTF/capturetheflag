@@ -303,8 +303,22 @@ minetest.register_chatcommand("inbox", {
 		else
 			chatplus.showInbox(name,false)
 		end
-	end,
+	end
 })
+
+function chatplus.send_mail(name, to, msg)
+	minetest.log("To: "..to..", From: "..name..", MSG: "..msg)
+	if chatplus.log_handle ~= nil then
+		chatplus.log("To: "..to..", From: "..name..", MSG: "..msg)
+	end
+	if chatplus.players[to] then
+		table.insert(chatplus.players[to].inbox,os.date("%d/%m").." <"..name..">: "..msg)
+		minetest.chat_send_player(name,"Message sent")
+		chatplus.save()
+	else
+		minetest.chat_send_player(name,"Player "..to.." does not exist")
+	end
+end
 
 minetest.register_chatcommand("mail", {
 	params = "name msg",
@@ -318,17 +332,7 @@ minetest.register_chatcommand("mail", {
 			return
 		end
 
-		minetest.log("To: "..to..", From: "..name..", MSG: "..msg)
-		if chatplus.log_handle ~= nil then
-			chatplus.log("To: "..to..", From: "..name..", MSG: "..msg)
-		end
-		if chatplus.players[to] then
-			table.insert(chatplus.players[to].inbox,os.date("%d/%m").." <"..name..">: "..msg)
-			minetest.chat_send_player(name,"Message sent")
-			chatplus.save()
-		else
-			minetest.chat_send_player(name,"Player "..to.." does not exist")
-		end
+		chatplus.send_mail(name, to, msg)
 	end,
 })
 
