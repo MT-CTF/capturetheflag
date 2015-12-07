@@ -139,6 +139,21 @@ function vote.vote(voteset, name, value)
 	vote.check_vote(voteset)
 end
 
+minetest.register_privilege("vote_admin", {
+	description = "Allows a player to manage running votes."
+})
+
+minetest.register_chatcommand("vote_clear", {
+	privs = {
+		vote_admin = true,
+	},
+	func = function(name, params)
+		vote.active = {}
+		vote.queue = {}
+		vote.update_all_hud()
+	end
+})
+
 local hudkit = dofile(minetest.get_modpath("vote") .. "/hudkit.lua")
 vote.hud = hudkit()
 function vote.update_hud(player)
