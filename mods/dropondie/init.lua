@@ -1,6 +1,25 @@
-local drop = function(pos, itemstack)
+local blacklist_drop = {
+	"default:pick_wood",
+	"default:sword_wood",
+	"default:ax_wood"
+}
 
+local function drop(pos, itemstack)
 	local it = itemstack:take_item(itemstack:get_count())
+	local sname = it:get_name()
+
+	for _, item in pairs(blacklist_drop) do
+		if sname == item then
+			return
+		end
+	end
+	if sname == "default:torch" then
+		it:take_item(3)
+		if it:get_count() <= 0 then
+			return
+		end
+	end
+
 	local obj = core.add_item(pos, it)
 
 	if obj then
@@ -15,8 +34,7 @@ local drop = function(pos, itemstack)
 	return itemstack
 end
 
-minetest.register_on_dieplayer(function(player)
-
+local function drop_all(player)
 	if minetest.setting_getbool("creative_mode") then
 		return
 	end
@@ -35,5 +53,7 @@ minetest.register_on_dieplayer(function(player)
 		drop(pos, player_inv:get_stack("craft", i))
 		player_inv:set_stack("craft", i, nil)
 	end
+end
 
-end)
+minetest.register_on_dieplayer(drop_all)
+minetest.register_on_leaveplayer(drop_all)
