@@ -10,5 +10,8 @@ function give_initial_stuff(player)
 	end
 end
 
-minetest.register_on_joinplayer(give_initial_stuff)
+minetest.register_on_joinplayer(function(player)
+	player:set_hp(20)
+	give_initial_stuff(player)
+end)
 minetest.register_on_respawnplayer(give_initial_stuff)
