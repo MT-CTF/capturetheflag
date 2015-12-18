@@ -209,7 +209,12 @@ end
 
 
 -- Minetest callbacks
-minetest.register_on_chat_message(chatplus.send)
+minetest.register_on_chat_message(function(...)
+	local ret = chatplus.send(...)
+	if ret and minetest.global_exists("irc") then
+		irc.on_chatmessage(...)
+	end
+end)
 minetest.register_on_joinplayer(function(player)
 	chatplus.log(player:get_player_name() .. " joined")
 end)
