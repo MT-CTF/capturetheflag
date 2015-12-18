@@ -22,8 +22,10 @@ local function calc_scores(players)
 		pstat.deaths = pstat.deaths or 0
 		pstat.captures = pstat.captures or 0
 		pstat.attempts = pstat.attempts or 0
-		local kd = pstat.kills / (pstat.deaths + 1)
-		if pstat.deaths < 1 and kd > 30 then
+		local kd = pstat.kills
+		if pstat.deaths > 0 then
+			kd = kd / pstat.deaths
+		elseif kd > 30 then
 			kd = 30
 		end
 		local ca = 0
@@ -58,13 +60,17 @@ function ctf_stats.get_formspec(title, players)
 	for i = 1, #players do
 		local pstat = players[i]
 		local color = pstat.color or "#ffffff"
+		local kd = pstat.kills
+		if pstat.deaths > 0 then
+			kd = kd / pstat.deaths
+		end
 		ret = ret ..
 			"," .. string.gsub(color, "0x", "#") ..
 			"," .. i ..
 			"," .. pstat.name ..
 			"," .. pstat.kills ..
 			"," .. pstat.deaths ..
-			"," .. math.floor(pstat.kills / (pstat.deaths + 1)*10)/10 ..
+			"," .. math.floor(kd*10)/10  ..
 			"," .. pstat.captures ..
 			"," .. pstat.attempts ..
 			"," .. math.floor(pstat.score*10)/10
@@ -95,12 +101,16 @@ function ctf_stats.get_html(title, players)
 	for i = 1, #players do
 		local pstat = players[i]
 		local color = pstat.color or "#ffffff"
+		local kd = pstat.kills
+		if pstat.deaths > 0 then
+			kd = kd / pstat.deaths
+		end
 		ret = ret ..
 			"<tr><td>" .. i ..
 			"</td><td>" .. pstat.name ..
 			"</td><td>" .. pstat.kills ..
 			"</td><td>" .. pstat.deaths ..
-			"</td><td>" .. math.floor(pstat.kills / (pstat.deaths + 1)*10)/10 ..
+			"</td><td>" .. math.floor(kd*10)/10 ..
 			"</td><td>" .. pstat.captures ..
 			"</td><td>" .. pstat.attempts ..
 			"</td><td>" .. math.floor(pstat.score*10)/10 .. "</td></tr>"
@@ -134,14 +144,52 @@ function ctf_stats.html_to_file(filepath)
 end
 
 minetest.register_chatcommand("rankings", {
-	func = function(name)
-		local players = {}
-		for name, pstat in pairs(ctf_stats.players) do
-			pstat.name = name
-			pstat.color = nil
-			table.insert(players, pstat)
+	func = function(name, param)
+		if param == "me" then
+			local players = {}
+			for pname, pstat in pairs(ctf_stats.players) do
+				pstat.name = pname
+				pstat.color = nil
+				table.insert(players, pstat)
+			end
+			calc_scores(players)
+			local place = -1
+			local me = nil
+			for i = 1, #players do
+				local pstat = players[i]
+				if pstat.name == name then
+					me = pstat
+					place = i
+					break
+				end
+			end
+			if place < 1 then
+				place = #players + 1
+			end
+			minetest.chat_send_player(name, "You are in " .. place .. " place.")
+			if me then
+				local kd = me.kills
+				if me.deaths > 0 then
+					kd = kd / me.deaths
+				end
+				minetest.chat_send_player(name,
+					"Kills: " .. me.kills ..
+					" | Deaths: " .. me.deaths ..
+					" | K/D: " .. math.floor(kd*10)/10 ..
+					" | Captures: " .. me.captures ..
+					" | Attempts: " .. me.attempts ..
+					" | Score: " .. me.score)
+			end
+		else
+			local players = {}
+			for pname, pstat in pairs(ctf_stats.players) do
+				pstat.name = pname
+				pstat.color = nil
+				table.insert(players, pstat)
+			end
+			local fs = ctf_stats.get_formspec("Player Rankings", players)
+			fs = fs .. "label[3.5,6.2;Tip: to see where you are, type /rankings me]"
+			minetest.show_formspec(name, "ctf_stats:rankings", fs)
 		end
-		local fs = ctf_stats.get_formspec("Player Rankings", players)
-		minetest.show_formspec(name, "ctf_stats:rankings", fs)
 	end
 })
