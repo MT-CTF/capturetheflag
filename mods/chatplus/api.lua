@@ -214,6 +214,7 @@ minetest.register_on_chat_message(function(...)
 	if ret and minetest.global_exists("irc") then
 		irc.on_chatmessage(...)
 	end
+	return ret
 end)
 minetest.register_on_joinplayer(function(player)
 	chatplus.log(player:get_player_name() .. " joined")
