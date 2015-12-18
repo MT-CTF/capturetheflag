@@ -1,12 +1,13 @@
-Chatplus
---------
+# Chatplus
+
+Adds ignoring and email style inboxes. Also provides a powerful API,
+and optionally allows distance limiting.
 
 License: GPL 3.0 or later.
 
 Created by rubenwardy.
 
-Commands
-========
+## Chat commands
 
 * /ignore [name] - ignore a player
 * /unignore [name] - unignore a player
@@ -17,7 +18,6 @@ Commands
 * /inbox txt - alias of /inbox text
 * /inbox t - alias of /inbox text
 
-HUD
-===
+## HUD
 
 This mod adds a new message icon to the HUD. If HUDs are not supported, no icon is added.
