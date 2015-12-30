@@ -35,3 +35,24 @@ minetest.register_chatcommand("ctf_respawn", {
 		end
 	end
 })
+
+local restart_on_next_match = false
+local restart_on_next_match_by = nil
+minetest.register_chatcommand("ctf_queue_restart", {
+	description = "Respawn a player (clean inv, send to base)",
+	privs = {
+		server = true
+	},
+	func = function(name, param)
+		restart_on_next_match = true
+		restart_on_next_match_by = name
+		return true, "Restart queued."
+	end
+})
+
+ctf_match.register_on_new_match(function()
+	if restart_on_next_match then
+		minetest.chat_send_player(restart_on_next_match_by, "Shutting down now!")
+		minetest.request_shutdown("Restarting server at operator request.", true)
+	end
+end)
