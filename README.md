@@ -9,9 +9,13 @@ Uses the [CTF PvP engine](https://github.com/rubenwardy/ctf_pvp_engine)
 System Requirements
 -------------------
 
-You'll need to host save your game on an SSD 
-or mount it in the ramdisk (use redis, leveldb or
-    [sqlite with this guide](https://forum.minetest.net/viewtopic.php?f=10&t=9588))
+###### Recommended
+Hosting your server using the dummy backend
+
+###### minimum
+Hosting your server using the leveldb or redis backend
+
+Hosting using sqlite on an SSD or ramdisk ([with this guide](https://forum.minetest.net/viewtopic.php?f=10&t=9588))
 
 License
 -------
