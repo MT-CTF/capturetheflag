@@ -28,18 +28,15 @@ local function calc_scores(players)
 		elseif kd > 30 then
 			kd = 30
 		end
-		local ca = 0
-		if pstat.attempts > 0 then
-			ca = pstat.captures / pstat.attempts
-		end
-		local killbonus = 0
+		--[[local killbonus = 0
 		if pstat.kills > 50 and pstat.kills < 200 then
 			killbonus = pstat.kills - 50
 		elseif pstat.kills >= 200 then
 			killbonus = 150
-		end
-		pstat.score = killbonus +
-		              10 * pstat.captures * ca +
+		end]]--
+		pstat.score = --killbonus +
+		              50 * pstat.captures +
+					  10 * pstat.attempts +
 				      5  * kd
 	end
 	table.sort(players, function(one, two)
