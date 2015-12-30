@@ -36,8 +36,8 @@ local function calc_scores(players)
 		end]]--
 		pstat.score = --killbonus +
 		              50 * pstat.captures +
-					  10 * pstat.attempts +
-				      5  * kd
+					  8 * pstat.attempts +
+				      6  * kd
 	end
 	table.sort(players, function(one, two)
 		return one.score > two.score
