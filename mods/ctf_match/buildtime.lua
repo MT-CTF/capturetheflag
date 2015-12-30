@@ -36,6 +36,13 @@ ctf.register_on_new_game(function()
 	end
 end)
 
+local function get_m_s_from_s(s)
+	local m = math.floor(s / 60)
+	s = math.floor(s - m * 60)
+
+	return m .. "m " .. s .. "s"
+end
+
 local last = 0
 minetest.register_globalstep(function(delta)
 	if ctf_match.build_timer > 0 then
@@ -47,7 +54,7 @@ minetest.register_globalstep(function(delta)
 		end
 		local rbt = math.floor(ctf_match.build_timer)
 		if last ~= rbt then
-			local text = math.floor(ctf_match.build_timer) .. "s until match begins!"
+			local text = get_m_s_from_s(ctf_match.build_timer) .. " until match begins!"
 			for _, player in pairs(minetest.get_connected_players()) do
 				ctf.hud:change(player, "ctf_match:countdown", "text", text)
 			end
@@ -90,7 +97,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 			hud_elem_type = "text",
 			position      = {x = 0.5, y = 0.5},
 			scale         = {x = 0, y = 70},
-			text          = math.floor(ctf_match.build_timer) .. "s until match begins!",
+			text          = get_m_s_from_s(ctf_match.build_timer) .. " until match begins!",
 			number        = 0xFFFFFF,
 			offset        = {x = -20, y = 20},
 			alignment     = {x = 0.2, y = 0}

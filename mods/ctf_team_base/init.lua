@@ -43,11 +43,11 @@ for _, color in pairs(colors) do
 		end,
 	    on_metadata_inventory_put = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..
-				" moves stuff to chest at " .. minetest.pos_to_string(pos))
+				" moves " .. (stack:get_name() or "stuff") .. " " .. (stack:get_count() or 0)  .. " to chest at " .. minetest.pos_to_string(pos))
 		end,
 	    on_metadata_inventory_take = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..
-				" takes stuff from chest at " .. minetest.pos_to_string(pos))
+				" takes " .. (stack:get_name() or "stuff") .. " " .. (stack:get_count() or 0) .. " from chest at " .. minetest.pos_to_string(pos))
 		end
 	})
 end
@@ -95,6 +95,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				minetest.set_node(pos, chest)
 				local inv = minetest.get_inventory({type = "node", pos=pos})
 				inv:add_item("main", ItemStack("default:cobble 99"))
+				inv:add_item("main", ItemStack("default:cobble 99"))				
 				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:glass 10"))
 				inv:add_item("main", ItemStack("default:torch 10"))
