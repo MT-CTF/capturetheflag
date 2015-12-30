@@ -18,6 +18,7 @@ minetest.register_chatcommand("ctf_respawn", {
 		ctf_team_mgr = true
 	},
 	func = function(name, param)
+		minetest.log("action", name .. " ran /ctf_respawn " .. param)
 		local tplayer = ctf.player_or_nil(param)
 		if tplayer then
 			local player = minetest.get_player_by_name(param)
