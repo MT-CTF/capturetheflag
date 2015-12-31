@@ -25,8 +25,6 @@ local function calc_scores(players)
 		local kd = pstat.kills
 		if pstat.deaths > 0 then
 			kd = kd / pstat.deaths
-		elseif kd > 30 then
-			kd = 30
 		end
 		--[[local killbonus = 0
 		if pstat.kills > 50 and pstat.kills < 200 then
