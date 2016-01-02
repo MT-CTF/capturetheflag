@@ -40,7 +40,7 @@ minetest.register_chatcommand("ctf_respawn", {
 local restart_on_next_match = false
 local restart_on_next_match_by = nil
 minetest.register_chatcommand("ctf_queue_restart", {
-	description = "Respawn a player (clean inv, send to base)",
+	description = "Queue server restart",
 	privs = {
 		server = true
 	},
@@ -48,6 +48,17 @@ minetest.register_chatcommand("ctf_queue_restart", {
 		restart_on_next_match = true
 		restart_on_next_match_by = name
 		return true, "Restart queued."
+	end
+})
+
+minetest.register_chatcommand("ctf_unqueue_restart", {
+	description = "Unqueue server restart",
+	privs = {
+		server = true
+	},
+	func = function(name, param)
+		restart_on_next_match = false
+		return true, "Restart cancelled."
 	end
 })
 
