@@ -4,7 +4,7 @@ shooter = {
 	rounds = {},
 	shots = {},
 	update_time = 0,
-	reload_time = 0
+	reload_time = 0,
 }
 
 SHOOTER_ADMIN_WEAPONS = false
@@ -71,30 +71,18 @@ local function get_particle_pos(p, v, d)
 end
 
 function shooter:spawn_particles(pos, texture)
-	if not SHOOTER_ENABLE_PARTICLE_FX then
-		return
+	if SHOOTER_ENABLE_PARTICLE_FX == true then
+		if type(texture) ~= "string" then
+			texture = SHOOTER_EXPLOSION_TEXTURE
+		end
+		local spread = {x=0.1, y=0.1, z=0.1}
+		minetest.add_particlespawner(15, 0.3,
+			vector.subtract(pos, spread), vector.add(pos, spread),
+			{x=-1, y=1, z=-1}, {x=1, y=2, z=1},
+			{x=-2, y=-2, z=-2}, {x=2, y=-2, z=2},
+			0.1, 0.75, 1, 2, false, texture
+		)
 	end
-
-	if type(texture) ~= "string" then
-		texture = SHOOTER_EXPLOSION_TEXTURE
-	end
-	local spread = {x=0.1, y=0.1, z=0.1}
-	minetest.add_particlespawner({
-	    amount = 15,
-	    time = 0.3,
-	    minpos = vector.subtract(pos, spread),
-	    maxpos = vector.add(pos, spread),
-	    minvel = {x=-1, y=1, z=-1},
-	    maxvel = {x=1, y=2, z=1},
-	    minacc = {x=-2, y=-2, z=-2},
-	    maxacc = {x=2, y=-2, z=2},
-	    minexptime = 0.1,
-	    maxexptime = 0.75,
-	    minsize = 1,
-	    maxsize = 2,
-	    collisiondetection = false,
-	    texture = texture
-	})
 end
 
 function shooter:play_node_sound(node, pos)
