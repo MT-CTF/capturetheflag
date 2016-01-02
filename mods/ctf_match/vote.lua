@@ -7,7 +7,7 @@ function ctf_match.register_on_skip_map(func)
 end
 
 function ctf_match.vote_next(name, params)
-	vote.new_vote(name, {
+	return vote.new_vote(name, {
 		description = "Skip to next match",
 		help = "/yes,  /no  or  /abstain",
 		duration = 60,
@@ -44,7 +44,10 @@ minetest.register_chatcommand("vote", {
 
 minetest.register_on_chat_message(function(name, msg)
 	if msg == "/vote_next" then
-		ctf_match.vote_next(name)
+		local suc, msg = ctf_match.vote_next(name)
+		if msg then
+			minetest.chat_send_player(name, msg)
+		end
 		return true
 	end
 end)

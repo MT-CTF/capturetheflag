@@ -5,16 +5,19 @@ vote = {
 
 function vote.new_vote(creator, voteset)
 	local max_votes = tonumber(minetest.setting_get("vote.maximum_active")) or 1
+	local max_queue = tonumber(minetest.setting_get("vote.maximum_active")) or 0
 
 	if #vote.active < max_votes then
 		vote.start_vote(voteset)
-	else
+		return true, "Vote Started. You still need to vote: " .. voteset.help
+	elseif max_queue == 0 then
+		return false, "A vote is already running, please try again later."
+	elseif #vote.queue < max_queue then
 		table.insert(vote.queue, voteset)
-		if creator then
-			minetest.chat_send_player(creator,
-					"Vote queued until there is less then " .. max_votes ..
-					" votes active.")
-		end
+		return true, "Vote queued until there is less then " .. max_votes ..
+			" votes active."
+	else
+		return false, "The queue of votes waiting to run is full. Please try again later."
 	end
 end
 
@@ -303,7 +306,7 @@ if set == nil or minetest.is_yes(set) then
 				return
 			end
 
-			vote.new_vote(name, {
+			return vote.new_vote(name, {
 				description = "Kick " .. param,
 				help = "/yes,  /no  or  /abstain",
 				name = param,
