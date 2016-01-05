@@ -9,11 +9,14 @@ end
 
 local function regen_all()
 	for _, player in pairs(minetest.get_connected_players()) do
-		local newhp = player:get_hp() + regen_amount
-		if newhp > 20 then
-			newhp = 20
+		local oldhp = player:get_hp()
+		if oldhp > 0 then
+			local newhp = oldhp + regen_amount
+			if newhp > 20 then
+				newhp = 20
+			end
+			player:set_hp(newhp)
 		end
-		player:set_hp(newhp)
 	end
 	minetest.after(regen_interval, regen_all)
 end
