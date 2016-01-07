@@ -1,0 +1,11 @@
+-- Wield3d Configuration (defaults)
+
+-- Increase this if you get non-attachment glitches when a player first joins.
+WIELD3D_INIT_DELAY = 1
+
+-- Number of seconds before retry if initialization fails.
+WIELD3D_RETRY_TIME = 10
+
+-- How often player wield items are updated.
+WIELD3D_UPDATE_TIME = 1
+
