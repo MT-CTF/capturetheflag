@@ -1,2 +1,5 @@
 default
+dye
+tnt
+wool
 mobs?

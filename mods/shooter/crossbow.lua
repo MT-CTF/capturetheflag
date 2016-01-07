@@ -130,7 +130,7 @@ minetest.register_entity("shooter:arrow_entity", {
 			self.object:set_animation({x=frame, y=frame}, 0)
 			local objects = minetest.get_objects_inside_radius(pos, 5)
 			for _,obj in ipairs(objects) do
-				if shooter:is_valid_object(obj) then
+				if shooter:is_valid_object(obj) and obj ~= self.player then
 					local collisionbox = {-0.25,-1.0,-0.25, 0.25,0.8,0.25}
 					local offset = SHOOTER_PLAYER_OFFSET
 					if not obj:is_player() then
