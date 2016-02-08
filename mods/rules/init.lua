@@ -1,4 +1,4 @@
--- Rules slide from agreerules
+-- License: WTFPL
 
 rules = {}
 function rules.show(player)
@@ -14,7 +14,7 @@ function rules.show(player)
 		"3. Don't be a cheater. No hacked clients.",
 		"4. Don't be a traitor. Don't:",
 		"    a. Dig blocks in your base to make it less secure or",
-		"       to trap team mates on purpuse.",
+		"       to trap team mates on purpose.",
 		"    b. Help the other team.",
 		"5. Don't impersonate other community members",
 		"Failure to follow these rules may result in a kick or ban",
