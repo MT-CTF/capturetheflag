@@ -15,9 +15,19 @@ function ctf_match.next()
 
 			minetest.after(1, function()
 				ctf.reset()
+				if vote then
+					vote.active = {}
+					vote.queue = {}
+					vote.update_all_hud()
+				end
 			end)
 		end)
 	else
 		ctf.reset()
+		if vote then
+			vote.active = {}
+			vote.queue = {}
+			vote.update_all_hud()
+		end
 	end
 end
