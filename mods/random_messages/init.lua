@@ -64,8 +64,9 @@ function random_messages.read_messages()
 end
 
 function random_messages.display_message(message_number)
-	if random_messages.messages[message_number] then
-		minetest.chat_send_all(random_messages.messages[message_number])
+	local msg = random_messages.messages[message_number] or message_number
+	if msg then
+		minetest.chat_send_all(msg)
 	end
 end
 
