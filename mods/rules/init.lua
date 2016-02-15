@@ -1,35 +1,49 @@
 -- License: WTFPL
 
+
 rules = {}
-function rules.show(player)
-	local msgs = {
-		"Welcome to Capture the Flag!",
-		"Developed and hosted by rubenwardy.",
-		"Moderators: Kpenguin, Thomas-S, Dragonop,",
-		"            stormchaser3000, Calinou.",
-		"    tip: use /vote to skip to the next round",
-		",By playing on this server you agree to these rules:",
-		"1. Be nice. eg: No (excessive or bad) swearing",
-		"2. No dating.",
-		"3. Don't be a cheater. No hacked clients.",
-		"4. Don't be a traitor. Don't:",
-		"    a. Dig blocks in your base to make it less secure or",
-		"       to trap team mates on purpose.",
-		"    b. Help the other team.",
-		"5. Don't impersonate other community members",
-		"Failure to follow these rules may result in a kick or ban",
-		"     (temp or permanent) depending on severity."}
 
-	local fs = ""
-	for _, line in pairs(msgs) do
-		if fs ~= "" then
-			fs = fs .. ","
+local items = {
+	"Welcome to Capture the Flag!",
+	"",
+	"Developed and hosted by rubenwardy.",
+	"Moderators: Kpenguin, Thomas-S, Dragonop,",
+	"            stormchaser3000, Calinou, sparky/ircSparky.",
+	"By playing on this server you agree to these rules:",
+	"1. Be nice. eg: No (excessive or bad) swearing",
+	"2. No dating.",
+	"3. Don't be a cheater. No hacked clients.",
+	"4. Don't be a traitor. Don't:",
+	"    a. Dig blocks in your base to make it less secure or",
+	"       to trap team mates on purpose.",
+	"    b. Help the other team win.",
+	"5. Don't impersonate other community members",
+	"Failure to follow these rules may result in a kick or ban",
+	"     (temp or permanent) depending on severity.",
+	"Use /report to send a message to a moderator.",
+	"For example, /report bobgreen is destroying our base"}
+
+for i = 1, #items do
+	items[i] = minetest.formspec_escape(items[i])
+end
+rules.txt = table.concat(items, ",")
+
+if minetest.global_exists("sfinv") then
+	sfinv.register_page("rules:rules", {
+		title = "Rules",
+		get = function(player, context)
+			return ([[
+					size[8,8.6]
+					bgcolor[#080808BB;true]
+					background[5,5;1,1;gui_formbg.png;true]
+					{{ nav }}
+					textlist[0,0;7.85,8.5;help;]] .. rules.txt .. "]")
 		end
-		fs = fs .. minetest.formspec_escape(line)
-	end
+	})
+end
 
-
-	fs = "size[8,8]textlist[0.1,0.1;7.8,6;msg;" .. fs .. "]"
+function rules.show(player)
+	local fs = "size[8,8]textlist[0.1,0.1;7.8,6;msg;" .. rules.txt .. "]"
 	if minetest.check_player_privs(player:get_player_name(), { interact = true }) then
 		fs = fs .. "button_exit[0.5,6;7,2;yes;Okay]"
 	else

@@ -46,21 +46,12 @@ function random_messages.check_params(name,func,params)
 end
 
 function random_messages.read_messages()
-	local line_number = 1
-	local input = io.open(minetest.get_worldpath().."/random_messages","r")
-	if not input then
-		local output = io.open(minetest.get_worldpath().."/random_messages","w")
-		output:write("To talk to only your team, start your messages with /t. For example, /t Hello team!\n")
-		output:write("If the map is ruined, use /vote to start a new vote to skip the current match.\n")
-		output:write("Eat apples to restore health quickly.\n")
-		io.close(output)
-		input = io.open(minetest.get_worldpath().."/random_messages","r")
-	end
-	for line in input:lines() do
-		random_messages.messages[line_number] = line
-		line_number = line_number + 1
-	end
-	io.close(input)
+	random_messages.messages = {
+		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
+		"If the map is ruined, use /vote to start a new vote to skip the current match.",
+		"Eat apples to restore health quickly.",
+		"You can steal items from the other team's chest."
+	}
 end
 
 function random_messages.display_message(message_number)
