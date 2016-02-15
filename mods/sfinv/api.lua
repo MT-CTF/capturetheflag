@@ -81,31 +81,6 @@ function sfinv.set(player, context)
 	local fs = sfinv.get(player, context)
 	print(fs)
 	player:set_inventory_formspec(fs)
-
-	--[[local tmp = [ [
-		size[8,8.6]
-		image[4.06,3.4;0.8,0.8;creative_trash_icon.png]
-		list[current_player;main;0,4.7;8,1;]
-		list[current_player;main;0,5.85;8,3;8]
-		list[detached:creative_trash;main;4,3.3;1,1;]
-		tablecolumns[color;text;color;text]
-		tableoptions[background=#00000000;highlight=#00000000;border=false]
-		button[5.4,3.2;0.8,0.9;creative_prev;<]
-		button[7.25,3.2;0.8,0.9;creative_next;>]
-		button[2.1,3.4;0.8,0.5;search;?]
-		button[2.75,3.4;0.8,0.5;clear;X]
-		tooltip[search;Search]
-		tooltip[clear;Reset]
-		listring[current_player;main]
-		] ] ..
-		"field[0.3,3.5;2.2,1;filter;;".. filter .."]"..
-		"listring[detached:creative_".. player_name ..";main]"..
-		"tabheader[0,0;tabs;Crafting,All,Nodes,Tools,Items;".. tostring(tab_id) ..";true;false]"..
-		"list[detached:creative_".. player_name ..";main;0,0;8,3;".. tostring(start_i) .."]"..
-		"table[6.05,3.35;1.15,0.5;pagenum;#FFFF00,".. tostring(pagenum) ..",#FFFFFF,/ ".. tostring(pagemax) .."]"..
-		default.get_hotbar_bg(0,4.7)..
-		default.gui_bg .. default.gui_bg_img .. default.gui_slots
-		]]--
 end
 
 minetest.register_on_joinplayer(function(player)
