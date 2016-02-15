@@ -1,4 +1,4 @@
-# Simple Fast Inventory
+# Simple Fast Inventory (WIP)
 
 A cleaner, simpler, solution to having an advanced inventory in Minetest.  
 Formspec style based on the creative inventory.
@@ -8,7 +8,7 @@ License: WTFPL
 
 ## Aims
 
-* Unified Inventory compatible.
+* Unified Inventory API compatible (a mod using UI's api will work with this)
 * Themable.
 * Clean API.
 
