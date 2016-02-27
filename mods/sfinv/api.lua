@@ -25,7 +25,6 @@ end
 function sfinv.parse_variables(fs, vars)
 	local ret = fs
 	for key, value in pairs(vars) do
-		print("Running " .. key .. "=" .. value .. " on string")
 		ret = string.gsub(ret, "{{([ ]+)" .. key .. "([ ]+)}}", value)
 	end
 	return ret
@@ -36,7 +35,6 @@ function sfinv.get(player, context)
 	if not page then
 		page = sfinv.pages["404"]
 	end
-	print(dump(page))
 
 	local fs = page:get(player, context)
 	local nav = {}
@@ -52,9 +50,6 @@ function sfinv.get(player, context)
 		end
 	end
 	context.nav = nav_ids
-
-	print(dump(context))
-	print(current_idx)
 
 	local vars = {
 		layout = theme,
@@ -77,9 +72,8 @@ function sfinv.set(player, context)
 			sfinv.contexts[name] = context
 		end
 	end
-	print("Setting " .. context.page)
+
 	local fs = sfinv.get(player, context)
-	print(fs)
 	player:set_inventory_formspec(fs)
 end
 
@@ -94,7 +88,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "" then
 		return false
 	end
-	print("Received fields! " .. dump(fields))
 
 	-- Get Context
 	local name = player:get_player_name()
