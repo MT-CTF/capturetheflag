@@ -310,6 +310,8 @@ function default.register_ores()
 	})
 end
 
+local WATER_H = tonumber(minetest.setting_get("water_level"))
+
 
 --
 -- Register biomes
@@ -352,7 +354,7 @@ function default.register_biomes()
 		--depth_water_top = ,
 		--node_water = "",
 		--node_river_water = "",
-		y_min = 44,
+		y_min = WATER_H + 1,
 		y_max = 55,
 		heat_point = 40,
 		humidity_point = 65,
@@ -371,7 +373,7 @@ function default.register_biomes()
 		--node_water = "",
 		--node_river_water = "",
 		y_min = -112,
-		y_max = 44,
+		y_max = WATER_H + 1,
 		heat_point = 40,
 		humidity_point = 65,
 	})
@@ -388,7 +390,7 @@ function default.register_biomes()
 		--depth_water_top = ,
 		--node_water = "",
 		--node_river_water = "",
-		y_min = 44,
+		y_min = WATER_H + 1,
 		y_max = 55,
 		heat_point = 60,
 		humidity_point = 65,
@@ -407,7 +409,7 @@ function default.register_biomes()
 		--node_water = "",
 		--node_river_water = "",
 		y_min = -112,
-		y_max = 43,
+		y_max = WATER_H,
 		heat_point = 60,
 		humidity_point = 65,
 	})
@@ -553,7 +555,8 @@ local function register_grass_decoration(offset, scale, length)
 	})
 end
 
-local MAX_TREE_H = 60
+local MAX_JTREE_H = 62
+local MAX_TREE_H = MAX_JTREE_H - 10
 local MAX_GRASS_H = 63
 
 local function register_dry_grass_decoration(offset, scale, length)
@@ -580,6 +583,7 @@ function default.register_decorations()
 	minetest.clear_registered_decorations()
 
 	-- Apple tree and log
+	local s = 15
 
 	minetest.register_decoration({
 		deco_type = "schematic",
@@ -588,7 +592,7 @@ function default.register_decorations()
 		noise_params = {
 			offset = 0.04,
 			scale = 0.02,
-			spread = {x = 250, y = 250, z = 250},
+			spread = {x = s, y = s, z = s},
 			seed = 2,
 			octaves = 3,
 			persist = 0.66
@@ -600,49 +604,16 @@ function default.register_decorations()
 		flags = "place_center_x, place_center_z",
 	})
 
-	minetest.register_decoration({
-		deco_type = "schematic",
-		place_on = {"default:dirt_with_grass"},
-		sidelen = 16,
-		noise_params = {
-			offset = 0.002,
-			scale = 0.001,
-			spread = {x = 250, y = 250, z = 250},
-			seed = 2,
-			octaves = 3,
-			persist = 0.66
-		},
-		biomes = {"deciduous_forest"},
-		y_min = 1,
-		y_max = MAX_TREE_H,
-		schematic = {
-			size = { x = 3, y = 3, z = 1},
-			data = {
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-				{ name = "default:tree", param2 = 12, prob = 191 },
-				{ name = "default:tree", param2 = 12 },
-				{ name = "default:tree", param2 = 12, prob = 127 },
-				{ name = "air", prob = 0 },
-				{ name = "flowers:mushroom_brown", prob = 63 },
-				{ name = "air", prob = 0 },
-			},
-		},
-		flags = "place_center_x",
-		rotation = "random",
-	})
-
 	-- Jungle tree and log
 
 	minetest.register_decoration({
 		deco_type = "schematic",
 		place_on = {"default:dirt_with_grass", "default:dirt"},
 		sidelen = 40,
-		fill_ratio = 0.035,
+		fill_ratio = 0.025,
 		biomes = {"rainforest", "rainforest_swamp"},
-		y_min = 0,
-		y_max = MAX_TREE_H,
+		y_min = MAX_TREE_H,
+		y_max = MAX_JTREE_H,
 		schematic = minetest.get_modpath("default").."/schematics/jungle_tree.mts",
 		flags = "place_center_x, place_center_z",
 		rotation = "random",
