@@ -78,22 +78,116 @@ minetest.register_node("tsm_chests:chest", {
 
 --[[ here are some configuration variables ]]
 
-local chests_per_chunk = 5	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
+local chests_per_chunk = 6	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
 local h_min = -1  		-- minimum chest spawning height, relative to water_level
-local h_max = 15		-- maximum chest spawning height, relative to water_level
+local h_max = 64-43		-- maximum chest spawning height, relative to water_level
 local t_min = 3			-- minimum amount of treasures found in a chest
 local t_max = 6			-- maximum amount of treasures found in a chest
+
+local r_max = tonumber(minetest.setting_get("barrier"))
+local water_level = tonumber(minetest.setting_get("water_level"))
+local get_node = minetest.get_node
+local env = minetest.env
+
+local function findGroundLevel(pos, y_min, y_max)
+	local ground = nil
+	local top    = y_max
+	for y = y_max, y_min, -1 do
+		local p = {x=pos.x,y=y,z=pos.z}
+		local name = get_node(p).name
+		if name == "air" or name == "default:water_source" or name == "default:lava_source" then
+			top = y
+			break
+		end
+	end
+	for y=top,y_min,-1 do
+		local p = {x=pos.x,y=y,z=pos.z}
+					local name = get_node(p).name
+		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
+			ground = y
+			break
+		end
+	end
+	return ground
+end
+
+local function getFacedirs(pos, ground)
+	-- secondly: rotate the chest
+	-- find possible faces
+	local xp, xm, zp, zm
+	xp = minetest.get_node({x=pos.x+1, y=ground+1, z=pos.z})
+	xm = minetest.get_node({x=pos.x-1, y=ground+1, z=pos.z})
+	zp = minetest.get_node({x=pos.x, y=ground+1, z=pos.z+1})
+	zm = minetest.get_node({x=pos.x, y=ground+1, z=pos.z-1})
+
+	-- Set Facedirs
+	local facedirs = {}
+	if xp.name=="air" or xp.name=="default:water_source" then
+		table.insert(facedirs, minetest.dir_to_facedir({x=-1,y=0,z=0}))
+	end
+	if xm.name=="air" or xm.name=="default:water_source" then
+		table.insert(facedirs, minetest.dir_to_facedir({x=1,y=0,z=0}))
+	end
+	if zp.name=="air" or zp.name=="default:water_source" then
+		table.insert(facedirs, minetest.dir_to_facedir({x=0,y=0,z=-1}))
+	end
+	if zm.name=="air" or zm.name=="default:water_source" then
+		table.insert(facedirs, minetest.dir_to_facedir({x=0,y=0,z=1}))
+	end
+	
+	return facedirs
+end
+
+local function placeChest(pos, chest_pos, ground, nn)
+	local chest = {name = "tsm_chests:chest"}
+	local facedirs = getFacedirs(pos, ground)
+
+	-- choose a random face (if possible)
+	if #facedirs == 0 then
+		minetest.set_node({x=pos.x,y=ground+1, z=pos.z+1}, {name=nn})
+		chest.param2 = minetest.dir_to_facedir({x=0,y=0,z=1})
+	else
+		chest.param2 = facedirs[math.floor(math.random(#facedirs))]
+	end
+
+	-- Lastly: place the chest
+	minetest.set_node(chest_pos, chest)
+
+	-- Get treasure
+	local treasure_amount = math.ceil(math.random(t_min, t_max))
+	local height = math.abs(h_min) - math.abs(h_max)
+	local y_norm = (ground+1) - h_min
+	local scale = 1 - (y_norm/height)
+	local minp = 0 --scale*4		-- minimal preciousness:   0..4
+	local maxp = 10 --scale*4+2.1	-- maximum preciousness: 2.1..6.1
+	local treasures = treasurer.select_random_treasures(treasure_amount, minp, maxp)
+	
+	-- Add Treasure to Chst
+	local meta = minetest.get_meta(chest_pos)
+	local inv = meta:get_inventory()
+	for i=1, #treasures do
+		inv:set_stack("main", i, treasures[i])
+	end
+end
 
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
 ]]
-minetest.register_on_generated(function(minp, maxp, seed)
-	-- get the water level and convert it to a number
-	local water_level = minetest.setting_get("water_level")
-	if water_level == nil or type(water_level) ~= "number" then
-		water_level = 1
-	else
-		water_level = tonumber(water_level)
+minetest.register_on_generated(function(minp, maxp, seed)	
+	minp = {x=minp.x, y=minp.y, z=minp.z}
+	maxp = {x=maxp.x, y=maxp.y, z=maxp.z}
+	
+	if minp.x <= -r_max then
+		minp.x = -r_max + 1
+	end
+	if minp.z <= -r_max then
+		minp.z = -r_max + 1
+	end
+	if minp.x >= r_max then
+		minp.x = r_max - 1
+	end
+	if minp.z >= r_max then
+		minp.z = r_max - 1
 	end
 
 	-- chests minimum and maximum spawn height
@@ -105,103 +199,34 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 	local y_min = math.max(minp.y, height_min)
 	local y_max = math.min(maxp.y, height_max)
-	local get_node = minetest.get_node
-	local env = minetest.env
-	for i=1, chests_per_chunk do
-		local pos = {x=math.random(minp.x,maxp.x),z=math.random(minp.z,maxp.z), y=minp.y}
+	local attempts = 0
+	local chests_placed = 0
+	while chests_placed < chests_per_chunk and attempts < chests_per_chunk + 6 do
+		attempts = attempts + 1
+		local pos = {
+			x = math.random(minp.x, maxp.x),
+			y = minp.y,
+			z = math.random(minp.z, maxp.z)
+		}
 
 		-- Find ground level
-		local ground = nil
-		local top    = y_max
-                for y=y_max,y_min,-1 do
-			local p = {x=pos.x,y=y,z=pos.z}
-			local name = get_node(p).name
-			if name == "air" or name == "default:water_source" or name == "default:lava_source" then
-				top = y
-				break
-			end
-		end
-		for y=top,y_min,-1 do
-			local p = {x=pos.x,y=y,z=pos.z}
-                        local name = get_node(p).name
-			if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
-				ground = y
-				break
-			end
-		end
-
-		if ground~=nil then
-			local chest_pos = {x=pos.x,y=ground+1, z=pos.z}
+		local ground = findGroundLevel(pos, y_min, y_max)
+		if ground ~= nil then
+			local chest_pos = {x = pos.x, y = ground + 1, z = pos.z}
+			
+			-- Don't spawn at barrier
 			if chest_pos.z == 0 then
 				chest_pos.z = -1
 			end
+			
 			local nn = minetest.get_node(chest_pos).name	-- chest node name (before it becomes a chest)
 			if nn == "air" or nn == "default:water_source" then
-				-->>>> chest spawning starts here <<<<--
-
-				-- first: spawn the chest
-				local chest = {name = "tsm_chests:chest"}
-
-				-- secondly: rotate the chest
-				-- find possible faces
-				local xp, xm, zp, zm
-				xp = minetest.get_node({x=pos.x+1,y=ground+1, z=pos.z})
-				xm = minetest.get_node({x=pos.x-1,y=ground+1, z=pos.z})
-				zp = minetest.get_node({x=pos.x,y=ground+1, z=pos.z+1})
-				zm = minetest.get_node({x=pos.x,y=ground+1, z=pos.z-1})
-
-				local facedirs = {}
-				if(xp.name=="air" or xp.name=="default:water_source") then
-					table.insert(facedirs, minetest.dir_to_facedir({x=-1,y=0,z=0}))
-				end
-				if(xm.name=="air" or xm.name=="default:water_source") then
-
-					table.insert(facedirs, minetest.dir_to_facedir({x=1,y=0,z=0}))
-				end
-				if(zp.name=="air" or zp.name=="default:water_source") then
-					table.insert(facedirs, minetest.dir_to_facedir({x=0,y=0,z=-1}))
-				end
-				if(zm.name=="air" or zm.name=="default:water_source") then
-					table.insert(facedirs, minetest.dir_to_facedir({x=0,y=0,z=1}))
-				end
-
-				-- choose a random face (if possible)
-				if(#facedirs == 0) then
-					minetest.set_node({x=pos.x,y=ground+1, z=pos.z+1},{name=nn})
-					chest.param2 = minetest.dir_to_facedir({x=0,y=0,z=1})
-				else
-					chest.param2 = facedirs[math.floor(math.random(#facedirs))]
-				end
-
-				-- Lastly: place the chest
-				minetest.set_node(chest_pos,chest)
-				--minetest.chat_send_all("Placed chest! " .. dump(chest_pos))
-
-				--->>>>>>>>>> At this point we are finally going to involve Treasurer. <<<<<<<<<<<<<<--
-				-- determine a random amount of treasures
-				local treasure_amount = math.ceil(math.random(t_min, t_max))
-
-				-- calculate preciousness of treasures based on height. higher = more precious
-				local height = math.abs(h_min) - math.abs(h_max)
-				local y_norm = (ground+1) - h_min
-				local scale = 1 - (y_norm/height)
-				local minp = 0 --scale*4		-- minimal preciousness:   0..4
-				local maxp = 10 --scale*4+2.1	-- maximum preciousness: 2.1..6.1
-
-				-- now use these values to finally request the treasure(s)
-				local treasures = treasurer.select_random_treasures(treasure_amount,minp,maxp)
-				-- That’s it!
-
-				-- Get the inventory of the chest to place the treasures in
-				local meta = minetest.get_meta(chest_pos)
-				local inv = meta:get_inventory()
-
-				--[[ Now that we got both our treasures and the chest’s inventory,
-				let’s place the treasures one for one into it. ]]
-				for i=1,#treasures do
-					inv:set_stack("main",i,treasures[i])
-				end
+				placeChest(pos, chest_pos, ground, nn)
+				
+				chests_placed = chests_placed + 1			
 			end
 		end
 	end
+	
+	print("Spawned " .. chests_placed .. " chests after " .. attempts .. " attempts!")
 end)
