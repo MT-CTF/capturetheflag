@@ -54,7 +54,7 @@ function sfinv.get(player, context)
 	local vars = {
 		layout = theme,
 		name = player:get_player_name(),
-		nav = "tabheader[0,0;tabs;" .. table.concat(nav, ",") .. ";" .. current_idx .."]"
+		nav = "tabheader[0,0;tabs;" .. table.concat(nav, ",") .. ";" .. current_idx .. ";true;false]"
 	}
 	fs = sfinv.parse_variables(fs, vars)
 	fs = sfinv.parse_variables(fs, vars)
