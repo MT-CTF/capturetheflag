@@ -31,7 +31,7 @@ rules.txt = table.concat(items, ",")
 if minetest.global_exists("sfinv") then
 	sfinv.register_page("rules:rules", {
 		title = "Rules",
-		get = function(player, context)
+		get = function(self, player, context)
 			return ([[
 					size[8,8.6]
 					bgcolor[#080808BB;true]

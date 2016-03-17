@@ -72,8 +72,7 @@ end)
 function email.get_formspec(name)
 	local inbox = email.get_inbox(name)
 
-	local fs = "size[12,8]"
-	fs  = fs .. "vertlabel[0,0;email Mail]"
+	local fs = "vertlabel[0,0;Your Inbox]"
 
 	function row(fs, c1, date, from, msg)
 		date = minetest.formspec_escape(date)
@@ -127,13 +126,28 @@ function email.show_inbox(name, text_mode)
 			return true, "End of mail (" .. #inbox .. " items)"
 		end
 	else
-		local fs = email.get_formspec(name)
+		local fs = "size[12,8]" .. email.get_formspec(name)
 		minetest.show_formspec(name, "email:inbox", fs)
 
 		return true, "Opened inbox!"
 	end
 
 	return true
+end
+
+if minetest.global_exists("sfinv") then
+	sfinv.register_page("email:inbox", {
+		title = "Inbox",
+		get = function(self, player, context)
+			local name = player:get_player_name()
+			return ([[
+				size[12,8]
+				bgcolor[#080808BB;true]
+				background[5,5;1,1;gui_formbg.png;true]
+				{{ nav }}
+			]]) .. email.get_formspec(name)
+		end
+	})
 end
 
 minetest.register_on_player_receive_fields(function(player,formname,fields)

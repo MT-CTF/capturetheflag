@@ -5,7 +5,7 @@ sfinv.register_page("sfinv:crafting", {
 	is_in_nav = function(player, context)
 		return true
 	end,
-	get = function(player, context)
+	get = function(self, player, context)
 		return [[ {{ layout }}
 			list[current_player;craft;1.75,0.5;3,3;]
 			list[current_player;craftpreview;5.75,1.5;1,1;]
