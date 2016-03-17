@@ -1,2 +1,2 @@
-Adds ignoring and email style inboxes. Also provides a powerful API,
-and optionally allows distance limiting.
+Adds chat functions such as ignoring, distance limiting, and swear filtering.
+Also provides a powerful API, and optionally allows distance limiting.

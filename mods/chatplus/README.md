@@ -1,7 +1,8 @@
 # Chatplus
 
-Adds ignoring and email style inboxes. Also provides a powerful API,
-and optionally allows distance limiting.
+**NOTE: Chatplus has split into two mods, chatplus and [email](https://github.com/rubenwardy/email)**
+
+Adds ignoring, distance limiting (optional) and a swear filter (optional). Also provides a powerful API.
 
 License: GPL 3.0 or later.
 
@@ -11,12 +12,6 @@ Created by rubenwardy.
 
 * /ignore [name] - ignore a player
 * /unignore [name] - unignore a player
-* /mail [name] [msg] - message a player (online or offline!)
-* /inbox - open your inbox
-* /inbox clear - clear your inbox
-* /inbox text - see the text version of the inbox.
-* /inbox txt - alias of /inbox text
-* /inbox t - alias of /inbox text
 
 ## HUD
 

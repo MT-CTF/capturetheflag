@@ -6,9 +6,6 @@
 ---------------------
 
 dofile(minetest.get_modpath("chatplus") .. "/api.lua")
-dofile(minetest.get_modpath("chatplus") .. "/mail.lua")
-
-
 
 --
 -- Ignoring

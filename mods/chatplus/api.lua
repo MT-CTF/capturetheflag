@@ -70,18 +70,23 @@ function chatplus.load()
 			if from_file.players and from_file.version >= 2 then
 				chatplus.players = from_file.players
 			else
+				chatplus.old_inbox = {}
 				chatplus.players = {}
 				for name, data in pairs(from_file) do
-					chatplus.players[name] = data
 					local inbox = data.inbox
-					data.inbox = {}
+					data.inbox = nil
+					chatplus.players[name] = data
+					chatplus.old_inbox[name] = {}
 					for _, msg in pairs(inbox) do
-						table.insert(data.inbox, {
+						table.insert(chatplus.old_inbox[name], {
 							date = "?",
 							from = "?",
 							msg = msg
 						})
 					end
+				end
+				if chatplus.on_old_inbox then
+					chatplus.on_old_inbox(chatplus.old_inbox)
 				end
 			end
 			return
@@ -211,7 +216,7 @@ end
 -- Minetest callbacks
 minetest.register_on_chat_message(function(...)
 	local ret = chatplus.send(...)
-	if ret and minetest.global_exists("irc") then
+	if ret and minetest.global_exists("irc") and irc.on_chatmessage then
 		irc.on_chatmessage(...)
 	end
 	return ret
