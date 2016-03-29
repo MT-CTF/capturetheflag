@@ -2,7 +2,13 @@ ctf.register_on_init(function()
 	ctf._set("match",                    false)
 	ctf._set("match.destroy_team",       false)
 	ctf._set("match.break_alliances",    true)
-	ctf._set("match.teams",              "")
+	ctf._set("match.teams",              2)
+	ctf._set("match.team.1",             "red")
+	ctf._set("match.team.1.color",       "red")
+	ctf._set("match.team.1.pos",         "7,65,93")
+	ctf._set("match.team.2",             "blue")
+	ctf._set("match.team.2.color",       "blue")
+	ctf._set("match.team.2.pos",         "-22,66,-78")
 	ctf._set("match.clear_inv",          false)
 end)
 
@@ -61,28 +67,18 @@ function ctf_match.check_for_winner()
 	end
 end
 
-ctf.register_on_new_game(function()
-	local teams = ctf.setting("match.teams")
-	if teams:trim() == "" then
-		return
-	end
-	ctf.log("match", "Setting up new game!")
+function ctf_match.create_teams()
+	local number = ctf.setting("match.teams")
 
-	teams = teams:split(";")
-	for i, v in pairs(teams) do
-		local team = v:split(",")
-		if #team == 5 then
-			local name  = team[1]:trim()
-			local color = team[2]:trim()
-			local x     = tonumber(team[3]:trim())
-			local y     = tonumber(team[4]:trim())
-			local z     = tonumber(team[5]:trim())
-			local flag  = {
-				x = x,
-				y = y,
-				z = z
-			}
+	for i = 1, number do
+		print("Creating team #" .. i)
+		local name  = ctf.setting("match.team." .. i)
+		local color = ctf.setting("match.team." .. i .. ".color")
+		local pos   = ctf.setting("match.team." .. i .. ".pos")
+		local flag  = minetest.string_to_pos(pos)
 
+		if name and color and pos and flag then
+			print(" - Success in getting settings")
 			ctf.team({
 				name     = name,
 				color    = color,
@@ -94,10 +90,12 @@ ctf.register_on_new_game(function()
 			minetest.after(0, function()
 				ctf_flag.assert_flag(flag)
 			end)
-		else
-			ctf.warning("match", "Invalid team setup: " .. dump(v))
 		end
 	end
+end
+
+ctf.register_on_new_game(function()
+	ctf_match.create_teams()
 
 	for i, player in pairs(minetest.get_connected_players()) do
 		local name       = player:get_player_name()
