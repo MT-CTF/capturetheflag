@@ -20,3 +20,15 @@ minetest.register_on_leaveplayer(function(player)
 		ctf.remove_player(player:get_player_name())
 	end
 end)
+
+if minetest.global_exists("irc") then
+	ctf_match.register_on_winner(function(winner)
+		if not irc.connected then return end
+		irc:say("Team " .. winner .. " won!")
+	end)
+
+	ctf.register_on_new_game(function()
+		if not irc.connected then return end
+		irc:say("Next round!")
+	end)
+end

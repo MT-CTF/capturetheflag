@@ -3,3 +3,4 @@ ctf_flag
 ctf_inventory
 vote
 hudkit
+irc?

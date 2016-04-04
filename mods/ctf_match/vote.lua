@@ -7,6 +7,11 @@ function ctf_match.register_on_skip_map(func)
 end
 
 function ctf_match.vote_next(name, params)
+	if minetest.global_exists("irc") then
+		local tname = ctf.player(name).team or "none"
+		irc:say("Vote started by " .. name .. " (team " .. tname .. ")")
+	end
+
 	return vote.new_vote(name, {
 		description = "Skip to next match",
 		help = "/yes,  /no  or  /abstain",
