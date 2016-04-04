@@ -7,6 +7,8 @@
 "colors.skins"   true
 "default_diplo_state"   "war"
 "diplomacy"   false
+"flag.alerts"   true
+"flag.alerts.neutral_alert"   true
 "flag.allow_multiple"   true
 "flag.capture_mode"   "take"
 "flag.capture_take"   true
@@ -25,7 +27,6 @@
 "gui.team.teleport_to_flag"   false
 "gui.team.teleport_to_spawn"   false
 "hud"   true
-"inventory"   false
 "match"   true
 "match.break_alliances"   true
 "match.build_time"   240
@@ -33,7 +34,13 @@
 "match.destroy_team"   true
 "match.map_reset_limit"   200
 "match.remove_player_on_leave"   true
-"match.teams"   "red, red, 7, 65, 93; blue, blue, -22, 66, -78"
+"match.team.1"   "red"
+"match.team.1.color"   "red"
+"match.team.1.pos"   "7,65,93"
+"match.team.2"   "blue"
+"match.team.2.color"   "blue"
+"match.team.2.pos"   "-22,66,-78"
+"match.teams"   2
 "maximum_in_team"   -1
 "node_ownership"   false
 "players_can_change_team"   false
