@@ -35,11 +35,4 @@ sfinv.register_page("ctf_inventory:help", {
 	end
 })
 
-
-minetest.register_on_joinplayer(function(player)
-	if ctf.setting("inventory") then
-		player:set_inventory_formspec(fs)
-	end
-end)
-
 dofile(minetest.get_modpath("ctf_inventory") .. "/give_initial_stuff.lua")
