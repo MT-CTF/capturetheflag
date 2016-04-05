@@ -23,11 +23,7 @@ function ctf_events.post(action, one, two)
 end
 
 ctf.register_on_killedplayer(function(victim, killer, type)
-	if killer == victim then
-		ctf_events.post("kill_grenade", nil, victim)
-	else
-		ctf_events.post("kill_" .. type, killer, victim)
-	end
+	ctf_events.post("kill_" .. type, killer, victim)
 	ctf_events.update_all()
 end)
 

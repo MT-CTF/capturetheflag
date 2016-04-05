@@ -393,9 +393,9 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 				obj_pos.y = obj_pos.y + 1.7
 				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
 				if minetest.line_of_sight(obj_pos, blast_pos, 1) then
-					obj:punch(obj, 2.0, {
+					obj:punch(user or obj, 2.0, {
 						full_punch_interval = 1.0,
-						damage_groups = {fleshy=damage},
+						damage_groups = {fleshy=damage, grenade=damage},
 					})
 				end
 			end

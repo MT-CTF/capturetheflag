@@ -12,6 +12,7 @@ minetest.register_entity("shooter:grenade_entity", {
 		"shooter_grenade.png",
 	},
 	player = nil,
+	player_name = nil,
 	collisionbox = {0,0,0, 0,0,0},
 	on_activate = function(self, staticdata)
 		if staticdata == "expired" then
@@ -62,6 +63,7 @@ minetest.register_tool("shooter:grenade", {
 				local ent = obj:get_luaentity()
 				if ent then
 					ent.player = ent.player or user
+					ent.player_name = user:get_player_name()
 				end
 			end
 		end
@@ -77,4 +79,3 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 end
-
