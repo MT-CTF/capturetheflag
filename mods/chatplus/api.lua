@@ -7,7 +7,7 @@
 
 
 chatplus = {
-	version = 2.2,
+	version = 2.3,
 	_logpath = minetest.get_worldpath().."/chatplus-log.txt",
 	_defsettings = {
 		log = true,
@@ -164,6 +164,14 @@ function chatplus.poke(name,player)
 	return chatplus.players[name]
 end
 
+minetest.register_on_joinplayer(function(player)
+	chatplus.poke(player:get_player_name(), player)
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	chatplus.poke(player:get_player_name(), "end")
+end)
+
 function chatplus.register_handler(func,place)
 	if not place then
 		table.insert(chatplus._handlers, func)
@@ -177,17 +185,13 @@ function chatplus.log_message(from, msg)
 	chatplus.log("<" .. from .. "> " .. msg)
 end
 
-minetest.register_on_joinplayer(function(player)
-	chatplus.poke(player:get_player_name(), player)
-end)
-
-minetest.register_on_leaveplayer(function(player)
-	chatplus.poke(player:get_player_name(), "end")
-end)
-
 function chatplus.send(from, msg)
 	if msg:sub(1, 1) == "/" then
 		return false
+	end
+	
+	if not minetest.check_player_privs(from, {shout = true}) then
+		return nil
 	end
 
 	chatplus.log_message(from, msg)
