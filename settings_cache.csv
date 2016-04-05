@@ -3,7 +3,8 @@
 "chat.default"   "global"
 "chat.global_channel"   true
 "chat.team_channel"   true
-"colors.nametag"   false
+"colors.nametag"   true
+"colors.nametag.tcolor"   false
 "colors.skins"   true
 "default_diplo_state"   "war"
 "diplomacy"   false
