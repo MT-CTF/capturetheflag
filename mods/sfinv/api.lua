@@ -79,7 +79,6 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	minetest.after(0.5, function()
-		minetest.chat_send_player(player:get_player_name(), "Hello!")
 		sfinv.set(player)
 	end)
 end)
