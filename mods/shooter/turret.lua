@@ -80,22 +80,12 @@ minetest.register_entity("shooter:turret_entity", {
 		get_turret_entity(self.pos)
 	end,
 	on_rightclick = function(self, clicker)
-		if self.player == nil then
+		if self.player then
+			self.player:set_detach()
+			self.player = nil
+		else
 			clicker:set_attach(self.object, "", {x=0,y=5,z=-8}, {x=0,y=0,z=0})
 			self.player = clicker
-		else
-			self.player:set_detach()
-			local yaw = self.yaw + math.pi / 2
-			local dir = vector.normalize({
-				x = math.cos(yaw),
-				y = 0,
-				z = math.sin(yaw),
-			})
-			local pos = vector.subtract(self.player:getpos(), dir)
-			minetest.after(0.2, function(player)
-				player:setpos(pos)
-			end, self.player)
-			self.player = nil
 		end
 	end,
 	on_step = function(self, dtime)

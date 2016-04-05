@@ -1,0 +1,2 @@
+First person shooter mod.
+Adds firearms plus a few other fun items.

@@ -23,7 +23,11 @@ function ctf_events.post(action, one, two)
 end
 
 ctf.register_on_killedplayer(function(victim, killer, type)
-	ctf_events.post("kill_" .. type, killer, victim)
+	if killer == victim then
+		ctf_events.post("kill_grenade", nil, victim)
+	else
+		ctf_events.post("kill_" .. type, killer, victim)
+	end
 	ctf_events.update_all()
 end)
 
@@ -47,21 +51,25 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 	local y_pos = i * 20
 
 	-- One
-	local tone_text, tone_hex = ctf_colors.get_color(evt.one, ctf.player(evt.one))
-	if hud:exists(player, idx) then
-		hud:change(player, idx, "text", evt.one)
-		hud:change(player, idx, "number", tone_hex)
+	if evt.one then
+		local tone_text, tone_hex = ctf_colors.get_color(evt.one, ctf.player(evt.one))
+		if hud:exists(player, idx) then
+			hud:change(player, idx, "text", evt.one)
+			hud:change(player, idx, "number", tone_hex)
+		else
+			local tmp = {
+				hud_elem_type = "text",
+				position      = {x = 0, y = 0.8},
+				scale         = {x = 200, y = 100},
+				text          = evt.one,
+				number        = tone_hex,
+				offset        = {x = 145, y = -y_pos},
+				alignment     = {x = -1, y = 0}
+			}
+			hud:add(player, idx, tmp)
+		end
 	else
-		local tmp = {
-			hud_elem_type = "text",
-			position      = {x = 0, y = 0.8},
-			scale         = {x = 200, y = 100},
-			text          = evt.one,
-			number        = tone_hex,
-			offset        = {x = 145, y = -y_pos},
-			alignment     = {x = -1, y = 0}
-		}
-		hud:add(player, idx, tmp)
+		hud:remove(player, idx)
 	end
 
 	-- Two
