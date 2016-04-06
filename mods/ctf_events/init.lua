@@ -22,16 +22,6 @@ function ctf_events.post(action, one, two)
 	end
 end
 
-ctf.register_on_killedplayer(function(victim, killer, type)
-	ctf_events.post("kill_" .. type, killer, victim)
-	ctf_events.update_all()
-end)
-
-ctf.register_on_new_game(function()
-	ctf_events.events = {}
-	ctf_events.update_all()
-end)
-
 function ctf_events.update_row(i, player, name, tplayer, evt)
 	local idx = "ctf_events:" .. i .. "_one"
 	local idxa = "ctf_events:" .. i .. "_action"
@@ -132,3 +122,13 @@ function ctf_events.update_all()
 	minetest.after(10, ctf_events.update_all)
 end
 minetest.after(10, ctf_events.update_all)
+
+ctf.register_on_killedplayer(function(victim, killer, type)
+	ctf_events.post("kill_" .. type, killer, victim)
+	ctf_events.update_all()
+end)
+
+ctf.register_on_new_game(function()
+	ctf_events.events = {}
+	ctf_events.update_all()
+end)
