@@ -42,13 +42,15 @@ end
 
 minetest.register_chatcommand("vote", {
 	privs = {
-		interact = true
+		interact = true,
+		vote_starter = true
 	},
 	func = ctf_match.vote_next
 })
 
 minetest.register_on_chat_message(function(name, msg)
-	if msg == "/vote_next" then
+	if msg == "/vote_next" and minetest.check_player_privs(name,
+			{interact=true, vote_starter=true}) then
 		local suc, msg = ctf_match.vote_next(name)
 		if msg then
 			minetest.chat_send_player(name, msg)

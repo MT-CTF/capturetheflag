@@ -162,7 +162,8 @@ vote.hud = hudkit()
 function vote.update_hud(player)
 	local name = player:get_player_name()
 	local voteset = vote.get_next_vote(name)
-	if not voteset then
+	if not voteset or not minetest.check_player_privs(name,
+			{interact=true, vote=true}) then
 		vote.hud:remove(player, "vote:desc")
 		vote.hud:remove(player, "vote:bg")
 		vote.hud:remove(player, "vote:help")
@@ -222,9 +223,18 @@ function vote.update_all_hud()
 end
 minetest.after(5, vote.update_all_hud)
 
+minetest.register_privilege("vote", {
+	description = "Can vote on issues"
+})
+
+minetest.register_privilege("vote_starter", {
+	description = "Can vote on issues"
+})
+
 minetest.register_chatcommand("yes", {
 	privs = {
-		interact = true
+		interact = true,
+		vote = true
 	},
 	func = function(name, params)
 		local voteset = vote.get_next_vote(name)
@@ -247,7 +257,8 @@ minetest.register_chatcommand("yes", {
 
 minetest.register_chatcommand("no", {
 	privs = {
-		interact = true
+		interact = true,
+		vote = true
 	},
 	func = function(name, params)
 		local voteset = vote.get_next_vote(name)
@@ -270,7 +281,8 @@ minetest.register_chatcommand("no", {
 
 minetest.register_chatcommand("abstain", {
 	privs = {
-		interact = true
+		interact = true,
+		vote = true
 	},
 	func = function(name, params)
 		local voteset = vote.get_next_vote(name)
@@ -297,7 +309,8 @@ local set = minetest.setting_get("vote.kick_vote")
 if set == nil or minetest.is_yes(set) then
 	minetest.register_chatcommand("vote_kick", {
 		privs = {
-			interact = true
+			interact = true,
+			vote_starter = true
 		},
 		func = function(name, param)
 			if not minetest.get_player_by_name(param) then
