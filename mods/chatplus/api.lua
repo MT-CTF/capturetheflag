@@ -189,7 +189,7 @@ function chatplus.send(from, msg)
 	if msg:sub(1, 1) == "/" then
 		return false
 	end
-	
+
 	if not minetest.check_player_privs(from, {shout = true}) then
 		return nil
 	end
@@ -228,9 +228,6 @@ end
 -- Minetest callbacks
 minetest.register_on_chat_message(function(...)
 	local ret = chatplus.send(...)
-	if ret and minetest.global_exists("irc") and irc.on_chatmessage then
-		irc.on_chatmessage(...)
-	end
 	return ret
 end)
 minetest.register_on_joinplayer(function(player)
