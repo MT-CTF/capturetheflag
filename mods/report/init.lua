@@ -22,6 +22,10 @@ minetest.register_chatcommand("report", {
 			end
 		end
 
+
+		if minetest.global_exists("irc") and irc.feature_mod_channel then
+			irc:say(irc.config.channel, "UserReport by " .. name .. ": " .. param, true)
+		end
 		if #mods > 0 then
 			mod_list = table.concat(mods, ", ")
 			email.send_mail(name, minetest.setting_get("name"),
