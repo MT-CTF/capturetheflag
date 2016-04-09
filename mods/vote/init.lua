@@ -224,11 +224,13 @@ end
 minetest.after(5, vote.update_all_hud)
 
 minetest.register_privilege("vote", {
-	description = "Can vote on issues"
+	description = "Can vote on issues",
+	basic_priv = true
 })
 
 minetest.register_privilege("vote_starter", {
-	description = "Can vote on issues"
+	description = "Can vote on issues",
+	basic_priv = true
 })
 
 minetest.register_chatcommand("yes", {
