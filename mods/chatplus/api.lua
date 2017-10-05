@@ -189,7 +189,7 @@ function chatplus.send(from, msg)
 	if msg:sub(1, 1) == "/" then
 		return false
 	end
-	
+
 	if not minetest.check_player_privs(from, {shout = true}) then
 		return nil
 	end
@@ -220,10 +220,14 @@ function chatplus.send(from, msg)
 				minetest.chat_send_player(to, "<" .. from .. "> " .. msg)
 			end
 		elseif minetest.features.no_chat_message_prediction then
-			minetest.chat_send_player(from, "<" .. from .. "> " .. msg)
+			chatplus.send_message_to_sender(from, msg)
 		end
 	end
 	return true
+end
+
+function chatplus.send_message_to_sender(from, msg)
+	minetest.chat_send_player(from, "<" .. from .. "> " .. msg)
 end
 
 
