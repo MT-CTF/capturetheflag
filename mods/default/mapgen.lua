@@ -33,7 +33,7 @@ minetest.register_alias("mapgen_pine_needles", "default:pine_needles")
 
 minetest.register_alias("mapgen_cobble", "default:cobble")
 minetest.register_alias("mapgen_stair_cobble", "air")
-minetest.register_alias("mapgen_mossycobble", "default:cobbe")
+minetest.register_alias("mapgen_mossycobble", "default:cobble")
 minetest.register_alias("mapgen_sandstonebrick", "default:sandstonebrick")
 minetest.register_alias("mapgen_stair_sandstonebrick", "air")
 
@@ -599,31 +599,6 @@ function default.register_decorations()
 		y_max = MAX_TREE_H,
 		schematic = minetest.get_modpath("default").."/schematics/pine_tree.mts",
 		flags = "place_center_x, place_center_z",
-	})
-
-	minetest.register_decoration({
-		deco_type = "schematic",
-		place_on = {"default:dirt_with_snow", "default:dirt_with_grass"},
-		sidelen = 80,
-		fill_ratio = 0.003,
-		biomes = {"taiga", "coniferous_forest"},
-		y_min = 1,
-		y_max = MAX_TREE_H,
-		schematic = {
-			size = { x = 3, y = 3, z = 1},
-			data = {
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-				{ name = "default:pine_tree", param2 = 12, prob = 191 },
-				{ name = "default:pine_tree", param2 = 12 },
-				{ name = "default:pine_tree", param2 = 12, prob = 127 },
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-			},
-		},
-		flags = "place_center_x",
-		rotation = "random",
 	})
 
 	-- Acacia tree and log
