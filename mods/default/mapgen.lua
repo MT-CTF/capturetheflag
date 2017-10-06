@@ -25,17 +25,17 @@ minetest.register_alias("mapgen_leaves", "default:leaves")
 minetest.register_alias("mapgen_apple", "default:apple")
 minetest.register_alias("mapgen_jungletree", "default:jungletree")
 minetest.register_alias("mapgen_jungleleaves", "default:jungleleaves")
-minetest.register_alias("mapgen_junglegrass", "default:junglegrass")
+minetest.register_alias("mapgen_junglegrass", "air")
 minetest.register_alias("mapgen_pine_tree", "default:pine_tree")
 minetest.register_alias("mapgen_pine_needles", "default:pine_needles")
 
 -- Dungeons
 
 minetest.register_alias("mapgen_cobble", "default:cobble")
-minetest.register_alias("mapgen_stair_cobble", "stairs:stair_cobble")
-minetest.register_alias("mapgen_mossycobble", "default:mossycobble")
+minetest.register_alias("mapgen_stair_cobble", "air")
+minetest.register_alias("mapgen_mossycobble", "default:cobbe")
 minetest.register_alias("mapgen_sandstonebrick", "default:sandstonebrick")
-minetest.register_alias("mapgen_stair_sandstonebrick", "stairs:stair_sandstonebrick")
+minetest.register_alias("mapgen_stair_sandstonebrick", "air")
 
 
 --
@@ -489,45 +489,6 @@ function default.register_mgv6_decorations()
 	        height_max = 4,
 	})
 
-	-- Long grasses
-
-	for length = 1, 5 do
-		minetest.register_decoration({
-			deco_type = "simple",
-			place_on = {"default:dirt_with_grass"},
-			sidelen = 16,
-			noise_params = {
-				offset = 0,
-				scale = 0.007,
-				spread = {x = 100, y = 100, z = 100},
-				seed = 329,
-				octaves = 3,
-				persist = 0.6
-			},
-			y_min = 1,
-			y_max = 30,
-			decoration = "default:grass_"..length,
-		})
-	end
-
-	-- Dry shrubs
-
-	minetest.register_decoration({
-		deco_type = "simple",
-		place_on = {"default:desert_sand", "default:dirt_with_snow"},
-		sidelen = 16,
-		noise_params = {
-			offset = 0,
-			scale = 0.035,
-			spread = {x = 100, y = 100, z = 100},
-			seed = 329,
-			octaves = 3,
-			persist = 0.6
-		},
-		y_min = 1,
-		y_max = 30,
-		decoration = "default:dry_shrub",
-	})
 end
 
 -- All mapgens except mgv6 and singlenode
@@ -658,7 +619,6 @@ function default.register_decorations()
 				{ name = "default:pine_tree", param2 = 12 },
 				{ name = "default:pine_tree", param2 = 12, prob = 127 },
 				{ name = "air", prob = 0 },
-				{ name = "flowers:mushroom_red", prob = 63 },
 				{ name = "air", prob = 0 },
 			},
 		},
@@ -740,38 +700,6 @@ function default.register_decorations()
 		rotation = "random",
 	})
 
-	minetest.register_decoration({
-		deco_type = "schematic",
-		place_on = {"default:dirt_with_grass"},
-		sidelen = 16,
-		noise_params = {
-			offset = 0.0,
-			scale = -0.0015,
-			spread = {x = 250, y = 250, z = 250},
-			seed = 2,
-			octaves = 3,
-			persist = 0.66
-		},
-		biomes = {"deciduous_forest"},
-		y_min = 1,
-		y_max = MAX_TREE_H,
-		schematic = {
-			size = { x = 3, y = 3, z = 1},
-			data = {
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-				{ name = "air", prob = 0 },
-				{ name = "default:aspen_tree", param2 = 12 },
-				{ name = "default:aspen_tree", param2 = 12 },
-				{ name = "default:aspen_tree", param2 = 12, prob = 127 },
-				{ name = "flowers:mushroom_red", prob = 63 },
-				{ name = "flowers:mushroom_brown", prob = 63 },
-				{ name = "air", prob = 0 },
-			},
-		},
-		flags = "place_center_x",
-		rotation = "random",
-	})
 	-- Large cactus
 
 	minetest.register_decoration({
@@ -851,39 +779,6 @@ function default.register_decorations()
 	register_dry_grass_decoration(0.05, 0.01,  3)
 	register_dry_grass_decoration(0.07, -0.01, 2)
 	register_dry_grass_decoration(0.09, -0.03, 1)
-
-	-- Junglegrass
-
-	minetest.register_decoration({
-		deco_type = "simple",
-		place_on = {"default:dirt_with_grass"},
-		sidelen = 80,
-		fill_ratio = 0.1,
-		biomes = {"rainforest"},
-		y_min = 1,
-		y_max = MAX_GRASS_H,
-		decoration = "default:junglegrass",
-	})
-
-	-- Dry shrub
-
-	minetest.register_decoration({
-		deco_type = "simple",
-		place_on = {"default:desert_sand", "default:dirt_with_snow"},
-		sidelen = 16,
-		noise_params = {
-			offset = 0,
-			scale = 0.02,
-			spread = {x = 200, y = 200, z = 200},
-			seed = 329,
-			octaves = 3,
-			persist = 0.6
-		},
-		biomes = {"desert", "tundra"},
-		y_min = 2,
-		y_max = MAX_GRASS_H,
-		decoration = "default:dry_shrub",
-	})
 end
 
 
