@@ -115,17 +115,20 @@ function ctf_events.update(player)
 end
 
 function ctf_events.update_all()
-	print("Updating events log")
+	print("Updating ctf_event logs for all players")
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf_events.update(player)
 	end
-	minetest.after(10, ctf_events.update_all)
 end
-minetest.after(10, ctf_events.update_all)
 
 ctf.register_on_killedplayer(function(victim, killer, type)
+	print("Player killed, posting ctf_event")
 	ctf_events.post("kill_" .. type, killer, victim)
 	ctf_events.update_all()
+end)
+
+minetest.register_on_joinplayer(function(player)
+	ctf_events.update(player)
 end)
 
 ctf.register_on_new_game(function()
