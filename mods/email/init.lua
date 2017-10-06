@@ -140,12 +140,7 @@ if minetest.global_exists("sfinv") then
 		title = "Inbox",
 		get = function(self, player, context)
 			local name = player:get_player_name()
-			return ([[
-				size[12,8]
-				bgcolor[#080808BB;true]
-				background[5,5;1,1;gui_formbg.png;true]
-				{{ nav }}
-			]]) .. email.get_formspec(name)
+			return sfinv.make_formspec(player, context, email.get_formspec(name), false, "size[12,8]")
 		end
 	})
 end

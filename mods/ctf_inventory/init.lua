@@ -1,11 +1,3 @@
-local fs = [[
-	size[8,8.6]
-	bgcolor[#080808BB;true]
-	background[5,5;1,1;gui_formbg.png;true]
-	{{ nav }}
-	textlist[0,0;7.85,8.5;help;
-]]
-
 local items = {
 	"Tips",
 	"",
@@ -26,12 +18,15 @@ local items = {
 for i = 1, #items do
 	items[i] = minetest.formspec_escape(items[i])
 end
-fs = fs .. table.concat(items, ",") .. "]"
+
+local fs = [[
+		textlist[0,0;7.85,8.5;help;
+	]] .. table.concat(items, ",") .. "]"
 
 sfinv.register_page("ctf_inventory:help", {
 	title = "Help",
-	get = function(player, context)
-		return fs
+	get = function(self, player, context)
+		return sfinv.make_formspec(player, context, fs, false)
 	end
 })
 
