@@ -47,18 +47,20 @@ local function get_is_player_pro(player)
 end
 
 local colors = {"red", "blue"}
-for _, color in pairs(colors) do
-	minetest.register_node("ctf_team_base:chest_" .. color, {
+local chest_name_to_team = {}
+for _, chest_color in pairs(colors) do
+	chest_name_to_team["ctf_team_base:chest_" .. chest_color] = chest_color
+	minetest.register_node("ctf_team_base:chest_" .. chest_color, {
 		description = "Chest",
 		tiles = {
-			"default_chest_top_" .. color .. ".png",
-			"default_chest_top_" .. color .. ".png",
-			"default_chest_side_" .. color .. ".png",
-			"default_chest_side_" .. color .. ".png",
-			"default_chest_side_" .. color .. ".png",
-			"default_chest_front_" .. color .. ".png"},
+			"default_chest_top_" .. chest_color .. ".png",
+			"default_chest_top_" .. chest_color .. ".png",
+			"default_chest_side_" .. chest_color .. ".png",
+			"default_chest_side_" .. chest_color .. ".png",
+			"default_chest_side_" .. chest_color .. ".png",
+			"default_chest_front_" .. chest_color .. ".png"},
 		paramtype2 = "facedir",
-		groups = {immortal = 1},
+		groups = {immortal = 1, team_chest=1},
 		legacy_facedir_simple = true,
 		is_ground_content = false,
 		sounds = default.node_sound_wood_defaults(),
@@ -70,11 +72,15 @@ for _, color in pairs(colors) do
 			inv:set_size("pro", 3*4)
 		end,
 		on_rightclick = function(pos, node, player)
-			local meta = minetest.get_meta(pos)
-			local owning_team = meta:get_string("owner_team")
-			if owning_team ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+			if chest_color ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return
+			end
+
+			local territory_owner = ctf.get_territory_owner(pos)
+			if chest_color ~= territory_owner then
+				ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. chest_color)
+				minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
 			end
 
 			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
@@ -111,9 +117,8 @@ for _, color in pairs(colors) do
 		allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
 			local meta = minetest.get_meta(pos)
-			local owning_team = meta:get_string("owner_team")
-			if owning_team ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+			if chest_color ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
 			end
 
@@ -124,10 +129,8 @@ for _, color in pairs(colors) do
 			end
 		end,
 		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-			local meta = minetest.get_meta(pos)
-			local owning_team = meta:get_string("owner_team")
-			if owning_team ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+			if chest_color ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
 			end
 
@@ -139,9 +142,8 @@ for _, color in pairs(colors) do
 		end,
 		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 			local meta = minetest.get_meta(pos)
-			local owning_team = meta:get_string("owner_team")
-			if owning_team ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+			if chest_color ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
 			end
 
@@ -154,16 +156,31 @@ for _, color in pairs(colors) do
 		can_dig = function(pos, player)
 			return false
 		end,
-	    on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		on_metadata_inventory_put = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..
 				" moves " .. (stack:get_name() or "stuff") .. " " .. (stack:get_count() or 0)  .. " to chest at " .. minetest.pos_to_string(pos))
 		end,
-	    on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		on_metadata_inventory_take = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..
 				" takes " .. (stack:get_name() or "stuff") .. " " .. (stack:get_count() or 0) .. " from chest at " .. minetest.pos_to_string(pos))
 		end
 	})
 end
+
+minetest.register_abm({
+	nodenames = {"group:team_chest"},
+	interval = 2, -- Run every 10 seconds
+	chance = 1, -- Select every 1 in 50 nodes
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local current_owner = assert(chest_name_to_team[node.name])
+
+		local territory_owner = ctf.get_territory_owner(pos)
+		if territory_owner and current_owner ~= territory_owner then
+			ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. current_owner)
+			minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
+		end
+	end
+})
 
 minetest.register_on_generated(function(minp, maxp, seed)
 	for tname, team in pairs(ctf.teams) do
@@ -206,9 +223,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					z = flag.z + dz
 				}
 				minetest.set_node(pos, chest)
-				local meta = minetest.get_meta(pos)
-				meta:set_string("owner_team", tname)
-				local inv = meta:get_inventory()
+				local inv = minetest.get_meta(pos):get_inventory()
 				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:cobble 99"))
