@@ -37,7 +37,7 @@ Textures: CC-BY-SA 3.0
 * [email](https://forum.minetest.net/viewtopic.php?t=13754) by rubenwardy (MIT)
 * [report](https://forum.minetest.net/viewtopic.php?t=13752) by rubenwardy (CC0)
 * [vote](https://forum.minetest.net/viewtopic.php?t=12829) by rubenwardy (MIT)
-* [no_sneak_glitch](https://forum.minetest.net/viewtopic.php?t=10424) by Wuzzy (WTFPL)
+
 * Minetest Game mods: default, doors, sfinv.
   Fun fact: sfinv was made for this subgame, and then merged into MTG.
 
@@ -45,3 +45,4 @@ Textures: CC-BY-SA 3.0
 
 * hpregen by rubenwardy (LGPLv2.1+)
 * ctf_* by rubenwardy (LGPLv2.1+)
+* no_minimap by rubenwardy (LGPLv2.1+)
