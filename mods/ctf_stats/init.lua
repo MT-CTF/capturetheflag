@@ -31,6 +31,26 @@ function ctf_stats.load()
 		for _, key in pairs(data_to_persist) do
 			ctf_stats[key] = minetest.parse_json(storage:get_string(key))
 		end
+
+		ctf_stats.matches.wins = ctf_stats.matches.wins or {
+			red  = ctf_stats.matches.red_wins or 0,
+			blue = ctf_stats.matches.blue_wins or 0,
+		}
+
+		for name, player_stats in pairs(ctf_stats.players) do
+			player_stats.wins = player_stats.wins or {}
+			if player_stats.blue_wins then
+				player_stats.wins.blue = player_stats.blue_wins
+				player_stats.blue_wins = nil
+			end
+			if player_stats.red_wins then
+				player_stats.wins.red  = player_stats.red_wins
+				player_stats.red_wins  = nil
+			end
+			player_stats.wins.blue = player_stats.wins.blue or 0
+			player_stats.wins.red  = player_stats.wins.red  or 0
+		end
+		ctf.needs_save = true
 	end
 
 	ctf_stats.matches = ctf_stats.matches or {
@@ -102,9 +122,9 @@ ctf_flag.register_on_capture(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.captures  = main.captures  + 1
-		main.score     = main.score     + 20
+		main.score     = main.score     + 25
 		match.captures = match.captures + 1
-		match.score     = match.score     + 20
+		match.score    = match.score    + 25
 		ctf.needs_save = true
 	end
 end)
@@ -134,7 +154,7 @@ ctf_flag.register_on_pick_up(function(name, flag)
 		main.attempts  = main.attempts  + 1
 		main.score     = main.score     + 5
 		match.attempts = match.attempts + 1
-		match.score     = match.score     + 5
+		match.score    = match.score    + 10
 		ctf.needs_save = true
 	end
 end)
@@ -170,10 +190,11 @@ local function calculateKillReward(victim, killer)
 
 	-- +5 for every kill they've made since last death in this match.
 	local reward = victim_match.kills_since_death * 5
-	ctf.log("ctf_stats", "Player " .. victim .. " has made " .. reward .. " kills since last death")
+	ctf.log("ctf_stats", "Player " .. victim .. " has made " .. reward ..
+			" score worth of kills since last death")
 
 	-- 15 * kd ration, with variable based on player's score
-	local kdreward = 15 * vmain.kills / (vmain.deaths + 1)
+	local kdreward = 20 * vmain.kills / (vmain.deaths + 1)
 	local max = vmain.score / 10
 	if kdreward > max then
 		kdreward = max
@@ -181,12 +202,13 @@ local function calculateKillReward(victim, killer)
 	if kdreward > 40 then
 		kdreward = 40
 	end
+	reward = reward + kdreward
 
 	-- Limited to  0 <= X <= 100
 	if reward > 100 then
 		reward = 100
-	elseif reward < 0 then
-		reward = 0
+	elseif reward < 10 then
+		reward = 10
 	end
 
 	-- Half if no good weapons
