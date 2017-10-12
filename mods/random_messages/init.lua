@@ -50,7 +50,8 @@ function random_messages.read_messages()
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
 		"Eat apples to restore health quickly.",
 		"Steel swords do more damage than guns, but you need to be up close.",
-		"Gain more score by killing more than you die, or by capturing the flag."
+		"Gain more score by killing more than you die, or by capturing the flag.",
+		"You gain more score the better the opponent you defeat.",
 	}
 end
 
