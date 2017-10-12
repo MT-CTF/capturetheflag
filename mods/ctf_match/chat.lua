@@ -12,6 +12,17 @@ minetest.register_chatcommand("ctf_next", {
 	end
 })
 
+minetest.register_chatcommand("ctf_start", {
+	description = "End build time",
+	privs = {
+		ctf_match = true
+	},
+	func = function(name, param)
+	ctf_match.build_timer = 0.01
+	end
+})
+
+
 minetest.register_chatcommand("ctf_respawn", {
 	description = "Respawn a player (clean inv, send to base)",
 	privs = {
