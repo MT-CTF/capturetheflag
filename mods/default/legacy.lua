@@ -7,12 +7,12 @@ function default.register_falling_node(nodename, texture)
 	minetest.log("error", debug.traceback())
 	minetest.log('error', "WARNING: default.register_falling_node is deprecated")
 	if minetest.registered_nodes[nodename] then
-		minetest.registered_nodes[nodename].groups.falling_node = 1
+		-- minetest.registered_nodes[nodename].groups.falling_node = 1
 	end
 end
 
 function default.spawn_falling_node(p, nodename)
-	spawn_falling_node(p, nodename)
+	-- spawn_falling_node(p, nodename)
 end
 
 -- Liquids
