@@ -177,7 +177,7 @@ minetest.register_abm({
 		local territory_owner = ctf.get_territory_owner(pos)
 		if territory_owner and current_owner ~= territory_owner then
 			ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. current_owner)
-			minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
+			minetest.set_node(pos, { name = "ctf_team_base:chest_" .. territory_owner })
 		end
 	end
 })
