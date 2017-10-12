@@ -32,3 +32,7 @@ if minetest.global_exists("irc") then
 		irc:say("Next round!")
 	end)
 end
+
+minetest.after(5, function()
+	ctf_match.next()
+end)
