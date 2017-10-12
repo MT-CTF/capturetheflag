@@ -42,7 +42,6 @@ local function get_is_player_pro(player)
 		pstat.color = nil
 		table.insert(players, pstat)
 	end
-	ctf_stats.calc_scores(players)
 	return ctf_stats.player(player:get_player_name()).score > 0
 end
 
