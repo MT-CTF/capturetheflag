@@ -2,3 +2,4 @@ ctf
 ctf_flag
 ctf_match
 ctf_barrier
+ctf_stats

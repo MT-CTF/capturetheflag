@@ -41,6 +41,7 @@ local function calc_scores(players)
 		return one.score > two.score
 	end)
 end
+ctf_stats.calc_scores = calc_scores
 
 function ctf_stats.get_formspec(title, players)
 	calc_scores(players)

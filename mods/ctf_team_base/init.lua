@@ -35,18 +35,16 @@ function ctf.get_spawn(tname)
 	end
 end
 
-
-local chest_formspec =
-	"size[8,9]" ..
-	default.gui_bg ..
-	default.gui_bg_img ..
-	default.gui_slots ..
-	"list[current_name;main;0,0.3;8,4;]" ..
-	"list[current_player;main;0,4.85;8,1;]" ..
-	"list[current_player;main;0,6.08;8,3;8]" ..
-	"listring[current_name;main]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0,4.85)
+local function get_is_player_pro(player)
+	local players = {}
+	for pname, pstat in pairs(ctf_stats.players) do
+		pstat.name = pname
+		pstat.color = nil
+		table.insert(players, pstat)
+	end
+	ctf_stats.calc_scores(players)
+	return ctf_stats.player(player:get_player_name()).score > 0
+end
 
 local colors = {"red", "blue"}
 for _, color in pairs(colors) do
@@ -66,18 +64,67 @@ for _, color in pairs(colors) do
 		sounds = default.node_sound_wood_defaults(),
 		on_construct = function(pos)
 			local meta = minetest.get_meta(pos)
-			meta:set_string("formspec", chest_formspec)
 			meta:set_string("infotext", "Chest")
 			local inv = meta:get_inventory()
-			inv:set_size("main", 8*4)
+			inv:set_size("main", 5*4)
+			inv:set_size("pro", 3*4)
 		end,
-		can_dig = function(pos,player)
-			return false
+		on_rightclick = function(pos, node, player)
+			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
+			local is_pro = get_is_player_pro(player)
+
+			local formspec =
+				"size[8,9]" ..
+				"label[0,-0.2;" .. minetest.formspec_escape("Any player can take from here, including enemies") .. "]" ..
+				default.gui_bg ..
+				default.gui_bg_img ..
+				default.gui_slots ..
+				"list[" .. chestinv .. ";main;0,0.3;5,4;]" ..
+				"background[5,-0.2;3.15,4.7;ctf_team_base_pro_only.png;false]" ..
+				"list[" .. chestinv .. ";pro;5,0.3;3,4;]" ..
+				"list[current_player;main;0,4.85;8,1;]" ..
+				"list[current_player;main;0,6.08;8,3;8]"
+
+			if is_pro then
+				formspec = formspec .. "listring[current_name;pro]" ..
+					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (score 200+)") .. "]"
+			else
+				formspec = formspec .. "listring[current_name;pro]" ..
+					"label[5,-0.2;" .. minetest.formspec_escape("You need more score (200+)") .. "]"
+			end
+
+			formspec = formspec ..
+				"listring[current_name;main]" ..
+				"listring[current_player;main]" ..
+				default.get_hotbar_bg(0,4.85)
+
+			minetest.show_formspec(player:get_player_name(), "ctf_team_base:chest",  formspec)
 		end,
-		on_metadata_inventory_move = function(pos, from_list, from_index,
+
+		allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
-			minetest.log("action", player:get_player_name() ..
-				" moves stuff in chest at " .. minetest.pos_to_string(pos))
+			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(player) then
+				return count
+			else
+				return 0
+			end
+		end,
+		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+			if listname ~= "pro" or get_is_player_pro(player) then
+				return stack:get_count()
+			else
+				return 0
+			end
+		end,
+		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+			if listname ~= "pro" or get_is_player_pro(player) then
+				return stack:get_count()
+			else
+				return 0
+			end
+		end,
+		can_dig = function(pos, player)
+			return false
 		end,
 	    on_metadata_inventory_put = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..

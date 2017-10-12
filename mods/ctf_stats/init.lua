@@ -53,7 +53,8 @@ function ctf_stats.player(name)
 			kills = 0,
 			deaths = 0,
 			captures = 0,
-			attempts = 0
+			attempts = 0,
+			score = -1,
 		}
 		ctf_stats.players[name] = player
 	end
