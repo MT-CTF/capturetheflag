@@ -70,12 +70,19 @@ for _, color in pairs(colors) do
 			inv:set_size("pro", 3*4)
 		end,
 		on_rightclick = function(pos, node, player)
+			local meta = minetest.get_meta(pos)
+			local owning_team = meta:get_string("owner_team")
+			if owning_team ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+				return
+			end
+
 			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
 			local is_pro = get_is_player_pro(player)
 
 			local formspec =
 				"size[8,9]" ..
-				"label[0,-0.2;" .. minetest.formspec_escape("Any player can take from here, including enemies") .. "]" ..
+				"label[0,-0.2;" .. minetest.formspec_escape("Any team member can take from here") .. "]" ..
 				default.gui_bg ..
 				default.gui_bg_img ..
 				default.gui_slots ..
@@ -103,6 +110,13 @@ for _, color in pairs(colors) do
 
 		allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
+			local meta = minetest.get_meta(pos)
+			local owning_team = meta:get_string("owner_team")
+			if owning_team ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+				return 0
+			end
+
 			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(player) then
 				return count
 			else
@@ -110,6 +124,13 @@ for _, color in pairs(colors) do
 			end
 		end,
 		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+			local meta = minetest.get_meta(pos)
+			local owning_team = meta:get_string("owner_team")
+			if owning_team ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+				return 0
+			end
+
 			if listname ~= "pro" or get_is_player_pro(player) then
 				return stack:get_count()
 			else
@@ -117,6 +138,13 @@ for _, color in pairs(colors) do
 			end
 		end,
 		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+			local meta = minetest.get_meta(pos)
+			local owning_team = meta:get_string("owner_team")
+			if owning_team ~= ctf.player(player:get_player_name()).team then
+				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. owning_team)
+				return 0
+			end
+
 			if listname ~= "pro" or get_is_player_pro(player) then
 				return stack:get_count()
 			else
@@ -178,11 +206,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					z = flag.z + dz
 				}
 				minetest.set_node(pos, chest)
-				local inv = minetest.get_inventory({type = "node", pos=pos})
+				local meta = minetest.get_meta(pos)
+				meta:set_string("owner_team", tname)
+				local inv = meta:get_inventory()
+				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:cobble 99"))
 				inv:add_item("main", ItemStack("default:wood 99"))
-				inv:add_item("main", ItemStack("default:glass 10"))
+				inv:add_item("main", ItemStack("default:glass 5"))
 				inv:add_item("main", ItemStack("default:torch 10"))
 			end
 		end

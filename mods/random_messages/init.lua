@@ -48,9 +48,9 @@ end
 function random_messages.read_messages()
 	random_messages.messages = {
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
-		"If the map is ruined, use /vote to start a new vote to skip the current match.",
 		"Eat apples to restore health quickly.",
-		"You can steal items from the other team's chest."
+		"Steel swords do more damage than guns, but you need to be up close.",
+		"Gain more score by killing more than you die, or by capturing the flag."
 	}
 end
 
@@ -84,11 +84,11 @@ function random_messages.add_message(t)
 end
 
 function random_messages.save_messages()
-		local output = io.open(minetest.get_worldpath().."/random_messages","w")
-		for k,v in pairs(random_messages.messages) do
-			output:write(v .. "\n")
-		end
-		io.close(output)
+	local output = io.open(minetest.get_worldpath().."/random_messages","w")
+	for k,v in pairs(random_messages.messages) do
+		output:write(v .. "\n")
+	end
+	io.close(output)
 end
 
 --When server starts:
