@@ -6,6 +6,8 @@
 "colors.nametag"   true
 "colors.nametag.tcolor"   false
 "colors.skins"   true
+"colors.hudtint"   true
+"hud.teamname"   false
 "default_diplo_state"   "war"
 "diplomacy"   false
 "flag.alerts"   true
