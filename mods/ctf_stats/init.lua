@@ -170,6 +170,7 @@ ctf_flag.register_on_precapture(function(name, flag)
 end)
 
 local good_weapons = {
+	"default:sword_stone",
 	"default:sword_steel",
 	"shooter:grenade",
 	"shooter:shotgun",
@@ -194,21 +195,21 @@ local function calculateKillReward(victim, killer)
 			" score worth of kills since last death")
 
 	-- 15 * kd ration, with variable based on player's score
-	local kdreward = 20 * vmain.kills / (vmain.deaths + 1)
-	local max = vmain.score / 10
+	local kdreward = 30 * vmain.kills / (vmain.deaths + 1)
+	local max = vmain.score / 6
 	if kdreward > max then
 		kdreward = max
 	end
-	if kdreward > 40 then
-		kdreward = 40
+	if kdreward > 80 then
+		kdreward = 80
 	end
 	reward = reward + kdreward
 
 	-- Limited to  0 <= X <= 100
-	if reward > 100 then
-		reward = 100
-	elseif reward < 10 then
-		reward = 10
+	if reward > 150 then
+		reward = 150
+	elseif reward < 14 then
+		reward = 14
 	end
 
 	-- Half if no good weapons
