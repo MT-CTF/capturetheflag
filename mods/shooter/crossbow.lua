@@ -1,5 +1,5 @@
 SHOOTER_CROSSBOW_USES = 50
-SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=2}}
+SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=7}}
 SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
 
 minetest.register_alias("shooter:arrow", "shooter:arrow_white")
@@ -200,7 +200,7 @@ for _, color in pairs(dye_basecolors) do
 					obj:set_properties({
 						textures = {get_texture("arrow_uv", color)}
 					})
-					minetest.sound_play("shooter_throw", {object=obj}) 
+					minetest.sound_play("shooter_throw", {object=obj})
 					local frame = get_animation_frame(dir)
 					obj:setyaw(yaw + math.pi)
 					obj:set_animation({x=frame, y=frame}, 0)
@@ -290,4 +290,3 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		end
 	end
 end
-

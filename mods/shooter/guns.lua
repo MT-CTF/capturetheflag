@@ -33,7 +33,7 @@ shooter:register_weapon("shooter:shotgun", {
 	spec = {
 		range = 50,
 		step = 15,
-		tool_caps = {full_punch_interval=1.5, damage_groups={fleshy=4}},
+		tool_caps = {full_punch_interval=1.5, damage_groups={fleshy=6}},
 		groups = {cracky=3, snappy=2, crumbly=2, choppy=2, fleshy=1, oddly_breakable_by_hand=1},
 		sound = "shooter_shotgun",
 		particle = "smoke_puff.png",
@@ -124,4 +124,3 @@ minetest.register_globalstep(function(dtime)
 		shooter.time = 0
 	end
 end)
-
