@@ -52,4 +52,4 @@ minetest.register_on_punchplayer(function(player, hitter,
 end)
 
 minetest.register_on_joinplayer(respawn_immunity.set_immune)
-minetest.register_on_dieplayer(respawn_immunity.set_immune)
+minetest.register_on_respawnplayer(respawn_immunity.set_immune)
