@@ -52,6 +52,7 @@ function random_messages.read_messages()
 		"Steel swords do more damage than guns, but you need to be up close.",
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
+		"Players are immune for 10 seconds after they respawn.",
 	}
 end
 
