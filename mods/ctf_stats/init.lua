@@ -23,32 +23,31 @@ function ctf_stats.load()
 				if player_stats.score > 800 then
 					player_stats.score = 800
 				end
+
+				player_stats.wins = player_stats.wins or {}
+				if player_stats.blue_wins then
+					player_stats.wins.blue = player_stats.blue_wins
+					player_stats.blue_wins = nil
+				end
+				if player_stats.red_wins then
+					player_stats.wins.red  = player_stats.red_wins
+					player_stats.red_wins  = nil
+				end
+				player_stats.wins.blue = player_stats.wins.blue or 0
+				player_stats.wins.red  = player_stats.wins.red  or 0
 			end
+
+			ctf_stats.matches.wins = ctf_stats.matches.wins or {
+				red  = ctf_stats.matches.red_wins or 0,
+				blue = ctf_stats.matches.blue_wins or 0,
+			}
+
 			ctf.needs_save = true
 		end
 		os.remove(minetest.get_worldpath() .. "/ctf_stats.txt")
 	else
 		for _, key in pairs(data_to_persist) do
 			ctf_stats[key] = minetest.parse_json(storage:get_string(key))
-		end
-
-		ctf_stats.matches.wins = ctf_stats.matches.wins or {
-			red  = ctf_stats.matches.red_wins or 0,
-			blue = ctf_stats.matches.blue_wins or 0,
-		}
-
-		for name, player_stats in pairs(ctf_stats.players) do
-			player_stats.wins = player_stats.wins or {}
-			if player_stats.blue_wins then
-				player_stats.wins.blue = player_stats.blue_wins
-				player_stats.blue_wins = nil
-			end
-			if player_stats.red_wins then
-				player_stats.wins.red  = player_stats.red_wins
-				player_stats.red_wins  = nil
-			end
-			player_stats.wins.blue = player_stats.wins.blue or 0
-			player_stats.wins.red  = player_stats.wins.red  or 0
 		end
 		ctf.needs_save = true
 	end
