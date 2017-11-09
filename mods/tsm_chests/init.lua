@@ -78,7 +78,7 @@ minetest.register_node("tsm_chests:chest", {
 
 --[[ here are some configuration variables ]]
 
-local chests_per_chunk = 6	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
+local chests_per_chunk = 13	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
 local h_min = -1  		-- minimum chest spawning height, relative to water_level
 local h_max = 64-43		-- maximum chest spawning height, relative to water_level
 local t_min = 3			-- minimum amount of treasures found in a chest
@@ -134,7 +134,7 @@ local function getFacedirs(pos, ground)
 	if zm.name=="air" or zm.name=="default:water_source" then
 		table.insert(facedirs, minetest.dir_to_facedir({x=0,y=0,z=1}))
 	end
-	
+
 	return facedirs
 end
 
@@ -161,7 +161,7 @@ local function placeChest(pos, chest_pos, ground, nn)
 	local minp = 0 --scale*4		-- minimal preciousness:   0..4
 	local maxp = 10 --scale*4+2.1	-- maximum preciousness: 2.1..6.1
 	local treasures = treasurer.select_random_treasures(treasure_amount, minp, maxp)
-	
+
 	-- Add Treasure to Chst
 	local meta = minetest.get_meta(chest_pos)
 	local inv = meta:get_inventory()
@@ -173,10 +173,10 @@ end
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
 ]]
-minetest.register_on_generated(function(minp, maxp, seed)	
+minetest.register_on_generated(function(minp, maxp, seed)
 	minp = {x=minp.x, y=minp.y, z=minp.z}
 	maxp = {x=maxp.x, y=maxp.y, z=maxp.z}
-	
+
 	if minp.x <= -r_max then
 		minp.x = -r_max + 1
 	end
@@ -213,20 +213,20 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		local ground = findGroundLevel(pos, y_min, y_max)
 		if ground ~= nil then
 			local chest_pos = {x = pos.x, y = ground + 1, z = pos.z}
-			
+
 			-- Don't spawn at barrier
 			if chest_pos.z == 0 then
 				chest_pos.z = -1
 			end
-			
+
 			local nn = minetest.get_node(chest_pos).name	-- chest node name (before it becomes a chest)
 			if nn == "air" or nn == "default:water_source" then
 				placeChest(pos, chest_pos, ground, nn)
-				
-				chests_placed = chests_placed + 1			
+
+				chests_placed = chests_placed + 1
 			end
 		end
 	end
-	
+
 	print("Spawned " .. chests_placed .. " chests after " .. attempts .. " attempts!")
 end)
