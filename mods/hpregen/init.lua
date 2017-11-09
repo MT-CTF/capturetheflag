@@ -1,6 +1,6 @@
 local regen_interval = tonumber(minetest.setting_get("regen_interval"))
 if regen_interval <= 0 then
-	regen_interval = 10
+	regen_interval = 6
 end
 local regen_amount = tonumber(minetest.setting_get("regen_amount"))
 if regen_amount <= 0 then
