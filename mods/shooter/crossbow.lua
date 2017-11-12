@@ -1,5 +1,5 @@
 SHOOTER_CROSSBOW_USES = 50
-SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=7}}
+SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=2}}
 SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
 
 minetest.register_alias("shooter:arrow", "shooter:arrow_white")
