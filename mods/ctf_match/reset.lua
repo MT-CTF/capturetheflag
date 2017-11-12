@@ -14,6 +14,7 @@ function ctf_match.next()
 			minetest.delete_area(vector.new(-r, -r, -r), vector.new(r, r, r))
 
 			minetest.after(1, function()
+				minetest.clear_objects()
 				ctf.reset()
 				if vote then
 					vote.active = {}
