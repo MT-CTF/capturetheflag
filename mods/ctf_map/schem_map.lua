@@ -19,10 +19,26 @@ function ctf_map.place_map(map)
 	return res ~= nil
 end
 
+local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
+
+do
+	local files_hash = {}
+	local files = minetest.get_dir_list(mapdir, false)
+	for i=1, #files do
+		files_hash[files[i]:split(".")[1]] = true
+	end
+
+	ctf_map.available_maps = {}
+	for key, _ in pairs(files_hash) do
+		table.insert(ctf_map.available_maps, key)
+	end
+end
+
+
 ctf_map.map = nil
 
 function ctf_match.load_map_meta(name)
-	local meta = Settings(minetest.get_modpath("ctf_map") .. "/maps/" .. name .. ".conf")
+	local meta = Settings(mapdir .. name .. ".conf")
 	local map = {
 		name      = meta:get("name"),
 		author    = meta:get("author"),
@@ -51,8 +67,8 @@ function ctf_match.load_map_meta(name)
 end
 
 ctf_match.register_on_new_match(function()
-	ctf_map.map = ctf_match.load_map_meta("01_two_hills")
-	print(dump(ctf_map.map))
+	local name = ctf_map.available_maps[math.random(#ctf_map.available_maps)]
+	ctf_map.map = ctf_match.load_map_meta(name)
 	ctf_map.place_map(ctf_map.map)
 end)
 
