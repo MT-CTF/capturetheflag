@@ -79,8 +79,8 @@ minetest.register_node("tsm_chests:chest", {
 --[[ here are some configuration variables ]]
 
 local chests_per_chunk = 13	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
-local h_min = -1  		-- minimum chest spawning height, relative to water_level
-local h_max = 64-43		-- maximum chest spawning height, relative to water_level
+local h_min = -65  		-- minimum chest spawning height, relative to water_level
+local h_max = 40		-- maximum chest spawning height, relative to water_level
 local t_min = 3			-- minimum amount of treasures found in a chest
 local t_max = 6			-- maximum amount of treasures found in a chest
 
@@ -173,7 +173,7 @@ end
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
 ]]
-minetest.register_on_generated(function(minp, maxp, seed)
+function place_chests(minp, maxp, seed)
 	minp = {x=minp.x, y=minp.y, z=minp.z}
 	maxp = {x=maxp.x, y=maxp.y, z=maxp.z}
 
@@ -229,4 +229,4 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	print("Spawned " .. chests_placed .. " chests after " .. attempts .. " attempts!")
-end)
+end

@@ -10,6 +10,12 @@ function ctf_map.place_map(map)
 	local res = minetest.place_schematic({ x = -r - 5, y = -h / 2, z = -r - 5 },
 		minetest.get_modpath("ctf_map") .. "/maps/" .. map.schematic, map.rotation == "z" and "0" or "90")
 
+	if res ~= nil then
+		local seed = minetest.get_mapgen_setting("seed")
+		place_chests({ x = -r, y = -h / 2, z = -r }, { x = r, y = h / 2, z = 0 }, seed)
+		place_chests({ x = -r, y = -h / 2, z =  0 }, { x = r, y = h / 2, z = r }, seed)
+	end
+
 	return res ~= nil
 end
 
