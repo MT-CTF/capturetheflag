@@ -59,7 +59,8 @@ local maptitle = "Untitled Map " .. randint
 local mapauthor = nil
 local center_barrier_rot = 1
 local function show_gui(name)
-	local author = mapauthor or name
+	mapauthor = mapauthor or name
+
 	local formspec = {
 		"size[8,9.5]",
 		"bgcolor[#080808BB;true]",
@@ -86,7 +87,7 @@ local function show_gui(name)
 		"label[0,5.5;3. Meta Data]",
 		"field[0.4,6.5;7.5,1;title;Title;" , minetest.formspec_escape(maptitle), "]",
 		"field[0.4,7.8;3.75,1;name;File Name;" , minetest.formspec_escape(mapname), "]",
-		"field[4.15,7.8;3.75,1;author;Author;", minetest.formspec_escape(author), "]",
+		"field[4.15,7.8;3.75,1;author;Author;", minetest.formspec_escape(mapauthor), "]",
 
 		"button_exit[0.8,8.8;3,1;close;Close]",
 		"button_exit[3.8,8.8;3,1;export;Export]",
@@ -122,6 +123,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		center.r  = tonumber(fields.posr)
 		center.h  = tonumber(fields.posh)
 		barrier_r = tonumber(fields.barrier_r)
+		maptitle  = fields.title
+		mapauthor = fields.author
+		mapname   = fields.name
 	end
 
 	if fields.center_barrier_rot and fields.center_barrier_rot ~= "" then
@@ -177,15 +181,23 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		we_select(player_name)
 		show_progress_formspec(player_name, "Exporting...")
 
-		minetest.after(0.1, function()
-			local path = minetest.get_worldpath() .. "/schems"
-			minetest.mkdir(path)
+		local path = minetest.get_worldpath() .. "/schems/"
+		minetest.mkdir(path)
 
-			local filepath = path .. "/" .. mapname .. ".mts"
+		local meta = Settings(path .. mapname .. ".conf")
+		meta:set("name", maptitle)
+		meta:set("author", mapauthor)
+		meta:set("rotation", center_barrier_rot == 0 and "x" or "z")
+		meta:set("r", center.r)
+		meta:set("h", center.h)
+		meta:write()
+
+		minetest.after(0.1, function()
+			local filepath = path .. mapname .. ".mts"
 			if minetest.create_schematic(worldedit.pos1[player_name],
 					worldedit.pos2[player_name], worldedit.prob_list[player_name],
 					filepath) then
-				minetest.chat_send_all("Exported to " .. filepath)
+				minetest.chat_send_all("Exported " .. mapname .. " to " .. path)
 				minetest.close_formspec(player_name, "")
 			else
 				minetest.chat_send_all("Failed!")

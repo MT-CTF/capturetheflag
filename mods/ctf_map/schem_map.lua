@@ -7,7 +7,7 @@ function ctf_map.place_map(map)
 	local h = map.h
 	minetest.emerge_area({ x = -r, y = -h / 2, z = -r }, { x = r, y = h / 2, z = r })
 
-	local res = minetest.place_schematic({ x = -r - 5, y = -h / 2, z = -r - 5 },
+	local res = minetest.place_schematic({ x = -r, y = -h / 2, z = -r },
 		minetest.get_modpath("ctf_map") .. "/maps/" .. map.schematic, map.rotation == "z" and "0" or "90")
 
 	if res ~= nil then
@@ -35,9 +35,9 @@ function ctf_match.load_map_meta(name)
 
 	local i = 1
 	while meta:get("team." .. i) do
-		local tname = meta:get("team." .. i)
+		local tname  = meta:get("team." .. i)
 		local tcolor = meta:get("team." .. i .. ".color")
-		local tpos = minetest.string_to_pos(meta:get("team." .. i .. ".pos"))
+		local tpos   = minetest.string_to_pos(meta:get("team." .. i .. ".pos"))
 
 		map.teams[tname] = {
 			color = tcolor,
