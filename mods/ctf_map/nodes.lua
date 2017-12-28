@@ -34,10 +34,17 @@ minetest.register_node("ctf_map:ind_stone", {
 	is_ground_content = false
 })
 
+minetest.register_node("ctf_map:ind_stone_red", {
+	description = "Cheater!",
+	groups = {immortal = 1},
+	tiles = {"ctf_map_stone_red.png"},
+	is_ground_content = false
+})
+
 minetest.register_node("ctf_map:ind_glass_red", {
 	description = "You cheater you!",
 	drawtype = "glasslike",
-	tiles = {"ctf_map_red.png"},
+	tiles = {"ctf_map_glass_red.png"},
 	inventory_image = minetest.inventorycube("default_glass.png"),
 	paramtype = "light",
 	sunlight_propagates = true,

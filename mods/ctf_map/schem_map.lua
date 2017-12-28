@@ -70,6 +70,12 @@ ctf_match.register_on_new_match(function()
 	local name = ctf_map.available_maps[math.random(#ctf_map.available_maps)]
 	ctf_map.map = ctf_match.load_map_meta(name)
 	ctf_map.place_map(ctf_map.map)
+
+	minetest.after(0.1, function()
+		for _, player in pairs(minetest.get_connected_players()) do
+			ctf.move_to_spawn(player:get_player_name())
+		end
+	end)
 end)
 
 function ctf_match.create_teams()
