@@ -2,18 +2,22 @@ assert(minetest.get_mapgen_setting("mg_name") == "singlenode", "singlenode mapge
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 
+local max_r = 120
 function ctf_map.place_map(map)
 	local r = map.r
 	local h = map.h
-	minetest.emerge_area({ x = -r, y = -h / 2, z = -r }, { x = r, y = h / 2, z = r })
+	minetest.delete_area({ x = -max_r, y = -max_r, z = -max_r }, { x = max_r, y = max_r, z = max_r })
+	minetest.emerge_area(map.pos1, map.pos2)
 
 	local res = minetest.place_schematic({ x = -r, y = -h / 2, z = -r },
 		minetest.get_modpath("ctf_map") .. "/maps/" .. map.schematic, map.rotation == "z" and "0" or "90")
 
 	if res ~= nil then
 		local seed = minetest.get_mapgen_setting("seed")
-		place_chests({ x = -r, y = -h / 2, z = -r }, { x = r, y = h / 2, z = 0 }, seed)
-		place_chests({ x = -r, y = -h / 2, z =  0 }, { x = r, y = h / 2, z = r }, seed)
+		local pos1_middle = { x = -r, y = -h / 2, z = 0 }
+		local pos2_middle = { x =  r, y =  h / 2, z = 0 }
+		place_chests(map.pos1, pos2_middle, seed)
+		place_chests(pos1_middle, map.pos2, seed)
 	end
 
 	return res ~= nil
@@ -49,6 +53,9 @@ function ctf_match.load_map_meta(name)
 		teams     = {}
 	}
 
+	map.pos1 = { x = -map.r, y = -map.h / 2, z = -map.r }
+	map.pos2 = { x =  map.r, y = map.h / 2,  z =  map.r }
+
 	local i = 1
 	while meta:get("team." .. i) do
 		local tname  = meta:get("team." .. i)
@@ -71,10 +78,12 @@ ctf_match.register_on_new_match(function()
 	ctf_map.map = ctf_match.load_map_meta(name)
 	ctf_map.place_map(ctf_map.map)
 
-	minetest.after(0.1, function()
+	minetest.after(1, function()
 		for _, player in pairs(minetest.get_connected_players()) do
 			ctf.move_to_spawn(player:get_player_name())
 		end
+
+		minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
 	end)
 end)
 
