@@ -53,27 +53,6 @@ minetest.register_globalstep(function(dtime)
 				players[playerName]["shouldSprint"] = false
 			end
 
-			--If the player is sprinting, create particles behind him/her
-			if playerInfo["sprinting"] == true and gameTime % 0.1 == 0 then
-				local numParticles = math.random(1, 2)
-				local playerPos = player:getpos()
-				local playerNode = minetest.get_node({x=playerPos["x"], y=playerPos["y"]-1, z=playerPos["z"]})
-				if playerNode["name"] ~= "air" then
-					for i=1, numParticles, 1 do
-						minetest.add_particle({
-							pos = {x=playerPos["x"]+math.random(-1,1)*math.random()/2,y=playerPos["y"]+0.1,z=playerPos["z"]+math.random(-1,1)*math.random()/2},
-							vel = {x=0, y=5, z=0},
-							acc = {x=0, y=-13, z=0},
-							expirationtime = math.random(),
-							size = math.random()+0.5,
-							collisiondetection = true,
-							vertical = false,
-							texture = "sprint_particle.png",
-						})
-					end
-				end
-			end
-
 			--Adjust player states
 			if players[playerName]["shouldSprint"] == true then --Stopped
 				setSprinting(playerName, true)
