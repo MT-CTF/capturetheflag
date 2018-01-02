@@ -104,6 +104,20 @@ function chatplus.save()
 	end
 end
 
+local function clean_player(name, value)
+	if value.messages then
+		value.inbox = value.messages
+		value.messages = nil
+	end
+
+	if (
+		(not value.inbox or #value.inbox==0) and
+		(not value.ignore or #value.ignore==0)
+	) then
+		chatplus.players[name] = nil
+	end
+end
+
 function chatplus.clean_players()
 	if not chatplus.players then
 		chatplus.players = {}
@@ -112,17 +126,7 @@ function chatplus.clean_players()
 
 	minetest.log("[Chatplus] Cleaning player lists")
 	for key,value in pairs(chatplus.players) do
-		if value.messages then
-			value.inbox = value.messages
-			value.messages = nil
-		end
-
-		if (
-			(not value.inbox or #value.inbox==0) and
-			(not value.ignore or #value.ignore==0)
-		) then
-			chatplus.players[key] = nil
-		end
+		clean_player(key, value)
 	end
 	chatplus.save()
 end
@@ -151,6 +155,7 @@ function chatplus.poke(name,player)
 		if player=="end" then
 			chatplus.players[name].enabled = false
 			chatplus.loggedin[name] = nil
+			clean_player(name, chatplus.players[name])
 		else
 			if not chatplus.loggedin[name] then
 				chatplus.loggedin[name] = {}

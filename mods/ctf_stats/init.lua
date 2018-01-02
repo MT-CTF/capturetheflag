@@ -76,6 +76,10 @@ ctf.register_on_save(function()
 	return nil
 end)
 
+function ctf_stats.player_or_nil(name)
+	return ctf_stats.players[name], ctf_stats.current.red[name] or ctf_stats.current.blue[name]
+end
+
 -- Returns a tuple: `player_stats`, `match_player_stats`
 function ctf_stats.player(name)
 	local player_stats = ctf_stats.players[name]
