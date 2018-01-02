@@ -54,7 +54,7 @@ function random_messages.read_messages()
 		"You gain more score the better the opponent you defeat.",
 		"Players are immune for 10 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 2k+ score and killing 2 people for every death.",
-		"Like CTF? rubenwardy.com/donate",
+		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 	}
 end
 
@@ -99,14 +99,11 @@ end
 random_messages.set_interval()
 random_messages.read_messages()
 
-local TIMER = 0
-minetest.register_globalstep(function(dtime)
-	TIMER = TIMER + dtime;
-	if TIMER > MESSAGE_INTERVAL then
-		random_messages.show_message()
-		TIMER = 0
-	end
-end)
+local function step(dtime)
+	random_messages.show_message()
+	minetest.after(MESSAGE_INTERVAL, step)
+end
+minetest.after(MESSAGE_INTERVAL, step)
 
 local register_chatcommand_table = {
 	params = "viewmessages | removemessage <number> | addmessage <number>",
