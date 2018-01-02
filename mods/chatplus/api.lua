@@ -121,7 +121,7 @@ function chatplus.clean_players()
 			(not value.inbox or #value.inbox==0) and
 			(not value.ignore or #value.ignore==0)
 		) then
-			value[key] = nil
+			chatplus.players[key] = nil
 		end
 	end
 	chatplus.save()
