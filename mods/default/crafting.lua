@@ -803,13 +803,6 @@ minetest.register_craft({
 	recipe = "default:clay_lump",
 })
 
-minetest.register_craft({
-	type = 'cooking',
-	output = 'default:gold_ingot',
-	recipe = 'default:key',
-	cooktime = 5,
-})
-
 --
 -- Fuels
 --

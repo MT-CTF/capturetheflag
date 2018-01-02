@@ -150,7 +150,11 @@ function _doors.door_toggle(pos, node, clicker)
 
 	replace_old_owner_information(pos)
 
-	if clicker and not default.can_interact_with_node(clicker, pos) then
+	local tname = ctf.player(clicker:get_player_name()).team
+	local owner_team = pos.z >= 0 and "red" or "blue"
+	local is_right_team = tname == owner_team
+	if clicker and not minetest.check_player_privs(clicker, "protection_bypass") and
+			not is_right_team then
 		return false
 	end
 
@@ -324,8 +328,7 @@ function doors.register(name, def)
 			meta:set_int("state", state)
 
 			if def.protected then
-				meta:set_string("owner", pn)
-				meta:set_string("infotext", "Owned by " .. pn)
+				meta:set_string("infotext", "Team Door")
 			end
 
 			if not (creative and creative.is_enabled_for and creative.is_enabled_for(pn)) then
@@ -383,40 +386,14 @@ function doors.register(name, def)
 	end
 
 	if def.protected then
-		def.can_dig = can_dig_door
 		def.on_blast = function() end
-		def.on_key_use = function(pos, player)
-			local door = doors.get(pos)
-			door:toggle(player)
-		end
-		def.on_skeleton_key_use = function(pos, player, newsecret)
-			replace_old_owner_information(pos)
-			local meta = minetest.get_meta(pos)
-			local owner = meta:get_string("owner")
-			local pname = player:get_player_name()
+	end
 
-			-- verify placer is owner of lockable door
-			if owner ~= pname then
-				minetest.record_protection_violation(pos, pname)
-				minetest.chat_send_player(pname, "You do not own this locked door.")
-				return nil
-			end
-
-			local secret = meta:get_string("key_lock_secret")
-			if secret == "" then
-				secret = newsecret
-				meta:set_string("key_lock_secret", secret)
-			end
-
-			return secret, "a locked door", owner
-		end
-	else
-		def.on_blast = function(pos, intensity)
-			minetest.remove_node(pos)
-			-- hidden node doesn't get blasted away.
-			minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
-			return {name}
-		end
+	def.on_blast = function(pos, intensity)
+		minetest.remove_node(pos)
+		-- hidden node doesn't get blasted away.
+		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
+		return {name}
 	end
 
 	def.on_destruct = function(pos)
