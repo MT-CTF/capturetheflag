@@ -53,6 +53,8 @@ function random_messages.read_messages()
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Players are immune for 10 seconds after they respawn.",
+		"Access the pro section of the chest by achieving a 2k+ score and killing 2 people for every death.",
+		"Like CTF? rubenwardy.com/donate",
 	}
 end
 
