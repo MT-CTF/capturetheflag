@@ -35,6 +35,10 @@ function ctf.get_spawn(tname)
 	end
 end
 
+local function max(a, b)
+	return (a > b) and a or b
+end
+
 local function get_is_player_pro(player)
 	local players = {}
 	for pname, pstat in pairs(ctf_stats.players) do
@@ -42,7 +46,9 @@ local function get_is_player_pro(player)
 		pstat.color = nil
 		table.insert(players, pstat)
 	end
-	return ctf_stats.player(player:get_player_name()).score > 0
+	local pstat = ctf_stats.player(player:get_player_name())
+	local kd = pstat.kills / max(pstat.deaths, 1)
+	return pstat.score > 2000 and kd > 2
 end
 
 local colors = {"red", "blue"}
@@ -99,10 +105,10 @@ for _, chest_color in pairs(colors) do
 
 			if is_pro then
 				formspec = formspec .. "listring[current_name;pro]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (score 200+)") .. "]"
+					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (2k+ score, good KD)") .. "]"
 			else
 				formspec = formspec .. "listring[current_name;pro]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("You need more score (200+)") .. "]"
+					"label[5,-0.2;" .. minetest.formspec_escape("You need 2k+ score and good KD") .. "]"
 			end
 
 			formspec = formspec ..
