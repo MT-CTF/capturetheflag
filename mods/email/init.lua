@@ -181,7 +181,7 @@ function email.send_mail(name, to, msg)
 
 		email.save()
 
-		minetest.chat_send_player(to, name .. " sent you mail! Type /inbox to see it.")
+		minetest.chat_send_player(to, "Mail from " .. name .. ": " .. msg)
 
 		return true, "Message sent to " .. to
 	else
@@ -197,7 +197,7 @@ minetest.register_chatcommand("inbox", {
 			email.clear_inbox(name)
 
 			return true, "Inbox cleared"
-		elseif param == "text" or param == "txt" or param == "t" then
+		elseif param == "text" or param == "txt" or param == "t" or not minetest.get_player_by_name(name) then
 			return email.show_inbox(name, true)
 		else
 			return email.show_inbox(name, false)
