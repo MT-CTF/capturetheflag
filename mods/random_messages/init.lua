@@ -54,6 +54,7 @@ function random_messages.read_messages()
 		"You gain more score the better the opponent you defeat.",
 		"Players are immune for 10 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 2k+ score and killing 2 people for every death.",
+		"Use steel doors to stop the enemy walking into your base",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 	}
 end
