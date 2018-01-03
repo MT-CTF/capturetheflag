@@ -3,8 +3,5 @@ minetest.register_can_bypass_userlimit(function(name, ip)
 	local actual_max_users = tonumber(minetest.settings:get("max_users")) +
 		tonumber(minetest.settings:get("max_extra_users") or "10")
 	local req_score = tonumber(minetest.settings:get("userlimit_bypass_required_score") or "10000")
-	local can_connect = pstat and pstat.score > req_score and #minetest.get_connected_players() < actual_max_users
-	if can_connect then
-		return true
-	end
+	return pstat and pstat.score > req_score and #minetest.get_connected_players() < actual_max_users
 end)
