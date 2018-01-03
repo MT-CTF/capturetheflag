@@ -115,46 +115,57 @@ function ctf_stats.html_to_file(filepath)
 	f:close()
 end
 
+local function send_as_chat_message(to, name)
+	local players = {}
+	for pname, pstat in pairs(ctf_stats.players) do
+		pstat.name = pname
+		pstat.color = nil
+		table.insert(players, pstat)
+	end
+
+	table.sort(players, function(one, two)
+		return one.score > two.score
+	end)
+
+	local place = -1
+	local me = nil
+	for i = 1, #players do
+		local pstat = players[i]
+		if pstat.name == name then
+			me = pstat
+			place = i
+			break
+		end
+	end
+	if place < 1 then
+		place = #players + 1
+	end
+	local you_are_in = (to == name) and "You are in " or "They are in "
+	minetest.chat_send_player(to, you_are_in .. place .. " place.")
+	if me then
+		local kd = me.kills
+		if me.deaths > 0 then
+			kd = kd / me.deaths
+		end
+		minetest.chat_send_player(to,
+			"Kills: " .. me.kills ..
+			" | Deaths: " .. me.deaths ..
+			" | K/D: " .. math.floor(kd*10)/10 ..
+			" | Captures: " .. me.captures ..
+			" | Attempts: " .. me.attempts ..
+			" | Score: " .. me.score)
+	end
+end
+
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
 		if param == "me" then
-			local players = {}
-			for pname, pstat in pairs(ctf_stats.players) do
-				pstat.name = pname
-				pstat.color = nil
-				table.insert(players, pstat)
-			end
-
-			table.sort(players, function(one, two)
-				return one.score > two.score
-			end)
-
-			local place = -1
-			local me = nil
-			for i = 1, #players do
-				local pstat = players[i]
-				if pstat.name == name then
-					me = pstat
-					place = i
-					break
-				end
-			end
-			if place < 1 then
-				place = #players + 1
-			end
-			minetest.chat_send_player(name, "You are in " .. place .. " place.")
-			if me then
-				local kd = me.kills
-				if me.deaths > 0 then
-					kd = kd / me.deaths
-				end
-				minetest.chat_send_player(name,
-					"Kills: " .. me.kills ..
-					" | Deaths: " .. me.deaths ..
-					" | K/D: " .. math.floor(kd*10)/10 ..
-					" | Captures: " .. me.captures ..
-					" | Attempts: " .. me.attempts ..
-					" | Score: " .. me.score)
+			send_as_chat_message(name, name)
+		elseif param ~= "" then
+			if ctf_stats.players[param:trim()] then
+				send_as_chat_message(name, param:trim())
+			else
+				return false, "Can't find player '" .. param:trim() .. "'"
 			end
 		else
 			local players = {}

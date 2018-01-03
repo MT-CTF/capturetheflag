@@ -52,6 +52,13 @@ function ctf_stats.load()
 		ctf.needs_save = true
 	end
 
+	for name, player_stats in pairs(ctf_stats.players) do
+		if not player_stats.score or player_stats.score <= 0 then
+			ctf_stats.players[name] = nil
+			ctf.needs_save = true
+		end
+	end
+
 	ctf_stats.matches = ctf_stats.matches or {
 		wins = {
 			blue = 0,
