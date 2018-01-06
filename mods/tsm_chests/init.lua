@@ -186,7 +186,7 @@ function place_chests(minp, maxp, seed, number_chests)
 	local y_max = math.min(maxp.y, height_max)
 	local attempts = 0
 	local chests_placed = 0
-	while chests_placed < number_chests and attempts < number_chests + 6 do
+	while chests_placed < number_chests and attempts < number_chests + 12 do
 		attempts = attempts + 1
 		local pos = {
 			x = math.random(minp.x, maxp.x),
