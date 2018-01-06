@@ -6,11 +6,10 @@ local max_r = 120
 function ctf_map.place_map(map)
 	local r = map.r
 	local h = map.h
-	minetest.delete_area({ x = -max_r, y = -max_r, z = -max_r }, { x = max_r, y = max_r, z = max_r })
 	minetest.emerge_area(map.pos1, map.pos2)
 
-	local res = minetest.place_schematic({ x = -r, y = -h / 2, z = -r },
-		minetest.get_modpath("ctf_map") .. "/maps/" .. map.schematic, map.rotation == "z" and "0" or "90")
+	local schempath = minetest.get_modpath("ctf_map") .. "/maps/" .. map.schematic
+	local res = minetest.place_schematic(map.pos1, schempath, map.rotation == "z" and "0" or "90")
 
 	if res ~= nil then
 		local seed = minetest.get_mapgen_setting("seed")
@@ -41,7 +40,7 @@ end
 
 ctf_map.map = nil
 
-function ctf_match.load_map_meta(name)
+function ctf_match.load_map_meta(name, offset)
 	local meta = Settings(mapdir .. name .. ".conf")
 	local map = {
 		name      = meta:get("name"),
@@ -53,8 +52,10 @@ function ctf_match.load_map_meta(name)
 		teams     = {}
 	}
 
-	map.pos1 = { x = -map.r, y = -map.h / 2, z = -map.r }
-	map.pos2 = { x =  map.r, y = map.h / 2,  z =  map.r }
+	assert(map.r <= max_r)
+
+	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
+	map.pos2 = vector.add(offset, { x =  map.r, y = map.h / 2,  z =  map.r })
 
 	local i = 1
 	while meta:get("team." .. i) do
@@ -64,7 +65,7 @@ function ctf_match.load_map_meta(name)
 
 		map.teams[tname] = {
 			color = tcolor,
-			pos = tpos,
+			pos = vector.add(offset, tpos),
 		}
 
 		i = i + 1
@@ -74,15 +75,12 @@ function ctf_match.load_map_meta(name)
 end
 
 ctf_match.register_on_new_match(function()
-	local name = ctf_map.available_maps[math.random(#ctf_map.available_maps)]
-	ctf_map.map = ctf_match.load_map_meta(name)
+	local idx = math.random(#ctf_map.available_maps)
+	local name = ctf_map.available_maps[idx]
+	ctf_map.map = ctf_match.load_map_meta(name, vector.new(600 * (idx - 1), 0, 0))
 	ctf_map.place_map(ctf_map.map)
 
-	minetest.after(1, function()
-		for _, player in pairs(minetest.get_connected_players()) do
-			ctf.move_to_spawn(player:get_player_name())
-		end
-
+	minetest.after(10, function()
 		minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
 	end)
 end)
