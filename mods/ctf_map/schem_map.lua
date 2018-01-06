@@ -95,7 +95,7 @@ function ctf_match.load_map_meta(idx, name)
 			chests = {
 				from = chests1,
 				to = chests2,
-				n = tonumber(meta:get("team." .. i .. ".num_chests") or "30"),
+				n = tonumber(meta:get("team." .. i .. ".num_chests") or "18"),
 			},
 		}
 
