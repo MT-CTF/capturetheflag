@@ -49,6 +49,7 @@ function ctf_match.load_map_meta(idx, name)
 	local meta   = Settings(mapdir .. name .. ".conf")
 
 	local map = {
+		idx       = idx,
 		name      = meta:get("name"),
 		author    = meta:get("author"),
 		rotation  = meta:get("rotation"),
@@ -105,11 +106,25 @@ function ctf_match.load_map_meta(idx, name)
 end
 
 ctf_match.register_on_new_match(function()
-	local idx = math.random(#ctf_map.available_maps)
+	-- Choose next map index, but don't select the same one again
+	local idx
+	if ctf_map.map then
+		idx = math.random(#ctf_map.available_maps - 1)
+		if idx == ctf_map.map.idx then
+			idx = idx + 1
+		end
+	else
+		idx = math.random(#ctf_map.available_maps)
+	end
+
+	-- Load meta data
 	local name = ctf_map.available_maps[idx]
 	ctf_map.map = ctf_match.load_map_meta(idx, name)
+
+	-- Place map
 	ctf_map.place_map(ctf_map.map)
 
+	-- Fixes
 	minetest.after(10, function()
 		minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
 	end)
