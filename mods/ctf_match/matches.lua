@@ -36,65 +36,7 @@ function ctf_match.next()
 	end
 
 	ctf.reset()
-	-- Note: ctf.reset calls register_on_new_game, below.
-end
 
--- Check for winner
-local game_won = false
-function ctf_match.check_for_winner()
-	local winner
-	for name, team in pairs(ctf.teams) do
-		if winner then
-			return
-		end
-		winner = name
-	end
-
-	-- There is a winner!
-	if not game_won then
-		game_won = true
-		ctf.action("match", winner .. " won!")
-		minetest.chat_send_all("Team " .. winner .. " won!")
-		for i = 1, #ctf_match.registered_on_winner do
-			ctf_match.registered_on_winner[i](winner)
-		end
-		minetest.after(2, function()
-			game_won = false
-			if ctf.setting("match") then
-				ctf_match.next()
-			end
-		end)
-	end
-end
-
-function ctf_match.create_teams()
-	local number = ctf.setting("match.teams")
-
-	for i = 1, number do
-		print("Creating team #" .. i)
-		local name  = ctf.setting("match.team." .. i)
-		local color = ctf.setting("match.team." .. i .. ".color")
-		local pos   = ctf.setting("match.team." .. i .. ".pos")
-		local flag  = minetest.string_to_pos(pos)
-
-		if name and color and pos and flag then
-			print(" - Success in getting settings")
-			ctf.team({
-				name     = name,
-				color    = color,
-				add_team = true
-			})
-
-			ctf_flag.add(name, flag)
-
-			minetest.after(0, function()
-				ctf_flag.assert_flag(flag)
-			end)
-		end
-	end
-end
-
-ctf.register_on_new_game(function()
 	ctf_match.create_teams()
 
 	for i, player in pairs(minetest.get_connected_players()) do
@@ -125,7 +67,40 @@ ctf.register_on_new_game(function()
 	if minetest.global_exists("chatplus") then
 		chatplus.log("Next round!")
 	end
-end)
+end
+
+-- Check for winner
+local game_won = false
+function ctf_match.check_for_winner()
+	local winner
+	for name, team in pairs(ctf.teams) do
+		if winner then
+			return
+		end
+		winner = name
+	end
+
+	-- There is a winner!
+	if not game_won then
+		game_won = true
+		ctf.action("match", winner .. " won!")
+		minetest.chat_send_all("Team " .. winner .. " won!")
+		for i = 1, #ctf_match.registered_on_winner do
+			ctf_match.registered_on_winner[i](winner)
+		end
+		minetest.after(2, function()
+			game_won = false
+			if ctf.setting("match") then
+				ctf_match.next()
+			end
+		end)
+	end
+end
+
+-- This is overriden by ctf_map
+function ctf_match.create_teams()
+	error("Error! Unimplemented")
+end
 
 ctf_flag.register_on_capture(function(attname, flag)
 	if not ctf.setting("match.destroy_team") then
