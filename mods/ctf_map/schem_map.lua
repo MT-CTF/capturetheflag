@@ -2,27 +2,11 @@ assert(minetest.get_mapgen_setting("mg_name") == "singlenode", "singlenode mapge
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 
-local max_r = 120
-function ctf_map.place_map(map)
-	local r = map.r
-	local h = map.h
-	minetest.emerge_area(map.pos1, map.pos2)
 
-	local schempath = minetest.get_modpath("ctf_map") .. "/maps/" .. map.schematic
-	local res = minetest.place_schematic(map.pos1, schempath, map.rotation == "z" and "0" or "90")
-
-	if res ~= nil then
-		local seed = minetest.get_mapgen_setting("seed")
-		local pos1_middle = { x = -r, y = -h / 2, z = 0 }
-		local pos2_middle = { x =  r, y =  h / 2, z = 0 }
-		place_chests(map.pos1, pos2_middle, seed)
-		place_chests(pos1_middle, map.pos2, seed)
-	end
-
-	return res ~= nil
-end
-
+local max_r  = 120
 local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
+ctf_map.map  = nil
+
 
 do
 	local files_hash = {}
@@ -38,10 +22,32 @@ do
 end
 
 
-ctf_map.map = nil
+function ctf_map.place_map(map)
+	local r = map.r
+	local h = map.h
+	minetest.emerge_area(map.pos1, map.pos2)
 
-function ctf_match.load_map_meta(name, offset)
-	local meta = Settings(mapdir .. name .. ".conf")
+	local schempath = mapdir .. map.schematic
+	local res = minetest.place_schematic(map.pos1, schempath,
+			map.rotation == "z" and "0" or "90")
+
+	if res ~= nil then
+		local seed = minetest.get_mapgen_setting("seed")
+		for _, value in pairs(ctf_map.map.teams) do
+			place_chests(value.chests.from, value.chests.to, seed, value.chests.n)
+			minetest.log("error", "Placing " .. value.chests.n .. " chests from " ..
+					minetest.pos_to_string(value.chests.from) .. " to "..
+					minetest.pos_to_string(value.chests.to))
+		end
+	end
+
+	return res ~= nil
+end
+
+function ctf_match.load_map_meta(idx, name)
+	local offset = vector.new(600 * (idx - 1), 0, 0)
+	local meta   = Settings(mapdir .. name .. ".conf")
+
 	local map = {
 		name      = meta:get("name"),
 		author    = meta:get("author"),
@@ -63,9 +69,33 @@ function ctf_match.load_map_meta(name, offset)
 		local tcolor = meta:get("team." .. i .. ".color")
 		local tpos   = minetest.string_to_pos(meta:get("team." .. i .. ".pos"))
 
+		local chests1 = meta:get("team." .. i .. ".chests1")
+		if chests1 then
+			chests1 = vector.add(offset, minetest.string_to_pos(chests1))
+		elseif i == 1 then
+			chests1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = 0 })
+		elseif i == 2 then
+			chests1 = map.pos1
+		end
+
+		local chests2 = meta:get("team." .. i .. ".chests2")
+		if chests2 then
+			chests2 = vector.add(offset, minetest.string_to_pos(chests2))
+		elseif i == 1 then
+			chests2 = map.pos2
+		elseif i == 2 then
+			chests2 = vector.add(offset, { x = map.r, y = map.h / 2, z = 0 })
+		end
+
+
 		map.teams[tname] = {
 			color = tcolor,
 			pos = vector.add(offset, tpos),
+			chests = {
+				from = chests1,
+				to = chests2,
+				n = tonumber(meta:get("team." .. i .. ".num_chests") or "30"),
+			},
 		}
 
 		i = i + 1
@@ -77,7 +107,7 @@ end
 ctf_match.register_on_new_match(function()
 	local idx = math.random(#ctf_map.available_maps)
 	local name = ctf_map.available_maps[idx]
-	ctf_map.map = ctf_match.load_map_meta(name, vector.new(600 * (idx - 1), 0, 0))
+	ctf_map.map = ctf_match.load_map_meta(idx, name)
 	ctf_map.place_map(ctf_map.map)
 
 	minetest.after(10, function()
