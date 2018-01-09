@@ -15,6 +15,10 @@ ctf.register_on_init(function()
 	ctf._set("match.remove_player_on_leave",     false)
 end)
 
+ctf_match.register_on_build_time_end(function()
+	minetest.sound_play({name="ctf_match_attack"}, { gain = 1.0 })
+end)
+
 minetest.register_on_leaveplayer(function(player)
 	if ctf.setting("match.remove_player_on_leave") then
 		ctf.remove_player(player:get_player_name())
