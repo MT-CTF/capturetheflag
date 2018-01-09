@@ -3,76 +3,85 @@ ctf_stats = {}
 local storage = minetest.get_mod_storage()
 local data_to_persist = { "matches", "players" }
 
-function ctf_stats.load()
+function ctf_stats.load_legacy()
 	local file = io.open(minetest.get_worldpath() .. "/ctf_stats.txt", "r")
-	if file then
-		local table = minetest.deserialize(file:read("*all"))
-		file:close()
-		if type(table) == "table" then
-			ctf.log("ctf_stats", "Migrating stats...")
-			ctf_stats.matches = table.matches
-			ctf_stats.players = table.players
+	if not file then
+		return false
+	end
 
-			for name, player_stats in pairs(ctf_stats.players) do
-				if not player_stats.score or player_stats.score < 0 then
-					player_stats.score = 0
-				end
-				if player_stats.score > 300 then
-					player_stats.score = (player_stats.score - 300) / 30 + 300
-				end
-				if player_stats.score > 800 then
-					player_stats.score = 800
-				end
+	local table = minetest.deserialize(file:read("*all"))
+	file:close()
+	os.remove(minetest.get_worldpath() .. "/ctf_stats.txt")
+	if type(table) ~= "table" then
+		return false
+	end
 
-				player_stats.wins = player_stats.wins or {}
-				if player_stats.blue_wins then
-					player_stats.wins.blue = player_stats.blue_wins
-					player_stats.blue_wins = nil
-				end
-				if player_stats.red_wins then
-					player_stats.wins.red  = player_stats.red_wins
-					player_stats.red_wins  = nil
-				end
-				player_stats.wins.blue = player_stats.wins.blue or 0
-				player_stats.wins.red  = player_stats.wins.red  or 0
-			end
+	ctf.log("ctf_stats", "Migrating stats...")
+	ctf_stats.matches = table.matches
+	ctf_stats.players = table.players
 
-			ctf_stats.matches.wins = ctf_stats.matches.wins or {
-				red  = ctf_stats.matches.red_wins or 0,
-				blue = ctf_stats.matches.blue_wins or 0,
-			}
-
-			ctf.needs_save = true
+	for name, player_stats in pairs(ctf_stats.players) do
+		if not player_stats.score or player_stats.score < 0 then
+			player_stats.score = 0
 		end
-		os.remove(minetest.get_worldpath() .. "/ctf_stats.txt")
-	else
+		if player_stats.score > 300 then
+			player_stats.score = (player_stats.score - 300) / 30 + 300
+		end
+		if player_stats.score > 800 then
+			player_stats.score = 800
+		end
+
+		player_stats.wins = player_stats.wins or {}
+		if player_stats.blue_wins then
+			player_stats.wins.blue = player_stats.blue_wins
+			player_stats.blue_wins = nil
+		end
+		if player_stats.red_wins then
+			player_stats.wins.red  = player_stats.red_wins
+			player_stats.red_wins  = nil
+		end
+		player_stats.wins.blue = player_stats.wins.blue or 0
+		player_stats.wins.red  = player_stats.wins.red  or 0
+	end
+
+	ctf_stats.matches.wins = ctf_stats.matches.wins or {
+		red  = ctf_stats.matches.red_wins or 0,
+		blue = ctf_stats.matches.blue_wins or 0,
+	}
+
+	ctf.needs_save = true
+	return true
+end
+
+function ctf_stats.load()
+	if not ctf_stats.load_legacy() then
 		for _, key in pairs(data_to_persist) do
 			ctf_stats[key] = minetest.parse_json(storage:get_string(key))
 		end
 		ctf.needs_save = true
 	end
 
+	-- Make sure all tables are present
+	ctf_stats.players = ctf_stats.players or {}
+	ctf_stats.matches = ctf_stats.matches or {
+		wins = {
+			blue = 0,
+			red  = 0,
+		},
+		skipped = 0,
+	}
+	ctf_stats.current = ctf_stats.current or {
+		red = {},
+		blue = {}
+	}
+
+	-- Strip players which have no score
 	for name, player_stats in pairs(ctf_stats.players) do
 		if not player_stats.score or player_stats.score <= 0 then
 			ctf_stats.players[name] = nil
 			ctf.needs_save = true
 		end
 	end
-
-	ctf_stats.matches = ctf_stats.matches or {
-		wins = {
-			blue = 0,
-			red = 0,
-		},
-		skipped = 0
-	}
-
-	ctf_stats.current = ctf_stats.current or {
-		red = {},
-		blue = {}
-	}
-
-	ctf_stats.players = ctf_stats.players or {}
 end
 
 ctf.register_on_save(function()
