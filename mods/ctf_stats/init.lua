@@ -11,7 +11,6 @@ function ctf_stats.load_legacy()
 
 	local table = minetest.deserialize(file:read("*all"))
 	file:close()
-	os.remove(minetest.get_worldpath() .. "/ctf_stats.txt")
 	if type(table) ~= "table" then
 		return false
 	end
@@ -50,6 +49,8 @@ function ctf_stats.load_legacy()
 	}
 
 	ctf.needs_save = true
+
+	os.remove(minetest.get_worldpath() .. "/ctf_stats.txt")
 	return true
 end
 
