@@ -1,34 +1,117 @@
---[[
-Sprint mod for Minetest by GunshipPenguin
+-- Sprint mod by rubenwardy. License: MIT.
+-- Heavily modified from a mod by GunshipPenguin
 
-To the extent possible under law, the author(s)
-have dedicated all copyright and related and neighboring rights
-to this software to the public domain worldwide. This software is
-distributed without any warranty.
-]]
-
---Configuration variables, these are all explained in README.md
-SPRINT_METHOD = 1
-SPRINT_SPEED = 1.8
-SPRINT_JUMP = 1.1
-SPRINT_STAMINA = 5
-SPRINT_TIMEOUT = 0.5 --Only used if SPRINT_METHOD = 0
+-- Config, see README.md
+local MOD_WALK    = tonumber(minetest.settings:get("sprint_speed")     or 1.8)
+local MOD_JUMP    = tonumber(minetest.settings:get("sprint_jump")      or 1.1)
+local STAMINA_MAX = tonumber(minetest.settings:get("sprint_stamina")   or 20)
+local HEAL_RATE   = tonumber(minetest.settings:get("sprint_heal_rate") or 0.5)
+local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
+local SPRINT_MODIFIERS = {
+	[true]  = { speed = MOD_WALK, jump = MOD_JUMP },
+	[false] = { speed = 1.0,      jump = 1.0      },
+}
 
 if minetest.get_modpath("hudbars") ~= nil then
 	hb.register_hudbar("sprint", 0xFFFFFF, "Stamina",
 		{ bar = "sprint_stamina_bar.png", icon = "sprint_stamina_icon.png" },
-		SPRINT_STAMINA, SPRINT_STAMINA,
+		STAMINA_MAX, STAMINA_MAX,
 		false, "%s: %.1f/%.1f")
+
 	SPRINT_HUDBARS_USED = true
 else
 	SPRINT_HUDBARS_USED = false
 end
 
-if SPRINT_METHOD == 0 then
-	dofile(minetest.get_modpath("sprint") .. "/wsprint.lua")
-elseif SPRINT_METHOD == 1 then
-	dofile(minetest.get_modpath("sprint") .. "/esprint.lua")
-else
-	minetest.log("error", "Sprint Mod - SPRINT_METHOD is not set properly, using e to sprint")
-	dofile(minetest.get_modpath("sprint") .. "/esprint.lua")
+local players = {}
+local staminaHud = {}
+
+local function setSprinting(player, info, sprinting)
+	if info.sprinting ~= sprinting then
+		player:set_physics_override(SPRINT_MODIFIERS[sprinting])
+	end
+	info.sprinting = sprinting
 end
+
+minetest.register_globalstep(function(dtime)
+	for name, info in pairs(players) do
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			players[name] = nil
+		else
+			-- ##?## You can enable recharging when the E key is pressed by
+			--       following these instructions.
+
+			--Check if the player should be sprinting
+			local controls = player:get_player_control()
+			local sprintRequested = controls.aux1 and controls.up
+			-- ##1## replace info.sprintRequested with info.sprinting
+			if sprintRequested ~= info.sprintRequested then
+				if sprintRequested and info.stamina > MIN_SPRINT then
+					setSprinting(player, info, true)
+				end
+
+				if not sprintRequested then
+					setSprinting(player, info, false)
+				end
+			end
+			info.sprintRequested = sprintRequested
+
+			local staminaChanged = false
+			if info.sprinting then
+				info.stamina = info.stamina - dtime
+				staminaChanged = true
+				if info.stamina <= 0 then
+					info.stamina = 0
+					setSprinting(player, info, false)
+				end
+
+			-- ##2## remove `not info.sprintRequested and`
+			elseif not info.sprintRequested and info.stamina < STAMINA_MAX then
+				info.stamina = info.stamina + dtime * HEAL_RATE
+				staminaChanged = true
+				if info.stamina > STAMINA_MAX then
+					info.stamina = STAMINA_MAX
+				end
+			end
+
+			if staminaChanged then
+				if SPRINT_HUDBARS_USED then
+					hb.change_hudbar(player, "sprint", info.stamina)
+				else
+					local numBars = (info.stamina / STAMINA_MAX) * 20
+					player:hud_change(info.hud, "number", numBars)
+				end
+			end
+		end
+	end
+end)
+
+minetest.register_on_joinplayer(function(player)
+	local info = {
+		sprinting       = false,       -- Is the player actually sprinting?
+		stamina         = STAMINA_MAX, -- integer, the stamina we have left
+		sprintRequested = false,       -- is the sprint key down / etc?
+	}
+
+	if SPRINT_HUDBARS_USED then
+		hb.init_hudbar(player, "sprint")
+	else
+		info.hud = player:hud_add({
+			hud_elem_type = "statbar",
+			position      = {x=0.5, y=1},
+			size          = {x=24, y=24},
+			text          = "sprint_stamina_icon.png",
+			number        = 20,
+			alignment     = {x=0, y=1},
+			offset        = {x=-263, y=-110},
+		})
+	end
+
+
+	players[player:get_player_name()] = info
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	players[player:get_player_name()] = nil
+end)
