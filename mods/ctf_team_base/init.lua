@@ -48,7 +48,7 @@ local function get_is_player_pro(player)
 	end
 	local pstat = ctf_stats.player(player:get_player_name())
 	local kd = pstat.kills / max(pstat.deaths, 1)
-	return pstat.score > 2000 and kd > 2
+	return pstat.score > 1000 and kd > 2
 end
 
 local colors = {"red", "blue"}
@@ -105,10 +105,10 @@ for _, chest_color in pairs(colors) do
 
 			if is_pro then
 				formspec = formspec .. "listring[current_name;pro]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (2k+ score, good KD)") .. "]"
+					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (1k+ score, good KD)") .. "]"
 			else
 				formspec = formspec .. "listring[current_name;pro]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("You need 2k+ score and good KD") .. "]"
+					"label[5,-0.2;" .. minetest.formspec_escape("You need 1k+ score and good KD") .. "]"
 			end
 
 			formspec = formspec ..
