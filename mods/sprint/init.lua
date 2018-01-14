@@ -79,8 +79,12 @@ minetest.register_globalstep(function(dtime)
 				if SPRINT_HUDBARS_USED then
 					hb.change_hudbar(player, "sprint", info.stamina)
 				else
-					local numBars = (info.stamina / STAMINA_MAX) * 20
-					player:hud_change(info.hud, "number", numBars)
+					local numBars = math.floor(20 * info.stamina / STAMINA_MAX)
+					if info.lastHudSendValue ~= numBars then
+						info.lastHudSendValue = numBars
+						player:hud_change(info.hud, "number", numBars)
+						print("Sending hud value")
+					end
 				end
 			end
 		end
