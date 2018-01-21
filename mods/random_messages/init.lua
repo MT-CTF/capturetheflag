@@ -52,7 +52,7 @@ function random_messages.read_messages()
 		"Steel swords do more damage than guns, but you need to be up close.",
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
-		"Players are immune for 10 seconds after they respawn.",
+		"Players are immune to attack for 15 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 1k+ score and killing 2 people for every death.",
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
