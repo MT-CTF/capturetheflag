@@ -52,14 +52,12 @@ local function update(player, settings)
 	tag_settings[player:get_player_name()] = settings
 
 	if settings.type == TYPE_BUILTIN then
-		minetest.log("error", "type: builtin")
 		remove_entity_tag(player)
 		print(dump(settings.color))
 		player:set_nametag_attributes({
 			color = settings.color
 		})
 	elseif settings.type == TYPE_ENTITY then
-		minetest.log("error", "type: entity")
 		add_entity_tag(player)
 	end
 end
@@ -68,7 +66,6 @@ function playertag.set(player, type, color)
 	local oldset = tag_settings[player:get_player_name()]
 	color = color or { a=255, r=255, g=255, b=255 }
 	if not oldset or oldset.type ~= type or oldset.color ~= color then
-		minetest.log("error", "updating")
 		update(player, { type = type, color = color })
 	end
 end
@@ -84,7 +81,6 @@ local nametag = {
 
 function nametag:on_activate(staticdata, dtime_s)
 	if staticdata == "expired" then
-		minetest.log("error", "Nametag expired, removing")
 		local name = self.wielder and self.wielder:get_player_name()
 		if name and nametags[name] == self.object then
 			nametags[name] = nil
@@ -98,20 +94,12 @@ function nametag:get_staticdata()
 	return "expired"
 end
 
-minetest.register_chatcommand("a", {
-	func = function(name)
-		playertag.set(minetest.get_player_by_name(name), TYPE_BUILTIN)
-	end
-})
-
 function nametag:on_step(dtime)
 	local name = self.wielder
 	local wielder = name and minetest.get_player_by_name(name)
 	if not wielder then
-		minetest.log("error", "no such wielder, removing")
 		self.object:remove()
 	elseif not tag_settings[name] or tag_settings[name].type ~= TYPE_ENTITY then
-		minetest.log("error", "wrong player setting, removing")
 		if name and nametags[name] == self.object then
 			nametags[name] = nil
 		end
