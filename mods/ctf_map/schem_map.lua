@@ -48,15 +48,17 @@ function ctf_match.load_map_meta(idx, name)
 	local offset = vector.new(600 * (idx - 1), 0, 0)
 	local meta   = Settings(mapdir .. name .. ".conf")
 
+	local initial_stuff = meta:get("initial_stuff")
 	local map = {
-		idx       = idx,
-		name      = meta:get("name"),
-		author    = meta:get("author"),
-		rotation  = meta:get("rotation"),
-		schematic = name .. ".mts",
-		r         = tonumber(meta:get("r")),
-		h         = tonumber(meta:get("h")),
-		teams     = {}
+		idx           = idx,
+		name          = meta:get("name"),
+		author        = meta:get("author"),
+		rotation      = meta:get("rotation"),
+		schematic     = name .. ".mts",
+		r             = tonumber(meta:get("r")),
+		h             = tonumber(meta:get("h")),
+		teams         = {},
+		initial_stuff = initial_stuff and initial_stuff:split(","),
 	}
 
 	assert(map.r <= max_r)

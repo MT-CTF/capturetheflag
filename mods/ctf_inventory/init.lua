@@ -41,5 +41,3 @@ sfinv.register_page("ctf_inventory:help", {
 		return sfinv.make_formspec(player, context, fs, false)
 	end
 })
-
-dofile(minetest.get_modpath("ctf_inventory") .. "/give_initial_stuff.lua")
