@@ -38,6 +38,8 @@ function ctf_map.place_map(map)
 			minetest.log("error", "Placing " .. value.chests.n .. " chests from " ..
 					minetest.pos_to_string(value.chests.from) .. " to "..
 					minetest.pos_to_string(value.chests.to))
+
+			ctf_team_base.place(value.color, value.pos)
 		end
 	end
 
