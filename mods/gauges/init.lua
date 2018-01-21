@@ -48,7 +48,7 @@ local function add_HP_gauge(name)
 		local pos = player:get_pos()
 		local ent = minetest.add_entity(pos, "gauges:hp_bar")
 		if ent ~= nil then
-			ent:set_attach(player, "", {x = 0, y = 10, z = 0}, {x = 0, y = 0, z = 0})
+			ent:set_attach(player, "", {x = 0, y = 9, z = 0}, {x = 0, y = 0, z = 0})
 			ent = ent:get_luaentity()
 			ent.wielder = player:get_player_name()
 		end
