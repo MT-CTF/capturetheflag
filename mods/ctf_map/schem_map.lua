@@ -10,9 +10,17 @@ ctf_map.map  = nil
 
 do
 	local files_hash = {}
-	local files = minetest.get_dir_list(mapdir, false)
-	for i=1, #files do
-		files_hash[files[i]:split(".")[1]] = true
+
+	local dirs = minetest.get_dir_list(mapdir, true)
+	table.insert(dirs, ".")
+	for _, dir in pairs(dirs) do
+		local files = minetest.get_dir_list(mapdir .. dir, false)
+		-- if dir ~= "" then
+		-- 	dir = dir .. "/"
+		-- end
+		for i=1, #files do
+			files_hash[dir .. "/" .. files[i]:split(".")[1]] = true
+		end
 	end
 
 	ctf_map.available_maps = {}
