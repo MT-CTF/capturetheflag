@@ -7,12 +7,14 @@ local function emergeblocks_callback(pos, action, num_calls_remaining, ctx)
 	ctx.current_blocks = ctx.current_blocks + 1
 
 	if ctx.current_blocks == ctx.total_blocks then
-		minetest.chat_send_player(ctx.name,
-			string.format("Finished emerging %d blocks in %.2fms.",
-			ctx.total_blocks, (os.clock() - ctx.start_time) * 1000))
+		if ctx.name then
+			minetest.chat_send_player(ctx.name,
+				string.format("Finished emerging %d blocks in %.2fms.",
+				ctx.total_blocks, (os.clock() - ctx.start_time) * 1000))
+		end
 
 		ctx:callback()
-	else
+	elseif ctx.progress then
 		ctx:progress()
 	end
 end

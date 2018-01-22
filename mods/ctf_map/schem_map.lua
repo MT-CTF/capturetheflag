@@ -29,15 +29,13 @@ end
 
 
 function ctf_map.place_map(map)
-	local r = map.r
-	local h = map.h
-	minetest.emerge_area(map.pos1, map.pos2)
+	ctf_map.emerge_with_callbacks(nil, map.pos1, map.pos2, function()
+		local schempath = mapdir .. map.schematic
+		local res = minetest.place_schematic(map.pos1, schempath,
+				map.rotation == "z" and "0" or "90")
 
-	local schempath = mapdir .. map.schematic
-	local res = minetest.place_schematic(map.pos1, schempath,
-			map.rotation == "z" and "0" or "90")
+		assert(res)
 
-	if res ~= nil then
 		local seed = minetest.get_mapgen_setting("seed")
 		for _, value in pairs(ctf_map.map.teams) do
 			place_chests(value.chests.from, value.chests.to, seed, value.chests.n)
@@ -47,13 +45,11 @@ function ctf_map.place_map(map)
 
 			ctf_team_base.place(value.color, value.pos)
 		end
-	end
 
-	minetest.after(5, function()
-		minetest.chat_send_all("Map: " .. map.name .. " by " .. map.author)
-	end)
-
-	return res ~= nil
+		minetest.after(2, function()
+			minetest.chat_send_all("Map: " .. map.name .. " by " .. map.author)
+		end)
+	end, nil)
 end
 
 function ctf_match.load_map_meta(idx, name)
