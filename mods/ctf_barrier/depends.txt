@@ -1,3 +1,0 @@
-default
-ctf
-ctf_match

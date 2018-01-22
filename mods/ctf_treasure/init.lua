@@ -2,6 +2,7 @@ treasurer.register_treasure("default:ladder",0.3,5,{1,20})
 treasurer.register_treasure("default:torch",0.3,5,{1,20})
 treasurer.register_treasure("default:cobble",0.4,5,{45,99})
 treasurer.register_treasure("default:apple",0.3,5,{1,8})
+treasurer.register_treasure("default:wood",0.3,5,{30,60})
 treasurer.register_treasure("doors:door_steel",0.3,5,{1,3})
 
 treasurer.register_treasure("default:pick_steel",0.5,5,{1,10})

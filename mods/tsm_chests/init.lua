@@ -78,13 +78,11 @@ minetest.register_node("tsm_chests:chest", {
 
 --[[ here are some configuration variables ]]
 
-local chests_per_chunk = 13	-- number of chests per chunk. 15 is a bit high, an actual mod might have a lower number
-local h_min = -1  		-- minimum chest spawning height, relative to water_level
-local h_max = 64-43		-- maximum chest spawning height, relative to water_level
+local h_min = -65  		-- minimum chest spawning height, relative to water_level
+local h_max = 40		-- maximum chest spawning height, relative to water_level
 local t_min = 3			-- minimum amount of treasures found in a chest
 local t_max = 6			-- maximum amount of treasures found in a chest
 
-local r_max = tonumber(minetest.setting_get("barrier"))
 local water_level = tonumber(minetest.setting_get("water_level"))
 local get_node = minetest.get_node
 local env = minetest.env
@@ -173,22 +171,9 @@ end
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
 ]]
-minetest.register_on_generated(function(minp, maxp, seed)
+function place_chests(minp, maxp, seed, number_chests)
 	minp = {x=minp.x, y=minp.y, z=minp.z}
 	maxp = {x=maxp.x, y=maxp.y, z=maxp.z}
-
-	if minp.x <= -r_max then
-		minp.x = -r_max + 1
-	end
-	if minp.z <= -r_max then
-		minp.z = -r_max + 1
-	end
-	if minp.x >= r_max then
-		minp.x = r_max - 1
-	end
-	if minp.z >= r_max then
-		minp.z = r_max - 1
-	end
 
 	-- chests minimum and maximum spawn height
 	local height_min = water_level + h_min
@@ -201,7 +186,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	local y_max = math.min(maxp.y, height_max)
 	local attempts = 0
 	local chests_placed = 0
-	while chests_placed < chests_per_chunk and attempts < chests_per_chunk + 6 do
+	while chests_placed < number_chests and attempts < number_chests + 12 do
 		attempts = attempts + 1
 		local pos = {
 			x = math.random(minp.x, maxp.x),
@@ -229,4 +214,4 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	end
 
 	print("Spawned " .. chests_placed .. " chests after " .. attempts .. " attempts!")
-end)
+end

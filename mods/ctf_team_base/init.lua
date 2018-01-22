@@ -187,55 +187,48 @@ minetest.register_abm({
 	end
 })
 
-minetest.register_on_generated(function(minp, maxp, seed)
-	for tname, team in pairs(ctf.teams) do
-		for _, flag in pairs(team.flags) do
-			if minp.x <= flag.x and maxp.x >= flag.x and
-					minp.y <= flag.y and maxp.y >= flag.y and
-					minp.z <= flag.z and maxp.z >= flag.z then
-				-- Spawn ind base
-				for x = flag.x - 2, flag.x + 2 do
-					for z = flag.z - 2, flag.z + 2 do
-						minetest.set_node({ x = x, y = flag.y - 1, z = z},
-							{name = "default:cobble"})
-					end
-				end
-				minetest.set_node({ x = flag.x, y = flag.y - 1, z = flag.z},
-					{name = "ctf_barrier:ind_stone"})
+ctf_team_base = {}
+function ctf_team_base.place(color, pos)
+	-- Spawn ind base
+	for x = pos.x - 2, pos.x + 2 do
+		for z = pos.z - 2, pos.z + 2 do
+			minetest.set_node({ x = x, y = pos.y - 1, z = z},
+				{name = "default:cobble"})
+		end
+	end
+	minetest.set_node({ x = pos.x, y = pos.y - 1, z = pos.z},
+		{name = "ctf_barrier:ind_stone"})
 
-				-- Check for trees
-				for y = flag.y, flag.y + 3 do
-					for x = flag.x - 3, flag.x + 3 do
-						for z = flag.z - 3, flag.z + 3 do
-							local pos = {x=x, y=y, z=z}
-							if minetest.get_node(pos).name == "default:tree" then
-								minetest.set_node(pos, {name="air"})
-							end
-						end
-					end
+	-- Check for trees
+	for y = pos.y, pos.y + 3 do
+		for x = pos.x - 3, pos.x + 3 do
+			for z = pos.z - 3, pos.z + 3 do
+				local pos = {x=x, y=y, z=z}
+				if minetest.get_node(pos).name == "default:tree" then
+					minetest.set_node(pos, {name="air"})
 				end
-
-				-- Spawn chest
-				local chest = {name = "ctf_team_base:chest_" .. team.data.color}
-				local dz = 2
-				if flag.z < 0 then
-					dz = -2
-					chest.param2 = minetest.dir_to_facedir({x=0,y=0,z=-1})
-				end
-				local pos = {
-					x = flag.x,
-					y = flag.y,
-					z = flag.z + dz
-				}
-				minetest.set_node(pos, chest)
-				local inv = minetest.get_meta(pos):get_inventory()
-				inv:add_item("main", ItemStack("default:cobble 99"))
-				inv:add_item("main", ItemStack("default:cobble 99"))
-				inv:add_item("main", ItemStack("default:cobble 99"))
-				inv:add_item("main", ItemStack("default:wood 99"))
-				inv:add_item("main", ItemStack("default:glass 5"))
-				inv:add_item("main", ItemStack("default:torch 10"))
 			end
 		end
 	end
-end)
+
+	-- Spawn chest
+	local chest = {name = "ctf_team_base:chest_" .. color}
+	local dz = 2
+	if pos.z < 0 then
+		dz = -2
+		chest.param2 = minetest.dir_to_facedir({x=0,y=0,z=-1})
+	end
+	local pos = {
+		x = pos.x,
+		y = pos.y,
+		z = pos.z + dz
+	}
+	minetest.set_node(pos, chest)
+	local inv = minetest.get_meta(pos):get_inventory()
+	inv:add_item("main", ItemStack("default:cobble 99"))
+	inv:add_item("main", ItemStack("default:cobble 99"))
+	inv:add_item("main", ItemStack("default:cobble 99"))
+	inv:add_item("main", ItemStack("default:wood 99"))
+	inv:add_item("main", ItemStack("default:glass 5"))
+	inv:add_item("main", ItemStack("default:torch 10"))
+end
