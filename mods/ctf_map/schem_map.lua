@@ -49,6 +49,10 @@ function ctf_map.place_map(map)
 		end
 	end
 
+	minetest.after(5, function()
+		minetest.chat_send_all("Map: " .. map.name .. " by " .. map.author)
+	end)
+
 	return res ~= nil
 end
 
