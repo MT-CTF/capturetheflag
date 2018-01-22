@@ -15,9 +15,6 @@ do
 	table.insert(dirs, ".")
 	for _, dir in pairs(dirs) do
 		local files = minetest.get_dir_list(mapdir .. dir, false)
-		-- if dir ~= "" then
-		-- 	dir = dir .. "/"
-		-- end
 		for i=1, #files do
 			files_hash[dir .. "/" .. files[i]:split(".")[1]] = true
 		end
@@ -27,6 +24,7 @@ do
 	for key, _ in pairs(files_hash) do
 		table.insert(ctf_map.available_maps, key)
 	end
+	print(dump(ctf_map.available_maps))
 end
 
 
@@ -122,7 +120,7 @@ ctf_match.register_on_new_match(function()
 	local idx
 	if ctf_map.map then
 		idx = math.random(#ctf_map.available_maps - 1)
-		if idx == ctf_map.map.idx then
+		if idx >= ctf_map.map.idx then
 			idx = idx + 1
 		end
 	else
