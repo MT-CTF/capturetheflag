@@ -173,6 +173,8 @@ function ctf_match.load_map_meta(idx, name)
 end
 
 ctf_match.register_on_new_match(function()
+	minetest.clear_objects({ mode = "quick" })
+
 	-- Choose next map index, but don't select the same one again
 	local idx
 	if ctf_map.map then
