@@ -1,3 +1,11 @@
+minetest.register_node("ctf_team_base:ind_cobble", {
+	description = "Cobblestone",
+	tiles = {"default_cobble.png"},
+	is_ground_content = false,
+	groups = {immortal = 1},
+	sounds = default.node_sound_stone_defaults(),
+})
+
 local function max(a, b)
 	return (a > b) and a or b
 end
@@ -156,11 +164,9 @@ function ctf_team_base.place(color, pos)
 	for x = pos.x - 2, pos.x + 2 do
 		for z = pos.z - 2, pos.z + 2 do
 			minetest.set_node({ x = x, y = pos.y - 1, z = z},
-				{name = "default:cobble"})
+				{name = "ctf_team_base:ind_cobble"})
 		end
 	end
-	minetest.set_node({ x = pos.x, y = pos.y - 1, z = pos.z},
-		{name = "ctf_barrier:ind_stone"})
 
 	-- Check for trees
 	for y = pos.y, pos.y + 3 do
