@@ -10,14 +10,7 @@ local function max(a, b)
 	return (a > b) and a or b
 end
 
-local function get_is_player_pro(player)
-	local players = {}
-	for pname, pstat in pairs(ctf_stats.players) do
-		pstat.name = pname
-		pstat.color = nil
-		table.insert(players, pstat)
-	end
-	local pstat = ctf_stats.player(player:get_player_name())
+local function get_is_player_pro(pstat)
 	local kd = pstat.kills / max(pstat.deaths, 1)
 	return pstat.score > 1000 and kd > 2
 end
@@ -59,20 +52,33 @@ for _, chest_color in pairs(colors) do
 				minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
 			end
 
-			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
-			local is_pro = get_is_player_pro(player)
+			local formspec = table.concat({
+				"size[8,9]",
+				default.gui_bg,
+				default.gui_bg_img,
+				default.gui_slots,
+				"list[current_player;main;0,4.85;8,1;]",
+				"list[current_player;main;0,6.08;8,3;8]",
+			}, "")
 
-			local formspec =
-				"size[8,9]" ..
+			local pstat = ctf_stats.player(player:get_player_name())
+			if not pstat or not pstat.score or pstat.score < 10 then
+				local msg = "You need at least 10 score to access the team chest.\n" ..
+					"Try killing an enemy player, or at least attempting to capture the flag.\n" ..
+					"Find resources in chests scattered around the map."
+				formspec = formspec .. "label[1,1;" .. minetest.formspec_escape(msg) .. "]"
+				minetest.show_formspec(player:get_player_name(), "ctf_team_base:no_access",  formspec)
+				return
+			end
+
+			local is_pro = get_is_player_pro(pstat)
+			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
+
+			formspec = formspec ..
 				"label[0,-0.2;" .. minetest.formspec_escape("Any team member can take from here") .. "]" ..
-				default.gui_bg ..
-				default.gui_bg_img ..
-				default.gui_slots ..
 				"list[" .. chestinv .. ";main;0,0.3;5,4;]" ..
 				"background[5,-0.2;3.15,4.7;ctf_team_base_pro_only.png;false]" ..
-				"list[" .. chestinv .. ";pro;5,0.3;3,4;]" ..
-				"list[current_player;main;0,4.85;8,1;]" ..
-				"list[current_player;main;0,6.08;8,3;8]"
+				"list[" .. chestinv .. ";pro;5,0.3;3,4;]"
 
 			if is_pro then
 				formspec = formspec .. "listring[current_name;pro]" ..
@@ -98,7 +104,12 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(player) then
+			local pstat = ctf_stats.player(player:get_player_name())
+			if not pstat or not pstat.score or pstat.score < 10 then
+				return 0
+			end
+
+			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(pstat) then
 				return count
 			else
 				return 0
@@ -110,7 +121,12 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			if listname ~= "pro" or get_is_player_pro(player) then
+			local pstat = ctf_stats.player(player:get_player_name())
+			if not pstat or not pstat.score or pstat.score < 10 then
+				return 0
+			end
+
+			if listname ~= "pro" or get_is_player_pro(pstat) then
 				return stack:get_count()
 			else
 				return 0
@@ -123,7 +139,12 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			if listname ~= "pro" or get_is_player_pro(player) then
+			local pstat = ctf_stats.player(player:get_player_name())
+			if not pstat or not pstat.score or pstat.score < 10 then
+				return 0
+			end
+
+			if listname ~= "pro" or get_is_player_pro(pstat) then
 				return stack:get_count()
 			else
 				return 0
