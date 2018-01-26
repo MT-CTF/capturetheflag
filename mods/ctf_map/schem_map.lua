@@ -57,7 +57,7 @@ function ctf_map.place_map(map)
 		local seed = minetest.get_mapgen_setting("seed")
 		for _, value in pairs(ctf_map.map.teams) do
 			place_chests(value.chests.from, value.chests.to, seed, value.chests.n)
-			minetest.log("error", "Placing " .. value.chests.n .. " chests from " ..
+			minetest.log("info", "Placing " .. value.chests.n .. " chests from " ..
 					minetest.pos_to_string(value.chests.from) .. " to "..
 					minetest.pos_to_string(value.chests.to))
 
@@ -89,6 +89,7 @@ function ctf_match.load_map_meta(idx, name)
 		h             = tonumber(meta:get("h")),
 		teams         = {},
 		initial_stuff = initial_stuff and initial_stuff:split(","),
+		offset        = offset,
 	}
 
 	assert(map.r <= max_r)

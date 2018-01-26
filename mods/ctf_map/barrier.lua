@@ -9,21 +9,19 @@ local c_water_f    = minetest.get_content_id("default:water_flowing")
 local c_air        = minetest.get_content_id("air")
 
 function ctf_map.remove_middle_barrier()
-	minetest.log("error", "Removing middle barrier!")
-
 	local r = ctf_map.map.r
 	local h = ctf_map.map.h
 
-	local min = {
+	local min = vector.add(ctf_map.map.offset, {
 		x = -r + 1,
 		y = -h / 2,
 		z = -1
-	}
-	local max = {
+	})
+	local max = vector.add(ctf_map.map.offset, {
 		x = r - 1,
 		y = h / 2,
 		z = 1
-	}
+	})
 
 	local vm = minetest.get_voxel_manip()
 	local emin, emax = vm:read_from_map(min, max)
