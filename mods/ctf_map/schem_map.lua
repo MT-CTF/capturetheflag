@@ -65,7 +65,11 @@ function ctf_map.place_map(map)
 		end
 
 		minetest.after(2, function()
-			minetest.chat_send_all("Map: " .. map.name .. " by " .. map.author)
+			local msg = "Map: " .. map.name .. " by " .. map.author
+			if map.hint then
+				msg = msg .. "\n" .. map.hint
+			end
+			minetest.chat_send_all(msg)
 		end)
 
 		minetest.after(10, function()
@@ -83,6 +87,7 @@ function ctf_match.load_map_meta(idx, name)
 		idx           = idx,
 		name          = meta:get("name"),
 		author        = meta:get("author"),
+		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
 		schematic     = name .. ".mts",
 		r             = tonumber(meta:get("r")),
@@ -184,3 +189,16 @@ function ctf_match.create_teams()
 		end
 	end
 end
+
+minetest.register_on_joinplayer(function(player)
+	local map = ctf_map.map
+	if not map then
+		return
+	end
+
+	local msg = "Map: " .. map.name .. " by " .. map.author
+	if map.hint then
+		msg = msg .. "\n" .. map.hint
+	end
+	minetest.chat_send_player(player:get_player_name(), msg)
+end)
