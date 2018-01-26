@@ -43,6 +43,7 @@ do
 		table.insert(ctf_map.available_maps, key)
 	end
 	print(dump(ctf_map.available_maps))
+	ctf_map.available_maps = {"ctf_extra_maps/03_caverns"}
 end
 
 
@@ -54,14 +55,16 @@ function ctf_map.place_map(map)
 
 		assert(res)
 
-		local seed = minetest.get_mapgen_setting("seed")
 		for _, value in pairs(ctf_map.map.teams) do
-			place_chests(value.chests.from, value.chests.to, seed, value.chests.n)
-			minetest.log("info", "Placing " .. value.chests.n .. " chests from " ..
-					minetest.pos_to_string(value.chests.from) .. " to "..
-					minetest.pos_to_string(value.chests.to))
-
 			ctf_team_base.place(value.color, value.pos)
+		end
+
+		local seed = minetest.get_mapgen_setting("seed")
+		for _, chestzone in pairs(ctf_map.map.chests) do
+			minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
+					minetest.pos_to_string(chestzone.from) .. " to "..
+					minetest.pos_to_string(chestzone.to))
+			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
 		end
 
 		minetest.after(2, function()
@@ -90,11 +93,12 @@ function ctf_match.load_map_meta(idx, name)
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
 		schematic     = name .. ".mts",
+		initial_stuff = initial_stuff and initial_stuff:split(","),
 		r             = tonumber(meta:get("r")),
 		h             = tonumber(meta:get("h")),
-		teams         = {},
-		initial_stuff = initial_stuff and initial_stuff:split(","),
 		offset        = offset,
+		teams         = {},
+		chests        = {},
 	}
 
 	assert(map.r <= max_r)
@@ -102,30 +106,12 @@ function ctf_match.load_map_meta(idx, name)
 	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
 	map.pos2 = vector.add(offset, { x =  map.r, y = map.h / 2,  z =  map.r })
 
+	-- Read teams from config
 	local i = 1
 	while meta:get("team." .. i) do
 		local tname  = meta:get("team." .. i)
 		local tcolor = meta:get("team." .. i .. ".color")
 		local tpos   = minetest.string_to_pos(meta:get("team." .. i .. ".pos"))
-
-		local chests1 = meta:get("team." .. i .. ".chests1")
-		if chests1 then
-			chests1 = vector.add(offset, minetest.string_to_pos(chests1))
-		elseif i == 1 then
-			chests1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = 0 })
-		elseif i == 2 then
-			chests1 = map.pos1
-		end
-
-		local chests2 = meta:get("team." .. i .. ".chests2")
-		if chests2 then
-			chests2 = vector.add(offset, minetest.string_to_pos(chests2))
-		elseif i == 1 then
-			chests2 = map.pos2
-		elseif i == 2 then
-			chests2 = vector.add(offset, { x = map.r, y = map.h / 2, z = 0 })
-		end
-
 
 		map.teams[tname] = {
 			color = tcolor,
@@ -138,6 +124,50 @@ function ctf_match.load_map_meta(idx, name)
 		}
 
 		i = i + 1
+	end
+
+	-- Read custom chest zones from config
+	i = 1
+	while meta:get("chests." .. i .. ".from") do
+		local from  = minetest.string_to_pos(meta:get("chests." .. i .. ".from"))
+		local to    = minetest.string_to_pos(meta:get("chests." .. i .. ".to"))
+		assert(from and to, "Positions needed for chest zone " .. i .. " in map " .. map.name)
+
+		map.chests[i] = {
+			from = vector.add(offset, from),
+			to   = vector.add(offset, to),
+			n    = tonumber(meta:get("chests." .. i .. ".n") or "23"),
+		}
+
+		minetest.log("warning", dump(map.chests[i]))
+
+		i = i + 1
+	end
+
+	-- Add default chest zones if none given
+	if i == 1 then
+		while meta:get("team." .. i) do
+			local chests1
+			if i == 1 then
+				chests1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = 0 })
+			elseif i == 2 then
+				chests1 = map.pos1
+			end
+
+			local chests2
+			if i == 1 then
+				chests2 = map.pos2
+			elseif i == 2 then
+				chests2 = vector.add(offset, { x = map.r, y = map.h / 2, z = 0 })
+			end
+
+			map.chests[i] = {
+				from = chests1,
+				to = chests2,
+				n = 23,
+			}
+			i = i + 1
+		end
 	end
 
 	return map
