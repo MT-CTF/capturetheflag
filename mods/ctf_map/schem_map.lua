@@ -49,11 +49,15 @@ function ctf_map.place_map(map)
 		minetest.after(2, function()
 			minetest.chat_send_all("Map: " .. map.name .. " by " .. map.author)
 		end)
+
+		minetest.after(10, function()
+			minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
+		end)
 	end, nil)
 end
 
 function ctf_match.load_map_meta(idx, name)
-	local offset = vector.new(600 * (idx - 1), 0, 0)
+	local offset = vector.new(600 * idx, 0, 0)
 	local meta   = Settings(mapdir .. name .. ".conf")
 
 	local initial_stuff = meta:get("initial_stuff")
@@ -133,11 +137,6 @@ ctf_match.register_on_new_match(function()
 
 	-- Place map
 	ctf_map.place_map(ctf_map.map)
-
-	-- Fixes
-	minetest.after(10, function()
-		minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
-	end)
 end)
 
 function ctf_match.create_teams()
