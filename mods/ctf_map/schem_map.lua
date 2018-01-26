@@ -43,7 +43,6 @@ do
 		table.insert(ctf_map.available_maps, key)
 	end
 	print(dump(ctf_map.available_maps))
-	ctf_map.available_maps = {"ctf_extra_maps/03_caverns"}
 end
 
 
