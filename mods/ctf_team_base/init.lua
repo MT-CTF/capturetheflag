@@ -145,7 +145,7 @@ end
 
 minetest.register_abm({
 	nodenames = {"group:team_chest"},
-	interval = 2, -- Run every 10 seconds
+	interval = 10, -- Run every 10 seconds
 	chance = 1, -- Select every 1 in 50 nodes
 	action = function(pos, node, active_object_count, active_object_count_wider)
 		local current_owner = assert(chest_name_to_team[node.name])
@@ -198,6 +198,7 @@ function ctf_team_base.place(color, pos)
 	inv:add_item("main", ItemStack("default:cobble 99"))
 	inv:add_item("main", ItemStack("default:cobble 99"))
 	inv:add_item("main", ItemStack("default:wood 99"))
+	inv:add_item("main", ItemStack("default:stick 30"))
 	inv:add_item("main", ItemStack("default:glass 5"))
 	inv:add_item("main", ItemStack("default:torch 10"))
 end
