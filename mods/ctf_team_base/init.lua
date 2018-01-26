@@ -12,7 +12,7 @@ end
 
 local function get_is_player_pro(pstat)
 	local kd = pstat.kills / max(pstat.deaths, 1)
-	return pstat.score > 1000 and kd > 2
+	return pstat.score > 1000 and kd > 1.5
 end
 
 local colors = {"red", "blue"}
