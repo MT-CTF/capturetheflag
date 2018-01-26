@@ -213,5 +213,5 @@ function place_chests(minp, maxp, seed, number_chests)
 		end
 	end
 
-	print("Spawned " .. chests_placed .. "/" .. number_chests .. " chests after " .. attempts .. " attempts!")
+	minetest.log("warning", "Spawned " .. chests_placed .. "/" .. number_chests .. " chests after " .. attempts .. " attempts!")
 end
