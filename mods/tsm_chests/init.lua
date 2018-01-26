@@ -80,8 +80,8 @@ minetest.register_node("tsm_chests:chest", {
 
 local h_min = -65  		-- minimum chest spawning height, relative to water_level
 local h_max = 40		-- maximum chest spawning height, relative to water_level
-local t_min = 3			-- minimum amount of treasures found in a chest
-local t_max = 6			-- maximum amount of treasures found in a chest
+local t_min = 4			-- minimum amount of treasures found in a chest
+local t_max = 7			-- maximum amount of treasures found in a chest
 
 local water_level = tonumber(minetest.setting_get("water_level"))
 local get_node = minetest.get_node
@@ -213,5 +213,5 @@ function place_chests(minp, maxp, seed, number_chests)
 		end
 	end
 
-	print("Spawned " .. chests_placed .. " chests after " .. attempts .. " attempts!")
+	print("Spawned " .. chests_placed .. "/" .. number_chests .. " chests after " .. attempts .. " attempts!")
 end
