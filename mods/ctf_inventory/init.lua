@@ -3,7 +3,7 @@ local items = {
 	"",
 	"*  Capture an enemy's flag by walking up to it, punching it, then",
 	"   running and punching your team's flag.",
-	"*  Look for weapons and other resources in chests.",
+	"*  Look for weapons and other resources in chests, or mine and use furnaces to make swords.",
 	"*  Good swords do more damage than guns, but need to be used at close range.",
 	"*  Use apples to replenish health quickly.",
 	"*  Gain more score by killing more than you die, or by capturing the flag.",
