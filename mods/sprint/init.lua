@@ -4,7 +4,7 @@
 -- Config, see README.md
 local MOD_WALK    = tonumber(minetest.settings:get("sprint_speed")     or 1.8)
 local MOD_JUMP    = tonumber(minetest.settings:get("sprint_jump")      or 1.1)
-local STAMINA_MAX = tonumber(minetest.settings:get("sprint_stamina")   or 20)
+local STAMINA_MAX = tonumber(minetest.settings:get("sprint_stamina")   or 5)
 local HEAL_RATE   = tonumber(minetest.settings:get("sprint_heal_rate") or 0.5)
 local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
 local SPRINT_MODIFIERS = {
