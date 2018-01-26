@@ -115,7 +115,7 @@ function ctf_stats.html_to_file(filepath)
 	f:close()
 end
 
-local function send_as_chat_message(to, name)
+local function send_as_chat_result(to, name)
 	local players = {}
 	for pname, pstat in pairs(ctf_stats.players) do
 		pstat.name = pname
@@ -141,29 +141,29 @@ local function send_as_chat_message(to, name)
 		place = #players + 1
 	end
 	local you_are_in = (to == name) and "You are in " or "They are in "
-	minetest.chat_send_player(to, you_are_in .. place .. " place.")
+	local result = you_are_in .. place .. " place.\n"
 	if me then
 		local kd = me.kills
 		if me.deaths > 0 then
 			kd = kd / me.deaths
 		end
-		minetest.chat_send_player(to,
-			"Kills: " .. me.kills ..
+		result = result .. "Kills: " .. me.kills ..
 			" | Deaths: " .. me.deaths ..
 			" | K/D: " .. math.floor(kd*10)/10 ..
 			" | Captures: " .. me.captures ..
 			" | Attempts: " .. me.attempts ..
-			" | Score: " .. me.score)
+			" | Score: " .. me.score
 	end
+	return true, result
 end
 
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
 		if param == "me" then
-			send_as_chat_message(name, name)
+			return send_as_chat_result(name, name)
 		elseif param ~= "" then
 			if ctf_stats.players[param:trim()] then
-				send_as_chat_message(name, param:trim())
+				return send_as_chat_result(name, param:trim())
 			else
 				return false, "Can't find player '" .. param:trim() .. "'"
 			end
