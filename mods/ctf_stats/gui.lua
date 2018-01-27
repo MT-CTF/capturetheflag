@@ -152,7 +152,7 @@ local function send_as_chat_result(to, name)
 			" | K/D: " .. math.floor(kd*10)/10 ..
 			" | Captures: " .. me.captures ..
 			" | Attempts: " .. me.attempts ..
-			" | Score: " .. me.score
+			" | Score: " .. math.floor(me.score)
 	end
 	return true, result
 end
