@@ -10,12 +10,7 @@ local function drop(pos, itemstack)
 
 	for _, item in pairs(blacklist_drop) do
 		if sname == item then
-			return
-		end
-	end
-	if sname == "default:torch" then
-		it:take_item(3)
-		if it:get_count() <= 0 then
+			minetest.log("error", "Not dropping " .. item)
 			return
 		end
 	end
@@ -34,25 +29,23 @@ local function drop(pos, itemstack)
 	return itemstack
 end
 
-local function drop_all(player)
-	if minetest.setting_getbool("creative_mode") then
-		return
+local function drop_list(pos, inv, list)
+	for i = 1, inv:get_size(list) do
+		drop(pos, inv:get_stack(list, i))
+		inv:set_stack(list, i, nil)
 	end
+end
 
+local function drop_all(player)
 	local pos = player:getpos()
 	pos.y = math.floor(pos.y + 0.5)
 
-	local player_inv = player:get_inventory()
-
-	for i=1,player_inv:get_size("main") do
-		drop(pos, player_inv:get_stack("main", i))
-		player_inv:set_stack("main", i, nil)
+	local inv = player:get_inventory()
+	for _, item in pairs(give_initial_stuff.get_stuff()) do
+		inv:remove_item("main", ItemStack(item))
 	end
-
-	for i=1,player_inv:get_size("craft") do
-		drop(pos, player_inv:get_stack("craft", i))
-		player_inv:set_stack("craft", i, nil)
-	end
+	drop_list(pos, inv, "main")
+	drop_list(pos, inv, "craft")
 end
 
 minetest.register_on_dieplayer(drop_all)

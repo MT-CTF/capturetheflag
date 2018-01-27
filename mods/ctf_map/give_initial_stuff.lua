@@ -1,18 +1,26 @@
-function give_initial_stuff(player)
-	minetest.log("action", "Giving initial stuff to player "..player:get_player_name())
-	local inv = player:get_inventory()
-	inv:set_list("main",  {})
-	inv:set_list("craft", {})
+give_initial_stuff = {}
 
-	local items = ctf_map.map and ctf_map.map.initial_stuff or {
+setmetatable(give_initial_stuff, {
+	__call = function(self, player)
+		minetest.log("action", "Giving initial stuff to player "..player:get_player_name())
+		local inv = player:get_inventory()
+		inv:set_list("main",  {})
+		inv:set_list("craft", {})
+
+		local items = give_initial_stuff.get_stuff()
+
+		for _, item in pairs(items) do
+			inv:add_item("main", item)
+		end
+	end
+})
+
+function give_initial_stuff.get_stuff()
+	return ctf_map.map and ctf_map.map.initial_stuff or {
 		"default:pick_wood",
 		"default:sword_wood",
 		"default:torch 3",
 	}
-
-	for _, item in pairs(items) do
-		inv:add_item("main", item)
-	end
 end
 
 minetest.register_on_joinplayer(function(player)
