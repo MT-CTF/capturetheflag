@@ -180,3 +180,25 @@ minetest.register_chatcommand("rankings", {
 		end
 	end
 })
+
+local reset_y = {}
+minetest.register_chatcommand("reset_rankings", {
+	func = function(name, param)
+		param = param:trim()
+		if param ~= "" and not minetest.check_player_privs(name, { ctf_admin = true}) then
+			return false, "Missing privilege: ctf_admin"
+		end
+
+		local reset_name = param == "" and name or param
+
+		if reset_name == name and not reset_y[name] then
+			reset_y[name] = true
+			return true, "This will reset your stats and rankings completely. You will lose access to any special privileges such as the team chest or userlimit skip. This is irreversable. If you're sure, type /reset_rankings again to perform the reset"
+		end
+		reset_y[name] = nil
+
+		ctf_stats.players[name] = nil
+		ctf_stats.player(reset_name)
+		return true, "Reset the stats and ranking of " .. reset_name
+	end
+})
