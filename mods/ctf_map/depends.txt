@@ -3,3 +3,4 @@ ctf_team_base?
 ctf?
 ctf_match?
 worldedit?
+irc?
