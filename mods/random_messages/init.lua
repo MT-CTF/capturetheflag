@@ -54,7 +54,7 @@ function random_messages.read_messages()
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
 		"Players are immune to attack for 15 seconds after they respawn.",
-		"Access the pro section of the chest by achieving a 1k+ score and killing 2 people for every death.",
+		"Access the pro section of the chest by achieving a 1k+ score and killing 3 people for every 2 deaths.",
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
