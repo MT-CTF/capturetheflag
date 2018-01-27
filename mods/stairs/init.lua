@@ -686,36 +686,6 @@ stairs.register_stair_and_slab(
 )
 
 stairs.register_stair_and_slab(
-	"obsidian",
-	"default:obsidian",
-	{cracky = 1, level = 2},
-	{"default_obsidian.png"},
-	"Obsidian Stair",
-	"Obsidian Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"obsidianbrick",
-	"default:obsidianbrick",
-	{cracky = 1, level = 2},
-	{"default_obsidian_brick.png"},
-	"Obsidian Brick Stair",
-	"Obsidian Brick Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"obsidian_block",
-	"default:obsidian_block",
-	{cracky = 1, level = 2},
-	{"default_obsidian_block.png"},
-	"Obsidian Block Stair",
-	"Obsidian Block Slab",
-	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
 	"brick",
 	"default:brick",
 	{cracky = 3},
@@ -723,56 +693,6 @@ stairs.register_stair_and_slab(
 	"Brick Stair",
 	"Brick Slab",
 	default.node_sound_stone_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"steelblock",
-	"default:steelblock",
-	{cracky = 1, level = 2},
-	{"default_steel_block.png"},
-	"Steel Block Stair",
-	"Steel Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"tinblock",
-	"default:tinblock",
-	{cracky = 1, level = 2},
-	{"default_tin_block.png"},
-	"Tin Block Stair",
-	"Tin Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"copperblock",
-	"default:copperblock",
-	{cracky = 1, level = 2},
-	{"default_copper_block.png"},
-	"Copper Block Stair",
-	"Copper Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"bronzeblock",
-	"default:bronzeblock",
-	{cracky = 1, level = 2},
-	{"default_bronze_block.png"},
-	"Bronze Block Stair",
-	"Bronze Block Slab",
-	default.node_sound_metal_defaults()
-)
-
-stairs.register_stair_and_slab(
-	"goldblock",
-	"default:goldblock",
-	{cracky = 1},
-	{"default_gold_block.png"},
-	"Gold Block Stair",
-	"Gold Block Slab",
-	default.node_sound_metal_defaults()
 )
 
 stairs.register_stair_and_slab(
