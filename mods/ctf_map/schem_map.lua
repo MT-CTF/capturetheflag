@@ -73,7 +73,7 @@ function ctf_map.place_map(map)
 			end
 			minetest.chat_send_all(msg)
 			if minetest.global_exists("irc") and irc.connected then
-				irc:say(msg)
+				irc:say("Map: " .. map.name)
 			end
 		end)
 
