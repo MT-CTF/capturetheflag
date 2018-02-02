@@ -26,15 +26,9 @@ minetest.register_chatcommand("report", {
 		if minetest.global_exists("irc") and irc.feature_mod_channel then
 			irc:say(irc.config.channel, "UserReport by " .. name .. ": " .. param, true)
 		end
-		if #mods > 0 then
-			mod_list = table.concat(mods, ", ")
-			email.send_mail(name, minetest.setting_get("name"),
-				"Report: " .. param .. " (mods online: " .. mod_list .. ")")
-			return true, "Reported. Moderators currently online: " .. mod_list
-		else
-			email.send_mail(name, minetest.setting_get("name"),
-				"Report: " .. param .. " (no mods online)")
-			return true, "Reported. We'll get back to you."
-		end
+
+		email.send_mail(name, minetest.setting_get("name"),
+			"Report: " .. param .. " (no mods online)")
+		return true, "Reported. We'll get back to you."
 	end
 })
