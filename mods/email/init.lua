@@ -2,6 +2,9 @@ email = {
 	log = function(msg) end
 }
 local _loading = true
+local send_as = {}
+local forward_to = {}
+local storage = minetest.get_mod_storage()
 
 if minetest.global_exists("chatplus") then
 	email.log = chatplus.log
@@ -37,6 +40,9 @@ function email.load()
 			end
 		end
 	end
+
+	forward_to = minetest.parse_json(storage:get_string("forward_to")) or {}
+	send_as    = minetest.parse_json(storage:get_string("send_as"))    or {}
 end
 
 function email.save()
@@ -164,29 +170,32 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 	end]]--
 end)
 
-function email.send_mail(name, to, msg)
-	minetest.log("Email - To: "..to..", From: "..name..", MSG: "..msg)
+function email.send_mail(aname, ato, msg)
+	local name = send_as[aname]  or aname
+	local to   = forward_to[ato] or ato
+
+	minetest.log("action", "Email - To: "..to..", From: "..name..", MSG: "..msg)
 	email.log("Email - To: "..to..", From: "..name..", MSG: "..msg)
-	if true then
-		local mail = {
-			date = os.date("%Y-%m-%d %H:%M:%S"),
-			from = name,
-			msg = msg}
-
-		if email.inboxes[to] then
-			table.insert(email.inboxes[to], mail)
-		else
-			email.inboxes[to] = { mail }
-		end
-
-		email.save()
-
-		minetest.chat_send_player(to, "Mail from " .. name .. ": " .. msg)
-
-		return true, "Message sent to " .. to
-	else
+	if not minetest.player_exists(to) then
 		return false, "Player '" .. to .. "' does not exist"
 	end
+
+	local mail = {
+		date = os.date("%Y-%m-%d %H:%M:%S"),
+		from = name,
+		msg = msg}
+
+	if email.inboxes[to] then
+		table.insert(email.inboxes[to], mail)
+	else
+		email.inboxes[to] = { mail }
+	end
+
+	email.save()
+
+	minetest.chat_send_player(to, "Mail from " .. name .. ": " .. msg)
+
+	return true, "Message sent to " .. ato
 end
 
 minetest.register_chatcommand("inbox", {
