@@ -1,6 +1,8 @@
 assert(minetest.get_mapgen_setting("mg_name") == "singlenode", "singlenode mapgen is required.")
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
+minetest.register_alias("ctf_map:flag", "air")
+
 minetest.register_alias("flowers:mushroom_red", "air")
 minetest.register_alias("flowers:mushroom_brown", "air")
 minetest.register_alias("flowers:waterlily", "air")

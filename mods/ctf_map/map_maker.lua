@@ -8,6 +8,52 @@ assert(minetest.get_modpath("worldedit") and
 		minetest.get_modpath("worldedit_commands"),
 		"worldedit and worldedit_commands are required!")
 
+local flag_positions = {}
+local function check_step()
+	for _, pos in pairs(flag_positions) do
+		if minetest.get_node(pos).name ~= "ctf_map:flag" then
+			minetest.set_node(pos, { name = "ctf_map:flag" })
+		end
+	end
+
+	minetest.after(1, check_step)
+end
+minetest.after(1, check_step)
+
+minetest.register_node("ctf_map:flag", {
+	description = "Flag",
+	drawtype="nodebox",
+	paramtype = "light",
+	walkable = false,
+	tiles = {
+		"default_wood.png",
+		"default_wood.png",
+		"default_wood.png",
+		"default_wood.png",
+		"flag_grey2.png",
+		"flag_grey.png"
+	},
+	node_box = {
+		type = "fixed",
+		fixed = {
+			{ 0.250000,-0.500000,0.000000,0.312500,0.500000,0.062500},
+			{ -0.5,0,0.000000,0.250000,0.500000,0.062500}
+		}
+	},
+	groups = {oddly_breakable_by_hand=1,snappy=3},
+	on_construct = function(pos)
+		table.insert(flag_positions, vector.new(pos))
+	end,
+	on_destruct = function(pos)
+		for i, v in pairs(flag_positions) do
+			if vector.equals(pos, v) then
+				flag_positions[i] = nil
+				return
+			end
+		end
+	end,
+})
+
 local center = { x = 0, y = 0, z = 0, r = 115, h = 140 }
 local function to_2pos()
 	return {
@@ -51,6 +97,39 @@ local function we_import(name)
 	end
 end
 
+local function get_flags()
+	local negative = nil
+	local positive = nil
+	for _, pos in pairs(flag_positions) do
+		pos = vector.subtract(pos, center)
+
+		if center_barrier_rot == 0 and pos.x < 0 or pos.z < 0 then
+			negative = pos
+		end
+
+		if center_barrier_rot == 0 and pos.x > 0 or pos.z > 0 then
+			positive = pos
+		end
+	end
+
+	return negative, positive
+end
+
+local function get_flag_status()
+	if #flag_positions > 2 then
+		return "Too many flags! (" .. #flag_positions .. "/2)"
+	elseif #flag_positions < 2 then
+		return "Place more flags (" .. #flag_positions .. "/2)"
+	else
+		local negative, positive = get_flags()
+		if positive and negative then
+			return "Flags placed (" .. #flag_positions .. "/2)"
+		else
+			return "Place one flag on each side of the barrier."
+		end
+	end
+end
+
 
 local randint = math.random(100)
 local barrier_r = 110
@@ -62,7 +141,7 @@ local function show_gui(name)
 	mapauthor = mapauthor or name
 
 	local formspec = {
-		"size[8,9.5]",
+		"size[9,9.5]",
 		"bgcolor[#080808BB;true]",
 		default.gui_bg,
 		default.gui_bg_img,
@@ -84,7 +163,11 @@ local function show_gui(name)
 		"dropdown[1.15,4.25;1,1;center_barrier_rot;X=0,Z=0;", center_barrier_rot + 1, "]",
 		"button[2.3,4.2;2,1;place_barrier;Place Barriers]",
 
-		"label[0,5.5;3. Meta Data]",
+		"label[5.3,3;3. Place Flags]",
+		"label[5.3,3.5;", minetest.formspec_escape(get_flag_status()), "]",
+		"button[5.3,4.2;3.5,1;giveme;Giveme Flags]",
+
+		"label[0,5.5;4. Meta Data]",
 		"field[0.4,6.5;7.5,1;title;Title;" , minetest.formspec_escape(maptitle), "]",
 		"field[0.4,7.8;3.75,1;name;File Name;" , minetest.formspec_escape(mapname), "]",
 		"field[4.15,7.8;3.75,1;author;Author;", minetest.formspec_escape(mapauthor), "]",
@@ -140,6 +223,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		center.h = h
 	end
 
+	if fields.giveme then
+		player:get_inventory():add_item("main", "ctf_map:flag 2")
+	end
+
 	local player_name = player:get_player_name()
 
 	if fields.emerge then
@@ -191,6 +278,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:set("r", center.r)
 		meta:set("h", center.h)
 		meta:write()
+
+		for _, flags in pairs(flag_positions) do
+			local pos = vector.subtract(flags, center)
+			if center_barrier_rot == 0 then
+				local old = vector.new(pos)
+				pos.x = old.z
+				pos.z = -old.x
+			end
+
+			local idx = pos.z > 0 and 1 or 2
+			meta:set("team." .. idx, pos.z > 0 and "red" or "blue")
+			meta:set("team." .. idx .. ".color", pos.z > 0 and "red" or "blue")
+			meta:set("team." .. idx .. ".pos", minetest.pos_to_string(pos))
+		end
 
 		minetest.after(0.1, function()
 			local filepath = path .. mapname .. ".mts"
