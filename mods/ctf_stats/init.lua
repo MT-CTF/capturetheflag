@@ -190,8 +190,10 @@ ctf_flag.register_on_precapture(function(name, flag)
 end)
 
 local good_weapons = {
-	"default:sword_stone",
 	"default:sword_steel",
+	"default:sword_bronze",
+	"default:sword_mese",
+	"default:sword_diamond",
 	"shooter:grenade",
 	"shooter:shotgun",
 	"shooter:rifle",
