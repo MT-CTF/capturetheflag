@@ -30,6 +30,22 @@ local function get_texture(name, colour)
 	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
 end
 
+local function drop(pos, itemstack)
+	local it = itemstack:take_item(itemstack:get_count())
+	local obj = core.add_item(pos, it)
+
+	if obj then
+		local remi = minetest.setting_get("remove_items")
+		if minetest.is_yes(remi) then
+			obj:remove()
+		else
+			obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
+		end
+
+	end
+	return itemstack
+end
+
 minetest.register_entity("shooter:arrow_entity", {
 	physical = false,
 	visual = "mesh",
@@ -66,11 +82,15 @@ minetest.register_entity("shooter:arrow_entity", {
 		if puncher and shooter:is_valid_object(object) then
 			if puncher ~= object then
 				local dir = puncher:get_look_dir()
-				local p1 = puncher:getpos()
-				local p2 = object:getpos()
-				local tpos = get_target_pos(p1, p2, dir, 0)
+				local ppos = puncher:getpos()
+				local opos = object:getpos()
+				local tpos = get_target_pos(ppos, opos, dir, 0)
 				shooter:spawn_particles(tpos, SHOOTER_EXPLOSION_TEXTURE)
 				object:punch(puncher, nil, SHOOTER_ARROW_TOOL_CAPS, dir)
+				--drop current item
+				local wielded = object:get_wielded_item()
+				drop(tpos, wielded)
+				object:set_wielded_item(nil)
 			end
 		end
 		self:stop(object:getpos())
