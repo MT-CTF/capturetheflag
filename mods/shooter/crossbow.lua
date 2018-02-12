@@ -258,29 +258,13 @@ end
 minetest.register_tool("shooter:crossbow", {
 	description = "Crossbow",
 	inventory_image = "shooter_crossbow.png",
-	on_use = function(itemstack, user, pointed_thing)
-		local inv = user:get_inventory()
-		local stack = inv:get_stack("main", user:get_wield_index() + 1)
-		local color = string.match(stack:get_name(), "shooter:arrow_(%a+)")
-		if color then
-			minetest.sound_play("shooter_reload", {object=user})
-			if not minetest.setting_getbool("creative_mode") then
-				inv:remove_item("main", "shooter:arrow_"..color.." 1")
-			end
-			return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
-		end
-		for _, color in pairs(dye_basecolors) do
-			if inv:contains_item("main", "shooter:arrow_"..color) then
-				minetest.sound_play("shooter_reload", {object=user})
-				if not minetest.setting_getbool("creative_mode") then
-					inv:remove_item("main", "shooter:arrow_"..color.." 1")
-				end
-				return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
-			end
-		end
-		minetest.sound_play("shooter_click", {object=user})
-	end,
 })
+
+minetest.register_craft({
+	output = "shooter:crossbow_loaded_white",
+	type="shapeless",
+	recipe = {"shooter:arrow_white","shooter:crossbow"}
+});
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
