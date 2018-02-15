@@ -189,16 +189,24 @@ ctf_flag.register_on_precapture(function(name, flag)
 	return true
 end)
 
+-- good_weapons now includes all mese and diamond implements, and swords of steel and better
 local good_weapons = {
 	"default:sword_steel",
 	"default:sword_bronze",
 	"default:sword_mese",
 	"default:sword_diamond",
+	"default:pick_mese"
+	"default:pick_diamond"
+	"default:axe_mese"
+	"default:axe_diamond"
+	"default:shovel_mese"
+	"default:shovel_diamond"
 	"shooter:grenade",
 	"shooter:shotgun",
 	"shooter:rifle",
 	"shooter:machine_gun",
 }
+
 local function invHasGoodWeapons(inv)
 	for _, weapon in pairs(good_weapons) do
 		if inv:contains_item("main", weapon) then
@@ -216,7 +224,7 @@ local function calculateKillReward(victim, killer)
 	ctf.log("ctf_stats", "Player " .. victim .. " has made " .. reward ..
 			" score worth of kills since last death")
 
-	-- 15 * kd ration, with variable based on player's score
+	-- 30 * K/D ratio, with variable based on player's score
 	local kdreward = 30 * vmain.kills / (vmain.deaths + 1)
 	local max = vmain.score / 6
 	if kdreward > max then
@@ -227,9 +235,9 @@ local function calculateKillReward(victim, killer)
 	end
 	reward = reward + kdreward
 
-	-- Limited to  0 <= X <= 100
-	if reward > 150 then
-		reward = 150
+	-- Limited to  0 <= X <= 200
+	if reward > 200 then
+		reward = 200
 	elseif reward < 14 then
 		reward = 14
 	end
