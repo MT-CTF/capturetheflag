@@ -195,12 +195,12 @@ local good_weapons = {
 	"default:sword_bronze",
 	"default:sword_mese",
 	"default:sword_diamond",
-	"default:pick_mese"
-	"default:pick_diamond"
-	"default:axe_mese"
-	"default:axe_diamond"
-	"default:shovel_mese"
-	"default:shovel_diamond"
+	"default:pick_mese",
+	"default:pick_diamond",
+	"default:axe_mese",
+	"default:axe_diamond",
+	"default:shovel_mese",
+	"default:shovel_diamond",
 	"shooter:grenade",
 	"shooter:shotgun",
 	"shooter:rifle",
