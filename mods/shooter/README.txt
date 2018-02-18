@@ -8,7 +8,7 @@ Minetest Version: 0.4.9, 0.4.10, 0.4.11
 Depends: default, dye, tnt, wool
 
 An experimental first person shooter mod that uses simple vector mathematics
-to produce an accurate and server-firendly method of hit detection.
+to produce an accurate and server-friendly method of hit detection.
 
 By default this mod is configured to work only against other players in
 multiplayer mode and against Simple Mobs [mobs] in singleplayer mode.
