@@ -388,7 +388,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 				obj:get_luaentity().name ~= "__builtin:item") then
 			local obj_pos = obj:getpos()
 			local dist = vector.distance(obj_pos, pos)
-			local damage = (fleshy * 0.5 ^ dist) * 2
+			local damage = (fleshy * 0.5 ^ dist) * 3
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1.7
 				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
