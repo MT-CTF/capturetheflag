@@ -43,10 +43,11 @@ minetest.register_tool("shooter:grenade", {
 		if not minetest.setting_getbool("creative_mode") then
 			itemstack = ""
 		end
+		-- clarification for future readers: grenade can be used only if player points at nothing (line 47)
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
-			if vector.distance(user:getpos(), pointed) < 8 then
-				shooter:blast(pointed, 1, 25, 5)
+			if vector.distance(user:getpos(), pointed) < 10 then
+				shooter:blast(pointed, 2, 25, 5)
 				return
 			end
 		end
