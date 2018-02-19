@@ -59,7 +59,7 @@ function random_messages.read_messages()
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
-		"Right-click your flag after joining to get the latest updates on the match.",
+		"Right-click your flag or type /team after joining to get the latest updates on the match.",
 		"Regularly post updates on the current match by typing '/post <message>' - this will be very helpful for players who join in the middle of a match",
 		"Using limited resources for building structures that don't strenghthen your base's defences is discouraged"
 		"Please use /report to notify the moderators of mis-behaving players, and any other issues."
