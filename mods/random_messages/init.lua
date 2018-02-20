@@ -29,10 +29,10 @@ end
 function random_messages.initialize() --Set the interval in minetest.conf.
 	minetest.setting_set("random_messages_interval",60)
 	minetest.setting_save();
-	return 120
+	return 60
 end
 
-function random_messages.set_interval() --Read the interval from minetest.conf(set it if it doesn'st exist)
+function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
 	MESSAGE_INTERVAL = tonumber(minetest.setting_get("random_messages_interval")) or random_messages.initialize()
 end
 
