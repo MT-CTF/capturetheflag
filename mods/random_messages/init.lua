@@ -62,7 +62,9 @@ function random_messages.read_messages()
 		"Right-click your flag or type /team after joining to get the latest updates on the match.",
 		"Regularly post updates on the current match by typing '/post <message>' - this will be very helpful for players who join in the middle of a match",
 		"Using limited resources for building structures that don't strenghthen your base's defences is discouraged"
-		"Please use /report to notify the moderators of mis-behaving players, and any other issues."
+		"Please use /report to notify the moderators of mis-behaving players, and any other issues.",
+		"Swearing, trolling and being rude will not be tolerated and you will be reported to the moderators immediately.",
+		"Trapping team-mates on purpose is strictly against the rules and you will face the appropriate consequences."
 	}
 end
 
