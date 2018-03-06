@@ -87,7 +87,7 @@ function ctf_map.place_middle_barrier(center, r, h, direction)
 			else
 				vi = a:index(center.x, y, x)
 			end
-			if data[vi] == c_air then
+			if data[vi] == c_air or data[vi] == c_water then
 				data[vi] = c_glass_red
 			end
 		end
