@@ -64,7 +64,7 @@ function random_messages.read_messages()
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken against you.",
 		"Trapping team-mates on purpose is strictly against the rules and you will be banned immediately."
 		"Always take only what you need from the team-chest.",
-		"If you pick up extra weapons from dead enemies, put them in the team-chest - there's no point in hogging everything.",
+		"Store all extra weapons in the team-chest - there's no point in hogging everything.",
 		"Avoid putting wooden tools and other useless items in the team-chest, as they unnecessarily occupy precious space."
 	}
 end
