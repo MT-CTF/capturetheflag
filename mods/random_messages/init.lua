@@ -65,7 +65,8 @@ function random_messages.read_messages()
 		"Trapping team-mates on purpose is strictly against the rules and you will be banned immediately."
 		"Always take only what you need from the team-chest.",
 		"Store all extra weapons in the team-chest - there's no point in hogging everything.",
-		"Avoid putting wooden tools and other useless items in the team-chest, as they unnecessarily occupy precious space."
+		"Avoid putting wooden tools and other useless items in the team-chest, as they unnecessarily occupy precious space.",
+		"Non-participation will result in a kick (and later a temp-ban) after a warning."
 	}
 end
 
