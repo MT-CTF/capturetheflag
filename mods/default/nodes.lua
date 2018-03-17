@@ -570,6 +570,7 @@ minetest.register_node("default:apple", {
 	drawtype = "plantlike",
 	tiles = {"default_apple.png"},
 	inventory_image = "default_apple.png",
+	stack_max = 30,
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
