@@ -71,16 +71,16 @@ minetest.register_chatcommand("report", {
 		-- Build message for offline listeners
 		local msg
 		if #mods == 0 then
-			msg = "Report: " .. param .. " (no mods online)"
+			msg = "Report from " ..name .. ": " .. param .. " (no mods online)"
 		else
-			msg = "Report: " .. param .. " (mods online: " ..
+			msg = "Report from " ..name .. ": " .. param .. " (mods online: " ..
 					table.concat(mods, ", ") .. ")"
 		end
 
 		-- Send to IRC moderators
-		for _, name in pairs(get_irc_mods()) do
-			if not minetest.get_player_by_name(name) then
-				minetest.chat_send_player(name, msg)
+		for _, toname in pairs(get_irc_mods()) do
+			if not minetest.get_player_by_name(toname) then
+				minetest.chat_send_player(toname, msg)
 			end
 		end
 
