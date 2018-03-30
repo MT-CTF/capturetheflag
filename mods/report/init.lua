@@ -1,3 +1,49 @@
+local storage = minetest.get_mod_storage()
+
+local function get_irc_mods()
+	return storage:get_string("irc_mods"):split(",")
+end
+
+local function add_irc_mod(name)
+	local mods = get_irc_mods()
+	if table.indexof(mods, name) > 0 then
+		return false
+	end
+	mods[#mods + 1] = name
+	storage:set_string("irc_mods", table.concat(mods, ","))
+	return true
+end
+
+local function remove_irc_mod(name)
+	local mods = get_irc_mods()
+	local idx = table.indexof(mods, name)
+	if idx > 0 then
+		table.remove(mods, idx)
+		storage:set_string("irc_mods", table.concat(mods, ","))
+		return true
+	end
+	return false
+end
+
+minetest.register_chatcommand("report_sub", {
+	privs = { kick = true },
+	func = function(name, param)
+		if param:lower():trim() == "remove" then
+			if remove_irc_mod(name) then
+				return true, "Successfully removed!"
+			else
+				return false, "Unable to remove, are you even subscribed?"
+			end
+		else
+			if add_irc_mod(name) then
+				return true, "Successfully added!"
+			else
+				return false, "Unable to add, are you already subscribed?"
+			end
+		end
+	end
+})
+
 minetest.register_chatcommand("report", {
 	func = function(name, param)
 		param = param:trim()
@@ -22,13 +68,25 @@ minetest.register_chatcommand("report", {
 			end
 		end
 
-
-		if minetest.global_exists("irc") and irc.feature_mod_channel then
-			irc:say(irc.config.channel, "UserReport by " .. name .. ": " .. param, true)
+		-- Build message for offline listeners
+		local msg
+		if #mods == 0 then
+			msg = "Report: " .. param .. " (no mods online)"
+		else
+			msg = "Report: " .. param .. " (mods online: " ..
+					table.concat(mods, ", ") .. ")"
 		end
 
-		email.send_mail(name, minetest.setting_get("name"),
-			"Report: " .. param .. " (no mods online)")
+		-- Send to IRC moderators
+		for _, name in pairs(get_irc_mods()) do
+			if not minetest.get_player_by_name(name) then
+				minetest.chat_send_player(name, msg)
+			end
+		end
+
+		-- Email to admin
+		email.send_mail(name, minetest.setting_get("name"), msg)
+
 		return true, "Reported. We'll get back to you."
 	end
 })
