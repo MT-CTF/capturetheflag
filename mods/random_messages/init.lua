@@ -58,15 +58,12 @@ function random_messages.read_messages()
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
-		"Want to contribute? Feel free to visit our GitHub repo at github.com/rubenwardy/capturetheflag",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
-		"Using limited resources for building structures that don't strenghthen your base's defences is discouraged."
-		"Please use /report to notify the moderators of mis-behaving players, or any other issues.",
+		"Using limited resources for building structures that don't strenghthen your base's defences is discouraged.",
+		"Please use /report to notify the moderators of misbehaving players, or any other issues.",
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken against you.",
-		"Trapping team-mates on purpose is strictly against the rules and you will be banned immediately."
-		"Always take only what you need from the team-chest.",
-		"Store all extra weapons in the team-chest - there's no point in hogging everything.",
-		"Avoid putting wooden tools and other useless items in the team-chest, as they unnecessarily occupy precious space.",
+		"Trapping team mates on purpose is strictly against the rules and you will be banned immediately.",
+		"Help your team claim victory by store extra weapons in the team chest, and never taking more than you need.",
 		"Non-participation will result in a kick (after warnings), and then a temp-ban if it persists."
 	}
 end
