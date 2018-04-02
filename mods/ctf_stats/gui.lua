@@ -44,7 +44,7 @@ function ctf_stats.get_formspec(title, players)
 			"," .. pstat.captures ..
 			"," .. pstat.attempts ..
 			"," .. math.floor(pstat.score*10)/10
-		if i > 40 then
+		if i > 49 then
 			break
 		end
 	end
@@ -86,7 +86,7 @@ function ctf_stats.get_html(title, players)
 			"</td><td>" .. pstat.captures ..
 			"</td><td>" .. pstat.attempts ..
 			"</td><td>" .. math.floor(pstat.score*10)/10 .. "</td></tr>"
-		if i > 40 then
+		if i > 49 then
 			break
 		end
 	end
