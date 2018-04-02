@@ -64,7 +64,8 @@ function random_messages.read_messages()
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken against you.",
 		"Trapping team mates on purpose is strictly against the rules and you will be banned immediately.",
 		"Help your team claim victory by store extra weapons in the team chest, and never taking more than you need.",
-		"Non-participation will result in a kick (after warnings), and then a temp-ban if it persists."
+		"Non-participation will result in a kick (after warnings), and then a temp-ban if it persists.",
+		"Note: The maximum number of apples in a stack has been reduced from 99 to 30."
 	}
 end
 
