@@ -74,8 +74,8 @@ ctf.register_on_killedplayer(function(victim, killer)
 	if victim == bountied_player then
 		local main, match = ctf_stats.player(killer)
 		if main and match then
-			main.score  = main.score  + 150
-			match.score = match.score + 150
+			main.score  = main.score  + bounty_score
+			match.score = match.score + bounty_score
 			ctf.needs_save = true
 		end
 		bountied_player = nil
