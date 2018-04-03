@@ -24,8 +24,8 @@ local function bounty_player(target)
 
 	bountied_player = target
 
-	if minetest.global_exists("irc") then
-		irc:say("Player " .. bountied_player .. " has a bounty on their head!")
+	-- if minetest.global_exists("irc") then
+		-- irc:say("Player " .. bountied_player .. " has a bounty on their head!")
 	end
 	minetest.after(0.1, announce_all)
 end
@@ -81,8 +81,8 @@ ctf.register_on_killedplayer(function(victim, killer)
 		bountied_player = nil
 
 		local msg = killer .. " has killed " .. victim .. " and received the prize!"
-		if minetest.global_exists("irc") then
-			irc:say(msg)
+		-- if minetest.global_exists("irc") then
+			-- irc:say(msg)
 		end
 		minetest.chat_send_all(msg)
 	end
