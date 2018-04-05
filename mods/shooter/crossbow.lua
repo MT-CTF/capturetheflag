@@ -30,6 +30,22 @@ local function get_texture(name, colour)
 	return "shooter_"..name..".png^wool_"..colour..".png^shooter_"..name..".png^[makealpha:255,126,126"
 end
 
+local function drop(pos, itemstack)
+	local it = itemstack:take_item(itemstack:get_count())
+	local obj = core.add_item(pos, it)
+
+	if obj then
+		local remi = minetest.setting_get("remove_items")
+		if minetest.is_yes(remi) then
+			obj:remove()
+		else
+			obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
+		end
+
+	end
+	return itemstack
+end
+
 minetest.register_entity("shooter:arrow_entity", {
 	physical = false,
 	visual = "mesh",
@@ -66,11 +82,15 @@ minetest.register_entity("shooter:arrow_entity", {
 		if puncher and shooter:is_valid_object(object) then
 			if puncher ~= object then
 				local dir = puncher:get_look_dir()
-				local p1 = puncher:getpos()
-				local p2 = object:getpos()
-				local tpos = get_target_pos(p1, p2, dir, 0)
+				local ppos = puncher:getpos()
+				local opos = object:getpos()
+				local tpos = get_target_pos(ppos, opos, dir, 0)
 				shooter:spawn_particles(tpos, SHOOTER_EXPLOSION_TEXTURE)
 				object:punch(puncher, nil, SHOOTER_ARROW_TOOL_CAPS, dir)
+				--drop current item
+				local wielded = object:get_wielded_item()
+				drop(tpos, wielded)
+				object:set_wielded_item(nil)
 			end
 		end
 		self:stop(object:getpos())
@@ -238,29 +258,13 @@ end
 minetest.register_tool("shooter:crossbow", {
 	description = "Crossbow",
 	inventory_image = "shooter_crossbow.png",
-	on_use = function(itemstack, user, pointed_thing)
-		local inv = user:get_inventory()
-		local stack = inv:get_stack("main", user:get_wield_index() + 1)
-		local color = string.match(stack:get_name(), "shooter:arrow_(%a+)")
-		if color then
-			minetest.sound_play("shooter_reload", {object=user})
-			if not minetest.setting_getbool("creative_mode") then
-				inv:remove_item("main", "shooter:arrow_"..color.." 1")
-			end
-			return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
-		end
-		for _, color in pairs(dye_basecolors) do
-			if inv:contains_item("main", "shooter:arrow_"..color) then
-				minetest.sound_play("shooter_reload", {object=user})
-				if not minetest.setting_getbool("creative_mode") then
-					inv:remove_item("main", "shooter:arrow_"..color.." 1")
-				end
-				return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
-			end
-		end
-		minetest.sound_play("shooter_click", {object=user})
-	end,
 })
+
+minetest.register_craft({
+	output = "shooter:crossbow_loaded_white",
+	type="shapeless",
+	recipe = {"shooter:arrow_white","shooter:crossbow"}
+});
 
 if SHOOTER_ENABLE_CRAFTING == true then
 	minetest.register_craft({
