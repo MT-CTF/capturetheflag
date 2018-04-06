@@ -11,13 +11,13 @@ math.randomseed(os.time())
 random_messages = {}
 random_messages.messages = {} --This table contains all messages.
 
-function table.count( t )
+function table.count( t ) -- luacheck: ignore
 	local i = 0
 	for k in pairs( t ) do i = i + 1 end
 	return i
 end
 
-function table.random( t )
+function table.random( t ) -- luacheck: ignore
 	local rk = math.random( 1, table.count( t ) )
 	local i = 1
 	for k, v in pairs( t ) do

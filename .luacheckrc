@@ -9,6 +9,7 @@ exclude_files = {
 	"mods/treasurer",
 }
 
+ignore = {"631"}
 
 globals = {
 	"crafting", "vector", "table", "minetest",

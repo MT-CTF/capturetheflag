@@ -29,7 +29,7 @@ end, {
 	}
 })
 
-function table.map_inplace(t, f)
+function table.map_inplace(t, f) -- luacheck: ignore
 	for key, value in pairs(t) do
 		t[key] = f(value)
 	end
