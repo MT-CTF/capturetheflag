@@ -70,7 +70,8 @@ minetest.register_on_joinplayer(function(player)
 	if #inbox > 0 then
 		minetest.after(10, function()
 			minetest.chat_send_player(player:get_player_name(),
-				minetest.colorize(#00FF00,"(" ..  #inbox .. ") You have mail! Type /inbox to recieve"))
+				minetest.colorize("#00FF00",
+					"(" ..  #inbox .. ") You have mail! Type /inbox to recieve"))
 		end)
 	end
 end)

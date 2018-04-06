@@ -24,9 +24,6 @@ local function bounty_player(target)
 
 	bountied_player = target
 
-	-- if minetest.global_exists("irc") then
-		-- irc:say("Player " .. bountied_player .. " has a bounty on their head!")
-	-- end
 	minetest.after(0.1, announce_all)
 end
 
@@ -44,12 +41,12 @@ local function bounty_find_new_target()
 
 	if #players > 0 then
 		bounty_player(players[math.random(1, #players)].name)
-		
+
 		--		  Score * K/D
 		-- bounty_score = -----------, or 500 (whichever is lesser)
 		--                   10000
 		bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
-		if bounty_score > 500
+		if bounty_score > 500 then
 			bounty_score = 500
 		end
 	end
@@ -81,9 +78,6 @@ ctf.register_on_killedplayer(function(victim, killer)
 		bountied_player = nil
 
 		local msg = killer .. " has killed " .. victim .. " and received the prize!"
-		-- if minetest.global_exists("irc") then
-			-- irc:say(msg)
-		-- end
 		minetest.chat_send_all(msg)
 	end
 end)
