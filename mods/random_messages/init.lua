@@ -59,7 +59,7 @@ function random_messages.read_messages()
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
-		"Using limited resources for building structures that don't strengthen your base's defenses is discouraged.",
+		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
 		"To report misbehaving players to moderators, please use /report NAME MESSAGE",
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
 		"Trapping team mates on purpose is strictly against the rules and you will be kicked / banned immediately.",
