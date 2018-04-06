@@ -64,7 +64,7 @@ minetest.register_chatcommand("report", {
 			local toname = player:get_player_name()
 			if minetest.check_player_privs(toname, {kick = true, ban = true}) then
 				table.insert(mods, toname)
-				minetest.chat_send_player(toname, "-!- " .. name .. " reported: " .. param)
+				minetest.chat_send_player(toname, minetest.colorize(#FFFF00,"-!- " .. name .. " reported: " .. param))
 			end
 		end
 
