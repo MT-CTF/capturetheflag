@@ -28,3 +28,66 @@ end, {
 		ctf_admin = true,
 	}
 })
+
+function table.map_inplace(t, f)
+	for key, value in pairs(t) do
+		t[key] = f(value)
+	end
+	return t
+end
+
+ctf_alloc = {}
+function ctf_alloc.set_all()
+	local players = minetest.get_connected_players()
+	table.map_inplace(players, function(a)
+		local stats, _ = ctf_stats.player(a:get_player_name())
+		return {
+			player = a,
+			score = stats.score,
+		}
+	end)
+	table.sort(players, function(a, b)
+		return a.score > b.score
+	end)
+
+	for k=1, math.random(#players / 4) do
+		local i = math.random(#players)
+		local j = math.random(#players)
+
+		local tmp = players[i]
+		players[i] = players[j]
+		players[j] = tmp
+	end
+
+	minetest.log("warning", dump(players))
+
+	local to_red = true
+	for _, spair in pairs(players) do
+		local player     = spair.player
+		local name       = player:get_player_name()
+		local alloc_mode = tonumber(ctf.setting("allocate_mode"))
+		local team
+		if to_red then
+			team = "red"
+		else
+			team = "blue"
+		end
+		to_red = not to_red
+
+		if alloc_mode ~= 0 and team then
+			ctf.log("autoalloc", name .. " was allocated to " .. team)
+			ctf.join(name, team)
+		end
+
+		ctf.move_to_spawn(name)
+
+		if ctf.setting("match.clear_inv") then
+			local inv = player:get_inventory()
+			inv:set_list("main", {})
+			inv:set_list("craft", {})
+			give_initial_stuff(player)
+		end
+
+		player:set_hp(20)
+	end
+end

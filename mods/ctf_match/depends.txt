@@ -1,6 +1,7 @@
 ctf
 ctf_flag
 ctf_inventory
+ctf_alloc
 vote
 hudkit
 irc?

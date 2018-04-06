@@ -39,27 +39,7 @@ function ctf_match.next()
 
 	ctf_match.create_teams()
 
-	for i, player in pairs(minetest.get_connected_players()) do
-		local name       = player:get_player_name()
-		local alloc_mode = tonumber(ctf.setting("allocate_mode"))
-		local team       = ctf.autoalloc(name, alloc_mode)
-
-		if alloc_mode ~= 0 and team then
-			ctf.log("autoalloc", name .. " was allocated to " .. team)
-			ctf.join(name, team)
-		end
-
-		ctf.move_to_spawn(name)
-
-		if ctf.setting("match.clear_inv") then
-			local inv = player:get_inventory()
-			inv:set_list("main", {})
-			inv:set_list("craft", {})
-			give_initial_stuff(player)
-		end
-
-		player:set_hp(20)
-	end
+	ctf_alloc.set_all()
 
 	minetest.set_timeofday(0.4)
 
