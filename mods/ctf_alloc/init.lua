@@ -50,18 +50,9 @@ function ctf_alloc.set_all()
 		return a.score > b.score
 	end)
 
-	for k=1, math.random(#players / 4) do
-		local i = math.random(#players)
-		local j = math.random(#players)
-
-		local tmp = players[i]
-		players[i] = players[j]
-		players[j] = tmp
-	end
-
 	minetest.log("warning", dump(players))
 
-	local to_red = true
+	local to_red = math.random(2) == 2
 	for _, spair in pairs(players) do
 		local player     = spair.player
 		local name       = player:get_player_name()
