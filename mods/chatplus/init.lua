@@ -82,3 +82,24 @@ chatplus.register_handler(function(from,to,msg)
 	end
 	return nil
 end)
+
+
+
+--
+-- Highlighted PMs
+--
+minetest.registered_chatcommands["msg"].func = function(name, param)
+	local sendto, message = param:match("^(%S+)%s(.+)$")
+	if not sendto then
+		return false, "Invalid usage, see /help msg."
+	end
+	if not core.get_player_by_name(sendto) then
+		return false, "The player " .. sendto
+				.. " is not online."
+	end
+	core.log("action", "PM from " .. name .. " to " .. sendto
+			.. ": " .. message)
+	core.chat_send_player(sendto, minetest.colorize(#00FF55,"PM from " .. name .. ": "
+			.. message))
+	return true, "Message sent."
+end
