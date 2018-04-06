@@ -49,8 +49,8 @@ local function bounty_find_new_target()
 		-- bounty_score = -----------, or 1000 (whichever is lesser)
 		--                   10000
 		bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
-		if bounty_score > 1000
-			bounty_score = 1000
+		if bounty_score > 500
+			bounty_score = 5000
 		end
 	end
 
