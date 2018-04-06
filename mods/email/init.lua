@@ -79,15 +79,14 @@ end)
 function email.get_formspec(name)
 	local inbox = email.get_inbox(name)
 
-	local fs = "vertlabel[0,0;Your Inbox]"
-
-	function row(fs, c1, date, from, msg)
+	local function row(fs, c1, date, from, msg)
 		date = minetest.formspec_escape(date)
 		from = minetest.formspec_escape(from)
 		msg = minetest.formspec_escape(msg)
 		return fs .. ",#d0d0d0," .. table.concat({date, c1, from, msg}, ",")
 	end
 
+	local fs = "vertlabel[0,0;Your Inbox]"
 	fs  = fs .. "tablecolumns[color;text;color;text;text]"
 	fs  = fs .. "tableoptions[highlight=#ffffff33]"
 	fs  = fs .. "table[0.5,0;11.25,7;inbox;"
@@ -138,8 +137,6 @@ function email.show_inbox(name, text_mode)
 
 		return true, "Opened inbox!"
 	end
-
-	return true
 end
 
 if minetest.global_exists("sfinv") then

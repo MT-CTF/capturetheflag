@@ -54,6 +54,12 @@ minetest.register_node("ctf_map:flag", {
 	end,
 })
 
+local randint = math.random(100)
+local barrier_r = 110
+local mapname = "ctf_" .. randint
+local maptitle = "Untitled Map " .. randint
+local mapauthor = nil
+local center_barrier_rot = 0
 local center = { x = 0, y = 0, z = 0, r = 115, h = 140 }
 local function to_2pos()
 	return {
@@ -130,13 +136,6 @@ local function get_flag_status()
 	end
 end
 
-
-local randint = math.random(100)
-local barrier_r = 110
-local mapname = "ctf_" .. randint
-local maptitle = "Untitled Map " .. randint
-local mapauthor = nil
-local center_barrier_rot = 1
 local function show_gui(name)
 	mapauthor = mapauthor or name
 

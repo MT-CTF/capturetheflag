@@ -72,7 +72,6 @@ function ctf_stats.get_html(title, players)
 
 	for i = 1, #players do
 		local pstat = players[i]
-		local color = pstat.color or "#ffffff"
 		local kd = pstat.kills
 		if pstat.deaths > 0 then
 			kd = kd / pstat.deaths

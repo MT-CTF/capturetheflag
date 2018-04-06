@@ -44,7 +44,7 @@ local function remove_entity_tag(player)
 	local tag = nametags[player:get_player_name()]
 	if tag then
 		tag:remove()
-		tag = nil
+		nametags[player:get_player_name()] = nil
 	end
 end
 

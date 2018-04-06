@@ -4,8 +4,8 @@ local c_glass      = minetest.get_content_id("ctf_map:ind_glass")
 local c_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
 local c_map_ignore = minetest.get_content_id("ctf_map:ignore")
 local c_actual_st  = minetest.get_content_id("default:stone")
-local c_water      = minetest.get_content_id("default:water_source")
-local c_water_f    = minetest.get_content_id("default:water_flowing")
+-- local c_water      = minetest.get_content_id("default:water_source")
+-- local c_water_f    = minetest.get_content_id("default:water_flowing")
 local c_air        = minetest.get_content_id("air")
 
 function ctf_map.remove_middle_barrier()
@@ -118,14 +118,16 @@ function ctf_map.place_outer_barrier(center, r, h)
 	print("Placing left wall")
 
 	-- Left
-	local x = center.x - r
-	for z = minp.z, maxp.z do
-		for y = minp.y, maxp.y do
-			local vi = a:index(x, y, z)
-			if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-				data[vi] = c_glass
-			else
-				data[vi] = c_stone
+	do
+		local x = center.x - r
+		for z = minp.z, maxp.z do
+			for y = minp.y, maxp.y do
+				local vi = a:index(x, y, z)
+				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
+					data[vi] = c_glass
+				else
+					data[vi] = c_stone
+				end
 			end
 		end
 	end
@@ -133,14 +135,16 @@ function ctf_map.place_outer_barrier(center, r, h)
 	print("Placing right wall")
 
 	-- Right
-	local x = center.x + r
-	for z = minp.z, maxp.z do
-		for y = minp.y, maxp.y do
-			local vi = a:index(x, y, z)
-			if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-				data[vi] = c_glass
-			else
-				data[vi] = c_stone
+	do
+		local x = center.x + r
+		for z = minp.z, maxp.z do
+			for y = minp.y, maxp.y do
+				local vi = a:index(x, y, z)
+				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
+					data[vi] = c_glass
+				else
+					data[vi] = c_stone
+				end
 			end
 		end
 	end
@@ -148,14 +152,16 @@ function ctf_map.place_outer_barrier(center, r, h)
 	print("Placing front wall")
 
 	-- Front
-	local z = center.z - r
-	for x = minp.x, maxp.x do
-		for y = minp.y, maxp.y do
-			local vi = a:index(x, y, z)
-			if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-				data[vi] = c_glass
-			else
-				data[vi] = c_stone
+	do
+		local z = center.z - r
+		for x = minp.x, maxp.x do
+			for y = minp.y, maxp.y do
+				local vi = a:index(x, y, z)
+				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
+					data[vi] = c_glass
+				else
+					data[vi] = c_stone
+				end
 			end
 		end
 	end
@@ -163,14 +169,16 @@ function ctf_map.place_outer_barrier(center, r, h)
 	print("Placing back wall")
 
 	-- Back
-	local z = center.z + r
-	for x = minp.x, maxp.x do
-		for y = minp.y, maxp.y do
-			local vi = a:index(x, y, z)
-			if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-				data[vi] = c_glass
-			else
-				data[vi] = c_stone
+	do
+		local z = center.z + r
+		for x = minp.x, maxp.x do
+			for y = minp.y, maxp.y do
+				local vi = a:index(x, y, z)
+				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
+					data[vi] = c_glass
+				else
+					data[vi] = c_stone
+				end
 			end
 		end
 	end

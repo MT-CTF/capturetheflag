@@ -13,9 +13,9 @@ function ctf_team_base.place(color, pos)
 	for y = pos.y, pos.y + 3 do
 		for x = pos.x - 3, pos.x + 3 do
 			for z = pos.z - 3, pos.z + 3 do
-				local pos = {x=x, y=y, z=z}
-				if minetest.get_node(pos).name == "default:tree" then
-					minetest.set_node(pos, {name="air"})
+				local pos2 = {x=x, y=y, z=z}
+				if minetest.get_node(pos2).name == "default:tree" then
+					minetest.set_node(pos2, {name="air"})
 				end
 			end
 		end
@@ -28,13 +28,13 @@ function ctf_team_base.place(color, pos)
 		dz = -2
 		chest.param2 = minetest.dir_to_facedir({x=0,y=0,z=-1})
 	end
-	local pos = {
+	local pos3 = {
 		x = pos.x,
 		y = pos.y,
 		z = pos.z + dz
 	}
-	minetest.set_node(pos, chest)
-	local inv = minetest.get_meta(pos):get_inventory()
+	minetest.set_node(pos3, chest)
+	local inv = minetest.get_meta(pos3):get_inventory()
 	inv:add_item("main", ItemStack("default:cobble 99"))
 	inv:add_item("main", ItemStack("default:cobble 99"))
 	inv:add_item("main", ItemStack("default:cobble 99"))

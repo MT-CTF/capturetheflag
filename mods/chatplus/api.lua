@@ -138,9 +138,9 @@ end
 minetest.after(30*60, cp_tick)
 
 function chatplus.poke(name,player)
-	local function check(name,value)
-		if not chatplus.players[name][value] then
-			chatplus.players[name][value] = {}
+	local function check(name2, value)
+		if not chatplus.players[name2][value] then
+			chatplus.players[name2][value] = {}
 		end
 	end
 	if not chatplus.players[name] then

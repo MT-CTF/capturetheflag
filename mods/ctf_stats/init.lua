@@ -181,7 +181,7 @@ end)
 
 ctf_flag.register_on_precapture(function(name, flag)
 	local tplayer = ctf.player(name)
-	local main, match = ctf_stats.player(name)
+	local main, _ = ctf_stats.player(name)
 	if main then
 		main.wins[tplayer.team] = main.wins[tplayer.team] + 1
 		ctf.needs_save = true

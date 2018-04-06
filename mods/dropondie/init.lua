@@ -15,7 +15,7 @@ local function drop(pos, itemstack)
 		end
 	end
 
-	local obj = core.add_item(pos, it)
+	local obj = minetest.add_item(pos, it)
 
 	if obj then
 		obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})

@@ -51,12 +51,6 @@ end
 -- Node callback functions that are the same for active and inactive furnace
 --
 
-local function can_dig(pos, player)
-	local meta = minetest.get_meta(pos);
-	local inv = meta:get_inventory()
-	return inv:is_empty("fuel") and inv:is_empty("dst") and inv:is_empty("src")
-end
-
 local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
 		return 0

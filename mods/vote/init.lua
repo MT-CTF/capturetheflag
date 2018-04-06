@@ -341,8 +341,8 @@ if set == nil or minetest.is_yes(set) then
 					end
 				end,
 
-				on_vote = function(self, name, value)
-					minetest.chat_send_all(name .. " voted " .. value .. " to '" ..
+				on_vote = function(self, voter, value)
+					minetest.chat_send_all(voter .. " voted " .. value .. " to '" ..
 							self.description .. "'")
 				end
 			})

@@ -15,7 +15,7 @@ local function step()
 	local avg = 0
 	if #minetest.get_connected_players() > 0 then
 		for _, player in pairs(minetest.get_connected_players()) do
-			local total, match = ctf_stats.player(player:get_player_name())
+			local total, _ = ctf_stats.player(player:get_player_name())
 			sum = sum + total.score
 		end
 		avg = sum / #minetest.get_connected_players()

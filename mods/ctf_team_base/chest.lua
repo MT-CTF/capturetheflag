@@ -90,7 +90,6 @@ for _, chest_color in pairs(colors) do
 
 		allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
-			local meta = minetest.get_meta(pos)
 			if chest_color ~= ctf.player(player:get_player_name()).team then
 				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
@@ -125,7 +124,6 @@ for _, chest_color in pairs(colors) do
 			end
 		end,
 		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
-			local meta = minetest.get_meta(pos)
 			if chest_color ~= ctf.player(player:get_player_name()).team then
 				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0

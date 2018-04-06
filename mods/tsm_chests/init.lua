@@ -85,7 +85,6 @@ local t_max = 7			-- maximum amount of treasures found in a chest
 
 local water_level = tonumber(minetest.setting_get("water_level"))
 local get_node = minetest.get_node
-local env = minetest.env
 
 local function findGroundLevel(pos, y_min, y_max)
 	local ground = nil
@@ -153,9 +152,9 @@ local function placeChest(pos, chest_pos, ground, nn)
 
 	-- Get treasure
 	local treasure_amount = math.ceil(math.random(t_min, t_max))
-	local height = math.abs(h_min) - math.abs(h_max)
-	local y_norm = (ground+1) - h_min
-	local scale = 1 - (y_norm/height)
+	-- local height = math.abs(h_min) - math.abs(h_max)
+	-- local y_norm = (ground+1) - h_min
+	-- local scale = 1 - (y_norm/height)
 	local minp = 0 --scale*4		-- minimal preciousness:   0..4
 	local maxp = 10 --scale*4+2.1	-- maximum preciousness: 2.1..6.1
 	local treasures = treasurer.select_random_treasures(treasure_amount, minp, maxp)

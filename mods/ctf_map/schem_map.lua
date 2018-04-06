@@ -120,11 +120,6 @@ function ctf_match.load_map_meta(idx, name)
 		map.teams[tname] = {
 			color = tcolor,
 			pos = vector.add(offset, tpos),
-			chests = {
-				from = chests1,
-				to = chests2,
-				n = tonumber(meta:get("team." .. i .. ".num_chests") or "23"),
-			},
 		}
 
 		i = i + 1
@@ -200,8 +195,6 @@ ctf_match.register_on_new_match(function()
 end)
 
 function ctf_match.create_teams()
-	local number = ctf.setting("match.teams")
-
 	for key, value in pairs(ctf_map.map.teams) do
 		local name  = key
 		local color = value.color

@@ -33,8 +33,8 @@ function ctf_match.vote_next(name, params)
 			end
 		end,
 
-		on_vote = function(self, name, value)
-			minetest.chat_send_all(name .. " voted " .. value .. " to '" ..
+		on_vote = function(self, voter, value)
+			minetest.chat_send_all(voter .. " voted " .. value .. " to '" ..
 					self.description .. "'")
 		end
 	})
@@ -51,9 +51,9 @@ minetest.register_chatcommand("vote", {
 minetest.register_on_chat_message(function(name, msg)
 	if msg == "/vote_next" and minetest.check_player_privs(name,
 			{interact=true, vote_starter=true}) then
-		local suc, msg = ctf_match.vote_next(name)
-		if msg then
-			minetest.chat_send_player(name, msg)
+		local _, vmsg = ctf_match.vote_next(name)
+		if vmsg then
+			minetest.chat_send_player(name, vmsg)
 		end
 		return true
 	end

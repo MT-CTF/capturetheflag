@@ -24,7 +24,6 @@ else
 end
 
 local players = {}
-local staminaHud = {}
 
 local function setSprinting(player, info, sprinting)
 	if info.sprinting ~= sprinting then
