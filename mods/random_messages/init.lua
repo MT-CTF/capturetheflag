@@ -53,22 +53,19 @@ function random_messages.read_messages()
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
-		"Players are immune to attack for 15 seconds after they re-spawn.",
+		"Players are immune to attack for 15 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 1k+ score and killing 3 people for every 2 deaths.",
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
 		"Using limited resources for building structures that don't strengthen your base's defenses is discouraged.",
-		"Please use /report to notify the moderators of misbehaving players, or any other issues.",
-		"Swearing, trolling and being rude will not be tolerated and strict action will be taken against you.",
-		"Trapping team mates on purpose is strictly against the rules and you will be banned immediately.",
+		"To report misbehaving players to moderators, please use /report NAME MESSAGE",
+		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
+		"Trapping team mates on purpose is strictly against the rules and you will be kicked / banned immediately.",
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
-		"Non-participation will result in a kick (after warnings), and then a temp-ban if it persists.",
 		"Note: The maximum number of apples in a stack has been reduced from 99 to 30.",
-		"Please don't report just a player's name - use /report <name> <message>",
-		"Kill bounty targets to score more points.",
-		"Spawn-killing is a direct violation of the rules - appropriate punishments will be given."
+		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given."
 	}
 end
 
