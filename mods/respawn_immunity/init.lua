@@ -45,7 +45,7 @@ minetest.register_on_punchplayer(function(player, hitter,
 
 	if hitter and respawn_immunity.is_immune(hitter) then
 		minetest.chat_send_player(hitter:get_player_name(),
-				"Your immunity has ended because you attacked a player")
+				minetest.colorize(#FF8C00,"Your immunity has ended because you attacked a player"))
 		immune_players[hitter:get_player_name()] = nil
 		respawn_immunity.update_effects(hitter)
 	end
