@@ -46,11 +46,11 @@ local function bounty_find_new_target()
 		bounty_player(players[math.random(1, #players)].name)
 		
 		--		  Score * K/D
-		-- bounty_score = -----------, or 1000 (whichever is lesser)
+		-- bounty_score = -----------, or 500 (whichever is lesser)
 		--                   10000
 		bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
 		if bounty_score > 500
-			bounty_score = 5000
+			bounty_score = 500
 		end
 	end
 
