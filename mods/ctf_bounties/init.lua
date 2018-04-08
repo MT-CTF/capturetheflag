@@ -24,15 +24,22 @@ local function bounty_player(target)
 
 	bountied_player = target
 
-	--		  Score * K/D
+	--                Score * K/D
 	-- bounty_score = -----------, or 500 (whichever is lesser)
-	--                   10000
+	--                   5000
 
 	local pstat, _ = ctf_stats.player(target)
+	if pstat.deaths == 0 then
+		pstat.deaths = 1
+	end
 	bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
 	if bounty_score > 500 then
 		bounty_score = 500
 	end
+	if bounty_score < 50 then
+		bounty_score = 50
+	end
+	bounty_score = math.floor(bounty_score)
 
 	minetest.after(0.1, announce_all)
 end
