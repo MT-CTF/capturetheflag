@@ -33,6 +33,9 @@ local function bounty_player(target)
 	if bounty_score > 500 then
 		bounty_score = 500
 	end
+	if bounty_score < 50 then
+		bounty_score = 50
+	end
 
 	minetest.after(0.1, announce_all)
 end
