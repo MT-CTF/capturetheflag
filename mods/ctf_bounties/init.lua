@@ -24,7 +24,7 @@ local function bounty_player(target)
 
 	bountied_player = target
 
-	--		  Score * K/D
+	--                Score * K/D
 	-- bounty_score = -----------, or 500 (whichever is lesser)
 	--                   10000
 
