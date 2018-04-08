@@ -29,6 +29,9 @@ local function bounty_player(target)
 	--                   10000
 
 	local pstat, _ = ctf_stats.player(target)
+	if pstat.deaths == 0
+		pstat.deaths = 1
+	end
 	bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
 	if bounty_score > 500 then
 		bounty_score = 500
