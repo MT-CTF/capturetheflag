@@ -466,7 +466,7 @@ doors.register("door_glass", {
 -- Capture mods using the old API as best as possible.
 function doors.register_door(name, def)
 	if def.only_placer_can_open then
-		def.protected = true
+		def.protected = false
 	end
 	def.only_placer_can_open = nil
 
