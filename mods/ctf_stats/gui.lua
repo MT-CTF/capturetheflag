@@ -1,4 +1,4 @@
-function ctf_stats.get_formspec_match_summary(stats)
+function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player, time)
 	local players = {}
 	for name, pstat in pairs(stats.red) do
 		pstat.name = name
@@ -10,17 +10,54 @@ function ctf_stats.get_formspec_match_summary(stats)
 		pstat.color = ctf.flag_colors.blue
 		table.insert(players, pstat)
 	end
-	local ret = ctf_stats.get_formspec("Match Summary", players)
-	ret = ret .. "label[3.5,6.2;Tip: type /rankings for league tables]"
+
+	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
+
+	if stats[winner_team] then
+		local winner_color = ctf.flag_colors[winner_team]:gsub("0x", "#")
+		ret = ret .. "item_image[0,0;1,1;ctf_flag:flag_top_"..winner_team.."]"
+		ret = ret .. "label[1,0;" .. minetest.colorize(winner_color, "TEAM " .. winner_team:upper() .. " WON!") .. "]"
+		ret = ret .. "label[1,0.5;Flag captured by " .. winner_player .. "]"
+	else
+		ret = ret .. "label[1,0;NO WINNER]"
+	end
+
+	local total_kills = 0
+	local total_attempts = 0
+	local total_score = 0
+	for i, pstat in ipairs(players) do
+		total_kills = total_kills + pstat.kills
+		total_attempts = total_attempts + pstat.attempts
+		total_score = total_score + pstat.score
+	end
+
+	ret = ret .. "label[4,0;Kills]"
+	ret = ret .. "label[6,0;" .. total_kills .. "]"
+	ret = ret .. "label[4,0.5;Attempts]"
+	ret = ret .. "label[6,0.5;" .. total_attempts .. "]"
+
+	local time_display = ""
+	if time >= 3600 then
+		time_display = math.floor(time/3600) .. "h"
+	end
+	time_display = time_display .. math.floor((time % 3600) / 60) .. "m" .. math.floor(time % 60) .. "s"
+	ret = ret .. "label[8,0;Duration]"
+	ret = ret .. "label[10,0;" .. time_display .. "]"
+	ret = ret .. "label[8,0.5;Total score]"
+	ret = ret .. "label[10,0.5;" .. math.floor(total_score*10)/10 .. "]"
+
+	ret = ret .. "label[3.5,7.2;Tip: type /rankings for league tables]"
 	return ret
 end
 
-function ctf_stats.get_formspec(title, players)
+function ctf_stats.get_formspec(title, players, header)
 	table.sort(players, function(one, two)
 		return one.score > two.score
 	end)
 
-	local ret = "size[12,6.5]"
+	local ret = "size[12,"..6.5+header.."]"
+	ret = ret .. "container[0,"..header.."]"
+
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
 	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text]"
 	ret = ret .. "tableoptions[highlight=#00000000]"
@@ -51,6 +88,7 @@ function ctf_stats.get_formspec(title, players)
 
 	ret = ret .. ";-1]"
 	ret = ret .. "button_exit[0.5,6;3,1;close;Close]"
+	ret = ret .. "container_end[]"
 	return ret
 end
 
@@ -173,7 +211,7 @@ minetest.register_chatcommand("rankings", {
 				pstat.color = nil
 				table.insert(players, pstat)
 			end
-			local fs = ctf_stats.get_formspec("Player Rankings", players)
+			local fs = ctf_stats.get_formspec("Player Rankings", players, 0)
 			fs = fs .. "label[3.5,6.2;Tip: to see where you are, type /rankings me]"
 			minetest.show_formspec(name, "ctf_stats:rankings", fs)
 		end
