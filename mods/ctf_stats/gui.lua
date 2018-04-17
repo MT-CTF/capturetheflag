@@ -1,14 +1,41 @@
+local function render_per_team_stats(red, blue, stat, round)
+	local red_stat, blue_stat = red[stat], blue[stat]
+	if round then
+		red_stat = math.floor(red_stat*10)/10
+		blue_stat = math.floor(blue_stat*10)/10
+	end
+	return red_stat+blue_stat .. " (" .. minetest.colorize(red.color, tostring(red_stat)) .. " - " .. minetest.colorize(blue.color, tostring(blue_stat)) .. ")"
+end
+
 function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player, time)
 	local players = {}
+	local red = {
+		color = ctf.flag_colors.red:gsub("0x", "#"),
+		kills = 0,
+		attempts = 0,
+		score = 0,
+	}
+	local blue = {
+		color = ctf.flag_colors.blue:gsub("0x", "#"),
+		kills = 0,
+		attempts = 0,
+		score = 0,
+	}
 	for name, pstat in pairs(stats.red) do
 		pstat.name = name
 		pstat.color = ctf.flag_colors.red
 		table.insert(players, pstat)
+		red.kills = red.kills + pstat.kills
+		red.attempts = red.attempts + pstat.attempts
+		red.score = red.score + pstat.score
 	end
 	for name, pstat in pairs(stats.blue) do
 		pstat.name = name
 		pstat.color = ctf.flag_colors.blue
 		table.insert(players, pstat)
+		blue.kills = blue.kills + pstat.kills
+		blue.attempts = blue.attempts + pstat.attempts
+		blue.score = blue.score + pstat.score
 	end
 
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
@@ -22,19 +49,10 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		ret = ret .. "label[1,0;NO WINNER]"
 	end
 
-	local total_kills = 0
-	local total_attempts = 0
-	local total_score = 0
-	for i, pstat in ipairs(players) do
-		total_kills = total_kills + pstat.kills
-		total_attempts = total_attempts + pstat.attempts
-		total_score = total_score + pstat.score
-	end
-
 	ret = ret .. "label[4,0;Kills]"
-	ret = ret .. "label[6,0;" .. total_kills .. "]"
+	ret = ret .. "label[6,0;" .. render_per_team_stats(red, blue, "kills") .. "]"
 	ret = ret .. "label[4,0.5;Attempts]"
-	ret = ret .. "label[6,0.5;" .. total_attempts .. "]"
+	ret = ret .. "label[6,0.5;" .. render_per_team_stats(red, blue, "attempts") .. "]"
 
 	local time_display = ""
 	if time >= 3600 then
@@ -44,7 +62,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[8,0;Duration]"
 	ret = ret .. "label[10,0;" .. time_display .. "]"
 	ret = ret .. "label[8,0.5;Total score]"
-	ret = ret .. "label[10,0.5;" .. math.floor(total_score*10)/10 .. "]"
+	ret = ret .. "label[10,0.5;" .. render_per_team_stats(red, blue, "score", true) .. "]"
 
 	ret = ret .. "label[3.5,7.2;Tip: type /rankings for league tables]"
 	return ret
