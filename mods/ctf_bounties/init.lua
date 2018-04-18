@@ -88,6 +88,10 @@ ctf.register_on_killedplayer(function(victim, killer)
 
 		local msg = killer .. " has killed " .. victim .. " and received the prize!"
 		minetest.chat_send_all(msg)
+
+		local pstats, mstats = ctf_stats.player(killer)
+		pstats.bounty_kills = pstats.bounty_kills + 1
+		mstats.bounty_kills = mstats.bounty_kills + 1
 	end
 end)
 

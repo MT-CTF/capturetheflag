@@ -77,10 +77,10 @@ function ctf_stats.get_formspec(title, players, header)
 	ret = ret .. "container[0,"..header.."]"
 
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
-	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text]"
+	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text;text]"
 	ret = ret .. "tableoptions[highlight=#00000000]"
 	ret = ret .. "table[0.5,0;11.25,6;scores;"
-	ret = ret .. "#ffffff,,username,kills,deaths,K/D ratio,captures,attempts,score"
+	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D ratio,Bounty kills,Captures,Attempts,Score"
 
 	for i = 1, #players do
 		local pstat = players[i]
@@ -96,6 +96,7 @@ function ctf_stats.get_formspec(title, players, header)
 			"," .. pstat.kills ..
 			"," .. pstat.deaths ..
 			"," .. math.floor(kd*10)/10  ..
+			"," .. pstat.bounty_kills ..
 			"," .. pstat.captures ..
 			"," .. pstat.attempts ..
 			"," .. math.floor(pstat.score*10)/10

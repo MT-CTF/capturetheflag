@@ -118,6 +118,8 @@ function ctf_stats.player(name)
 		ctf_stats.players[name] = player_stats
 	end
 
+	player_stats.bounty_kills = player_stats.bounty_kills or 0
+
 	local match_player_stats =
 			ctf_stats.current.red[name] or ctf_stats.current.blue[name]
 
@@ -132,6 +134,7 @@ ctf.register_on_join_team(function(name, tname)
 		attempts = 0,
 		captures = 0,
 		score = 0,
+		bounty_kills = 0,
 	}
 end)
 
