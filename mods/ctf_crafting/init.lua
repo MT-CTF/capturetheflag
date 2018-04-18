@@ -58,6 +58,14 @@ end
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "default:mese_crystal 9",
+	items  = { "default:mese"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "default:furnace",
 	items  = { "default:cobble 10" },
 	always_known = true,
