@@ -74,6 +74,7 @@ function ctf_stats.get_formspec(title, players, header)
 	end)
 
 	local ret = "size[12,"..6.5+header.."]"
+	ret = ret .. default.gui_bg .. default.gui_bg_img
 	ret = ret .. "container[0,"..header.."]"
 
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
