@@ -41,6 +41,8 @@ function ctf_stats.load_legacy()
 		end
 		player_stats.wins.blue = player_stats.wins.blue or 0
 		player_stats.wins.red  = player_stats.wins.red  or 0
+
+		player_stats.bounty_kills = player_stats.bounty_kills or 0
 	end
 
 	ctf_stats.matches.wins = ctf_stats.matches.wins or {
@@ -114,11 +116,10 @@ function ctf_stats.player(name)
 			captures = 0,
 			attempts = 0,
 			score = 0,
+			bounty_kills = 0,
 		}
 		ctf_stats.players[name] = player_stats
 	end
-
-	player_stats.bounty_kills = player_stats.bounty_kills or 0
 
 	local match_player_stats =
 			ctf_stats.current.red[name] or ctf_stats.current.blue[name]
