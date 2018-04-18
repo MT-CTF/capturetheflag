@@ -76,6 +76,8 @@ function ctf_stats.load()
 		blue = {}
 	}
 
+	ctf_stats.start = os.time()
+
 	-- Strip players which have no score
 	for name, player_stats in pairs(ctf_stats.players) do
 		if not player_stats.score or player_stats.score <= 0 then
@@ -138,6 +140,9 @@ ctf_match.register_on_skip_map(function()
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 end)
 
+local winner_team = "-"
+local winner_player = "-"
+
 ctf_flag.register_on_capture(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
@@ -147,15 +152,17 @@ ctf_flag.register_on_capture(function(name, flag)
 		match.score    = match.score    + 25
 		ctf.needs_save = true
 	end
+	winner_player = name
 end)
 
 ctf_match.register_on_winner(function(winner)
 	ctf.needs_save = true
 	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
+	winner_team = winner
 end)
 
 ctf_match.register_on_new_match(function()
-	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current)
+	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current, winner_team, winner_player, os.time()-ctf_stats.start)
 	local players = minetest.get_connected_players()
 	for _, player in pairs(players) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
@@ -165,6 +172,9 @@ ctf_match.register_on_new_match(function()
 		red = {},
 		blue = {}
 	}
+	winner_team = "-"
+	winner_player = "-"
+	ctf_stats.start = os.time()
 	ctf.needs_save = true
 end)
 
