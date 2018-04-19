@@ -41,8 +41,6 @@ function ctf_stats.load_legacy()
 		end
 		player_stats.wins.blue = player_stats.wins.blue or 0
 		player_stats.wins.red  = player_stats.wins.red  or 0
-
-		player_stats.bounty_kills = player_stats.bounty_kills or 0
 	end
 
 	ctf_stats.matches.wins = ctf_stats.matches.wins or {
@@ -85,6 +83,8 @@ function ctf_stats.load()
 		if not player_stats.score or player_stats.score <= 0 then
 			ctf_stats.players[name] = nil
 			ctf.needs_save = true
+		else
+			player_stats.bounty_kills = player_stats.bounty_kills or 0
 		end
 	end
 end
