@@ -83,7 +83,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "doors:door_steel",
-	items  = { "default:steel 6" },
+	items  = { "default:steel_ingot 6" },
 	always_known = true,
 	level  = 1,
 })
