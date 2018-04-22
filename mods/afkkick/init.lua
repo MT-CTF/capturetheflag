@@ -35,15 +35,26 @@ end)
 minetest.register_globalstep(function(dtime)
 	local currGameTime = minetest.get_gametime()
 
+	--Check for inactivity once every CHECK_INTERVAL seconds
+	checkTimer = checkTimer + dtime
+
+	local checkNow = checkTimer >= CHECK_INTERVAL
+	if checkNow then
+		checkTimer = checkTimer - CHECK_INTERVAL
+	end
+
 	--Loop through each player in players
 	for playerName,_ in pairs(players) do
 		local player = minetest.get_player_by_name(playerName)
 		if player then
-			--Check for inactivity once every CHECK_INTERVAL seconds
-			checkTimer = checkTimer + dtime
-			if checkTimer > CHECK_INTERVAL and not minetest.check_player_privs(player, { canafk = true }) then
-				checkTimer = 0
+			--Check if this player is doing an action
+			for _,keyPressed in pairs(player:get_player_control()) do
+				if keyPressed then
+					players[playerName]["lastAction"] = currGameTime
+				end
+			end
 
+			if checkNow and not minetest.check_player_privs(player, { canafk = true }) then
 				--Kick player if he/she has been inactive for longer than MAX_INACTIVE_TIME seconds
 				if players[playerName]["lastAction"] + MAX_INACTIVE_TIME < currGameTime then
 					minetest.kick_player(playerName, "Kicked for inactivity")
@@ -51,14 +62,9 @@ minetest.register_globalstep(function(dtime)
 
 				--Warn player if he/she has less than WARN_TIME seconds to move or be kicked
 				if players[playerName]["lastAction"] + MAX_INACTIVE_TIME - WARN_TIME < currGameTime then
-					minetest.chat_send_player(playerName, minetest.colorize("#FF8C00", "Warning, you have " .. tostring(players[playerName]["lastAction"] + MAX_INACTIVE_TIME - currGameTime) .. " seconds to move or be kicked"))
-				end
-			end
-
-			--Check if this player is doing an action
-			for _,keyPressed in pairs(player:get_player_control()) do
-				if keyPressed then
-					players[playerName]["lastAction"] = currGameTime
+					minetest.chat_send_player(playerName, minetest.colorize("#FF8C00", "Warning, you have " ..
+						tostring(players[playerName]["lastAction"] + MAX_INACTIVE_TIME - currGameTime + 1) ..
+						" seconds to move or be kicked"))
 				end
 			end
 		end
