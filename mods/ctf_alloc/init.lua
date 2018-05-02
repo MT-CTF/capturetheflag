@@ -44,8 +44,12 @@ function ctf_alloc.set_all()
 		return {
 			player = a,
 			score = stats.score,
+			
 			kills = stats.kills,
-			deaths = stats.deaths
+			deaths = stats.deaths,
+			
+			captures = stats.captures,
+			attempts = stats.attempts
 		}
 	end)
 	table.sort(players, function(a, b)
@@ -54,7 +58,7 @@ function ctf_alloc.set_all()
 
 	minetest.log("warning", dump(players))
 	
-	local kd_diff = 0
+	local index_diff = 0
 	
 	for _, spair in pairs(players) do
 		local player     = spair.player
@@ -63,17 +67,19 @@ function ctf_alloc.set_all()
 		local team
 		local to_red
 		
-		if kd_diff == 0 then
+		if index_diff == 0 then
 			to_red = math.random(1, 2) == 1
 		else
-			to_red = kd_diff < 0
+			to_red = index_diff < 0
 		end
 		
+		local index = spair.kills / (spair.deaths + 1) + spair.captures * 5 / (spair.attempts - spair.captures + 1)
+		
 		if to_red then
-			kd_diff = kd_diff + spair.kills / (spair.deaths + 1)
+			index_diff = index_diff + index
 			team = "red"
 		else
-			kd_diff = kd_diff - spair.kills / (spair.deaths + 1)
+			index_diff = index_diff - index
 			team = "blue"
 		end
 
