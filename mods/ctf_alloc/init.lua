@@ -76,6 +76,8 @@ function ctf_alloc.set_all()
 			local inv = player:get_inventory()
 			inv:set_list("main", {})
 			inv:set_list("craft", {})
+			inv:set_list("craftpreview", {})
+			inv:set_list("hand", {})
 			give_initial_stuff(player)
 		end
 
