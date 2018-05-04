@@ -6,8 +6,10 @@ setmetatable(give_initial_stuff, {
 		local inv = player:get_inventory()
 		inv:set_list("main",  {})
 		inv:set_list("craft", {})
-		inv:set_list("craftresult", {})
-		inv:set_list("hand", {})
+
+		inv:set_size("craft", 1)
+		inv:set_size("craftresult", 0)
+		inv:set_size("hand", 0)
 
 		local items = give_initial_stuff.get_stuff()
 

@@ -37,7 +37,7 @@ local function drop_list(pos, inv, list)
 end
 
 local function drop_all(player)
-	local pos = player:get_pos()
+	local pos = player:getpos()
 	pos.y = math.floor(pos.y + 0.5)
 
 	local inv = player:get_inventory()
@@ -46,8 +46,6 @@ local function drop_all(player)
 	end
 	drop_list(pos, inv, "main")
 	drop_list(pos, inv, "craft")
-	drop_list(pos, inv, "craftresult")
-	drop_list(pos, inv, "hand")
 end
 
 minetest.register_on_dieplayer(drop_all)
