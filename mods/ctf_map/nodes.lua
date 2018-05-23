@@ -34,6 +34,28 @@ minetest.register_node("ctf_map:ind_stone", {
 	is_ground_content = false
 })
 
+minetest.register_node("ctf_map:ind_dirt", {
+	description = "Cheater!",
+	groups = {immortal = 1},
+	tiles = {"default_dirt.png"},
+	is_ground_content = false,
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name = "default_grass_footstep", gain = 0.25}
+	}),
+})
+
+minetest.register_node("ctf_map:ind_dirt_with_grass", {
+	description = "Cheater!",
+	groups = {immortal = 1},
+	tiles = {"default_grass.png", "default_dirt.png",
+		{name = "default_dirt.png^default_grass_side.png",
+				tileable_vertical = false}},
+	is_ground_content = false,
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name = "default_grass_footstep", gain = 0.25},
+	}),
+})
+
 minetest.register_node("ctf_map:ind_stone_red", {
 	description = "Cheater!",
 	groups = {immortal = 1},
