@@ -1,5 +1,5 @@
 minetest.register_node("ctf_map:ignore", {
-	description = "MyAir (you hacker you!)",
+	description = "Artificial Ignore", -- this may need to be given a more appropriate name
 	drawtype = "airlike",
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -13,7 +13,7 @@ minetest.register_node("ctf_map:ignore", {
 })
 
 minetest.register_node("ctf_map:ind_glass", {
-	description = "You cheater you!",
+	description = "Indestructible Glass",
 	drawtype = "glasslike_framed_optional",
 	tiles = {"default_glass.png", "default_glass_detail.png"},
 	inventory_image = minetest.inventorycube("default_glass.png"),
@@ -28,14 +28,14 @@ minetest.register_node("ctf_map:ind_glass", {
 })
 
 minetest.register_node("ctf_map:ind_stone", {
-	description = "Cheater!",
+	description = "Indestructible Stone",
 	groups = {immortal = 1},
 	tiles = {"default_stone.png"},
 	is_ground_content = false
 })
 
 minetest.register_node("ctf_map:ind_dirt", {
-	description = "Cheater!",
+	description = "Indestructible Dirt",
 	groups = {immortal = 1},
 	tiles = {"default_dirt.png"},
 	is_ground_content = false,
@@ -45,7 +45,7 @@ minetest.register_node("ctf_map:ind_dirt", {
 })
 
 minetest.register_node("ctf_map:ind_dirt_with_grass", {
-	description = "Cheater!",
+	description = "Indestructible Dirt with Grass",
 	groups = {immortal = 1},
 	tiles = {"default_grass.png", "default_dirt.png",
 		{name = "default_dirt.png^default_grass_side.png",
@@ -57,14 +57,14 @@ minetest.register_node("ctf_map:ind_dirt_with_grass", {
 })
 
 minetest.register_node("ctf_map:ind_stone_red", {
-	description = "Cheater!",
+	description = "Indestructible Red Stone",
 	groups = {immortal = 1},
 	tiles = {"ctf_map_stone_red.png"},
 	is_ground_content = false
 })
 
 minetest.register_node("ctf_map:ind_glass_red", {
-	description = "You cheater you!",
+	description = "Indestructible Red Glass",
 	drawtype = "glasslike",
 	tiles = {"ctf_map_glass_red.png"},
 	inventory_image = minetest.inventorycube("default_glass.png"),
