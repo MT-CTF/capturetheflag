@@ -49,20 +49,20 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		ret = ret .. "label[1,0;NO WINNER]"
 	end
 
-	ret = ret .. "label[4,0;Kills]"
-	ret = ret .. "label[6,0;" .. render_per_team_stats(red, blue, "kills") .. "]"
-	ret = ret .. "label[4,0.5;Attempts]"
-	ret = ret .. "label[6,0.5;" .. render_per_team_stats(red, blue, "attempts") .. "]"
+	ret = ret .. "label[6.5,0;Kills]"
+	ret = ret .. "label[8,0;" .. render_per_team_stats(red, blue, "kills") .. "]"
+	ret = ret .. "label[6.5,0.5;Attempts]"
+	ret = ret .. "label[8,0.5;" .. render_per_team_stats(red, blue, "attempts") .. "]"
 
 	local time_display = ""
 	if time >= 3600 then
 		time_display = math.floor(time/3600) .. "h"
 	end
 	time_display = time_display .. math.floor((time % 3600) / 60) .. "m" .. math.floor(time % 60) .. "s"
-	ret = ret .. "label[8,0;Duration]"
-	ret = ret .. "label[10,0;" .. time_display .. "]"
-	ret = ret .. "label[8,0.5;Total score]"
-	ret = ret .. "label[10,0.5;" .. render_per_team_stats(red, blue, "score", true) .. "]"
+	ret = ret .. "label[9.5,0;Duration]"
+	ret = ret .. "label[11,0;" .. time_display .. "]"
+	ret = ret .. "label[9.5,0.5;Total score]"
+	ret = ret .. "label[11,0.5;" .. render_per_team_stats(red, blue, "score", true) .. "]"
 
 	ret = ret .. "label[3.5,7.2;Tip: type /rankings for league tables]"
 	return ret
@@ -73,14 +73,14 @@ function ctf_stats.get_formspec(title, players, header)
 		return one.score > two.score
 	end)
 
-	local ret = "size[12,"..6.5+header.."]"
+	local ret = "size[13,"..6.5+header.."]"
 	ret = ret .. default.gui_bg .. default.gui_bg_img
 	ret = ret .. "container[0,"..header.."]"
 
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
 	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text;text]"
 	ret = ret .. "tableoptions[highlight=#00000000]"
-	ret = ret .. "table[0.5,0;11.25,6;scores;"
+	ret = ret .. "table[0.5,0;12.25,6;scores;"
 	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D ratio,Bounty kills,Captures,Attempts,Score"
 
 	for i = 1, #players do
