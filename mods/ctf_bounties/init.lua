@@ -2,9 +2,17 @@ local bountied_player = nil
 local bounty_score = 0
 
 local function announce(name)
+	local name_colour
+	local player_team = ctf.player(name).team or "none"
+	if player_team == "red" then
+		name_colour = "#FF4444"
+	elseif player_team == "blue" then
+		name_colour = "#4466FF"
+	end
 	minetest.chat_send_player(name,
-			minetest.colorize("#fff326", "The next person to kill " .. bountied_player ..
-			" will receive " .. bounty_score .. " points!"))
+			minetest.colorize("#fff326", "The next person to kill ") ..
+			minetest.colorize(name_colour, bountied_player) ..
+			minetest.colorize("#fff326", " will receive " .. bounty_score .. " points!"))
 end
 
 local function announce_all()
