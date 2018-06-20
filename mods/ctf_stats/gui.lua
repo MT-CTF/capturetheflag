@@ -38,9 +38,10 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		blue.score = blue.score + pstat.score
 	end
 
-	local time_hours = string.format("%02d", math.floor(time/3600))
-	local time_minutes = string.format("%02d", math.floor((time % 3600) / 60))
-	local time_seconds = string.format("%02d", math.floor(time % 60))
+	local match_length = string.format("%02d:%02d:%02d",
+		math.floor(time/3600), 		-- hours
+		math.floor((time % 3600) / 60),	-- minutes
+		math.floor(time % 60)) 		-- seconds
 
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
 
@@ -58,7 +59,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[6.5,0.5;Attempts]"
 	ret = ret .. "label[8,0.5;" .. render_per_team_stats(red, blue, "attempts") .. "]"
 	ret = ret .. "label[9.5,0;Duration]"
-	ret = ret .. "label[11,0;" .. time_hours .. ":" .. time_minutes .. ":" .. time_seconds .. "]"
+	ret = ret .. "label[11,0;" .. match_length .. "]"
 	ret = ret .. "label[9.5,0.5;Total score]"
 	ret = ret .. "label[11,0.5;" .. render_per_team_stats(red, blue, "score", true) .. "]"
 	ret = ret .. "label[3.5,7.2;Tip: type /rankings for league tables]"
