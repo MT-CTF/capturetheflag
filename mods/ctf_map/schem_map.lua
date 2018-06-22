@@ -22,6 +22,7 @@ minetest.register_alias("default:grass_5", "air")
 minetest.register_alias("default:bush_leaves", "air")
 minetest.register_alias("default:bush_stem", "air")
 
+local offset
 local max_r  = 120
 local max_h  = 150
 local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
