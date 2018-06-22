@@ -55,7 +55,7 @@ function ctf_map.place_map(map)
 	--------------------------------------------------
 	-- LVM
 
-	local vm   = VoxelManip(map.pos1, map.pos2)
+	local vm  = minetest.get_voxel_manip(map.pos1, map.pos2)
 	local res = minetest.place_schematic_on_vmanip(vm, map.pos1, schempath,
 			map.rotation == "z" and "0" or "90")
 
