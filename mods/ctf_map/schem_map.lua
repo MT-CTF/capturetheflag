@@ -59,11 +59,11 @@ function ctf_map.place_map(map)
 	local res = minetest.place_schematic_on_vmanip(vm, map.pos1, schempath,
 			map.rotation == "z" and "0" or "90")
 
+	assert(res)
+
 	vm:write_to_map()
 
 	--------------------------------------------------
-
-	assert(res)
 
 	for _, value in pairs(ctf_map.map.teams) do
 		ctf_team_base.place(value.color, value.pos)
