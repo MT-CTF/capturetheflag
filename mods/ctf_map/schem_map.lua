@@ -22,7 +22,6 @@ minetest.register_alias("default:grass_5", "air")
 minetest.register_alias("default:bush_leaves", "air")
 minetest.register_alias("default:bush_stem", "air")
 
-local offset
 local max_r  = 120
 local max_h  = 150
 local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
@@ -90,7 +89,7 @@ function ctf_map.place_map(map)
 end
 
 function ctf_match.load_map_meta(idx, name)
-	offset = vector.new(600 * idx, 0, 0)
+	local offset = vector.new(600 * idx, 0, 0)
 	local meta = Settings(mapdir .. name .. ".conf")
 
 	local initial_stuff = meta:get("initial_stuff")
