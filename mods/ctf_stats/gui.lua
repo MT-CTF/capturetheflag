@@ -68,14 +68,14 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	return ret
 end
 
-function ctf_stats.get_formspec(title, players, header)
+function ctf_stats.get_formspec(title, players, header, highlight)
 	table.sort(players, function(one, two)
 		return one.score > two.score
 	end)
 
-	local ret = "size[12,"..6.5+header.."]"
+	local ret = "size[12," .. 6.5 + header .. "]"
 	ret = ret .. default.gui_bg .. default.gui_bg_img
-	ret = ret .. "container[0,"..header.."]"
+	ret = ret .. "container[0," .. header .. "]"
 
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
 	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text;text]"
@@ -85,7 +85,12 @@ function ctf_stats.get_formspec(title, players, header)
 
 	for i = 1, #players do
 		local pstat = players[i]
-		local color = pstat.color or "#ffffff"
+		local color
+		if pstat.name == highlight then
+			color = "#ffff00"
+		else
+			color = pstat.color or "#ffffff"
+		end
 		local kd = pstat.kills
 		if pstat.deaths > 0 then
 			kd = kd / pstat.deaths
@@ -96,11 +101,11 @@ function ctf_stats.get_formspec(title, players, header)
 			"," .. pstat.name ..
 			"," .. pstat.kills ..
 			"," .. pstat.deaths ..
-			"," .. math.floor(kd*10)/10  ..
+			"," .. math.floor(kd * 10) / 10  ..
 			"," .. pstat.bounty_kills ..
 			"," .. pstat.captures ..
 			"," .. pstat.attempts ..
-			"," .. math.floor(pstat.score*10)/10
+			"," .. math.floor(pstat.score * 10) / 10
 		if i > 49 then
 			break
 		end
@@ -216,9 +221,7 @@ end
 
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
-		if param == "me" then
-			return send_as_chat_result(name, name)
-		elseif param ~= "" then
+		if param ~= "" then
 			if ctf_stats.players[param:trim()] then
 				return send_as_chat_result(name, param:trim())
 			else
@@ -231,8 +234,7 @@ minetest.register_chatcommand("rankings", {
 				pstat.color = nil
 				table.insert(players, pstat)
 			end
-			local fs = ctf_stats.get_formspec("Player Rankings", players, 0)
-			fs = fs .. "label[3.5,6.2;Tip: to see where you are, type /rankings me]"
+			local fs = ctf_stats.get_formspec("Player Rankings", players, 0, name)
 			minetest.show_formspec(name, "ctf_stats:rankings", fs)
 		end
 	end
