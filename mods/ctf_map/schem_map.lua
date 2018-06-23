@@ -1,4 +1,4 @@
-assert(minetest.get_mapgen_setting("mg_name") == "singlenode", "singlenode mapgen is required.")
+minetest.set_mapgen_params({mgname = "singlenode", flags = "nolight"})
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 minetest.register_alias("ctf_map:flag", "air")
@@ -23,7 +23,6 @@ minetest.register_alias("default:bush_leaves", "air")
 minetest.register_alias("default:bush_stem", "air")
 
 local max_r  = 120
-local max_h  = 150
 local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
 ctf_map.map  = nil
 
@@ -51,23 +50,25 @@ end
 function ctf_map.place_map(map)
 	local schempath = mapdir .. map.schematic
 
-	--------------------------------------------------
-	-- LVM
-
+	--
+	-- Place schematic
+	--
 	local vm  = minetest.get_voxel_manip(map.pos1, map.pos2)
 	local res = minetest.place_schematic_on_vmanip(vm, map.pos1, schempath,
 			map.rotation == "z" and "0" or "90")
-
 	assert(res)
-
 	vm:write_to_map()
 
-	--------------------------------------------------
-
+	--
+	-- Create bases
+	--
 	for _, value in pairs(ctf_map.map.teams) do
 		ctf_team_base.place(value.color, value.pos)
 	end
 
+	--
+	-- Place flags
+	--
 	local seed = minetest.get_mapgen_setting("seed")
 	for _, chestzone in pairs(ctf_map.map.chests) do
 		minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
@@ -76,6 +77,9 @@ function ctf_map.place_map(map)
 		place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
 	end
 
+	--
+	-- Wait then send map messages (avoids "X joined blue" spam)
+	--
 	minetest.after(2, function()
 		local msg = "Map: " .. map.name .. " by " .. map.author
 		if map.hint then
@@ -108,7 +112,7 @@ function ctf_match.load_map_meta(idx, name)
 		chests        = {},
 	}
 
-	assert(map.r <= max_r and map.h <= max_h)
+	assert(map.r <= max_r)
 
 	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
 	map.pos2 = vector.add(offset, { x =  map.r, y =  map.h / 2, z =  map.r })
