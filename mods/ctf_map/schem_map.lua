@@ -27,6 +27,20 @@ local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
 ctf_map.map  = nil
 
 
+local next_idx
+minetest.register_chatcommand("set_next", {
+	privs = { ctf_admin = true },
+	func = function(name, param)
+		for i, mname in pairs(ctf_map.available_maps) do
+			if mname:lower():find(param, 1, true) then
+				next_idx = i
+				return true, "Selected " .. mname
+			end
+		end
+	end,
+})
+
+
 do
 	local files_hash = {}
 
@@ -184,7 +198,9 @@ ctf_match.register_on_new_match(function()
 
 	-- Choose next map index, but don't select the same one again
 	local idx
-	if ctf_map.map then
+	if next_idx then
+		idx = next_idx
+	elseif ctf_map.map then
 		idx = math.random(#ctf_map.available_maps - 1)
 		if idx >= ctf_map.map.idx then
 			idx = idx + 1
@@ -192,6 +208,7 @@ ctf_match.register_on_new_match(function()
 	else
 		idx = math.random(#ctf_map.available_maps)
 	end
+	next_idx = (idx % #ctf_map.available_maps) + 1
 
 	-- Load meta data
 	local name = ctf_map.available_maps[idx]
