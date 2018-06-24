@@ -68,7 +68,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	return ret
 end
 
-function ctf_stats.get_formspec(title, players, header, highlight)
+function ctf_stats.get_formspec(title, players, header, hlt_name)
 	table.sort(players, function(one, two)
 		return one.score > two.score
 	end)
@@ -83,37 +83,71 @@ function ctf_stats.get_formspec(title, players, header, highlight)
 	ret = ret .. "table[0.5,0;11.25,6;scores;"
 	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D ratio,Bounty kills,Captures,Attempts,Score"
 
-	for i = 1, #players do
+	local player_in_top_50 = false
+
+	for i = 1, math.min(#players, 3) do
 		local pstat = players[i]
 		local color
-		if pstat.name == highlight then
+		if hlt_name and pstat.name == hlt_name then
 			color = "#ffff00"
+			player_in_top_50 = true
 		else
 			color = pstat.color or "#ffffff"
 		end
 		local kd = pstat.kills
-		if pstat.deaths > 0 then
+		if pstat.deaths > 1 then
 			kd = kd / pstat.deaths
 		end
 		ret = ret ..
-			"," .. string.gsub(color, "0x", "#") ..
-			"," .. i ..
-			"," .. pstat.name ..
-			"," .. pstat.kills ..
-			"," .. pstat.deaths ..
-			"," .. math.floor(kd * 10) / 10  ..
-			"," .. pstat.bounty_kills ..
-			"," .. pstat.captures ..
-			"," .. pstat.attempts ..
-			"," .. math.floor(pstat.score * 10) / 10
-		if i > 49 then
-			break
+			  "," .. string.gsub(color, "0x", "#") ..
+			  "," .. i ..
+			  "," .. pstat.name ..
+			  "," .. pstat.kills ..
+			  "," .. pstat.deaths ..
+			  "," .. math.floor(kd * 10) / 10  ..
+			  "," .. pstat.bounty_kills ..
+			  "," .. pstat.captures ..
+			  "," .. pstat.attempts ..
+			  "," .. math.floor(pstat.score * 10) / 10
+	end
+
+	if hlt_name and not player_in_top_50 then
+		local hlt_player, hlt_rank, hlt_kd
+
+		for i = 1, #players do
+			if players[i].name == hlt_name then
+				hlt_player = players[i]
+				hlt_rank = i
+				break
+			end
 		end
+
+		print("Appending hlt_player's stats to players{}")
+		hlt_kd = hlt_player.kills
+		if hlt_player.deaths > 1 then
+			hlt_kd = hlt_kd / hlt_player.deaths
+		end
+		local append =
+			"," .. "#ffff00" ..
+			"," .. hlt_rank ..
+			"," .. hlt_player.name ..
+			"," .. hlt_player.kills ..
+			"," .. hlt_player.deaths ..
+			"," .. math.floor(hlt_kd * 10) / 10  ..
+			"," .. hlt_player.bounty_kills ..
+			"," .. hlt_player.captures ..
+			"," .. hlt_player.attempts ..
+			"," .. math.floor(hlt_player.score * 10) / 10
+		ret = ret .. append
+		print("Appended!")
 	end
 
 	ret = ret .. ";-1]"
 	ret = ret .. "button_exit[0.5,6;3,1;close;Close]"
 	ret = ret .. "container_end[]"
+
+	print("Final formspec string:\n"..ret)
+
 	return ret
 end
 
@@ -133,10 +167,10 @@ function ctf_stats.get_html(title, players)
 		"<th>attempts</th>" ..
 		"<th>score</th></tr>"
 
-	for i = 1, #players do
+	for i = 1, math.min(#players, 50) do
 		local pstat = players[i]
 		local kd = pstat.kills
-		if pstat.deaths > 0 then
+		if pstat.deaths > 1 then
 			kd = kd / pstat.deaths
 		end
 		ret = ret ..
@@ -148,9 +182,6 @@ function ctf_stats.get_html(title, players)
 			"</td><td>" .. pstat.captures ..
 			"</td><td>" .. pstat.attempts ..
 			"</td><td>" .. math.floor(pstat.score*10)/10 .. "</td></tr>"
-		if i > 49 then
-			break
-		end
 	end
 
 	ret = ret .. "</table>\n"
@@ -206,7 +237,7 @@ local function send_as_chat_result(to, name)
 	local result = you_are_in .. place .. " place.\n"
 	if me then
 		local kd = me.kills
-		if me.deaths > 0 then
+		if me.deaths > 1 then
 			kd = kd / me.deaths
 		end
 		result = result .. "Kills: " .. me.kills ..
@@ -221,22 +252,27 @@ end
 
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
+		local target
 		if param ~= "" then
-			if ctf_stats.players[param:trim()] then
-				return send_as_chat_result(name, param:trim())
+			local param_name = param:trim()
+			if ctf_stats.players[param_name] then
+				target = param_name
 			else
 				return false, "Can't find player '" .. param:trim() .. "'"
 			end
 		else
-			local players = {}
-			for pname, pstat in pairs(ctf_stats.players) do
-				pstat.name = pname
-				pstat.color = nil
-				table.insert(players, pstat)
-			end
-			local fs = ctf_stats.get_formspec("Player Rankings", players, 0, name)
-			minetest.show_formspec(name, "ctf_stats:rankings", fs)
+			target = name			
 		end
+
+		local players = {}
+		for pname, pstat in pairs(ctf_stats.players) do
+			pstat.name = pname
+			pstat.color = nil
+			table.insert(players, pstat)
+		end
+
+		local fs = ctf_stats.get_formspec("Player Rankings", players, 0, target)
+		minetest.show_formspec(name, "ctf_stats:rankings", fs)
 	end
 })
 
