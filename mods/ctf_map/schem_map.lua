@@ -41,7 +41,7 @@ minetest.register_chatcommand("set_next", {
 })
 
 
-do
+local function search_for_maps()
 	local files_hash = {}
 
 	local dirs = minetest.get_dir_list(mapdir, true)
@@ -57,8 +57,18 @@ do
 	for key, _ in pairs(files_hash) do
 		table.insert(ctf_map.available_maps, key)
 	end
-	print(dump(ctf_map.available_maps))
+	return ctf_map.available_maps
 end
+print(dump(search_for_maps()))
+
+minetest.register_chatcommand("maps_reload", {
+	privs = { ctf_admin = true },
+	func = function(name, param)
+		local maps = search_for_maps()
+		next_idx = nil
+		return true, #maps .. " maps found: " .. table.concat(maps, ", ")
+	end,
+})
 
 
 function ctf_map.place_map(map)
