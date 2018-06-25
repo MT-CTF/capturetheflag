@@ -41,10 +41,8 @@ function ctf_events.post(action, one, two)
 	if minetest.global_exists("irc") and emoji[action] then
 		local color1, clear1 = get_colorcodes(one)
 		local color2, clear2 = get_colorcodes(two)
-		local tag1  = one and (color1 .. "_" .. clear1) or ""
-		local tag2  = two and (color2 .. "_" .. clear2) or ""
-		local name1 = one and (tag1 .. one .. tag1) or ""
-		local name2 = two and (tag2 .. two .. tag2) or ""
+		local name1 = one and (color1 .. one .. clear1) or ""
+		local name2 = two and (color2 .. two .. clear2) or ""
 		irc.say((name1 .. " " .. emoji[action] .. " " .. name2):trim())
 	end
 
