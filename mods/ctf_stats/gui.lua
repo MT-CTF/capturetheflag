@@ -85,7 +85,7 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 
 	local player_in_top_50 = false
 
-	for i = 1, math.min(#players, 3) do
+	for i = 1, math.min(#players, 50) do
 		local pstat = players[i]
 		local color
 		if hlt_name and pstat.name == hlt_name then
