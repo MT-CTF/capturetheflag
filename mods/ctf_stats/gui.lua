@@ -122,32 +122,26 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 			end
 		end
 
-		print("Appending hlt_player's stats to players{}")
 		hlt_kd = hlt_player.kills
 		if hlt_player.deaths > 1 then
 			hlt_kd = hlt_kd / hlt_player.deaths
 		end
-		local append =
-			"," .. "#ffff00" ..
-			"," .. hlt_rank ..
-			"," .. hlt_player.name ..
-			"," .. hlt_player.kills ..
-			"," .. hlt_player.deaths ..
-			"," .. math.floor(hlt_kd * 10) / 10  ..
-			"," .. hlt_player.bounty_kills ..
-			"," .. hlt_player.captures ..
-			"," .. hlt_player.attempts ..
-			"," .. math.floor(hlt_player.score * 10) / 10
-		ret = ret .. append
-		print("Appended!")
+		ret = ret ..
+			  "," .. "#ffff00" ..
+			  "," .. hlt_rank ..
+			  "," .. hlt_player.name ..
+			  "," .. hlt_player.kills ..
+			  "," .. hlt_player.deaths ..
+			  "," .. math.floor(hlt_kd * 10) / 10  ..
+			  "," .. hlt_player.bounty_kills ..
+			  "," .. hlt_player.captures ..
+			  "," .. hlt_player.attempts ..
+			  "," .. math.floor(hlt_player.score * 10) / 10
 	end
 
 	ret = ret .. ";-1]"
 	ret = ret .. "button_exit[0.5,6;3,1;close;Close]"
 	ret = ret .. "container_end[]"
-
-	print("Final formspec string:\n"..ret)
-
 	return ret
 end
 
@@ -208,48 +202,6 @@ function ctf_stats.html_to_file(filepath)
 	f:close()
 end
 
-local function send_as_chat_result(to, name)
-	local players = {}
-	for pname, pstat in pairs(ctf_stats.players) do
-		pstat.name = pname
-		pstat.color = nil
-		table.insert(players, pstat)
-	end
-
-	table.sort(players, function(one, two)
-		return one.score > two.score
-	end)
-
-	local place = -1
-	local me = nil
-	for i = 1, #players do
-		local pstat = players[i]
-		if pstat.name == name then
-			me = pstat
-			place = i
-			break
-		end
-	end
-	if place < 1 then
-		place = #players + 1
-	end
-	local you_are_in = (to == name) and "You are in " or "They are in "
-	local result = you_are_in .. place .. " place.\n"
-	if me then
-		local kd = me.kills
-		if me.deaths > 1 then
-			kd = kd / me.deaths
-		end
-		result = result .. "Kills: " .. me.kills ..
-			" | Deaths: " .. me.deaths ..
-			" | K/D: " .. math.floor(kd*10)/10 ..
-			" | Captures: " .. me.captures ..
-			" | Attempts: " .. me.attempts ..
-			" | Score: " .. math.floor(me.score)
-	end
-	return true, result
-end
-
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
 		local target
@@ -261,7 +213,7 @@ minetest.register_chatcommand("rankings", {
 				return false, "Can't find player '" .. param:trim() .. "'"
 			end
 		else
-			target = name			
+			target = name
 		end
 
 		local players = {}
