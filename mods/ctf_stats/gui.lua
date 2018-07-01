@@ -1,3 +1,6 @@
+local storage = minetest.get_mod_storage()
+local prev_match_summary = storage:get_string("prev_match_summary")
+
 local function render_per_team_stats(red, blue, stat, round)
 	local red_stat, blue_stat = red[stat], blue[stat]
 	if round then
@@ -65,6 +68,11 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[10,0.5;" .. render_per_team_stats(red, blue, "score", true) .. "]"
 
 	ret = ret .. "label[3.5,7.2;Tip: type /rankings for league tables]"
+
+	-- Set prev_match_summary and write to mod_storage
+	prev_match_summary = ret
+	storage:set_string("prev_match_summary", ret)
+
 	return ret
 end
 
@@ -257,5 +265,15 @@ minetest.register_chatcommand("reset_rankings", {
 		ctf_stats.players[name] = nil
 		ctf_stats.player(reset_name)
 		return true, "Reset the stats and ranking of " .. reset_name
+	end
+})
+
+minetest.register_chatcommand("summary", {
+	func = function (name, param)
+		if not prev_match_summary then
+			return false, "Couldn't find the requested data."
+		end
+
+		minetest.show_formspec(name, "ctf_stats:prev_match_summary", prev_match_summary)
 	end
 })
