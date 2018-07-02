@@ -1,5 +1,5 @@
 local storage = minetest.get_mod_storage()
-local prev_match_summary = storage:get_string("prev_match_summary")
+local prev_match_summary = storage:get("prev_match_summary")
 
 local function render_per_team_stats(red, blue, stat, round)
 	local red_stat, blue_stat = red[stat], blue[stat]
@@ -71,7 +71,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 
 	-- Set prev_match_summary and write to mod_storage
 	prev_match_summary = ret
-	storage:set_string("prev_match_summary", ret)
+	storage:set("prev_match_summary", ret)
 
 	return ret
 end
