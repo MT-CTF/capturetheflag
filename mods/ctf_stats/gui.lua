@@ -202,6 +202,48 @@ function ctf_stats.html_to_file(filepath)
 	f:close()
 end
 
+local function send_as_chat_result(to, name)
+	local players = {}
+	for pname, pstat in pairs(ctf_stats.players) do
+		pstat.name = pname
+		pstat.color = nil
+		table.insert(players, pstat)
+	end
+
+	table.sort(players, function(one, two)
+		return one.score > two.score
+	end)
+
+	local place = -1
+	local me = nil
+	for i = 1, #players do
+		local pstat = players[i]
+		if pstat.name == name then
+			me = pstat
+			place = i
+			break
+		end
+	end
+	if place < 1 then
+		place = #players + 1
+	end
+	local you_are_in = (to == name) and "You are in " or "They are in "
+	local result = you_are_in .. place .. " place."
+	if me then
+		local kd = me.kills
+		if me.deaths > 1 then
+			kd = kd / me.deaths
+		end
+		result = result .. "Kills: " .. me.kills ..
+			" | Deaths: " .. me.deaths ..
+			" | K/D: " .. math.floor(kd*10)/10 ..
+			" | Captures: " .. me.captures ..
+			" | Attempts: " .. me.attempts ..
+			" | Score: " .. math.floor(me.score)
+	end
+	return true, result
+end
+
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
 		local target
@@ -213,18 +255,22 @@ minetest.register_chatcommand("rankings", {
 				return false, "Can't find player '" .. param:trim() .. "'"
 			end
 		else
-			target = name
+			target = name			
 		end
 
-		local players = {}
-		for pname, pstat in pairs(ctf_stats.players) do
-			pstat.name = pname
-			pstat.color = nil
-			table.insert(players, pstat)
-		end
+		if not minetest.get_player_by_name(name) then
+			send_as_chat_result(name, target)
+		else
+			local players = {}
+			for pname, pstat in pairs(ctf_stats.players) do
+				pstat.name = pname
+				pstat.color = nil
+				table.insert(players, pstat)
+			end
 
-		local fs = ctf_stats.get_formspec("Player Rankings", players, 0, target)
-		minetest.show_formspec(name, "ctf_stats:rankings", fs)
+			local fs = ctf_stats.get_formspec("Player Rankings", players, 0, target)
+			minetest.show_formspec(name, "ctf_stats:rankings", fs)
+		end
 	end
 })
 
