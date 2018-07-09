@@ -153,13 +153,14 @@ function ctf_stats.get_html(title, players)
 	local ret = "<h1>" .. title .. "</h1>"
 	ret = ret .. "<table>" ..
 		"<tr><th></th>" ..
-		"<th>username</th>" ..
-		"<th>kills</th>" ..
-		"<th>deaths</th>" ..
+		"<th>Player</th>" ..
+		"<th>Kills</th>" ..
+		"<th>Deaths</th>" ..
 		"<th>K/D ratio</th>" ..
-		"<th>captures</th>" ..
-		"<th>attempts</th>" ..
-		"<th>score</th></tr>"
+		"<th>Bounty kills</th>" ..
+		"<th>Captures</th>" ..
+		"<th>Attempts</th>" ..
+		"<th>Score</th></tr>"
 
 	for i = 1, math.min(#players, 50) do
 		local pstat = players[i]
@@ -172,7 +173,8 @@ function ctf_stats.get_html(title, players)
 			"</td><td>" .. pstat.name ..
 			"</td><td>" .. pstat.kills ..
 			"</td><td>" .. pstat.deaths ..
-			"</td><td>" .. math.floor(kd*10)/10 ..
+			"</td><td>" .. math.floor(kd * 10) / 10 ..
+			"</td><td>" .. pstat.bounty_kills ..
 			"</td><td>" .. pstat.captures ..
 			"</td><td>" .. pstat.attempts ..
 			"</td><td>" .. math.floor(pstat.score*10)/10 .. "</td></tr>"
@@ -227,7 +229,7 @@ local function send_as_chat_result(to, name)
 	if place < 1 then
 		place = #players + 1
 	end
-	local you_are_in = (to == name) and "You are in " or "They are in "
+	local you_are_in = (to == name) and "You are in " or name ..  " is in "
 	local result = you_are_in .. place .. " place."
 	if me then
 		local kd = me.kills
@@ -236,7 +238,8 @@ local function send_as_chat_result(to, name)
 		end
 		result = result .. "Kills: " .. me.kills ..
 			" | Deaths: " .. me.deaths ..
-			" | K/D: " .. math.floor(kd*10)/10 ..
+			" | K/D: " .. math.floor(kd * 10) / 10 ..
+			" | Bounty kills: " .. me.bounty_kills ..
 			" | Captures: " .. me.captures ..
 			" | Attempts: " .. me.attempts ..
 			" | Score: " .. math.floor(me.score)
@@ -248,11 +251,11 @@ minetest.register_chatcommand("rankings", {
 	func = function(name, param)
 		local target
 		if param ~= "" then
-			local param_name = param:trim()
-			if ctf_stats.players[param_name] then
-				target = param_name
+			param = param:trim()
+			if ctf_stats.players[param] then
+				target = param
 			else
-				return false, "Can't find player '" .. param:trim() .. "'"
+				return false, "Can't find player '" .. param .. "'"
 			end
 		else
 			target = name			
