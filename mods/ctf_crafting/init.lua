@@ -107,7 +107,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:torch 5",
-	items  = { "default:stick", "default:coal_lump"},
+	items  = { "default:stick", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
 })
@@ -115,7 +115,15 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:ladder 5",
-	items  = { "group:wood 7"},
+	items  = { "default:stick 7" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:stick 2",
+	items  = { "default:ladder" },
 	always_known = true,
 	level  = 1,
 })
