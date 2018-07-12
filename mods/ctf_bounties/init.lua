@@ -44,6 +44,9 @@ local function bounty_player(target)
 	end
 	bounty_score = math.floor(bounty_score)
 
+	ctf_stats.current_bounty["name"] = bountied_player
+	ctf_stats.current_bounty["score"] = bounty_score
+
 	minetest.after(0.1, announce_all)
 end
 
@@ -70,6 +73,7 @@ minetest.after(math.random(500, 1000), bounty_find_new_target)
 minetest.register_on_leaveplayer(function(player)
 	if bountied_player == player:get_player_name() then
 		bountied_player = nil
+		ctf_stats.current_bounty = {}
 	end
 end)
 
@@ -80,6 +84,10 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 ctf.register_on_killedplayer(function(victim, killer)
+	-- Suicide is not encouraged here at CTF
+	if victim == killer then
+		return
+	end
 	if victim == bountied_player then
 		local main, match = ctf_stats.player(killer)
 		if main and match then
@@ -88,6 +96,7 @@ ctf.register_on_killedplayer(function(victim, killer)
 			ctf.needs_save = true
 		end
 		bountied_player = nil
+		ctf_stats.current_bounty = {}
 
 		local msg = killer .. " has killed " .. victim .. " and received the prize!"
 		minetest.chat_send_all(msg)
