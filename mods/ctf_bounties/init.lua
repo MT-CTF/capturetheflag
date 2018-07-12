@@ -80,6 +80,10 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 ctf.register_on_killedplayer(function(victim, killer)
+	-- Suicide is not encouraged here at CTF
+	if victim == killer then
+		return
+	end
 	if victim == bountied_player then
 		local main, match = ctf_stats.player(killer)
 		if main and match then
