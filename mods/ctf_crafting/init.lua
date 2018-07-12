@@ -127,3 +127,35 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:wood 3",
+	items  = { "default:pick_wood" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:wood 2",
+	items  = { "default:sword_wood" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:wood 3",
+	items  = { "default:axe_wood" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:wood 1",
+	items  = { "default:shovel_wood" },
+	always_known = true,
+	level  = 1,
+})
