@@ -18,6 +18,7 @@
 local disallowed_base_nodes = {
 	"default:leaves",
 	"default:jungleleaves",
+	"default:pine_needles",
 	"default:acacia_leaves",
 	"default:aspen_leaves",
 	"default:tree",
