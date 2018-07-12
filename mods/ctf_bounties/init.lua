@@ -81,7 +81,7 @@ end)
 
 ctf.register_on_killedplayer(function(victim, killer)
 	-- Suicide is not encouraged here at CTF
-	if victim == killer
+	if victim == killer then
 		return
 	end
 	if victim == bountied_player then
