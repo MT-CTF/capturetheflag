@@ -266,7 +266,7 @@ minetest.register_chatcommand("rankings", {
 		else
 			local players = {}
 			for pname, pstat in pairs(ctf_stats.players) do
-				pstat.name = pname
+				pstat.name  = pname
 				pstat.color = nil
 				table.insert(players, pstat)
 			end
