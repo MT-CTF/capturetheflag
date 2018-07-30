@@ -258,7 +258,7 @@ minetest.register_chatcommand("rankings", {
 				return false, "Can't find player '" .. param .. "'"
 			end
 		else
-			target = name			
+			target = name
 		end
 
 		if not minetest.get_player_by_name(name) then
@@ -266,7 +266,7 @@ minetest.register_chatcommand("rankings", {
 		else
 			local players = {}
 			for pname, pstat in pairs(ctf_stats.players) do
-				pstat.name  = pname
+				pstat.name = pname
 				pstat.color = nil
 				table.insert(players, pstat)
 			end
