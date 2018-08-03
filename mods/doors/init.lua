@@ -302,6 +302,15 @@ function doors.register(name, def)
 			-- Get placer's team
 			local tname = ctf.player(pn).team or ""
 
+			-- Prevent door placement if within 40 nodes of enemy base
+			local enemy_base, enemy_team
+			enemy_team = tname == "red" and "blue" or "red"
+			enemy_base = ctf_map.map.teams[enemy_team].pos
+			if vector.distance(pos, enemy_base) < 40 then
+				minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
+				return itemstack
+			end
+
 			local dir = minetest.dir_to_facedir(placer:get_look_dir())
 
 			local ref = {
@@ -319,7 +328,7 @@ function doors.register(name, def)
 
 			-- If steel doors are placed, append tname to place coloured team-doors instead
 			if name == "doors:door_steel" then
-				name = name .. "_" .. tname	-- "doors:door_steel_red" (or blue)
+				name = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
 			end
 
 			local state = 0
