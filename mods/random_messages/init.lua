@@ -60,12 +60,12 @@ function random_messages.read_messages()
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
 		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
-		"To report misbehaving players to moderators, please use /report NAME MESSAGE",
+		"To report misbehaving players to moderators, please use /report <name> <action>",
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
-		"Trapping team mates on purpose is strictly against the rules and you will be kicked / banned immediately.",
+		"Trapping team mates on purpose is strictly against the rules and you will be kicked immediately.",
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
-		"Note: The maximum number of apples in a stack has been reduced from 99 to 30.",
-		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given."
+		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
+		"Check your score and your rank in the league tables using /rankings"
 	}
 end
 

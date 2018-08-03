@@ -76,14 +76,14 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	return ret
 end
 
-function ctf_stats.get_formspec(title, players, header)
+function ctf_stats.get_formspec(title, players, header, hlt_name)
 	table.sort(players, function(one, two)
 		return one.score > two.score
 	end)
 
-	local ret = "size[12,"..6.5+header.."]"
+	local ret = "size[12," .. 6.5 + header .. "]"
 	ret = ret .. default.gui_bg .. default.gui_bg_img
-	ret = ret .. "container[0,"..header.."]"
+	ret = ret .. "container[0," .. header .. "]"
 
 	ret = ret .. "vertlabel[0,0;" .. title .. "]"
 	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text;text]"
@@ -91,27 +91,60 @@ function ctf_stats.get_formspec(title, players, header)
 	ret = ret .. "table[0.5,0;11.25,6;scores;"
 	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D ratio,Bounty kills,Captures,Attempts,Score"
 
-	for i = 1, #players do
+	local player_in_top_50 = false
+
+	for i = 1, math.min(#players, 50) do
 		local pstat = players[i]
-		local color = pstat.color or "#ffffff"
+		local color
+		if hlt_name and pstat.name == hlt_name then
+			color = "#ffff00"
+			player_in_top_50 = true
+		else
+			color = pstat.color or "#ffffff"
+		end
 		local kd = pstat.kills
-		if pstat.deaths > 0 then
+		if pstat.deaths > 1 then
 			kd = kd / pstat.deaths
 		end
 		ret = ret ..
-			"," .. string.gsub(color, "0x", "#") ..
-			"," .. i ..
-			"," .. pstat.name ..
-			"," .. pstat.kills ..
-			"," .. pstat.deaths ..
-			"," .. math.floor(kd*10)/10  ..
-			"," .. pstat.bounty_kills ..
-			"," .. pstat.captures ..
-			"," .. pstat.attempts ..
-			"," .. math.floor(pstat.score*10)/10
-		if i > 49 then
-			break
+			  "," .. string.gsub(color, "0x", "#") ..
+			  "," .. i ..
+			  "," .. pstat.name ..
+			  "," .. pstat.kills ..
+			  "," .. pstat.deaths ..
+			  "," .. math.floor(kd * 10) / 10  ..
+			  "," .. pstat.bounty_kills ..
+			  "," .. pstat.captures ..
+			  "," .. pstat.attempts ..
+			  "," .. math.floor(pstat.score * 10) / 10
+	end
+
+	if hlt_name and not player_in_top_50 then
+		local hlt_player, hlt_rank, hlt_kd
+
+		for i = 1, #players do
+			if players[i].name == hlt_name then
+				hlt_player = players[i]
+				hlt_rank = i
+				break
+			end
 		end
+
+		hlt_kd = hlt_player.kills
+		if hlt_player.deaths > 1 then
+			hlt_kd = hlt_kd / hlt_player.deaths
+		end
+		ret = ret ..
+			  "," .. "#ffff00" ..
+			  "," .. hlt_rank ..
+			  "," .. hlt_player.name ..
+			  "," .. hlt_player.kills ..
+			  "," .. hlt_player.deaths ..
+			  "," .. math.floor(hlt_kd * 10) / 10  ..
+			  "," .. hlt_player.bounty_kills ..
+			  "," .. hlt_player.captures ..
+			  "," .. hlt_player.attempts ..
+			  "," .. math.floor(hlt_player.score * 10) / 10
 	end
 
 	ret = ret .. ";-1]"
@@ -128,18 +161,19 @@ function ctf_stats.get_html(title, players)
 	local ret = "<h1>" .. title .. "</h1>"
 	ret = ret .. "<table>" ..
 		"<tr><th></th>" ..
-		"<th>username</th>" ..
-		"<th>kills</th>" ..
-		"<th>deaths</th>" ..
+		"<th>Player</th>" ..
+		"<th>Kills</th>" ..
+		"<th>Deaths</th>" ..
 		"<th>K/D ratio</th>" ..
-		"<th>captures</th>" ..
-		"<th>attempts</th>" ..
-		"<th>score</th></tr>"
+		"<th>Bounty kills</th>" ..
+		"<th>Captures</th>" ..
+		"<th>Attempts</th>" ..
+		"<th>Score</th></tr>"
 
-	for i = 1, #players do
+	for i = 1, math.min(#players, 50) do
 		local pstat = players[i]
 		local kd = pstat.kills
-		if pstat.deaths > 0 then
+		if pstat.deaths > 1 then
 			kd = kd / pstat.deaths
 		end
 		ret = ret ..
@@ -147,13 +181,11 @@ function ctf_stats.get_html(title, players)
 			"</td><td>" .. pstat.name ..
 			"</td><td>" .. pstat.kills ..
 			"</td><td>" .. pstat.deaths ..
-			"</td><td>" .. math.floor(kd*10)/10 ..
+			"</td><td>" .. math.floor(kd * 10) / 10 ..
+			"</td><td>" .. pstat.bounty_kills ..
 			"</td><td>" .. pstat.captures ..
 			"</td><td>" .. pstat.attempts ..
 			"</td><td>" .. math.floor(pstat.score*10)/10 .. "</td></tr>"
-		if i > 49 then
-			break
-		end
 	end
 
 	ret = ret .. "</table>\n"
@@ -205,16 +237,17 @@ local function send_as_chat_result(to, name)
 	if place < 1 then
 		place = #players + 1
 	end
-	local you_are_in = (to == name) and "You are in " or "They are in "
-	local result = you_are_in .. place .. " place.\n"
+	local you_are_in = (to == name) and "You are in " or name ..  " is in "
+	local result = you_are_in .. place .. " place."
 	if me then
 		local kd = me.kills
-		if me.deaths > 0 then
+		if me.deaths > 1 then
 			kd = kd / me.deaths
 		end
 		result = result .. "Kills: " .. me.kills ..
 			" | Deaths: " .. me.deaths ..
-			" | K/D: " .. math.floor(kd*10)/10 ..
+			" | K/D: " .. math.floor(kd * 10) / 10 ..
+			" | Bounty kills: " .. me.bounty_kills ..
 			" | Captures: " .. me.captures ..
 			" | Attempts: " .. me.attempts ..
 			" | Score: " .. math.floor(me.score)
@@ -224,14 +257,20 @@ end
 
 minetest.register_chatcommand("rankings", {
 	func = function(name, param)
-		if param == "me" then
-			return send_as_chat_result(name, name)
-		elseif param ~= "" then
-			if ctf_stats.players[param:trim()] then
-				return send_as_chat_result(name, param:trim())
+		local target
+		if param ~= "" then
+			param = param:trim()
+			if ctf_stats.players[param] then
+				target = param
 			else
-				return false, "Can't find player '" .. param:trim() .. "'"
+				return false, "Can't find player '" .. param .. "'"
 			end
+		else
+			target = name
+		end
+
+		if not minetest.get_player_by_name(name) then
+			send_as_chat_result(name, target)
 		else
 			local players = {}
 			for pname, pstat in pairs(ctf_stats.players) do
@@ -239,8 +278,8 @@ minetest.register_chatcommand("rankings", {
 				pstat.color = nil
 				table.insert(players, pstat)
 			end
-			local fs = ctf_stats.get_formspec("Player Rankings", players, 0)
-			fs = fs .. "label[3.5,6.2;Tip: to see where you are, type /rankings me]"
+
+			local fs = ctf_stats.get_formspec("Player Rankings", players, 0, target)
 			minetest.show_formspec(name, "ctf_stats:rankings", fs)
 		end
 	end
