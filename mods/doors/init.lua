@@ -303,9 +303,8 @@ function doors.register(name, def)
 			local tname = ctf.player(pn).team or ""
 
 			-- Prevent door placement if within 40 nodes of enemy base
-			local enemy_base, enemy_team
-			enemy_team = tname == "red" and "blue" or "red"
-			enemy_base = ctf_map.map.teams[enemy_team].pos
+			local enemy_team = tname == "red" and "blue" or "red"
+			local enemy_base = ctf_map.map.teams[enemy_team].pos
 			if vector.distance(pos, enemy_base) < 40 then
 				minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
 				return itemstack
@@ -389,7 +388,10 @@ function doors.register(name, def)
 
 	def.groups.not_in_creative_inventory = 1
 	def.groups.door = 1
-	def.drop = name
+
+	-- If name contains team door itemstring, drop plain uncoloured team door
+	def.drop = name:find("doors:door_steel") and "doors:door_steel" or name
+
 	def.door = {
 		name = name,
 		sounds = { def.sound_close, def.sound_open },
@@ -402,13 +404,6 @@ function doors.register(name, def)
 	def.after_dig_node = function(pos, node, meta, digger)
 		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
 		minetest.check_for_falling({x = pos.x, y = pos.y + 1, z = pos.z})
-
-		-- After dig, convert coloured doors into normal steel doors
-		local wielditem = digger:get_wielded_item()
-		if wielditem:get_name():find("doors:door_steel") then
-			wielditem:set_name("doors:door_steel")
-			digger:set_wielded_item(wielditem)
-		end
 	end
 	def.on_rotate = function(pos, node, user, mode, new_param2)
 		return false
