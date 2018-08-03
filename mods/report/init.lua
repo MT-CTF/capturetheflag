@@ -85,9 +85,6 @@ minetest.register_chatcommand("report", {
 			end
 		end
 
-		-- Email to admin
-		email.send_mail(name, minetest.setting_get("name"), msg)
-
 		return true, "Reported. We'll get back to you."
 	end
 })

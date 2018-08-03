@@ -264,6 +264,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	if fields.export then
+		if #flag_positions ~= 2 then
+			minetest.chat_send_all("You need to place two flags!")
+			return
+		end
+
 		we_select(player_name)
 		show_progress_formspec(player_name, "Exporting...")
 
