@@ -15,6 +15,18 @@
 	For this, there is another example mod, called “trm_default_example”, which registers a bunch of items of the default mod, like default:gold_ingot.
 ]]
 
+local disallowed_base_nodes = {
+	"default:leaves",
+	"default:jungleleaves",
+	"default:pine_needles",
+	"default:acacia_leaves",
+	"default:aspen_leaves",
+	"default:tree",
+	"default:jungletree",
+	"default:pine_tree",
+	"default:acacia_tree",
+	"default:aspen_tree"
+}
 
 local chest_formspec =
 	"size[8,9]" ..
@@ -197,6 +209,19 @@ function place_chests(minp, maxp, seed, number_chests)
 		local ground = findGroundLevel(pos, y_min, y_max)
 		if ground ~= nil then
 			local chest_pos = {x = pos.x, y = ground + 1, z = pos.z}
+			local ground_pos = {x = pos.x, y = ground, z = pos.z}
+
+			-- Don't spawn on trees
+			local disallowed_base = false
+			local chest_base = minetest.get_node(ground_pos).name
+			for _, disallowed_base_node in ipairs(disallowed_base_nodes) do
+				if chest_base == disallowed_base_node then
+					disallowed_base = true
+				end
+			end
+			if disallowed_base then
+				break
+			end
 
 			-- Don't spawn at barrier
 			if chest_pos.z == 0 then
