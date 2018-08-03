@@ -3,6 +3,7 @@ ctf_stats = {}
 local storage = minetest.get_mod_storage()
 local prev_match_summary = storage:get_string("prev_match_summary")
 local data_to_persist = { "matches", "players" }
+local kill_assists = {}
 
 function ctf_stats.get_prev_match_summary()
 	return prev_match_summary
@@ -90,6 +91,7 @@ function ctf_stats.load()
 			ctf.needs_save = true
 		else
 			player_stats.bounty_kills = player_stats.bounty_kills or 0
+			player_stats.kill_assists = player_stats.kill_assists or 0
 		end
 	end
 end
@@ -122,6 +124,7 @@ function ctf_stats.player(name)
 			attempts = 0,
 			score = 0,
 			bounty_kills = 0,
+			kill_assists = 0,
 		}
 		ctf_stats.players[name] = player_stats
 	end
@@ -141,6 +144,7 @@ ctf.register_on_join_team(function(name, tname)
 		captures = 0,
 		score = 0,
 		bounty_kills = 0,
+		kill_assists = 0
 	}
 end)
 
@@ -197,6 +201,7 @@ ctf_match.register_on_new_match(function()
 		red = {},
 		blue = {}
 	}
+	kill_assists = {}
 	winner_team = "-"
 	winner_player = "-"
 	ctf_stats.start = os.time()
@@ -207,7 +212,7 @@ ctf_flag.register_on_pick_up(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.attempts  = main.attempts  + 1
-		main.score     = main.score     + 5
+		main.score     = main.score     + 10
 		match.attempts = match.attempts + 1
 		match.score    = match.score    + 10
 		ctf.needs_save = true
@@ -250,6 +255,30 @@ local function invHasGoodWeapons(inv)
 	return false
 end
 
+-- Store total damage dealt by player
+minetest.register_on_punchplayer(function(player, hitter, _, _, _, damage)
+	local pname = player:get_player_name()
+	local hname = hitter:get_player_name()
+
+	if not kill_assists[pname] then
+		kill_assists[pname] = {}
+	end
+
+	local total_dmg, ptime
+	if not kill_assists[pname][hname] then
+		total_dmg = damage
+		ptime = os.time()
+	else
+		total_dmg = kill_assists[pname][hname].hp + damage
+		ptime = kill_assists[pname][hname].time
+	end
+
+	kill_assists[pname][hname] = {
+		hp = total_dmg,
+		time = ptime
+	}
+end)
+
 local function calculateKillReward(victim, killer)
 	local vmain, victim_match = ctf_stats.player(victim)
 
@@ -269,7 +298,7 @@ local function calculateKillReward(victim, killer)
 	end
 	reward = reward + kdreward
 
-	-- Limited to  0 <= X <= 200
+	-- Limited to 14 <= X <= 200
 	if reward > 200 then
 		reward = 200
 	elseif reward < 14 then
@@ -293,9 +322,13 @@ ctf.register_on_killedplayer(function(victim, killer)
 	if victim == killer then
 		return
 	end
+
+	-- Calculate kill reward
+	local reward = calculateKillReward(victim, killer)
+
+	-- Award points for kills
 	local main, match = ctf_stats.player(killer)
 	if main and match then
-		local reward = calculateKillReward(victim, killer)
 		main.kills  = main.kills  + 1
 		main.score  = main.score  + reward
 		match.kills = match.kills + 1
@@ -311,6 +344,38 @@ ctf.register_on_killedplayer(function(victim, killer)
 			value = reward
 		})
 	end
+
+	-- Award reward for kill assists based on the damage dealt
+	local assist_reward
+	for assist_player, assist_def in pairs(kill_assists[victim]) do
+		-- Only award points if player dealt damage more than 10 hp
+		-- and only if damage was dealt within the past 30 seconds
+		local time = os.time() - assist_def.time
+		if assist_def.hp > 10 and time < 30 and assist_player ~= killer then
+			local amain, amatch = ctf_stats.player(assist_player)
+			if amain and amatch then
+				assist_reward = (assist_def.hp / 20) * reward
+
+				hud_score.new(killer, {
+					name = "ctf_stats:kill_assist_score",
+					color = "0x00FFAA",
+					value = assist_reward
+				})
+
+				amain.kill_assists = amain.kills + 1
+				amain.score = amain.score + assist_reward
+				amatch.kill_assists = amatch.kills + 1
+				amatch.score = amatch.score + assist_reward
+				ctf.needs_save = true
+			end
+		end
+	end
+
+	kill_assists[victim] = {}
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	kill_assists[player:get_player_name()] = {}
 end)
 
 minetest.register_on_dieplayer(function(player)

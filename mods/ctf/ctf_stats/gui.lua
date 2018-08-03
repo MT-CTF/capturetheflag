@@ -9,6 +9,7 @@ local tablecolumns = {
 	"text,width=6;",
 	"text,width=6;",
 	"text,width=6;",
+	"text,width=6;",
 	"text,width=6]"
 }
 tablecolumns = table.concat(tablecolumns, "")
@@ -99,7 +100,7 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 	ret = ret .. tablecolumns
 	ret = ret .. "tableoptions[highlight=#00000000]"
 	ret = ret .. "table[0.5,0;13.25,6.1;scores;"
-	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D,Bounty Kills,Captures,Attempts,Score"
+	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D ratio,Bounty kills,Kill assists,Captures,Attempts,Score"
 
 	local player_in_top_50 = false
 
@@ -124,6 +125,7 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 			  "," .. pstat.deaths ..
 			  "," .. math.floor(kd * 10) / 10  ..
 			  "," .. pstat.bounty_kills ..
+			  "," .. pstat.kill_assists ..
 			  "," .. pstat.captures ..
 			  "," .. pstat.attempts ..
 			  "," .. math.floor(pstat.score * 10) / 10
