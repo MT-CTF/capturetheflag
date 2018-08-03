@@ -151,7 +151,7 @@ function _doors.door_toggle(pos, node, clicker)
 	replace_old_owner_information(pos)
 
 	local tname = ctf.player(clicker:get_player_name()).team
-	local owner_team = pos.z >= 0 and "red" or "blue"
+	local owner_team = meta:get_string("owner_team")
 	local is_right_team = tname == owner_team
 	if clicker and not minetest.check_player_privs(clicker, "protection_bypass") and
 			not is_right_team then
@@ -299,6 +299,17 @@ function doors.register(name, def)
 				return itemstack
 			end
 
+			-- Get placer's team
+			local tname = ctf.player(pn).team or ""
+
+			-- Prevent door placement if within 40 nodes of enemy base
+			local enemy_team = tname == "red" and "blue" or "red"
+			local enemy_base = ctf_map.map.teams[enemy_team].pos
+			if vector.distance(pos, enemy_base) < 40 then
+				minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
+				return itemstack
+			end
+
 			local dir = minetest.dir_to_facedir(placer:get_look_dir())
 
 			local ref = {
@@ -314,6 +325,11 @@ function doors.register(name, def)
 				z = pos.z + ref[dir + 1].z,
 			}
 
+			-- If steel doors are placed, append tname to place coloured team-doors instead
+			if name == "doors:door_steel" then
+				name = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
+			end
+
 			local state = 0
 			if minetest.get_item_group(minetest.get_node(aside).name, "door") == 1 then
 				state = state + 2
@@ -328,7 +344,12 @@ function doors.register(name, def)
 			meta:set_int("state", state)
 
 			if def.protected then
-				meta:set_string("infotext", "Team Door")
+				local infotext = "Team Door"
+				if tname and tname ~= "" then
+					infotext = infotext .. " (" .. tname .. ")"
+				end
+				meta:set_string("infotext", infotext)
+				meta:set_string("owner_team", tname)
 			end
 
 			if not (creative and creative.is_enabled_for and creative.is_enabled_for(pn)) then
@@ -367,7 +388,10 @@ function doors.register(name, def)
 
 	def.groups.not_in_creative_inventory = 1
 	def.groups.door = 1
-	def.drop = name
+
+	-- If name contains team door itemstring, drop plain uncoloured team door
+	def.drop = name:find("doors:door_steel") and "doors:door_steel" or name
+
 	def.door = {
 		name = name,
 		sounds = { def.sound_close, def.sound_open },
@@ -434,6 +458,38 @@ doors.register("door_wood", {
 
 doors.register("door_steel", {
 		tiles = {{name = "doors_door_steel.png", backface_culling = true}},
+		description = "Team Door",
+		inventory_image = "doors_item_steel.png",
+		protected = true,
+		groups = {cracky = 1, level = 2},
+		sounds = default.node_sound_metal_defaults(),
+		sound_open = "doors_steel_door_open",
+		sound_close = "doors_steel_door_close",
+		recipe = {
+			{"default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "default:steel_ingot"},
+		}
+})
+
+doors.register("door_steel_blue", {
+		tiles = {{name = "doors_door_steel_blue.png", backface_culling = true}},
+		description = "Team Door",
+		inventory_image = "doors_item_steel.png",
+		protected = true,
+		groups = {cracky = 1, level = 2},
+		sounds = default.node_sound_metal_defaults(),
+		sound_open = "doors_steel_door_open",
+		sound_close = "doors_steel_door_close",
+		recipe = {
+			{"default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "default:steel_ingot"},
+			{"default:steel_ingot", "default:steel_ingot"},
+		}
+})
+
+doors.register("door_steel_red", {
+		tiles = {{name = "doors_door_steel_red.png", backface_culling = true}},
 		description = "Team Door",
 		inventory_image = "doors_item_steel.png",
 		protected = true,
