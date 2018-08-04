@@ -1,3 +1,4 @@
+local storage = minetest.get_mod_storage()
 ctf_match = {}
 
 local claimed = ctf_flag.collect_claimed()
@@ -9,6 +10,20 @@ dofile(minetest.get_modpath("ctf_match") .. "/matches.lua")
 dofile(minetest.get_modpath("ctf_match") .. "/buildtime.lua")
 dofile(minetest.get_modpath("ctf_match") .. "/chat.lua")
 dofile(minetest.get_modpath("ctf_match") .. "/vote.lua")
+
+local flag_stall_warning = minetest.parse_json(storage:get("flag_stall_warning")) or {}
+ctf_flag.register_on_drop(function(name, flag)
+	-- If player has already been warned, kick
+	if flag_stall_warning[name] then
+		minetest.kick_player(name, "You held the flag for too long!")
+	-- Else, warn
+	else
+		minetest.chat_send_player(name,
+				minetest.colorize("#FF4466", "You will be kicked the next time you don't capture the flag!"))
+		flag_stall_warning[name] = true
+		storage:set("flag_stall_warning", minetest.write_json(flag_stall_warning))
+	end
+end)
 
 ctf.register_on_init(function()
 	ctf._set("match.remove_player_on_leave",     false)
