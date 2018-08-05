@@ -146,15 +146,17 @@ minetest.register_privilege("vote_admin", {
 	description = "Allows a player to manage running votes."
 })
 
+function vote.clear_vote()
+	vote.active = {}
+	vote.queue = {}
+	vote.update_all_hud()
+end
+
 minetest.register_chatcommand("vote_clear", {
 	privs = {
 		vote_admin = true,
 	},
-	func = function(name, params)
-		vote.active = {}
-		vote.queue = {}
-		vote.update_all_hud()
-	end
+	func = vote.clear_vote()
 })
 
 local hudkit = dofile(minetest.get_modpath("vote") .. "/hudkit.lua")
@@ -229,7 +231,7 @@ minetest.register_privilege("vote", {
 })
 
 minetest.register_privilege("vote_starter", {
-	description = "Can vote on issues",
+	description = "Can start votes on issues",
 	basic_priv = true
 })
 
