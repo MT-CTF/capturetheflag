@@ -1,11 +1,8 @@
 dofile(minetest.get_modpath("playertag") .. "/api.lua")
 
-local builtin_tags = {}
-
 ctf_flag.register_on_pick_up(function(attname, flag)
 	playertag.set(minetest.get_player_by_name(attname), playertag.TYPE_BUILTIN,
-			{ a=255, r=255, g=0, b=0 })
-	table.insert(builtin_tags, attname)
+					{ a=255, r=255, g=0, b=0 })
 end)
 
 ctf_flag.register_on_drop(function(attname, flag)
@@ -17,7 +14,9 @@ ctf_flag.register_on_capture(function(attname, flag)
 end)
 
 ctf_match.register_on_new_match(function()
-	for _, name in pairs(builtin_tags) do
-		playertag.set(minetest.get_player_by_name(name), playertag.TYPE_ENTITY)
+	for name, settings in pairs(playertag.get_all()) do
+		if settings.type == playertag.TYPE_BUILTIN then
+			playertag.set(minetest.get_player_by_name(name), playertag.TYPE_ENTITY)
+		end
 	end
 end)

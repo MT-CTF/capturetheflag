@@ -70,6 +70,14 @@ function playertag.set(player, type, color)
 	end
 end
 
+function playertag.get(player)
+	return tag_settings[player:get_player_by_name()]
+end
+
+function playertag.get_all()
+	return tag_settings
+end
+
 local nametag = {
 	npcf_id = "nametag",
 	physical = false,
