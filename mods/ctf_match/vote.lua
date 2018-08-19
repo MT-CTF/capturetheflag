@@ -40,7 +40,7 @@ function ctf_match.vote_next(name, params)
 	})
 end
 
-ctf_match.register_on_new_match(vote.clear_vote())
+ctf_match.register_on_new_match(vote.clear_vote)
 
 minetest.register_chatcommand("vote", {
 	privs = {
