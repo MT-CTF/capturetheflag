@@ -254,8 +254,8 @@ local function send_as_chat_result(to, name)
 end
 
 minetest.register_chatcommand("rankings", {
-	params = "[<name>]"
-	description = "Display rankings of yourself or another player."
+	params = "[<name>]",
+	description = "Display rankings of yourself or another player.",
 	func = function(name, param)
 		local target
 		if param ~= "" then
