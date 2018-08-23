@@ -287,7 +287,7 @@ minetest.register_chatcommand("rankings", {
 
 local reset_y = {}
 minetest.register_chatcommand("reset_rankings", {
-	params = "[<name>]"
+	params = "[<name>]",
 	description = "Reset the rankings of yourself or another player",
 	func = function(name, param)
 		param = param:trim()
