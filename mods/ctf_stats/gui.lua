@@ -316,7 +316,7 @@ minetest.register_chatcommand("transfer_rankings", {
 		if not param then
 			return false, "Invalid syntax. Provide source and destination player names."
 		end
-		local src, dest = param:trim():gmatch("([^"..sep.."]+)")
+		local src, dest = param:trim():gmatch("([%a%d_-]+) ([%a%d_-]+)")
 		if not ctf_stats.player(src) then
 			return false, "Player '" .. src .. "' does not exist."
 		end
