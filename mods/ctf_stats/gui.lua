@@ -42,7 +42,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	end
 
 	local match_length = string.format("%02d:%02d:%02d",
-		math.floor(time/3600), 		-- hours
+		math.floor(time / 3600), 	-- hours
 		math.floor((time % 3600) / 60),	-- minutes
 		math.floor(time % 60)) 		-- seconds
 
@@ -309,7 +309,6 @@ minetest.register_chatcommand("reset_rankings", {
 	end
 })
 
-local transfer_y = {}
 minetest.register_chatcommand("transfer_rankings", {
 	params = "<src> <dest>",
 	description = "Transfer rankings of one player to another.",
