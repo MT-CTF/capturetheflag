@@ -287,6 +287,8 @@ minetest.register_chatcommand("rankings", {
 
 local reset_y = {}
 minetest.register_chatcommand("reset_rankings", {
+	params = "[<name>]"
+	description = "Reset the rankings of yourself or another player",
 	func = function(name, param)
 		param = param:trim()
 		if param ~= "" and not minetest.check_player_privs(name, { ctf_admin = true}) then
@@ -303,7 +305,7 @@ minetest.register_chatcommand("reset_rankings", {
 
 		ctf_stats.players[name] = nil
 		ctf_stats.player(reset_name)
-		return true, "Reset the stats and ranking of " .. reset_name
+		return true, "Successfully reset the stats and ranking of " .. reset_name
 	end
 })
 
