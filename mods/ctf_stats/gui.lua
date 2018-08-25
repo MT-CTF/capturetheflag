@@ -325,13 +325,11 @@ minetest.register_chatcommand("transfer_rankings", {
 			return false, "Player '" .. dest .. "' does not exist."
 		end
 
-		local pstat_src, _  = ctf_stats.player(src)
-		local pstat_dest, _ = ctf_stats.player(dest)
-		pstat_dest = pstat_src
-		pstat_src  = nil
+		ctf_stats.players[dest] = ctf_stats.players[src]
+		ctf_stats.players[src] = nil
 		ctf.needs_save = true
 
-		return true, "Stats of '" .. src .. "' has been transferred to '" .. dest .. "'."
+		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
 	end
 })
 
