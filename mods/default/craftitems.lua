@@ -32,11 +32,6 @@ minetest.register_craftitem("default:mese_crystal", {
 	inventory_image = "default_mese_crystal.png",
 })
 
-minetest.register_craftitem("default:gold_lump", {
-	description = "Gold Lump",
-	inventory_image = "default_gold_lump.png",
-})
-
 minetest.register_craftitem("default:diamond", {
 	description = "Diamond",
 	inventory_image = "default_diamond.png",
@@ -65,11 +60,6 @@ minetest.register_craftitem("default:tin_ingot", {
 minetest.register_craftitem("default:bronze_ingot", {
 	description = "Bronze Ingot",
 	inventory_image = "default_bronze_ingot.png",
-})
-
-minetest.register_craftitem("default:gold_ingot", {
-	description = "Gold Ingot",
-	inventory_image = "default_gold_ingot.png"
 })
 
 minetest.register_craftitem("default:mese_crystal_fragment", {
