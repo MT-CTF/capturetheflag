@@ -317,11 +317,15 @@ minetest.register_chatcommand("transfer_rankings", {
 		if not param then
 			return false, "Invalid syntax. Provide source and destination player names."
 		end
-		local src, dest = param:trim():gmatch("([%a%d_-]+) ([%a%d_-]+)")
-		if not ctf_stats.player(src) then
+		param = param:trim()
+		local src, dest = param:trim():match("([%a%d_-]+) ([%a%d_-]+)")
+		if not src or not dest then
+			return false, "Invalid usage, see /help transfer_rankings"
+		end
+		if not ctf_stats.players[src] then
 			return false, "Player '" .. src .. "' does not exist."
 		end
-		if not ctf_stats.player(dest) then
+		if not ctf_stats.players[dest] then
 			return false, "Player '" .. dest .. "' does not exist."
 		end
 
