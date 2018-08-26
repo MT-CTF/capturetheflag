@@ -1,4 +1,13 @@
 local blacklist = {
+	"default:pick_wood",
+	"default:axe_wood",
+	"default:shovel_wood",
+	"default:sword_wood",
+	"default:leaves",
+	"default:jungleleaves",
+	"default:pine_needles",
+	"default:acacia_leaves",
+	"default:aspen_leaves"
 }
 
 local function max(a, b)
