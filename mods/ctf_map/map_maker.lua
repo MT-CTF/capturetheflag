@@ -281,7 +281,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:set("rotation", center_barrier_rot == 0 and "x" or "z")
 		meta:set("r", center.r)
 		meta:set("h", center.h)
-		meta:write()
 
 		for _, flags in pairs(flag_positions) do
 			local pos = vector.subtract(flags, center)
@@ -296,6 +295,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			meta:set("team." .. idx .. ".color", pos.z > 0 and "red" or "blue")
 			meta:set("team." .. idx .. ".pos", minetest.pos_to_string(pos))
 		end
+		meta:write()
 
 		minetest.after(0.1, function()
 			local filepath = path .. mapname .. ".mts"
