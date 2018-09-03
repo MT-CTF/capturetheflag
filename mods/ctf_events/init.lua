@@ -1,9 +1,5 @@
 local hud = hudkit()
 
-minetest.register_on_leaveplayer(function(player)
-	hud.players[player:get_player_name()] = nil
-end)
-
 local NUM_EVT = 6
 
 ctf_events = {
@@ -31,8 +27,9 @@ local function get_colorcodes(name)
 	return color, clear
 end
 
-function ctf_events.post(action, one, two)
+function ctf_events.post_kill(action, one, two)
 	table.insert(ctf_events.events, 1, {
+		type = "kill",
 		action = action,
 		one = one,
 		two = two
@@ -47,9 +44,17 @@ function ctf_events.post(action, one, two)
 		local name2 = two and (tag2 .. two .. tag2) or ""
 		irc.say((name1 .. " " .. emoji[action] .. " " .. name2):trim())
 	end
+end
 
-	while #ctf_events.events > NUM_EVT do
-		table.remove(ctf_events.events, #ctf_events.events)
+function ctf_events.post_streak(name, streak_msg)
+	table.insert(ctf_events.events, 1, {
+		type = "streak",
+		name = name,
+		status = streak_msg
+	})
+
+	if minetest.global_exists("irc") then
+		irc.say(name .. ": " .. streak_msg)
 	end
 end
 
@@ -57,15 +62,52 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 	local idx = "ctf_events:" .. i .. "_one"
 	local idxa = "ctf_events:" .. i .. "_action"
 	local idx2 = "ctf_events:" .. i .. "_two"
+	local idxn = "ctf_events:" .. i .. "_streak_name"
+	local idxm = "ctf_events:" .. i .. "_streak_msg"
 
 	if not evt then
 		hud:remove(player, idx)
 		hud:remove(player, idxa)
 		hud:remove(player, idx2)
+		hud:remove(player, idxn)
+		hud:remove(player, idxm)
 		return
 	end
 
 	local y_pos = i * 20
+
+	if evt.type == "streak" then
+		local pname = evt.name
+		local pcolor = ctf_colors.get_color(pname, ctf.player(pname))
+		if hud:exists(player, idxn) then
+			hud:change(player, idxn, "text", pname)
+			hud:change(player, idxn, "number", pcolor)
+		else
+			hud:add(player, idxn, {
+				hud_elem_type = "text",
+				position      = {x = 0, y = 0.8},
+				scale         = {x = 200, y = 100},
+				text          = pname,
+				number        = pcolor,
+				offset        = {x = 145, y = -y_pos},
+				alignment     = {x = -1, y = 0}
+			})
+		end
+
+		if hud:exists(player, idxm) then
+			hud:change(player, idxm, "text", evt.streak_msg)
+		else
+			hud:add(player, idxm, {
+				hud_elem_type = "text",
+				position      = {x = 0, y = 0.8},
+				text          = evt.streak_msg,
+				number        = 0xFFFFFF,
+				offset        = {x = 160, y = -y_pos},
+				alignment     = {x = 0, y = 0}
+			})
+		end
+		return
+	end
 
 	-- One
 	if evt.one then
@@ -74,7 +116,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 			hud:change(player, idx, "text", evt.one)
 			hud:change(player, idx, "number", tone_hex)
 		else
-			local tmp = {
+			hud:add(player, idx, {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
@@ -82,8 +124,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 				number        = tone_hex,
 				offset        = {x = 145, y = -y_pos},
 				alignment     = {x = -1, y = 0}
-			}
-			hud:add(player, idx, tmp)
+			})
 		end
 	else
 		hud:remove(player, idx)
@@ -96,7 +137,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 			hud:change(player, idx2, "text", evt.two)
 			hud:change(player, idx2, "number", ttwo_hex)
 		else
-			local tmp = {
+			hud:add(player, idx2, {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
@@ -104,8 +145,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 				number        = ttwo_hex,
 				offset        = {x = 175, y = -y_pos},
 				alignment     = {x = 1, y = 0}
-			}
-			hud:add(player, idx2, tmp)
+			})
 		end
 	else
 		hud:remove(player, idx2)
@@ -146,15 +186,13 @@ function ctf_events.update(player)
 end
 
 function ctf_events.update_all()
-	print("Updating ctf_event logs for all players")
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf_events.update(player)
 	end
 end
 
 ctf.register_on_killedplayer(function(victim, killer, type)
-	print("Player killed, posting ctf_event")
-	ctf_events.post("kill_" .. type, killer, victim)
+	ctf_events.post_kill("kill_" .. type, killer, victim)
 	ctf_events.update_all()
 end)
 
@@ -162,7 +200,12 @@ minetest.register_on_joinplayer(function(player)
 	ctf_events.update(player)
 end)
 
-ctf.register_on_new_game(function()
+minetest.register_on_leaveplayer(function(player)
+	hud.players[player:get_player_name()] = nil
+	ctf_events.update_all()
+end)
+
+ctf.register_on_new_match(function()
 	ctf_events.events = {}
 	ctf_events.update_all()
 end)
