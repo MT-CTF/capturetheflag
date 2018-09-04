@@ -268,6 +268,20 @@ local function calculateKillReward(victim, killer)
 	return reward
 end
 
+local function streak_msg(count)
+	local caption
+	if count == 5 then
+		caption = "Killing Spree!"
+	elseif count == 10 then
+		caption = "Unstoppable!"
+	elseif count == 20 then
+		caption = "MASSACRE!"
+	end
+
+	return caption or ""
+end
+
+local kill_streaks = {}
 ctf.register_on_killedplayer(function(victim, killer)
 	local main, match = ctf_stats.player(killer)
 	if main and match then
@@ -277,6 +291,36 @@ ctf.register_on_killedplayer(function(victim, killer)
 		match.kills = match.kills + 1
 		match.score = match.score + reward
 		match.kills_since_death = match.kills_since_death + 1
+
+		local streak = kill_streaks[killer]
+		if not streak then
+			kill_streaks[killer] = {
+				count = 1,
+				time = os.time()
+			}
+		else
+			-- If time bet. this kill and prev. kill is less than 10s
+			-- Add to player's streak count
+			if streak.time + 10 > os.time() then
+				kill_streaks[killer] = {
+					count = streak.count + 1,
+					time = os.time()
+				}
+
+				streak = kill_streaks[killer]
+
+				-- If current streak == 5 or 10 or 20,
+				-- post streak to ctf_events and reward player
+				-- with (2 * streak)% of kill reward
+				if streak.count == 5 or streak.count == 10 or streak.count == 20 then
+					ctf_events.post_streak(killer, streak_msg(streak.count))
+					local streak_reward = ((2 * streak.count) / 100) * reward
+					main.score = main.score + streak_reward
+					match.score = match.score + streak_reward
+				end
+			end
+		end
+
 		ctf.needs_save = true
 	end
 end)
