@@ -17,5 +17,8 @@ minetest.register_node("ctf_team_base:reinforced_cobble", {
 minetest.register_craft({
 	output = "ctf_team_base:reinforced_cobble",
 	type   = "shapeless",
-	recipe = {"default:cobble", "default:steel_ingot"},
+	recipe = {
+		{"default:cobble", "default:cobble"},
+		{"default:cobble", "default:cobble"}
+	},
 })
