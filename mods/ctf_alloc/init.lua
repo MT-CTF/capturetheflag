@@ -44,6 +44,12 @@ function ctf_alloc.set_all()
 		return {
 			player = a,
 			score = stats.score,
+			
+			kills = stats.kills,
+			deaths = stats.deaths,
+			
+			captures = stats.captures,
+			attempts = stats.attempts
 		}
 	end)
 	table.sort(players, function(a, b)
@@ -51,19 +57,31 @@ function ctf_alloc.set_all()
 	end)
 
 	minetest.log("warning", dump(players))
-
-	local to_red = math.random(2) == 2
+	
+	local index_diff = 0
+	
 	for _, spair in pairs(players) do
 		local player     = spair.player
 		local name       = player:get_player_name()
 		local alloc_mode = tonumber(ctf.setting("allocate_mode"))
 		local team
+		local to_red
+		
+		if index_diff == 0 then
+			to_red = math.random(1, 2) == 1
+		else
+			to_red = index_diff < 0
+		end
+		
+		local index = spair.kills / (spair.deaths + 1) + spair.captures * 5 / (spair.attempts - spair.captures + 1)
+		
 		if to_red then
+			index_diff = index_diff + index
 			team = "red"
 		else
+			index_diff = index_diff - index
 			team = "blue"
 		end
-		to_red = not to_red
 
 		if alloc_mode ~= 0 and team then
 			ctf.log("autoalloc", name .. " was allocated to " .. team)
