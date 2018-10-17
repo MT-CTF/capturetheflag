@@ -805,15 +805,6 @@ minetest.register_node("default:mese", {
 	light_source = 3,
 })
 
-
-minetest.register_node("default:stone_with_gold", {
-	description = "Gold Ore",
-	tiles = {"default_stone.png^default_mineral_gold.png"},
-	groups = {cracky = 2},
-	drop = "default:gold_lump",
-	sounds = default.node_sound_stone_defaults(),
-})
-
 minetest.register_node("default:stone_with_diamond", {
 	description = "Diamond Ore",
 	tiles = {"default_stone.png^default_mineral_diamond.png"},

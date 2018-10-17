@@ -21,6 +21,7 @@ minetest.register_alias("default:sand_with_kelp", "default:sand")
 minetest.register_alias("default:grass_5", "air")
 minetest.register_alias("default:bush_leaves", "air")
 minetest.register_alias("default:bush_stem", "air")
+minetest.register_alias("default:stone_with_gold", "default:stone")
 
 
 local max_r  = 120
