@@ -42,7 +42,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	end
 
 	local match_length = string.format("%02d:%02d:%02d",
-		math.floor(time/3600), 		-- hours
+		math.floor(time / 3600), 	-- hours
 		math.floor((time % 3600) / 60),	-- minutes
 		math.floor(time % 60)) 		-- seconds
 
@@ -254,6 +254,8 @@ local function send_as_chat_result(to, name)
 end
 
 minetest.register_chatcommand("rankings", {
+	params = "[<name>]",
+	description = "Display rankings of yourself or another player.",
 	func = function(name, param)
 		local target
 		if param ~= "" then
@@ -285,6 +287,8 @@ minetest.register_chatcommand("rankings", {
 
 local reset_y = {}
 minetest.register_chatcommand("reset_rankings", {
+	params = "[<name>]",
+	description = "Reset the rankings of yourself or another player",
 	func = function(name, param)
 		param = param:trim()
 		if param ~= "" and not minetest.check_player_privs(name, { ctf_admin = true}) then
@@ -301,11 +305,40 @@ minetest.register_chatcommand("reset_rankings", {
 
 		ctf_stats.players[name] = nil
 		ctf_stats.player(reset_name)
-		return true, "Reset the stats and ranking of " .. reset_name
+		return true, "Successfully reset the stats and ranking of " .. reset_name
+	end
+})
+
+minetest.register_chatcommand("transfer_rankings", {
+	params = "<src> <dest>",
+	description = "Transfer rankings of one player to another.",
+	privs = {ctf_admin = true},
+	func = function(name, param)
+		if not param then
+			return false, "Invalid syntax. Provide source and destination player names."
+		end
+		param = param:trim()
+		local src, dest = param:trim():match("([%a%d_-]+) ([%a%d_-]+)")
+		if not src or not dest then
+			return false, "Invalid usage, see /help transfer_rankings"
+		end
+		if not ctf_stats.players[src] then
+			return false, "Player '" .. src .. "' does not exist."
+		end
+		if not ctf_stats.players[dest] then
+			return false, "Player '" .. dest .. "' does not exist."
+		end
+
+		ctf_stats.players[dest] = ctf_stats.players[src]
+		ctf_stats.players[src] = nil
+		ctf.needs_save = true
+
+		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
 	end
 })
 
 minetest.register_chatcommand("summary", {
+	description = "Display the scoreboard of the previous match.",
 	func = function (name, param)
 		if not prev_match_summary then
 			return false, "Couldn't find the requested data."
