@@ -62,10 +62,16 @@ minetest.register_globalstep(function(delta)
 	end
 end)
 
+minetest.register_on_punchplayer(function(_, hitter)
+	if ctf_match.is_in_build_time() then
+		minetest.chat_send_player(hitter:get_player_name(), "Match hasn't started yet!")
+		return true
+	end
+end)
+
 ctf_match.register_on_build_time_start(function()
 	minetest.chat_send_all("Prepare your base! Match starts in " ..
 		ctf.setting("match.build_time") .. " seconds.")
-	minetest.setting_set("enable_pvp", "false")
 end)
 
 ctf_match.register_on_build_time_end(function()
@@ -73,7 +79,6 @@ ctf_match.register_on_build_time_end(function()
 		chatplus.log("Build time over!")
 	end
 	minetest.chat_send_all("Build time over! Attack and defend!")
-	minetest.setting_set("enable_pvp", "true")
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf.hud:remove(player, "ctf_match:countdown")
 	end
