@@ -74,10 +74,10 @@ for _, chest_color in pairs(colors) do
 
 			if is_pro then
 				formspec = formspec .. "listring[current_name;pro]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (1k+ score, good KD)") .. "]"
+					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (1k+ score, 1.5+ KD)") .. "]"
 			else
 				formspec = formspec .. "listring[current_name;pro]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("You need 1k+ score and good KD") .. "]"
+					"label[5,-0.2;" .. minetest.formspec_escape("You need 1k+ score and 1.5+ KD") .. "]"
 			end
 
 			formspec = formspec ..
