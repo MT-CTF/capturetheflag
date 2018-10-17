@@ -1,3 +1,15 @@
+local blacklist = {
+	"default:pick_wood",
+	"default:axe_wood",
+	"default:shovel_wood",
+	"default:sword_wood",
+	"default:leaves",
+	"default:jungleleaves",
+	"default:pine_needles",
+	"default:acacia_leaves",
+	"default:aspen_leaves"
+}
+
 local function max(a, b)
 	return (a > b) and a or b
 end
@@ -110,6 +122,12 @@ for _, chest_color in pairs(colors) do
 			if chest_color ~= ctf.player(player:get_player_name()).team then
 				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
+			end
+
+			for itemstring in ipairs(blacklist) do
+				if stack:get_name() == itemstring then
+					return 0
+				end
 			end
 
 			local pstat = ctf_stats.player(player:get_player_name())
