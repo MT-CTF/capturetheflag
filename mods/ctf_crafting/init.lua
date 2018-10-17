@@ -5,10 +5,6 @@ local full_ores = {
 	{"mese", "default:mese_crystal"},
 	{"diamond", "default:diamond"},
 }
-local lim_ores = {
-	{"stone", "default:cobble"},
-	{"steel", "default:steel_ingot"},
-}
 
 for _, orex in pairs(full_ores) do
 	crafting.register_recipe({
@@ -37,7 +33,7 @@ for _, orex in pairs(full_ores) do
 		level  = 1,
 	})
 end
-for _, orex in pairs(lim_ores) do
+for _, orex in pairs(full_ores) do
 	crafting.register_recipe({
 		type   = "inv",
 		output = "default:shovel_" .. orex[1],
@@ -46,7 +42,7 @@ for _, orex in pairs(lim_ores) do
 		level  = 1,
 	})
 end
-for _, orex in pairs(lim_ores) do
+for _, orex in pairs(full_ores) do
 	crafting.register_recipe({
 		type   = "inv",
 		output = "default:axe_" .. orex[1],
