@@ -4,7 +4,7 @@ local c_glass      = minetest.get_content_id("ctf_map:ind_glass")
 local c_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
 local c_map_ignore = minetest.get_content_id("ctf_map:ignore")
 local c_actual_st  = minetest.get_content_id("default:stone")
--- local c_water      = minetest.get_content_id("default:water_source")
+local c_water      = minetest.get_content_id("default:water_source")
 -- local c_water_f    = minetest.get_content_id("default:water_flowing")
 local c_air        = minetest.get_content_id("air")
 
@@ -32,9 +32,18 @@ function ctf_map.remove_middle_barrier()
 	local data = vm:get_data()
 	for x = min.x, max.x do
 		for y = min.y, max.y do
-			local vi = a:index(x, y, 0)
+			local vi   = a:index(x, y,  0)
+			local adj1 = a:index(x, y,  1)
+			local adj2 = a:index(x, y, -1)
+
 			if data[vi] == c_glass_red then
-				data[vi] = c_air
+				-- If surrounding nodes are water, replace node with water
+				if data[adj1] == c_water and data[adj2] == c_water then
+					data[vi] = c_water
+				-- Else replace with air
+				else
+					data[vi] = c_air
+				end
 			elseif data[vi] == c_stone_red then
 				data[vi] = c_actual_st
 			end
@@ -87,7 +96,7 @@ function ctf_map.place_middle_barrier(center, r, h, direction)
 			else
 				vi = a:index(center.x, y, x)
 			end
-			if data[vi] == c_air then
+			if data[vi] == c_air or data[vi] == c_water then
 				data[vi] = c_glass_red
 			end
 		end
