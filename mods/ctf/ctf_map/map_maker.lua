@@ -41,6 +41,18 @@ minetest.register_on_joinplayer(function(player)
 	minetest.after(1, function(name)
 		minetest.chat_send_player(name, "*** CTF_MAP IS IN MAP MAKER MODE ***")
 	end, player:get_player_name())
+
+	local inv = player:get_inventory()
+	if not inv:contains_item("main", ItemStack("ctf_map:adminpick")) then
+		inv:add_item("main", ItemStack("ctf_map:adminpick"))
+	end
+end)
+
+minetest.register_on_respawnplayer(function(player)
+	local inv = player:get_inventory()
+	if not inv:contains_item("main", ItemStack("ctf_map:adminpick")) then
+		inv:add_item("main", ItemStack("ctf_map:adminpick"))
+	end
 end)
 
 assert(minetest.get_modpath("worldedit") and
@@ -406,4 +418,19 @@ minetest.register_chatcommand("gui", {
 		show_gui(name)
 		return true
 	end
+})
+
+-- Register special pickaxe to break indestructible nodes
+minetest.register_tool("ctf_map:adminpick", {
+	description = "Admin pickaxe used to break indestructible nodes.",
+	inventory_image = "ctf_map_adminpick.png",
+	range = 16,
+	tool_capabilities = {
+		full_punch_interval = 1.0,
+		max_drop_level = 3,
+		groupcaps = {
+			immortal = {times = {[1] = 0.5}, uses = 0, maxlevel = 3}
+		},
+		damage_groups = {fleshy = 10000}
+	}
 })
