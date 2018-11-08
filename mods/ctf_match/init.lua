@@ -12,6 +12,7 @@ dofile(minetest.get_modpath("ctf_match") .. "/vote.lua")
 
 ctf.register_on_init(function()
 	ctf._set("match.remove_player_on_leave",     false)
+	minetest.setting_set("enable_pvp", "true")
 end)
 
 ctf_match.register_on_build_time_end(function()
