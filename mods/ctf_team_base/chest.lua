@@ -52,6 +52,11 @@ for _, chest_color in pairs(colors) do
 
 			local territory_owner = ctf.get_territory_owner(pos)
 			if chest_color ~= territory_owner then
+				if not territory_owner then
+					ctf.warning("ctf_team_base", "Unowned team chest")
+					minetest.set_node(pos, { name = "air" })
+					return
+				end
 				ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. chest_color)
 				minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
 			end
