@@ -102,51 +102,66 @@ minetest.register_node("doors:hidden", {
 	},
 })
 
+local STATE_CLOSED_MAIN = 1
+local STATE_OPEN_MAIN = 2
+local STATE_CLOSED_ASIDE = 3
+local STATE_OPEN_ASIDE = 4
+
+local autoclose_delay = 3
+local min_distance_to_enemy_base = 40
+
 -- table used to aid door opening/closing
-local transform = {
-	{
-		{v = "_a", param2 = 3},
-		{v = "_a", param2 = 0},
-		{v = "_a", param2 = 1},
-		{v = "_a", param2 = 2},
-	},
-	{
-		{v = "_b", param2 = 1},
-		{v = "_b", param2 = 2},
-		{v = "_b", param2 = 3},
-		{v = "_b", param2 = 0},
-	},
-	{
-		{v = "_b", param2 = 1},
-		{v = "_b", param2 = 2},
-		{v = "_b", param2 = 3},
-		{v = "_b", param2 = 0},
-	},
-	{
-		{v = "_a", param2 = 3},
-		{v = "_a", param2 = 0},
-		{v = "_a", param2 = 1},
-		{v = "_a", param2 = 2},
-	},
+-- row index is new state
+-- col index is face direction
+--    1 2 3 4
+
+-- 1  3 0 1 2  STATE_CLOSED_MAIN
+-- 2  1 2 3 0  STATE_OPEN_MAIN
+-- 3  1 2 3 0  STATE_CLOSED_ASIDE
+-- 4  3 0 1 2  STATE_OPEN_ASIDE
+
+-- Suffix is a mesh identifier
+-- When door is on opposite side of block "_a" means that handle is on the left side
+-- When door is on opposite side of block "_b" means that handle is on the right side
+-- Suffix will change on opening/closing
+local transform = {}
+transform[STATE_CLOSED_MAIN] = {
+	{suffix = "_a", param2 = 3},
+	{suffix = "_a", param2 = 0},
+	{suffix = "_a", param2 = 1},
+	{suffix = "_a", param2 = 2},
 }
+transform[STATE_OPEN_MAIN] = {
+	{suffix = "_b", param2 = 1},
+	{suffix = "_b", param2 = 2},
+	{suffix = "_b", param2 = 3},
+	{suffix = "_b", param2 = 0},
+}
+transform[STATE_CLOSED_ASIDE] = {
+	{suffix = "_b", param2 = 1},
+	{suffix = "_b", param2 = 2},
+	{suffix = "_b", param2 = 3},
+	{suffix = "_b", param2 = 0},
+}
+transform[STATE_OPEN_ASIDE] = {
+	{suffix = "_a", param2 = 3},
+	{suffix = "_a", param2 = 0},
+	{suffix = "_a", param2 = 1},
+	{suffix = "_a", param2 = 2},
+}
+
+local opposite_state_of = {}
+opposite_state_of[STATE_CLOSED_MAIN] = STATE_OPEN_MAIN
+opposite_state_of[STATE_OPEN_MAIN] = STATE_CLOSED_MAIN
+opposite_state_of[STATE_CLOSED_ASIDE] = STATE_OPEN_ASIDE
+opposite_state_of[STATE_OPEN_ASIDE] = STATE_CLOSED_ASIDE
 
 function _doors.door_toggle(pos, node, clicker)
 	local meta = minetest.get_meta(pos)
 	node = node or minetest.get_node(pos)
 	local def = minetest.registered_nodes[node.name]
-	local name = def.door.name
 
-	local state = meta:get_string("state")
-	if state == "" then
-		-- fix up lvm-placed right-hinged doors, default closed
-		if node.name:sub(-2) == "_b" then
-			state = 2
-		else
-			state = 0
-		end
-	else
-		state = tonumber(state)
-	end
+	local state = _doors.get_state(node, meta)
 
 	replace_old_owner_information(pos)
 
@@ -158,31 +173,50 @@ function _doors.door_toggle(pos, node, clicker)
 		return false
 	end
 
-	-- until Lua-5.2 we have no bitwise operators :(
-	if state % 2 == 1 then
-		state = state - 1
-	else
-		state = state + 1
-	end
+	_doors.update_state(pos, node, def, meta, opposite_state_of[state])
+	return true
+end
 
-	local dir = node.param2
-	if state % 2 == 0 then
+function _doors.update_state(pos, node, def, meta, new_state)
+	local old_face_dir = node.param2
+	local name = def.door.name
+	if new_state == STATE_CLOSED_MAIN or new_state == STATE_CLOSED_ASIDE then
 		minetest.sound_play(def.door.sounds[1],
 			{pos = pos, gain = 0.3, max_hear_distance = 10})
 	else
 		minetest.sound_play(def.door.sounds[2],
 			{pos = pos, gain = 0.3, max_hear_distance = 10})
+
+		local timer = minetest.get_node_timer(pos)
+		timer:start(autoclose_delay)
 	end
+	--Main door opening:
+	--Transition from state 0 face direction 2 to state 1 face direction 3
+	--Main door closing:
+	--Transition from state 1 face direction 3 to state 0 face direction 2
+	--Aside door opening:
+	--Transition from state 2 face direction 2 to state 3 face direction 1
+	--Aside door close:
+	--Transition from state 3 face direction 1 to state 2 face direction 2
 
+	local t = transform[new_state][old_face_dir+1]
+	local new_face_dir = t.param2
+	local new_mesh_suffix = t.suffix
 	minetest.swap_node(pos, {
-		name = name .. transform[state + 1][dir+1].v,
-		param2 = transform[state + 1][dir+1].param2
+		name = name .. new_mesh_suffix,
+		param2 = new_face_dir
 	})
-	meta:set_int("state", state)
-
-	return true
+	meta:set_int("state", new_state)
 end
 
+function _doors.get_state(node, meta)
+	local state = meta:get_string("state")
+	if state == "" then
+		return STATE_CLOSED_MAIN
+	else
+		return tonumber(state)
+	end
+end
 
 local function on_place_node(place_to, newnode,
 	placer, oldnode, itemstack, pointed_thing)
@@ -215,45 +249,14 @@ local function can_dig_door(pos, digger)
 	end
 end
 
+local function pos_above(pos)
+	return {x = pos.x, y = pos.y + 1, z = pos.z}
+end
+
 function doors.register(name, def)
 	if not name:find(":") then
 		name = "doors:" .. name
 	end
-
-	-- replace old doors of this type automatically
-	minetest.register_lbm({
-		name = ":doors:replace_" .. name:gsub(":", "_"),
-		nodenames = {name.."_b_1", name.."_b_2"},
-		action = function(pos, node)
-			local l = tonumber(node.name:sub(-1))
-			local meta = minetest.get_meta(pos)
-			local h = meta:get_int("right") + 1
-			local p2 = node.param2
-			local replace = {
-				{{type = "a", state = 0}, {type = "a", state = 3}},
-				{{type = "b", state = 1}, {type = "b", state = 2}}
-			}
-			local new = replace[l][h]
-			-- retain infotext and doors_owner fields
-			minetest.swap_node(pos, {name = name .. "_" .. new.type, param2 = p2})
-			meta:set_int("state", new.state)
-			-- properly place doors:hidden at the right spot
-			local p3 = p2
-			if new.state >= 2 then
-				p3 = (p3 + 3) % 4
-			end
-			if new.state % 2 == 1 then
-				if new.state >= 2 then
-					p3 = (p3 + 1) % 4
-				else
-					p3 = (p3 + 3) % 4
-				end
-			end
-			-- wipe meta on top node as it's unused
-			minetest.set_node({x = pos.x, y = pos.y + 1, z = pos.z},
-				{name = "doors:hidden", param2 = p3})
-		end
-	})
 
 	minetest.register_craftitem(":" .. name, {
 		description = def.description,
@@ -286,7 +289,7 @@ function doors.register(name, def)
 				end
 			end
 
-			local above = {x = pos.x, y = pos.y + 1, z = pos.z}
+			local above = pos_above(pos)
 			local top_node = minetest.get_node_or_nil(above)
 			local topdef = top_node and minetest.registered_nodes[top_node.name]
 
@@ -302,10 +305,10 @@ function doors.register(name, def)
 			-- Get placer's team
 			local tname = ctf.player(pn).team or ""
 
-			-- Prevent door placement if within 40 nodes of enemy base
+			-- Prevent door placement if too close to enemy base
 			local enemy_team = tname == "red" and "blue" or "red"
 			local enemy_base = ctf_map.map.teams[enemy_team].pos
-			if vector.distance(pos, enemy_base) < 40 then
+			if vector.distance(pos, enemy_base) < min_distance_to_enemy_base then
 				minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
 				return itemstack
 			end
@@ -331,9 +334,9 @@ function doors.register(name, def)
 				dname = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
 			end
 
-			local state = 0
+			local state = STATE_CLOSED_MAIN
 			if minetest.get_item_group(minetest.get_node(aside).name, "door") == 1 then
-				state = state + 2
+				state = STATE_CLOSED_ASIDE
 				minetest.set_node(pos, {name = dname .. "_b", param2 = dir})
 				minetest.set_node(above, {name = "doors:hidden", param2 = (dir + 3) % 4})
 			else
@@ -387,9 +390,6 @@ function doors.register(name, def)
 		def.sound_close = "doors_door_close"
 	end
 
-	def.groups.not_in_creative_inventory = 1
-	def.groups.door = 1
-
 	-- If name contains team door itemstring, drop plain uncoloured team door
 	def.drop = name:find("doors:door_steel") and "doors:door_steel" or name
 
@@ -398,13 +398,24 @@ function doors.register(name, def)
 		sounds = { def.sound_close, def.sound_open },
 	}
 
+	def.on_timer = function(pos)
+		local meta = minetest.get_meta(pos)
+		local node = minetest.get_node(pos)
+		local state = _doors.get_state(node, meta)
+		if state == STATE_OPEN_MAIN or state == STATE_OPEN_ASIDE then
+			_doors.update_state(pos, node, def, meta, opposite_state_of[state])
+		end
+		return false
+	end
+
 	def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		_doors.door_toggle(pos, node, clicker)
 		return itemstack
 	end
 	def.after_dig_node = function(pos, node, meta, digger)
-		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
-		minetest.check_for_falling({x = pos.x, y = pos.y + 1, z = pos.z})
+		local above = pos_above(pos)
+		minetest.remove_node(above)
+		minetest.check_for_falling(above)
 	end
 	def.on_rotate = function(pos, node, user, mode, new_param2)
 		return false
@@ -417,12 +428,12 @@ function doors.register(name, def)
 	def.on_blast = function(pos, intensity)
 		minetest.remove_node(pos)
 		-- hidden node doesn't get blasted away.
-		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
+		minetest.remove_node(pos_above(pos))
 		return {name}
 	end
 
 	def.on_destruct = function(pos)
-		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
+		minetest.remove_node(pos_above(pos))
 	end
 
 	def.drawtype = "mesh"
@@ -449,7 +460,13 @@ doors.register("door_wood", {
 		tiles = {{ name = "doors_door_wood.png", backface_culling = true }},
 		description = "Wooden Door",
 		inventory_image = "doors_item_wood.png",
-		groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+		groups = {
+			choppy = 2,
+			oddly_breakable_by_hand = 2,
+			flammable = 2,
+			door = 1,
+			not_in_creative_inventory = 1
+		},
 		recipe = {
 			{"group:wood", "group:wood"},
 			{"group:wood", "group:wood"},
@@ -462,7 +479,12 @@ doors.register("door_steel", {
 		description = "Team Door",
 		inventory_image = "doors_item_steel.png",
 		protected = true,
-		groups = {cracky = 1, level = 2},
+		groups = {
+			cracky = 1,
+			level = 2,
+			door = 1,
+			not_in_creative_inventory = 1
+		},
 		sounds = default.node_sound_metal_defaults(),
 		sound_open = "doors_steel_door_open",
 		sound_close = "doors_steel_door_close",
@@ -478,7 +500,12 @@ doors.register("door_steel_blue", {
 		description = "Team Door",
 		inventory_image = "doors_item_steel.png",
 		protected = true,
-		groups = {cracky = 1, level = 2},
+		groups = {
+			cracky = 1,
+			level = 2,
+			door = 1,
+			not_in_creative_inventory = 1
+		},
 		sounds = default.node_sound_metal_defaults(),
 		sound_open = "doors_steel_door_open",
 		sound_close = "doors_steel_door_close",
@@ -494,7 +521,12 @@ doors.register("door_steel_red", {
 		description = "Team Door",
 		inventory_image = "doors_item_steel.png",
 		protected = true,
-		groups = {cracky = 1, level = 2},
+		groups = {
+			cracky = 1,
+			level = 2,
+			door = 1,
+			not_in_creative_inventory = 1
+		},
 		sounds = default.node_sound_metal_defaults(),
 		sound_open = "doors_steel_door_open",
 		sound_close = "doors_steel_door_close",
@@ -509,7 +541,12 @@ doors.register("door_glass", {
 		tiles = {"doors_door_glass.png"},
 		description = "Glass Door",
 		inventory_image = "doors_item_glass.png",
-		groups = {cracky=3, oddly_breakable_by_hand=3},
+		groups = {
+			cracky=3,
+			oddly_breakable_by_hand=3,
+			door = 1,
+			not_in_creative_inventory = 1
+		},
 		sounds = default.node_sound_glass_defaults(),
 		sound_open = "doors_glass_door_open",
 		sound_close = "doors_glass_door_close",
