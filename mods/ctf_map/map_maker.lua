@@ -59,6 +59,7 @@ local barrier_r = 110
 local mapname = "ctf_" .. randint
 local maptitle = "Untitled Map " .. randint
 local mapauthor = nil
+local mapinitial = nil
 local center_barrier_rot = 0
 local center = { x = 0, y = 0, z = 0, r = 115, h = 140 }
 local function to_2pos()
@@ -138,6 +139,7 @@ end
 
 local function show_gui(name)
 	mapauthor = mapauthor or name
+	mapinitial = mapinitial or ""
 
 	local formspec = {
 		"size[9,9.5]",
@@ -149,30 +151,38 @@ local function show_gui(name)
 		"field[0.4,1;1,1;posx;X;", center.x, "]",
 		"field[1.4,1;1,1;posy;Y;", center.y, "]",
 		"field[2.4,1;1,1;posz;Z;", center.z, "]",
-		"field[0.4,2;1,1;posr;R;", center.r, "]",
-		"field[1.4,2;1,1;posh;H;", center.h, "]",
-		"button[4.3,0.7;1.5,1;set_center;Player Pos]",
-		"button[5.8,0.7;1.1,1;towe;To WE]",
-		"button[6.9,0.7;1.1,1;fromwe;From WE]",
-		"button[4.3,1.7;1.5,1;emerge;Emerge Area]",
+		"field[0.4,2;1.5,1;posr;R;", center.r, "]",
+		"field[1.9,2;1.5,1;posh;H;", center.h, "]",
+		"button[4.3,0.7;1.75,1;set_center;Player Pos]",
+		"button[6.05,0.7;1.5,1;towe;To WE]",
+		"button[7.55,0.7;1.5,1;fromwe;From WE]",
+		"button[4.3,1.7;4.75,1;emerge;Emerge Area]",
 
-		"label[0,3;2. Place Barriers]",
-		"label[0,3.5;This may take a few minutes.]",
-		"field[0.4,4.5;1,1;barrier_r;R;", barrier_r, "]",
-		"dropdown[1.15,4.25;1,1;center_barrier_rot;X=0,Z=0;", center_barrier_rot + 1, "]",
-		"button[2.3,4.2;2,1;place_barrier;Place Barriers]",
+		"box[0,2.65;8.85,0.05;#111111BB]",
 
-		"label[5.3,3;3. Place Flags]",
-		"label[5.3,3.5;", minetest.formspec_escape(get_flag_status()), "]",
-		"button[5.3,4.2;3.5,1;giveme;Giveme Flags]",
+		"label[0,2.8;2. Place Barriers]",
+		"label[0.1,3.3;This may take a few minutes.]",
+		"field[0.4,4.3;1,1;barrier_r;R;", barrier_r, "]",
+		"dropdown[1.15,4.05;1,1;center_barrier_rot;X=0,Z=0;", center_barrier_rot + 1, "]",
+		"button[2.3,4;2,1;place_barrier;Place Barriers]",
 
-		"label[0,5.5;4. Meta Data]",
-		"field[0.4,6.5;7.5,1;title;Title;" , minetest.formspec_escape(maptitle), "]",
-		"field[0.4,7.8;3.75,1;name;File Name;" , minetest.formspec_escape(mapname), "]",
-		"field[4.15,7.8;3.75,1;author;Author;", minetest.formspec_escape(mapauthor), "]",
+		"box[4.4,2.8;0.05,2.2;#111111BB]",
 
-		"button_exit[0.8,8.8;3,1;close;Close]",
-		"button_exit[3.8,8.8;3,1;export;Export]",
+		"label[4.8,2.8;3. Place Flags]",
+		"label[4.8,3.3;", minetest.formspec_escape(get_flag_status()), "]",
+		"button[4.8,4;3.5,1;giveme;Giveme Flags]",
+
+		"box[0,5.06;8.85,0.05;#111111BB]",
+
+		"label[0,5.15;4. Meta Data]",
+		"field[0.4,6.2;8.5,1;title;Title;" , minetest.formspec_escape(maptitle), "]",
+		"field[0.4,7.3;8.5,1;initial_stuff;Stuff to give on (re)spawn, comma-separated itemstrings;",
+		minetest.formspec_escape(mapinitial), "]",
+		"field[0.4,8.4;4.25,1;name;File Name;" , minetest.formspec_escape(mapname), "]",
+		"field[4.625,8.4;4.25,1;author;Author;", minetest.formspec_escape(mapauthor), "]",
+
+		"button_exit[1.3,9;3,1;close;Close]",
+		"button_exit[4.3,9;3,1;export;Export]",
 	}
 
 	formspec = table.concat(formspec, "")
@@ -278,6 +288,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local meta = Settings(path .. mapname .. ".conf")
 		meta:set("name", maptitle)
 		meta:set("author", mapauthor)
+		meta:set("initial_stuff", mapinitial)
 		meta:set("rotation", center_barrier_rot == 0 and "x" or "z")
 		meta:set("r", center.r)
 		meta:set("h", center.h)
