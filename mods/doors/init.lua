@@ -300,7 +300,12 @@ function doors.register(name, def)
 			end
 
 			-- Get placer's team
-			local tname = ctf.player(pn).team or ""
+			local tname = ctf.player(pn).team
+
+			-- If steel doors, append tname to place coloured team-doors instead
+			if name:find("doors:door_steel") then
+				name = "doors:door_steel_" .. tname -- e.g. "doors:door_steel_red"
+			end
 
 			-- Prevent door placement if within 40 nodes of enemy base
 			local enemy_team = tname == "red" and "blue" or "red"
@@ -324,11 +329,6 @@ function doors.register(name, def)
 				y = pos.y + ref[dir + 1].y,
 				z = pos.z + ref[dir + 1].z,
 			}
-
-			-- If steel doors are placed, append tname to place coloured team-doors instead
-			if name == "doors:door_steel" then
-				name = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
-			end
 
 			local state = 0
 			if minetest.get_item_group(minetest.get_node(aside).name, "door") == 1 then
