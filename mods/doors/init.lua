@@ -325,18 +325,19 @@ function doors.register(name, def)
 				z = pos.z + ref[dir + 1].z,
 			}
 
+			local dname = name
 			-- If steel doors are placed, append tname to place coloured team-doors instead
 			if name == "doors:door_steel" then
-				name = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
+				dname = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
 			end
 
 			local state = 0
 			if minetest.get_item_group(minetest.get_node(aside).name, "door") == 1 then
 				state = state + 2
-				minetest.set_node(pos, {name = name .. "_b", param2 = dir})
+				minetest.set_node(pos, {name = dname .. "_b", param2 = dir})
 				minetest.set_node(above, {name = "doors:hidden", param2 = (dir + 3) % 4})
 			else
-				minetest.set_node(pos, {name = name .. "_a", param2 = dir})
+				minetest.set_node(pos, {name = dname .. "_a", param2 = dir})
 				minetest.set_node(above, {name = "doors:hidden", param2 = dir})
 			end
 
