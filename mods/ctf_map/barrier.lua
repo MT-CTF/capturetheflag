@@ -183,6 +183,30 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
+	print("Placing bedrock")
+
+	-- Bedrock
+	do
+		local y = minp.y
+		for x = minp.x, maxp.x do
+			for z = minp.z, maxp.z do
+				data[a:index(x, y, z)] = c_stone
+			end
+		end
+	end
+
+	print("Placing ceiling")
+
+	-- Ceiling
+	do
+		local y = maxp.y
+		for x = minp.x, maxp.x do
+			for z = minp.z, maxp.z do
+				data[a:index(x, y, z)] = c_glass
+			end
+		end
+	end
+
 	print("Writing to engine!")
 
 	vm:set_data(data)
