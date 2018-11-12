@@ -235,8 +235,8 @@ local function send_as_chat_result(to, name)
 	if place < 1 then
 		place = #players + 1
 	end
-	local you_are_in = (to == name) and "You are in " or name ..  " is in "
-	local result = you_are_in .. place .. " place."
+	local you_are_in = (to == name) and "You are in " or name .. " is in "
+	local result = you_are_in .. place .. " place.\n"
 	if me then
 		local kd = me.kills
 		if me.deaths > 1 then
@@ -245,10 +245,10 @@ local function send_as_chat_result(to, name)
 		result = result .. "Kills: " .. me.kills ..
 			" | Deaths: " .. me.deaths ..
 			" | K/D: " .. math.floor(kd * 10) / 10 ..
-			" | Bounty kills: " .. me.bounty_kills ..
+			"\nBounty kills: " .. me.bounty_kills ..
 			" | Captures: " .. me.captures ..
 			" | Attempts: " .. me.attempts ..
-			" | Score: " .. math.floor(me.score)
+			"\nScore: " .. math.floor(me.score)
 	end
 	return true, result
 end
@@ -270,7 +270,7 @@ minetest.register_chatcommand("rankings", {
 		end
 
 		if not minetest.get_player_by_name(name) then
-			send_as_chat_result(name, target)
+			return send_as_chat_result(name, target)
 		else
 			local players = {}
 			for pname, pstat in pairs(ctf_stats.players) do
