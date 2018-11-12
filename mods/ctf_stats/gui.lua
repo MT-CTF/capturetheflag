@@ -253,6 +253,13 @@ local function send_as_chat_result(to, name)
 	return true, result
 end
 
+minetest.register_chatcommand("r", {
+	description = "Display your rankings as a chat result.",
+	func = function(name, param)
+		return send_as_chat_result(name, name)
+	end
+})
+
 minetest.register_chatcommand("rankings", {
 	params = "[<name>]",
 	description = "Display rankings of yourself or another player.",
