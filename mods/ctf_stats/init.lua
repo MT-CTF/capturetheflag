@@ -346,8 +346,7 @@ ctf.register_on_killedplayer(function(victim, killer)
 	local main, match = ctf_stats.player(killer)
 	if main and match then
 		local reward = calculateKillReward(victim, killer)
-		local bounty_kill = victim:get_player_name() ==
-			ctf_stats.current_bounty["name"] and true or false
+		local bounty_kill = (victim == ctf_stats.current_bounty["name"]) and true or false
 		showKillPoints(killer, bounty_kill, reward)
 		main.kills  = main.kills  + 1
 		main.score  = main.score  + reward
