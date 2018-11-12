@@ -1,3 +1,20 @@
+local randint = math.random(100)
+
+-- Load map metadata from mod_storage if it exists
+local storage = minetest.get_mod_storage()
+local mapname = storage:get("mapname") or "ctf_" .. randint
+local maptitle = storage:get("maptitle") or "Untitled Map " .. randint
+local mapauthor = storage:get("mapauthor")
+local mapinitial = storage:get_string("mapinitial")
+local center_barrier_rot = storage:get_int("center_barrier_rot")
+local barrier_r = storage:contains("barrier_r")
+					and storage:get_int("barrier_r") or 110
+local center = storage:contains("center")
+					and minetest.parse_json(storage:get("center"))
+					or { x = 0, y = 0, z = 0, r = 115, h = 140 }
+local flag_positions = storage:contains("flags")
+							and minetest.parse_json(storage:get("flags")) or {}
+
 minetest.register_on_joinplayer(function(player)
 	minetest.after(1, function(name)
 		minetest.chat_send_player(name, "*** CTF_MAP IS IN MAP MAKER MODE ***")
@@ -8,7 +25,6 @@ assert(minetest.get_modpath("worldedit") and
 		minetest.get_modpath("worldedit_commands"),
 		"worldedit and worldedit_commands are required!")
 
-local flag_positions = {}
 local function check_step()
 	for _, pos in pairs(flag_positions) do
 		if minetest.get_node(pos).name ~= "ctf_map:flag" then
@@ -41,8 +57,13 @@ minetest.register_node("ctf_map:flag", {
 		}
 	},
 	groups = {oddly_breakable_by_hand=1,snappy=3},
-	on_construct = function(pos)
+	on_place = function(_, _, pthing)
+		local node = minetest.get_node(pthing.under).name
+		local ndef = minetest.registered_nodes[node]
+		local pos = (ndef and ndef.buildable_to) and pthing.under or pthing.above
+
 		table.insert(flag_positions, vector.new(pos))
+		storage:set_string("flags", minetest.write_json(flag_positions))
 	end,
 	on_destruct = function(pos)
 		for i, v in pairs(flag_positions) do
@@ -54,14 +75,6 @@ minetest.register_node("ctf_map:flag", {
 	end,
 })
 
-local randint = math.random(100)
-local barrier_r = 110
-local mapname = "ctf_" .. randint
-local maptitle = "Untitled Map " .. randint
-local mapauthor = nil
-local mapinitial = nil
-local center_barrier_rot = 0
-local center = { x = 0, y = 0, z = 0, r = 115, h = 140 }
 local function to_2pos()
 	return {
 			x = center.x - center.r,
@@ -101,6 +114,7 @@ local function we_import(name)
 		center = vector.divide(vector.add(pos1, pos2), 2)
 		center.r = r
 		center.h = size.y
+		storage:set_string("center", minetest.write_json(center))
 	end
 end
 
@@ -138,8 +152,10 @@ local function get_flag_status()
 end
 
 local function show_gui(name)
-	mapauthor = mapauthor or name
-	mapinitial = mapinitial or ""
+	if not mapauthor then
+		mapauthor = name
+		storage:set_string("mapauthor", mapauthor)
+	end
 
 	local formspec = {
 		"size[9,9.5]",
@@ -175,8 +191,8 @@ local function show_gui(name)
 		"box[0,5.06;8.85,0.05;#111111BB]",
 
 		"label[0,5.15;4. Meta Data]",
-		"field[0.4,6.2;8.5,1;title;Title;" , minetest.formspec_escape(maptitle), "]",
-		"field[0.4,7.3;8.5,1;initial_stuff;Stuff to give on (re)spawn, comma-separated itemstrings;",
+		"field[0.4,6.2;8.5,1;title;Title;", minetest.formspec_escape(maptitle), "]",
+		"field[0.4,7.3;8.5,1;initial;Stuff to give on (re)spawn, comma-separated itemstrings;",
 		minetest.formspec_escape(mapinitial), "]",
 		"field[0.4,8.4;4.25,1;name;File Name;" , minetest.formspec_escape(mapname), "]",
 		"field[4.625,8.4;4.25,1;author;Author;", minetest.formspec_escape(mapauthor), "]",
@@ -214,14 +230,38 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		center.z  = tonumber(fields.posz)
 		center.r  = tonumber(fields.posr)
 		center.h  = tonumber(fields.posh)
-		barrier_r = tonumber(fields.barrier_r)
+		storage:set_string("center", minetest.write_json(center))
+	end
+
+	fields.barrier_r = tonumber(fields.barrier_r)
+	if fields.barrier_r and fields.barrier_r ~= barrier_r then
+		barrier_r = fields.barrier_r
+		storage:set_int("barrier_r", barrier_r)
+	end
+
+	if fields.title and fields.title ~= maptitle then
 		maptitle  = fields.title
+		storage:set_string("maptitle", maptitle)
+	end
+
+	if fields.author and fields.author ~= mapauthor then
 		mapauthor = fields.author
-		mapname   = fields.name
+		storage:set_string("mapauthor", mapauthor)
+	end
+
+	if fields.name and fields.name ~= mapname then
+		mapname = fields.name
+		storage:set_string("mapname", mapname)
+	end
+
+	if fields.initial and fields.initial ~= mapinitial then
+		mapinitial = fields.initial
+		storage:set_string("mapinitial", mapinitial)
 	end
 
 	if fields.center_barrier_rot and fields.center_barrier_rot ~= "" then
 		center_barrier_rot = fields.center_barrier_rot == "X=0" and 0 or 1
+		storage:set_int("center_barrier_rot", center_barrier_rot)
 	end
 
 	if fields.set_center then
@@ -230,6 +270,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		center = vector.floor(player:get_pos())
 		center.r = r
 		center.h = h
+		storage:set_string("center", minetest.write_json(center))
 	end
 
 	if fields.giveme then
@@ -285,6 +326,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local path = minetest.get_worldpath() .. "/schems/"
 		minetest.mkdir(path)
 
+		-- Reset mod_storage
+		storage:set_string("center", "")
+		storage:set_string("maptitle", "")
+		storage:set_string("mapauthor", "")
+		storage:set_string("mapname", "")
+		storage:set_string("mapinitial", "")
+		storage:set_string("center_barrier_rot", "")
+		storage:set_string("barrier_r", "")
+
+		-- Write to .conf
 		local meta = Settings(path .. mapname .. ".conf")
 		meta:set("name", maptitle)
 		meta:set("author", mapauthor)
