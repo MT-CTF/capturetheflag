@@ -1,13 +1,30 @@
 local storage = minetest.get_mod_storage()
 local prev_match_summary = storage:get_string("prev_match_summary")
 
-local function render_per_team_stats(red, blue, stat, round)
+-- Formspec element that governs table columns and their attributes
+local tablecolumns = {
+	"tablecolumns[color;",
+	"text;",
+	"text,width=20;",
+	"text,width=4;",
+	"text,width=4;",
+	"text,width=4;",
+	"text,width=6;",
+	"text,width=6;",
+	"text,width=6;",
+	"text,width=6]"
+}
+tablecolumns = table.concat(tablecolumns, "")
+
+local function render_team_stats(red, blue, stat, round)
 	local red_stat, blue_stat = red[stat], blue[stat]
 	if round then
-		red_stat = math.floor(red_stat*10)/10
-		blue_stat = math.floor(blue_stat*10)/10
+		red_stat  = math.floor(red_stat  * 10) / 10
+		blue_stat = math.floor(blue_stat * 10) / 10
 	end
-	return red_stat+blue_stat .. " (" .. minetest.colorize(red.color, tostring(red_stat)) .. " - " .. minetest.colorize(blue.color, tostring(blue_stat)) .. ")"
+	return red_stat + blue_stat .. " (" ..
+			minetest.colorize(red.color, tostring(red_stat)) .. " - " ..
+			minetest.colorize(blue.color, tostring(blue_stat)) .. ")"
 end
 
 function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player, time)
@@ -42,30 +59,32 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	end
 
 	local match_length = string.format("%02d:%02d:%02d",
-		math.floor(time / 3600), 	-- hours
-		math.floor((time % 3600) / 60),	-- minutes
-		math.floor(time % 60)) 		-- seconds
+		math.floor(time / 3600),        -- hours
+		math.floor((time % 3600) / 60), -- minutes
+		math.floor(time % 60))          -- seconds
 
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
 
 	if stats[winner_team] then
 		local winner_color = ctf.flag_colors[winner_team]:gsub("0x", "#")
 		ret = ret .. "item_image[0,0;1,1;ctf_flag:flag_top_"..winner_team.."]"
-		ret = ret .. "label[1,0;" .. minetest.colorize(winner_color, "TEAM " .. winner_team:upper() .. " WON!") .. "]"
-		ret = ret .. "label[1,0.5;Flag captured by " .. winner_player .. "]"
+		ret = ret .. "label[1,0;" .. minetest.colorize(winner_color,
+						"TEAM " .. winner_team:upper() .. " WON!") .. "]"
+		ret = ret .. "label[1,0.5;Flag captured by " ..
+						minetest.colorize(winner_color, winner_player) .. "]"
 	else
 		ret = ret .. "label[1,0;NO WINNER]"
 	end
 
 	ret = ret .. "label[6.5,0;Kills]"
-	ret = ret .. "label[8,0;" .. render_per_team_stats(red, blue, "kills") .. "]"
+	ret = ret .. "label[8,0;" .. render_team_stats(red, blue, "kills") .. "]"
 	ret = ret .. "label[6.5,0.5;Attempts]"
-	ret = ret .. "label[8,0.5;" .. render_per_team_stats(red, blue, "attempts") .. "]"
-	ret = ret .. "label[9.5,0;Duration]"
-	ret = ret .. "label[11,0;" .. match_length .. "]"
-	ret = ret .. "label[9.5,0.5;Total score]"
-	ret = ret .. "label[11,0.5;" .. render_per_team_stats(red, blue, "score", true) .. "]"
-	ret = ret .. "label[3.5,7.2;Tip: type /rankings for league tables]"
+	ret = ret .. "label[8,0.5;" .. render_team_stats(red, blue, "attempts") .. "]"
+	ret = ret .. "label[10.5,0;Duration]"
+	ret = ret .. "label[12,0;" .. match_length .. "]"
+	ret = ret .. "label[10.5,0.5;Total score]"
+	ret = ret .. "label[12,0.5;" .. render_team_stats(red, blue, "score", true) .. "]"
+	ret = ret .. "label[2,7.75;Tip: type /rankings for league tables]"
 
 	-- Set prev_match_summary and write to mod_storage
 	prev_match_summary = ret
@@ -79,15 +98,15 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 		return one.score > two.score
 	end)
 
-	local ret = "size[13,"..6.5+header.."]"
+	local ret = "size[14," .. 7 + header .. "]"
 	ret = ret .. default.gui_bg .. default.gui_bg_img
 	ret = ret .. "container[0," .. header .. "]"
 
-	ret = ret .. "vertlabel[0,0;" .. title .. "]"
-	ret = ret .. "tablecolumns[color;text;text;text;text;text;text;text;text;text]"
+	ret = ret .. "vertlabel[0,1;" .. title .. "]"
+	ret = ret .. tablecolumns
 	ret = ret .. "tableoptions[highlight=#00000000]"
-	ret = ret .. "table[0.5,0;12.25,6;scores;"
-	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D ratio,Bounty kills,Captures,Attempts,Score"
+	ret = ret .. "table[0.5,0;13.25,6.1;scores;"
+	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D,Bounty Kills,Captures,Attempts,Score"
 
 	local player_in_top_50 = false
 
@@ -116,7 +135,11 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 			  "," .. pstat.attempts ..
 			  "," .. math.floor(pstat.score * 10) / 10
 	end
+	ret = ret .. ";-1]"
 
+	-- If hlt_name not in top 50, add a separate table
+	-- This would result in the player's score displayed at the bottom
+	-- of the list but yet be visible without having to scroll
 	if hlt_name and not player_in_top_50 then
 		local hlt_player, hlt_rank, hlt_kd
 
@@ -128,25 +151,34 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 			end
 		end
 
-		hlt_kd = hlt_player.kills
-		if hlt_player.deaths > 1 then
-			hlt_kd = hlt_kd / hlt_player.deaths
+		if hlt_player then
+			hlt_kd = hlt_player.kills
+			if hlt_player.deaths > 1 then
+				hlt_kd = hlt_kd / hlt_player.deaths
+			end
+
+			ret = ret .. tablecolumns
+			ret = ret .. "tableoptions[highlight=#00000000]"
+			ret = ret .. "table[0.5,6.1;13.25,0.4;hlt_score;"
+			ret = ret .. "#ffff00" ..
+				  "," .. hlt_rank ..
+				  "," .. hlt_player.name ..
+				  "," .. hlt_player.kills ..
+				  "," .. hlt_player.deaths ..
+				  "," .. math.floor(hlt_kd * 10) / 10 ..
+				  "," .. hlt_player.bounty_kills ..
+				  "," .. hlt_player.captures ..
+				  "," .. hlt_player.attempts ..
+				  "," .. math.floor(hlt_player.score * 10) / 10 .. ";-1]"
 		end
-		ret = ret ..
-			  "," .. "#ffff00" ..
-			  "," .. hlt_rank ..
-			  "," .. hlt_player.name ..
-			  "," .. hlt_player.kills ..
-			  "," .. hlt_player.deaths ..
-			  "," .. math.floor(hlt_kd * 10) / 10  ..
-			  "," .. hlt_player.bounty_kills ..
-			  "," .. hlt_player.captures ..
-			  "," .. hlt_player.attempts ..
-			  "," .. math.floor(hlt_player.score * 10) / 10
+	-- else
+		-- ret = ret .. "box[0.5,6.1;13.25,0.4;#101010]"
+		-- Adds a box where the extra table should be, in order to make it
+		-- appear as an extension of the main table, but the color can't be
+		-- matched, and looks slightly brighter or slightly darker than the table
 	end
 
-	ret = ret .. ";-1]"
-	ret = ret .. "button_exit[0.5,6;3,1;close;Close]"
+	ret = ret .. "button_exit[10,6.5;3,1;close;Close]"
 	ret = ret .. "container_end[]"
 	return ret
 end
