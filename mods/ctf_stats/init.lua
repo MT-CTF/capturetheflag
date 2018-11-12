@@ -268,10 +268,87 @@ local function calculateKillReward(victim, killer)
 	return reward
 end
 
+ctf_stats.current_bounty = {}
+
+local hud_timer = {}
+local hud_main = {}
+local hud_bounty = {}
+local hud_duration = 2
+
+-- Called on every player kill
+-- Creates new HUD element or updates existing one
+local function showKillPoints(killer, bounty_kill, points)
+	if not killer then
+		return
+	end
+
+	local name = killer:get_player_name()
+	local bounty = ctf_stats.current_bounty["score"]
+
+	-- If HUD element already exists, update
+	if hud_main[name] then
+		killer:hud_change(hud_main[name], "text", points)
+
+		if bounty_kill and hud_bounty[name] then
+			killer:hud_change(hud_bounty[name], "text", "+ " .. bounty)
+		end
+
+	-- Else create a new one
+	else
+		hud_main[name] = killer:hud_add({
+			hud_elem_type = "text",
+			position =  {x = 0.5, y =    1},
+			alignment = {x =   0, y =    0},
+			offset =    {x =   0, y = -150},
+			text = points,
+			number = 0x00DD00
+		})
+		-- If victim was a bounty target, show bounty points too
+		if bounty_kill then
+			hud_bounty[name] = killer:hud_add({
+				hud_elem_type = "text",
+				position =  {x = 0.5, y =    1},
+				alignment = {x =   0, y =    0},
+				offset =    {x =   0, y = -120},
+				text = "+ " .. bounty,
+				number = 0xFF4444
+			})
+		end
+	end
+
+	-- Set duration for which the HUD element would be visible
+	hud_timer[name] = os.time() + hud_duration
+end
+
+minetest.register_globalstep(function(dtime)
+	for _, player in pairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+
+		-- If no timer exists for player, return
+		if not hud_timer[name] then
+			return
+		end
+
+		-- If HUD element's visibility duration expired, remove it
+		if hud_timer[name] <= os.time() then
+			player:hud_remove(hud_main[name])
+			hud_main[name] = nil
+			-- If bounty score is displayed, remove that too
+			if hud_bounty[name] then
+				player:hud_remove(hud_bounty[name])
+				hud_bounty[name] = nil
+			end
+		end
+	end
+end)
+
 ctf.register_on_killedplayer(function(victim, killer)
 	local main, match = ctf_stats.player(killer)
 	if main and match then
 		local reward = calculateKillReward(victim, killer)
+		local bounty_kill = victim:get_player_name() ==
+			ctf_stats.current_bounty["name"] and true or false
+		showKillPoints(killer, bounty_kill, reward)
 		main.kills  = main.kills  + 1
 		main.score  = main.score  + reward
 		match.kills = match.kills + 1
@@ -293,4 +370,4 @@ end)
 
 ctf_stats.load()
 
-dofile(minetest.get_modpath("ctf_stats").."/gui.lua")
+dofile(minetest.get_modpath("ctf_stats") .. "/gui.lua")
