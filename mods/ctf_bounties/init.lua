@@ -1,19 +1,23 @@
-local bountied_player = nil
-local bounty_score = 0
+ctf_bounties = {
+	current = {}
+}
 
 local function announce(name)
-	local _, tcolor = ctf_colors.get_color(bountied_player, ctf.player(bountied_player))
+	local bname = ctf_bounties.current.name
+	local bscore = ctf_bounties.current.score
+	local _, tcolor = ctf_colors.get_color(bname, ctf.player(bname))
 	tcolor = tcolor:gsub("0x", "#")
 	minetest.chat_send_player(name,
 			minetest.colorize("#fff326", "The next person to kill ") ..
-			minetest.colorize(tcolor, bountied_player) ..
-			minetest.colorize("#fff326", " will receive " .. bounty_score .. " points!"))
+			minetest.colorize(tcolor, bname) ..
+			minetest.colorize("#fff326", " will receive " .. bscore .. " points!"))
 end
 
 local function announce_all()
-	if bountied_player then
+	local current = ctf_bounties.current
+	if current then
 		for _, player in pairs(minetest.get_connected_players()) do
-			if bountied_player ~= player:get_player_name() then
+			if current.name ~= player:get_player_name() then
 				announce(player:get_player_name())
 			end
 		end
@@ -21,21 +25,20 @@ local function announce_all()
 end
 
 local function bounty_player(target)
-	if bountied_player then
-		minetest.chat_send_all("Player " .. bountied_player .. " no longer has a bounty on their head!")
+	local current = ctf_bounties.current
+	if current then
+		minetest.chat_send_all("Player " .. current.name .. " no longer has a bounty on their head!")
 	end
 
-	bountied_player = target
-
-	--                Score * K/D
-	-- bounty_score = -----------, or 500 (whichever is lesser)
-	--                   5000
+	--                     Score * K/D
+	-- bounty_score = 50 < ----------- < 500
+	--                        10000
 
 	local pstat, _ = ctf_stats.player(target)
 	if pstat.deaths == 0 then
 		pstat.deaths = 1
 	end
-	bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
+	local bounty_score = (pstat.score * (pstat.kills / pstat.deaths)) / 10000
 	if bounty_score > 500 then
 		bounty_score = 500
 	end
@@ -43,6 +46,10 @@ local function bounty_player(target)
 		bounty_score = 50
 	end
 	bounty_score = math.floor(bounty_score)
+
+	current.name  = target
+	current.score = bounty_score
+	ctf_bounties.current = current
 
 	minetest.after(0.1, announce_all)
 end
@@ -68,30 +75,32 @@ end
 minetest.after(math.random(500, 1000), bounty_find_new_target)
 
 minetest.register_on_leaveplayer(function(player)
-	if bountied_player == player:get_player_name() then
-		bountied_player = nil
+	if ctf_bounties.current.name == player:get_player_name() then
+		ctf_bounties.current.name = nil
 	end
 end)
 
 minetest.register_on_joinplayer(function(player)
-	if bountied_player then
+	if ctf_bounties.current then
 		announce(player:get_player_name())
 	end
 end)
 
 ctf.register_on_killedplayer(function(victim, killer)
+	local current = ctf_bounties.current
+
 	-- Suicide is not encouraged here at CTF
 	if victim == killer then
 		return
 	end
-	if victim == bountied_player then
+	if victim == current.name then
 		local main, match = ctf_stats.player(killer)
 		if main and match then
-			main.score  = main.score  + bounty_score
-			match.score = match.score + bounty_score
+			main.score  = main.score  + current.score
+			match.score = match.score + current.score
 			ctf.needs_save = true
 		end
-		bountied_player = nil
+		ctf_bounties.current = nil
 
 		local msg = killer .. " has killed " .. victim .. " and received the prize!"
 		minetest.chat_send_all(msg)

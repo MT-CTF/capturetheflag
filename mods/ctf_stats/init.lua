@@ -268,10 +268,82 @@ local function calculateKillReward(victim, killer)
 	return reward
 end
 
+local hud = {}
+local hud_duration = 2
+
+-- Called on every player kill
+-- Creates new HUD element or updates existing one
+local function showKillPoints(name, points, bounty)
+	local killer = minetest.get_player_by_name(name)
+	if not killer then
+		return
+	end
+
+	-- If HUD element already exists, update
+	if hud[name].main then
+		killer:hud_change(hud[name].main, "text", points)
+
+		if hud[name].bounty then
+			if bounty then
+				killer:hud_change(hud[name].bounty, "text", "+ " .. bounty)
+			else
+				killer:hud_remove(hud[name].bounty)
+			end
+		end
+
+	-- Else create a new one
+	else
+		hud[name].main = killer:hud_add({
+			hud_elem_type = "text",
+			position =  {x = 0.5, y =    1},
+			alignment = {x =   0, y =    0},
+			offset =    {x =   0, y = -150},
+			text = points,
+			number = 0x00DD00
+		})
+		-- If victim was a bounty target, show bounty points too
+		if bounty then
+			hud[name].bounty = killer:hud_add({
+				hud_elem_type = "text",
+				position =  {x = 0.5, y =    1},
+				alignment = {x =   0, y =    0},
+				offset =    {x =   0, y = -120},
+				text = "+ " .. bounty,
+				number = 0xFF4444
+			})
+		end
+	end
+
+	-- Set duration for which the HUD element would be visible
+	hud[name].time = os.time() + hud_duration
+end
+
+minetest.register_globalstep(function(dtime)
+	for _, player in pairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+		local set = hud[name]
+
+		-- If HUD element exists and has expired, remove it
+		if set and set.time and set.time <= os.time() then
+			player:hud_remove(set.main)
+			hud[name].main = nil
+
+			-- If bounty score is displayed, remove that too
+			if set.bounty then
+				player:hud_remove(set.bounty)
+				hud[name].bounty = nil
+			end
+		end
+	end
+end)
+
 ctf.register_on_killedplayer(function(victim, killer)
 	local main, match = ctf_stats.player(killer)
 	if main and match then
 		local reward = calculateKillReward(victim, killer)
+		local bounty = killer == ctf_bounties.current.name and
+						ctf_bounties.current.score
+		showKillPoints(killer, reward, bounty)
 		main.kills  = main.kills  + 1
 		main.score  = main.score  + reward
 		match.kills = match.kills + 1
