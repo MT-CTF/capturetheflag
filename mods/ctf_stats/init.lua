@@ -139,11 +139,6 @@ ctf.register_on_join_team(function(name, tname)
 	}
 end)
 
-ctf_match.register_on_skip_map(function()
-	ctf.needs_save = true
-	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
-end)
-
 local winner_team = "-"
 local winner_player = "-"
 
@@ -159,19 +154,41 @@ ctf_flag.register_on_capture(function(name, flag)
 	winner_player = name
 end)
 
+local prev_match_summary = storage:get_string("prev_match_summary")
 ctf_match.register_on_winner(function(winner)
 	ctf.needs_save = true
 	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
 	winner_team = winner
-end)
 
-ctf_match.register_on_new_match(function()
-	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current, winner_team, winner_player, os.time()-ctf_stats.start)
-	local players = minetest.get_connected_players()
-	for _, player in pairs(players) do
+	-- Show match summary
+	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
+					winner_team, winner_player, os.time()-ctf_stats.start)
+	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
 	end
 
+	-- Set prev_match_summary and write to mod_storage
+	prev_match_summary = fs
+	storage:set_string("prev_match_summary", fs)
+end)
+
+ctf_match.register_on_skip_map(function()
+	ctf.needs_save = true
+	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
+
+	-- Show match summary
+	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
+					winner_team, winner_player, os.time()-ctf_stats.start)
+	for _, player in pairs(minetest.get_connected_players()) do
+		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
+	end
+
+	-- Set prev_match_summary and write to mod_storage
+	prev_match_summary = fs
+	storage:set_string("prev_match_summary", fs)
+end)
+
+ctf_match.register_on_new_match(function()
 	ctf_stats.current = {
 		red = {},
 		blue = {}
@@ -290,6 +307,16 @@ minetest.register_on_dieplayer(function(player)
 		ctf.needs_save = true
 	end
 end)
+
+minetest.register_chatcommand("summary", {
+	func = function (name, param)
+		if not prev_match_summary then
+			return false, "Couldn't find the requested data."
+		end
+
+		minetest.show_formspec(name, "ctf_stats:prev_match_summary", prev_match_summary)
+	end
+})
 
 ctf_stats.load()
 

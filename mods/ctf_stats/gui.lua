@@ -1,6 +1,3 @@
-local storage = minetest.get_mod_storage()
-local prev_match_summary = storage:get_string("prev_match_summary")
-
 -- Formspec element that governs table columns and their attributes
 local tablecolumns = {
 	"tablecolumns[color;",
@@ -85,10 +82,6 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[10.5,0.5;Total score]"
 	ret = ret .. "label[12,0.5;" .. render_team_stats(red, blue, "score", true) .. "]"
 	ret = ret .. "label[2,7.75;Tip: type /rankings for league tables]"
-
-	-- Set prev_match_summary and write to mod_storage
-	prev_match_summary = ret
-	storage:set_string("prev_match_summary", ret)
 
 	return ret
 end
@@ -373,16 +366,5 @@ minetest.register_chatcommand("transfer_rankings", {
 		ctf.needs_save = true
 
 		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
-	end
-})
-
-minetest.register_chatcommand("summary", {
-	description = "Display the scoreboard of the previous match.",
-	func = function (name, param)
-		if not prev_match_summary then
-			return false, "Couldn't find the requested data."
-		end
-
-		minetest.show_formspec(name, "ctf_stats:prev_match_summary", prev_match_summary)
 	end
 })
