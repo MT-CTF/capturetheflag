@@ -45,7 +45,8 @@ function ctf_events.post(action, one, two)
 		local tag2  = two and (color2 .. "_" .. clear2) or ""
 		local name1 = one and (tag1 .. one .. tag1) or ""
 		local name2 = two and (tag2 .. two .. tag2) or ""
-		irc.say((name1 .. " " .. emoji[action] .. " " .. name2):trim())
+		irc.say(("\t\t" .. name1 .. " " .. emoji[action]
+				.. " " .. name2):trim())
 	end
 
 	while #ctf_events.events > NUM_EVT do
