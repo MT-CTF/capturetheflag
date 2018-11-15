@@ -142,7 +142,7 @@ end)
 local winner_team = "-"
 local winner_player = "-"
 
-ctf_flag.register_on_capture(function(name, flag)
+table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.captures  = main.captures  + 1
@@ -162,7 +162,7 @@ ctf_match.register_on_winner(function(winner)
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-					winner_team, winner_player, os.time()-ctf_stats.start)
+					winner_team, winner_player, os.time() - ctf_stats.start)
 	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
 	end
