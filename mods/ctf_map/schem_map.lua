@@ -49,15 +49,29 @@ local function search_for_maps()
 	local dirs = minetest.get_dir_list(mapdir, true)
 	table.insert(dirs, ".")
 	for _, dir in pairs(dirs) do
-		local files = minetest.get_dir_list(mapdir .. dir, false)
-		for i=1, #files do
-			files_hash[dir .. "/" .. files[i]:split(".")[1]] = true
+		if dir ~= ".git" then
+			local files = minetest.get_dir_list(mapdir .. dir, false)
+			for i=1, #files do
+				local parts = files[i]:split(".")
+				local filename = parts[1]
+				local extension = parts[2]
+				if extension == "mts" then
+					files_hash[dir .. "/" .. filename] = true
+				else
+					if extension ~= "conf" and extension ~= "md" then
+						error("Map extension is not '.mts': " .. files[i])
+					end
+				end
+			end
 		end
 	end
 
 	ctf_map.available_maps = {}
 	for key, _ in pairs(files_hash) do
 		table.insert(ctf_map.available_maps, key)
+	end
+	if next(ctf_map.available_maps) == nil then
+		error("No maps found in directory " .. mapdir)
 	end
 	return ctf_map.available_maps
 end
@@ -112,7 +126,12 @@ end
 
 function ctf_match.load_map_meta(idx, name)
 	local offset = vector.new(600 * idx, 0, 0)
-	local meta   = Settings(mapdir .. name .. ".conf")
+	local conf_path = mapdir .. name .. ".conf"
+	local meta   = Settings(conf_path)
+
+	if meta:get("r") == nil then
+		error("Map was not properly configured " .. conf_path)
+	end
 
 	local initial_stuff = meta:get("initial_stuff")
 	local map = {
