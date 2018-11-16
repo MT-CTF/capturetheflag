@@ -1,37 +1,51 @@
+
+local storage = minetest.get_mod_storage()
 local randint = math.random(100)
+local defaults = {
+	mapname = "ctf_" .. randint,
+	mapauthor = nil,
+	maptitle = "Untitled Map " .. randint,
+	mapinitial = "",
+	barrier_r = 110,
+	barrier_rot = 0,
+	center = { x = 0, y = 0, z = 0, r = 115, h = 140 },
+	flags = {}
+}
 
 -- Reload mapmaker context from mod_storage if it exists
-local storage = minetest.get_mod_storage()
-local mapname = storage:get_string("mapname")
-local maptitle = storage:get_string("maptitle")
-local mapauthor = storage:get_string("mapauthor")
-local mapinitial = storage:get_string("mapinitial")
-local center = storage:get_string("center")
-local flag_positions = storage:get_string("flags")
-local barrier_r = storage:get_int("barrier_r")
-local center_barrier_rot = storage:get_int("center_barrier_rot")
+local config = {
+	mapname = storage:get_string("mapname"),
+	maptitle = storage:get_string("maptitle"),
+	mapauthor = storage:get_string("mapauthor"),
+	mapinitial = storage:get_string("mapinitial"),
+	center = storage:get_string("center"),
+	flags = storage:get_string("flags"),
+	barrier_r = storage:get_int("barrier_r"),
+	barrier_rot = storage:get_int("barrier_rot"),
+	barriers_placed = storage:get_int("barriers_placed") == 1
+}
 
-if mapname == "" then
-	mapname = "ctf_" .. randint
+if config.mapname == "" then
+	config.mapname = defaults.mapname
 end
-if mapauthor == "" then
-	mapauthor = nil
+if config.mapauthor == "" then
+	config.mapauthor = defaults.mapauthor
 end
-if maptitle == "" then
-	maptitle = "Untitled Map " .. randint
+if config.maptitle == "" then
+	config.maptitle = defaults.maptitle
 end
-if barrier_r == 0 then
-	barrier_r = 110
+if config.barrier_r == 0 then
+	config.barrier_r = defaults.barrier_r
 end
-if center == "" then
-	center = { x = 0, y = 0, z = 0, r = 115, h = 140 }
+if config.center == "" then
+	config.center = defaults.center
 else
-	center = minetest.parse_json(storage:get("center"))
+	config.center = minetest.parse_json(storage:get("center"))
 end
-if flag_positions == "" then
-	flag_positions = {}
+if config.flags == "" then
+	config.flags = defaults.flags
 else
-	minetest.parse_json(storage:get("flags"))
+	config.center = minetest.parse_json(storage:get("flags"))
 end
 
 --------------------------------------------------------------------------------
@@ -48,7 +62,7 @@ assert(minetest.get_modpath("worldedit") and
 		"worldedit and worldedit_commands are required!")
 
 local function check_step()
-	for _, pos in pairs(flag_positions) do
+	for _, pos in pairs(config.flags) do
 		if minetest.get_node(pos).name ~= "ctf_map:flag" then
 			minetest.set_node(pos, { name = "ctf_map:flag" })
 		end
@@ -79,18 +93,26 @@ minetest.register_node("ctf_map:flag", {
 		}
 	},
 	groups = {oddly_breakable_by_hand=1,snappy=3},
-	on_place = function(_, _, pthing)
+	on_place = function(stack, placer, pthing)
 		local node = minetest.get_node(pthing.under).name
 		local ndef = minetest.registered_nodes[node]
 		local pos = (ndef and ndef.buildable_to) and pthing.under or pthing.above
 
-		table.insert(flag_positions, vector.new(pos))
-		storage:set_string("flags", minetest.write_json(flag_positions))
+		if #config.flags < 2 then
+			stack = minetest.item_place(stack, placer, pthing)
+			table.insert(config.flags, vector.new(pos))
+			storage:set_string("flags", minetest.write_json(config.flags))
+		else
+			minetest.chat_send_all("Only two flags are allowed!")
+		end
+		return stack
 	end,
 	on_destruct = function(pos)
-		for i, v in pairs(flag_positions) do
+		for i, v in pairs(config.flags) do
 			if vector.equals(pos, v) then
-				flag_positions[i] = nil
+				config.flags[i] = nil
+				storage:set_string("flags",
+						minetest.write_json(config.flags))
 				return
 			end
 		end
@@ -99,13 +121,13 @@ minetest.register_node("ctf_map:flag", {
 
 local function to_2pos()
 	return {
-			x = center.x - center.r,
-			y = center.y - center.h / 2,
-			z = center.z - center.r,
+			x = config.center.x - config.center.r,
+			y = config.center.y - config.center.h / 2,
+			z = config.center.z - config.center.r,
 		}, {
-			x = center.x + center.r,
-			y = center.y + center.h / 2,
-			z = center.z + center.r,
+			x = config.center.x + config.center.r,
+			y = config.center.y + config.center.h / 2,
+			z = config.center.z + config.center.r,
 		}
 end
 
@@ -133,24 +155,24 @@ local function we_import(name)
 	if pos1 and pos2 then
 		local size = vector.subtract(pos2, pos1)
 		local r = max(size.x, size.z) / 2
-		center = vector.divide(vector.add(pos1, pos2), 2)
-		center.r = r
-		center.h = size.y
-		storage:set_string("center", minetest.write_json(center))
+		config.center = vector.divide(vector.add(pos1, pos2), 2)
+		config.center.r = r
+		config.center.h = size.y
+		storage:set_string("center", minetest.write_json(config.center))
 	end
 end
 
 local function get_flags()
 	local negative = nil
 	local positive = nil
-	for _, pos in pairs(flag_positions) do
-		pos = vector.subtract(pos, center)
+	for _, pos in pairs(config.flags) do
+		pos = vector.subtract(pos, config.center)
 
-		if center_barrier_rot == 0 and pos.x < 0 or pos.z < 0 then
+		if config.barrier_rot == 0 and pos.x < 0 or pos.z < 0 then
 			negative = pos
 		end
 
-		if center_barrier_rot == 0 and pos.x > 0 or pos.z > 0 then
+		if config.barrier_rot == 0 and pos.x > 0 or pos.z > 0 then
 			positive = pos
 		end
 	end
@@ -159,14 +181,12 @@ local function get_flags()
 end
 
 local function get_flag_status()
-	if #flag_positions > 2 then
-		return "Too many flags! (" .. #flag_positions .. "/2)"
-	elseif #flag_positions < 2 then
-		return "Place more flags (" .. #flag_positions .. "/2)"
+	if #config.flags < 2 then
+		return "Place more flags (" .. #config.flags .. "/2)"
 	else
 		local negative, positive = get_flags()
 		if positive and negative then
-			return "Flags placed (" .. #flag_positions .. "/2)"
+			return "Flags placed (" .. #config.flags .. "/2)"
 		else
 			return "Place one flag on each side of the barrier."
 		end
@@ -174,9 +194,9 @@ local function get_flag_status()
 end
 
 local function show_gui(name)
-	if not mapauthor then
-		mapauthor = name
-		storage:set_string("mapauthor", mapauthor)
+	if not config.mapauthor then
+		config.mapauthor = name
+		storage:set_string("mapauthor", config.mapauthor)
 	end
 
 	local formspec = {
@@ -186,11 +206,11 @@ local function show_gui(name)
 		default.gui_bg_img,
 
 		"label[0,0;1. Select Area]",
-		"field[0.4,1;1,1;posx;X;", center.x, "]",
-		"field[1.4,1;1,1;posy;Y;", center.y, "]",
-		"field[2.4,1;1,1;posz;Z;", center.z, "]",
-		"field[0.4,2;1.5,1;posr;R;", center.r, "]",
-		"field[1.9,2;1.5,1;posh;H;", center.h, "]",
+		"field[0.4,1;1,1;posx;X;", config.center.x, "]",
+		"field[1.4,1;1,1;posy;Y;", config.center.y, "]",
+		"field[2.4,1;1,1;posz;Z;", config.center.z, "]",
+		"field[0.4,2;1.5,1;posr;R;", config.center.r, "]",
+		"field[1.9,2;1.5,1;posh;H;", config.center.h, "]",
 		"button[4.3,0.7;1.75,1;set_center;Player Pos]",
 		"button[6.05,0.7;1.5,1;towe;To WE]",
 		"button[7.55,0.7;1.5,1;fromwe;From WE]",
@@ -200,8 +220,9 @@ local function show_gui(name)
 
 		"label[0,2.8;2. Place Barriers]",
 		"label[0.1,3.3;This may take a few minutes.]",
-		"field[0.4,4.3;1,1;barrier_r;R;", barrier_r, "]",
-		"dropdown[1.15,4.05;1,1;center_barrier_rot;X=0,Z=0;", center_barrier_rot + 1, "]",
+		"field[0.4,4.3;1,1;barrier_r;R;", config.barrier_r, "]",
+		"dropdown[1.15,4.05;1,1;barrier_rot;X=0,Z=0;",
+		config.barrier_rot + 1, "]",
 		"button[2.3,4;2,1;place_barrier;Place Barriers]",
 
 		"box[4.4,2.8;0.05,2.2;#111111BB]",
@@ -213,14 +234,18 @@ local function show_gui(name)
 		"box[0,5.06;8.85,0.05;#111111BB]",
 
 		"label[0,5.15;4. Meta Data]",
-		"field[0.4,6.2;8.5,1;title;Title;", minetest.formspec_escape(maptitle), "]",
+		"field[0.4,6.2;8.5,1;title;Title;",
+		minetest.formspec_escape(config.maptitle), "]",
 		"field[0.4,7.3;8.5,1;initial;Stuff to give on (re)spawn, comma-separated itemstrings;",
-		minetest.formspec_escape(mapinitial), "]",
-		"field[0.4,8.4;4.25,1;name;File Name;" , minetest.formspec_escape(mapname), "]",
-		"field[4.625,8.4;4.25,1;author;Author;", minetest.formspec_escape(mapauthor), "]",
+		minetest.formspec_escape(config.mapinitial), "]",
+		"field[0.4,8.4;4.25,1;name;File Name;",
+		minetest.formspec_escape(config.mapname), "]",
+		"field[4.625,8.4;4.25,1;author;Author;",
+		minetest.formspec_escape(config.mapauthor), "]",
 
-		"button_exit[1.3,9;3,1;close;Close]",
-		"button_exit[4.3,9;3,1;export;Export]",
+		"button[1.3,9;2,1;reset;Reset]",
+		"button_exit[3.3,9;2,1;export;Export]",
+		"button_exit[5.3,9;2,1;close;Close]",
 	}
 
 	formspec = table.concat(formspec, "")
@@ -241,62 +266,73 @@ local function emerge_progress(ctx)
 		(ctx.current_blocks / ctx.total_blocks) * 100))
 end
 
+local function reset()
+	config = defaults
+	for key, _ in pairs(config) do
+		storage:set_string(key, "")
+	end
+end
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname ~= "ctf_map:tool" then
 		return
 	end
 
 	if fields.posx then
-		center.x  = tonumber(fields.posx)
-		center.y  = tonumber(fields.posy)
-		center.z  = tonumber(fields.posz)
-		center.r  = tonumber(fields.posr)
-		center.h  = tonumber(fields.posh)
-		storage:set_string("center", minetest.write_json(center))
+		config.center.x = tonumber(fields.posx)
+		config.center.y = tonumber(fields.posy)
+		config.center.z = tonumber(fields.posz)
+		config.center.r = tonumber(fields.posr)
+		config.center.h = tonumber(fields.posh)
+		storage:set_string("center", minetest.write_json(config.center))
 	end
 
 	fields.barrier_r = tonumber(fields.barrier_r)
-	if fields.barrier_r and fields.barrier_r ~= barrier_r then
-		barrier_r = fields.barrier_r
-		storage:set_int("barrier_r", barrier_r)
+	if fields.barrier_r and fields.barrier_r ~= config.barrier_r then
+		config.barrier_r = fields.barrier_r
+		storage:set_int("barrier_r", config.barrier_r)
 	end
 
-	if fields.title and fields.title ~= maptitle then
-		maptitle  = fields.title
-		storage:set_string("maptitle", maptitle)
+	if fields.title and fields.title ~= config.maptitle then
+		config.maptitle  = fields.title
+		storage:set_string("maptitle", config.maptitle)
 	end
 
-	if fields.author and fields.author ~= mapauthor then
-		mapauthor = fields.author
-		storage:set_string("mapauthor", mapauthor)
+	if fields.author and fields.author ~= config.mapauthor then
+		config.mapauthor = fields.author
+		storage:set_string("mapauthor", config.mapauthor)
 	end
 
-	if fields.name and fields.name ~= mapname then
-		mapname = fields.name
-		storage:set_string("mapname", mapname)
+	if fields.name and fields.name ~= config.mapname then
+		config.mapname = fields.name
+		storage:set_string("mapname", config.mapname)
 	end
 
-	if fields.initial and fields.initial ~= mapinitial then
-		mapinitial = fields.initial
-		storage:set_string("mapinitial", mapinitial)
+	if fields.initial and fields.initial ~= config.mapinitial then
+		config.mapinitial = fields.initial
+		storage:set_string("mapinitial", config.mapinitial)
 	end
 
-	if fields.center_barrier_rot and fields.center_barrier_rot ~= "" then
-		center_barrier_rot = fields.center_barrier_rot == "X=0" and 0 or 1
-		storage:set_int("center_barrier_rot", center_barrier_rot)
+	if fields.barrier_rot and fields.barrier_rot ~= "" then
+		config.barrier_rot = fields.barrier_rot == "X=0" and 0 or 1
+		storage:set_int("barrier_rot", config.barrier_rot)
 	end
 
 	if fields.set_center then
-		local r = center.r
-		local h = center.h
-		center = vector.floor(player:get_pos())
-		center.r = r
-		center.h = h
-		storage:set_string("center", minetest.write_json(center))
+		local r = config.center.r
+		local h = config.center.h
+		config.center = vector.floor(player:get_pos())
+		config.center.r = r
+		config.center.h = h
+		storage:set_string("center", minetest.write_json(config.center))
 	end
 
 	if fields.giveme then
-		player:get_inventory():add_item("main", "ctf_map:flag 2")
+		if not config.barriers_placed then
+			minetest.chat_send_all("You have to place barriers first!")
+		else
+			player:get_inventory():add_item("main", "ctf_map:flag 2")
+		end
 	end
 
 	local player_name = player:get_player_name()
@@ -314,17 +350,23 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local pos1, pos2 = to_2pos()
 		show_progress_formspec(player_name, "Emerging area...")
 		ctf_map.emerge_with_callbacks(player_name, pos1, pos2, function()
-			show_progress_formspec(player_name, "Placing center barrier, this may take a while...")
+			show_progress_formspec(player_name,
+					"Placing center barrier, this may take a while...")
 
 			minetest.after(0.1, function()
-				ctf_map.place_middle_barrier(center, barrier_r, center.h, (center_barrier_rot == 0) and "x" or "z")
-				show_progress_formspec(player_name, "Placing outer barriers, this may take a while...")
+				ctf_map.place_middle_barrier(config.center, config.barrier_r,
+						config.center.h, (config.barrier_rot == 0) and "x" or "z")
+				show_progress_formspec(player_name,
+						"Placing outer barriers, this may take a while...")
 				minetest.after(0.1, function()
-					ctf_map.place_outer_barrier(center, barrier_r, center.h)
+					ctf_map.place_outer_barrier(config.center,
+							config.barrier_r, config.center.h)
 					show_gui(player_name)
 				end)
 			end)
 		end, emerge_progress)
+		config.barriers_placed = true
+		storage:set_int("barriers_placed", 1)
 		return true
 	end
 
@@ -337,8 +379,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	if fields.export then
-		if #flag_positions ~= 2 then
+		if #config.flags < 2 then
 			minetest.chat_send_all("You need to place two flags!")
+			return
+		end
+		if not config.barriers_placed then
+			minetest.chat_send_all("You need to place barriers!")
 			return
 		end
 
@@ -348,29 +394,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local path = minetest.get_worldpath() .. "/schems/"
 		minetest.mkdir(path)
 
-		-- Reset mod_storage
-		storage:set_string("center", "")
-		storage:set_string("maptitle", "")
-		storage:set_string("mapauthor", "")
-		storage:set_string("mapname", "")
-		storage:set_string("mapinitial", "")
-		storage:set_string("center_barrier_rot", "")
-		storage:set_string("barrier_r", "")
-
 		-- Write to .conf
-		local meta = Settings(path .. mapname .. ".conf")
-		meta:set("name", maptitle)
-		meta:set("author", mapauthor)
-		meta:set("initial_stuff", mapinitial)
-		meta:set("rotation", center_barrier_rot == 0 and "x" or "z")
-		meta:set("r", center.r)
-		meta:set("h", center.h)
+		local meta = Settings(path .. config.mapname .. ".conf")
+		meta:set("name", config.maptitle)
+		meta:set("author", config.mapauthor)
+		meta:set("initial_stuff", config.mapinitial)
+		meta:set("rotation", config.barrier_rot == 0 and "x" or "z")
+		meta:set("r", config.center.r)
+		meta:set("h", config.center.h)
 
-		for _, flags in pairs(flag_positions) do
-			local pos = vector.subtract(flags, center)
-			if center_barrier_rot == 0 then
+		for _, flag in pairs(config.flags) do
+			local pos = vector.subtract(flag, config.center)
+			if config.barrier_rot == 0 then
 				local old = vector.new(pos)
-				pos.x = old.z
+				pos.x =  old.z
 				pos.z = -old.x
 			end
 
@@ -382,18 +419,28 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:write()
 
 		minetest.after(0.1, function()
-			local filepath = path .. mapname .. ".mts"
+			local filepath = path .. config.mapname .. ".mts"
 			if minetest.create_schematic(worldedit.pos1[player_name],
 					worldedit.pos2[player_name], worldedit.prob_list[player_name],
 					filepath) then
-				minetest.chat_send_all("Exported " .. mapname .. " to " .. path)
+				minetest.chat_send_all("Exported " .. config.mapname .. " to " .. path)
 				minetest.close_formspec(player_name, "")
+				reset()
 			else
 				minetest.chat_send_all("Failed!")
 				show_gui(player_name)
 			end
 		end)
 		return
+	end
+
+	if fields.reset then
+		for _, pos in pairs(config.flags) do
+			minetest.remove_node(pos)
+		end
+		reset()
+
+		minetest.chat_send_all("Map Maker has been successfully reset!")
 	end
 
 	if not fields.quit then
