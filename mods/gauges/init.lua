@@ -59,7 +59,7 @@ end
 if minetest.setting_getbool("health_bars") ~= false and
 		minetest.setting_getbool("enable_damage") then
 	minetest.register_on_joinplayer(function(player)
-		minetest.after(1, add_HP_gauge, player:get_player_name())
+		minetest.after(2, add_HP_gauge, player:get_player_name())
 	end)
 end
 

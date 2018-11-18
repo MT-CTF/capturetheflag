@@ -1,4 +1,4 @@
-WIELD3D_INIT_DELAY = 1
+WIELD3D_INIT_DELAY = 2
 WIELD3D_RETRY_TIME = 10
 WIELD3D_UPDATE_TIME = 1
 
@@ -129,4 +129,3 @@ minetest.register_on_joinplayer(function(player)
 	player_wielding[player:get_player_name()] = 0
 	minetest.after(WIELD3D_INIT_DELAY, add_wield_entity, player)
 end)
-
