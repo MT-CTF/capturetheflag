@@ -110,8 +110,8 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "default:ladder 5",
-	items  = { "default:stick 7" },
+	output = "default:ladder 4",
+	items  = { "default:stick 8" },
 	always_known = true,
 	level  = 1,
 })
