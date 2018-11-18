@@ -73,7 +73,6 @@ default:tree
 default:wood
 default:leaves
 default:sapling
-default:apple
 
 default:jungletree
 default:junglewood
@@ -563,32 +562,6 @@ minetest.register_node("default:leaves", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
-})
-
-minetest.register_node("default:apple", {
-	description = "Apple",
-	drawtype = "plantlike",
-	tiles = {"default_apple.png"},
-	inventory_image = "default_apple.png",
-	stack_max = 30,
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	is_ground_content = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-3 / 16, -7 / 16, -3 / 16, 3 / 16, 4 / 16, 3 / 16}
-	},
-	groups = {fleshy = 3, dig_immediate = 3, flammable = 2,
-		leafdecay = 3, leafdecay_drop = 1},
-	on_use = minetest.item_eat(2),
-	sounds = default.node_sound_leaves_defaults(),
-
-	after_place_node = function(pos, placer, itemstack)
-		if placer:is_player() then
-			minetest.set_node(pos, {name = "default:apple", param2 = 1})
-		end
-	end,
 })
 
 
@@ -1248,7 +1221,7 @@ minetest.register_node("default:meselamp", {
 if minetest.get_mapgen_setting("mg_name") == "v6" then
 	default.register_leafdecay({
 		trunks = {"default:tree"},
-		leaves = {"default:apple", "default:leaves"},
+		leaves = {"default:leaves"},
 		radius = 2,
 	})
 
@@ -1266,7 +1239,7 @@ if minetest.get_mapgen_setting("mg_name") == "v6" then
 else
 	default.register_leafdecay({
 		trunks = {"default:tree"},
-		leaves = {"default:apple", "default:leaves"},
+		leaves = {"default:leaves"},
 		radius = 3,
 	})
 

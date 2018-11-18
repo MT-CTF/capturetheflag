@@ -297,12 +297,6 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "fuel",
-	recipe = "default:apple",
-	burntime = 3,
-})
-
-minetest.register_craft({
-	type = "fuel",
 	recipe = "default:coal_lump",
 	burntime = 40,
 })
