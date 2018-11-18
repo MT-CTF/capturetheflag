@@ -48,7 +48,8 @@ end
 function random_messages.read_messages()
 	random_messages.messages = {
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
-		"Eat apples to restore health quickly.",
+		"Use medkits to gradually restore your health.",
+		"Moving or fighting while healing will interrupt the healing process.",
 		"Steel swords do more damage than guns, but you need to be up close.",
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",

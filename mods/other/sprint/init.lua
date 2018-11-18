@@ -28,8 +28,8 @@ local players = {}
 local function setSprinting(player, info, sprinting)
 	if info.sprinting ~= sprinting then
 		player:set_physics_override(SPRINT_MODIFIERS[sprinting])
+		info.sprinting = sprinting
 	end
-	info.sprinting = sprinting
 end
 
 minetest.register_globalstep(function(dtime)
@@ -46,11 +46,10 @@ minetest.register_globalstep(function(dtime)
 			local sprintRequested = controls.aux1 and controls.up
 			-- ##1## replace info.sprintRequested with info.sprinting
 			if sprintRequested ~= info.sprintRequested then
-				if sprintRequested and info.stamina > MIN_SPRINT then
+				if sprintRequested and info.stamina > MIN_SPRINT
+						and not is_healing(player:get_player_name()) then
 					setSprinting(player, info, true)
-				end
-
-				if not sprintRequested then
+				elseif not sprintRequested then
 					setSprinting(player, info, false)
 				end
 			end

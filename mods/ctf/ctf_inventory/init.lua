@@ -5,7 +5,7 @@ local items = {
 	"   running and punching your team's flag.",
 	"*  Look for weapons and other resources in chests, or mine and use furnaces to make swords.",
 	"*  Good swords do more damage than guns, but need to be used at close range.",
-	"*  Use apples to replenish health quickly.",
+	"*  Use medkits to replenish health gradually.",
 	"*  Gain more score by killing more than you die, or by capturing the flag.",
 	"*  Players are immune for 10 seconds after they respawn.",
 	"*  Access the pro section of the chest by achieving a 2k+ score and",
