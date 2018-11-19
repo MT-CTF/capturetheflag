@@ -1,0 +1,5 @@
+Spears from mod "Lottweapons"
+
+Original code: Amaz - LGPL v2.1
+Textures: Amaz - CC BY-SA
+CTF integration: Xudo
