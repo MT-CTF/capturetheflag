@@ -235,6 +235,11 @@ minetest.register_privilege("vote_starter", {
 	basic_priv = true
 })
 
+minetest.register_privilege("vote_kick", {
+	description = "Can (start) vote to kick a player",
+	basic_priv = true
+})
+
 minetest.register_chatcommand("yes", {
 	privs = {
 		interact = true,
@@ -314,7 +319,7 @@ if set == nil or minetest.is_yes(set) then
 	minetest.register_chatcommand("vote_kick", {
 		privs = {
 			interact = true,
-			vote_starter = true
+		        vote_kick = true
 		},
 		func = function(name, param)
 			if not minetest.get_player_by_name(param) then
