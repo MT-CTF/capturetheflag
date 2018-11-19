@@ -163,3 +163,19 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "spears:mese_spear 1",
+	items  = { "default:mese_crystal 3", "default:stick 2" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "spears:stone_spear 1",
+	items  = { "default:cobble 3", "default:stick 2" },
+	always_known = true,
+	level  = 1,
+})
