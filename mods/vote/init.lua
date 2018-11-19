@@ -227,12 +227,10 @@ minetest.after(5, vote.update_all_hud)
 
 minetest.register_privilege("vote", {
 	description = "Can vote on issues",
-	basic_priv = true
 })
 
 minetest.register_privilege("vote_starter", {
 	description = "Can start votes on issues",
-	basic_priv = true
 })
 
 minetest.register_chatcommand("yes", {
@@ -311,10 +309,14 @@ minetest.register_chatcommand("abstain", {
 
 local set = minetest.setting_get("vote.kick_vote")
 if set == nil or minetest.is_yes(set) then
+	minetest.register_privilege("vote_kick", {
+		description = "Can (start) vote to kick a player",
+	})
+
 	minetest.register_chatcommand("vote_kick", {
 		privs = {
 			interact = true,
-			vote_starter = true
+			vote_kick = true,
 		},
 		func = function(name, param)
 			if not minetest.get_player_by_name(param) then
