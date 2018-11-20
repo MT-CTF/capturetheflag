@@ -163,3 +163,11 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "shooter:ammo 1",
+	items  = { "default:steel_ingot 3", "default:coal_lump 2" },
+	always_known = true,
+	level  = 1,
+})
