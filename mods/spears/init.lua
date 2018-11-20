@@ -1,7 +1,7 @@
 --Spears from mod Lottweapons, originally made by Amaz
 
 --Spears:
-minetest.register_tool("spears:stone_spear", {
+minetest.register_tool("spears:spear_stone", {
 	description = "Stone Spear",
 	inventory_image = "lottweapons_stone_spear.png",
 	wield_image = "lottweapons_stone_spear.png^[transformFX",
@@ -15,7 +15,7 @@ minetest.register_tool("spears:stone_spear", {
 		damage_groups = {fleshy=3},
 	}
 })
-minetest.register_tool("spears:mese_spear", {
+minetest.register_tool("spears:spear_mese", {
 	description = "Mese Spear",
 	inventory_image = "lottweapons_gold_spear.png",
 	wield_image = "lottweapons_gold_spear.png^[transformFX",
@@ -29,22 +29,3 @@ minetest.register_tool("spears:mese_spear", {
 		damage_groups = {fleshy=4},
 	}
 })
---[[
-minetest.register_craft({
-	output = 'spears:stone_spear',
-	recipe = {
-		{'', 'default:cobble', ''},
-		{'default:cobble', 'group:stick', 'default:cobble'},
-		{'', 'group:stick', ''},
-	}
-})
-
-minetest.register_craft({
-	output = 'spears:mese_spear',
-	recipe = {
-		{'', 'default:mese_crystal', ''},
-		{'default:mese_crystal', 'group:stick', 'default:mese_crystal'},
-		{'', 'group:stick', ''},
-	}
-})
---]]
