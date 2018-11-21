@@ -364,7 +364,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 	local pos = vector.round(pos)
 	local p1 = vector.subtract(pos, radius)
 	local p2 = vector.add(pos, radius)
-	minetest.sound_play("tnt_explode", {pos=pos, gain=1})
+	minetest.sound_play("shooter_explode", {pos=pos, gain=1})
 	if SHOOTER_ALLOW_NODES and SHOOTER_ENABLE_BLASTING then
 		if SHOOTER_ENABLE_PROTECTION then
 			if not minetest.is_protected(pos, name) then
