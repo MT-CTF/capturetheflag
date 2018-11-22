@@ -3,6 +3,8 @@ vote = {
 	queue = {}
 }
 
+local vlist = {} -- table storing player name, ip & lock status
+
 function vote.new_vote(creator, voteset)
 	local max_votes = tonumber(minetest.setting_get("vote.maximum_active")) or 1
 	local max_queue = tonumber(minetest.setting_get("vote.maximum_active")) or 0
@@ -337,7 +339,12 @@ if set == nil or minetest.is_yes(set) then
 						minetest.chat_send_all("Vote passed, " ..
 								#results.yes .. " to " .. #results.no .. ", " ..
 								self.name .. " will be kicked.")
-						minetest.kick_player(self.name, "The vote to kick you passed")
+						minetest.kick_player(self.name, "The vote to kick you passed")	
+						-- after player kick
+					vlist[self.name].locked = true
+  						minetest.after(600, function()
+ 					vlist[self.name] = nil
+                    			end)
 					else
 						minetest.chat_send_all("Vote failed, " ..
 								#results.yes .. " to " .. #results.no .. ", " ..
@@ -353,3 +360,32 @@ if set == nil or minetest.is_yes(set) then
 		end
 	})
 end
+
+minetest.register_on_joinplayer(function(player)
+    local name = player:get_player_name()
+    if not vlist[name] then
+        vlist[name] = {
+            ip = minetest.get_player_ip(name),
+            locked = false
+        }
+    end
+end)
+ 
+minetest.register_on_prejoinplayer(function(name, ip)
+    if vlist[name] and vlist[name].locked then
+        return "Please wait until the vote cool down period has elapsed before rejoining!"
+    else
+        for k,v in pairs(vlist) do
+            if v.ip == ip and v.locked then
+                return "You can't bypass the cool down by changing name!"
+            end
+        end
+    end
+end)
+ 
+minetest.register_on_leaveplayer(function(player)
+    local name = player:get_player_name()
+    if not vlist[name].locked then
+        vlist[name] = nil
+    end
+end)
