@@ -339,12 +339,12 @@ if set == nil or minetest.is_yes(set) then
 						minetest.chat_send_all("Vote passed, " ..
 								#results.yes .. " to " .. #results.no .. ", " ..
 								self.name .. " will be kicked.")
-						minetest.kick_player(self.name, "The vote to kick you passed")	
+						minetest.kick_player(self.name, "The vote to kick you passed")
 						-- after player kick
 					vlist[self.name].locked = true
-  						minetest.after(600, function()
- 					vlist[self.name] = nil
-                    			end)
+						minetest.after(600, function()
+					vlist[self.name] = nil
+					end)
 					else
 						minetest.chat_send_all("Vote failed, " ..
 								#results.yes .. " to " .. #results.no .. ", " ..
@@ -370,7 +370,7 @@ minetest.register_on_joinplayer(function(player)
         }
     end
 end)
- 
+
 minetest.register_on_prejoinplayer(function(name, ip)
     if vlist[name] and vlist[name].locked then
         return "Please wait until the vote cool down period has elapsed before rejoining!"
@@ -382,7 +382,7 @@ minetest.register_on_prejoinplayer(function(name, ip)
         end
     end
 end)
- 
+
 minetest.register_on_leaveplayer(function(player)
     local name = player:get_player_name()
     if not vlist[name].locked then
