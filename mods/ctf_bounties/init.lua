@@ -21,10 +21,7 @@ local function announce_all()
 end
 
 local function bounty_player(target)
-	if bountied_player then
-		minetest.chat_send_all("Player " .. bountied_player .. " no longer has a bounty on their head!")
-	end
-
+	local prev = bountied_player
 	bountied_player = target
 
 	--                Score * K/D
@@ -43,6 +40,19 @@ local function bounty_player(target)
 		bounty_score = 50
 	end
 	bounty_score = math.floor(bounty_score)
+
+	if prev then
+		for _, player in pairs(minetest.get_connected_players()) do
+			local name = player:get_player_name()
+			if bountied_player ~= name then
+				local _, prev_color = ctf_colors.get_color(prev, ctf.player(prev))
+				minetest.chat_send_player(player:get_player_name(),
+					minetest.colorize("#fff326", "Player ") ..
+					minetest.colorize(prev_color:gsub("0x", "#"), prev) ..
+					minetest.colorize("#fff326", " no longer has a bounty on their head!"))
+			end
+		end
+	end
 
 	minetest.after(0.1, announce_all)
 end
