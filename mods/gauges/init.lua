@@ -1,6 +1,8 @@
 -- Adds health bars above players.
 -- Code by 4aiman, textures by Calinou. Licensed under CC0.
 
+gauges = {}
+
 local hp_bar = {
 	physical = false,
 	collisionbox = {x = 0, y = 0, z = 0},
@@ -42,7 +44,7 @@ end
 
 minetest.register_entity("gauges:hp_bar", hp_bar)
 
-local function add_HP_gauge(name)
+function gauges.add_HP_gauge(name)
 	local player = minetest.get_player_by_name(name)
 	if player then
 		local pos = player:get_pos()
@@ -59,11 +61,11 @@ end
 if minetest.setting_getbool("health_bars") ~= false and
 		minetest.setting_getbool("enable_damage") then
 	minetest.register_on_joinplayer(function(player)
-		minetest.after(1, add_HP_gauge, player:get_player_name())
+		minetest.after(1, gauges.add_HP_gauge, player:get_player_name())
 	end)
 end
 
-local function check_gauges()
+function gauges.check_gauges()
 	for _, player in pairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local found = false
@@ -78,9 +80,9 @@ local function check_gauges()
 
 		if not found then
 			print("Gauge not found!")
-			add_HP_gauge(pname)
+			gauges.add_HP_gauge(pname)
 		end
 	end
-	minetest.after(9.3, check_gauges)
+	minetest.after(9.3, gauges.check_gauges)
 end
-minetest.after(2, check_gauges)
+minetest.after(2, gauges.check_gauges)
