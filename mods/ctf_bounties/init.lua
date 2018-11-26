@@ -67,15 +67,11 @@ local function bounty_find_new_target()
 end
 minetest.after(math.random(500, 1000), bounty_find_new_target)
 
-minetest.register_on_leaveplayer(function(player)
-	if bountied_player == player:get_player_name() then
-		bountied_player = nil
-	end
-end)
-
 minetest.register_on_joinplayer(function(player)
-	if bountied_player then
-		announce(player:get_player_name())
+	local name = player:get_player_name()
+	if bountied_player and
+			bountied_player ~= name then
+		announce(name)
 	end
 end)
 
