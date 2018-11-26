@@ -249,10 +249,15 @@ if minetest.get_modpath("ctf") then
 			local name = player:get_player_name()
 			local tname = ctf.player(name).team
 			local pos = player:get_pos()
-			if tname and
-					(tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
-				minetest.chat_send_player(name, "Match hasn't started yet!")
-				ctf.move_to_spawn(name)
+			if tname and not minetest.check_player_privs(name, {
+						fly = true,
+						interact = false
+					}) then
+				if (tname == "blue" and pos.z >= 0) or
+						(tname == "red" and pos.z <= 0) then
+					minetest.chat_send_player(name, "Match hasn't started yet!")
+					ctf.move_to_spawn(name)
+				end
 			end
 		end
 
