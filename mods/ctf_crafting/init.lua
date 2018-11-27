@@ -171,3 +171,19 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "grenades:grenade_regular 1",
+	items  = { "default:steel_ingot 5", "default:coal_lump 1" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "grenades:grenade_smoke 1",
+	items  = { "default:steel_ingot 5", "default:coal_lump 2" },
+	always_known = true,
+	level  = 1,
+})
