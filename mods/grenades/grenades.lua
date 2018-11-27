@@ -14,7 +14,7 @@ if not regular or regular == true then
         on_explode = function(pos, name)
             local player = minetest.get_player_by_name(name)
 
-            local radius = 3
+            local radius = 4
 
             minetest.add_particlespawner({
                 amount = 20,
@@ -37,7 +37,7 @@ if not regular or regular == true then
 
             for k, v in ipairs(minetest.get_objects_inside_radius(pos, radius)) do
                 if v:is_player() and v:get_hp() > 0 then
-                    v:punch(player, 2, {damage_groups = {fleshy = 20-vector.distance(pos, v:get_pos())}}, nil)
+                    v:punch(player, 2, {damage_groups = {fleshy = 22-vector.distance(pos, v:get_pos())}}, nil)
                 end
             end
         end,
