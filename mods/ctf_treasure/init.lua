@@ -11,6 +11,7 @@ treasurer.register_treasure("default:sword_steel",0.4,5,{1,4})
 treasurer.register_treasure("default:shovel_stone",0.6,5,{1,10})
 treasurer.register_treasure("default:shovel_steel",0.3,5,{1,10})
 treasurer.register_treasure("spears:spear_stone",0.6,5,{1,10})
+treasurer.register_treasure("spears:spear_steel",0.3,5,{1,10})
 
 treasurer.register_treasure("shooter:crossbow",0.5,2,{1,5})
 treasurer.register_treasure("shooter:pistol",0.4,2,{1,5})

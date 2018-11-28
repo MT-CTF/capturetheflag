@@ -166,6 +166,14 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "spears:spear_diamond 1",
+	items  = { "default:diamond 3", "default:stick 2" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "spears:spear_mese 1",
 	items  = { "default:mese_crystal 3", "default:stick 2" },
 	always_known = true,
@@ -174,8 +182,32 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "spears:spear_bronze 1",
+	items  = { "default:bronze_ingot 3", "default:stick 2" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "spears:spear_steel 1",
+	items  = { "default:steel_ingot 3", "default:stick 2" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "spears:spear_stone 1",
 	items  = { "default:cobble 3", "default:stick 2" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "spears:spear_wood 1",
+	items  = { "default:wood 3", "default:stick 2" },
 	always_known = true,
 	level  = 1,
 })
