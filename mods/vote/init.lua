@@ -220,8 +220,8 @@ minetest.register_on_leaveplayer(function(player)
 	local name = player:get_player_name()
 	vote.hud.players[name] = nil
 	if not vlist[name].locked then
-	vlist[name] = nil
-end
+		vlist[name] = nil
+	end
 end)
 
 function vote.update_all_hud()
