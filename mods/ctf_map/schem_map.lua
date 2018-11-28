@@ -1,4 +1,4 @@
-minetest.set_mapgen_params({mgname = "singlenode", flags = "nolight"})
+minetest.set_mapgen_setting("mgname", "singlenode")
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 minetest.register_alias("ctf_map:flag", "air")

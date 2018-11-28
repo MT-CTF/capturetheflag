@@ -51,7 +51,7 @@ function ctf_map.remove_middle_barrier()
 	end
 
 	vm:set_data(data)
-	vm:write_to_map(data)
+	vm:write_to_map()
 	vm:update_map()
 end
 
