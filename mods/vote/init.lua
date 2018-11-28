@@ -1,6 +1,7 @@
 vote = {
 	active = {},
-	queue = {}
+	queue = {},
+	kick_cooldown = 600
 }
 
 local vlist = {} -- table storing player name, ip & lock status
@@ -216,8 +217,13 @@ function vote.update_hud(player)
 	end
 end
 minetest.register_on_leaveplayer(function(player)
-	vote.hud.players[player:get_player_name()] = nil
+        local name = player:get_player_name()
+		vote.hud.players[name] = nil
+		if not vlist[name].locked then
+		vlist[name] = nil
+	end
 end)
+
 function vote.update_all_hud()
 	local players = minetest.get_connected_players()
 	for _, player in pairs(players) do
@@ -339,10 +345,11 @@ if set == nil or minetest.is_yes(set) then
 						minetest.chat_send_all("Vote passed, " ..
 								#results.yes .. " to " .. #results.no .. ", " ..
 								self.name .. " will be kicked.")
-						minetest.kick_player(self.name, "The vote to kick you passed.\n You have been temporarily banned for 10 minutes.")
-						-- after player kick
+						minetest.kick_player(self.name, 
+							("The vote to kick you passed.\n You have been temporarily banned" .. 
+							" for %s minutes."):format(tostring(vote.kick_cooldown / 60)))
 						vlist[self.name].locked = true
-						minetest.after(600, function()
+						minetest.after(vote.kick_cooldown, function()
 							vlist[self.name] = nil
 						end)
 					else
@@ -370,8 +377,7 @@ minetest.register_on_joinplayer(function(player)
         }
     end
 end)
-
-minetest.register_on_prejoinplayer(function(name, ip)
+ minetest.register_on_prejoinplayer(function(name, ip)
     if vlist[name] and vlist[name].locked then
         return "Please wait until the vote cool down period has elapsed before rejoining!"
     else
@@ -380,12 +386,5 @@ minetest.register_on_prejoinplayer(function(name, ip)
                 return "You can't bypass the cool down by changing name!"
             end
         end
-    end
-end)
-
-minetest.register_on_leaveplayer(function(player)
-    local name = player:get_player_name()
-    if not vlist[name].locked then
-        vlist[name] = nil
     end
 end)
