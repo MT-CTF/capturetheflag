@@ -55,7 +55,7 @@ if flash ~= false then
 		description = "Flashbang grenade (Blinds all who look at blast)",
 		image = "grenades_flashbang.png",
 		on_explode = function(pos, name)
-			for k, v in ipairs(minetest.get_objects_inside_radius(pos, 15)) do
+			for k, v in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
 				if v:is_player() and v:get_hp() > 0 then
 					local playerdir = vector.round(v:get_look_dir())
 					local grenadedir = vector.round(vector.direction(v:get_pos(), pos))
@@ -68,7 +68,7 @@ if flash ~= false then
 								position = {x = 0, y = 0},
 								name = "flashbang hud "..pname,
 								scale = {x = -200, y = -200},
-								text = "grenades_white.png^[opacity:"..tostring(255-(i*13)),
+								text = "grenades_white.png^[opacity:"..tostring(255-(i*17)),
 								alignment = {x = 0, y = 0},
 								offset = {x = 0, y = 0}
 							})
@@ -96,7 +96,7 @@ if smoke ~= false then
 		on_explode = function(pos, name)
 			for i = 0, 5, 1 do
 				minetest.add_particlespawner({
-					amount = 15,
+					amount = 20,
 					time = 11,
 					minpos = vector.subtract(pos, 3.5),
 					maxpos = vector.add(pos, 3.5),
