@@ -4,7 +4,7 @@ Still WIP. Please suggest new features here: https://forum.minetest.net/viewtopi
 
 ##API
 
-	`grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'flashbang')
+	grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'flashbang')
 		description = "", -- A short description of the grenade.
 		image = "", -- The name of the grenade's texture
 		on_explode = function(pos, name)
@@ -21,4 +21,4 @@ Still WIP. Please suggest new features here: https://forum.minetest.net/viewtopi
 		    glow = 0, -- Brightens the texture in darkness
 		    interval = 5, -- How long it takes before a particle can be added
 		}
-	})`
+	})
