@@ -345,8 +345,8 @@ if set == nil or minetest.is_yes(set) then
 						minetest.chat_send_all("Vote passed, " ..
 								#results.yes .. " to " .. #results.no .. ", " ..
 								self.name .. " will be kicked.")
-						minetest.kick_player(self.name, 
-							("The vote to kick you passed.\n You have been temporarily banned" .. 
+						minetest.kick_player(self.name,
+							("The vote to kick you passed.\n You have been temporarily banned" ..
 							" for %s minutes."):format(tostring(vote.kick_cooldown / 60)))
 						vlist[self.name].locked = true
 						minetest.after(vote.kick_cooldown, function()
