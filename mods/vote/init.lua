@@ -217,11 +217,11 @@ function vote.update_hud(player)
 	end
 end
 minetest.register_on_leaveplayer(function(player)
-        local name = player:get_player_name()
+		local name = player:get_player_name()
 		vote.hud.players[name] = nil
 		if not vlist[name].locked then
-		vlist[name] = nil
-	end
+			vlist[name] = nil
+		end
 end)
 
 function vote.update_all_hud()
@@ -377,7 +377,7 @@ minetest.register_on_joinplayer(function(player)
         }
     end
 end)
- minetest.register_on_prejoinplayer(function(name, ip)
+minetest.register_on_prejoinplayer(function(name, ip)
     if vlist[name] and vlist[name].locked then
         return "Please wait until the vote cool down period has elapsed before rejoining!"
     else
