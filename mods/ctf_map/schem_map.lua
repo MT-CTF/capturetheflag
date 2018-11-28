@@ -23,8 +23,8 @@ minetest.register_alias("default:bush_leaves", "air")
 minetest.register_alias("default:bush_stem", "air")
 minetest.register_alias("default:stone_with_gold", "default:stone")
 
-
 local max_r  = 120
+local max_h  = 150
 local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
 ctf_map.map  = nil
 
@@ -89,50 +89,48 @@ minetest.register_chatcommand("maps_reload", {
 
 
 function ctf_map.place_map(map)
-	ctf_map.emerge_with_callbacks(nil, map.pos1, map.pos2, function()
-		local schempath = mapdir .. map.schematic
-		local res = minetest.place_schematic(map.pos1, schempath,
-				map.rotation == "z" and "0" or "90")
+	local schempath = mapdir .. map.schematic
 
-		assert(res)
+	--------------------------------------------------
+	-- LVM
 
-		for _, value in pairs(ctf_map.map.teams) do
-			ctf_team_base.place(value.color, value.pos)
+	local vm  = minetest.get_voxel_manip(map.pos1, map.pos2)
+	local res = minetest.place_schematic_on_vmanip(vm, map.pos1, schempath,
+			map.rotation == "z" and "0" or "90")
+
+	assert(res)
+
+	vm:write_to_map()
+
+	--------------------------------------------------
+
+	for _, value in pairs(ctf_map.map.teams) do
+		ctf_team_base.place(value.color, value.pos)
+	end
+
+	local seed = minetest.get_mapgen_setting("seed")
+	for _, chestzone in pairs(ctf_map.map.chests) do
+		minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
+				minetest.pos_to_string(chestzone.from) .. " to "..
+				minetest.pos_to_string(chestzone.to))
+		place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
+	end
+
+	minetest.after(2, function()
+		local msg = "Map: " .. map.name .. " by " .. map.author
+		if map.hint then
+			msg = msg .. "\n" .. map.hint
 		end
-
-		local seed = minetest.get_mapgen_setting("seed")
-		for _, chestzone in pairs(ctf_map.map.chests) do
-			minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
-					minetest.pos_to_string(chestzone.from) .. " to "..
-					minetest.pos_to_string(chestzone.to))
-			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
+		minetest.chat_send_all(msg)
+		if minetest.global_exists("irc") and irc.connected then
+			irc:say("Map: " .. map.name)
 		end
-
-		minetest.after(2, function()
-			local msg = "Map: " .. map.name .. " by " .. map.author
-			if map.hint then
-				msg = msg .. "\n" .. map.hint
-			end
-			minetest.chat_send_all(msg)
-			if minetest.global_exists("irc") and irc.connected then
-				irc:say("Map: " .. map.name)
-			end
-		end)
-
-		minetest.after(10, function()
-			minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
-		end)
-	end, nil)
+	end)
 end
 
 function ctf_match.load_map_meta(idx, name)
 	local offset = vector.new(600 * idx, 0, 0)
-	local conf_path = mapdir .. name .. ".conf"
-	local meta   = Settings(conf_path)
-
-	if meta:get("r") == nil then
-		error("Map was not properly configured " .. conf_path)
-	end
+	local meta = Settings(mapdir .. name .. ".conf")
 
 	local initial_stuff = meta:get("initial_stuff")
 	local map = {
@@ -150,10 +148,10 @@ function ctf_match.load_map_meta(idx, name)
 		chests        = {},
 	}
 
-	assert(map.r <= max_r)
+	assert(map.r <= max_r and map.h <= max_h)
 
 	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
-	map.pos2 = vector.add(offset, { x =  map.r, y = map.h / 2,  z =  map.r })
+	map.pos2 = vector.add(offset, { x =  map.r, y =  map.h / 2, z =  map.r })
 
 	-- Read teams from config
 	local i = 1
