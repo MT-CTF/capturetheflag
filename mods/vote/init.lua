@@ -383,7 +383,7 @@ minetest.register_on_prejoinplayer(function(name, ip)
 	else
 		for k, v in pairs(vlist) do
 			if v.ip == ip and v.locked then
-				return "This IP has been temporarily blocked.".. 
+				return "This IP has been temporarily blocked."..
 					" Please wait until the cool-down period has elapsed before rejoining."
 			end
 		end
