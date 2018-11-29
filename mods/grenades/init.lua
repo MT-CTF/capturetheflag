@@ -27,7 +27,7 @@ function grenades.register_grenade(name, def)
 		on_step = function(self, dtime)
 			local obj = self.object
 			local pos = obj:get_pos()
-			local node = minetest.get_node(vector.add(pos, vector.normalize(obj:get_velocity)))
+			local node = minetest.get_node(vector.add(pos, vector.normalize(obj:get_velocity())))
 
 			if self.particle == nil then
 				self.particle = 0
