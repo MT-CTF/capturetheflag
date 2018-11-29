@@ -136,9 +136,14 @@ end
 minetest.after(10, step)
 
 minetest.register_on_joinplayer(function(player)
-	playertag.set(player, TYPE_ENTITY)
+	minetest.after(2, function(name)
+		player = minetest.get_player_by_name(name)
+		if player then
+			playertag.set(player, TYPE_ENTITY)
+		end
+	end, player:get_player_name())
 end)
 
-minetest.register_on_leaveplayer(function (player)
+minetest.register_on_leaveplayer(function(player)
 	remove_entity_tag(player)
 end)
