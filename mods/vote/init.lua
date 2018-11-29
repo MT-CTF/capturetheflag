@@ -381,7 +381,7 @@ minetest.register_on_prejoinplayer(function(name, ip)
 	if vlist[name] and vlist[name].locked then
 		return "Please wait until the vote cool down period has elapsed before rejoining!"
 	else
-		for k,v in pairs(vlist) do
+		for k, v in pairs(vlist) do
 			if v.ip == ip and v.locked then
 				return "You can't bypass the cool down by changing name!"
 			end
