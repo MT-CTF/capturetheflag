@@ -5,9 +5,9 @@ grenades.register_grenade("regular", {
 	description = "Regular grenade (Kills anyone near blast)",
 	image = "grenades_regular.png",
 	on_explode = function(pos, name)
-        if not name or not pos then
-            return
-        end
+		if not name or not pos then
+			return
+		end
 
 		local player = minetest.get_player_by_name(name)
 
