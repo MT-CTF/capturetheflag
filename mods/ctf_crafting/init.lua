@@ -46,7 +46,7 @@ for _, orex in pairs(full_ores) do
 	crafting.register_recipe({
 		type   = "inv",
 		output = "default:axe_" .. orex[1],
-		items  = { "default:stick 2", orex[2] .. " 2" },
+		items  = { "default:stick 2", orex[2] .. " 3" },
 		always_known = true,
 		level  = 1,
 	})
@@ -71,7 +71,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:furnace",
-	items  = { "default:cobble 10" },
+	items  = { "default:cobble 8" },
 	always_known = true,
 	level  = 1,
 })
@@ -110,8 +110,8 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "default:ladder 5",
-	items  = { "default:stick 7" },
+	output = "default:ladder 4",
+	items  = { "default:stick 8" },
 	always_known = true,
 	level  = 1,
 })
@@ -159,7 +159,15 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "shooter:ammo 1",
-	items  = { "default:steel_ingot 5", "default:coal_lump 2" },
+	items  = { "default:tin_ingot 3", "default:coal_lump 2" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "shooter:ammo 1",
+	items  = { "default:steel_ingot 3", "default:coal_lump 2" },
 	always_known = true,
 	level  = 1,
 })

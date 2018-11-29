@@ -23,7 +23,7 @@ local function rotate_and_place(itemstack, placer, pointed_thing)
 	local param2 = 0
 
 	if placer then
-		local placer_pos = placer:getpos()
+		local placer_pos = placer:get_pos()
 		if placer_pos then
 			param2 = minetest.dir_to_facedir(vector.subtract(p1, placer_pos))
 		end
@@ -44,10 +44,12 @@ local function rotate_and_place(itemstack, placer, pointed_thing)
 	return minetest.item_place(itemstack, placer, pointed_thing, param2)
 end
 
--- Register stairs.
+
+-- Register stair
 -- Node will be called stairs:stair_<subname>
 
-function stairs.register_stair(subname, recipeitem, groups, images, description, sounds)
+function stairs.register_stair(subname, recipeitem, groups, images, description,
+		sounds, worldaligntex)
 	-- Set backface culling and world-aligned textures
 	local stair_images = {}
 	for i, image in ipairs(images) do
@@ -55,19 +57,22 @@ function stairs.register_stair(subname, recipeitem, groups, images, description,
 			stair_images[i] = {
 				name = image,
 				backface_culling = true,
-				align_style = "world",
 			}
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
 		else
 			stair_images[i] = table.copy(image)
 			if stair_images[i].backface_culling == nil then
 				stair_images[i].backface_culling = true
 			end
-			if stair_images[i].align_style == nil then
+			if worldaligntex and stair_images[i].align_style == nil then
 				stair_images[i].align_style = "world"
 			end
 		end
 	end
-	groups.stair = 1
+	local new_groups = table.copy(groups)
+	new_groups.stair = 1
 	minetest.register_node(":stairs:stair_" .. subname, {
 		description = description,
 		drawtype = "nodebox",
@@ -75,7 +80,7 @@ function stairs.register_stair(subname, recipeitem, groups, images, description,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		groups = groups,
+		groups = new_groups,
 		sounds = sounds,
 		node_box = {
 			type = "fixed",
@@ -138,29 +143,30 @@ function stairs.register_stair(subname, recipeitem, groups, images, description,
 end
 
 
--- Slab facedir to placement 6d matching table
-local slab_trans_dir = {[0] = 8, 0, 2, 1, 3, 4}
-
--- Register slabs.
+-- Register slab
 -- Node will be called stairs:slab_<subname>
 
-function stairs.register_slab(subname, recipeitem, groups, images, description, sounds)
+function stairs.register_slab(subname, recipeitem, groups, images, description,
+		sounds, worldaligntex)
 	-- Set world-aligned textures
 	local slab_images = {}
 	for i, image in ipairs(images) do
 		if type(image) == "string" then
 			slab_images[i] = {
 				name = image,
-				align_style = "world",
 			}
+			if worldaligntex then
+				slab_images[i].align_style = "world"
+			end
 		else
 			slab_images[i] = table.copy(image)
-			if image.align_style == nil then
+			if worldaligntex and image.align_style == nil then
 				slab_images[i].align_style = "world"
 			end
 		end
 	end
-	groups.slab = 1
+	local new_groups = table.copy(groups)
+	new_groups.slab = 1
 	minetest.register_node(":stairs:slab_" .. subname, {
 		description = description,
 		drawtype = "nodebox",
@@ -168,7 +174,7 @@ function stairs.register_slab(subname, recipeitem, groups, images, description, 
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		groups = groups,
+		groups = new_groups,
 		sounds = sounds,
 		node_box = {
 			type = "fixed",
@@ -181,32 +187,12 @@ function stairs.register_slab(subname, recipeitem, groups, images, description, 
 			local creative_enabled = (creative and creative.is_enabled_for
 					and creative.is_enabled_for(player_name))
 
-			if under and under.name:find("stairs:slab_") then
+			if under and under.name:find("^stairs:slab_") then
 				-- place slab using under node orientation
 				local dir = minetest.dir_to_facedir(vector.subtract(
 					pointed_thing.above, pointed_thing.under), true)
 
 				local p2 = under.param2
-
-				-- combine two slabs if possible
-				if slab_trans_dir[math.floor(p2 / 4)] == dir
-						and wield_item == under.name then
-
-					if not recipeitem then
-						return itemstack
-					end
-					if minetest.is_protected(pointed_thing.under, player_name) and not
-							minetest.check_player_privs(player_name, "protection_bypass") then
-						minetest.record_protection_violation(pointed_thing.under,
-							player_name)
-						return
-					end
-					minetest.set_node(pointed_thing.under, {name = recipeitem, param2 = p2})
-					if not creative_enabled then
-						itemstack:take_item()
-					end
-					return itemstack
-				end
 
 				-- Placing a slab on an upside down slab should make it right-side up.
 				if p2 >= 20 and dir == 8 then
@@ -292,10 +278,12 @@ if replace then
 	})
 end
 
--- Register stairs.
+
+-- Register inner stair
 -- Node will be called stairs:stair_inner_<subname>
 
-function stairs.register_stair_inner(subname, recipeitem, groups, images, description, sounds)
+function stairs.register_stair_inner(subname, recipeitem, groups, images,
+		description, sounds, worldaligntex)
 	-- Set backface culling and world-aligned textures
 	local stair_images = {}
 	for i, image in ipairs(images) do
@@ -303,27 +291,30 @@ function stairs.register_stair_inner(subname, recipeitem, groups, images, descri
 			stair_images[i] = {
 				name = image,
 				backface_culling = true,
-				align_style = "world",
 			}
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
 		else
 			stair_images[i] = table.copy(image)
 			if stair_images[i].backface_culling == nil then
 				stair_images[i].backface_culling = true
 			end
-			if stair_images[i].align_style == nil then
+			if worldaligntex and stair_images[i].align_style == nil then
 				stair_images[i].align_style = "world"
 			end
 		end
 	end
-	groups.stair = 1
+	local new_groups = table.copy(groups)
+	new_groups.stair = 1
 	minetest.register_node(":stairs:stair_inner_" .. subname, {
-		description = description .. " Inner",
+		description = "Inner " .. description,
 		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		groups = groups,
+		groups = new_groups,
 		sounds = sounds,
 		node_box = {
 			type = "fixed",
@@ -368,10 +359,12 @@ function stairs.register_stair_inner(subname, recipeitem, groups, images, descri
 	end
 end
 
--- Register stairs.
+
+-- Register outer stair
 -- Node will be called stairs:stair_outer_<subname>
 
-function stairs.register_stair_outer(subname, recipeitem, groups, images, description, sounds)
+function stairs.register_stair_outer(subname, recipeitem, groups, images,
+		description, sounds, worldaligntex)
 	-- Set backface culling and world-aligned textures
 	local stair_images = {}
 	for i, image in ipairs(images) do
@@ -379,27 +372,30 @@ function stairs.register_stair_outer(subname, recipeitem, groups, images, descri
 			stair_images[i] = {
 				name = image,
 				backface_culling = true,
-				align_style = "world",
 			}
+			if worldaligntex then
+				stair_images[i].align_style = "world"
+			end
 		else
 			stair_images[i] = table.copy(image)
 			if stair_images[i].backface_culling == nil then
 				stair_images[i].backface_culling = true
 			end
-			if stair_images[i].align_style == nil then
+			if worldaligntex and stair_images[i].align_style == nil then
 				stair_images[i].align_style = "world"
 			end
 		end
 	end
-	groups.stair = 1
+	local new_groups = table.copy(groups)
+	new_groups.stair = 1
 	minetest.register_node(":stairs:stair_outer_" .. subname, {
-		description = description .. " Outer",
+		description = "Outer " .. description,
 		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
 		paramtype2 = "facedir",
 		is_ground_content = false,
-		groups = groups,
+		groups = new_groups,
 		sounds = sounds,
 		node_box = {
 			type = "fixed",
@@ -443,15 +439,22 @@ function stairs.register_stair_outer(subname, recipeitem, groups, images, descri
 	end
 end
 
+
 -- Stair/slab registration function.
 -- Nodes will be called stairs:{stair,slab}_<subname>
 
-function stairs.register_stair_and_slab(subname, recipeitem, groups, images, desc_stair, desc_slab, sounds)
-	stairs.register_stair(subname, recipeitem, groups, images, desc_stair, sounds)
-	stairs.register_stair_inner(subname, recipeitem, groups, images, desc_stair, sounds)
-	stairs.register_stair_outer(subname, recipeitem, groups, images, desc_stair, sounds)
-	stairs.register_slab(subname, recipeitem, groups, images, desc_slab, sounds)
+function stairs.register_stair_and_slab(subname, recipeitem, groups, images,
+		desc_stair, desc_slab, sounds, worldaligntex)
+	stairs.register_stair(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+	stairs.register_stair_inner(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+	stairs.register_stair_outer(subname, recipeitem, groups, images, desc_stair,
+		sounds, worldaligntex)
+	stairs.register_slab(subname, recipeitem, groups, images, desc_slab,
+		sounds, worldaligntex)
 end
+
 
 -- Register default stairs and slabs
 
@@ -462,7 +465,8 @@ stairs.register_stair_and_slab(
 	{"default_wood.png"},
 	"Wooden Stair",
 	"Wooden Slab",
-	default.node_sound_wood_defaults()
+	default.node_sound_wood_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -472,7 +476,8 @@ stairs.register_stair_and_slab(
 	{"default_junglewood.png"},
 	"Jungle Wood Stair",
 	"Jungle Wood Slab",
-	default.node_sound_wood_defaults()
+	default.node_sound_wood_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -482,7 +487,8 @@ stairs.register_stair_and_slab(
 	{"default_pine_wood.png"},
 	"Pine Wood Stair",
 	"Pine Wood Slab",
-	default.node_sound_wood_defaults()
+	default.node_sound_wood_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -492,7 +498,8 @@ stairs.register_stair_and_slab(
 	{"default_acacia_wood.png"},
 	"Acacia Wood Stair",
 	"Acacia Wood Slab",
-	default.node_sound_wood_defaults()
+	default.node_sound_wood_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -502,7 +509,8 @@ stairs.register_stair_and_slab(
 	{"default_aspen_wood.png"},
 	"Aspen Wood Stair",
 	"Aspen Wood Slab",
-	default.node_sound_wood_defaults()
+	default.node_sound_wood_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -512,7 +520,8 @@ stairs.register_stair_and_slab(
 	{"default_stone.png"},
 	"Stone Stair",
 	"Stone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -522,7 +531,8 @@ stairs.register_stair_and_slab(
 	{"default_cobble.png"},
 	"Cobblestone Stair",
 	"Cobblestone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -532,7 +542,8 @@ stairs.register_stair_and_slab(
 	{"default_mossycobble.png"},
 	"Mossy Cobblestone Stair",
 	"Mossy Cobblestone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -542,7 +553,8 @@ stairs.register_stair_and_slab(
 	{"default_stone_brick.png"},
 	"Stone Brick Stair",
 	"Stone Brick Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -552,7 +564,8 @@ stairs.register_stair_and_slab(
 	{"default_stone_block.png"},
 	"Stone Block Stair",
 	"Stone Block Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -562,7 +575,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_stone.png"},
 	"Desert Stone Stair",
 	"Desert Stone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -572,7 +586,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_cobble.png"},
 	"Desert Cobblestone Stair",
 	"Desert Cobblestone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -582,7 +597,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_stone_brick.png"},
 	"Desert Stone Brick Stair",
 	"Desert Stone Brick Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -592,7 +608,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_stone_block.png"},
 	"Desert Stone Block Stair",
 	"Desert Stone Block Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -602,7 +619,8 @@ stairs.register_stair_and_slab(
 	{"default_sandstone.png"},
 	"Sandstone Stair",
 	"Sandstone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -612,7 +630,8 @@ stairs.register_stair_and_slab(
 	{"default_sandstone_brick.png"},
 	"Sandstone Brick Stair",
 	"Sandstone Brick Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -622,7 +641,8 @@ stairs.register_stair_and_slab(
 	{"default_sandstone_block.png"},
 	"Sandstone Block Stair",
 	"Sandstone Block Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -632,7 +652,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_sandstone.png"},
 	"Desert Sandstone Stair",
 	"Desert Sandstone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -642,7 +663,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_sandstone_brick.png"},
 	"Desert Sandstone Brick Stair",
 	"Desert Sandstone Brick Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -652,7 +674,8 @@ stairs.register_stair_and_slab(
 	{"default_desert_sandstone_block.png"},
 	"Desert Sandstone Block Stair",
 	"Desert Sandstone Block Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -662,7 +685,8 @@ stairs.register_stair_and_slab(
 	{"default_silver_sandstone.png"},
 	"Silver Sandstone Stair",
 	"Silver Sandstone Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -672,7 +696,8 @@ stairs.register_stair_and_slab(
 	{"default_silver_sandstone_brick.png"},
 	"Silver Sandstone Brick Stair",
 	"Silver Sandstone Brick Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	false
 )
 
 stairs.register_stair_and_slab(
@@ -682,7 +707,41 @@ stairs.register_stair_and_slab(
 	{"default_silver_sandstone_block.png"},
 	"Silver Sandstone Block Stair",
 	"Silver Sandstone Block Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"obsidian",
+	"default:obsidian",
+	{cracky = 1, level = 2},
+	{"default_obsidian.png"},
+	"Obsidian Stair",
+	"Obsidian Slab",
+	default.node_sound_stone_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"obsidianbrick",
+	"default:obsidianbrick",
+	{cracky = 1, level = 2},
+	{"default_obsidian_brick.png"},
+	"Obsidian Brick Stair",
+	"Obsidian Brick Slab",
+	default.node_sound_stone_defaults(),
+	false
+)
+
+stairs.register_stair_and_slab(
+	"obsidian_block",
+	"default:obsidian_block",
+	{cracky = 1, level = 2},
+	{"default_obsidian_block.png"},
+	"Obsidian Block Stair",
+	"Obsidian Block Slab",
+	default.node_sound_stone_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -692,7 +751,63 @@ stairs.register_stair_and_slab(
 	{"default_brick.png"},
 	"Brick Stair",
 	"Brick Slab",
-	default.node_sound_stone_defaults()
+	default.node_sound_stone_defaults(),
+	false
+)
+
+stairs.register_stair_and_slab(
+	"steelblock",
+	"default:steelblock",
+	{cracky = 1, level = 2},
+	{"default_steel_block.png"},
+	"Steel Block Stair",
+	"Steel Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"tinblock",
+	"default:tinblock",
+	{cracky = 1, level = 2},
+	{"default_tin_block.png"},
+	"Tin Block Stair",
+	"Tin Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"copperblock",
+	"default:copperblock",
+	{cracky = 1, level = 2},
+	{"default_copper_block.png"},
+	"Copper Block Stair",
+	"Copper Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"bronzeblock",
+	"default:bronzeblock",
+	{cracky = 1, level = 2},
+	{"default_bronze_block.png"},
+	"Bronze Block Stair",
+	"Bronze Block Slab",
+	default.node_sound_metal_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"goldblock",
+	"default:goldblock",
+	{cracky = 1},
+	{"default_gold_block.png"},
+	"Gold Block Stair",
+	"Gold Block Slab",
+	default.node_sound_metal_defaults(),
+	true
 )
 
 stairs.register_stair_and_slab(
@@ -702,5 +817,115 @@ stairs.register_stair_and_slab(
 	{"default_ice.png"},
 	"Ice Stair",
 	"Ice Slab",
-	default.node_sound_glass_defaults()
+	default.node_sound_glass_defaults(),
+	true
+)
+
+stairs.register_stair_and_slab(
+	"snowblock",
+	"default:snowblock",
+	{crumbly = 3, puts_out_fire = 1, cools_lava = 1, snowy = 1},
+	{"default_snow.png"},
+	"Snow Block Stair",
+	"Snow Block Slab",
+	default.node_sound_dirt_defaults({
+		footstep = {name = "default_snow_footstep", gain = 0.15},
+		dug = {name = "default_snow_footstep", gain = 0.2},
+		dig = {name = "default_snow_footstep", gain = 0.2}
+	}),
+	true
+)
+
+-- Glass stair nodes need to be registered individually to utilize specialized textures.
+
+stairs.register_stair(
+	"glass",
+	"default:glass",
+	{cracky = 3},
+	{"stairs_glass_split.png", "default_glass.png",
+	"stairs_glass_stairside.png^[transformFX", "stairs_glass_stairside.png",
+	"default_glass.png", "stairs_glass_split.png"},
+	"Glass Stair",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_slab(
+	"glass",
+	"default:glass",
+	{cracky = 3},
+	{"default_glass.png", "default_glass.png", "stairs_glass_split.png"},
+	"Glass Slab",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_stair_inner(
+	"glass",
+	"default:glass",
+	{cracky = 3},
+	{"stairs_glass_stairside.png^[transformR270", "default_glass.png",
+	"stairs_glass_stairside.png^[transformFX", "default_glass.png",
+	"default_glass.png", "stairs_glass_stairside.png"},
+	"Glass Stair",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_stair_outer(
+	"glass",
+	"default:glass",
+	{cracky = 3},
+	{"stairs_glass_stairside.png^[transformR90", "default_glass.png",
+	"stairs_glass_outer_stairside.png", "stairs_glass_stairside.png",
+	"stairs_glass_stairside.png^[transformR90","stairs_glass_outer_stairside.png"},
+	"Glass Stair",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_stair(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"stairs_obsidian_glass_split.png", "default_obsidian_glass.png",
+	"stairs_obsidian_glass_stairside.png^[transformFX", "stairs_obsidian_glass_stairside.png",
+	"default_obsidian_glass.png", "stairs_obsidian_glass_split.png"},
+	"Obsidian Glass Stair",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_slab(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"default_obsidian_glass.png", "default_obsidian_glass.png", "stairs_obsidian_glass_split.png"},
+	"Obsidian Glass Slab",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_stair_inner(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"stairs_obsidian_glass_stairside.png^[transformR270", "default_obsidian_glass.png",
+	"stairs_obsidian_glass_stairside.png^[transformFX", "default_obsidian_glass.png",
+	"default_obsidian_glass.png", "stairs_obsidian_glass_stairside.png"},
+	"Obsidian Glass Stair",
+	default.node_sound_glass_defaults(),
+	false
+)
+
+stairs.register_stair_outer(
+	"obsidian_glass",
+	"default:obsidian_glass",
+	{cracky = 3},
+	{"stairs_obsidian_glass_stairside.png^[transformR90", "default_obsidian_glass.png",
+	"stairs_obsidian_glass_outer_stairside.png", "stairs_obsidian_glass_stairside.png",
+	"stairs_obsidian_glass_stairside.png^[transformR90","stairs_obsidian_glass_outer_stairside.png"},
+	"Obsidian Glass Stair",
+	default.node_sound_glass_defaults(),
+	false
 )

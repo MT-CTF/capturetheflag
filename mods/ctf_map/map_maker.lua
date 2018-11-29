@@ -1,19 +1,41 @@
 local randint = math.random(100)
 
--- Load map metadata from mod_storage if it exists
+-- Reload mapmaker context from mod_storage if it exists
 local storage = minetest.get_mod_storage()
-local mapname = storage:get("mapname") or "ctf_" .. randint
-local maptitle = storage:get("maptitle") or "Untitled Map " .. randint
-local mapauthor = storage:get("mapauthor")
+local mapname = storage:get_string("mapname")
+local maptitle = storage:get_string("maptitle")
+local mapauthor = storage:get_string("mapauthor")
 local mapinitial = storage:get_string("mapinitial")
+local center = storage:get_string("center")
+local flag_positions = storage:get_string("flags")
+local barrier_r = storage:get_int("barrier_r")
 local center_barrier_rot = storage:get_int("center_barrier_rot")
-local barrier_r = storage:contains("barrier_r")
-					and storage:get_int("barrier_r") or 110
-local center = storage:contains("center")
-					and minetest.parse_json(storage:get("center"))
-					or { x = 0, y = 0, z = 0, r = 115, h = 140 }
-local flag_positions = storage:contains("flags")
-							and minetest.parse_json(storage:get("flags")) or {}
+
+if mapname == "" then
+	mapname = "ctf_" .. randint
+end
+if mapauthor == "" then
+	mapauthor = nil
+end
+if maptitle == "" then
+	maptitle = "Untitled Map " .. randint
+end
+if barrier_r == 0 then
+	barrier_r = 110
+end
+if center == "" then
+	center = { x = 0, y = 0, z = 0, r = 115, h = 140 }
+else
+	center = minetest.parse_json(storage:get("center"))
+end
+if flag_positions == "" then
+	flag_positions = {}
+else
+	minetest.parse_json(storage:get("flags"))
+end
+
+--------------------------------------------------------------------------------
+
 
 minetest.register_on_joinplayer(function(player)
 	minetest.after(1, function(name)

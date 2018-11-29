@@ -42,6 +42,15 @@ if singleplayer then
 	SHOOTER_ALLOW_PLAYERS = false
 end
 
+if minetest.global_exists("ctf_match") then
+	ctf_match.register_on_build_time_start(function()
+		SHOOTER_ALLOW_PLAYERS = false
+	end)
+	ctf_match.register_on_build_time_end(function()
+		SHOOTER_ALLOW_PLAYERS = true
+	end)
+end
+
 local modpath = minetest.get_modpath(minetest.get_current_modname())
 local worldpath = minetest.get_worldpath()
 local input = io.open(modpath.."/shooter.conf", "r")
