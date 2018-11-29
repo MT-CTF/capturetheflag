@@ -4,10 +4,9 @@ local function throw_grenade(name, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.4, z = pos.z + dir.z}, name)
-	local yaw = player:get_look_yaw()
 
-	obj:setvelocity({x = dir.x * 20, y = dir.y * 20, z = dir.z * 20})
-	obj:setacceleration({x = dir.x * -4, y = -20, z = dir.z * -4})
+	obj:set_velocity({x = dir.x * 40, y = dir.y * 40, z = dir.z * 40})
+	obj:set_acceleration({x = dir.x * -4, y = -10, z = dir.z * -4})
 
 	return(obj:get_luaentity())
 end
@@ -19,15 +18,16 @@ function grenades.register_grenade(name, def)
 
 	local grenade_entity = {
 		physical = true,
+		collide_with_objects = true,
 		timer = 0,
 		visual = "sprite",
 		visual_size = {x = 1, y = 1, z = 1},
 		textures = {def.image},
 		collisionbox = {1, 1, 1, 1, 1, 1},
 		on_step = function(self, dtime)
-			local pos = self.object:getpos()
-			local node = minetest.get_node(pos)
 			local obj = self.object
+			local pos = obj:get_pos()
+			local node = minetest.get_node(vector.add(pos, vector.normalize(obj:get_velocity)))
 
 			if self.particle == nil then
 				self.particle = 0
@@ -59,6 +59,7 @@ function grenades.register_grenade(name, def)
 			end
 
 			if self.timer > def.timeout or node.name ~= "air" then
+				minetest.log("[Grenades] A grenade thrown by "..self.thrower_name.." is exploding at "..minetest.pos_to_string(pos))
 				def.on_explode(pos, self.thrower_name)
 
 				obj:remove()
