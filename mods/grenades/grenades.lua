@@ -85,7 +85,7 @@ grenades.register_grenade("smoke", {
 	on_explode = function(pos, name)
 		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
-				amount = 20,
+				amount = 25,
 				time = 11,
 				minpos = vector.subtract(pos, 3.5),
 				maxpos = vector.add(pos, 3.5),
@@ -95,8 +95,8 @@ grenades.register_grenade("smoke", {
 				maxacc = {x = 1, y = 0.2, z = 1},
 				minexptime = 0.3,
 				maxexptime = 1,
-				minsize = 150,
-				maxsize = 150,
+				minsize = 120,
+				maxsize = 120,
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,

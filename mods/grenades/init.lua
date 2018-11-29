@@ -5,7 +5,7 @@ local function throw_grenade(name, player)
 	local pos = player:get_pos()
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.4, z = pos.z + dir.z}, name)
 
-	obj:set_velocity({x = dir.x * 30, y = dir.y * 30, z = dir.z * 30})
+	obj:set_velocity({x = dir.x * 23, y = dir.y * 23, z = dir.z * 23})
 	obj:set_acceleration({x = dir.x * -5, y = -20, z = dir.z * -5})
 
 	return(obj:get_luaentity())
@@ -17,7 +17,7 @@ function grenades.register_grenade(name, def)
 	end
 
 	local grenade_entity = {
-		physical = true,
+		physical = false,
 		collide_with_objects = true,
 		timer = 0,
 		visual = "sprite",
