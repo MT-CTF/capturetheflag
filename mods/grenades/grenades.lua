@@ -25,10 +25,10 @@ if regular ~= false then
 				time = 0.5,
 				minpos = vector.subtract(pos, radius),
 				maxpos = vector.add(pos, radius),
-				minvel = {x=0, y=5, z=0},
-				maxvel = {x=0, y=7, z=0},
-				minacc = {x=0, y=1, z=0},
-				maxacc = {x=0, y=1, z=0},
+				minvel = {x = 0, y = 5, z = 0},
+				maxvel = {x = 0, y = 7, z = 0},
+				minacc = {x = 0, y = 1, z = 0},
+				maxacc = {x = 0, y = 1, z = 0},
 				minexptime = 0.3,
 				maxexptime = 0.6,
 				minsize = 7,
@@ -41,7 +41,7 @@ if regular ~= false then
 
 			for k, v in ipairs(minetest.get_objects_inside_radius(pos, radius)) do
 				if v:is_player() and v:get_hp() > 0 then
-					v:punch(player, 2, {damage_groups = {fleshy = 21.5-vector.distance(pos, v:get_pos())}}, nil)
+					v:punch(player, 2, {damage_groups = {fleshy = 22 - (vector.distance(pos, v:get_pos()) * 2)}}, nil)
 				end
 			end
 		end,
@@ -68,7 +68,7 @@ if flash ~= false then
 								position = {x = 0, y = 0},
 								name = "flashbang hud "..pname,
 								scale = {x = -200, y = -200},
-								text = "grenades_white.png^[opacity:"..tostring(255-(i*17)),
+								text = "grenades_white.png^[opacity:"..tostring(255 - (i * 17)),
 								alignment = {x = 0, y = 0},
 								offset = {x = 0, y = 0}
 							})
@@ -100,10 +100,10 @@ if smoke ~= false then
 					time = 11,
 					minpos = vector.subtract(pos, 3.5),
 					maxpos = vector.add(pos, 3.5),
-					minvel = {x=0, y=2, z=0},
-					maxvel = {x=0, y=3, z=0},
-					minacc = {x=1, y=0.2, z=1},
-					maxacc = {x=1, y=0.2, z=1},
+					minvel = {x = 0, y = 2, z = 0},
+					maxvel = {x = 0, y = 3, z = 0},
+					minacc = {x = 1, y = 0.2, z = 1},
+					maxacc = {x = 1, y = 0.2, z = 1},
 					minexptime = 0.3,
 					maxexptime = 1,
 					minsize = 150,

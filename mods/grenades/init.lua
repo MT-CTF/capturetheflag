@@ -3,11 +3,11 @@ grenades = {}
 local function throw_grenade(name, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
-	local obj = minetest.add_entity({x=pos.x+dir.x, y=pos.y+1.4, z=pos.z+dir.z}, name)
+	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.4, z = pos.z + dir.z}, name)
 	local yaw = player:get_look_yaw()
 
-	obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
-	obj:setacceleration({x=dir.x * -4, y=-20, z=dir.z * -4})
+	obj:setvelocity({x = dir.x * 20, y = dir.y * 20, z = dir.z * 20})
+	obj:setacceleration({x = dir.x * -4, y = -20, z = dir.z * -4})
 
 	return(obj:get_luaentity())
 end
@@ -21,7 +21,7 @@ function grenades.register_grenade(name, def)
 		physical = true,
 		timer = 0,
 		visual = "sprite",
-		visual_size = {x=1, y=1, z=1},
+		visual_size = {x = 1, y = 1, z = 1},
 		textures = {def.image},
 		collisionbox = {1, 1, 1, 1, 1, 1},
 		on_step = function(self, dtime)
