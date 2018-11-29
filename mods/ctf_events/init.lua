@@ -20,7 +20,7 @@ local function get_colorcodes(name)
 	if not name then
 		return "", ""
 	end
-	local color = ctf_colors.get_irc_color(name, ctf.player(name))
+	local color = ctf_colors.get_irc_color(ctf.player(name))
 	local clear = "\x0F"
 	if color then
 		color = "\x03" .. color
@@ -69,7 +69,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 
 	-- One
 	if evt.one then
-		local _, tone_hex = ctf_colors.get_color(evt.one, ctf.player(evt.one))
+		local _, tone_hex = ctf_colors.get_color(ctf.player(evt.one))
 		if hud:exists(player, idx) then
 			hud:change(player, idx, "text", evt.one)
 			hud:change(player, idx, "number", tone_hex)
@@ -91,7 +91,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 
 	-- Two
 	if evt.two then
-		local _, ttwo_hex = ctf_colors.get_color(evt.two, ctf.player(evt.two))
+		local _, ttwo_hex = ctf_colors.get_color(ctf.player(evt.two))
 		if hud:exists(player, idx2) then
 			hud:change(player, idx2, "text", evt.two)
 			hud:change(player, idx2, "number", ttwo_hex)
