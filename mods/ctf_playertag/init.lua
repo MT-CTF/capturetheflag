@@ -1,4 +1,4 @@
-dofile(minetest.get_modpath("playertag") .. "/api.lua")
+dofile(minetest.get_modpath("ctf_playertag") .. "/api.lua")
 
 ctf_flag.register_on_pick_up(function(attname, flag)
 	local _, color = ctf_colors.get_color(ctf.player(attname))
