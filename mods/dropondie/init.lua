@@ -20,7 +20,7 @@ local function drop(pos, itemstack)
 	if obj then
 		obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
 
-		local remi = minetest.setting_get("remove_items")
+		local remi = minetest.settings:get("remove_items")
 		if minetest.is_yes(remi) then
 			obj:remove()
 		end

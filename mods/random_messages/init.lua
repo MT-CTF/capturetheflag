@@ -27,13 +27,13 @@ function table.random( t ) -- luacheck: ignore
 end
 
 function random_messages.initialize() --Set the interval in minetest.conf.
-	minetest.setting_set("random_messages_interval",60)
-	minetest.setting_save();
+	minetest.settings:set("random_messages_interval",60)
+	minetest.settings:write();
 	return 60
 end
 
 function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
-	MESSAGE_INTERVAL = tonumber(minetest.setting_get("random_messages_interval")) or random_messages.initialize()
+	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval")) or random_messages.initialize()
 end
 
 function random_messages.check_params(name,func,params)
