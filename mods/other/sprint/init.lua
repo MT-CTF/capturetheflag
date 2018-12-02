@@ -7,10 +7,6 @@ local MOD_JUMP    = tonumber(minetest.settings:get("sprint_jump")      or 1.1)
 local STAMINA_MAX = tonumber(minetest.settings:get("sprint_stamina")   or 20)
 local HEAL_RATE   = tonumber(minetest.settings:get("sprint_heal_rate") or 0.5)
 local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
-local SPRINT_MODIFIERS = {
-	[true]  = { speed = MOD_WALK, jump = MOD_JUMP },
-	[false] = { speed = 1.0,      jump = 1.0      },
-}
 
 if minetest.get_modpath("hudbars") ~= nil then
 	hb.register_hudbar("sprint", 0xFFFFFF, "Stamina",
@@ -27,7 +23,14 @@ local players = {}
 
 local function setSprinting(player, info, sprinting)
 	if info.sprinting ~= sprinting then
-		player:set_physics_override(SPRINT_MODIFIERS[sprinting])
+		if sprinting then
+			physics.set(player:get_player_name(), "sprint:sprint", {
+				speed = MOD_WALK,
+				jump  = MOD_JUMP
+			})
+		else
+			physics.remove(player:get_player_name(), "sprint:sprint")
+		end
 		info.sprinting = sprinting
 	end
 end
