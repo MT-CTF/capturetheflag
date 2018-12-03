@@ -1,10 +1,7 @@
 vote = {
 	active = {},
 	queue = {},
-	kick_cooldown = 600
 }
-
-local vlist = {} -- table storing player name, ip & lock status
 
 function vote.new_vote(creator, voteset)
 	local max_votes = tonumber(minetest.setting_get("vote.maximum_active")) or 1
@@ -217,11 +214,7 @@ function vote.update_hud(player)
 	end
 end
 minetest.register_on_leaveplayer(function(player)
-	local name = player:get_player_name()
-	vote.hud.players[name] = nil
-	if not vlist[name].locked then
-		vlist[name] = nil
-	end
+	vote.hud.players[player:get_player_name()] = nil
 end)
 
 function vote.update_all_hud()
@@ -317,75 +310,5 @@ minetest.register_chatcommand("abstain", {
 
 local set = minetest.setting_get("vote.kick_vote")
 if set == nil or minetest.is_yes(set) then
-	minetest.register_privilege("vote_kick", {
-		description = "Can (start) vote to kick a player",
-	})
-
-	minetest.register_chatcommand("vote_kick", {
-		privs = {
-			interact = true,
-			vote_kick = true,
-		},
-		func = function(name, param)
-			if not minetest.get_player_by_name(param) then
-				minetest.chat_send_player(name, "There is no player called '" ..
-						param .. "'")
-				return
-			end
-
-			return vote.new_vote(name, {
-				description = "Kick " .. param,
-				help = "/yes,  /no  or  /abstain",
-				name = param,
-				duration = 60,
-				perc_needed = 0.8,
-
-				on_result = function(self, result, results)
-					if result == "yes" then
-						minetest.chat_send_all("Vote passed, " ..
-								#results.yes .. " to " .. #results.no .. ", " ..
-								self.name .. " will be kicked.")
-						minetest.kick_player(self.name,
-							("The vote to kick you passed.\n You have been temporarily banned" ..
-							" for %s minutes."):format(tostring(vote.kick_cooldown / 60)))
-						vlist[self.name].locked = true
-						minetest.after(vote.kick_cooldown, function()
-							vlist[self.name] = nil
-						end)
-					else
-						minetest.chat_send_all("Vote failed, " ..
-								#results.yes .. " to " .. #results.no .. ", " ..
-								self.name .. " remains ingame.")
-					end
-				end,
-
-				on_vote = function(self, voter, value)
-					minetest.chat_send_all(voter .. " voted " .. value .. " to '" ..
-							self.description .. "'")
-				end
-			})
-		end
-	})
+	dofile(minetest.get_modpath("vote") .. "/vote_kick.lua")
 end
-
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    if not vlist[name] then
-        vlist[name] = {
-            ip = minetest.get_player_ip(name),
-            locked = false
-        }
-    end
-end)
-minetest.register_on_prejoinplayer(function(name, ip)
-	if vlist[name] and vlist[name].locked then
-		return "Please wait until the vote cool down period has elapsed before rejoining!"
-	else
-		for k, v in pairs(vlist) do
-			if v.ip == ip and v.locked then
-				return "This IP has been temporarily blocked."..
-					" Please wait until the cool-down period has elapsed before rejoining."
-			end
-		end
-	end
-end)
