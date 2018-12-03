@@ -136,6 +136,7 @@ end
 minetest.after(10, step)
 
 minetest.register_on_joinplayer(function(player)
+	playertag.set(player, TYPE_BUILTIN, {a = 0, r = 255, g = 255, b = 255})
 	minetest.after(2, function(name)
 		player = minetest.get_player_by_name(name)
 		if player then
