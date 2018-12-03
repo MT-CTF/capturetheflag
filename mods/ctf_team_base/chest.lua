@@ -90,15 +90,15 @@ for _, chest_color in pairs(colors) do
 				"list[" .. chestinv .. ";pro;5,0.3;3,4;]"
 
 			if is_pro then
-				formspec = formspec .. "listring[current_name;pro]" ..
+				formspec = formspec .. "listring[" .. chestinv ..";pro]" ..
 					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (1k+ score, 1.5+ KD)") .. "]"
 			else
-				formspec = formspec .. "listring[current_name;pro]" ..
+				formspec = formspec ..
 					"label[5,-0.2;" .. minetest.formspec_escape("You need 1k+ score and 1.5+ KD") .. "]"
 			end
 
 			formspec = formspec ..
-				"listring[current_name;main]" ..
+				"listring[" .. chestinv ..";main]" ..
 				"listring[current_player;main]" ..
 				default.get_hotbar_bg(0,4.85)
 
