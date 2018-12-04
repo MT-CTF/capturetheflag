@@ -129,7 +129,7 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			for itemstring in ipairs(blacklist) do
+			for _, itemstring in ipairs(blacklist) do
 				if stack:get_name() == itemstring then
 					return 0
 				end
