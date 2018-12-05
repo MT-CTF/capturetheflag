@@ -131,6 +131,8 @@ for _, chest_color in pairs(colors) do
 					chestinv:remove_item("helper", stack)
 					chestinv:remove_item("pro", n_stack)
 					return 0
+				elseif from_list == "helper" then
+					return 0
 				else
 					return count
 				end
