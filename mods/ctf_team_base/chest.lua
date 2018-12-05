@@ -120,7 +120,7 @@ for _, chest_color in pairs(colors) do
 			end
 
 			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(pstat) then
-				if to_list == "helper" and from_list ~= "main" then
+				if to_list == "helper" then
 					-- handle move & overflow
 					local chestinv = minetest.get_inventory({type = "node", pos = pos})
 					local playerinv = player:get_inventory()
@@ -139,6 +139,9 @@ for _, chest_color in pairs(colors) do
 			end
 		end,
 		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+			if listname == "helper" then
+				return 0
+			end
 			if chest_color ~= ctf.player(player:get_player_name()).team then
 				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
@@ -174,6 +177,9 @@ for _, chest_color in pairs(colors) do
 			end
 		end,
 		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+			if listname == "helper" then
+				return 0
+			end
 			if chest_color ~= ctf.player(player:get_player_name()).team then
 				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
 				return 0
