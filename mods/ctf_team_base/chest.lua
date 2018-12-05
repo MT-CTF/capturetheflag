@@ -120,12 +120,9 @@ for _, chest_color in pairs(colors) do
 			end
 
 			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(pstat) then
-				if to_list == "helper" then
+				if to_list == "helper" and from_list ~= "main" then
 					-- handle move & overflow
-					local chestinv = minetest.get_inventory({
-						type = "node",
-						pos = {x = pos.x, y = pos.y, z = pos.z}
-					})
+					local chestinv = minetest.get_inventory({type = "node", pos = pos})
 					local playerinv = player:get_inventory()
 					local stack = chestinv:get_stack(from_list, from_index)
 					local leftover = playerinv:add_item("main", stack)
@@ -159,10 +156,7 @@ for _, chest_color in pairs(colors) do
 			end
 
 			if listname ~= "pro" or get_is_player_pro(pstat) then
-				local chestinv = minetest.get_inventory({
-					type = "node",
-					pos = {x = pos.x, y = pos.y, z = pos.z}
-				})
+				local chestinv = minetest.get_inventory({type = "node", pos = pos})
 				if chestinv:room_for_item("pro", stack) then
 					return stack:get_count()
 				else
