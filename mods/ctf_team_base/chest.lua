@@ -43,6 +43,7 @@ for _, chest_color in pairs(colors) do
 			local inv = meta:get_inventory()
 			inv:set_size("main", 5*4)
 			inv:set_size("pro", 3*4)
+			inv:set_size("helper", 1*1)
 		end,
 		on_rightclick = function(pos, node, player)
 			if chest_color ~= ctf.player(player:get_player_name()).team then
@@ -91,7 +92,7 @@ for _, chest_color in pairs(colors) do
 
 			if is_pro then
 				formspec = formspec .. "listring[" .. chestinv ..";pro]" ..
-					"listring[current_player;main]" ..
+					"listring[" .. chestinv .. ";helper]" ..
 					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (1k+ score, 1.5+ KD)") .. "]"
 			else
 				formspec = formspec ..
@@ -119,7 +120,23 @@ for _, chest_color in pairs(colors) do
 			end
 
 			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(pstat) then
-				return count
+				if to_list == "helper" then
+					-- handle move & overflow
+					local chestinv = minetest.get_inventory({
+						type = "node",
+						pos = {x = pos.x, y = pos.y, z = pos.z}
+					})
+					local playerinv = player:get_inventory()
+					local stack = chestinv:get_stack(from_list, from_index)
+					local leftover = playerinv:add_item("main", stack)
+					local n_stack = stack
+					n_stack:set_count(stack:get_count() - leftover:get_count())
+					chestinv:remove_item("helper", stack)
+					chestinv:remove_item("pro", n_stack)
+					return 0
+				else
+					return count
+				end
 			else
 				return 0
 			end
@@ -142,7 +159,22 @@ for _, chest_color in pairs(colors) do
 			end
 
 			if listname ~= "pro" or get_is_player_pro(pstat) then
-				return stack:get_count()
+				local chestinv = minetest.get_inventory({
+					type = "node",
+					pos = {x = pos.x, y = pos.y, z = pos.z}
+				})
+				if chestinv:room_for_item("pro", stack) then
+					return stack:get_count()
+				else
+					-- handle overflow
+					local playerinv = player:get_inventory()
+					local leftovers = chestinv:add_item("pro", stack)
+					local leftover = chestinv:add_item("main", leftovers)
+					local n_stack = stack
+					n_stack:set_count(stack:get_count() - leftover:get_count())
+					playerinv:remove_item("main", n_stack)
+					return 0
+				end
 			else
 				return 0
 			end
