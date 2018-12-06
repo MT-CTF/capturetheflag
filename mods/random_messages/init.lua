@@ -65,7 +65,7 @@ function random_messages.read_messages()
 		"Trapping team mates on purpose is strictly against the rules and you will be kicked immediately.",
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
 		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
-		"Check your score and your rank in the league tables using /rankings"
+		"Check your score using /r and your rank in the league tables using /rankings"
 	}
 end
 
