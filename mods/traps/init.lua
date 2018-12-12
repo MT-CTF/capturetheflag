@@ -45,7 +45,7 @@ minetest.register_node("traps:spike", {
 	items  = { "default:steel_ingot 5" },
 	always_known = true,
     level  = 1,
-    
+ 
 Crafting recipe for ghost stones,
      crafting.register_recipe({
 	type   = "inv",
@@ -92,7 +92,7 @@ minetest.register_node("traps:damage_cobble", {
             return pdef.on_rightclick(pointed_thing.under,
                 node, placer, itemstack, pointed_thing)
             end
- 
+
             if pdef and pdef.buildable_to then
                 pos = pointed_thing.under
             else
