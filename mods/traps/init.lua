@@ -103,16 +103,16 @@ minetest.register_node("traps:damage_cobble", {
                     return itemstack
                 end
             end
- 
+
             return minetest.item_place(itemstack, placer, pointed_thing)
     end,
- 
+
     on_dig = function(pos, node, digger)
         local name = digger:get_player_name()
         if not digger then
             return
         end
- 
+
         local digger_team = ctf.player(name).team
         local meta = minetest.get_meta(pos)
         local placer_team = meta:get_string("placer") or "missing"
@@ -122,10 +122,10 @@ minetest.register_node("traps:damage_cobble", {
             minetest.remove_node(pos)
             return
         end
- 
+
         meta:set_string("placer", "")
         return minetest.node_dig(pos, node, digger)
-       
+
     end,
     after_place_node = function(pos, placer, itemstack, pointed_thing)
         local meta = minetest.get_meta(pos)
