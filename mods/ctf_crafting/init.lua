@@ -171,3 +171,43 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "traps:spike 1",
+	items  = { "default:steel_ingot 5" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "traps:dirt 1",
+	items  = { "default:dirt 5", "default:coal" },
+	always_known = true,
+	level  = 1,
+})
+		
+crafting.register_recipe({
+	type   = "inv",
+	output = "traps:cobblestone 1",
+	items  = { "default:cobblestone 5", "default:coal" },
+	always_known = true,
+	level  = 1,
+})
+				
+crafting.register_recipe({
+	type   = "inv",
+	output = "traps:stone 1",
+	items  = { "default:stone 5", "default:coal" },
+	always_known = true,
+	level  = 1,
+})						
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "traps:damage_cobble 1",
+	items  = { "default:cobblestone", "default:coal 4", "default:steel_ingot 4" },
+	always_known = true,
+	level  = 1,
+})
