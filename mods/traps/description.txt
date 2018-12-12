@@ -1,0 +1,1 @@
+Adds various traps for CTF. Ghost nodes like stone, dirt and cobblestone. The mod also adds spikes and fake cobble
