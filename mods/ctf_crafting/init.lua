@@ -187,7 +187,7 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
-		
+
 crafting.register_recipe({
 	type   = "inv",
 	output = "traps:cobblestone 1",
@@ -195,14 +195,14 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
-				
+
 crafting.register_recipe({
 	type   = "inv",
 	output = "traps:stone 1",
 	items  = { "default:stone 5", "default:coal" },
 	always_known = true,
 	level  = 1,
-})						
+})
 
 crafting.register_recipe({
 	type   = "inv",
