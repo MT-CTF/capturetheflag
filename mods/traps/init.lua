@@ -53,19 +53,16 @@ minetest.register_node("traps:damage_cobble", {
 			return pdef.on_rightclick(pointed_thing.under,
 			node, placer, itemstack, pointed_thing)
 		end
-
-		if pdef and pdef.buildable_to then
-		else
+		if not pdef then
 			pos = pointed_thing.above
 			node = minetest.get_node(pos)
 			pdef = minetest.registered_nodes[node.name]
 			if not pdef or not pdef.buildable_to then
 				return itemstack
 			end
-		end
 
-		return minetest.item_place(itemstack, placer, pointed_thing)
-	end,
+			return minetest.item_place(itemstack, placer, pointed_thing)
+		end,
 
 	on_dig = function(pos, node, digger)
 		local name = digger:get_player_name()
