@@ -51,7 +51,7 @@ minetest.register_node("traps:damage_cobble", {
 		if pdef and pdef.on_rightclick and
 			not placer:get_player_control().sneak then
 			return pdef.on_rightclick(pointed_thing.under,
-			node, placer, itemstack, pointed_thing)
+				node, placer, itemstack, pointed_thing)
 		end
 		if not pdef then
 			pos = pointed_thing.above
