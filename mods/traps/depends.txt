@@ -1,3 +1,2 @@
 default
-ctf_crafting?
 crafting?
