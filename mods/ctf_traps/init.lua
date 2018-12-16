@@ -1,32 +1,32 @@
-minetest.register_node("traps:dirt", {
+minetest.register_node("ctf_traps:dirt", {
 	description = "Unwalkable Dirt",
-	tiles = {"traps_dirt.png"},
+	tiles = {"ctf_traps_dirt.png"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {crumbly=3, soil=1}
 })
 
-minetest.register_node("traps:stone", {
+minetest.register_node("ctf_traps:stone", {
 	description = "Unwalkable Stone",
-	tiles = {"traps_stone.png"},
+	tiles = {"ctf_traps_stone.png"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=1}
 })
 
-minetest.register_node("traps:cobble", {
+minetest.register_node("ctf_traps:cobble", {
 	description = "Unwalkable Cobblestone",
-	tiles = {"traps_cobble.png"},
+	tiles = {"ctf_traps_cobble.png"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=2}
 })
 
-minetest.register_node("traps:spike", {
+minetest.register_node("ctf_traps:spike", {
 	description = "Spike",
 	drawtype = "plantlike",
-	tiles = {"traps_spike.png"},
-	inventory_image = "traps_spike.png",
+	tiles = {"ctf_traps_spike.png"},
+	inventory_image = "ctf_traps_spike.png",
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
@@ -38,9 +38,9 @@ minetest.register_node("traps:spike", {
 	},
 })
 
-minetest.register_node("traps:damage_cobble", {
+minetest.register_node("ctf_traps:damage_cobble", {
 	description = "Cobblestone that damages digger",
-	tiles = {"traps_dmg_cobble.png"},
+	tiles = {"ctf_traps_dmg_cobble.png"},
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3, stone=2},
