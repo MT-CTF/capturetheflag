@@ -4,7 +4,7 @@ minetest.register_on_leaveplayer(function(player)
 	hud.players[player:get_player_name()] = nil
 end)
 
-local NUM_EVT = 6
+local NUM_EVT = 12
 
 ctf_events = {
 	events = {}
