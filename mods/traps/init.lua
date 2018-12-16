@@ -14,7 +14,7 @@ minetest.register_node("traps:stone", {
 	groups = {cracky=3, stone=1}
 })
 
-minetest.register_node("traps:cobblestone", {
+minetest.register_node("traps:cobble", {
 	description = "Unwalkable Cobblestone",
 	tiles = {"traps_cobble.png"},
 	is_ground_content = false,
@@ -44,26 +44,6 @@ minetest.register_node("traps:damage_cobble", {
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3, stone=2},
-	on_place = function(itemstack, placer, pointed_thing)
-		local pos
-		local node = minetest.get_node(pointed_thing.under)
-		local pdef = minetest.registered_nodes[node.name]
-		if pdef and pdef.on_rightclick and
-			not placer:get_player_control().sneak then
-			return pdef.on_rightclick(pointed_thing.under,
-				node, placer, itemstack, pointed_thing)
-		end
-		if not pdef then
-			pos = pointed_thing.above
-			node = minetest.get_node(pos)
-			pdef = minetest.registered_nodes[node.name]
-			if not pdef or not pdef.buildable_to then
-				return itemstack
-			end
-		end
-	return minetest.item_place(itemstack, placer, pointed_thing)
-	end,
-
 	on_dig = function(pos, node, digger)
 		local name = digger:get_player_name()
 		if not digger then
@@ -82,7 +62,6 @@ minetest.register_node("traps:damage_cobble", {
 
 		meta:set_string("placer", "")
 		return minetest.node_dig(pos, node, digger)
-
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
