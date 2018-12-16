@@ -34,7 +34,7 @@ minetest.register_node("ctf_traps:spike", {
 	groups = {cracky=1, level=2},
 	selection_box = {
 		type = "fixed",
-		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -3 / 16, 6 / 16},
+		fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 	},
 })
 
