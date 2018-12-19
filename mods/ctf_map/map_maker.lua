@@ -31,7 +31,7 @@ end
 if flag_positions == "" then
 	flag_positions = {}
 else
-	minetest.parse_json(storage:get("flags"))
+	flag_positions = minetest.parse_json(storage:get("flags"))
 end
 
 --------------------------------------------------------------------------------
