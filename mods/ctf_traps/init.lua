@@ -39,7 +39,7 @@ minetest.register_node("ctf_traps:spike", {
 })
 
 minetest.register_node("ctf_traps:damage_cobble", {
-	description = "Cobblestone that damages digger",
+	description = "Cobblestone that damages digger of enemy team",
 	tiles = {"ctf_traps_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,
