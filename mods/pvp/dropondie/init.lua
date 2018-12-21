@@ -1,3 +1,5 @@
+dropondie = {}
+
 local blacklist_drop = {}
 
 local function drop(pos, itemstack)
@@ -12,7 +14,6 @@ local function drop(pos, itemstack)
 	end
 
 	local obj = minetest.add_item(pos, it)
-
 	if obj then
 		obj:set_velocity({ x = math.random(-1, 1), y = 5, z = math.random(-1, 1) })
 
@@ -21,7 +22,6 @@ local function drop(pos, itemstack)
 			obj:remove()
 		end
 	end
-	return itemstack
 end
 
 local function drop_list(pos, inv, list)
@@ -31,11 +31,9 @@ local function drop_list(pos, inv, list)
 	end
 end
 
-local function drop_all(player)
-	local pos = player:get_pos()
+function dropondie.drop_all(inv, pos)
 	pos.y = math.floor(pos.y + 0.5)
 
-	local inv = player:get_inventory()
 	for _, item in pairs(give_initial_stuff.get_stuff()) do
 		inv:remove_item("main", ItemStack(item))
 	end
@@ -43,5 +41,9 @@ local function drop_all(player)
 	drop_list(pos, inv, "craft")
 end
 
-minetest.register_on_dieplayer(drop_all)
-minetest.register_on_leaveplayer(drop_all)
+minetest.register_on_dieplayer(function(player)
+	dropondie.drop_all(player:get_inventory(), player:get_pos())
+end)
+minetest.register_on_leaveplayer(function(player)
+	dropondie.drop_all(player:get_inventory(), player:get_pos())
+end)
