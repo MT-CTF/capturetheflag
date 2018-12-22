@@ -26,20 +26,22 @@ end
 
 function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player, time)
 	local players = {}
-	local t1 = ctf.team_list[1]
-	local t2 = ctf.team_list[2]
-	local team1 = {
-		color = ctf.flag_colors[t1]:gsub("0x", "#"),
-		kills = 0,
-		attempts = 0,
-		score = 0,
-	}
-	local team2 = {
-		color = ctf.flag_colors[t2]:gsub("0x", "#"),
-		kills = 0,
-		attempts = 0,
-		score = 0,
-	}
+	local team_data = {}
+	local team_list = {}
+	for name in pairs(stats) do
+		local tdata = {
+			color = ctf.flag_colors[name]:gsub("0x", "#"),
+			kills = 0,
+			attempts = 0,
+			score = 0,
+		}
+		table.insert(team_data, tdata)
+		table.insert(team_list, name)
+	end
+
+	local t1, t2 = unpack(team_list)
+	local team1, team2 = unpack(team_data)
+	
 	for name, pstat in pairs(stats[t1]) do
 		pstat.name = name
 		pstat.color = ctf.flag_colors[t1]

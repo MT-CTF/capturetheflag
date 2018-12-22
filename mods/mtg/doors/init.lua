@@ -305,7 +305,7 @@ function doors.register(name, def)
 			-- Prevent door placement if within 40 nodes of enemy base
 			for team, _ in pairs(ctf.teams) do
 				if team ~= tname then
-					local base = ctf_map.map.teams[enemy_team].pos
+					local base = ctf_map.map.teams[team].pos
 					if vector.distance(pos, base) < 40 then
 						minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
 						break
