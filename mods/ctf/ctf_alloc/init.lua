@@ -52,18 +52,14 @@ function ctf_alloc.set_all()
 
 	minetest.log("warning", dump(players))
 
-	local to_red = math.random(2) == 2
+	local team_count = #ctf.team_list
+	local team_n = math.random(team_count)
 	for _, spair in pairs(players) do
 		local player     = spair.player
 		local name       = player:get_player_name()
 		local alloc_mode = tonumber(ctf.setting("allocate_mode"))
-		local team
-		if to_red then
-			team = "red"
-		else
-			team = "blue"
-		end
-		to_red = not to_red
+		local team = ctf.team_list[team_n]
+		team_n = (team_n % team_count) + 1
 
 		if alloc_mode ~= 0 and team then
 			ctf.log("autoalloc", name .. " was allocated to " .. team)

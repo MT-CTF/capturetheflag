@@ -31,13 +31,13 @@ end
 
 -- Load next match. May be overrided
 function ctf_match.next()
-	for i = 1, #ctf_match.registered_on_new_match do
-		ctf_match.registered_on_new_match[i]()
-	end
-
 	ctf.reset()
 
 	ctf_match.create_teams()
+
+	for i = 1, #ctf_match.registered_on_new_match do
+		ctf_match.registered_on_new_match[i]()
+	end
 
 	ctf_alloc.set_all()
 

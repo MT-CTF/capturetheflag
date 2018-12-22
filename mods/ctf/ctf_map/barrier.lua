@@ -231,8 +231,8 @@ if minetest.get_modpath("ctf") then
 		end
 
 		local tname = ctf.player(name).team
-		if tname and
-				(tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
+		if tname and tname.spawn and
+				tname.spawn.z * pos.z <= 0 then -- If Z coordinate of spawn and pos have opposite signs, product is negative
 			minetest.chat_send_player(name, "Can't dig beyond the barrier!")
 			return true
 		else
@@ -251,8 +251,7 @@ if minetest.get_modpath("ctf") then
 			local pos = player:get_pos()
 			local privs = minetest.get_player_privs(name)
 			if tname and not privs.fly and privs.interact then
-				if (tname == "blue" and pos.z >= 0) or
-						(tname == "red" and pos.z <= 0) then
+				if tname.spawn and tname.spawn.z * pos.z <= 0 then -- If Z coordinate of spawn and pos have opposite signs, product is negative
 					minetest.chat_send_player(name, "Match hasn't started yet!")
 					ctf.move_to_spawn(name)
 				end

@@ -19,8 +19,7 @@ local function get_is_player_pro(pstat)
 	return pstat.score > 1000 and kd > 1.5
 end
 
-local colors = {"red", "blue"}
-for _, chest_color in pairs(colors) do
+for chest_color, _ in pairs(ctf_colors.colors) do
 	minetest.register_node("ctf_team_base:chest_" .. chest_color, {
 		description = "Chest",
 		tiles = {

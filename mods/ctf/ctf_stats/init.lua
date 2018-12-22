@@ -16,7 +16,7 @@ function ctf_stats.load_legacy()
 	end
 
 	ctf.log("ctf_stats", "Migrating stats...")
-	ctf_stats.matches = table.matches
+	--ctf_stats.matches = table.matches
 	ctf_stats.players = table.players
 
 	for name, player_stats in pairs(ctf_stats.players) do
@@ -30,7 +30,7 @@ function ctf_stats.load_legacy()
 			player_stats.score = 800
 		end
 
-		player_stats.wins = player_stats.wins or {}
+		--[[player_stats.wins = player_stats.wins or {}
 		if player_stats.blue_wins then
 			player_stats.wins.blue = player_stats.blue_wins
 			player_stats.blue_wins = nil
@@ -40,13 +40,13 @@ function ctf_stats.load_legacy()
 			player_stats.red_wins  = nil
 		end
 		player_stats.wins.blue = player_stats.wins.blue or 0
-		player_stats.wins.red  = player_stats.wins.red  or 0
+		player_stats.wins.red  = player_stats.wins.red  or 0]]
 	end
 
-	ctf_stats.matches.wins = ctf_stats.matches.wins or {
-		red  = ctf_stats.matches.red_wins or 0,
-		blue = ctf_stats.matches.blue_wins or 0,
-	}
+	--[[ctf_stats.matches.wins = ctf_stats.matches.wins or {
+	--	red  = ctf_stats.matches.red_wins or 0,
+	--	blue = ctf_stats.matches.blue_wins or 0,
+	}]]
 
 	ctf.needs_save = true
 
@@ -64,13 +64,13 @@ function ctf_stats.load()
 
 	-- Make sure all tables are present
 	ctf_stats.players = ctf_stats.players or {}
-	ctf_stats.matches = ctf_stats.matches or {
+	--[[ctf_stats.matches = ctf_stats.matches or {
 		wins = {
 			blue = 0,
 			red  = 0,
 		},
 		skipped = 0,
-	}
+	}]]
 	ctf_stats.current = ctf_stats.current or {
 		red = {},
 		blue = {}
@@ -98,7 +98,13 @@ ctf.register_on_save(function()
 end)
 
 function ctf_stats.player_or_nil(name)
-	return ctf_stats.players[name], ctf_stats.current.red[name] or ctf_stats.current.blue[name]
+	local playerstats = ctf_stats.players[name]
+	for _, stats in pairs(ctf_stats.current) do
+		if stats[name] then
+			return playerstats, stats[name]
+		end
+	end
+	return playerstats
 end
 
 -- Returns a tuple: `player_stats`, `match_player_stats`
@@ -107,10 +113,10 @@ function ctf_stats.player(name)
 	if not player_stats then
 		player_stats = {
 			name = name,
-			wins = {
+			--[[wins = {
 				red = 0,
 				blue = 0,
-			},
+			},]]
 			kills = 0,
 			deaths = 0,
 			captures = 0,
@@ -121,8 +127,13 @@ function ctf_stats.player(name)
 		ctf_stats.players[name] = player_stats
 	end
 
-	local match_player_stats =
-			ctf_stats.current.red[name] or ctf_stats.current.blue[name]
+	local match_player_stats
+	for _, stats in pairs(ctf_stats.current) do
+		if stats[name] then
+			match_player_stats = stats[name]
+			break
+		end
+	end
 
 	return player_stats, match_player_stats
 end
@@ -157,7 +168,7 @@ end)
 local prev_match_summary = storage:get_string("prev_match_summary")
 ctf_match.register_on_winner(function(winner)
 	ctf.needs_save = true
-	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
+	--ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
 	winner_team = winner
 
 	-- Show match summary
@@ -174,7 +185,7 @@ end)
 
 ctf_match.register_on_skip_map(function()
 	ctf.needs_save = true
-	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
+	--ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
@@ -189,10 +200,11 @@ ctf_match.register_on_skip_map(function()
 end)
 
 ctf_match.register_on_new_match(function()
-	ctf_stats.current = {
-		red = {},
-		blue = {}
-	}
+	local current_stats = {}
+	for _, team in ipairs(ctf.team_list) do
+		current_stats[name] = {}
+	end
+	ctf_stats.current = current_stats
 	winner_team = "-"
 	winner_player = "-"
 	ctf_stats.start = os.time()
@@ -210,7 +222,7 @@ ctf_flag.register_on_pick_up(function(name, flag)
 	end
 end)
 
-ctf_flag.register_on_precapture(function(name, flag)
+--[[ctf_flag.register_on_precapture(function(name, flag)
 	local tplayer = ctf.player(name)
 	local main, _ = ctf_stats.player(name)
 	if main then
@@ -218,7 +230,7 @@ ctf_flag.register_on_precapture(function(name, flag)
 		ctf.needs_save = true
 	end
 	return true
-end)
+end)]]
 
 -- good_weapons now includes all mese and diamond implements, and swords of steel and better
 local good_weapons = {

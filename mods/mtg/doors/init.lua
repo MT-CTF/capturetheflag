@@ -303,11 +303,14 @@ function doors.register(name, def)
 			local tname = ctf.player(pn).team or ""
 
 			-- Prevent door placement if within 40 nodes of enemy base
-			local enemy_team = tname == "red" and "blue" or "red"
-			local enemy_base = ctf_map.map.teams[enemy_team].pos
-			if vector.distance(pos, enemy_base) < 40 then
-				minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
-				return itemstack
+			for team, _ in pairs(ctf.teams) do
+				if team ~= tname then
+					local base = ctf_map.map.teams[enemy_team].pos
+					if vector.distance(pos, base) < 40 then
+						minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
+						break
+					end
+				end
 			end
 
 			local dir = minetest.dir_to_facedir(placer:get_look_dir())
@@ -473,37 +476,23 @@ doors.register("door_steel", {
 		}
 })
 
-doors.register("door_steel_blue", {
-		tiles = {{name = "doors_door_steel_blue.png", backface_culling = true}},
-		description = "Team Door",
-		inventory_image = "doors_item_steel.png",
-		protected = true,
-		groups = {cracky = 1, level = 2},
-		sounds = default.node_sound_metal_defaults(),
-		sound_open = "doors_steel_door_open",
-		sound_close = "doors_steel_door_close",
-		recipe = {
-			{"default:steel_ingot", "default:steel_ingot"},
-			{"default:steel_ingot", "default:steel_ingot"},
-			{"default:steel_ingot", "default:steel_ingot"},
-		}
-})
-
-doors.register("door_steel_red", {
-		tiles = {{name = "doors_door_steel_red.png", backface_culling = true}},
-		description = "Team Door",
-		inventory_image = "doors_item_steel.png",
-		protected = true,
-		groups = {cracky = 1, level = 2},
-		sounds = default.node_sound_metal_defaults(),
-		sound_open = "doors_steel_door_open",
-		sound_close = "doors_steel_door_close",
-		recipe = {
-			{"default:steel_ingot", "default:steel_ingot"},
-			{"default:steel_ingot", "default:steel_ingot"},
-			{"default:steel_ingot", "default:steel_ingot"},
-		}
-})
+for color, _ in pairs(ctf_colors.colors) do
+	doors.register("door_steel_" .. color, {
+			tiles = {{name = "doors_door_steel_" .. color .. ".png", backface_culling = true}},
+			description = "Team Door",
+			inventory_image = "doors_item_steel.png",
+			protected = true,
+			groups = {cracky = 1, level = 2},
+			sounds = default.node_sound_metal_defaults(),
+			sound_open = "doors_steel_door_open",
+			sound_close = "doors_steel_door_close",
+			recipe = {
+				{"default:steel_ingot", "default:steel_ingot"},
+				{"default:steel_ingot", "default:steel_ingot"},
+				{"default:steel_ingot", "default:steel_ingot"},
+			}
+	})
+end
 
 doors.register("door_glass", {
 		tiles = {"doors_door_glass.png"},

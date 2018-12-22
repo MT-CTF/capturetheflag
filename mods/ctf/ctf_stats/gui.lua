@@ -13,46 +13,48 @@ local tablecolumns = {
 }
 tablecolumns = table.concat(tablecolumns, "")
 
-local function render_team_stats(red, blue, stat, round)
-	local red_stat, blue_stat = red[stat], blue[stat]
+local function render_team_stats(team1, team2, stat, round)
+	local team1_stat, team2_stat = team1[stat], team2[stat]
 	if round then
-		red_stat  = math.floor(red_stat  * 10) / 10
-		blue_stat = math.floor(blue_stat * 10) / 10
+		team1_stat  = math.floor(team1_stat  * 10) / 10
+		team2_stat = math.floor(team2_stat * 10) / 10
 	end
-	return red_stat + blue_stat .. " (" ..
-			minetest.colorize(red.color, tostring(red_stat)) .. " - " ..
-			minetest.colorize(blue.color, tostring(blue_stat)) .. ")"
+	return team1_stat + team2_stat .. " (" ..
+			minetest.colorize(team1.color, tostring(team1_stat)) .. " - " ..
+			minetest.colorize(team2.color, tostring(team2_stat)) .. ")"
 end
 
 function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player, time)
 	local players = {}
-	local red = {
-		color = ctf.flag_colors.red:gsub("0x", "#"),
+	local t1 = ctf.team_list[1]
+	local t2 = ctf.team_list[2]
+	local team1 = {
+		color = ctf.flag_colors[t1]:gsub("0x", "#"),
 		kills = 0,
 		attempts = 0,
 		score = 0,
 	}
-	local blue = {
-		color = ctf.flag_colors.blue:gsub("0x", "#"),
+	local team2 = {
+		color = ctf.flag_colors[t2]:gsub("0x", "#"),
 		kills = 0,
 		attempts = 0,
 		score = 0,
 	}
-	for name, pstat in pairs(stats.red) do
+	for name, pstat in pairs(stats[t1]) do
 		pstat.name = name
-		pstat.color = ctf.flag_colors.red
+		pstat.color = ctf.flag_colors[t1]
 		table.insert(players, pstat)
-		red.kills = red.kills + pstat.kills
-		red.attempts = red.attempts + pstat.attempts
-		red.score = red.score + pstat.score
+		team1.kills = team1.kills + pstat.kills
+		team1.attempts = team1.attempts + pstat.attempts
+		team1.score = team1.score + pstat.score
 	end
-	for name, pstat in pairs(stats.blue) do
+	for name, pstat in pairs(stats[t2]) do
 		pstat.name = name
-		pstat.color = ctf.flag_colors.blue
+		pstat.color = ctf.flag_colors[t2]
 		table.insert(players, pstat)
-		blue.kills = blue.kills + pstat.kills
-		blue.attempts = blue.attempts + pstat.attempts
-		blue.score = blue.score + pstat.score
+		team2.kills = team2.kills + pstat.kills
+		team2.attempts = team2.attempts + pstat.attempts
+		team2.score = team2.score + pstat.score
 	end
 
 	local match_length = string.format("%02d:%02d:%02d",
@@ -74,13 +76,13 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	end
 
 	ret = ret .. "label[6.5,0;Kills]"
-	ret = ret .. "label[8,0;" .. render_team_stats(red, blue, "kills") .. "]"
+	ret = ret .. "label[8,0;" .. render_team_stats(team1, team2, "kills") .. "]"
 	ret = ret .. "label[6.5,0.5;Attempts]"
-	ret = ret .. "label[8,0.5;" .. render_team_stats(red, blue, "attempts") .. "]"
+	ret = ret .. "label[8,0.5;" .. render_team_stats(team1, team2, "attempts") .. "]"
 	ret = ret .. "label[10.5,0;Duration]"
 	ret = ret .. "label[12,0;" .. match_length .. "]"
 	ret = ret .. "label[10.5,0.5;Total score]"
-	ret = ret .. "label[12,0.5;" .. render_team_stats(red, blue, "score", true) .. "]"
+	ret = ret .. "label[12,0.5;" .. render_team_stats(team1, team2, "score", true) .. "]"
 	ret = ret .. "label[2,7.75;Tip: type /rankings for league tables]"
 
 	return ret
