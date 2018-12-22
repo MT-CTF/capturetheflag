@@ -199,10 +199,10 @@ ctf_match.register_on_skip_map(function()
 	storage:set_string("prev_match_summary", fs)
 end)
 
-ctf_match.register_on_new_match(function()
+ctf_match.register_on_create_teams(function()
 	local current_stats = {}
 	for _, team in ipairs(ctf.team_list) do
-		current_stats[name] = {}
+		current_stats[team] = {}
 	end
 	ctf_stats.current = current_stats
 	winner_team = "-"

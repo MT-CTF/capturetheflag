@@ -20,6 +20,14 @@ function ctf_match.register_on_new_match(func)
 	table.insert(ctf_match.registered_on_new_match, func)
 end
 
+ctf_match.registered_on_create_teams = {}
+function ctf_match.register_on_create_teams(func)
+	if ctf._mt_loaded then
+		error("You can't register callbacks at game time!")
+	end
+	table.insert(ctf_match.registered_on_create_teams, func)
+end
+
 ctf_match.registered_on_winner = {}
 function ctf_match.register_on_winner(func)
 	if ctf._mt_loaded then
@@ -33,10 +41,14 @@ end
 function ctf_match.next()
 	ctf.reset()
 
-	ctf_match.create_teams()
-
 	for i = 1, #ctf_match.registered_on_new_match do
 		ctf_match.registered_on_new_match[i]()
+	end
+
+	ctf_match.create_teams()
+
+	for i = 1, #ctf_match.registered_on_create_teams do
+		ctf_match.registered_on_create_teams[i]()
 	end
 
 	ctf_alloc.set_all()

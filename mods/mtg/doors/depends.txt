@@ -1,2 +1,3 @@
 default
+ctf_colors
 screwdriver?
