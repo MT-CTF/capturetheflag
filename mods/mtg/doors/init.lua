@@ -308,7 +308,7 @@ function doors.register(name, def)
 					local base = ctf_map.map.teams[team].pos
 					if vector.distance(pos, base) < 40 then
 						minetest.chat_send_player(pn, "You can't place team-doors near the enemy base!")
-						break
+						return itemstack
 					end
 				end
 			end
