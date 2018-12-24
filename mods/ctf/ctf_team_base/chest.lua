@@ -19,6 +19,29 @@ local function get_is_player_pro(pstat)
 	return pstat.score > 1000 and kd > 1.5
 end
 
+local function check_chest_territory(pos)
+	local meta = minetest.get_meta(pos)
+	local current_owner = assert(meta:get_string("team"))
+	local territory_owner = ctf.get_territory_owner(pos)
+
+	if territory_owner and current_owner ~= territory_owner then
+		ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. current_owner)
+		minetest.set_node(pos, { name = "ctf_team_base:chest_" .. ctf_colors.get_team_color(territory_owner) })
+		meta:set_string("team", territory_owner)
+		return false
+	end
+	return true
+end
+
+local function is_your_chest(pos, player)
+	local chest_team = minetest.get_meta(pos):get_string("team")
+	local right_chest = chest_team == ctf.player(player:get_player_name()).team
+	if not right_chest then
+		minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_team)
+	end
+	return right_chest
+end
+
 for chest_color, _ in pairs(ctf_colors.colors) do
 	minetest.register_node("ctf_team_base:chest_" .. chest_color, {
 		description = "Chest",
@@ -43,20 +66,12 @@ for chest_color, _ in pairs(ctf_colors.colors) do
 			inv:set_size("helper", 1*1)
 		end,
 		on_rightclick = function(pos, node, player)
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+			if not is_your_chest(pos, player) then
 				return
 			end
 
-			local territory_owner = ctf.get_territory_owner(pos)
-			if chest_color ~= territory_owner then
-				if not territory_owner then
-					ctf.warning("ctf_team_base", "Unowned team chest")
-					minetest.set_node(pos, { name = "air" })
-					return
-				end
-				ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. chest_color)
-				minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
+			if not check_chest_territory(pos, node) then
+				return
 			end
 
 			local formspec = table.concat({
@@ -106,8 +121,7 @@ for chest_color, _ in pairs(ctf_colors.colors) do
 
 		allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+			if not is_your_chest(pos, player) then
 				return 0
 			end
 
@@ -138,11 +152,7 @@ for chest_color, _ in pairs(ctf_colors.colors) do
 			end
 		end,
 		allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-			if listname == "helper" then
-				return 0
-			end
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+			if listname == "helper" or not is_your_chest(pos, player) then
 				return 0
 			end
 
@@ -176,11 +186,7 @@ for chest_color, _ in pairs(ctf_colors.colors) do
 			end
 		end,
 		allow_metadata_inventory_take = function(pos, listname, index, stack, player)
-			if listname == "helper" then
-				return 0
-			end
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+			if listname == "helper" or not is_your_chest(pos, player) then
 				return 0
 			end
 
