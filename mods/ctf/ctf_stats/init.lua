@@ -29,24 +29,7 @@ function ctf_stats.load_legacy()
 		if player_stats.score > 800 then
 			player_stats.score = 800
 		end
-
-		--[[player_stats.wins = player_stats.wins or {}
-		if player_stats.blue_wins then
-			player_stats.wins.blue = player_stats.blue_wins
-			player_stats.blue_wins = nil
-		end
-		if player_stats.red_wins then
-			player_stats.wins.red  = player_stats.red_wins
-			player_stats.red_wins  = nil
-		end
-		player_stats.wins.blue = player_stats.wins.blue or 0
-		player_stats.wins.red  = player_stats.wins.red  or 0]]
 	end
-
-	--[[ctf_stats.matches.wins = ctf_stats.matches.wins or {
-	--	red  = ctf_stats.matches.red_wins or 0,
-	--	blue = ctf_stats.matches.blue_wins or 0,
-	}]]
 
 	ctf.needs_save = true
 
@@ -64,17 +47,13 @@ function ctf_stats.load()
 
 	-- Make sure all tables are present
 	ctf_stats.players = ctf_stats.players or {}
-	--[[ctf_stats.matches = ctf_stats.matches or {
-		wins = {
-			blue = 0,
-			red  = 0,
-		},
-		skipped = 0,
-	}]]
-	ctf_stats.current = ctf_stats.current or {
-		red = {},
-		blue = {}
-	}
+	if not ctf_stats.current then
+		local current = {}
+		for team in pairs(ctf.teams) do
+			current[team] = {}
+		end
+		ctf_stats.current = current
+	end
 
 	ctf_stats.start = os.time()
 
@@ -113,10 +92,6 @@ function ctf_stats.player(name)
 	if not player_stats then
 		player_stats = {
 			name = name,
-			--[[wins = {
-				red = 0,
-				blue = 0,
-			},]]
 			kills = 0,
 			deaths = 0,
 			captures = 0,
@@ -168,7 +143,6 @@ end)
 local prev_match_summary = storage:get_string("prev_match_summary")
 ctf_match.register_on_winner(function(winner)
 	ctf.needs_save = true
-	--ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
 	winner_team = winner
 
 	-- Show match summary
@@ -185,7 +159,6 @@ end)
 
 ctf_match.register_on_skip_map(function()
 	ctf.needs_save = true
-	--ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
@@ -221,16 +194,6 @@ ctf_flag.register_on_pick_up(function(name, flag)
 		ctf.needs_save = true
 	end
 end)
-
---[[ctf_flag.register_on_precapture(function(name, flag)
-	local tplayer = ctf.player(name)
-	local main, _ = ctf_stats.player(name)
-	if main then
-		main.wins[tplayer.team] = main.wins[tplayer.team] + 1
-		ctf.needs_save = true
-	end
-	return true
-end)]]
 
 -- good_weapons now includes all mese and diamond implements, and swords of steel and better
 local good_weapons = {
