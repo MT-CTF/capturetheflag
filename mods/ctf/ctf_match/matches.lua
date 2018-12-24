@@ -63,24 +63,17 @@ end
 
 -- Check for winner
 local game_won = false
-function ctf_match.check_for_winner()
-	local winner
-	for name, team in pairs(ctf.teams) do
-		if winner then
-			return
-		end
-		winner = name
-	end
-
-	-- There is a winner!
+function ctf_match.win_game(winner)
 	if not game_won then
 		game_won = true
 		ctf.action("match", winner .. " won!")
 		minetest.chat_send_all("Team " .. winner .. " won!")
-		for i = 1, #ctf_match.registered_on_winner do
-			ctf_match.registered_on_winner[i](winner)
-		end
+
+		-- Execute this at the end
 		minetest.after(2, function()
+			for i = 1, #ctf_match.registered_on_winner do
+				ctf_match.registered_on_winner[i](winner)
+			end
 			game_won = false
 			if ctf.setting("match") then
 				ctf_match.next()
@@ -95,16 +88,12 @@ function ctf_match.create_teams()
 end
 
 ctf_flag.register_on_capture(function(attname, flag)
-	if not ctf.setting("match.destroy_team") then
-		return
-	end
-
+	local winner_team = ctf.player(attname).team
 	local fl_team = ctf.team(flag.team)
 	if fl_team and #fl_team.flags == 0 then
 		ctf.action("match", flag.team .. " was defeated.")
-		ctf.remove_team(flag.team)
 		minetest.chat_send_all(flag.team .. " has been defeated!")
 	end
 
-	ctf_match.check_for_winner()
+	ctf_match.win_game(winner_team)
 end)

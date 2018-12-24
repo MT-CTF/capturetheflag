@@ -153,7 +153,7 @@ end)
 local winner_team = "-"
 local winner_player = "-"
 
-table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
+ctf_flag.register_on_capture(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.captures  = main.captures  + 1
@@ -215,7 +215,7 @@ ctf_flag.register_on_pick_up(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.attempts  = main.attempts  + 1
-		main.score     = main.score     + 5
+		main.score     = main.score     + 10
 		match.attempts = match.attempts + 1
 		match.score    = match.score    + 10
 		ctf.needs_save = true

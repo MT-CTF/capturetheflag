@@ -68,12 +68,13 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
 
 	if stats[winner_team] then
-		local winner_color = ctf_colors.get_team_color(winner_team):gsub("0x", "#")
-		ret = ret .. "item_image[0,0;1,1;ctf_flag:flag_top_"..winner_team.."]"
-		ret = ret .. "label[1,0;" .. minetest.colorize(winner_color,
+		local winner_color, winner_hexcolor = ctf_colors.get_team_color(winner_team)
+		winner_hexcolor = winner_hexcolor:gsub("0x", "#")
+		ret = ret .. "item_image[0,0;1,1;ctf_flag:flag_top_"..winner_color.."]"
+		ret = ret .. "label[1,0;" .. minetest.colorize(winner_hexcolor,
 						"TEAM " .. winner_team:upper() .. " WON!") .. "]"
 		ret = ret .. "label[1,0.5;Flag captured by " ..
-						minetest.colorize(winner_color, winner_player) .. "]"
+						minetest.colorize(winner_hexcolor, winner_player) .. "]"
 	else
 		ret = ret .. "label[1,0;NO WINNER]"
 	end
