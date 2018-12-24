@@ -29,8 +29,9 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	local team_data = {}
 	local team_list = {}
 	for name in pairs(stats) do
+		local _, hexcolor = ctf_colors.get_team_color(name)
 		local tdata = {
-			color = ctf.flag_colors[name]:gsub("0x", "#"),
+			color = hexcolor:gsub("0x", "#"),
 			kills = 0,
 			attempts = 0,
 			score = 0,
@@ -44,7 +45,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	
 	for name, pstat in pairs(stats[t1]) do
 		pstat.name = name
-		pstat.color = ctf.flag_colors[t1]
+		pstat.color = team1.color
 		table.insert(players, pstat)
 		team1.kills = team1.kills + pstat.kills
 		team1.attempts = team1.attempts + pstat.attempts
@@ -52,7 +53,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	end
 	for name, pstat in pairs(stats[t2]) do
 		pstat.name = name
-		pstat.color = ctf.flag_colors[t2]
+		pstat.color = team2.color
 		table.insert(players, pstat)
 		team2.kills = team2.kills + pstat.kills
 		team2.attempts = team2.attempts + pstat.attempts
@@ -67,7 +68,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
 
 	if stats[winner_team] then
-		local winner_color = ctf.flag_colors[winner_team]:gsub("0x", "#")
+		local winner_color = ctf_colors.get_team_color(winner_team):gsub("0x", "#")
 		ret = ret .. "item_image[0,0;1,1;ctf_flag:flag_top_"..winner_team.."]"
 		ret = ret .. "label[1,0;" .. minetest.colorize(winner_color,
 						"TEAM " .. winner_team:upper() .. " WON!") .. "]"
@@ -121,7 +122,7 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 			kd = kd / pstat.deaths
 		end
 		ret = ret ..
-			  "," .. string.gsub(color, "0x", "#") ..
+			  "," .. color ..
 			  "," .. i ..
 			  "," .. pstat.name ..
 			  "," .. pstat.kills ..

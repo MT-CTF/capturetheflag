@@ -102,8 +102,8 @@ function ctf_map.place_map(map)
 
 		assert(res)
 
-		for _, value in pairs(ctf_map.map.teams) do
-			ctf_team_base.place(value.color, value.pos)
+		for tname, value in pairs(ctf_map.map.teams) do
+			ctf_team_base.place(value.color, value.pos, tname)
 		end
 
 		local seed = minetest.get_mapgen_setting("seed")

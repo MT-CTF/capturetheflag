@@ -1,6 +1,6 @@
 
 ctf_team_base = {}
-function ctf_team_base.place(color, pos)
+function ctf_team_base.place(color, pos, tname)
 	-- Spawn ind base
 	for x = pos.x - 2, pos.x + 2 do
 		for z = pos.z - 2, pos.z + 2 do
@@ -34,7 +34,8 @@ function ctf_team_base.place(color, pos)
 		z = pos.z + dz
 	}
 	minetest.set_node(pos3, chest)
-	local inv = minetest.get_meta(pos3):get_inventory()
+	local meta = minetest.get_meta(pos3)
+	local inv = meta:get_inventory()
 	inv:add_item("main", ItemStack("default:cobble 99"))
 	inv:add_item("main", ItemStack("default:cobble 99"))
 	inv:add_item("main", ItemStack("default:cobble 99"))
@@ -42,4 +43,5 @@ function ctf_team_base.place(color, pos)
 	inv:add_item("main", ItemStack("default:stick 30"))
 	inv:add_item("main", ItemStack("default:glass 5"))
 	inv:add_item("main", ItemStack("default:torch 10"))
+	meta:set_string("team", tname)
 end

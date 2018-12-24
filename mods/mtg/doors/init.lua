@@ -331,7 +331,8 @@ function doors.register(name, def)
 			local dname = name
 			-- If steel doors are placed, append tname to place coloured team-doors instead
 			if name == "doors:door_steel" then
-				dname = name .. "_" .. tname	-- e.g. "doors:door_steel_red"
+				local color = ctf_colors.get_team_color(tname)
+				dname = name .. "_" .. color	-- e.g. "doors:door_steel_red"
 			end
 
 			local state = 0

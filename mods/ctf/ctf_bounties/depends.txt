@@ -1,3 +1,4 @@
 ctf
 ctf_stats
+ctf_colors
 irc?
