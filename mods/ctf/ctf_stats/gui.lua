@@ -42,7 +42,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 
 	local t1, t2 = unpack(team_list)
 	local team1, team2 = unpack(team_data)
-	
+
 	for name, pstat in pairs(stats[t1]) do
 		pstat.name = name
 		pstat.color = team1.color
