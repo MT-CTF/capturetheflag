@@ -166,6 +166,9 @@ function ctf_match.load_map_meta(idx, name)
 	while meta:get("team." .. i) do
 		local tname  = meta:get("team." .. i)
 		local tcolor = meta:get("team." .. i .. ".color")
+		if minetest.global_exists("ctf_colors") then
+			assert(ctf_colors.colors[tcolor], "Invalid color \"" .. tcolor .. "\" in " .. conf_path)
+		end
 		local tpos   = minetest.string_to_pos(meta:get("team." .. i .. ".pos"))
 
 		map.teams[tname] = {
