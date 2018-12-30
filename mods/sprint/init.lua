@@ -111,8 +111,11 @@ minetest.register_on_joinplayer(function(player)
 		})
 	end
 
-
 	players[player:get_player_name()] = info
+end)
+
+minetest.register_on_respawnplayer(function(player)
+	players[player:get_player_name()].stamina = STAMINA_MAX
 end)
 
 minetest.register_on_leaveplayer(function(player)
