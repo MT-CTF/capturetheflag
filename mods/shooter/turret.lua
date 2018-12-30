@@ -50,7 +50,7 @@ minetest.register_entity("shooter:tnt_entity", {
 	end,
 	get_staticdata = function(self)
 		return "expired"
-	end,	
+	end,
 })
 
 minetest.register_entity("shooter:turret_entity", {
@@ -92,7 +92,7 @@ minetest.register_entity("shooter:turret_entity", {
 		self.timer = self.timer + dtime
 		if self.timer < 0.1 then
 			return
-		end	
+		end
 		if self.player then
 			local pitch = self.pitch
 			local yaw = self.object:getyaw()
@@ -122,7 +122,7 @@ minetest.register_entity("shooter:turret_entity", {
 				end
 				if pitch < 0 then
 					pitch = 0
-				elseif pitch > 90 then 
+				elseif pitch > 90 then
 					pitch = 90
 				end
 				if self.pitch ~= pitch then
@@ -148,7 +148,7 @@ minetest.register_entity("shooter:turret_entity", {
 			return
 		end
 		minetest.sound_play("shooter_shotgun", {object=self.object})
-		if not minetest.setting_getbool("creative_mode") then
+		if not minetest.settings:get_bool("creative_mode") then
 			inv:remove_item("main", "tnt:tnt")
 		end
 		local pitch = math.rad(self.pitch - 40)
@@ -263,4 +263,3 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 end
-

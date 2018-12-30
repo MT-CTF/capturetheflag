@@ -179,7 +179,7 @@ for _, color in pairs(dye_basecolors) do
 		groups = {not_in_creative_inventory=1},
 		on_use = function(itemstack, user, pointed_thing)
 			minetest.sound_play("shooter_click", {object=user})
-			if not minetest.setting_getbool("creative_mode") then
+			if not minetest.settings:get_bool("creative_mode") then
 				itemstack:add_wear(65535/SHOOTER_CROSSBOW_USES)
 			end
 			itemstack = "shooter:crossbow 1 "..itemstack:get_wear()
@@ -244,7 +244,7 @@ minetest.register_tool("shooter:crossbow", {
 		local color = string.match(stack:get_name(), "shooter:arrow_(%a+)")
 		if color then
 			minetest.sound_play("shooter_reload", {object=user})
-			if not minetest.setting_getbool("creative_mode") then
+			if not minetest.settings:get_bool("creative_mode") then
 				inv:remove_item("main", "shooter:arrow_"..color.." 1")
 			end
 			return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()
@@ -252,7 +252,7 @@ minetest.register_tool("shooter:crossbow", {
 		for _, color in pairs(dye_basecolors) do
 			if inv:contains_item("main", "shooter:arrow_"..color) then
 				minetest.sound_play("shooter_reload", {object=user})
-				if not minetest.setting_getbool("creative_mode") then
+				if not minetest.settings:get_bool("creative_mode") then
 					inv:remove_item("main", "shooter:arrow_"..color.." 1")
 				end
 				return "shooter:crossbow_loaded_"..color.." 1 "..itemstack:get_wear()

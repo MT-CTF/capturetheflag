@@ -4,8 +4,8 @@ vote = {
 }
 
 function vote.new_vote(creator, voteset)
-	local max_votes = tonumber(minetest.setting_get("vote.maximum_active")) or 1
-	local max_queue = tonumber(minetest.setting_get("vote.maximum_active")) or 0
+	local max_votes = tonumber(minetest.settings:get("vote.maximum_active")) or 1
+	local max_queue = tonumber(minetest.settings:get("vote.maximum_active")) or 0
 
 	if #vote.active < max_votes then
 		vote.start_vote(voteset)
@@ -90,7 +90,7 @@ function vote.end_vote(voteset)
 		voteset:on_result(result, voteset.results)
 	end
 
-	local max_votes = tonumber(minetest.setting_get("vote.maximum_active")) or 1
+	local max_votes = tonumber(minetest.settings:get("vote.maximum_active")) or 1
 	if #vote.active < max_votes and #vote.queue > 0 then
 		local nextvote = table.remove(vote.queue, 1)
 		vote.start_vote(nextvote)
@@ -308,7 +308,7 @@ minetest.register_chatcommand("abstain", {
 	end
 })
 
-local set = minetest.setting_get("vote.kick_vote")
+local set = minetest.settings:get("vote.kick_vote")
 if set == nil or minetest.is_yes(set) then
 	dofile(minetest.get_modpath("vote") .. "/vote_kick.lua")
 end

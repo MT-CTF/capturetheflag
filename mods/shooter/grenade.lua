@@ -40,7 +40,7 @@ minetest.register_tool("shooter:grenade", {
 	description = "Grenade",
 	inventory_image = "shooter_hand_grenade.png",
 	on_use = function(itemstack, user, pointed_thing)
-		if not minetest.setting_getbool("creative_mode") then
+		if not minetest.settings:get_bool("creative_mode") then
 			itemstack = ""
 		end
 		-- clarification for future readers: grenade can be used only if player points at nothing (line 47)

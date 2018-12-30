@@ -310,7 +310,7 @@ function default.register_ores()
 	})
 end
 
-local WATER_H = tonumber(minetest.setting_get("water_level"))
+local WATER_H = tonumber(minetest.settings:get("water_level"))
 
 
 --

@@ -83,7 +83,7 @@ local h_max = 40		-- maximum chest spawning height, relative to water_level
 local t_min = 4			-- minimum amount of treasures found in a chest
 local t_max = 7			-- maximum amount of treasures found in a chest
 
-local water_level = tonumber(minetest.setting_get("water_level"))
+local water_level = tonumber(minetest.settings:get("water_level"))
 local get_node = minetest.get_node
 
 local function findGroundLevel(pos, y_min, y_max)

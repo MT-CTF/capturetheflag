@@ -30,7 +30,7 @@ function chatplus.init()
 end
 
 function chatplus.setting(name)
-	local get = minetest.setting_get("chatplus_" .. name)
+	local get = minetest.settings:get("chatplus_" .. name)
 	if get then
 		return get
 	elseif chatplus._defsettings[name]~= nil then

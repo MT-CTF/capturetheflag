@@ -4,7 +4,7 @@ local function throw_hook(itemstack, user, vel)
 	local dir = user:get_look_dir()
 	local yaw = user:get_look_yaw()
 	if pos and dir and yaw then
-		if not minetest.setting_getbool("creative_mode") then
+		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:add_wear(65535/100)
 		end
 		pos.y = pos.y + 1.5
@@ -84,7 +84,7 @@ minetest.register_tool("shooter:grapple_gun", {
 	inventory_image = "shooter_hook_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
-		if inv:contains_item("main", "shooter:grapple_hook") and 
+		if inv:contains_item("main", "shooter:grapple_hook") and
 				inv:contains_item("main", "tnt:gunpowder") then
 			inv:remove_item("main", "tnt:gunpowder")
 			minetest.sound_play("shooter_reload", {object=user})
@@ -129,4 +129,3 @@ if SHOOTER_ENABLE_CRAFTING == true then
 		},
 	})
 end
-

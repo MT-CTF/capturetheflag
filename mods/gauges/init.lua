@@ -58,8 +58,8 @@ function gauges.add_HP_gauge(name)
 end
 
 -- If health_bars not defined or set to true
-if minetest.setting_getbool("health_bars") ~= false and
-		minetest.setting_getbool("enable_damage") then
+if minetest.settings:get_bool("health_bars") ~= false and
+		minetest.settings:get_bool("enable_damage") then
 	minetest.register_on_joinplayer(function(player)
 		minetest.after(2, gauges.add_HP_gauge, player:get_player_name())
 	end)
