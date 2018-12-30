@@ -235,7 +235,7 @@ function ctf_stats.html_to_file(filepath)
 	f:close()
 end
 
-local function send_as_chat_result(to, name)
+local function return_as_chat_result(to, name)
 	local players = {}
 	for pname, pstat in pairs(ctf_stats.players) do
 		pstat.name = pname
@@ -279,9 +279,21 @@ local function send_as_chat_result(to, name)
 end
 
 minetest.register_chatcommand("r", {
-	description = "Display your rankings as a chat result.",
+	params = "[<name>]",
+	description = "Display rankings of yourself or another player as a chat result.",
 	func = function(name, param)
-		return send_as_chat_result(name, name)
+		local target
+		if param ~= "" then
+			param = param:trim()
+			if ctf_stats.players[param] then
+				target = param
+			else
+				return false, "Can't find player '" .. param .. "'"
+			end
+		else
+			target = name
+		end
+		return return_as_chat_result(name, target)
 	end
 })
 
@@ -302,7 +314,7 @@ minetest.register_chatcommand("rankings", {
 		end
 
 		if not minetest.get_player_by_name(name) then
-			return send_as_chat_result(name, target)
+			return return_as_chat_result(name, target)
 		else
 			local players = {}
 			for pname, pstat in pairs(ctf_stats.players) do
