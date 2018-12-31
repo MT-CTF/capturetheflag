@@ -151,7 +151,20 @@ function ctf_events.update_all()
 	end
 end
 
-ctf.register_on_killedplayer(function(victim, killer, type)
+ctf.register_on_killedplayer(function(victim, killer, stack)
+	local sname = stack:get_name()
+	local tool_caps = stack:get_tool_capabilities()
+	local type = "sword"
+	if sname:sub(1, 8) == "shooter:" then
+		if sname == "shooter:grenade" then
+			type = "grenade"
+		else
+			type = "bullet"
+		end
+	end
+	if tool_caps.damage_groups.grenade then
+		type = "grenade"
+	end
 	ctf_events.post("kill_" .. type, killer, victim)
 	ctf_events.update_all()
 end)
