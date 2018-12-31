@@ -1,8 +1,10 @@
-dofile(minetest.get_modpath("playertag") .. "/api.lua")
+dofile(minetest.get_modpath("ctf_playertag") .. "/api.lua")
 
 ctf_flag.register_on_pick_up(function(attname, flag)
+	local _, color = ctf_colors.get_color(ctf.player(attname))
+	color = color:gsub("0x", "#")
 	playertag.set(minetest.get_player_by_name(attname), playertag.TYPE_BUILTIN,
-					{ a=255, r=255, g=0, b=0 })
+					color)
 end)
 
 ctf_flag.register_on_drop(function(attname, flag)

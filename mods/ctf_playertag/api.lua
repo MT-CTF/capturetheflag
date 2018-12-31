@@ -10,7 +10,7 @@ playertag = {
 }
 
 local function add_entity_tag(player)
-	local ent = minetest.add_entity(player:get_pos(), "playertag:tag")
+	local ent = minetest.add_entity(player:get_pos(), "ctf_playertag:tag")
 
 	-- Build name from font texture
 	local color = "W"
@@ -116,7 +116,7 @@ function nametag:on_step(dtime)
 	end
 end
 
-minetest.register_entity("playertag:tag", nametag)
+minetest.register_entity("ctf_playertag:tag", nametag)
 
 local function step()
 	for _, player in pairs(minetest.get_connected_players()) do
