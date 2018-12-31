@@ -64,7 +64,7 @@ grenades.register_grenade("flashbang", {
 							offset = {x = 0, y = 0}
 						})
 
-						minetest.after(1.6 * i, function()
+						minetest.after(2 * i, function()
 							if minetest.get_player_by_name(pname) then
 								minetest.get_player_by_name(pname):hud_remove(key)
 							end
