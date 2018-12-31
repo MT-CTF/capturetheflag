@@ -59,7 +59,7 @@ grenades.register_grenade("flashbang", {
 							position = {x = 0, y = 0},
 							name = "flashbang hud "..pname,
 							scale = {x = -200, y = -200},
-							text = "grenades_white.png^[opacity:"..tostring(255 - (i * 17)),
+							text = "grenades_white.png^[opacity:"..tostring(255 - (i * 16)),
 							alignment = {x = 0, y = 0},
 							offset = {x = 0, y = 0}
 						})
@@ -85,18 +85,18 @@ grenades.register_grenade("smoke", {
 	on_explode = function(pos, name)
 		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
-				amount = 25,
+				amount = 30,
 				time = 11,
-				minpos = vector.subtract(pos, 3.5),
-				maxpos = vector.add(pos, 3.5),
+				minpos = vector.subtract(pos, 3),
+				maxpos = vector.add(pos, 3),
 				minvel = {x = 0, y = 2, z = 0},
 				maxvel = {x = 0, y = 3, z = 0},
 				minacc = {x = 1, y = 0.2, z = 1},
 				maxacc = {x = 1, y = 0.2, z = 1},
 				minexptime = 0.3,
-				maxexptime = 1,
-				minsize = 120,
-				maxsize = 120,
+				maxexptime = 0.5,
+				minsize = 90,
+				maxsize = 100,
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,
