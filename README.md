@@ -5,6 +5,14 @@ Uses the [CTF PvP engine](https://github.com/rubenwardy/ctf_pvp_engine)
 * Fast rounds of CTF games
 * Removed nodes for focus
 
+## USE RECURSIVE CLONING!
+
+Capture the flag uses several submodules. Make sure to grab them all by cloning like this:
+
+```sh
+git clone --recursive https://github.com/MT-CTF/capturetheflag.git
+```
+
 ## System Requirements
 
 ### Recommended
