@@ -8,5 +8,5 @@ Suppose `player`, `griefer` and `moderator` are online players.
 The Admin (named in "name") is mailed via chatplus: `<player1> Report: player2 is griefing (mods online: player3)`
 
 License: WTFPL  
-Depends: chatplus.
+Depends: email.
 
