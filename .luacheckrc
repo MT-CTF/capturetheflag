@@ -27,7 +27,7 @@ read_globals = {
 	"VoxelArea", "ItemStack",
 	"Settings",
 	"prometheus", "hb",
-	"awards",
+	"awards", "chatplus",
 
 
 	-- Testing
