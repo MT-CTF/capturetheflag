@@ -211,18 +211,3 @@ for _, chest_color in pairs(colors) do
 		end
 	})
 end
-
-minetest.register_abm({
-	nodenames = {"group:team_chest"},
-	interval = 10, -- Run every 10 seconds
-	chance = 1, -- Select every 1 in 50 nodes
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		local current_owner = assert(chest_name_to_team[node.name])
-
-		local territory_owner = ctf.get_territory_owner(pos)
-		if territory_owner and current_owner ~= territory_owner then
-			ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. current_owner)
-			minetest.set_node(pos, { name = "ctf_team_base:chest_" .. territory_owner })
-		end
-	end
-})
