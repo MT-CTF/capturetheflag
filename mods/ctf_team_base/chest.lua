@@ -20,9 +20,7 @@ local function get_is_player_pro(pstat)
 end
 
 local colors = {"red", "blue"}
-local chest_name_to_team = {}
 for _, chest_color in pairs(colors) do
-	chest_name_to_team["ctf_team_base:chest_" .. chest_color] = chest_color
 	minetest.register_node("ctf_team_base:chest_" .. chest_color, {
 		description = "Chest",
 		tiles = {

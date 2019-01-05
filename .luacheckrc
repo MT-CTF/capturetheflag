@@ -14,7 +14,7 @@ ignore = {"631"}
 globals = {
 	"crafting", "vector", "table", "minetest",
 	"worldedit", "ctf", "ctf_flag", "ctf_colors",
-	"hudkit", "default", "treasurer", "ChatCmdBuilder",
+	"hudkit", "default", "treasurer", "ChatCmdBuilder", "chatplus",
 }
 
 read_globals = {
@@ -27,7 +27,7 @@ read_globals = {
 	"VoxelArea", "ItemStack",
 	"Settings",
 	"prometheus", "hb",
-	"awards", "chatplus",
+	"awards",
 
 
 	-- Testing
