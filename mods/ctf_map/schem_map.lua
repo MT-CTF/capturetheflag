@@ -71,8 +71,8 @@ local function search_for_maps()
 	for key, _ in pairs(files_hash) do
 		local conf = Settings(mapdir .. "/" .. key .. ".conf")
 		minetest.log("error", "ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
-		if not conf:get_bool("disabled", false) and
-				minetest.settings:get_bool("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."), true) then
+		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
+		if not conf:get_bool("disabled", false) and val ~= "false" then
 			table.insert(ctf_map.available_maps, key)
 		else
 			minetest.log("error", key .. " disabled!")
