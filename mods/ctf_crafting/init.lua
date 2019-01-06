@@ -190,7 +190,7 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_traps:cobblestone 1",
+	output = "ctf_traps:cobble 1",
 	items  = { "default:cobblestone 5", "default:coal" },
 	always_known = true,
 	level  = 1,
