@@ -1,2 +1,2 @@
 crafting
-traps?
+ctf_traps?
