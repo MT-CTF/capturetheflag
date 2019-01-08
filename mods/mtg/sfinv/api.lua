@@ -29,16 +29,14 @@ end
 function sfinv.get_nav_fs(player, context, nav, current_idx)
 	-- Only show tabs if there is more than one page
 	if #nav > 1 then
-		return "tabheader[0,0;tabs;" .. table.concat(nav, ",") .. ";" .. current_idx .. ";true;false]"
+		return "tabheader[0,0;sfinv_nav_tabs;" .. table.concat(nav, ",") ..
+				";" .. current_idx .. ";true;false]"
 	else
 		return ""
 	end
 end
 
-local theme_main = "bgcolor[#080808BB;true]" .. default.gui_bg ..
-		default.gui_bg_img
-
-local theme_inv = default.gui_slots .. [[
+local theme_inv = [[
 		list[current_player;main;0,4.7;8,1;]
 		list[current_player;main;0,5.85;8,3;8]
 	]]
@@ -46,7 +44,6 @@ local theme_inv = default.gui_slots .. [[
 function sfinv.make_formspec(player, context, content, show_inv, size)
 	local tmp = {
 		size or "size[8,8.6]",
-		theme_main,
 		sfinv.get_nav_fs(player, context, context.nav_titles, context.nav_idx),
 		content
 	}
@@ -84,9 +81,20 @@ function sfinv.get_formspec(player, context)
 		return page:get(player, context)
 	else
 		local old_page = context.page
-		context.page = sfinv.get_homepage_name(player)
+		local home_page = sfinv.get_homepage_name(player)
+
+		if old_page == home_page then
+			minetest.log("error", "[sfinv] Couldn't find " .. dump(old_page) ..
+					", which is also the old page")
+
+			return ""
+		end
+
+		context.page = home_page
 		assert(sfinv.pages[context.page], "[sfinv] Invalid homepage")
-		minetest.log("warning", "[sfinv] Couldn't find " .. dump(old_page) .. " so using switching to homepage")
+		minetest.log("warning", "[sfinv] Couldn't find " .. dump(old_page) ..
+				" so switching to homepage")
+
 		return sfinv.get_formspec(player, context)
 	end
 end
@@ -127,6 +135,11 @@ function sfinv.set_page(player, pagename)
 	sfinv.set_player_inventory_formspec(player, context)
 end
 
+function sfinv.get_page(player)
+	local context = sfinv.contexts[player:get_player_name()]
+	return context and context.page or sfinv.get_homepage_name(player)
+end
+
 minetest.register_on_joinplayer(function(player)
 	if sfinv.enabled then
 		sfinv.set_player_inventory_formspec(player)
@@ -151,8 +164,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	-- Was a tab selected?
-	if fields.tabs and context.nav then
-		local tid = tonumber(fields.tabs)
+	if fields.sfinv_nav_tabs and context.nav then
+		local tid = tonumber(fields.sfinv_nav_tabs)
 		if tid and tid > 0 then
 			local id = context.nav[tid]
 			local page = sfinv.pages[id]
