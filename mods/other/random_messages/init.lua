@@ -27,17 +27,18 @@ function table.random( t ) -- luacheck: ignore
 end
 
 function random_messages.initialize() --Set the interval in minetest.conf.
-	minetest.settings:set("random_messages_interval",60)
+	minetest.settings:set("random_messages_interval", 60)
 	minetest.settings:write();
 	return 60
 end
 
 function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
-	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval")) or random_messages.initialize()
+	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval"))
+							or random_messages.initialize()
 end
 
 function random_messages.check_params(name,func,params)
-	local stat,msg = func(params)
+	local stat, msg = func(params)
 	if not stat then
 		minetest.chat_send_player(name,msg)
 		return false
@@ -69,7 +70,8 @@ function random_messages.read_messages()
 		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
 		"Use /r to check your score and rank, and /rankings to see the league tables.",
 		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
-		"Use /m to add a team marker at pointed location, that's visible only to team-mates."
+		"Use /m to add a team marker at pointed location, that's visible only to team-mates.",
+		"Use /summary to check scores of the current match or the previous match."
 	}
 end
 
