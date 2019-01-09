@@ -78,6 +78,14 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "default:furnace",
+	items  = { "default:desert_cobble 8" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "doors:door_steel",
 	items  = { "default:steel_ingot 6" },
 	always_known = true,
