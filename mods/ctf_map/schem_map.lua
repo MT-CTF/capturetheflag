@@ -74,8 +74,6 @@ local function search_for_maps()
 		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
 		if not conf:get_bool("disabled", false) and val ~= "false" then
 			table.insert(ctf_map.available_maps, key)
-		else
-			minetest.log("error", key .. " disabled!")
 		end
 	end
 	if next(ctf_map.available_maps) == nil then
@@ -83,7 +81,6 @@ local function search_for_maps()
 	end
 	return ctf_map.available_maps
 end
-print(dump(search_for_maps()))
 
 minetest.register_chatcommand("maps_reload", {
 	privs = { ctf_admin = true },
