@@ -82,6 +82,8 @@ local function search_for_maps()
 	return ctf_map.available_maps
 end
 
+search_for_maps()
+
 minetest.register_chatcommand("maps_reload", {
 	privs = { ctf_admin = true },
 	func = function(name, param)
