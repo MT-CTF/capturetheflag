@@ -76,6 +76,14 @@ crafting.register_recipe({
 -- Wooden plank x4
 crafting.register_recipe({
 	type   = "inv",
+	output = "ctf_team_base:reinforced_cobble",
+	items  = { "default:cobble 4" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "default:wood 4",
 	items  = { "group:tree" },
 	always_known = true,

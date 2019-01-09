@@ -13,12 +13,3 @@ minetest.register_node("ctf_team_base:reinforced_cobble", {
 	groups = {cracky = 1, stone = 2},
 	sounds = default.node_sound_stone_defaults(),
 })
-
-minetest.register_craft({
-	output = "ctf_team_base:reinforced_cobble",
-	type   = "shapeless",
-	recipe = {
-		{"default:cobble", "default:cobble"},
-		{"default:cobble", "default:cobble"}
-	},
-})
