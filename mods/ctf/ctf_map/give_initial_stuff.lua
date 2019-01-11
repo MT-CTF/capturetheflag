@@ -2,7 +2,8 @@ give_initial_stuff = {}
 
 setmetatable(give_initial_stuff, {
 	__call = function(self, player)
-		minetest.log("action", "Giving initial stuff to player "..player:get_player_name())
+		minetest.log("action", "Giving initial stuff to player "
+				.. player:get_player_name())
 		local inv = player:get_inventory()
 		inv:set_list("main",  {})
 		inv:set_list("craft", {})
@@ -21,8 +22,8 @@ setmetatable(give_initial_stuff, {
 
 function give_initial_stuff.get_stuff()
 	return ctf_map.map and ctf_map.map.initial_stuff or {
-		"default:pick_wood",
-		"default:sword_wood",
+		"default:pick_stone",
+		"default:sword_stone",
 		"default:torch 3",
 	}
 end

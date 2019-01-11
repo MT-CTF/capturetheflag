@@ -1,8 +1,4 @@
-local blacklist_drop = {
-	"default:pick_wood",
-	"default:sword_wood",
-	"default:ax_wood"
-}
+local blacklist_drop = {}
 
 local function drop(pos, itemstack)
 	local it = itemstack:take_item(itemstack:get_count())
@@ -10,7 +6,7 @@ local function drop(pos, itemstack)
 
 	for _, item in pairs(blacklist_drop) do
 		if sname == item then
-			minetest.log("error", "Not dropping " .. item)
+			minetest.log("info", "Not dropping " .. item)
 			return
 		end
 	end

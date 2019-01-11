@@ -11,7 +11,6 @@ wield3d_location = {
 	["flowers:rose"] = {bone, {x=0.2, y=6.5, z=3}, {x=-100, y=182, z=83}},
 	["flowers:tulip"] = {bone, {x=0.2, y=6.5, z=3}, {x=-100, y=182, z=83}},
 	["flowers:viola"] = {bone, {x=0.2, y=6.5, z=3}, {x=-100, y=182, z=83}},
-	["default:shovel_wood"] = {bone, {x=0, y=6.5, z=3}, {x=-90, y=137, z=83}},
 	["default:shovel_stone"] = {bone, {x=0, y=6.5, z=3}, {x=-90, y=137, z=83}},
 	["default:shovel_steel"] = {bone, {x=0, y=6.5, z=3}, {x=-90, y=137, z=83}},
 	["default:shovel_bronze"] = {bone, {x=0, y=6.5, z=3}, {x=-90, y=137, z=83}},
@@ -29,4 +28,3 @@ wield3d_location = {
 	["vessels:drinking_glass"] = {bone, {x=0, y=6.5, z=3}, {x=-90, y=137, z=83}},
 	["vessels:steel_bottle"] = {bone, {x=0, y=6.5, z=3}, {x=-90, y=137, z=83}},
 }
-

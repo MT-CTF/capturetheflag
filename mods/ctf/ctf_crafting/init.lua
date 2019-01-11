@@ -73,6 +73,7 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+-- Wood x4
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:wood 4",
@@ -144,64 +145,6 @@ crafting.register_recipe({
 	level  = 1,
 })
 
--- Shovels
-for _, orex in pairs(full_ores) do
-	crafting.register_recipe({
-		type   = "inv",
-		output = "default:shovel_" .. orex[1],
-		items  = { "default:stick 2", orex[2] },
-		always_known = true,
-		level  = 1,
-	})
-end
-
--- Axes
-for _, orex in pairs(full_ores) do
-	crafting.register_recipe({
-		type   = "inv",
-		output = "default:axe_" .. orex[1],
-		items  = { "default:stick 2", orex[2] .. " 3" },
-		always_known = true,
-		level  = 1,
-	})
-end
-
--- Wooden plank x3 <== Wooden pickaxe
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:wood 3",
-	items  = { "default:pick_wood" },
-	always_known = true,
-	level  = 1,
-})
-
--- Wooden plank x2 <== Wooden sword
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:wood 2",
-	items  = { "default:sword_wood" },
-	always_known = true,
-	level  = 1,
-})
-
--- Wooden plank x3 <== Wooden axe
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:wood 3",
-	items  = { "default:axe_wood" },
-	always_known = true,
-	level  = 1,
-})
-
--- Wooden plank <== Wooden shovel
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:wood 1",
-	items  = { "default:shovel_wood" },
-	always_known = true,
-	level  = 1,
-})
-
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_traps:spike 1",
@@ -241,3 +184,25 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+-- Shovels
+for _, orex in pairs(full_ores) do
+	crafting.register_recipe({
+		type   = "inv",
+		output = "default:shovel_" .. orex[1],
+		items  = { "default:stick 2", orex[2] },
+		always_known = true,
+		level  = 1,
+	})
+end
+
+-- Axes
+for _, orex in pairs(full_ores) do
+	crafting.register_recipe({
+		type   = "inv",
+		output = "default:axe_" .. orex[1],
+		items  = { "default:stick 2", orex[2] .. " 3" },
+		always_known = true,
+		level  = 1,
+	})
+end
