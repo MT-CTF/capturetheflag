@@ -2,11 +2,11 @@ unused_args = false
 allow_defined_top = true
 
 exclude_files = {
-	"mods/default",
+	"mods/mtg/default",
 	"mods/ctf_pvp_engine",
-	"mods/shooter",
-	"mods/wield3d",
-	"mods/treasurer",
+	"mods/pvp/shooter",
+	"mods/other/wield3d",
+	"mods/other/treasurer",
 }
 
 ignore = {"631"}
