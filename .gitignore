@@ -5,7 +5,6 @@
 tags
 *.vim
 debug.txt
-mods/ctf/ctf_map/maps/*
 
 ## Files related to minetest development cycle
 *.patch
