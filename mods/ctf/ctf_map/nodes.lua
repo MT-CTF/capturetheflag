@@ -735,6 +735,30 @@ minetest.register_node("ctf_map:meselamp", {
 	light_source = default.LIGHT_MAX,
 })
 
+minetest.register_node("ctf_map:killnode", {
+	description = "Kill Node",
+	drawtype = "glasslike",
+	tiles = {"ctf_map_killnode.png"},
+	paramtype = "light",
+	sunlight_propogates = true,
+	is_ground_content = false,
+	groups = {immortal = 1},
+	sounds = default.node_sound_stone_defaults(),
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		 local timer = minetest.get_node_timer(pos)
+		 timer:start(0.5)
+	end,
+	on_timer = function(pos, elapsed)
+		local objects = minetest.get_objects_inside_radius(pos, 1)
+		for i, object in pairs(objects) do
+		    if minetest.is_player(object) then
+		       object:set_hp(0)
+		    end
+		end
+		return true
+	end
+})
+
 -- Re-register all nodes from stairs and wool
 for name, nodedef in pairs(minetest.registered_nodes) do
 	if name:find("stairs") then
