@@ -238,6 +238,8 @@ local function furnace_node_timer(pos, elapsed)
 	return result
 end
 
+local furnaces = {}
+
 local function on_destruct(pos)
 	local inv = minetest.get_inventory({ type = "node", pos = pos })
 	for _, list in pairs(inv:get_lists()) do
@@ -245,6 +247,7 @@ local function on_destruct(pos)
 			minetest.add_item(pos, item)
 		end
 	end
+	furnaces[minetest.pos_to_string(pos)] = nil
 end
 
 --
@@ -273,6 +276,7 @@ minetest.register_node("furnace:furnace", {
 		inv:set_size('src', 1)
 		inv:set_size('fuel', 1)
 		inv:set_size('dst', 4)
+		furnaces[minetest.pos_to_string(pos)] = true
 	end,
 
 	on_metadata_inventory_move = function(pos)
@@ -332,11 +336,12 @@ minetest.register_node("furnace:furnace_active", {
 
 minetest.register_alias("default:furnace", "furnace:furnace")
 
-minetest.register_craft({
-	output = 'furnace:furnace',
-	recipe = {
-		{'group:stone', 'group:stone', 'group:stone'},
-		{'group:stone', '', 'group:stone'},
-		{'group:stone', 'group:stone', 'group:stone'},
-	}
-})
+if minetest.global_exists("ctf_match") then
+	ctf_match.register_on_new_match(function()
+		for i, _ in pairs(furnaces) do
+			local pos = minetest.string_to_pos(i)
+			minetest.remove_node(pos)
+			furnaces[i] = nil
+		end
+	end)
+end
