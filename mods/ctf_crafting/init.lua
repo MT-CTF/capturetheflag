@@ -171,3 +171,10 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "ctf_bandages:bandage",
+	items  = { "group:leaves 5, default:copper_ingot"},
+	always_known = true,
+	level  = 1,
