@@ -1,0 +1,1 @@
+Adds a bandage which heals 75% of total HP
