@@ -46,20 +46,11 @@ crafting.register_recipe({
 	level  = 1,
 })
 
--- Furnace <== Cobble x8
+-- Furnace <== group:stone x8
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:furnace",
-	items  = { "default:cobble 8" },
-	always_known = true,
-	level  = 1,
-})
-
--- Furnace <== Desert cobble x8
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:furnace",
-	items  = { "default:desert_cobble 8" },
+	items  = { "group:stone 8" },
 	always_known = true,
 	level  = 1,
 })
