@@ -742,6 +742,7 @@ minetest.register_node("ctf_map:killnode", {
 	paramtype = "light",
 	sunlight_propogates = true,
 	walkable = false,
+	pointable = false,
 	damage_per_second = 20,
 	is_ground_content = false,
 	groups = {immortal = 1},
