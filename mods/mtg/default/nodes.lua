@@ -559,7 +559,7 @@ minetest.register_node("default:leaves", {
 	special_tiles = {"default_leaves_simple.png"},
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+	groups = {snappy = 3, flammable = 2, leaves = 1},
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
@@ -579,8 +579,7 @@ minetest.register_node("default:apple", {
 		type = "fixed",
 		fixed = {-3 / 16, -7 / 16, -3 / 16, 3 / 16, 4 / 16, 3 / 16}
 	},
-	groups = {fleshy = 3, dig_immediate = 3, flammable = 2,
-		leafdecay = 3, leafdecay_drop = 1},
+	groups = {fleshy = 3, dig_immediate = 3, flammable = 2},
 	on_use = minetest.item_eat(2),
 	sounds = default.node_sound_leaves_defaults(),
 
@@ -622,7 +621,7 @@ minetest.register_node("default:jungleleaves", {
 	special_tiles = {"default_jungleleaves_simple.png"},
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+	groups = {snappy = 3, flammable = 2, leaves = 1},
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
@@ -658,7 +657,7 @@ minetest.register_node("default:pine_needles",{
 	waving = 1,
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+	groups = {snappy = 3, flammable = 2, leaves = 1},
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
@@ -694,7 +693,7 @@ minetest.register_node("default:acacia_leaves", {
 	waving = 1,
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+	groups = {snappy = 3, flammable = 2, leaves = 1},
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
@@ -729,7 +728,7 @@ minetest.register_node("default:aspen_leaves", {
 	waving = 1,
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
+	groups = {snappy = 3, flammable = 2, leaves = 1},
 	sounds = default.node_sound_leaves_defaults(),
 
 	after_place_node = default.after_place_leaves,
@@ -1239,58 +1238,4 @@ minetest.register_node("default:meselamp", {
 	groups = {cracky = 3, oddly_breakable_by_hand = 3},
 	sounds = default.node_sound_glass_defaults(),
 	light_source = default.LIGHT_MAX,
-})
-
---
--- register trees for leafdecay
---
-
-if minetest.get_mapgen_setting("mg_name") == "v6" then
-	default.register_leafdecay({
-		trunks = {"default:tree"},
-		leaves = {"default:apple", "default:leaves"},
-		radius = 2,
-	})
-
-	default.register_leafdecay({
-		trunks = {"default:jungletree"},
-		leaves = {"default:jungleleaves"},
-		radius = 3,
-	})
-
-	default.register_leafdecay({
-		trunks = {"default:pine_tree"},
-		leaves = {"default:pine_needles"},
-		radius = 3,
-	})
-else
-	default.register_leafdecay({
-		trunks = {"default:tree"},
-		leaves = {"default:apple", "default:leaves"},
-		radius = 3,
-	})
-
-	default.register_leafdecay({
-		trunks = {"default:jungletree"},
-		leaves = {"default:jungleleaves"},
-		radius = 2,
-	})
-
-	default.register_leafdecay({
-		trunks = {"default:pine_tree"},
-		leaves = {"default:pine_needles"},
-		radius = 2,
-	})
-end
-
-default.register_leafdecay({
-	trunks = {"default:acacia_tree"},
-	leaves = {"default:acacia_leaves"},
-	radius = 2,
-})
-
-default.register_leafdecay({
-	trunks = {"default:aspen_tree"},
-	leaves = {"default:aspen_leaves"},
-	radius = 3,
 })
