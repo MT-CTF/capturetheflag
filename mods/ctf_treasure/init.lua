@@ -4,6 +4,7 @@ treasurer.register_treasure("default:cobble",0.4,5,{45,99})
 treasurer.register_treasure("default:apple",0.3,5,{1,8})
 treasurer.register_treasure("default:wood",0.3,5,{30,60})
 treasurer.register_treasure("doors:door_steel",0.3,5,{1,3})
+treasurer.register_treasure("ctf_bandages:bandage",0.3,5,{1,6})
 
 treasurer.register_treasure("default:pick_steel",0.5,5,{1,10})
 treasurer.register_treasure("default:sword_stone",0.6,5,{1,10})
