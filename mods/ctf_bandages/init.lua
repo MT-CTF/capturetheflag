@@ -1,8 +1,8 @@
 --Inspired from Andrey's bandages mod
 
-minetest.register_craftitem("bandages:bandage", {
+minetest.register_craftitem("ctf_bandages:bandage", {
     description = "Bandage, heals teammates for 15HP",
-    inventory_image = "bandage.png",
+    inventory_image = "ctf_bandages_bandage.png",
     range = 4,
     on_use = function(itemstack, player, pointed_thing)
     if pointed_thing.type == "object" then
