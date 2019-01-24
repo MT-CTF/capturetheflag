@@ -102,7 +102,7 @@ local function findGroundLevel(pos, y_min, y_max)
 			end
 		end
 		if loop then
-		   	break
+			break
 		end
 	end
 	loop = false
@@ -117,7 +117,7 @@ local function findGroundLevel(pos, y_min, y_max)
 			end
 		end
 		if loop then
-		   	break
+			break
 		end
 	end
 	return ground
