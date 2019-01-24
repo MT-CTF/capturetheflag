@@ -90,24 +90,34 @@ local get_node = minetest.get_node
 local function findGroundLevel(pos, y_min, y_max)
 	local ground = nil
 	local top    = y_max
+	local loop = false
 	for y = y_max, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
 		for i = 1, 1 do
 			if string.match(non_ground_nodes[i], name) then
 				top = y
+				loop = true
 				break
 			end
 		end
+		if loop then
+		   	break
+		end
 	end
+	loop = false
 	for y = top, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
 		for i = 1, 1 do
 			if not string.match(non_ground_nodes[i], name) then
 				ground = y
+				loop = true
 				break
 			end
+		end
+		if loop then
+		   	break
 		end
 	end
 	return ground
