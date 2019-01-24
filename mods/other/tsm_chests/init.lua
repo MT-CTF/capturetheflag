@@ -82,6 +82,7 @@ local h_min = -65  		-- minimum chest spawning height, relative to water_level
 local h_max = 40		-- maximum chest spawning height, relative to water_level
 local t_min = 4			-- minimum amount of treasures found in a chest
 local t_max = 7			-- maximum amount of treasures found in a chest
+local non_ground_nodes = {"air", "default:water_source", "default:lava_source", "default:grass_", "default:snow"} -- nodes that will be ignored when finding ground level
 
 local water_level = tonumber(minetest.settings:get("water_level"))
 local get_node = minetest.get_node
@@ -92,17 +93,21 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y = y_max, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
-		if name == "air" or name == "default:water_source" or name == "default:lava_source" then
-			top = y
-			break
+		for i = 1, 1 do
+			if string.match(non_ground_nodes[i], name) then
+				top = y
+				break
+			end
 		end
 	end
-	for y=top,y_min,-1 do
+	for y = top, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
-					local name = get_node(p).name
-		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
-			ground = y
-			break
+		local name = get_node(p).name
+		for i = 1, 1 do
+			if not string.match(non_ground_nodes[i], name) then
+				ground = y
+				break
+			end
 		end
 	end
 	return ground
