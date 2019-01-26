@@ -1,0 +1,1 @@
+Adds a bandage which heals team-mates if they are below 15 HP. The bandages heal 3-4 HP until the player reaches 15 HP.
