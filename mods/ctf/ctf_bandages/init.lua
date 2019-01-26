@@ -1,6 +1,6 @@
 --Inspired from Andrey's bandages mod
 
-local healing_limit = 15 
+local healing_limit = 15
 
 minetest.register_craftitem("ctf_bandages:bandage", {
     description = "Bandage, heals teammates for 3-4 HP until HP is equal to 15",
