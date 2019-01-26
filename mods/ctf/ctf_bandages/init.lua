@@ -3,7 +3,7 @@
 local healing_limit = 15
 
 minetest.register_craftitem("ctf_bandages:bandage", {
-    description = "Bandage, heals teammates for 3-4 HP until HP is equal to 15",
+    description = "Bandage, heals teammates for 3-4 HP until HP is equal to "..healing_limit,
     inventory_image = "ctf_bandages_bandage.png",
     range = 4,
     on_use = function(itemstack, player, pointed_thing)
@@ -34,5 +34,5 @@ minetest.register_craftitem("ctf_bandages:bandage", {
         else
             minetest.chat_send_player(name, pname.." isn't in your team!")
         end
-end,
+    end,
 })
