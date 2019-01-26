@@ -22,4 +22,6 @@ function ctf_treasure.register_default_treasures()
 	treasurer.register_treasure("shooter:machine_gun",0.02,2,1)
 	treasurer.register_treasure("shooter:ammo",0.3,2,{1,10})
 	treasurer.register_treasure("shooter:arrow_white",0.5,2,{2,18})
+
+	treasurer.register_treasure("ctf_bandages:bandage",0.3,5,{1,6})
 end
