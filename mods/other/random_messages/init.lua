@@ -66,7 +66,7 @@ function random_messages.read_messages()
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
 		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
 		"Use /r to check your score and rank, and /rankings to see the league tables.",
-		"Use bandages on team-mates to heal them."
+		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP."
 	}
 end
 
