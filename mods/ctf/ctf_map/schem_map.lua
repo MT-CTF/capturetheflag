@@ -137,10 +137,12 @@ function ctf_match.load_map_meta(idx, name)
 	local meta   = Settings(conf_path)
 
 	if meta:get("r") == nil then
-		error("Map was not properly configured " .. conf_path)
+		error("Map was not properly configured: " .. conf_path)
 	end
 
 	local initial_stuff = meta:get("initial_stuff")
+	local treasures = meta:get("treasures")
+	treasures = treasures and treasures:split(";")
 	local map = {
 		idx           = idx,
 		name          = meta:get("name"),
@@ -149,11 +151,12 @@ function ctf_match.load_map_meta(idx, name)
 		rotation      = meta:get("rotation"),
 		schematic     = name .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
+		treasures     = treasures,
 		r             = tonumber(meta:get("r")),
 		h             = tonumber(meta:get("h")),
 		offset        = offset,
 		teams         = {},
-		chests        = {},
+		chests        = {}
 	}
 
 	assert(map.r <= max_r)
@@ -174,6 +177,35 @@ function ctf_match.load_map_meta(idx, name)
 		}
 
 		i = i + 1
+	end
+
+	-- Register per-map treasures or the default set of treasures
+	-- if treasures field hasn't been defined in map meta
+	if treasurer and ctf_treasure then
+		treasurer.treasures = {}
+		if treasures then
+			for _, item in pairs(treasures) do
+				item = item:split(",")
+				-- treasurer.register_treasure(name, rarity, preciousness, count)
+				if #item == 4 then
+					treasurer.register_treasure(item[1],
+						tonumber(item[2]),
+						tonumber(item[3]),
+						tonumber(item[4]))
+				-- treasurer.register_treasure(name, rarity, preciousness, {min, max})
+				elseif #item == 5 then
+					treasurer.register_treasure(item[1],
+						tonumber(item[2]),
+						tonumber(item[3]),
+						{
+							tonumber(item[4]),
+							tonumber(item[5])
+						})
+				end
+			end
+		else
+			ctf_treasure.register_default_treasures()
+		end
 	end
 
 	-- Read custom chest zones from config

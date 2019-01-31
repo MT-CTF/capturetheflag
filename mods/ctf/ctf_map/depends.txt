@@ -1,4 +1,5 @@
 default
+ctf_treasure?
 ctf_team_base?
 ctf?
 ctf_match?
