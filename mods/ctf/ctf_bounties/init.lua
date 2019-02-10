@@ -45,7 +45,7 @@ local function bounty_player(target)
 		for _, player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
 			if bountied_player ~= name then
-				local _, prev_color = ctf_colors.get_color(prev, ctf.player(prev))
+				local _, prev_color = ctf_colors.get_player_color(prev)
 				minetest.chat_send_player(player:get_player_name(),
 					minetest.colorize("#fff326", "Player ") ..
 					minetest.colorize(prev_color:gsub("0x", "#"), prev) ..
