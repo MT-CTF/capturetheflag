@@ -1,4 +1,6 @@
 default
+stairs?
+wool?
 ctf_team_base?
 ctf?
 ctf_match?
