@@ -2,7 +2,7 @@
 local tablecolumns = {
 	"tablecolumns[color;",
 	"text;",
-	"text,width=20;",
+	"text,width=16;",
 	"text,width=4;",
 	"text,width=4;",
 	"text,width=4;",
