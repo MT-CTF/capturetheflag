@@ -32,6 +32,7 @@ end
 
 minetest.register_entity("shooter:arrow_entity", {
 	physical = false,
+	collide_with_objects = false,
 	visual = "mesh",
 	mesh = "shooter_arrow.b3d",
 	visual_size = {x=1, y=1},
@@ -48,7 +49,7 @@ minetest.register_entity("shooter:arrow_entity", {
 	stop = function(self, pos)
 		local acceleration = {x=0, y=-10, z=0}
 		if self.state == "stuck" then
-			pos = pos or self.object:getpos()
+			pos = pos or self.object:get_pos()
 			acceleration = {x=0, y=0, z=0}
 		end
 		if pos then
@@ -56,24 +57,24 @@ minetest.register_entity("shooter:arrow_entity", {
 		end
 		self.object:set_properties({
 			physical = true,
-			collisionbox = {-1/8,-1/8,-1/8, 1/8,1/8,1/8},
+			collisionbox = {-1/8, -1/8, -1/8, 1/8, 1/8, 1/8},
 		})
-		self.object:setvelocity({x=0, y=0, z=0})
-		self.object:setacceleration(acceleration)
+		self.object:set_velocity({x=0, y=0, z=0})
+		self.object:set_acceleration(acceleration)
 	end,
 	strike = function(self, object)
 		local puncher = self.player
 		if puncher and shooter:is_valid_object(object) then
 			if puncher ~= object then
 				local dir = puncher:get_look_dir()
-				local p1 = puncher:getpos()
-				local p2 = object:getpos()
+				local p1 = puncher:get_pos()
+				local p2 = object:get_pos()
 				local tpos = get_target_pos(p1, p2, dir, 0)
 				shooter:spawn_particles(tpos, SHOOTER_EXPLOSION_TEXTURE)
 				object:punch(puncher, nil, SHOOTER_ARROW_TOOL_CAPS, dir)
 			end
 		end
-		self:stop(object:getpos())
+		self:stop(object:get_pos())
 	end,
 	on_activate = function(self, staticdata)
 		self.object:set_armor_groups({immortal=1})
@@ -129,7 +130,7 @@ minetest.register_entity("shooter:arrow_entity", {
 			local frame = get_animation_frame(dir)
 			self.object:set_animation({x=frame, y=frame}, 0)
 			local objects = minetest.get_objects_inside_radius(pos, 5)
-			for _,obj in ipairs(objects) do
+			for _, obj in ipairs(objects) do
 				if shooter:is_valid_object(obj) and obj ~= self.player then
 					local collisionbox = {-0.25,-1.0,-0.25, 0.25,0.8,0.25}
 					local offset = SHOOTER_PLAYER_OFFSET
@@ -141,7 +142,7 @@ minetest.register_entity("shooter:arrow_entity", {
 							collisionbox = def.collisionbox or collisionbox
 						end
 					end
-					local opos = vector.add(obj:getpos(), offset)
+					local opos = vector.add(obj:get_pos(), offset)
 					local ray = {pos=pos, dir=dir}
 					local plane = {pos=opos, normal={x=-1, y=0, z=-1}}
 					local ipos = shooter:get_intersect_pos(ray, plane, collisionbox)
@@ -183,7 +184,7 @@ for _, color in pairs(dye_basecolors) do
 				itemstack:add_wear(65535/SHOOTER_CROSSBOW_USES)
 			end
 			itemstack = "shooter:crossbow 1 "..itemstack:get_wear()
-			local pos = user:getpos()
+			local pos = user:get_pos()
 			local dir = user:get_look_dir()
 			local yaw = user:get_look_yaw()
 			if pos and dir and yaw then
@@ -202,9 +203,9 @@ for _, color in pairs(dye_basecolors) do
 					})
 					minetest.sound_play("shooter_throw", {object=obj})
 					local frame = get_animation_frame(dir)
-					obj:setyaw(yaw + math.pi)
+					obj:set_yaw(yaw + math.pi)
 					obj:set_animation({x=frame, y=frame}, 0)
-					obj:setvelocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
+					obj:set_velocity({x=dir.x * 14, y=dir.y * 14, z=dir.z * 14})
 					if pointed_thing.type ~= "nothing" then
 						local ppos = minetest.get_pointed_thing_position(pointed_thing, false)
 						local _, npos = minetest.line_of_sight(pos, ppos, 1)
@@ -227,7 +228,7 @@ for _, color in pairs(dye_basecolors) do
 							return itemstack
 						end
 					end
-					obj:setacceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
+					obj:set_acceleration({x=dir.x * -3, y=-5, z=dir.z * -3})
 				end
 			end
 			return itemstack
@@ -284,7 +285,7 @@ if SHOOTER_ENABLE_CRAFTING == true then
 			minetest.register_craft({
 				output = "shooter:arrow_"..color,
 				recipe = {
-					{"", "dye:"..color, "shooter:arrow_white"},
+					{"", "dye:" .. color, "shooter:arrow_white"},
 				},
 			})
 		end
