@@ -59,123 +59,38 @@ local next_idx
 minetest.register_chatcommand("set_next", {
 	privs = { ctf_admin = true },
 	func = function(name, param)
-		for i, mname in pairs(ctf_map.available_maps) do
-			if mname:lower():find(param, 1, true) then
+		for i, map in pairs(ctf_map.available_maps) do
+			if map.name:lower():find(param, 1, true) or
+					map.path:lower():find(param, 1, true) then
 				next_idx = i
-				return true, "Selected " .. mname
+				return true, "Selected " .. map.name
 			end
 		end
+
+		return false, "Couldn't find any matches"
 	end,
 })
 
+local function load_map_meta(idx, path)
+	print("load_map_meta: Loading map meta from \"" .. path .. "\"")
+	local conf_path = mapdir .. path .. ".conf"
+	local offset    = vector.new(600 * idx, 0, 0)
+	local meta      = Settings(conf_path)
 
-local function search_for_maps()
-	local files_hash = {}
-
-	local dirs = minetest.get_dir_list(mapdir, true)
-	table.insert(dirs, ".")
-	for _, dir in pairs(dirs) do
-		if dir ~= ".git" then
-			local files = minetest.get_dir_list(mapdir .. dir, false)
-			for i=1, #files do
-				local parts = files[i]:split(".")
-				local filename = parts[1]
-				local extension = parts[2]
-				if extension == "mts" then
-					files_hash[dir .. "/" .. filename] = true
-				else
-					if extension ~= "conf" and extension ~= "md"
-							and files[i] ~= ".git" then
-						error("Map extension is not '.mts': " .. files[i])
-					end
-				end
-			end
-		end
-	end
-
-	ctf_map.available_maps = {}
-	for key, _ in pairs(files_hash) do
-		local conf = Settings(mapdir .. "/" .. key .. ".conf")
-		minetest.log("error", "ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
-		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
-		if not conf:get_bool("disabled", false) and val ~= "false" then
-			table.insert(ctf_map.available_maps, key)
-		end
-	end
-	if next(ctf_map.available_maps) == nil then
-		error("No maps found in directory " .. mapdir)
-	end
-	return ctf_map.available_maps
-end
-
-search_for_maps()
-
-minetest.register_chatcommand("maps_reload", {
-	privs = { ctf_admin = true },
-	func = function(name, param)
-		local maps = search_for_maps()
-		next_idx = nil
-		return true, #maps .. " maps found: " .. table.concat(maps, ", ")
-	end,
-})
-
-
-function ctf_map.place_map(map)
-	ctf_map.emerge_with_callbacks(nil, map.pos1, map.pos2, function()
-		local schempath = mapdir .. map.schematic
-		local res = minetest.place_schematic(map.pos1, schempath,
-				map.rotation == "z" and "0" or "90")
-
-		assert(res)
-
-		for _, value in pairs(ctf_map.map.teams) do
-			ctf_map.place_base(value.color, value.pos)
-		end
-
-		local seed = minetest.get_mapgen_setting("seed")
-		for _, chestzone in pairs(ctf_map.map.chests) do
-			minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
-					minetest.pos_to_string(chestzone.from) .. " to "..
-					minetest.pos_to_string(chestzone.to))
-			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
-		end
-
-		minetest.after(2, function()
-			local msg = map_str
-			if map.hint then
-				msg = msg .. "\n" .. map.hint
-			end
-			minetest.chat_send_all(msg)
-			if minetest.global_exists("irc") and irc.connected then
-				irc:say("Map: " .. map.name)
-			end
-		end)
-
-		minetest.after(10, function()
-			minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
-		end)
-	end, nil)
-end
-
-function ctf_match.load_map_meta(idx, name)
-	local offset = vector.new(600 * idx, 0, 0)
-	local conf_path = mapdir .. name .. ".conf"
-	local meta   = Settings(conf_path)
-
-	if meta:get("r") == nil then
-		error("Map was not properly configured: " .. conf_path)
+	if not meta:get("r") then
+		error("Map was not properly configured " .. conf_path)
 	end
 
 	local initial_stuff = meta:get("initial_stuff")
 	local treasures = meta:get("treasures")
 	treasures = treasures and treasures:split(";")
 	local map = {
-		idx           = idx,
 		name          = meta:get("name"),
 		author        = meta:get("author"),
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
-		schematic     = name .. ".mts",
+		screenshot    = meta:get("screenshot"),
+		schematic     = path .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
 		treasures     = treasures,
 		r             = tonumber(meta:get("r")),
@@ -189,8 +104,6 @@ function ctf_match.load_map_meta(idx, name)
 
 	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
 	map.pos2 = vector.add(offset, { x =  map.r, y = map.h / 2,  z =  map.r })
-
-	map_str = "Map: " .. map.name .. " by " .. map.author
 
 	-- Read teams from config
 	local i = 1
@@ -243,14 +156,14 @@ function ctf_match.load_map_meta(idx, name)
 							t_stack:get_count() == 1 then
 						is_valid = false
 						minetest.log("action",
-						             "ctf_map: Omitting treasure - " .. def[1])
+								"ctf_map: Omitting treasure - " .. def[1])
 						break
 					end
 				end
 
 				if is_valid then
 					minetest.log("info",
-					             "ctf_map: Registering treasure - " .. def[1])
+							"ctf_map: Registering treasure - " .. def[1])
 					treasurer.register_treasure(def[1], def[2], def[3], def[4])
 				end
 			end
@@ -263,7 +176,7 @@ function ctf_match.load_map_meta(idx, name)
 		local from  = minetest.string_to_pos(meta:get("chests." .. i .. ".from"))
 		local to    = minetest.string_to_pos(meta:get("chests." .. i .. ".to"))
 		assert(from and to, "Positions needed for chest zone " ..
-		                    i .. " in map " .. map.name)
+				i .. " in map " .. map.name)
 
 		map.chests[i] = {
 			from = vector.add(offset, from),
@@ -305,6 +218,98 @@ function ctf_match.load_map_meta(idx, name)
 	return map
 end
 
+local function load_maps()
+	local files_hash = {}
+
+	local dirs = minetest.get_dir_list(mapdir, true)
+	table.insert(dirs, ".")
+	for _, dir in pairs(dirs) do
+		if dir ~= ".git" then
+			local files = minetest.get_dir_list(mapdir .. dir, false)
+			for i = 1, #files do
+				local parts = files[i]:split(".")
+				local filename = parts[1]
+				local extension = parts[2]
+				if extension == "mts" then
+					files_hash[dir .. "/" .. filename] = true
+				else
+					if extension ~= "conf" and extension ~= "md"
+							and files[i] ~= ".git" then
+						error("Map extension is not '.mts': " .. files[i])
+					end
+				end
+			end
+		end
+	end
+
+	local idx = 1
+	ctf_map.available_maps = {}
+	for key, _ in pairs(files_hash) do
+		local conf = Settings(mapdir .. "/" .. key .. ".conf")
+		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
+		if not conf:get_bool("disabled", false) and val ~= "false" then
+			local map = load_map_meta(idx, key)
+			map.path = key
+			table.insert(ctf_map.available_maps, map)
+			minetest.log("action", "Found map '" .. map.name .. "'")
+			minetest.log("info", dump(map))
+			idx = idx + 1
+		end
+	end
+	if not next(ctf_map.available_maps) then
+		error("No maps found in directory " .. mapdir)
+	end
+	return ctf_map.available_maps
+end
+
+load_maps()
+
+minetest.register_chatcommand("maps_reload", {
+	privs = { ctf_admin = true },
+	func = function(name, param)
+		local maps = load_maps()
+		next_idx = nil
+		return true, #maps .. " maps found: " .. table.concat(maps, ", ")
+	end,
+})
+
+local function place_map(map)
+	ctf_map.emerge_with_callbacks(nil, map.pos1, map.pos2, function()
+		local schempath = mapdir .. map.schematic
+		local res = minetest.place_schematic(map.pos1, schempath,
+				map.rotation == "z" and "0" or "90")
+
+		assert(res)
+
+		for _, value in pairs(ctf_map.map.teams) do
+			ctf_map.place_base(value.color, value.pos)
+		end
+
+		local seed = minetest.get_mapgen_setting("seed")
+		for _, chestzone in pairs(ctf_map.map.chests) do
+			minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
+					minetest.pos_to_string(chestzone.from) .. " to "..
+					minetest.pos_to_string(chestzone.to))
+			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
+		end
+
+		minetest.after(2, function()
+			local msg = "Map: " .. map.name .. " by " .. map.author
+			if map.hint then
+				msg = msg .. "\n" .. map.hint
+			end
+			minetest.chat_send_all(msg)
+			if minetest.global_exists("irc") and irc.connected then
+				irc:say("Map: " .. map.name)
+			end
+		end)
+
+		minetest.after(10, function()
+			minetest.fix_light(ctf_map.map.pos1, ctf_map.map.pos2)
+		end)
+	end, nil)
+end
+
 ctf_match.register_on_new_match(function()
 	minetest.clear_objects({ mode = "quick" })
 
@@ -323,11 +328,12 @@ ctf_match.register_on_new_match(function()
 	next_idx = (idx % #ctf_map.available_maps) + 1
 
 	-- Load meta data
-	local name = ctf_map.available_maps[idx]
-	ctf_map.map = ctf_match.load_map_meta(idx, name)
+	ctf_map.map = ctf_map.available_maps[idx]
+	ctf_map.map.idx = idx
 
+	map_str = "Map: " .. ctf_map.map.name .. " by " .. ctf_map.map.author
 	-- Place map
-	ctf_map.place_map(ctf_map.map)
+	place_map(ctf_map.map)
 end)
 
 function ctf_match.create_teams()
