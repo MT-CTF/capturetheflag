@@ -4,8 +4,8 @@
 -- * ID of "healing effect" HUD element
 local players = {}
 
-local regen_max = 6        -- Max HP provided by one medkit
-local regen_interval = 0.5 -- Time in seconds between each iteration
+local regen_max = 20        -- Max HP provided by one medkit
+local regen_interval = 0.3 -- Time in seconds between each iteration
 local regen_timer = 0      -- Timer to keep track of regen_interval
 local regen_step = 1       -- Number of HP added every iteration
 
