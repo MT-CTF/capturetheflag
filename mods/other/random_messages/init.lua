@@ -56,6 +56,7 @@ function random_messages.read_messages()
 		"Players are immune to attack for 15 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 1k+ score and killing 3 people for every 2 deaths.",
 		"Use team doors (steel) to stop the enemy walking into your base.",
+		"Craft 4 cobbles together to make reinforced cobble.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
