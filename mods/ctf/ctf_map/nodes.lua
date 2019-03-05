@@ -735,6 +735,20 @@ minetest.register_node("ctf_map:meselamp", {
 	light_source = default.LIGHT_MAX,
 })
 
+minetest.register_node("ctf_map:killnode", {
+	description = "Kill Node",
+	drawtype = "glasslike",
+	tiles = {"ctf_map_killnode.png"},
+	paramtype = "light",
+	sunlight_propogates = true,
+	walkable = false,
+	pointable = false,
+	damage_per_second = 20,
+	is_ground_content = false,
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults(),
+})
+
 -- Re-register all nodes from stairs and wool
 for name, nodedef in pairs(minetest.registered_nodes) do
 	if name:find("stairs") then
