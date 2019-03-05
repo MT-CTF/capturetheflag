@@ -592,7 +592,7 @@ minetest.register_node("default:snow", {
 			{-0.5, -0.5, -0.5, 0.5, -7 / 16, 0.5},
 		},
 	},
-	groups = {crumbly = 3, falling_node = 1, snowy = 1},
+	groups = {crumbly = 3, falling_node = 1, snowy = 1, slippery = 2},
 	sounds = default.node_sound_snow_defaults(),
 
 	on_construct = function(pos)
@@ -606,7 +606,7 @@ minetest.register_node("default:snow", {
 minetest.register_node("default:snowblock", {
 	description = "Snow Block",
 	tiles = {"default_snow.png"},
-	groups = {crumbly = 3, cools_lava = 1, snowy = 1},
+	groups = {crumbly = 3, cools_lava = 1, snowy = 1, slippery = 2},
 	sounds = default.node_sound_snow_defaults(),
 
 	on_construct = function(pos)
@@ -623,7 +623,7 @@ minetest.register_node("default:ice", {
 	tiles = {"default_ice.png"},
 	is_ground_content = false,
 	paramtype = "light",
-	groups = {cracky = 3, cools_lava = 1, slippery = 3},
+	groups = {cracky = 3, cools_lava = 1, slippery = 4},
 	sounds = default.node_sound_glass_defaults(),
 })
 
@@ -632,7 +632,7 @@ minetest.register_node("default:cave_ice", {
 	description = "Cave Ice",
 	tiles = {"default_ice.png"},
 	paramtype = "light",
-	groups = {cracky = 3, cools_lava = 1, slippery = 3,
+	groups = {cracky = 3, cools_lava = 1, slippery = 4,
 		not_in_creative_inventory = 1},
 	drop = "default:ice",
 	sounds = default.node_sound_glass_defaults(),
