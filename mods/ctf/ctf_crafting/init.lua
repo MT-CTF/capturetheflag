@@ -205,7 +205,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_traps:spike 1",
-	items  = { "default:steel_ingot 5" },
+	items  = { "default:steel_ingot 2" },
 	always_known = true,
 	level  = 1,
 })
