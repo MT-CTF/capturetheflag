@@ -49,7 +49,7 @@ function random_messages.read_messages()
 	random_messages.messages = {
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
 		"Use medkits to gradually restore your health.",
-		"Moving or fighting while healing will interrupt the healing process.",
+		"Moving or fighting while using medkits will interrupt the healing process.",
 		"Steel swords do more damage than guns, but you need to be up close.",
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
@@ -68,7 +68,8 @@ function random_messages.read_messages()
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
 		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
 		"Use /r to check your score and rank, and /rankings to see the league tables.",
-		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP."
+		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
+		"Use /m to add a team marker at pointed location, that's visible only to team-mates."
 	}
 end
 
