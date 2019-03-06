@@ -1,16 +1,19 @@
 -- Table of tables indexed by player names, each having three fields:
--- * HP at time of left-click + regen_max,
--- * Max HP of player (generally 20)
--- * ID of "healing effect" HUD element
+-- {
+--     hp:  HP at time of left-click + regen_max,
+--     pos: Position of player while initiating the healing process
+--     hud: ID of "healing effect" HUD element
+-- }
 local players = {}
 
-local regen_max = 20        -- Max HP provided by one medkit
-local regen_interval = 0.3 -- Time in seconds between each iteration
+local regen_max = 20       -- Max HP provided by one medkit
+local regen_interval = 0.5 -- Time in seconds between each iteration
 local regen_timer = 0      -- Timer to keep track of regen_interval
 local regen_step = 1       -- Number of HP added every iteration
 
 -- Boolean function for use by other mods to check if a player is healing
-function is_healing(name)
+medkits = {}
+function medkits.is_healing(name)
 	return players[name] and true or false
 end
 
@@ -22,14 +25,14 @@ local function start_healing(stack, player)
 	end
 	local name = player:get_player_name()
 
-	if players[name] or player:get_hp() >= 20 then
+	if players[name] or player:get_hp() >= regen_max then
 		return stack
 	end
 
 	players[name] = {
-		pos    = player:get_pos(),
-		target = player:get_hp() + regen_max,
-		hud    = player:hud_add({
+		hp  = player:get_hp(),
+		pos = player:get_pos(),
+		hud = player:hud_add({
 			hud_elem_type = "image",
 			position = {x = 0.5, y = 0.5},
 			scale = {x = -100, y = -100},
@@ -50,8 +53,8 @@ local function stop_healing(player, interrupted)
 	players[name] = nil
 	if interrupted then
 		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-										"Your healing was interrupted!"))
-		player:set_hp(info.target - regen_max)
+		                                "Your healing was interrupted!"))
+		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end
 
@@ -80,9 +83,10 @@ minetest.register_globalstep(function(dtime)
 
 			-- Stop healing if target reached
 			local hp = player:get_hp()
-			if hp < info.target and hp < 20 then
+			if hp < regen_max then
 				player:set_hp(hp + regen_step)
 			else
+				player:set_hp(regen_max)
 				stop_healing(player)
 			end
 		end
