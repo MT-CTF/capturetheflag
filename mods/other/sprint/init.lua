@@ -47,7 +47,7 @@ minetest.register_globalstep(function(dtime)
 			-- ##1## replace info.sprintRequested with info.sprinting
 			if sprintRequested ~= info.sprintRequested then
 				if sprintRequested and info.stamina > MIN_SPRINT
-						and not is_healing(player:get_player_name()) then
+						and not medkits.is_healing(player:get_player_name()) then
 					setSprinting(player, info, true)
 				elseif not sprintRequested then
 					setSprinting(player, info, false)
