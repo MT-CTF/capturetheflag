@@ -21,16 +21,17 @@ end
 -- Aborts if player is already healing
 local function start_healing(stack, player)
 	if not player then
-		return stack
+		return
 	end
 	local name = player:get_player_name()
+	local hp = player:get_hp()
 
-	if players[name] or player:get_hp() >= regen_max then
-		return stack
+	if players[name] or hp >= regen_max then
+		return
 	end
 
 	players[name] = {
-		hp  = player:get_hp(),
+		hp  = hp,
 		pos = player:get_pos(),
 		hud = player:hud_add({
 			hud_elem_type = "image",
@@ -82,12 +83,14 @@ minetest.register_globalstep(function(dtime)
 			end
 
 			-- Stop healing if target reached
-			local hp = player:get_hp()
-			if hp < regen_max then
-				player:set_hp(hp + regen_step)
-			else
-				player:set_hp(regen_max)
-				stop_healing(player)
+			if players[name] then
+				local hp = player:get_hp()
+				if hp < regen_max then
+					player:set_hp(math.min(hp + regen_step, regen_max))
+				else
+					player:set_hp(regen_max)
+					stop_healing(player)
+				end
 			end
 		end
 	end
