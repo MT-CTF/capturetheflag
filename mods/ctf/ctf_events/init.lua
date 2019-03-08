@@ -10,9 +10,9 @@ ctf_events = {
 	events = {}
 }
 
-function ctf_events.post(action, one, two)
+function ctf_events.post(image, one, two)
 	table.insert(ctf_events.events, 1, {
-		action = action,
+		image = image,
 		one = one,
 		two = two
 	})
@@ -24,7 +24,7 @@ end
 
 function ctf_events.update_row(i, player, name, tplayer, evt)
 	local idx = "ctf_events:" .. i .. "_one"
-	local idxa = "ctf_events:" .. i .. "_action"
+	local idxa = "ctf_events:" .. i .. "_image"
 	local idx2 = "ctf_events:" .. i .. "_two"
 
 	if not evt then
@@ -34,9 +34,9 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 		return
 	end
 
-	local y_pos = i * 20
+	local y_pos = i * 40
 
-	-- One
+	-- Killer
 	if evt.one then
 		local tcolor = ctf_colors.get_color(ctf.player(evt.one))
 		if hud:exists(player, idx) then
@@ -58,7 +58,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 		hud:remove(player, idx)
 	end
 
-	-- Two
+	-- Victim
 	if evt.two then
 		local tcolor = ctf_colors.get_color(ctf.player(evt.two))
 		if hud:exists(player, idx2) then
@@ -71,7 +71,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 				scale         = {x = 200, y = 100},
 				text          = evt.two,
 				number        = tcolor.hex,
-				offset        = {x = 175, y = -y_pos},
+				offset        = {x = 195, y = -y_pos},
 				alignment     = {x = 1, y = 0}
 			}
 			hud:add(player, idx2, tmp)
@@ -80,17 +80,17 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 		hud:remove(player, idx2)
 	end
 
-	-- Action
-	if evt.action then
+	-- Kill weapon
+	if evt.image then
 		if hud:exists(player, idxa) then
-			hud:change(player, idxa, "text", "ctf_events_" .. evt.action .. ".png")
+			hud:change(player, idxa, "text", evt.image)
 		else
 			local tmp = {
 				hud_elem_type = "image",
 				position      = {x = 0, y = 0.8},
-				scale         = {x = 1, y = 1},
-				text          = "ctf_events_" .. evt.action .. ".png",
-				offset        = {x = 160, y = -y_pos},
+				scale         = {x = 2, y = 2},
+				text          = evt.image,
+				offset        = {x = 170, y = -y_pos},
 				alignment     = {x = 0, y = 0}
 			}
 			hud:add(player, idxa, tmp)
@@ -104,8 +104,8 @@ function ctf_events.update(player)
 	local name = player:get_player_name()
 	local tplayer = ctf.player_or_nil(name)
 	if tplayer then
-		for i=1, NUM_EVT do
-			local evt = nil
+		for i = 1, NUM_EVT do
+			local evt
 			if #ctf_events.events >= i then
 				evt = ctf_events.events[i]
 			end
@@ -122,16 +122,32 @@ end
 
 ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 	local sname = stack:get_name()
-	local type = "sword"
-	if sname == "" then
-		if tool_caps.damage_groups.grenade then
-			type = "grenade"
-		end
-	elseif sname:sub(1, 8) == "shooter:" then
-		type = "bullet"
+
+	-- If wielditem name is "" but there's a special `grenade`
+	-- damage_group, then set the kill weapon to a grenade
+	if sname == "" and tool_caps.damage_groups.grenade then
+		sname = "shooter:grenade"
 	end
 
-	ctf_events.post("kill_" .. type, killer, victim)
+	-- Get inventory image of kill weapon
+	local image
+	if sname == "" then
+		image = "wieldhand.png"
+	else
+		local def = minetest.registered_items[sname]
+		image = (def.inventory_image ~= "") and def.inventory_image
+		if not image then
+			if def.tiles[1] then
+				local tile = def.tiles[1]
+				image = (type(tile) == "table") and tile.name or tile
+			else
+				image = "ctf_events_fallback.png"
+			end
+		end
+	end
+	minetest.chat_send_all(image)
+
+	ctf_events.post(image, killer, victim)
 	ctf_events.update_all()
 end)
 
