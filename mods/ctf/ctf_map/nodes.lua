@@ -752,9 +752,11 @@ minetest.register_node("ctf_map:killnode", {
 -- Re-register all nodes from stairs and wool
 for name, nodedef in pairs(minetest.registered_nodes) do
 	if name:find("stairs") then
+		nodedef = table.copy(nodedef)
 		nodedef.groups = {immortal = 1}
 		minetest.register_node("ctf_map:" .. name:split(":")[2], nodedef)
 	elseif name:find("wool") then
+		nodedef = table.copy(nodedef)
 		nodedef.groups = {immortal = 1}
 		minetest.register_node("ctf_map:" .. name:split(":")[2], nodedef)
 	end
