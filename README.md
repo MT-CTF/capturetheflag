@@ -46,7 +46,7 @@ Textures: CC-BY-SA 3.0
 * [tsm_chests](https://forum.minetest.net/viewtopic.php?t=7292) by Wuzzy (WTFPL)
 * [vote](https://forum.minetest.net/viewtopic.php?t=12829) by rubenwardy (MIT)
 * [wield3d](https://forum.minetest.net/viewtopic.php?t=6407) by stu (WTFPL)
-* Minetest Game mods: default, doors, sfinv, killme, stairs.
+* Minetest Game mods: default, doors, furnace, game_commands, player_api, sfinv, stairs, wool.
   Fun fact: sfinv was made for this subgame, and then merged into MTG.
 
 **Custom Mods:**
