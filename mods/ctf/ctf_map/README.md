@@ -2,6 +2,10 @@
 
 This mod handles creating and loading maps.
 
+## Attributions
+
+- Indestructible nodes adapted from various mods in `minetest_game`.
+
 ## Creating a new map
 
 ### 1. Dependencies
@@ -61,14 +65,17 @@ Each map's metadata is stored in an accompanying .conf file containing the follo
 * `hint`: [Optional] Helpful hint or tip for unique maps, to help players understand the map.
 * `rotation`: Rotation of the schem. [`x`|`z`]
 * `schematic`: Name of the map's schematic.
-* `initial_stuff`: [Optional] Comma-separated list of itemstacks to be given to the player on join and on respawn.
-* `treasures`: [Optional] List of treasures to be registered for the map, in a serialized format. Refer to the `treasures` sub-section for more details.
+* `initial_stuff`: [Optional] Comma-separated list of itemstacks to be given to the player
+ on join and on respawn.
+* `treasures`: [Optional] List of treasures to be registered for the map, in a serialized
+format. Refer to the `treasures` sub-section for more details.
 * `r`: Radius of the map.
 * `h`: Height of the map.
 * `team.i`: Name of team `i`.
 * `team.i.color`: Color of team `i`.
 * `team.i.pos`: Position of team `i`'s flag, relative to center of schem.
-* `chests.i.from`, `chests.i.to`: [Optional] Positions of diagonal corners of custom chest zone `i`, relative to the center of the schem.
+* `chests.i.from`, `chests.i.to`: [Optional] Positions of diagonal corners of custom chest
+zone `i`, relative to the center of the schem.
 * `chests.i.n`: [Optional] Number of chests to place in custom chest zone `i`.
 
 #### `treasures`
@@ -82,3 +89,15 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 ```
 
 (See [here](../../other/treasurer/README.md) to understand the magic numbers)
+
+## Indestructible nodes
+
+- `ctf_map` provides indestructible nodes for most nodes from default, and all nodes from
+stairs.
+
+- All indestructible nodes have the same item name with the mod prefix being `ctf_map:`
+instead of their original prefixes (e.g. `default:stone` -> `ctf_map:stone` and
+`stairs:stair_stone` -> `ctf_map:stair_stone`) with the exception of wool, whose
+indestructible nodes have slightly different names from the original node names -
+`ctf_map:wool_<color>`. This is because the original nomenclature becomes meaningless
+if the modname prefix is changed.
