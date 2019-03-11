@@ -2,7 +2,7 @@
 -- marker, because the members in the team needn't
 -- be the same within an extended duration of time
 local teams = {}
-local visibility_time = 10
+local visibility_time = 30
 
 -- Convenience function that returns passed
 -- string enclosed by color escape codes
