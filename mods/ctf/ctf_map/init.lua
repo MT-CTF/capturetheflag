@@ -1,5 +1,16 @@
 ctf_map = {}
 
+function ctf_map.get_team_relative_z(player)
+	local name = player:get_player_name()
+	local tname = ctf.player(name).team
+	return (tname == "red" and 1 or -1) * player:get_pos().z
+end
+
+-- Overridden by server mods
+function ctf_map.can_cross(player)
+	return false
+end
+
 dofile(minetest.get_modpath("ctf_map") .. "/nodes.lua")
 dofile(minetest.get_modpath("ctf_map") .. "/emerge.lua")
 dofile(minetest.get_modpath("ctf_map") .. "/barrier.lua")

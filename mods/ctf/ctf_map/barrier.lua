@@ -246,16 +246,10 @@ if minetest.get_modpath("ctf") then
 		end
 
 		for _, player in pairs(minetest.get_connected_players()) do
-			local name = player:get_player_name()
-			local tname = ctf.player(name).team
-			local pos = player:get_pos()
-			local privs = minetest.get_player_privs(name)
-			if tname and not privs.fly and privs.interact then
-				if (tname == "blue" and pos.z >= 0) or
-						(tname == "red" and pos.z <= 0) then
-					minetest.chat_send_player(name, "Match hasn't started yet!")
-					ctf.move_to_spawn(name)
-				end
+			if ctf_map.get_team_relative_z(player) < 0 and not ctf_map.can_cross(player) then
+				local name = player:get_player_name()
+				minetest.chat_send_player(name, "Match hasn't started yet!")
+				ctf.move_to_spawn(name)
 			end
 		end
 
