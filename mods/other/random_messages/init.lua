@@ -58,7 +58,7 @@ function random_messages.read_messages()
 		"Players are immune to attack for 15 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 1k+ score and killing 3 people for every 2 deaths.",
 		"Use team doors (steel) to stop the enemy walking into your base.",
-		"Craft 4 cobbles together to make reinforced cobble.",
+		"Craft 4 cobbles and 1 steel ingot together to make reinforced cobble.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
 		"Map makers needed! Visit ctf.rubenwardy.com to get involved.",
@@ -71,7 +71,7 @@ function random_messages.read_messages()
 		"Use /r to check your score and rank, and /rankings to see the league tables.",
 		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
 		"Use /m to add a team marker at pointed location, that's visible only to team-mates.",
-		"Use /summary to check scores of the current match or the previous match."
+		"Use /summary to check scores of the current match and the previous match."
 	}
 end
 
