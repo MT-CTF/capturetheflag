@@ -28,6 +28,30 @@ local max_r  = 120
 local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
 ctf_map.map  = nil
 
+-- Modify server status message to include map info
+local map_str
+local old_server_status = minetest.get_server_status
+function minetest.get_server_status(name, joined)
+	local status = old_server_status()
+
+	if not ctf_map.map or not map_str then
+		return status
+	end
+
+	local str = map_str
+	if minetest.get_player_by_name(name) then
+		str = minetest.colorize("#44FF44", str)
+	end
+	status = status .. "\n" .. str
+
+	-- If player just joined, also display map hint
+	if joined and ctf_map.map.hint then
+		status = status .. "\n" .. minetest.colorize("#22FF22", ctf_map.map.hint)
+	end
+
+	return status
+end
+
 
 local next_idx
 minetest.register_chatcommand("set_next", {
@@ -115,7 +139,7 @@ function ctf_map.place_map(map)
 		end
 
 		minetest.after(2, function()
-			local msg = "Map: " .. map.name .. " by " .. map.author
+			local msg = map_str
 			if map.hint then
 				msg = msg .. "\n" .. map.hint
 			end
@@ -163,6 +187,8 @@ function ctf_match.load_map_meta(idx, name)
 
 	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
 	map.pos2 = vector.add(offset, { x =  map.r, y = map.h / 2,  z =  map.r })
+
+	map_str = "Map: " .. map.name .. " by " .. map.author
 
 	-- Read teams from config
 	local i = 1
@@ -304,16 +330,3 @@ function ctf_match.create_teams()
 		end
 	end
 end
-
-minetest.register_on_joinplayer(function(player)
-	local map = ctf_map.map
-	if not map then
-		return
-	end
-
-	local msg = "Map: " .. map.name .. " by " .. map.author
-	if map.hint then
-		msg = msg .. "\n" .. map.hint
-	end
-	minetest.chat_send_player(player:get_player_name(), msg)
-end)
