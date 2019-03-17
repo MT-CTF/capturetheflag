@@ -32,14 +32,14 @@ ctf_map.map  = nil
 local map_str
 local old_server_status = minetest.get_server_status
 function minetest.get_server_status(name, joined)
-	local status = old_server_status()
+	local status = old_server_status(name, joined)
 
 	if not ctf_map.map or not map_str then
 		return status
 	end
 
 	local str = map_str
-	if minetest.get_player_by_name(name) then
+	if name and minetest.get_player_by_name(name) then
 		str = minetest.colorize("#44FF44", str)
 	end
 	status = status .. "\n" .. str
