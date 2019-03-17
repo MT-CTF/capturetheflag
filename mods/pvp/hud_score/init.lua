@@ -4,6 +4,7 @@ local hud = hudkit()
 local players = {}
 local duration = 5
 local max = 6
+local next_check = 10000000
 
 local function update(name)
 	local player = minetest.get_player_by_name(name)
@@ -63,6 +64,9 @@ function hud_score.new(name, def)
 	-- Store element expiration time in def.time
 	-- and append score element def to players[name]
 	def.time = os.time() + duration
+	if next_check > duration then
+		next_check = duration
+	end
 	table.insert(players[name], def)
 
 	-- If more than `max` active elements, mark oldest element for deletion
@@ -73,16 +77,25 @@ function hud_score.new(name, def)
 	update(name)
 end
 
-local modified
 minetest.register_globalstep(function(dtime)
+	next_check = next_check - dtime
+	if next_check > 0 then
+		return
+	end
+
+	next_check = 10000000
+
 	-- Loop through HUD score elements of all players
 	-- and remove them if they've expired
 	for name, hudset in pairs(players) do
-		modified = false
+		local modified = false
 		for i, def in pairs(hudset) do
-			if def.time < os.time() then
+			local rem = def.time - os.time()
+			if rem <= 0 then
 				def.delete = true
 				modified = true
+			elseif rem < next_check then
+				next_check = rem
 			end
 		end
 
