@@ -1,11 +1,26 @@
 
-ctf_team_base = {}
-function ctf_team_base.place(color, pos)
+minetest.register_node("ctf_map:ind_cobble", {
+	description = "Cobblestone",
+	tiles = {"default_cobble.png"},
+	is_ground_content = false,
+	groups = {immortal = 1},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+minetest.register_node("ctf_map:reinforced_cobble", {
+	description = "Reinforced Cobblestone",
+	tiles = {"ctf_map_reinforced_cobble.png"},
+	is_ground_content = false,
+	groups = {cracky = 1, stone = 2},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+function ctf_map.place_base(color, pos)
 	-- Spawn ind base
 	for x = pos.x - 2, pos.x + 2 do
 		for z = pos.z - 2, pos.z + 2 do
 			minetest.set_node({ x = x, y = pos.y - 1, z = z},
-				{name = "ctf_team_base:ind_cobble"})
+				{name = "ctf_map:ind_cobble"})
 		end
 	end
 
@@ -22,7 +37,7 @@ function ctf_team_base.place(color, pos)
 	end
 
 	-- Spawn chest
-	local chest = {name = "ctf_team_base:chest_" .. color}
+	local chest = {name = "ctf_map:chest_" .. color}
 	local dz = 2
 	if pos.z < 0 then
 		dz = -2
