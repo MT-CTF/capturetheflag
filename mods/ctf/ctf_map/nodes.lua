@@ -1,3 +1,12 @@
+minetest.register_node("ctf_map:reinforced_cobble", {
+	description = "Reinforced Cobblestone",
+	tiles = {"ctf_map_reinforced_cobble.png"},
+	is_ground_content = false,
+	groups = {cracky = 1, stone = 2},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+
 --
 -- Special nodes
 --
@@ -75,13 +84,15 @@ minetest.register_node("ctf_map:stone", {
 	sounds = default.node_sound_stone_defaults(),
 })
 
-minetest.register_node("ctf_map:cobble", {
-	description = "Indestructible Cobblestone",
+minetest.register_node("ctf_map:ind_cobble", {
+	description = "Cobblestone",
 	tiles = {"default_cobble.png"},
 	is_ground_content = false,
 	groups = {immortal = 1},
 	sounds = default.node_sound_stone_defaults(),
 })
+
+minetest.register_alias("ctf_map:cobble", "ctf_map:ind_cobble")
 
 minetest.register_node("ctf_map:stonebrick", {
 	description = "Indestructible Stone Brick",
@@ -108,7 +119,6 @@ minetest.register_node("ctf_map:mossycobble", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_stone_defaults(),
 })
-
 
 minetest.register_node("ctf_map:desert_stone", {
 	description = "Indestructible Desert Stone",
