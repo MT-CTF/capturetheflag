@@ -68,7 +68,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_map:reinforced_cobble",
-	items  = { "default:cobble 4" },
+	items  = { "default:cobble 4", "default:steel_ingot" },
 	always_known = true,
 	level  = 1,
 })
