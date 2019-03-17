@@ -86,26 +86,27 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 ctf.register_on_killedplayer(function(victim, killer)
-	-- Suicide is not encouraged here at CTF
-	if victim == killer then
+	if victim ~= bountied_player or victim == killer then
 		return
 	end
-	if victim == bountied_player then
-		local main, match = ctf_stats.player(killer)
-		if main and match then
-			main.score  = main.score  + bounty_score
-			match.score = match.score + bounty_score
-			ctf.needs_save = true
-		end
-		bountied_player = nil
 
-		local msg = killer .. " has killed " .. victim .. " and received the prize!"
-		minetest.chat_send_all(msg)
-
-		local pstats, mstats = ctf_stats.player(killer)
-		pstats.bounty_kills = pstats.bounty_kills + 1
-		mstats.bounty_kills = mstats.bounty_kills + 1
+	local main, match = ctf_stats.player(killer)
+	if main and match then
+		main.score  = main.score  + bounty_score
+		match.score = match.score + bounty_score
+		main.bounty_kills = main.bounty_kills + 1
+		match.bounty_kills = match.bounty_kills + 1
+		ctf.needs_save = true
 	end
+	bountied_player = nil
+
+	local msg = killer .. " has killed " .. victim .. " and received the prize!"
+	minetest.chat_send_all(msg)
+	hud_score.new(killer, {
+		name = "ctf_bounty:prize",
+		color = 0x4444FF,
+		value = bounty_score
+	})
 end)
 
 minetest.register_privilege("bounty_admin")

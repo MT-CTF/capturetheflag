@@ -299,6 +299,14 @@ ctf.register_on_killedplayer(function(victim, killer)
 		match.score = match.score + reward
 		match.kills_since_death = match.kills_since_death + 1
 		ctf.needs_save = true
+
+		reward = math.floor(reward * 100) / 100
+
+		hud_score.new(killer, {
+			name = "ctf_stats:kill_score",
+			color = "0x00FF00",
+			value = reward
+		})
 	end
 end)
 
