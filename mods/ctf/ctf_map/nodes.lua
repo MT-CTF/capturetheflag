@@ -78,7 +78,7 @@ minetest.register_node("ctf_map:stone", {
 })
 
 minetest.register_node("ctf_map:cobble", {
-	description = "Cobblestone",
+	description = "Indestructible Cobblestone",
 	tiles = {"default_cobble.png"},
 	is_ground_content = false,
 	groups = {immortal = 1},
