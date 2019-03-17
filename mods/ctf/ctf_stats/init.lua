@@ -1,7 +1,12 @@
 ctf_stats = {}
 
 local storage = minetest.get_mod_storage()
+local prev_match_summary = storage:get_string("prev_match_summary")
 local data_to_persist = { "matches", "players" }
+
+function ctf_stats.get_prev_match_summary()
+	return prev_match_summary
+end
 
 function ctf_stats.load_legacy()
 	local file = io.open(minetest.get_worldpath() .. "/ctf_stats.txt", "r")
@@ -154,7 +159,6 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	winner_player = name
 end)
 
-local prev_match_summary = storage:get_string("prev_match_summary")
 ctf_match.register_on_winner(function(winner)
 	ctf.needs_save = true
 	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
@@ -220,7 +224,6 @@ ctf_flag.register_on_precapture(function(name, flag)
 	return true
 end)
 
--- good_weapons now includes all mese and diamond implements, and swords of steel and better
 local good_weapons = {
 	"default:sword_steel",
 	"default:sword_bronze",
@@ -274,7 +277,7 @@ local function calculateKillReward(victim, killer)
 	end
 
 	-- Half if no good weapons
-	local inv = minetest.get_inventory({ type="player", name = victim })
+	local inv = minetest.get_inventory({ type = "player", name = victim })
 	if not invHasGoodWeapons(inv) then
 		ctf.log("ctf_stats", "Player " .. victim .. " has no good weapons")
 		reward = reward * 0.5
@@ -321,15 +324,36 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 minetest.register_chatcommand("summary", {
-	func = function (name, param)
-		if not prev_match_summary then
-			return false, "Couldn't find the requested data."
-		end
+	func = function(name)
+		local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
+						winner_team, winner_player, os.time() - ctf_stats.start)
 
-		minetest.show_formspec(name, "ctf_stats:prev_match_summary", prev_match_summary)
+		fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
+
+		minetest.show_formspec(name, "ctf_stats:match_summary", fs)
 	end
 })
 
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if formname ~= "ctf_stats:match_summary" then
+		return
+	end
+
+	local fs
+	if fields.b_prev then
+		fs = prev_match_summary
+		fs = fs .. "button[6,7.5;4,1;b_curr;Current match >>]"
+	elseif fields.b_curr then
+		fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
+					winner_team, winner_player, os.time() - ctf_stats.start)
+		fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
+	else
+		return
+	end
+
+	minetest.show_formspec(player:get_player_name(), "ctf_stats:match_summary", fs)
+end)
+
 ctf_stats.load()
 
-dofile(minetest.get_modpath("ctf_stats").."/gui.lua")
+dofile(minetest.get_modpath("ctf_stats") .. "/gui.lua")
