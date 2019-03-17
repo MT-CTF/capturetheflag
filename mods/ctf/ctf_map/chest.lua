@@ -21,7 +21,7 @@ end
 
 local colors = {"red", "blue"}
 for _, chest_color in pairs(colors) do
-	minetest.register_node("ctf_team_base:chest_" .. chest_color, {
+	minetest.register_node("ctf_map:chest_" .. chest_color, {
 		description = "Chest",
 		tiles = {
 			"default_chest_top_" .. chest_color .. ".png",
@@ -52,12 +52,12 @@ for _, chest_color in pairs(colors) do
 			local territory_owner = ctf.get_territory_owner(pos)
 			if chest_color ~= territory_owner then
 				if not territory_owner then
-					ctf.warning("ctf_team_base", "Unowned team chest")
+					ctf.warning("ctf_map", "Unowned team chest")
 					minetest.set_node(pos, { name = "air" })
 					return
 				end
-				ctf.warning("ctf_team_base", "Wrong chest, changing to " .. territory_owner .. " from " .. chest_color)
-				minetest.set_node(pos, "ctf_team_base:chest_" .. territory_owner)
+				ctf.warning("ctf_map", "Wrong chest, changing to " .. territory_owner .. " from " .. chest_color)
+				minetest.set_node(pos, "ctf_map:chest_" .. territory_owner)
 			end
 
 			local formspec = table.concat({
@@ -75,7 +75,7 @@ for _, chest_color in pairs(colors) do
 					"Try killing an enemy player, or at least attempting to capture the flag.\n" ..
 					"Find resources in chests scattered around the map."
 				formspec = formspec .. "label[1,1;" .. minetest.formspec_escape(msg) .. "]"
-				minetest.show_formspec(player:get_player_name(), "ctf_team_base:no_access",  formspec)
+				minetest.show_formspec(player:get_player_name(), "ctf_map:no_access",  formspec)
 				return
 			end
 
@@ -85,7 +85,7 @@ for _, chest_color in pairs(colors) do
 			formspec = formspec ..
 				"label[0,-0.2;" .. minetest.formspec_escape("Any team member can take from here") .. "]" ..
 				"list[" .. chestinv .. ";main;0,0.3;5,4;]" ..
-				"background[5,-0.2;3.15,4.7;ctf_team_base_pro_only.png;false]" ..
+				"background[5,-0.2;3.15,4.7;ctf_map_pro_only.png;false]" ..
 				"list[" .. chestinv .. ";pro;5,0.3;3,4;]"
 
 			if is_pro then
@@ -102,7 +102,7 @@ for _, chest_color in pairs(colors) do
 				"listring[current_player;main]" ..
 				default.get_hotbar_bg(0,4.85)
 
-			minetest.show_formspec(player:get_player_name(), "ctf_team_base:chest",  formspec)
+			minetest.show_formspec(player:get_player_name(), "ctf_map:chest",  formspec)
 		end,
 
 		allow_metadata_inventory_move = function(pos, from_list, from_index,

@@ -1,3 +1,12 @@
+minetest.register_node("ctf_map:reinforced_cobble", {
+	description = "Reinforced Cobblestone",
+	tiles = {"ctf_map_reinforced_cobble.png"},
+	is_ground_content = false,
+	groups = {cracky = 1, stone = 2},
+	sounds = default.node_sound_stone_defaults(),
+})
+
+
 --
 -- Special nodes
 --
@@ -29,13 +38,6 @@ minetest.register_node("ctf_map:ind_glass", {
 	pointable = false,
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
-})
-
-minetest.register_node("ctf_map:ind_stone", {
-	description = "Indestructible Stone",
-	groups = {immortal = 1},
-	tiles = {"default_stone.png"},
-	is_ground_content = false
 })
 
 minetest.register_node("ctf_map:ind_glass_red", {
@@ -108,7 +110,6 @@ minetest.register_node("ctf_map:mossycobble", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_stone_defaults(),
 })
-
 
 minetest.register_node("ctf_map:desert_stone", {
 	description = "Indestructible Desert Stone",
@@ -761,3 +762,6 @@ for name, nodedef in pairs(minetest.registered_nodes) do
 		minetest.register_node("ctf_map:" .. name:split(":")[2], nodedef)
 	end
 end
+
+minetest.register_alias("ctf_map:ind_cobble", "ctf_map:cobble")
+minetest.register_alias("ctf_map:ind_stone", "ctf_map:stone")

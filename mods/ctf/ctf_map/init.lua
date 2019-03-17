@@ -3,9 +3,10 @@ ctf_map = {}
 dofile(minetest.get_modpath("ctf_map") .. "/nodes.lua")
 dofile(minetest.get_modpath("ctf_map") .. "/emerge.lua")
 dofile(minetest.get_modpath("ctf_map") .. "/barrier.lua")
-
+dofile(minetest.get_modpath("ctf_map") .. "/base.lua")
 
 if minetest.get_modpath("ctf") then
+	dofile(minetest.get_modpath("ctf_map") .. "/chest.lua")
 	dofile(minetest.get_modpath("ctf_map") .. "/schem_map.lua")
 	dofile(minetest.get_modpath("ctf_map") .. "/give_initial_stuff.lua")
 
