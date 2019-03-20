@@ -26,6 +26,7 @@ SHOOTER_ALLOW_PLAYERS = true
 SHOOTER_OBJECT_RELOAD_TIME = 1
 SHOOTER_OBJECT_UPDATE_TIME = 0.25
 SHOOTER_ROUNDS_UPDATE_TIME = 0.4
+SHOOTER_EYE_HEIGHT = 1.47
 SHOOTER_PLAYER_OFFSET = {x=0, y=1, z=0}
 SHOOTER_ENTITY_OFFSET = {x=0, y=0, z=0}
 SHOOTER_ENTITIES = {}
@@ -271,7 +272,7 @@ function shooter:fire_weapon(user, pointed_thing, def)
 	if not v1 or not p1 then
 		return
 	end
-	minetest.add_particle({x=p1.x, y=p1.y + 1.6, z=p1.z},
+	minetest.add_particle({x=p1.x, y=p1.y + SHOOTER_EYE_HEIGHT, z=p1.z},
 		vector.multiply(v1, {x=30, y=30, z=30}),
 		{x=0, y=0, z=0}, 0.5, 0.25,
 		false, def.particle
@@ -285,14 +286,14 @@ function shooter:fire_weapon(user, pointed_thing, def)
 			object:punch(user, nil, def.tool_caps, v1)
 			local p2 = object:getpos()
 			local pp = get_particle_pos(p1, v1, vector.distance(p1, p2))
-			pp.y = pp.y + 1.75
+			pp.y = pp.y + SHOOTER_EYE_HEIGHT
 			shooter:spawn_particles(pp, SHOOTER_EXPLOSION_TEXTURE)
 		end
 	else
 		shooter:update_objects()
 		table.insert(shooter.rounds, {
 			name = def.name,
-			pos = vector.add(p1, {x=0, y=1.75, z=0}),
+			pos = vector.add(p1, {x=0, y=SHOOTER_EYE_HEIGHT, z=0}),
 			ray = v1,
 			dist = 0,
 			def = def,
@@ -399,7 +400,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			local dist = vector.distance(obj_pos, pos)
 			local damage = (fleshy * 0.5 ^ dist) * 3
 			if dist ~= 0 then
-				obj_pos.y = obj_pos.y + 1.7
+				obj_pos.y = obj_pos.y + SHOOTER_EYE_HEIGHT
 				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
 				if minetest.line_of_sight(obj_pos, blast_pos, 1) then
 					obj:punch(user or obj, 2.0, {
