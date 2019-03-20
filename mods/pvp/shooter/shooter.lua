@@ -384,6 +384,8 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			minetest.set_node(pos, {name="tnt:boom"})
 		end
 	end
+
+	-- Explosion particles
 	if SHOOTER_ENABLE_PARTICLE_FX == true then
 		minetest.add_particlespawner(50, 0.1,
 			p1, p2, {x=-0, y=-0, z=-0}, {x=0, y=0, z=0},
@@ -391,6 +393,8 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			0.1, 1, 8, 15, false, "tnt_smoke.png"
 		)
 	end
+
+	-- Damage to objects within range
 	local objects = minetest.get_objects_inside_radius(pos, distance)
 	for _,obj in ipairs(objects) do
 		if (obj:is_player() and SHOOTER_ALLOW_PLAYERS == true) or
@@ -398,7 +402,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 				obj:get_luaentity().name ~= "__builtin:item") then
 			local obj_pos = obj:getpos()
 			local dist = vector.distance(obj_pos, pos)
-			local damage = (fleshy * 0.5 ^ dist) * 3
+			local damage = fleshy * (0.707106 ^ dist) * 3
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + SHOOTER_EYE_HEIGHT
 				blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
@@ -411,6 +415,8 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 			end
 		end
 	end
+
+	-- Node blasting using LVM
 	if SHOOTER_ALLOW_NODES and SHOOTER_ENABLE_BLASTING then
 		local pr = PseudoRandom(os.time())
 		local vm = VoxelManip()

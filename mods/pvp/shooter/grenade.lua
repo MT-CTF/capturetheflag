@@ -21,7 +21,7 @@ minetest.register_entity("shooter:grenade_entity", {
 	end,
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
-		if self.timer > 0.2 then
+		if self.timer > 0.1 then
 			local pos = self.object:getpos()
 			local above = {x=pos.x, y=pos.y + 1, z=pos.z}
 			if minetest.get_node(pos).name ~= "air" then
@@ -41,26 +41,25 @@ minetest.register_tool("shooter:grenade", {
 	inventory_image = "shooter_hand_grenade.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if not minetest.settings:get_bool("creative_mode") then
-			itemstack = ""
+			itemstack:take_item()
 		end
-		-- clarification for future readers: grenade can be used only if player points at nothing (line 47)
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
-			if vector.distance(user:getpos(), pointed) < 10 then
+			if vector.distance(user:get_pos(), pointed) < 10 then
 				shooter:blast(pointed, 2, 25, 5)
 				return
 			end
 		end
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local dir = user:get_look_dir()
 		local yaw = user:get_look_yaw()
 		if pos and dir then
 			pos.y = pos.y + 1.5
 			local obj = minetest.add_entity(pos, "shooter:grenade_entity")
 			if obj then
-				obj:setvelocity({x=dir.x * 15, y=dir.y * 15, z=dir.z * 15})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-				obj:setyaw(yaw + math.pi)
+				obj:set_velocity({x = dir.x * 20, y = dir.y * 20, z = dir.z * 20})
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(yaw + math.pi)
 				local ent = obj:get_luaentity()
 				if ent then
 					ent.player = ent.player or user
