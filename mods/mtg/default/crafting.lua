@@ -162,13 +162,6 @@ minetest.register_craft({
 })
 
 
--- Support use of group:sapling, includes default:sapling which has the same burn time
-minetest.register_craft({
-	type = "fuel",
-	recipe = "group:sapling",
-	burntime = 5,
-})
-
 minetest.register_craft({
 	type = "fuel",
 	recipe = "default:bush_sapling",

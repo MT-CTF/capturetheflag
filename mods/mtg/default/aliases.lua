@@ -39,7 +39,6 @@ minetest.register_alias("locked_chest", "default:chest_locked")
 minetest.register_alias("cobble", "default:cobble")
 minetest.register_alias("mossycobble", "default:mossycobble")
 minetest.register_alias("steelblock", "default:steelblock")
-minetest.register_alias("sapling", "default:sapling")
 
 minetest.register_alias("STPick", "default:pick_stone")
 minetest.register_alias("SteelPick", "default:pick_steel")
