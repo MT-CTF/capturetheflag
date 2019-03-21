@@ -29,7 +29,7 @@ function give_initial_stuff.get_stuff()
 end
 
 minetest.register_on_joinplayer(function(player)
-	player:set_hp(20)
+	player:set_hp(player:get_properties().hp_max)
 	give_initial_stuff(player)
 end)
 minetest.register_on_respawnplayer(give_initial_stuff)
