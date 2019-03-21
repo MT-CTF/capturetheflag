@@ -37,6 +37,7 @@ local function add_marker(name, tname, pos, str)
 		players = {},
 		time = 0
 	}
+
 	for pname, _ in pairs(team.players) do
 		local tplayer = minetest.get_player_by_name(pname)
 		if tplayer then

@@ -12,8 +12,8 @@ local function regen_all()
 		local oldhp = player:get_hp()
 		if oldhp > 0 then
 			local newhp = oldhp + regen_amount
-			if newhp > 20 then
-				newhp = 20
+			if newhp > player:get_properties().hp_max then
+				newhp = player:get_properties().hp_max
 			end
 			player:set_hp(newhp)
 		end
