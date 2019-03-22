@@ -5,6 +5,7 @@ ctf_classes = {
 
 dofile(minetest.get_modpath("ctf_classes") .. "/api.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/gui.lua")
+dofile(minetest.get_modpath("ctf_classes") .. "/regen.lua")
 
 ctf_classes.register("knight", {
 	description = "Knight",
@@ -67,9 +68,26 @@ local flags = {
 	"ctf_flag:flag_top_blue",
 }
 
-for _, flag in pairs(flags) do
+for _, flagname in pairs(flags) do
+	local old_func = minetest.registered_nodes[flagname].on_punch
+	local function on_punch(pos, node, player, ...)
+		if ctf_classes.get(player).name == "medic" then
+			local flag = ctf_flag.get(pos)
+			local team = ctf.player(player:get_player_name()).team
+			if not flag or not flag.team or not team or team ~= flag.team then
+				minetest.chat_send_player(player:get_player_name(),
+					"Medics can't capture the flag!")
+				return
+			end
+		end
+
+		return old_func(pos, node, player, ...)
+	end
 	local function show(_, _, player)
 		ctf_classes.show_gui(player:get_player_name(), player)
 	end
-	minetest.override_item(flag, { on_rightclick = show })
+	minetest.override_item(flagname, {
+		on_punch = on_punch,
+		on_rightclick = show,
+	})
 end
