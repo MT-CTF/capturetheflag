@@ -83,13 +83,18 @@ minetest.register_tool("shooter:grapple_gun", {
 	description = "Grappling Gun",
 	inventory_image = "shooter_hook_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
+		local ent = pointed_thing.ref and pointed_thing.ref:get_luaentity()
+		if ent and ent.name == "__builtin:item" then
+			return ent:on_punch(user)
+		end
+
 		local inv = user:get_inventory()
 		if inv:contains_item("main", "shooter:grapple_hook") and
-				inv:contains_item("main", "tnt:gunpowder") then
-			inv:remove_item("main", "tnt:gunpowder")
+				true then --inv:contains_item("main", "tnt:gunpowder") then
+			-- inv:remove_item("main", "tnt:gunpowder")
 			minetest.sound_play("shooter_reload", {object=user})
 			local stack = inv:remove_item("main", "shooter:grapple_hook")
-			itemstack = "shooter:grapple_gun_loaded 1 "..stack:get_wear()
+			itemstack = ItemStack("shooter:grapple_gun_loaded 1 "..stack:get_wear())
 		else
 			minetest.sound_play("shooter_click", {object=user})
 		end
@@ -107,6 +112,7 @@ minetest.register_tool("shooter:grapple_gun_loaded", {
 		end
 		minetest.sound_play("shooter_pistol", {object=user})
 		itemstack = ItemStack("shooter:grapple_hook 1 "..itemstack:get_wear())
+		itemstack:add_wear(65536 / 6)
 		throw_hook(itemstack, user, 20)
 		return "shooter:grapple_gun"
 	end,
