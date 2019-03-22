@@ -15,9 +15,21 @@ local function regen_all()
 			if newhp > player:get_properties().hp_max then
 				newhp = player:get_properties().hp_max
 			end
-			player:set_hp(newhp)
+			if oldhp ~= newhp then
+				player:set_hp(newhp)
+			end
 		end
 	end
-	minetest.after(regen_interval, regen_all)
 end
-minetest.after(regen_interval, regen_all)
+
+
+local update = 0
+minetest.register_globalstep(function(delta)
+	update = update + delta
+	if update < regen_interval then
+		return
+	end
+	update = update - regen_interval
+
+	regen_all()
+end)
