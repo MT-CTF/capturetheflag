@@ -229,18 +229,20 @@ function shooter:register_weapon(name, def)
 		inventory_image = def.inventory_image,
 		on_use = function(itemstack, user, pointed_thing)
 			if itemstack:get_wear() < max_wear then
-				def.spec.name = user:get_player_name()
-				if shots > 1 then
-					local step = def.spec.tool_caps.full_punch_interval
-					for i = 0, step * shots, step do
-						minetest.after(i, function()
-							shooter:fire_weapon(user, pointed_thing, def.spec)
-						end)
+				local spec = shooter:get_weapon_spec(user, name)
+				if spec then
+					if shots > 1 then
+						local step = spec.tool_caps.full_punch_interval
+						for i = 0, step * shots, step do
+							minetest.after(i, function()
+								shooter:fire_weapon(user, pointed_thing, spec)
+							end)
+						end
+					else
+						shooter:fire_weapon(user, pointed_thing, spec)
 					end
-				else
-					shooter:fire_weapon(user, pointed_thing, def.spec)
+					itemstack:add_wear(wear)
 				end
-				itemstack:add_wear(wear)
 			else
 				local inv = user:get_inventory()
 				if inv then
@@ -257,6 +259,16 @@ function shooter:register_weapon(name, def)
 			return itemstack
 		end,
 	})
+end
+
+function shooter:get_weapon_spec(user, name)
+	local spec = shooter.registered_weapons[name]
+	if not spec then
+		return nil
+	end
+	spec = spec.spec
+	spec.name = user:get_player_name()
+	return spec
 end
 
 function shooter:fire_weapon(user, pointed_thing, def)
@@ -466,9 +478,8 @@ if not singleplayer and SHOOTER_ADMIN_WEAPONS then
 			if player:get_player_control().LMB then
 				local name = player:get_player_name()
 				if minetest.check_player_privs(name, {server=true}) then
-					local spec = shooter.registered_weapons[player:get_wielded_item():get_name()]
+					local spec = shooter:get_weapon_spec(player, player:get_wielded_item():get_name())
 					if spec then
-						spec = spec.spec
 						shooter.shots[name] = false
 						spec.name = name
 						shooter:fire_weapon(player, {}, spec)
