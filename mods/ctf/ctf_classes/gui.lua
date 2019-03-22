@@ -66,9 +66,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				"Move closer to the flag to change classes!")
 	end
 
-	for _, class in pairs(ctf_classes.__classes_ordered) do
-		if fields["select_" .. class.name] then
-			ctf_classes.set(player, class.name)
+	for name in pairs(ctf_classes.__classes) do
+		if fields["select_" .. name] then
+			ctf_classes.set(player, name)
 			return true
 		end
 	end

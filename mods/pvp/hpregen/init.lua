@@ -1,17 +1,19 @@
-local regen_interval = tonumber(minetest.settings:get("regen_interval"))
-if regen_interval <= 0 then
-	regen_interval = 6
+hpregen = {}
+
+hpregen.interval = tonumber(minetest.settings:get("hpregen.interval"))
+if hpregen.interval <= 0 then
+	hpregen.interval = 6
 end
-local regen_amount = tonumber(minetest.settings:get("regen_amount"))
-if regen_amount <= 0 then
-	regen_amount = 1
+hpregen.amount = tonumber(minetest.settings:get("hpregen.amount"))
+if hpregen.amount <= 0 then
+	hpregen.amount = 1
 end
 
 local function regen_all()
 	for _, player in pairs(minetest.get_connected_players()) do
 		local oldhp = player:get_hp()
 		if oldhp > 0 then
-			local newhp = oldhp + regen_amount
+			local newhp = oldhp + hpregen.amount
 			if newhp > player:get_properties().hp_max then
 				newhp = player:get_properties().hp_max
 			end
@@ -26,10 +28,10 @@ end
 local update = 0
 minetest.register_globalstep(function(delta)
 	update = update + delta
-	if update < regen_interval then
+	if update < hpregen.interval then
 		return
 	end
-	update = update - regen_interval
+	update = update - hpregen.interval
 
 	regen_all()
 end)

@@ -1,0 +1,18 @@
+diff --git a/builtin/game/statbars.lua b/builtin/game/statbars.lua
+index 46c947b6..f4372843 100644
+--- builtin/game/statbars.lua
++++ builtin/game/statbars.lua
+@@ -24,12 +24,14 @@ local breath_bar_definition = {
+ local hud_ids = {}
+
+ local function scaleToDefault(player, field)
++       return player["get_" .. field](player)
+-        -- Scale "hp" or "breath" to the default dimensions
+-       local current = player["get_" .. field](player)
+-       local nominal = core["PLAYER_MAX_".. field:upper() .. "_DEFAULT"]
+-       local max_display = math.max(nominal,
+-               math.max(player:get_properties()[field .. "_max"], current))
+-       return current / max_display * nominal
+ end
+
+ local function update_builtin_statbars(player)
