@@ -29,6 +29,10 @@ Created by [rubenwardy](https://rubenwardy.com/).
 Code: LGPLv2.1+
 Textures: CC-BY-SA 3.0
 
+### Textures
+
+* ctf_classes_skin_* found and edited by GreenDimond/GreenXenith
+
 ### Mods
 
 Check out [mods/](mods/) to see all the installed mods and their respective licenses.

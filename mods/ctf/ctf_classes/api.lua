@@ -12,7 +12,7 @@ end
 
 function ctf_classes.set_skin(player, color, class)
 	player:set_properties({
-		textures = {"ctf_classes_skins_" .. class.name .. "_" .. (color or "blue") .. ".png"}
+		textures = {"ctf_classes_skin_" .. class.name .. "_" .. (color or "blue") .. ".png"}
 	})
 end
 
