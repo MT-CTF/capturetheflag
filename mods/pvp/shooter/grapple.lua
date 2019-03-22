@@ -112,7 +112,7 @@ minetest.register_tool("shooter:grapple_gun_loaded", {
 		end
 		minetest.sound_play("shooter_pistol", {object=user})
 		itemstack = ItemStack("shooter:grapple_hook 1 "..itemstack:get_wear())
-		itemstack:add_wear(65536 / 6)
+		itemstack:add_wear(65536 / 8)
 		throw_hook(itemstack, user, 20)
 		return "shooter:grapple_gun"
 	end,

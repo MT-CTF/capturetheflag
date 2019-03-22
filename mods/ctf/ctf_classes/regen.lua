@@ -1,13 +1,3 @@
-local regen_interval = tonumber(minetest.settings:get("regen_interval"))
-if regen_interval <= 0 then
-	regen_interval = 6
-end
-
-local regen_amount = tonumber(minetest.settings:get("regen_amount"))
-if regen_amount <= 0 then
-	regen_amount = 1
-end
-
 local function regen_update()
 	local get = ctf_classes.get
 	local players = minetest.get_connected_players()
@@ -54,7 +44,7 @@ local function regen_update()
 			local medics = medic_by_team[tname]
 			for j=1, #medics do
 				if sqdist(pos, medics[j]) < 100 then
-					hp = hp + regen_amount
+					hp = hp + hpregen.amount
 					player:set_hp(hp)
 					break
 				end
@@ -63,13 +53,13 @@ local function regen_update()
 	end
 end
 
-local update = regen_interval / 2
+local update = hpregen.interval / 2
 minetest.register_globalstep(function(delta)
 	update = update + delta
-	if update < regen_interval then
+	if update < hpregen.interval then
 		return
 	end
-	update = update - regen_interval
+	update = update - hpregen.interval
 
 	regen_update()
 end)

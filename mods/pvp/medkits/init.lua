@@ -8,7 +8,7 @@ local players = {}
 
 local regen_max = 20       -- Max HP provided by one medkit
 local regen_interval = 0.5 -- Time in seconds between each iteration
-local regen_timer = 0      -- Timer to keep track of regen_interval
+local regen_timer = 0      -- Timer to keep track of hpregen.interval
 local regen_step = 1       -- Number of HP added every iteration
 
 -- Boolean function for use by other mods to check if a player is healing
@@ -54,7 +54,7 @@ local function stop_healing(player, interrupted)
 	players[name] = nil
 	if interrupted then
 		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-		                                "Your healing was interrupted!"))
+				"Your healing was interrupted!"))
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end

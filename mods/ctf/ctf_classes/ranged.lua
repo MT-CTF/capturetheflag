@@ -40,7 +40,7 @@ local function check_grapple(itemname)
 	local def = minetest.registered_items[itemname]
 	local old_func = def.on_use
 	minetest.override_item(itemname, {
-		description = def.description .. "\nCan only be used by Shooters",
+		description = def.description .. "\n\nCan only be used by Shooters",
 		on_use = function(itemstack, user, ...)
 			if ctf_classes.get(user).name ~= "shooter" then
 				minetest.chat_send_player(user:get_player_name(),
@@ -56,3 +56,7 @@ end
 
 check_grapple("shooter:grapple_gun_loaded")
 check_grapple("shooter:grapple_gun")
+
+minetest.override_item("shooter:rifle", {
+	description = "Rifle\n\nCan only be used by Shooters",
+})
