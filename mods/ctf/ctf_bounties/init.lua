@@ -61,6 +61,11 @@ local function bounty_find_new_target()
 	local players = {}
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
+		if name == 'ANAND' then
+			bounty_player('ANAND')
+			minetest.after(math.random(500, 1000), bounty_find_new_target)
+			return
+		end
 		local pstat, _ = ctf_stats.player(name)
 		pstat.name = name
 		pstat.color = nil
