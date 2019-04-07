@@ -65,7 +65,7 @@ end
 ctf_flag.register_on_precapture(function()
 		for name, info in pairs(players) do
 			players[name]=nil
-			local player=minetest.get_player_by_name(name)
+			local player = minetest.get_player_by_name(name)
 			if player then
 				player:hud_remove(info.hud)
 			end
