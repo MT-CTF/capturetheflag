@@ -38,17 +38,17 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 
 	-- One
 	if evt.one then
-		local _, tone_hex = ctf_colors.get_color(ctf.player(evt.one))
+		local tcolor = ctf_colors.get_color(ctf.player(evt.one))
 		if hud:exists(player, idx) then
 			hud:change(player, idx, "text", evt.one)
-			hud:change(player, idx, "number", tone_hex)
+			hud:change(player, idx, "number", tcolor.hex)
 		else
 			local tmp = {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
 				text          = evt.one,
-				number        = tone_hex,
+				number        = tcolor.hex,
 				offset        = {x = 145, y = -y_pos},
 				alignment     = {x = -1, y = 0}
 			}
@@ -60,17 +60,17 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 
 	-- Two
 	if evt.two then
-		local _, ttwo_hex = ctf_colors.get_color(ctf.player(evt.two))
+		local tcolor = ctf_colors.get_color(ctf.player(evt.two))
 		if hud:exists(player, idx2) then
 			hud:change(player, idx2, "text", evt.two)
-			hud:change(player, idx2, "number", ttwo_hex)
+			hud:change(player, idx2, "number", tcolor.hex)
 		else
 			local tmp = {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
 				text          = evt.two,
-				number        = ttwo_hex,
+				number        = tcolor.hex,
 				offset        = {x = 175, y = -y_pos},
 				alignment     = {x = 1, y = 0}
 			}
