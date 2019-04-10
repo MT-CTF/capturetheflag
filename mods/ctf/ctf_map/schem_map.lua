@@ -207,9 +207,9 @@ function ctf_match.load_map_meta(idx, name)
 		i = i + 1
 	end
 
-	-- Register per-map treasures or the default set of treasures
+	-- Register per-map treasures, or the default set of treasures
 	-- if treasures field hasn't been defined in map meta
-	if treasurer and ctf_treasure then
+	if ctf_treasure then
 		treasurer.treasures = {}
 		if treasures then
 			for _, item in pairs(treasures) do
@@ -232,7 +232,28 @@ function ctf_match.load_map_meta(idx, name)
 				end
 			end
 		else
-			ctf_treasure.register_default_treasures()
+			-- If treasure is a part of map's initial stuff, don't register it
+			local blacklist = map.initial_stuff or give_initial_stuff.get_stuff()
+			for _, def in pairs(ctf_treasure.get_default_treasures()) do
+				local is_valid = true
+				for _, b_item in pairs(blacklist) do
+					local b_stack = ItemStack(b_item)
+					local t_stack = ItemStack(def[1])
+					if b_stack:get_name() == t_stack:get_name() and
+							t_stack:get_count() == 1 then
+						is_valid = false
+						minetest.log("action",
+						             "ctf_map: Omitting treasure - " .. def[1])
+						break
+					end
+				end
+
+				if is_valid then
+					minetest.log("info",
+					             "ctf_map: Registering treasure - " .. def[1])
+					treasurer.register_treasure(def[1], def[2], def[3], def[4])
+				end
+			end
 		end
 	end
 
@@ -241,7 +262,8 @@ function ctf_match.load_map_meta(idx, name)
 	while meta:get("chests." .. i .. ".from") do
 		local from  = minetest.string_to_pos(meta:get("chests." .. i .. ".from"))
 		local to    = minetest.string_to_pos(meta:get("chests." .. i .. ".to"))
-		assert(from and to, "Positions needed for chest zone " .. i .. " in map " .. map.name)
+		assert(from and to, "Positions needed for chest zone " ..
+		                    i .. " in map " .. map.name)
 
 		map.chests[i] = {
 			from = vector.add(offset, from),
