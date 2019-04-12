@@ -4,7 +4,8 @@ local ATTACH_POSITION = minetest.rgba and {x=0,y=20,z=0} or {x=0,y=10,z=0}
 
 local TYPE_BUILTIN = 0
 local TYPE_ENTITY = 1
-playertag = {
+
+ctf_playertag = {
 	TYPE_BUILTIN = TYPE_BUILTIN,
 	TYPE_ENTITY  = TYPE_ENTITY,
 }
@@ -62,7 +63,7 @@ local function update(player, settings)
 	end
 end
 
-function playertag.set(player, type, color)
+function ctf_playertag.set(player, type, color)
 	local oldset = tag_settings[player:get_player_name()]
 	color = color or { a=255, r=255, g=255, b=255 }
 	if not oldset or oldset.type ~= type or oldset.color ~= color then
@@ -70,11 +71,11 @@ function playertag.set(player, type, color)
 	end
 end
 
-function playertag.get(player)
+function ctf_playertag.get(player)
 	return tag_settings[player:get_player_by_name()]
 end
 
-function playertag.get_all()
+function ctf_playertag.get_all()
 	return tag_settings
 end
 
@@ -136,11 +137,11 @@ end
 minetest.after(10, step)
 
 minetest.register_on_joinplayer(function(player)
-	playertag.set(player, TYPE_BUILTIN, {a = 0, r = 255, g = 255, b = 255})
+	ctf_playertag.set(player, TYPE_BUILTIN, {a = 0, r = 255, g = 255, b = 255})
 	minetest.after(2, function(name)
 		player = minetest.get_player_by_name(name)
 		if player then
-			playertag.set(player, TYPE_ENTITY)
+			ctf_playertag.set(player, TYPE_ENTITY)
 		end
 	end, player:get_player_name())
 end)
