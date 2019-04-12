@@ -12,9 +12,9 @@ exclude_files = {
 ignore = {"631"}
 
 globals = {
-	"crafting", "vector", "table", "minetest",
-	"worldedit", "ctf", "ctf_flag", "ctf_colors",
-	"hudkit", "default", "treasurer", "ChatCmdBuilder", "chatplus",
+	"crafting", "vector", "table", "minetest", "worldedit", "ctf", "ctf_flag",
+	"ctf_colors", "hudkit", "default", "treasurer", "ChatCmdBuilder", "ctf_map",
+	"ctf_match", "ctf_stats", "ctf_treasure", "ctf_playertag", "chatplus"
 }
 
 read_globals = {
