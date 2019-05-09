@@ -37,6 +37,15 @@ minetest.register_chatcommand("vote_kick", {
 
 		minetest.log("warning", "Player '" .. name .. "' started a vote" ..
 							" to kick '" .. param .. "'")
+
+
+		if not vlist[param] then
+			vlist[param] = {
+				ip = minetest.get_player_ip(param),
+				locked = false
+			}
+		end
+
 		return vote.new_vote(name, {
 			description = "Kick " .. param,
 			help = "/yes,  /no  or  /abstain",
@@ -60,6 +69,9 @@ minetest.register_chatcommand("vote_kick", {
 					minetest.chat_send_all("Vote failed, " ..
 							#results.yes .. " to " .. #results.no .. ", " ..
 							self.name .. " remains ingame.")
+					if not minetest.get_player_by_name(self.name) then
+						vlist[self.name] = nil
+					end
 				end
 			end,
 
@@ -81,35 +93,14 @@ minetest.register_chatcommand("unblock", {
 			return false, "Please specify a player name to be unblocked!"
 		end
 
-		if not minetest.get_player_by_name(param) then
-			return false, "Can't find player '" .. param .. "'"
-		end
-
-		if not vlist[name].locked then
+		if not vlist[param].locked then
 			return false, "Failed! " .. param .. " is not blocked"
 		end
 
-		vlist[name].locked = false
+		vlist[param].locked = false
 		return true, param .. " has been successfully unblocked!"
 	end
 })
-
-minetest.register_on_joinplayer(function(player)
-	local name = player:get_player_name()
-	if not vlist[name] then
-		vlist[name] = {
-			ip = minetest.get_player_ip(name),
-			locked = false
-		}
-	end
-end)
-
-minetest.register_on_leaveplayer(function(player)
-	local name = player:get_player_name()
-	if not vlist[name].locked then
-		vlist[name] = nil
-	end
-end)
 
 minetest.register_on_prejoinplayer(function(name, ip)
 	if vlist[name] and vlist[name].locked then
