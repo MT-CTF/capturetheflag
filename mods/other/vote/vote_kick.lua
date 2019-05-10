@@ -4,10 +4,16 @@ local vlist = {} -- table storing player name, ip & lock status
 minetest.register_privilege("vote_kick", {
 	description = "Can (start) vote to kick a player",
 	on_grant = function(name, granter)
+		if not granter then
+			granter = "<nil>"
+		end
 		minetest.log("warning", "Player '" .. name .. "' has been" ..
 						" granted 'vote_kick' by '" .. granter .. "'")
 	end,
 	on_revoke = function(name, revoker)
+		if not revoker then
+			revoker = "<nil>"
+		end
 		minetest.log("warning", "Player '" .. name .. "' has been" ..
 						" revoked of 'vote_kick' by '" .. revoker .. "'")
 	end
