@@ -1,6 +1,6 @@
 respawn_immunity = {}
 
-local IMMUNE_TIME = 15
+local IMMUNE_TIME = 10
 local immune_serial = 0
 local immune_players = {}
 
