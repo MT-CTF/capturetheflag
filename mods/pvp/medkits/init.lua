@@ -62,6 +62,16 @@ local function stop_healing(player, interrupted)
 	player:hud_remove(info.hud)
 end
 
+ctf_flag.register_on_precapture(function()
+	for name, info in pairs(players) do
+		players[name]=nil
+		local player = minetest.get_player_by_name(name)
+		if player then
+			player:hud_remove(info.hud)
+		end
+	end
+end)
+
 -- Called after left-click every n seconds (determined by regen_interval)
 -- heals player for a total of regen_max, limited by player's max hp
 minetest.register_globalstep(function(dtime)
