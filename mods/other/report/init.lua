@@ -85,6 +85,6 @@ minetest.register_chatcommand("report", {
 			end
 		end
 
-		return true, "Report has been sent."
+		return true, "Reported. We will get back to you."
 	end
 })
