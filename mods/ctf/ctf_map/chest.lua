@@ -3,7 +3,7 @@ local blacklist = {
 	"default:jungleleaves",
 	"default:pine_needles",
 	"default:acacia_leaves",
-	"default:aspen_leaves",	
+	"default:aspen_leaves",
 	"default:sword_stone",
 	"default:pick_stone"
 }
