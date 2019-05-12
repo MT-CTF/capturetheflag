@@ -55,19 +55,27 @@ function minetest.get_server_status(name, joined)
 end
 
 
+function ctf_map.get_idx_and_map(param)
+	param = param:lower():trim()
+	for i, map in pairs(ctf_map.available_maps) do
+		if map.name:lower():find(param, 1, true) or
+				map.path:lower():find(param, 1, true) then
+			return i, map
+		end
+	end
+end
+
 local next_idx
 minetest.register_chatcommand("set_next", {
 	privs = { ctf_admin = true },
 	func = function(name, param)
-		for i, map in pairs(ctf_map.available_maps) do
-			if map.name:lower():find(param, 1, true) or
-					map.path:lower():find(param, 1, true) then
-				next_idx = i
-				return true, "Selected " .. map.name
-			end
+		local idx, map = ctf_map.get_idx_and_map(param)
+		if idx then
+			next_idx = idx
+			return true, "Selected " .. map.name
+		else
+			return false, "Couldn't find any matches"
 		end
-
-		return false, "Couldn't find any matches"
 	end,
 })
 
