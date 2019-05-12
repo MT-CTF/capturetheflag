@@ -100,12 +100,7 @@ minetest.register_chatcommand("maps", {
 		-- If arg. supplied, set idx to index of the matching map name
 		-- or path. Else, set to indices[name] or index of current map
 		if param then
-			for i, map in pairs(ctf_map.available_maps) do
-				if map.name:find(param) or map.path:find(param) then
-					idx = i
-					break
-				end
-			end
+			idx = ctf_map.get_idx_and_map(param)
 		else
 			idx = indices[name] or ctf_map.map and ctf_map.map.idx or 1
 		end
