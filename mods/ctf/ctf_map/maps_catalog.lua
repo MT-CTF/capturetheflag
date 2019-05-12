@@ -83,6 +83,9 @@ end)
 minetest.register_chatcommand("maps", {
 	privs = {interact = true},
 	func = function(name, param)
+		if #ctf_map.available_maps == 0 then
+			return false, "No maps are loaded!"
+		end
 		if not minetest.get_player_by_name(name) then
 			return false, "You must be online to view the maps catalog!"
 		end
@@ -104,7 +107,7 @@ minetest.register_chatcommand("maps", {
 				end
 			end
 		else
-			idx = indices[name] or ctf_map.map.idx
+			idx = indices[name] or ctf_map.map and ctf_map.map.idx or 1
 		end
 
 		show_catalog(name, idx or 1)
