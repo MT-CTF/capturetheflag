@@ -45,14 +45,16 @@ local function show_catalog(name, idx)
 	local y = 1
 	if map.screenshot then
 		fs = fs .. "image[4,1.5;6.5,3.5;" .. map.screenshot .. "]"
-		y = y + 4
+		y = y + 3.5
 	end
 
 	-- Other fields
 	fs = fs .. "container[3.5," .. y + 0.5 .. "]"
-	fs = fs .. "label[0.5,0;HINT: " ..
+	fs = fs .. "label[0.5,0;" .. minetest.colorize("#FFFF00", "HINT:") .. "]"
+	fs = fs .. "textarea[0.8,0.5;5.5,1;;;" ..
 			minetest.formspec_escape(map.hint or "---") .. "]"
-	fs = fs .. "label[0.5,0.5;LICENSE: " ..
+	fs = fs .. "label[0.5,1.5;" .. minetest.colorize("#FFFF00", "LICENSE:") .. "]"
+	fs = fs .. "textarea[0.8,2;5.5,1;;;" ..
 			minetest.formspec_escape(map.license or "---") .. "]"
 	fs = fs .. "container_end[]"
 
