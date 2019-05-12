@@ -11,18 +11,19 @@ function ctf_map.can_cross(player)
 	return false
 end
 
-dofile(minetest.get_modpath("ctf_map") .. "/nodes.lua")
-dofile(minetest.get_modpath("ctf_map") .. "/emerge.lua")
-dofile(minetest.get_modpath("ctf_map") .. "/barrier.lua")
-dofile(minetest.get_modpath("ctf_map") .. "/base.lua")
+local modpath = minetest.get_modpath("ctf_map")
+dofile(modpath .. "/nodes.lua")
+dofile(modpath .. "/emerge.lua")
+dofile(modpath .. "/barrier.lua")
+dofile(modpath .. "/base.lua")
 
 if minetest.get_modpath("ctf") then
-	dofile(minetest.get_modpath("ctf_map") .. "/chest.lua")
-	dofile(minetest.get_modpath("ctf_map") .. "/schem_map.lua")
-	dofile(minetest.get_modpath("ctf_map") .. "/give_initial_stuff.lua")
+	dofile(modpath .. "/chest.lua")
+	dofile(modpath .. "/give_initial_stuff.lua")
+	dofile(modpath .. "/schem_map.lua")
+	dofile(modpath .. "/maps_catalog.lua")
 
-	assert(ctf_match)
 	ctf_match.register_on_build_time_end(ctf_map.remove_middle_barrier)
 else
-	dofile(minetest.get_modpath("ctf_map") .. "/map_maker.lua")
+	dofile(modpath .. "/map_maker.lua")
 end
