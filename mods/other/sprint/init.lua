@@ -84,7 +84,6 @@ minetest.register_globalstep(function(dtime)
 					if info.lastHudSendValue ~= numBars then
 						info.lastHudSendValue = numBars
 						player:hud_change(info.hud, "number", numBars)
-						print("Sending hud value")
 					end
 				end
 			end
