@@ -241,7 +241,7 @@ local function load_maps()
 				if extension == "mts" then
 					files_hash[dir .. "/" .. filename] = true
 				else
-					if extension ~= "conf" and extension ~= "md"
+					if extension ~= "conf" and extension ~= "md" and extension ~= "png"
 							and files[i] ~= ".git" then
 						error("Map extension is not '.mts': " .. files[i])
 					end
