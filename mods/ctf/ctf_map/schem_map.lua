@@ -98,6 +98,8 @@ local function load_map_meta(idx, path)
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
 		screenshot    = meta:get("screenshot"),
+		license       = meta:get("license"),
+		others        = meta:get("others"),
 		schematic     = path .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
 		treasures     = treasures,
