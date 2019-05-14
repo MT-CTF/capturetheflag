@@ -72,7 +72,7 @@ function random_messages.read_messages()
 		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
 		"Use /m to add a team marker at pointed location, that's visible only to team-mates.",
 		"Use /summary to check scores of the current match and the previous match.",
-		"Use /maps to view the maps catalog. You can also see license information there."
+		"Use /maps to view the maps catalog. It also contains license info and attribution details."
 	}
 end
 
