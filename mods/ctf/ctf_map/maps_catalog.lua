@@ -8,7 +8,7 @@ local function show_catalog(name, idx)
 	-- Select map to be displayed
 	local map = ctf_map.available_maps[idx]
 
-	local fs = "size[10,8]"
+	local fs = "size[10,9]"
 
 	fs = fs .. "container[0,0]"
 	fs = fs .. "box[0,0;9.8,1;#111]"
@@ -20,12 +20,14 @@ local function show_catalog(name, idx)
 	end
 
 	-- Map name and author
-	fs = fs .. "label[3,0;" .. minetest.formspec_escape(map.name) .. "]"
-	fs = fs .. "label[5,0.5;" .. "(by " .. minetest.formspec_escape(map.author) .. ")]"
+	fs = fs .. "label[1.75,0;" ..
+			minetest.colorize("#ffff00", minetest.formspec_escape(map.name)) .. "]"
+	fs = fs .. "label[1.75,0.5;" .. minetest.colorize("#cccccc",
+					"by " .. minetest.formspec_escape(map.author)) .. "]"
 	fs = fs .. "container_end[]"
 
 	-- List of maps
-	fs = fs .. "textlist[0,1.2;3.5,6.8;maps_list;"
+	fs = fs .. "textlist[0,1.2;3.5,7.8;maps_list;"
 	for i, v in pairs(ctf_map.available_maps) do
 		local mname = v.name
 
@@ -45,15 +47,32 @@ local function show_catalog(name, idx)
 	local y = 1
 	if map.screenshot then
 		fs = fs .. "image[4,1.5;6.5,3.5;" .. map.screenshot .. "]"
-		y = y + 4
+		y = y + 3.5
 	end
 
 	-- Other fields
 	fs = fs .. "container[3.5," .. y + 0.5 .. "]"
-	fs = fs .. "label[0.5,0;HINT: " ..
-			minetest.formspec_escape(map.hint or "---") .. "]"
-	fs = fs .. "label[0.5,0.5;LICENSE: " ..
-			minetest.formspec_escape(map.license or "---") .. "]"
+	y = 0
+	if map.hint then
+		fs = fs .. "label[0.5," .. y .. ";" ..
+				minetest.colorize("#FFFF00", "HINT:") .. "]"
+		fs = fs .. "textarea[0.8," .. y + 0.5 .. ";5.5,1;;;" ..
+				minetest.formspec_escape(map.hint) .. "]"
+		y = y + 1.375
+	end
+	if map.license then
+		fs = fs .. "label[0.5," .. y .. ";" ..
+				minetest.colorize("#FFFF00", "LICENSE:") .. "]"
+		fs = fs .. "textarea[0.8," .. y + 0.5 .. ";5.5,1;;;" ..
+				minetest.formspec_escape(map.license) .. "]"
+		y = y + 1.375
+	end
+	if map.others then
+		fs = fs .. "label[0.5," .. y .. ";" ..
+				minetest.colorize("#FFFF00", "MORE INFORMATION:") .. "]"
+		fs = fs .. "textarea[0.8," .. y + 0.5 .. ";5.5,1;;;" ..
+				minetest.formspec_escape(map.others) .. "]"
+	end
 	fs = fs .. "container_end[]"
 
 	minetest.show_formspec(name, "ctf_map:maps_catalog", fs)
