@@ -78,6 +78,25 @@ local function show_catalog(name, idx)
 	minetest.show_formspec(name, "ctf_map:maps_catalog", fs)
 end
 
+local function send_irc_catalog(name, idx)
+	-- Select map to be displayed
+	local map = ctf_map.available_maps[idx]
+	local red = string.char(3) .. "4"
+	local normal = string.char(3)
+	minetest.chat_send_player(name, red .. "Map: " .. normal .. map.name)
+	minetest.chat_send_player(name, red .. "Author: " .. normal .. map.author)
+	if map.hint then
+		minetest.chat_send_player(name, red .. "Hint: " .. normal .. map.hint)
+	end
+	if map.license then
+		minetest.chat_send_player(name, red .. "License: " .. normal .. map.license)
+	end
+	if map.others then
+		minetest.chat_send_player(name,
+				red .. "More Information: " .. normal .. map.others)
+	end
+end
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if not player or formname ~= "ctf_map:maps_catalog" then
 		return
@@ -105,15 +124,13 @@ minetest.register_chatcommand("maps", {
 		if #ctf_map.available_maps == 0 then
 			return false, "No maps are available!"
 		end
-		if not minetest.get_player_by_name(name) then
-			return false, "You must be online to view the maps catalog!"
-		end
 
 		-- Set param to nil if it's empty
 		if param and param:trim() == "" then
 			param = nil
 		end
 
+		local player = minetest.get_player_by_name(name)
 		local idx
 
 		-- If arg. supplied, set idx to index of the matching map name
@@ -121,10 +138,20 @@ minetest.register_chatcommand("maps", {
 		if param then
 			idx = ctf_map.get_idx_and_map(param)
 		else
-			idx = indices[name] or ctf_map.map and ctf_map.map.idx or 1
+			idx = (player and indices[name]) or ctf_map.map and ctf_map.map.idx or 1
 		end
 
-		show_catalog(name, idx or 1)
+		if player then
+			show_catalog(name, idx or 1)
+		else
+			minetest.chat_send_player(name, " *** CTF Map Catalog for IRC *** ")
+			if not param then
+				minetest.chat_send_player(name,
+						"No param supplied, showing information for current map.")
+			end
+			send_irc_catalog(name, idx or 1)
+		end
+
 		return true
 	end
 })
