@@ -35,13 +35,14 @@ for _, chest_color in pairs(colors) do
 			local meta = minetest.get_meta(pos)
 			meta:set_string("infotext", "Chest")
 			local inv = meta:get_inventory()
-			inv:set_size("main", 5*4)
-			inv:set_size("pro", 3*4)
-			inv:set_size("helper", 1*1)
+			inv:set_size("main", 4 * 7)
+			inv:set_size("pro", 4 * 7)
+			inv:set_size("helper", 1 * 1)
 		end,
 		on_rightclick = function(pos, node, player)
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+			local name = player:get_player_name()
+			if chest_color ~= ctf.player(name).team then
+				minetest.chat_send_player(name, "You're not on team " .. chest_color)
 				return
 			end
 
@@ -52,63 +53,65 @@ for _, chest_color in pairs(colors) do
 					minetest.set_node(pos, { name = "air" })
 					return
 				end
-				ctf.warning("ctf_map", "Wrong chest, changing to " .. territory_owner .. " from " .. chest_color)
+				ctf.warning("ctf_map", "Wrong chest, changing to " ..
+						territory_owner .. " from " .. chest_color)
 				minetest.set_node(pos, "ctf_map:chest_" .. territory_owner)
 			end
 
 			local formspec = table.concat({
-				"size[8,9]",
+				"size[8,12]",
 				default.gui_bg,
 				default.gui_bg_img,
 				default.gui_slots,
-				"list[current_player;main;0,4.85;8,1;]",
-				"list[current_player;main;0,6.08;8,3;8]",
+				default.get_hotbar_bg(0,7.85),
+				"list[current_player;main;0,7.85;8,1;]",
+				"list[current_player;main;0,9.08;8,3;8]",
 			}, "")
 
-			local pstat = ctf_stats.player(player:get_player_name())
+			local pstat = ctf_stats.player(name)
 			if not pstat or not pstat.score or pstat.score < 10 then
 				local msg = "You need at least 10 score to access the team chest.\n" ..
-					"Try killing an enemy player, or at least attempting to capture the flag.\n" ..
+					"Try killing an enemy player, or at least try to capture the flag.\n" ..
 					"Find resources in chests scattered around the map."
-				formspec = formspec .. "label[1,1;" .. minetest.formspec_escape(msg) .. "]"
-				minetest.show_formspec(player:get_player_name(), "ctf_map:no_access",  formspec)
+				formspec = formspec .. "label[0.75,3;" .. minetest.formspec_escape(msg) .. "]"
+				minetest.show_formspec(name, "ctf_map:no_access", formspec)
 				return
 			end
 
 			local is_pro = get_is_player_pro(pstat)
 			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
 
-			formspec = formspec ..
-				"label[0,-0.2;" .. minetest.formspec_escape("Any team member can take from here") .. "]" ..
-				"list[" .. chestinv .. ";main;0,0.3;5,4;]" ..
-				"background[5,-0.2;3.15,4.7;ctf_map_pro_only.png;false]" ..
-				"list[" .. chestinv .. ";pro;5,0.3;3,4;]"
+			formspec = formspec .. "list[" .. chestinv .. ";main;0,0.3;4,7;]" ..
+				"background[4,-0.2;4.15,7.7;ctf_map_pro_section.png;false]"
 
 			if is_pro then
-				formspec = formspec .. "listring[" .. chestinv ..";pro]" ..
+				formspec = formspec .. "list[" .. chestinv .. ";pro;4,0.3;4,7;]" ..
+					"listring[" .. chestinv ..";pro]" ..
 					"listring[" .. chestinv .. ";helper]" ..
-					"label[5,-0.2;" .. minetest.formspec_escape("Pro players only (1k+ score, 1.5+ KD)") .. "]"
+					"label[5,-0.2;" ..
+					minetest.formspec_escape("Pro players only") .. "]"
 			else
-				formspec = formspec ..
-					"label[5,-0.2;" .. minetest.formspec_escape("You need 1k+ score and 1.5+ KD") .. "]"
+				formspec = formspec .. "label[4.75,3;" ..
+					minetest.formspec_escape("You need at least 1000" ..
+					"\nscore and 1.5+ KD to\naccess the pro section") .. "]"
 			end
 
 			formspec = formspec ..
 				"listring[" .. chestinv ..";main]" ..
-				"listring[current_player;main]" ..
-				default.get_hotbar_bg(0,4.85)
+				"listring[current_player;main]"
 
-			minetest.show_formspec(player:get_player_name(), "ctf_map:chest",  formspec)
+			minetest.show_formspec(name, "ctf_map:chest",  formspec)
 		end,
 
 		allow_metadata_inventory_move = function(pos, from_list, from_index,
 				to_list, to_index, count, player)
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+			local name = player:get_player_name()
+			if chest_color ~= ctf.player(name).team then
+				minetest.chat_send_player(name, "You're not on team " .. chest_color)
 				return 0
 			end
 
-			local pstat = ctf_stats.player(player:get_player_name())
+			local pstat = ctf_stats.player(name)
 			if not pstat or not pstat.score or pstat.score < 10 then
 				return 0
 			end
@@ -138,8 +141,10 @@ for _, chest_color in pairs(colors) do
 			if listname == "helper" then
 				return 0
 			end
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+
+			local name = player:get_player_name()
+			if chest_color ~= ctf.player(name).team then
+				minetest.chat_send_player(name, "You're not on team " .. chest_color)
 				return 0
 			end
 
@@ -149,7 +154,7 @@ for _, chest_color in pairs(colors) do
 				end
 			end
 
-			local pstat = ctf_stats.player(player:get_player_name())
+			local pstat = ctf_stats.player(name)
 			if not pstat or not pstat.score or pstat.score < 10 then
 				return 0
 			end
@@ -176,12 +181,14 @@ for _, chest_color in pairs(colors) do
 			if listname == "helper" then
 				return 0
 			end
-			if chest_color ~= ctf.player(player:get_player_name()).team then
-				minetest.chat_send_player(player:get_player_name(), "You're not on team " .. chest_color)
+
+			local name = player:get_player_name()
+			if chest_color ~= ctf.player(name).team then
+				minetest.chat_send_player(name, "You're not on team " .. chest_color)
 				return 0
 			end
 
-			local pstat = ctf_stats.player(player:get_player_name())
+			local pstat = ctf_stats.player(name)
 			if not pstat or not pstat.score or pstat.score < 10 then
 				return 0
 			end
@@ -197,11 +204,15 @@ for _, chest_color in pairs(colors) do
 		end,
 		on_metadata_inventory_put = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..
-				" moves " .. (stack:get_name() or "stuff") .. " " .. (stack:get_count() or 0)  .. " to chest at " .. minetest.pos_to_string(pos))
+				" moves " .. (stack:get_name() or "stuff") .. " " ..
+				(stack:get_count() or 0) .. " to chest at " ..
+				minetest.pos_to_string(pos))
 		end,
 		on_metadata_inventory_take = function(pos, listname, index, stack, player)
 			minetest.log("action", player:get_player_name() ..
-				" takes " .. (stack:get_name() or "stuff") .. " " .. (stack:get_count() or 0) .. " from chest at " .. minetest.pos_to_string(pos))
+				" takes " .. (stack:get_name() or "stuff") .. " " ..
+				(stack:get_count() or 0) .. " from chest at " ..
+				minetest.pos_to_string(pos))
 		end
 	})
 end
