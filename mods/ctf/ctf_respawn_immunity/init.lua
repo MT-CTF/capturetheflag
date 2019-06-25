@@ -1,30 +1,30 @@
-respawn_immunity = {}
+ctf_respawn_immunity = {}
 
 local IMMUNE_TIME = 15
 local immune_serial = 0
 local immune_players = {}
 
-function respawn_immunity.is_immune(player)
+function ctf_respawn_immunity.is_immune(player)
 	return immune_players[player:get_player_name()]
 end
 
-function respawn_immunity.set_immune(player)
+function ctf_respawn_immunity.set_immune(player)
 	immune_serial = immune_serial + 1
 	immune_players[player:get_player_name()] = immune_serial
 	minetest.after(1, function()
-		respawn_immunity.update_effects(player)
+		ctf_respawn_immunity.update_effects(player)
 	end)
 
 	-- Set time out
 	minetest.after(IMMUNE_TIME, function(name, id)
 		if immune_players[name] == id then
 			immune_players[name] = nil
-			respawn_immunity.update_effects(minetest.get_player_by_name(name))
+			ctf_respawn_immunity.update_effects(minetest.get_player_by_name(name))
 		end
 	end, player:get_player_name(), immune_serial)
 end
 
-function respawn_immunity.update_effects(player)
+function ctf_respawn_immunity.update_effects(player)
 	-- TODO: transparent player when immune
 	--
 	-- if immune_players[player:get_player_name()] then
@@ -42,21 +42,22 @@ minetest.register_on_punchplayer(function(player, hitter,
 
 	local pname = player:get_player_name()
 	local hname = hitter:get_player_name()
+	local pteam = ctf.player(pname).team
+	local hteam = ctf.player(hname).team
 
-	if player and respawn_immunity.is_immune(player) then
-		minetest.chat_send_player(hname, minetest.colorize("FF8C77", pname ..
-				" just respawned or joined, and is immune to attacks!"))
+	if player and ctf_respawn_immunity.is_immune(player) and pteam ~= hteam then
+		minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
+				" just respawned or joined," .. " and is immune to attacks!"))
 		return true
 	end
 
-	if hitter and respawn_immunity.is_immune(hitter) and
-			ctf.player(hname).team ~= ctf.player(pname).team then
+	if hitter and ctf_respawn_immunity.is_immune(hitter) then
 		minetest.chat_send_player(hname, minetest.colorize("#FF8C00",
 				"Your immunity has ended because you attacked a player"))
 		immune_players[hname] = nil
-		respawn_immunity.update_effects(hitter)
+		ctf_respawn_immunity.update_effects(hitter)
 	end
 end)
 
-minetest.register_on_joinplayer(respawn_immunity.set_immune)
-minetest.register_on_respawnplayer(respawn_immunity.set_immune)
+minetest.register_on_joinplayer(ctf_respawn_immunity.set_immune)
+minetest.register_on_respawnplayer(ctf_respawn_immunity.set_immune)
