@@ -25,13 +25,25 @@ function ctf_respawn_immunity.set_immune(player)
 end
 
 function ctf_respawn_immunity.update_effects(player)
-	-- TODO: transparent player when immune
-	--
-	-- if immune_players[player:get_player_name()] then
-	-- 	player:set_texture_mod("[multiply:#1f1")
-	-- else
-	-- 	player:set_texture_mod(nil)
-	-- end
+	local prop = player:get_properties()
+	local texture = prop.textures[1]
+	local modifier = "^ctf_respawn_immunity_overlay.png"
+	--local modifier = "^[transformR90"
+
+	-- Escape special characters in modifier
+	local escaped_modifier = modifier:gsub("%^", "%%^"):gsub("%[", "%%[")
+
+	-- If player is immune, and player's texture doesn't have `modifier`
+	-- applied, apply `modifier`. Else remove `modifier` from texture
+	if immune_players[player:get_player_name()]
+			and not texture:find(escaped_modifier) then
+		texture = texture .. modifier
+	else
+		texture = texture:gsub(escaped_modifier, "")
+	end
+
+	prop.textures[1] = texture
+	player:set_properties(prop)
 end
 
 minetest.register_on_punchplayer(function(player, hitter,
@@ -47,7 +59,7 @@ minetest.register_on_punchplayer(function(player, hitter,
 
 	if player and ctf_respawn_immunity.is_immune(player) and pteam ~= hteam then
 		minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
-				" just respawned or joined," .. " and is immune to attacks!"))
+			" just respawned or joined," .. " and is immune to attacks!"))
 		return true
 	end
 
