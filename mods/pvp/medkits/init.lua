@@ -63,6 +63,7 @@ local function stop_healing(player, interrupted)
 end
 
 ctf_flag.register_on_precapture(function()
+	-- Reset all player states at the end of the match
 	for name, info in pairs(players) do
 		players[name]=nil
 		local player = minetest.get_player_by_name(name)
@@ -70,6 +71,7 @@ ctf_flag.register_on_precapture(function()
 			player:hud_remove(info.hud)
 		end
 	end
+	return true
 end)
 
 -- Called after left-click every n seconds (determined by regen_interval)
