@@ -287,10 +287,10 @@ crafting.register_recipe({
 	level  = 1,
 })
 
-crafting.register_recipe({
-	type   = "inv",
-	output = "grenades_basic:flashbang 1",
-	items  = { "default:steel_ingot 5", "default:torch 5" },
-	always_known = true,
-	level  = 1,
-})
+-- crafting.register_recipe({
+-- 	type   = "inv",
+-- 	output = "grenades_basic:flashbang 1",
+-- 	items  = { "default:steel_ingot 5", "default:torch 5" },
+-- 	always_known = true,
+-- 	level  = 1,
+-- })
