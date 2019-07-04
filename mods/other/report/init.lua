@@ -11,6 +11,7 @@ local function add_irc_mod(name)
 	end
 	mods[#mods + 1] = name
 	storage:set_string("irc_mods", table.concat(mods, ","))
+	minetest.log("action", name .. " subscribed to IRC reports")
 	return true
 end
 
@@ -20,6 +21,7 @@ local function remove_irc_mod(name)
 	if idx > 0 then
 		table.remove(mods, idx)
 		storage:set_string("irc_mods", table.concat(mods, ","))
+		minetest.log("action", name .. " un-subscribed from IRC reports")
 		return true
 	end
 	return false
@@ -36,6 +38,7 @@ minetest.register_chatcommand("report_sub", {
 			end
 		else
 			if add_irc_mod(name) then
+				minetest.log("action", name .. " subscribed to IRC reports")
 				return true, "Successfully added!"
 			else
 				return false, "Unable to add, are you already subscribed?"

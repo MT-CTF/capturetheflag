@@ -114,7 +114,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 	minp.y = center.y - h / 2
 	maxp.y = center.y + h / 2
 
-	print("Loading data into LVM")
+	minetest.log("action", "Map maker: Loading data into LVM")
 
 	local vm = minetest.get_voxel_manip()
 	local emin, emax = vm:read_from_map(minp, maxp)
@@ -124,7 +124,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 	}
 	local data = vm:get_data()
 
-	print("Placing left wall")
+	minetest.log("action", "Map maker: Placing left wall")
 
 	-- Left
 	do
@@ -141,7 +141,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	print("Placing right wall")
+	minetest.log("action", "Map maker: Placing right wall")
 
 	-- Right
 	do
@@ -158,7 +158,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	print("Placing front wall")
+	minetest.log("action", "Map maker: Placing front wall")
 
 	-- Front
 	do
@@ -175,7 +175,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	print("Placing back wall")
+	minetest.log("action", "Map maker: Placing back wall")
 
 	-- Back
 	do
@@ -192,7 +192,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	print("Placing bedrock")
+	minetest.log("action", "Map maker: Placing bedrock")
 
 	-- Bedrock
 	do
@@ -204,7 +204,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	print("Placing ceiling")
+	minetest.log("action", "Map maker: Placing ceiling")
 
 	-- Ceiling
 	do
@@ -216,7 +216,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	print("Writing to engine!")
+	minetest.log("action", "Map maker: Writing to engine!")
 
 	vm:set_data(data)
 	vm:write_to_map(data)

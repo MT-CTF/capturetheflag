@@ -152,6 +152,7 @@ minetest.register_chatcommand("maps", {
 			send_irc_catalog(name, idx or 1)
 		end
 
+		minetest.log("action", name .. " views the map catalog")
 		return true
 	end
 })

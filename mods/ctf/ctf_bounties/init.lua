@@ -99,6 +99,7 @@ ctf.register_on_killedplayer(function(victim, killer)
 	bountied_player = nil
 
 	local msg = killer .. " has killed " .. victim .. " and received the prize!"
+	minetest.log("action", msg)
 	minetest.chat_send_all(msg)
 	hud_score.new(killer, {
 		name = "ctf_bounty:prize",
@@ -118,6 +119,7 @@ minetest.register_chatcommand("place_bounty", {
 		end
 
 		bounty_player(target)
+		minetest.log("action", name .. " places bounty on " .. target)
 		return true, "Put bounty on " .. target
 	end
 })

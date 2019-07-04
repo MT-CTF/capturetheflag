@@ -287,11 +287,13 @@ minetest.register_chatcommand("r", {
 			param = param:trim()
 			if ctf_stats.players[param] then
 				target = param
+				minetest.log("action", name .. " ran /r " .. param)
 			else
 				return false, "Can't find player '" .. param .. "'"
 			end
 		else
 			target = name
+			minetest.log("action", name .. " ran /r")
 		end
 		return return_as_chat_result(name, target)
 	end
@@ -306,11 +308,13 @@ minetest.register_chatcommand("rankings", {
 			param = param:trim()
 			if ctf_stats.players[param] then
 				target = param
+				minetest.log("action", name .. " ran /rankings " .. param)
 			else
 				return false, "Can't find player '" .. param .. "'"
 			end
 		else
 			target = name
+			minetest.log("action", name .. " ran /rankings")
 		end
 
 		if not minetest.get_player_by_name(name) then
@@ -359,6 +363,13 @@ minetest.register_chatcommand("reset_rankings", {
 
 		ctf_stats.players[reset_name] = nil
 		ctf_stats.player(reset_name)
+
+		if reset_name == name then
+			minetest.log("action", name .. " reset their rankings")
+		else
+			minetest.log("action", name .. " reset rankings of " .. reset_name)
+		end
+
 		return true, "Successfully reset the stats and ranking of " .. reset_name
 	end
 })
@@ -386,6 +397,7 @@ minetest.register_chatcommand("transfer_rankings", {
 		ctf_stats.players[dest] = ctf_stats.players[src]
 		ctf_stats.players[src] = nil
 
+		minetest.log("action", name .. " transferred stats of " .. src .. " to " .. dest)
 		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
 	end
 })
