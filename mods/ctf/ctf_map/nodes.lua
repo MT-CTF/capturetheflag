@@ -750,7 +750,8 @@ end
 
 -- Register indestructible variants of nodes from stairs and wool
 do
-	for name, nodedef in pairs(minetest.registered_nodes) do
+	local nodes = table.copy(minetest.registered_nodes)
+	for name, nodedef in pairs(nodes) do
 		if name:find("stairs") then
 			nodedef = table.copy(nodedef)
 			nodedef.groups = {immortal = 1}
