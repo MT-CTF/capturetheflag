@@ -145,26 +145,29 @@ grenades.register_grenade("grenades:smoke", {
 			max_hear_distance = 32,
 		})
 
-		minetest.sound_play("grenades_hiss", {
+		local hiss = minetest.sound_play("grenades_hiss", {
 			pos = pos,
 			gain = 1.0,
+			loop = true,
 			max_hear_distance = 32,
 		})
 
+		minetest.after(40, minetest.sound_stop, hiss)
+
 		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
-				amount = 30,
-				time = 11,
-				minpos = vector.subtract(pos, 3),
-				maxpos = vector.add(pos, 3),
+				amount = 40,
+				time = 45,
+				minpos = vector.subtract(pos, 2),
+				maxpos = vector.add(pos, 2),
 				minvel = {x = 0, y = 2, z = 0},
 				maxvel = {x = 0, y = 3, z = 0},
 				minacc = {x = 1, y = 0.2, z = 1},
 				maxacc = {x = 1, y = 0.2, z = 1},
-				minexptime = 0.3,
-				maxexptime = 0.5,
-				minsize = 90,
-				maxsize = 100,
+				minexptime = 1,
+				maxexptime = 1,
+				minsize = 125,
+				maxsize = 140,
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,
