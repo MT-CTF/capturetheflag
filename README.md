@@ -27,10 +27,14 @@ Hosting using sqlite on an SSD or ramdisk ([with this guide](https://forum.minet
 
 ## License
 
-Created by [rubenwardy](https://rubenwardy.com/)  
+Created by [rubenwardy](https://rubenwardy.com/)
 Code: LGPLv2.1+
 Textures: CC-BY-SA 3.0
 
 ### Mods
 
 Check out [mods/](mods/) to see all the installed mods and their respective licenses.
+
+## update.sh
+
+Content in this repository and its sub-modules are arranged in a manner best optimised for distribution. For all features of CTF to work properly, run update.sh instead of manually syncing the local copy. update.sh automatically pulls the latest master of the repository and all its submodules, and does some extra processing to make stuff work.
