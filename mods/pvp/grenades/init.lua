@@ -129,3 +129,5 @@ function grenades.register_grenade(name, def)
 
 	minetest.register_craftitem(name, newdef)
 end
+
+dofile(minetest.get_modpath("grenades").."/grenades.lua")

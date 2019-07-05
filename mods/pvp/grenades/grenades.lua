@@ -9,7 +9,7 @@ local function remove_flora(pos, radius)
 	end
 end
 
-grenades.register_grenade("grenades_basic:regular", {
+grenades.register_grenade("grenades:regular", {
 	description = "Regular grenade (Kills anyone near blast)",
 	image = "grenades_regular.png",
 	on_explode = function(pos, name)
@@ -40,7 +40,7 @@ grenades.register_grenade("grenades_basic:regular", {
 			texture = "grenades_smoke.png",
 		})
 
-		minetest.sound_play("boom", {
+		minetest.sound_play("grenades_boom", {
 			pos = pos,
 			gain = 1.0,
 			max_hear_distance = 32,
@@ -63,7 +63,7 @@ grenades.register_grenade("grenades_basic:regular", {
 
 -- local flash_huds = {}
 
--- grenades.register_grenade("grenades_basic:flashbang", {
+-- grenades.register_grenade("grenades:flashbang", {
 -- 	description = "Flashbang grenade (Blinds all who look at blast)",
 -- 	image = "grenades_flashbang.png",
 -- 	clock = 4,
@@ -134,18 +134,18 @@ grenades.register_grenade("grenades_basic:regular", {
 
 -- Smoke Grenade
 
-grenades.register_grenade("grenades_basic:smoke", {
+grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
 	clock = 2,
 	on_explode = function(pos)
-		minetest.sound_play("glasslike_break", {
+		minetest.sound_play("grenades_glasslike_break", {
 			pos = pos,
 			gain = 1.0,
 			max_hear_distance = 32,
 		})
 
-		minetest.sound_play("hiss", {
+		minetest.sound_play("grenades_hiss", {
 			pos = pos,
 			gain = 1.0,
 			max_hear_distance = 32,
