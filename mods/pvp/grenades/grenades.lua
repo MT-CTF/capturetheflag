@@ -137,7 +137,6 @@ grenades.register_grenade("grenades:regular", {
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
-	clock = 2,
 	on_explode = function(pos)
 		minetest.sound_play("grenades_glasslike_break", {
 			pos = pos,

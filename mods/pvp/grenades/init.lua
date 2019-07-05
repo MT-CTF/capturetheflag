@@ -15,7 +15,7 @@ end
 
 function grenades.register_grenade(name, def)
 	if not def.clock then
-		def.clock = 3
+		def.clock = 4
 	end
 
 	local grenade_entity = {
