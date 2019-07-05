@@ -21,7 +21,7 @@ local timer = 0
 
 local function add_wield_entity(player)
 	local name = player:get_player_name()
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	local inv = player:get_inventory()
 	if name and pos and inv then
 		local offset = {x=pos.x, y=pos.y + 0.5, z=pos.z}
@@ -64,8 +64,8 @@ minetest.register_entity("wield3d:wield_entity", {
 		local player = self.player
 		if player then
 			local name = player:get_player_name()
-			local p1 = player:getpos()
-			local p2 = self.object:getpos()
+			local p1 = player:get_pos()
+			local p2 = self.object:get_pos()
 			if p1 and p2 then
 				if vector.equals(p1, p2) then
 					local stack = player:get_wielded_item()

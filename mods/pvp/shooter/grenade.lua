@@ -52,7 +52,7 @@ minetest.register_tool("shooter:grenade", {
 		end
 		local pos = user:get_pos()
 		local dir = user:get_look_dir()
-		local yaw = user:get_look_yaw()
+		local yaw = user:get_look_horizontal()
 		if pos and dir then
 			pos.y = pos.y + 1.5
 			local obj = minetest.add_entity(pos, "shooter:grenade_entity")

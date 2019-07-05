@@ -53,7 +53,7 @@ minetest.register_entity("shooter:arrow_entity", {
 			acceleration = {x=0, y=0, z=0}
 		end
 		if pos then
-			self.object:moveto(pos)
+			self.object:move_to(pos)
 		end
 		self.object:set_properties({
 			physical = true,
@@ -186,7 +186,7 @@ for _, color in pairs(dye_basecolors) do
 			itemstack = "shooter:crossbow 1 "..itemstack:get_wear()
 			local pos = user:get_pos()
 			local dir = user:get_look_dir()
-			local yaw = user:get_look_yaw()
+			local yaw = user:get_look_horizontal()
 			if pos and dir and yaw then
 				pos.y = pos.y + 1.5
 				local obj = minetest.add_entity(pos, "shooter:arrow_entity")
