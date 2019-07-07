@@ -12,20 +12,20 @@ function ctf_map.update_time()
 	minetest.settings:set("time_speed", BASE_TIME_SPEED * mult)
 end
 
-function ctf_map.skybox_exists(subdir, filename)
+function ctf_map.skybox_exists(subdir)
 	return ctf_map.file_exists(subdir, {
-		filename .. "_skybox_1.png",
-		filename .. "_skybox_2.png",
-		filename .. "_skybox_3.png",
-		filename .. "_skybox_4.png",
-		filename .. "_skybox_5.png",
-		filename .. "_skybox_6.png"
+		"skybox_1.png",
+		"skybox_2.png",
+		"skybox_3.png",
+		"skybox_4.png",
+		"skybox_5.png",
+		"skybox_6.png"
 	})
 end
 
 function ctf_map.set_skybox(player)
 	if ctf_map.map.skybox then
-		local prefix = ctf_map.map.filename .. "_skybox_"
+		local prefix = ctf_map.map.dirname .. "_skybox_"
 		local skybox_textures = {
 			prefix .. "1.png",  -- up
 			prefix .. "2.png",  -- down
