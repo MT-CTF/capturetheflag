@@ -3,11 +3,12 @@ grenades = {}
 local function throw_grenade(name, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
-	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.6, z = pos.z + dir.z}, name)
+	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5, z = pos.z + dir.z}, name)
 	local self = obj:get_luaentity()
 
-	obj:set_velocity({x = dir.x * 40, y = dir.y * 30, z = dir.z * 40})
-	obj:set_acceleration({x = 0, y = -30, z = 0})
+	local m = 40
+	obj:set_velocity({x = dir.x * m, y = dir.y * 30, z = dir.z * m})
+	obj:set_acceleration({x = 0, y = (-m/2) - (dir.y*2), z = 0})
 	self.dir = dir
 
 	return(obj:get_luaentity())
