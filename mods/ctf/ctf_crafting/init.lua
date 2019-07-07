@@ -273,7 +273,7 @@ end
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "grenades:regular 1",
+	output = "grenades:frag 1",
 	items  = { "default:steel_ingot 5", "default:iron_lump" },
 	always_known = true,
 	level  = 1,

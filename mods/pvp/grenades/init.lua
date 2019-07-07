@@ -63,7 +63,6 @@ function grenades.register_grenade(name, def)
 			-- Fix accel bug
 
 			vel.x = vel.x / 1.05
-
 			vel.z = vel.z / 1.05
 
 			obj:set_velocity(vel)

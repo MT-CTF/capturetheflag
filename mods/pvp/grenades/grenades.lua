@@ -9,9 +9,9 @@ local function remove_flora(pos, radius)
 	end
 end
 
-grenades.register_grenade("grenades:regular", {
-	description = "Regular grenade (Kills anyone near blast)",
-	image = "grenades_regular.png",
+grenades.register_grenade("grenades:frag", {
+	description = "Frag grenade (Kills anyone near blast)",
+	image = "grenades_frag.png",
 	on_explode = function(pos, name)
 		if not name or not pos then
 			return
