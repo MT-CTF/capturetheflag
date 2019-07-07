@@ -371,7 +371,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		we_select(player_name)
 		show_progress_formspec(player_name, "Exporting...")
 
-		local path = minetest.get_worldpath() .. "/schems/"
+		local path = minetest.get_worldpath() .. "/schems/" .. config.mapname .. "/"
 		minetest.mkdir(path)
 
 		-- Reset mod_storage
@@ -384,7 +384,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		storage:set_string("barrier_r", "")
 
 		-- Write to .conf
-		local meta = Settings(path .. config.mapname .. ".conf")
+		local meta = Settings(path .. "map.conf")
 		meta:set("name", config.maptitle)
 		meta:set("author", config.mapauthor)
 		if config.mapinitial ~= "" then
@@ -410,7 +410,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:write()
 
 		minetest.after(0.1, function()
-			local filepath = path .. config.mapname .. ".mts"
+			local filepath = path .. "map.mts"
 			if minetest.create_schematic(worldedit.pos1[player_name],
 					worldedit.pos2[player_name], worldedit.prob_list[player_name],
 					filepath) then
