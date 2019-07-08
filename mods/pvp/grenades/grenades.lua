@@ -40,9 +40,23 @@ grenades.register_grenade("grenades:frag", {
 			texture = "grenades_smoke.png",
 		})
 
+		minetest.add_particle({
+			pos = pos,
+			velocity = {x=0, y=0, z=0},
+			acceleration = {x=0, y=0, z=0},
+			expirationtime = 0.3,
+			size = 15,
+			collisiondetection = false,
+			collision_removal = false,
+			object_collision = false,
+			vertical = false,
+			texture = "grenades_boom.png",
+			glow = 10
+		})
+
 		minetest.sound_play("grenades_boom", {
 			pos = pos,
-			gain = 1.0,
+			gain = 1.5,
 			max_hear_distance = 32,
 		})
 
