@@ -178,12 +178,12 @@ minetest.register_tool("default:axe_stone", {
 	description = "Stone Axe",
 	inventory_image = "default_tool_stoneaxe.png",
 	tool_capabilities = {
-		full_punch_interval = 1.4,
+		full_punch_interval = 1.2,
 		max_drop_level=0,
 		groupcaps={
 			choppy={times={[1]=3.00, [2]=2.00, [3]=1.30}, uses=20, maxlevel=1},
 		},
-		damage_groups = {fleshy=5},
+		damage_groups = {fleshy=3},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -197,7 +197,7 @@ minetest.register_tool("default:axe_bronze", {
 		groupcaps={
 			choppy={times={[1]=2.75, [2]=1.70, [3]=1.15}, uses=20, maxlevel=2},
 		},
-		damage_groups = {fleshy=7},
+		damage_groups = {fleshy=4},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -211,7 +211,7 @@ minetest.register_tool("default:axe_steel", {
 		groupcaps={
 			choppy={times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=20, maxlevel=2},
 		},
-		damage_groups = {fleshy=7},
+		damage_groups = {fleshy=4},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -225,7 +225,7 @@ minetest.register_tool("default:axe_mese", {
 		groupcaps={
 			choppy={times={[1]=2.20, [2]=1.00, [3]=0.60}, uses=20, maxlevel=3},
 		},
-		damage_groups = {fleshy=8},
+		damage_groups = {fleshy=6},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -239,7 +239,7 @@ minetest.register_tool("default:axe_diamond", {
 		groupcaps={
 			choppy={times={[1]=2.10, [2]=0.90, [3]=0.50}, uses=30, maxlevel=3},
 		},
-		damage_groups = {fleshy=9},
+		damage_groups = {fleshy=7},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
