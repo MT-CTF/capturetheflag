@@ -351,7 +351,7 @@ function ctf_match.create_teams()
 	for key, value in pairs(ctf_map.map.teams) do
 		local name  = key
 		local color = value.color
-		local flag  = value.pos
+		local flag  = table.copy(value.pos)
 
 		if name and color and flag then
 			print(" - creating " .. key)
