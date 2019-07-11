@@ -1,9 +1,9 @@
-[submodule "mods/ctf_pvp_engine"]
-	path = mods/ctf_pvp_engine
-	url = https://github.com/rubenwardy/ctf_pvp_engine
-[submodule "mods/crafting"]
-	path = mods/crafting
+[submodule "ctf_pvp_engine"]
+	path = mods/ctf/ctf_pvp_engine
+	url = https://github.com/MT-CTF/ctf_pvp_engine
+[submodule "crafting"]
+	path = mods/other/crafting
 	url = https://github.com/rubenwardy/crafting
-[submodule "mods/ctf/ctf_map/maps"]
+[submodule "maps"]
 	path = mods/ctf/ctf_map/maps
 	url = https://github.com/MT-CTF/maps.git
