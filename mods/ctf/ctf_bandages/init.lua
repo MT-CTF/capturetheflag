@@ -24,7 +24,7 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 				end
 				object:set_hp(hp)
 				itemstack:take_item()
-				minetest.chat_send_player(pname, name .. " has has healed you! ")
+				minetest.chat_send_player(pname, minetest.colorize("#C1FF44", name .. " has healed you!"))
 				return itemstack
 			else
 				minetest.chat_send_player(name, pname .. " has " .. hp .. " HP. You can't heal them.")
