@@ -41,3 +41,18 @@ function ctf_map.place_base(color, pos)
 	inv:add_item("main", ItemStack("default:glass 5"))
 	inv:add_item("main", ItemStack("default:torch 10"))
 end
+
+-- Override ctf.get_spawn to implement random spawns
+local old_spawn = ctf.get_spawn
+function ctf.get_spawn(team)
+	local spawn = old_spawn(team)
+	if not spawn then
+		return
+	end
+
+	return vector.add(spawn, {
+		x = math.random(-1, 1),
+		y = 0,
+		z = math.random(-1, 1)
+	})
+end
