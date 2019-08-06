@@ -6,9 +6,14 @@ local function throw_grenade(name, player)
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5, z = pos.z + dir.z}, name)
 	local self = obj:get_luaentity()
 
-	local m = 40
-	obj:set_velocity({x = dir.x * m, y = dir.y * 30, z = dir.z * m})
-	obj:set_acceleration({x = 0, y = (-m/2) - (dir.y*2), z = 0})
+	local dm = 1
+	if dir.y < 0 then
+		dm = -1
+	end
+
+	local m = 33
+	obj:set_velocity({x = dir.x * m, y = dir.y * m, z = dir.z * m})
+	obj:set_acceleration({x = 0, y = -math.abs(dm) * 30, z = 0})
 	self.dir = dir
 
 	return(obj:get_luaentity())
@@ -52,7 +57,7 @@ function grenades.register_grenade(name, def)
 					self.last_vel.x = self.last_vel.x * -0.5
 				end
 
-				if self.last_vel.y <= -5 then
+				if math.abs(self.last_vel.y) - 5 > math.abs(vel.y) then
 					self.last_vel.y = self.last_vel.y * -0.3
 				end
 
@@ -62,8 +67,8 @@ function grenades.register_grenade(name, def)
 
 			-- Fix accel bug
 
-			vel.x = vel.x / 1.05
-			vel.z = vel.z / 1.05
+			vel.x = vel.x / 1.03
+			vel.z = vel.z / 1.03
 
 			obj:set_velocity(vel)
 			self.last_vel = vel
