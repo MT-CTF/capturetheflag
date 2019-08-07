@@ -6,14 +6,9 @@ local function throw_grenade(name, player)
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5, z = pos.z + dir.z}, name)
 	local self = obj:get_luaentity()
 
-	local dm = 1
-	if dir.y < 0 then
-		dm = -1
-	end
-
 	local m = 33
 	obj:set_velocity({x = dir.x * m, y = dir.y * m, z = dir.z * m})
-	obj:set_acceleration({x = 0, y = -math.abs(dm) * 30, z = 0})
+	obj:set_acceleration({x = 0, y = -30, z = 0})
 	self.dir = dir
 
 	return(obj:get_luaentity())
@@ -65,8 +60,7 @@ function grenades.register_grenade(name, def)
 				vel = obj:get_velocity()
 			end
 
-			-- Fix accel bug
-
+			-- Can't use set_acceleration() because the grenade will shoot backwards once the velocity reaches 0
 			vel.x = vel.x / 1.03
 			vel.z = vel.z / 1.03
 
