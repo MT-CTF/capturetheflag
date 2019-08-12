@@ -1,1 +1,0 @@
-Generates some chests in the underground with random treasures.

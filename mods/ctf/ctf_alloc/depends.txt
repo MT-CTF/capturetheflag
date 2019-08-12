@@ -1,2 +1,0 @@
-ctf
-lib_chatcmdbuilder

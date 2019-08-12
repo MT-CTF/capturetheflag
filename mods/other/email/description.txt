@@ -1,1 +1,0 @@
-Adds email style inboxes to Minetest.

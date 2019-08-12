@@ -1,2 +1,0 @@
-ctf
-ctf_stats
