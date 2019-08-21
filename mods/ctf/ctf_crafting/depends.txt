@@ -1,2 +1,0 @@
-crafting
-ctf_traps?
