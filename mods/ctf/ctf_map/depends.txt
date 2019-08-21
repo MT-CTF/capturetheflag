@@ -1,9 +1,0 @@
-default
-ctf_treasure?
-stairs?
-wool?
-ctf?
-ctf_match?
-worldedit?
-irc?
-ctf_stats?
