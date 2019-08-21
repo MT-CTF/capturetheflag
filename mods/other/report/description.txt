@@ -1,1 +1,0 @@
-Allows players to report misconduct or bugs using /report.
