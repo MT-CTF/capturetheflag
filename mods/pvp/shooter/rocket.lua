@@ -27,7 +27,7 @@ minetest.register_entity("shooter:rocket_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local above = {x=pos.x, y=pos.y + 1, z=pos.z}
 			if minetest.get_node(pos).name ~= "air" then
 				self.object:remove()
@@ -44,7 +44,7 @@ minetest.register_entity("shooter:rocket_entity", {
 minetest.register_tool("shooter:rocket_gun_loaded", {
 	description = "Rocket Gun",
 	inventory_image = "shooter_rocket_gun_loaded.png",
-	groups = {not_in_creative_inventory=1},
+	groups = {not_in_creative_inventory = 1},
 	on_use = function(itemstack, user, pointed_thing)
 		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:add_wear(65535/50)
@@ -52,12 +52,12 @@ minetest.register_tool("shooter:rocket_gun_loaded", {
 		itemstack = "shooter:rocket_gun 1 "..itemstack:get_wear()
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
-			if vector.distance(user:getpos(), pointed) < 8 then
+			if vector.distance(user:get_pos(), pointed) < 8 then
 				shooter:blast(pointed, 2, 50, 7)
 				return itemstack
 			end
 		end
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local dir = user:get_look_dir()
 		local yaw = user:get_look_yaw()
 		if pos and dir and yaw then
@@ -65,9 +65,9 @@ minetest.register_tool("shooter:rocket_gun_loaded", {
 			local obj = minetest.add_entity(pos, "shooter:rocket_entity")
 			if obj then
 				minetest.sound_play("shooter_rocket_fire", {object=obj})
-				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-				obj:setyaw(yaw + math.pi)
+				obj:set_velocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(yaw + math.pi)
 				local ent = obj:get_luaentity()
 				if ent then
 					ent.player = ent.player or user
@@ -84,7 +84,7 @@ minetest.register_tool("shooter:rocket_gun", {
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
 		if inv:contains_item("main", "shooter:rocket") then
-			minetest.sound_play("shooter_reload", {object=user})
+			minetest.sound_play("shooter_reload", {object = user})
 			if not minetest.settings:get_bool("creative_mode") then
 				inv:remove_item("main", "shooter:rocket 1")
 			end
