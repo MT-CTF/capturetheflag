@@ -57,12 +57,12 @@ minetest.register_entity("shooter:flare_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local below = {x=pos.x, y=pos.y - 1, z=pos.z}
 			local node = minetest.get_node(below)
 			if node.name ~= "air" then
-				self.object:setvelocity({x=0, y=-10, z=0})
-				self.object:setacceleration({x=0, y=0, z=0})
+				self.object:set_velocity({x=0, y=-10, z=0})
+				self.object:set_acceleration({x=0, y=0, z=0})
 				if minetest.get_node(pos).name == "air" and
 						node.name ~= "default:water_source" and
 						node.name ~= "default:water_flowing" then
@@ -108,7 +108,7 @@ minetest.register_tool("shooter:flaregun", {
 			inv:remove_item("main", "shooter:flare 1")
 			itemstack:add_wear(65535/100)
 		end
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local dir = user:get_look_dir()
 		local yaw = user:get_look_yaw()
 		if pos and dir and yaw then
@@ -116,9 +116,9 @@ minetest.register_tool("shooter:flaregun", {
 			local obj = minetest.add_entity(pos, "shooter:flare_entity")
 			if obj then
 				minetest.sound_play("shooter_flare_fire", {object=obj})
-				obj:setvelocity({x=dir.x * 16, y=dir.y * 16, z=dir.z * 16})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-				obj:setyaw(yaw + math.pi)
+				obj:set_velocity({x=dir.x * 16, y=dir.y * 16, z=dir.z * 16})
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(yaw + math.pi)
 				local ent = obj:get_luaentity()
 				if ent then
 					ent.player = ent.player or user
