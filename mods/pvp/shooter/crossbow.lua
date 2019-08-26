@@ -126,7 +126,7 @@ minetest.register_entity("shooter:arrow_entity", {
 		end
 		if self.timer > 0.2 then
 			local pos = self.object:getpos()
-			local dir = vector.normalize(self.object:getvelocity())
+			local dir = vector.normalize(self.object:get_velocity())
 			local frame = get_animation_frame(dir)
 			self.object:set_animation({x=frame, y=frame}, 0)
 			local objects = minetest.get_objects_inside_radius(pos, 5)
