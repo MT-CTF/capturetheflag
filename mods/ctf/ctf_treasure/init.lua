@@ -24,6 +24,9 @@ function ctf_treasure.get_default_treasures()
 		{ "shooter:ammo",        0.3,  2, { 1, 10 } },
 		{ "shooter:arrow_white", 0.5,  2, { 2, 18 } },
 
+		{ "sniper_rifles:rifle_762",    0.05, 2, 1 },
+		{ "sniper_rifles:rifle_magnum", 0.03, 2, 1 },
+
 		{ "medkits:medkit",       0.8, 5, 2 },
 	}
 end
