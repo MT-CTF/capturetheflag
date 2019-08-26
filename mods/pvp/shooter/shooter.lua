@@ -268,7 +268,7 @@ function shooter:fire_weapon(user, pointed_thing, def)
 	shooter.shots[def.name] = shooter.time + def.tool_caps.full_punch_interval
 	minetest.sound_play(def.sound, {object=user})
 	local v1 = user:get_look_dir()
-	local p1 = user:getpos()
+	local p1 = user:get_pos()
 	if not v1 or not p1 then
 		return
 	end
@@ -284,7 +284,7 @@ function shooter:fire_weapon(user, pointed_thing, def)
 		local object = pointed_thing.ref
 		if shooter:is_valid_object(object) == true then
 			object:punch(user, nil, def.tool_caps, v1)
-			local p2 = object:getpos()
+			local p2 = object:get_pos()
 			local pp = get_particle_pos(p1, v1, vector.distance(p1, p2))
 			pp.y = pp.y + SHOOTER_EYE_HEIGHT
 			shooter:spawn_particles(pp, SHOOTER_EXPLOSION_TEXTURE)
@@ -306,7 +306,7 @@ function shooter:load_objects()
 	if SHOOTER_ALLOW_PLAYERS == true then
 		local players = minetest.get_connected_players()
 		for _,player in ipairs(players) do
-			local pos = player:getpos()
+			local pos = player:get_pos()
 			local name = player:get_player_name()
 			local hp = player:get_hp() or 0
 			if pos and name and hp > 0 then
@@ -324,7 +324,7 @@ function shooter:load_objects()
 		for _,ref in pairs(minetest.luaentities) do
 			if ref.object and ref.name then
 				if allowed_entities[ref.name] then
-					local pos = ref.object:getpos()
+					local pos = ref.object:get_pos()
 					local hp = ref.object:get_hp() or 0
 					if pos and hp > 0 then
 						local def = minetest.registered_entities[ref.name]
@@ -400,7 +400,7 @@ function shooter:blast(pos, radius, fleshy, distance, user)
 		if (obj:is_player() and SHOOTER_ALLOW_PLAYERS == true) or
 				(obj:get_luaentity() and SHOOTER_ALLOW_ENTITIES == true and
 				obj:get_luaentity().name ~= "__builtin:item") then
-			local obj_pos = obj:getpos()
+			local obj_pos = obj:get_pos()
 			local dist = vector.distance(obj_pos, pos)
 			local damage = fleshy * (0.707106 ^ dist) * 3
 			if dist ~= 0 then
@@ -465,7 +465,7 @@ if not singleplayer and SHOOTER_ADMIN_WEAPONS then
 		for _,player in pairs(minetest.get_connected_players()) do
 			if player:get_player_control().LMB then
 				local name = player:get_player_name()
-				if minetest.check_player_privs(name, {server=true}) then
+				if minetest.check_player_privs(name, {server = true}) then
 					local spec = shooter.registered_weapons[player:get_wielded_item():get_name()]
 					if spec then
 						spec = spec.spec
