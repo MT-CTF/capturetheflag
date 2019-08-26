@@ -1,6 +1,6 @@
 local function throw_hook(itemstack, user, vel)
 	local inv = user:get_inventory()
-	local pos = user:getpos()
+	local pos = user:get_pos()
 	local dir = user:get_look_dir()
 	local yaw = user:get_look_yaw()
 	if pos and dir and yaw then
@@ -11,9 +11,9 @@ local function throw_hook(itemstack, user, vel)
 		local obj = minetest.add_entity(pos, "shooter:hook")
 		if obj then
 			minetest.sound_play("shooter_throw", {object=obj})
-			obj:setvelocity({x=dir.x * vel, y=dir.y * vel, z=dir.z * vel})
-			obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-			obj:setyaw(yaw + math.pi)
+			obj:set_velocity({x=dir.x * vel, y=dir.y * vel, z=dir.z * vel})
+			obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+			obj:set_yaw(yaw + math.pi)
 			local ent = obj:get_luaentity()
 			if ent then
 				ent.player = ent.player or user
@@ -44,12 +44,12 @@ minetest.register_entity("shooter:hook", {
 		end
 		self.timer = self.timer + dtime
 		if self.timer > 0.25 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local below = {x=pos.x, y=pos.y - 1, z=pos.z}
 			local node = minetest.get_node(below)
 			if node.name ~= "air" then
-				self.object:setvelocity({x=0, y=-10, z=0})
-				self.object:setacceleration({x=0, y=0, z=0})
+				self.object:set_velocity({x=0, y=-10, z=0})
+				self.object:set_acceleration({x=0, y=0, z=0})
 				if minetest.get_item_group(node.name, "liquid") == 0 and
 						minetest.get_node(pos).name == "air" then
 					self.player:moveto(pos)
