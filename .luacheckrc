@@ -19,7 +19,7 @@ globals = {
 }
 
 read_globals = {
-	string = {fields = {"split"}},
+	string = {fields = {"split", "trim"}},
 	table = {fields = {"copy", "getn"}},
 
 	"dump", "DIR_DELIM",
