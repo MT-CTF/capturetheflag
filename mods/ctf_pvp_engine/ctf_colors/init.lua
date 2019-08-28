@@ -28,4 +28,3 @@ ctf.register_on_init(function()
 end)
 
 dofile(minetest.get_modpath("ctf_colors") .. "/hud.lua")
-dofile(minetest.get_modpath("ctf_colors") .. "/gui.lua")

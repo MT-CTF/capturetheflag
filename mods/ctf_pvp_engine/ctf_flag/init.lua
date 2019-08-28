@@ -12,8 +12,6 @@ ctf.register_on_init(function()
 	ctf._set("flag.crafting",	       false)
 	ctf._set("flag.alerts",                true)
 	ctf._set("flag.alerts.neutral_alert",  true)
-	ctf._set("gui.team.teleport_to_flag",  true)
-	ctf._set("gui.team.teleport_to_spawn", false)
 end)
 
 minetest.register_privilege("ctf_place_flag", {
@@ -21,7 +19,6 @@ minetest.register_privilege("ctf_place_flag", {
 })
 
 dofile(minetest.get_modpath("ctf_flag") .. "/hud.lua")
-dofile(minetest.get_modpath("ctf_flag") .. "/gui.lua")
 dofile(minetest.get_modpath("ctf_flag") .. "/flag_func.lua")
 dofile(minetest.get_modpath("ctf_flag") .. "/api.lua")
 dofile(minetest.get_modpath("ctf_flag") .. "/flags.lua")

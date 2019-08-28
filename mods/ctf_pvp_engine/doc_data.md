@@ -50,17 +50,3 @@ ctf.teams = {
 	flag_name = "Capital" -- human readable name
 }
 ```
-
-## Diplomacy
-
-```lua
-ctf.diplo.diplo = {
-	(diplo_table), (diplo_table)
-}
-
-(diplo_table) = {
-	one = "teamname1",
-	two = "teamname2",
-	state = "war" / "peace" / "alliance"
-}
-```
