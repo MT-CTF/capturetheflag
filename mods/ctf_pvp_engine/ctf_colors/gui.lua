@@ -35,7 +35,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if team and ctf.can_mod(name, pdata.team) then
 			if ctf.flag_colors[fields.color] then
 				team.data.color = fields.color
-				ctf.needs_save = true
 
 				minetest.chat_send_player(name, "Team color set to " .. fields.color)
 			else

@@ -242,7 +242,6 @@ minetest.register_chatcommand("ctf_reload", {
 	description = "reload the ctf main frame and get settings",
 	privs = {ctf_admin=true},
 	func = function(name, param)
-		ctf.needs_save = true
 		ctf.init()
 		return true, "CTF core reloaded!"
 	end
@@ -274,7 +273,6 @@ minetest.register_chatcommand("team_owner", {
 				ctf.player(param).auth = true
 				return true, param.." was upgraded to an admin of "..ctf.player(name).team
 			end
-			ctf.needs_save = true
 		else
 			return false, "Unable to do that :/ "..param.." does not exist, or is not part of a valid team."
 		end

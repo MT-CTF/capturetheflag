@@ -79,8 +79,6 @@ local function do_capture(attname, flag, returned)
 			ctf_flag.registered_on_capture[i](attname, flag)
 		end
 	end
-
-	ctf.needs_save = true
 end
 
 local function player_drop_flag(player)
@@ -227,8 +225,6 @@ ctf_flag = {
 				team.spawn = pos
 			end
 
-			ctf.needs_save = true
-
 			local pos2 = {
 				x = pos.x,
 				y = pos.y + 1,
@@ -237,7 +233,6 @@ ctf_flag = {
 
 			if not team.data.color then
 				team.data.color = "red"
-				ctf.needs_save = true
 			end
 
 			minetest.set_node(pos2, {name="ctf_flag:flag_top_"..team.data.color})

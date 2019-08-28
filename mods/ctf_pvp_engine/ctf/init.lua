@@ -4,14 +4,6 @@
 
 ctf = {}
 
--- Fix for https://github.com/minetest/minetest/issues/2383
-local csa = minetest.chat_send_all
-function minetest.chat_send_all(msg)
-	minetest.after(0, function()
-		csa(msg)
-	end)
-end
-
 -- Privs
 minetest.register_privilege("ctf_team_mgr", {
 	description = "Team manager",

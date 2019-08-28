@@ -1,5 +1,6 @@
 ctf_stats = {}
 
+local _needs_save = false
 local storage = minetest.get_mod_storage()
 local prev_match_summary = storage:get_string("prev_match_summary")
 local data_to_persist = { "matches", "players" }
@@ -53,7 +54,7 @@ function ctf_stats.load_legacy()
 		blue = ctf_stats.matches.blue_wins or 0,
 	}
 
-	ctf.needs_save = true
+	_needs_save = true
 
 	os.remove(minetest.get_worldpath() .. "/ctf_stats.txt")
 	return true
@@ -64,7 +65,7 @@ function ctf_stats.load()
 		for _, key in pairs(data_to_persist) do
 			ctf_stats[key] = minetest.parse_json(storage:get_string(key))
 		end
-		ctf.needs_save = true
+		_needs_save = true
 	end
 
 	-- Make sure all tables are present
@@ -87,20 +88,27 @@ function ctf_stats.load()
 	for name, player_stats in pairs(ctf_stats.players) do
 		if not player_stats.score or player_stats.score <= 0 then
 			ctf_stats.players[name] = nil
-			ctf.needs_save = true
+			_needs_save = true
 		else
 			player_stats.bounty_kills = player_stats.bounty_kills or 0
 		end
 	end
 end
 
-ctf.register_on_save(function()
+function ctf_stats.save()
+	if not _needs_save then
+		return
+	end
+
+	_needs_save = false
+
 	for _, key in pairs(data_to_persist) do
 		storage:set_string(key, minetest.write_json(ctf_stats[key]))
 	end
 
-	return nil
-end)
+	minetest.after(13, ctf_stats.save)
+end
+minetest.after(13, ctf_stats.save)
 
 function ctf_stats.player_or_nil(name)
 	return ctf_stats.players[name], ctf_stats.current.red[name] or ctf_stats.current.blue[name]
@@ -154,7 +162,7 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 		main.score     = main.score     + 25
 		match.captures = match.captures + 1
 		match.score    = match.score    + 25
-		ctf.needs_save = true
+		_needs_save = true
 	end
 	winner_player = name
 
@@ -166,7 +174,7 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 end)
 
 ctf_match.register_on_winner(function(winner)
-	ctf.needs_save = true
+	_needs_save = true
 	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
 	winner_team = winner
 
@@ -183,7 +191,7 @@ ctf_match.register_on_winner(function(winner)
 end)
 
 ctf_match.register_on_skip_map(function()
-	ctf.needs_save = true
+	_needs_save = true
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 
 	-- Show match summary
@@ -206,7 +214,7 @@ ctf_match.register_on_new_match(function()
 	winner_team = "-"
 	winner_player = "-"
 	ctf_stats.start = os.time()
-	ctf.needs_save = true
+	_needs_save = true
 end)
 
 ctf_flag.register_on_pick_up(function(name, flag)
@@ -216,7 +224,7 @@ ctf_flag.register_on_pick_up(function(name, flag)
 		main.score     = main.score     + 10
 		match.attempts = match.attempts + 1
 		match.score    = match.score    + 10
-		ctf.needs_save = true
+		_needs_save = true
 	end
 
 	hud_score.new(name, {
@@ -231,7 +239,7 @@ ctf_flag.register_on_precapture(function(name, flag)
 	local main, _ = ctf_stats.player(name)
 	if main then
 		main.wins[tplayer.team] = main.wins[tplayer.team] + 1
-		ctf.needs_save = true
+		_needs_save = true
 	end
 	return true
 end)
@@ -313,7 +321,7 @@ ctf.register_on_killedplayer(function(victim, killer)
 		match.kills = match.kills + 1
 		match.score = match.score + reward
 		match.kills_since_death = match.kills_since_death + 1
-		ctf.needs_save = true
+		_needs_save = true
 
 		reward = math.floor(reward * 100) / 100
 
@@ -331,7 +339,7 @@ minetest.register_on_dieplayer(function(player)
 		main.deaths = main.deaths + 1
 		match.deaths = match.deaths + 1
 		match.kills_since_death = 0
-		ctf.needs_save = true
+		_needs_save = true
 	end
 end)
 

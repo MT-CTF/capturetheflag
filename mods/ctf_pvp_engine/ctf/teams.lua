@@ -40,8 +40,6 @@ function ctf.create_team(name, data)
 		ctf.registered_on_new_team[i](ctf.teams[name])
 	end
 
-	ctf.needs_save = true
-
 	return ctf.teams[name]
 end
 
@@ -55,7 +53,6 @@ function ctf.remove_team(name)
 			team.flags[i].team = nil
 		end
 		ctf.teams[name] = nil
-		ctf.needs_save = true
 		return true
 	else
 		return false
@@ -99,7 +96,6 @@ function ctf.new_player(name)
 		ctf.players[name] = {
 			name = name
 		}
-		ctf.needs_save = true
 	else
 		ctf.error("team", "Can't create a blank player")
 		ctf.log("team", debug.traceback())
@@ -137,7 +133,6 @@ function ctf.remove_player(name)
 			team.players[name] = nil
 		end
 		ctf.players[name] = nil
-		ctf.needs_save = true
 		return true
 	else
 		return false
@@ -210,8 +205,6 @@ function ctf.join(name, team, force, by)
 	team_data.players[player.name] = player
 	ctf.player_last_team[name] = team
 
-	ctf.needs_save = true
-
 	minetest.log("action", name .. " joined team " .. team)
 	minetest.chat_send_all(name.." has joined team "..team)
 
@@ -232,8 +225,6 @@ function ctf.clean_player_lists()
 			ctf.log("utils", " - Skipping player "..str.name)
 		end
 	end
-
-	ctf.needs_save = true
 end
 
 -- Sees if the player can change stuff in a team
@@ -268,7 +259,6 @@ function ctf.post(team, msg)
 	ctf.log("team", "message posted to team board")
 
 	table.insert(ctf.team(team).log, 1, msg)
-	ctf.needs_save = true
 
 	return true
 end
