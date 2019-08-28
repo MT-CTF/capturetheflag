@@ -38,7 +38,7 @@ end
 function ctf_colors.set_skin(player, color)
 	if minetest.global_exists("armor") then
 		-- TODO: how should support for skin mods be done?
-		armor.textures[name].skin = "ctf_colors_skin_" .. color .. ".png"
+		armor.textures[player:get_player_name()].skin = "ctf_colors_skin_" .. color .. ".png"
 		armor:update_player_visuals(player)
 	else
 		player:set_properties({

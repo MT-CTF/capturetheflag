@@ -327,7 +327,7 @@ minetest.register_chatcommand("t", {
 				chatplus.log("<" .. name .. "> ** ".. param .. " **")
 			end
 
-			tcolor = ctf_colors.get_color(ctf.player(name))
+			local tcolor = ctf_colors.get_color(ctf.player(name))
 			for username, to in pairs(team.players) do
 				minetest.chat_send_player(username,
 						minetest.colorize(tcolor.css, "<" .. name .. "> ** " .. param .. " **"))
@@ -344,7 +344,6 @@ minetest.register_chatcommand("t", {
 
 if minetest.global_exists("irc") then
 	function irc.playerMessage(name, message)
-		local tname = ctf.player(name).team
 		local color = ctf_colors.get_irc_color(ctf.player(name))
 		local clear = "\x0F"
 		if color then

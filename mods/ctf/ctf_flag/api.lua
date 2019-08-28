@@ -81,8 +81,8 @@ function ctf_flag.player_drop_flag(name)
 			ctf.action("flag", name .. " dropped " .. flag_name)
 			minetest.chat_send_all(flag_name.." has returned.")
 
-			for i = 1, #ctf_flag.registered_on_drop do
-				ctf_flag.registered_on_drop[i](name, flag)
+			for j = 1, #ctf_flag.registered_on_drop do
+				ctf_flag.registered_on_drop[j](name, flag)
 			end
 		end
 	end
@@ -124,7 +124,7 @@ function ctf_flag.update(pos)
 		minetest.set_node(top,{name="air"})
 		return
 	end
-	local topmeta = minetest.get_meta(top)
+
 	local flag_name = flag_team_data.name
 	if flag_name and flag_name ~= "" then
 		flagmeta:set_string("infotext", flag_name.." - "..flag_team_data.team)
@@ -142,7 +142,7 @@ function ctf_flag.update(pos)
 		minetest.set_node(top,{name="ctf_flag:flag_top_"..ctf.team(flag_team_data.team).data.color})
 	end
 
-	topmeta = minetest.get_meta(top)
+	local topmeta = minetest.get_meta(top)
 	if flag_name and flag_name ~= "" then
 		topmeta:set_string("infotext", flag_name.." - "..flag_team_data.team)
 	else

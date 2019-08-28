@@ -63,11 +63,8 @@ function ctf.list_teams(name)
 	minetest.chat_send_player(name, "Teams:")
 	for tname, team in pairs(ctf.teams) do
 		if team and team.players then
-			local details = ""
-
 			local numPlayers = ctf.count_players_in_team(tname)
-			details = numPlayers .. " members"
-
+			local details = numPlayers .. " members"
 			if team.flags then
 				local numFlags = 0
 				for flagid, flag in pairs(team.flags) do
@@ -233,7 +230,7 @@ function ctf.can_mod(player,team)
 
 	if privs then
 		if privs.ctf_admin == true then
-		 	return true
+			return true
 		end
 	end
 
@@ -277,10 +274,10 @@ function ctf.autoalloc(name, alloc_mode)
 	local max_players = ctf.setting("maximum_in_team")
 
 	local mtot = false -- more than one team
-	for key, team in pairs(ctf.teams) do
+	if next(ctf.teams) then
 		mtot = true
-		break
 	end
+
 	if not mtot then
 		ctf.error("autoalloc", "No teams to allocate " .. name .. " to!")
 		return

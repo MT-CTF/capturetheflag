@@ -71,8 +71,8 @@ local function do_capture(attname, flag, returned)
 			ctf_flag.delete(team, vector.new(flag))
 			ctf_flag.add(attacker.team, vector.new(flag))
 		else
-			minetest.set_node(pos,{name="air"})
-			ctf_flag.delete(team,pos)
+			minetest.set_node(flag,{name="air"})
+			ctf_flag.delete(team,flag)
 		end
 
 		for i = 1, #ctf_flag.registered_on_capture do
