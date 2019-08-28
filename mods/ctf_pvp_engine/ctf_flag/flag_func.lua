@@ -114,7 +114,6 @@ ctf_flag = {
 				flag.claimed = nil
 			end
 		end
-		ctf.gui.flag_board(name, pos)
 	end,
 	on_punch = function(pos, node, puncher)
 		local name = puncher:get_player_name()
@@ -150,15 +149,6 @@ ctf_flag = {
 					ctf_flag._flagret(name)
 				end
 			else
-				-- Clicked on another team's flag
-				local diplo = ctf.diplo.get(team, ctf.player(name).team) or
-						ctf.setting("default_diplo_state")
-
-				if diplo ~= "war" then
-					minetest.chat_send_player(name, "You are at peace with this team!")
-					return
-				end
-
 				do_capture(name, flag)
 			end
 		else

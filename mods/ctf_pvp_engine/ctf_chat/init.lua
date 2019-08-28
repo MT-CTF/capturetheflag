@@ -183,20 +183,6 @@ minetest.register_chatcommand("team", {
 				minetest.chat_send_player(name, "'"..param.."' is an invalid parameter to /team")
 				team_console_help(name)
 			end
-			if ctf.setting("gui") then
-				if (ctf and
-						ctf.players and
-						ctf.players[name] and
-						ctf.players[name].team) then
-					print("showing")
-					ctf.gui.show(name)
-					return true, "Showing the team window"
-				else
-					return false, "You're not part of a team!"
-				end
-			else
-				return false, "GUI is disabled!"
-			end
 		end
 		return false, "Nothing could be done"
 	end
