@@ -131,73 +131,6 @@ ctf.gui.register_tab("news", "News", function(name, tname)
 		result)
 end)
 
--- Team interface
-ctf.gui.register_tab("diplo", "Diplomacy", function(name, tname)
-	local result = ""
-	local data = {}
-
-	local amount = 0
-
-	for key, value in pairs(ctf.teams) do
-		if key ~= tname then
-			table.insert(data,{
-					team  = key,
-					state = ctf.diplo.get(tname, key),
-					to    = ctf.diplo.check_requests(tname, key),
-					from  = ctf.diplo.check_requests(key, tname)
-				})
-		end
-	end
-
-	result = result .. "label[1,1;Diplomacy from the perspective of " .. tname .. "]"
-
-	for i = 1, #data do
-		amount = i
-		local height = (i*1)+0.5
-
-		if height > 5 then
-			break
-		end
-
-		result = result .. "background[1," .. height .. ";8.2,1;diplo_" ..
-				data[i].state .. ".png]"
-		result = result .. "button[1.25," .. height .. ";2,1;team_" ..
-				data[i].team .. ";" .. data[i].team .. "]"
-		result = result .. "label[3.75," .. height .. ";" .. data[i].state
-				.. "]"
-
-		if ctf.can_mod(name, tname) and ctf.player(name).team == tname then
-			if not data[i].from and not data[i].to then
-				if data[i].state == "war" then
-					result = result .. "button[7.5," .. height ..
-							";1.5,1;peace_" .. data[i].team .. ";Peace]"
-				elseif data[i].state == "peace" then
-					result = result .. "button[6," .. height ..
-							";1.5,1;war_" .. data[i].team .. ";War]"
-					result = result .. "button[7.5," .. height ..
-							";1.5,1;alli_" .. data[i].team .. ";Alliance]"
-				elseif data[i].state == "alliance" then
-					result = result .. "button[6," .. height ..
-							";1.5,1;peace_" .. data[i].team .. ";Peace]"
-				end
-			elseif data[i].from ~= nil then
-				result = result .. "label[6," .. height ..
-						";request recieved]"
-			elseif data[i].to ~= nil then
-				result = result .. "label[5.5," .. height ..
-						";request sent]"
-				result = result .. "button[7.5," .. height ..
-						";1.5,1;cancel_" .. data[i].team .. ";Cancel]"
-			end
-		end
-	end
-
-	minetest.show_formspec(name, "ctf:diplo",
-		"size[10,7]" ..
-		ctf.gui.get_tabs(name, tname) ..
-		result
-	)
-end)
 
 local function formspec_is_ctf_tab(fsname)
 	for name, tab in pairs(ctf.gui.tabs) do
@@ -234,7 +167,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	-- News page
 	if fields.clear then
 		team.log = {}
-		ctf.needs_save = true
 		ctf.gui.show(name, "news")
 		return true
 	end
@@ -272,82 +204,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				end
 
 				table.remove(team.log, id)
-				ctf.needs_save = true
 				ctf.gui.show(name, "news")
 				return true
 			end
 		end
 	end
-end)
-
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local name    = player:get_player_name()
-	local tplayer = ctf.player(name)
-	local tname   = tplayer.team
-	local team    = ctf.team(tname)
-
-	if not team or formname ~= "ctf:diplo" then
-		return false
-	end
-
-	for key, field in pairs(fields) do
-		local tname2 = string.match(key, "team_(.+)")
-		if tname2 and ctf.team(tname2) then
-			ctf.gui.show(name, "diplo", tname2)
-			return true
-		end
-
-		if ctf.can_mod(name, tname) then
-			tname2 = string.match(key, "peace_(.+)")
-			if tname2 then
-				if ctf.diplo.get(tname, tname2) == "war" then
-					ctf.post(tname2, {
-						type = "request",
-						msg  = "peace",
-						team = tname,
-						mode = "diplo" })
-				else
-					ctf.diplo.set(tname, tname2, "peace")
-					ctf.post(tname, {
-						msg = "You have cancelled the alliance treaty with " .. tname2 })
-					ctf.post(tname2, {
-						msg = tname .. " has cancelled the alliance treaty" })
-				end
-
-				ctf.gui.show(name, "diplo")
-				return true
-			end
-
-			tname2 = string.match(key, "war_(.+)")
-			if tname2 then
-				ctf.diplo.set(tname, tname2, "war")
-				ctf.post(tname, {
-					msg = "You have declared war on " .. tname2 })
-				ctf.post(tname2, {
-					msg = tname .. " has declared war on you" })
-
-				ctf.gui.show(name, "diplo")
-				return true
-			end
-
-			tname2 = string.match(key, "alli_(.+)")
-			if tname2 then
-				ctf.post(tname2, {
-					type = "request",
-					msg  = "alliance",
-					team = tname,
-					mode = "diplo" })
-
-				ctf.gui.show(name, "diplo")
-				return true
-			end
-
-			tname2 = string.match(key, "cancel_(.+)")
-			if tname2 then
-				ctf.diplo.cancel_requests(tname, tname2)
-				ctf.gui.show(name, "diplo")
-				return true
-			end
-		end -- end if can mod
-	end -- end for each field
 end)

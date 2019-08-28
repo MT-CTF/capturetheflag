@@ -95,7 +95,6 @@ ctf.register_on_killedplayer(function(victim, killer)
 		match.score = match.score + bounty_score
 		main.bounty_kills = main.bounty_kills + 1
 		match.bounty_kills = match.bounty_kills + 1
-		ctf.needs_save = true
 	end
 	bountied_player = nil
 

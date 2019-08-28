@@ -1,20 +1,6 @@
-# Data Formats
-
-This file documents the contents of ctf.txt  
-Values are added to the file using ctf.register_on_save and ctf.register_on_load.  
-Here are the default values:
-
-```lua
-{
-	players = ctf.players,
-	teams = ctf.teams,
-	diplo = ctf.diplo.diplo
-}
-```
-
 ## Players
 
-Commonly called tplayer (may be called data or player in old code).  
+Commonly called tplayer (may be called data or player in old code).
 Player name is commonly called name (but may be called other things in older code).
 
 ```lua
@@ -34,7 +20,7 @@ ctf.players = {
 
 ## Teams
 
-Commonly called team.  
+Commonly called team.
 Team name is commonly called tname (but may be called team in old code).
 
 ```lua

@@ -53,13 +53,6 @@ function ctf.register_on_load(func)
 		func(ctf._loaddata)
 	end
 end
-ctf.registered_on_save = {}
-function ctf.register_on_save(func)
-	if ctf._mt_loaded then
-		error("You can't register callbacks at game time!")
-	end
-	table.insert(ctf.registered_on_save, func)
-end
 ctf.registered_on_init = {}
 function ctf.register_on_init(func)
 	if ctf._mt_loaded then
@@ -203,67 +196,8 @@ function ctf.setting(name)
 end
 
 function ctf.load()
-	ctf.log("io", "Loading CTF state")
-	local file = io.open(minetest.get_worldpath().."/ctf.txt", "r")
-	if file then
-		local table = minetest.deserialize(file:read("*all"))
-		if type(table) == "table" then
-			ctf.teams = table.teams
-			ctf.players = table.players
-
-			for i = 1, #ctf.registered_on_load do
-				ctf.registered_on_load[i](table)
-			end
-			return
-		end
-		ctf._loaddata = table
-	else
-		ctf.log("io", "ctf.txt is not present in the world folder")
-		ctf._new_game = true
-		for i = 1, #ctf.registered_on_new_game do
-			ctf.registered_on_new_game[i]()
-		end
-	end
-end
-
-minetest.after(0, function()
-	ctf._loaddata = nil
-	ctf._mt_loaded = true
-end)
-
-function ctf.check_save()
-	if ctf_flag and ctf_flag.assert_flags then
-		ctf_flag.assert_flags()
-	end
-	if ctf.needs_save then
-		ctf.save()
-	end
-	minetest.after(10, ctf.check_save)
-end
-minetest.after(10, ctf.check_save)
-
-function ctf.save()
-	local file = io.open(minetest.get_worldpath().."/ctf.txt", "w")
-	if file then
-		local out = {
-			teams = ctf.teams,
-			players = ctf.players
-		}
-
-		for i = 1, #ctf.registered_on_save do
-			local res = ctf.registered_on_save[i]()
-
-			if res then
-				for key, value in pairs(res) do
-					out[key] = value
-				end
-			end
-		end
-
-		file:write(minetest.serialize(out))
-		file:close()
-    	ctf.needs_save = false
-	else
-		ctf.error("io", "CTF file failed to save!")
+	ctf._new_game = true
+	for i = 1, #ctf.registered_on_new_game do
+		ctf.registered_on_new_game[i]()
 	end
 end
