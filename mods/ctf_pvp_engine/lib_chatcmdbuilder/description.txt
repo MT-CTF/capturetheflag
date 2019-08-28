@@ -1,0 +1,1 @@
+A library to make registering chat commands easier
