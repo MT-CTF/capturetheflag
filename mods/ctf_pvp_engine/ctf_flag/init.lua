@@ -141,6 +141,9 @@ local function update_flag_drops()
 				" seconds to capture the flag before it returns.")
 		end
 	end
+
+	ctf_flag.assert_flags()
+
 	minetest.after(5, update_flag_drops)
 end
 minetest.after(5, update_flag_drops)

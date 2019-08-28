@@ -103,7 +103,6 @@ function ctf_flag.add(team, pos)
 
 	pos.team = team
 	table.insert(ctf.team(team).flags,pos)
-	ctf.needs_save = true
 end
 
 function ctf_flag.update(pos)
@@ -135,7 +134,6 @@ function ctf_flag.update(pos)
 
 	if not ctf.team(flag_team_data.team).data.color then
 		ctf.team(flag_team_data.team).data.color = "red"
-		ctf.needs_save = true
 	end
 
 	if flag_team_data.claimed then
