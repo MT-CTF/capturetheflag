@@ -54,9 +54,9 @@ grenades.register_grenade("grenades:frag", {
 			glow = 10
 		})
 
-		minetest.sound_play("grenades_boom", {
+		minetest.sound_play("grenades_explode", {
 			pos = pos,
-			gain = 1.5,
+			gain = 1.0,
 			max_hear_distance = 32,
 		})
 

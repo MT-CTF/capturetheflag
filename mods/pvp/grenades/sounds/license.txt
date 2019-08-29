@@ -1,4 +1,5 @@
 Creative Commons Attribution 4.0 International Public License
+for grenades_glasslike_break.ogg and grenades_hiss.ogg
 
 Copyright (c) 2019 LoneWolfHT
 
@@ -95,3 +96,38 @@ Section 8 – Interpretation.
     To the extent possible, if any provision of this Public License is deemed unenforceable, it shall be automatically reformed to the minimum extent necessary to make it enforceable. If the provision cannot be reformed, it shall be severed from this Public License without affecting the enforceability of the remaining terms and conditions.
     No term or condition of this Public License will be waived and no failure to comply consented to unless expressly agreed to by the Licensor.
     Nothing in this Public License constitutes or may be interpreted as a limitation upon, or waiver of, any privileges and immunities that apply to the Licensor or You, including from the legal processes of any jurisdiction or authority.
+
+=====================
+=====================
+=====================
+
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication 
+for grenades_explode.ogg
+TumeniNodes
+steveygos93
+theneedle.tv
+frankelmedico
+
+No Copyright
+
+The person who associated a work with this deed has dedicated the work to the public domain
+by waiving all of his or her rights to the work worldwide under copyright law, including all
+related and neighboring rights, to the extent allowed by law.
+
+You can copy, modify, distribute and perform the work, even for commercial purposes, all
+without asking permission. See Other Information below.
+
+In no way are the patent or trademark rights of any person affected by CC0, nor are the
+rights that other persons may have in the work or in how the work is used, such as publicity
+or privacy rights.
+
+Unless expressly stated otherwise, the person who associated a work with this deed makes no
+warranties about the work, and disclaims liability for all uses of the work, to the fullest
+extent permitted by applicable law.
+
+When using or citing the work, you should not imply endorsement by the author or the affirmer.
+
+This license is acceptable for Free Cultural Works.
+For more Information:
+https://creativecommons.org/publicdomain/zero/1.0/
+
