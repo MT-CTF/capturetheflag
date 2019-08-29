@@ -61,8 +61,8 @@ function grenades.register_grenade(name, def)
 			end
 
 			-- Can't use set_acceleration() because the grenade will shoot backwards once the velocity reaches 0
-			vel.x = vel.x / 1.03
-			vel.z = vel.z / 1.03
+			vel.x = vel.x / 1.04
+			vel.z = vel.z / 1.04
 
 			obj:set_velocity(vel)
 			self.last_vel = vel
