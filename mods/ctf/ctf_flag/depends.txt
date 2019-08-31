@@ -1,3 +1,0 @@
-ctf
-ctf_colors
-chatplus?

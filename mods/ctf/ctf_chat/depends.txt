@@ -1,4 +1,0 @@
-ctf
-ctf_colors
-chatplus?
-irc?
