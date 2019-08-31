@@ -15,9 +15,9 @@ local modpath = minetest.get_modpath("ctf_map")
 dofile(modpath .. "/nodes.lua")
 dofile(modpath .. "/emerge.lua")
 dofile(modpath .. "/barrier.lua")
-dofile(modpath .. "/base.lua")
 
 if minetest.get_modpath("ctf") then
+	dofile(modpath .. "/base.lua")
 	dofile(modpath .. "/chest.lua")
 	dofile(modpath .. "/give_initial_stuff.lua")
 	dofile(modpath .. "/schem_map.lua")
