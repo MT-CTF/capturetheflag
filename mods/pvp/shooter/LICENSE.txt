@@ -30,4 +30,4 @@ License Sounds: freesound.org
 
 	Sparkler.aif by Ned Bouhalassa - CC0 1.0 Universal (CC0 1.0)
 
-	tnt_explode.ogg by TumeniNodes - CC0 1.0 Universal (CC0 1.0)
+	tnt_explode.ogg by steveygos93, TumeniNodes - CC0 1.0 Universal (CC0 1.0)
