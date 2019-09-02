@@ -457,6 +457,7 @@ function ctf.register_on_killedplayer(func)
 	end
 	table.insert(ctf.registered_on_killedplayer, func)
 end
+
 local dead_players = {}
 minetest.register_on_respawnplayer(function(player)
 	dead_players[player:get_player_name()] = nil
@@ -464,40 +465,42 @@ end)
 minetest.register_on_joinplayer(function(player)
 	dead_players[player:get_player_name()] = nil
 end)
+
 minetest.register_on_punchplayer(function(player, hitter,
 		time_from_last_punch, tool_capabilities, dir, damage)
-	if player and hitter then
-		local pname = player:get_player_name()
-		local hname = hitter:get_player_name()
+	if not player or not hitter then
+		return
+	end
 
-		local to = ctf.player(pname)
-		local from = ctf.player(hname)
+	local pname = player:get_player_name()
+	local hname = hitter:get_player_name()
 
-		if dead_players[pname] then
-			return
+	-- Suicide check
+	if pname == hname then
+		return true
+	end
+
+	local to = ctf.player(pname)
+	local from = ctf.player(hname)
+
+	if to.team == from.team and to.team ~= "" and
+			to.team ~= nil and to.name ~= from.name then
+		minetest.chat_send_player(hname, pname .. " is on your team!")
+		if not ctf.setting("friendly_fire") then
+			return true
 		end
+	end
 
-		if to.team == from.team and to.team ~= "" and
-				to.team ~= nil and to.name ~= from.name then
-			minetest.chat_send_player(hname, pname .. " is on your team!")
-			if not ctf.setting("friendly_fire") then
-				return true
-			end
-		end
+	local hp = player:get_hp()
+	if hp == 0 or dead_players[pname] then
+		return false
+	end
 
-		local hp = player:get_hp()
-		if hp == 0 then
-			return false
-		end
-
-		if hp - damage <= 0 then
-			dead_players[pname] = true
-			local wielded = hitter:get_wielded_item()
-			for i = 1, #ctf.registered_on_killedplayer do
-				ctf.registered_on_killedplayer[i](pname, hname,
-						wielded, tool_capabilities)
-			end
-			return false
+	if hp - damage <= 0 then
+		dead_players[pname] = true
+		for i = 1, #ctf.registered_on_killedplayer do
+			ctf.registered_on_killedplayer[i](pname, hname,
+				hitter:get_wielded_item(), tool_capabilities)
 		end
 	end
 end)

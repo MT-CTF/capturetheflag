@@ -85,7 +85,7 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 ctf.register_on_killedplayer(function(victim, killer)
-	if victim ~= bountied_player or victim == killer then
+	if victim ~= bountied_player then
 		return
 	end
 
