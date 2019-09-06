@@ -40,7 +40,7 @@ minetest.register_entity("shooter:tnt_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			if minetest.get_node(pos).name ~= "air" then
 				self.object:remove()
 				shooter:blast(pos, 4, 80, 10, self.player)
@@ -68,8 +68,8 @@ minetest.register_entity("shooter:turret_entity", {
 	yaw = 0,
 	firing = false,
 	on_activate = function(self, staticdata)
-		self.pos = self.object:getpos()
-		self.yaw = self.object:getyaw()
+		self.pos = self.object:get_pos()
+		self.yaw = self.object:get_yaw()
 		if minetest.get_node(self.pos).name ~= "shooter:turret" then
 			self.object:remove()
 			return
@@ -95,7 +95,7 @@ minetest.register_entity("shooter:turret_entity", {
 		end
 		if self.player then
 			local pitch = self.pitch
-			local yaw = self.object:getyaw()
+			local yaw = self.object:get_yaw()
 			local ctrl = self.player:get_player_control()
 			local step = 2
 			if ctrl then
@@ -130,7 +130,7 @@ minetest.register_entity("shooter:turret_entity", {
 					self.pitch = pitch
 				end
 				if self.yaw ~= yaw then
-					self.object:setyaw(yaw)
+					self.object:set_yaw(yaw)
 					self.yaw = yaw
 				end
 			end
@@ -166,9 +166,9 @@ minetest.register_entity("shooter:turret_entity", {
 			if ent then
 				minetest.sound_play("shooter_rocket_fire", {object=obj})
 				ent.player = self.player
-				obj:setyaw(self.yaw)
-				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(self.yaw)
+				obj:set_velocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
 			end
 		end
 		if SHOOTER_ENABLE_PARTICLE_FX == true then

@@ -27,7 +27,7 @@ minetest.register_entity("shooter:rocket_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.2 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local above = {x=pos.x, y=pos.y + 1, z=pos.z}
 			if minetest.get_node(pos).name ~= "air" then
 				self.object:remove()
@@ -52,22 +52,22 @@ minetest.register_tool("shooter:rocket_gun_loaded", {
 		itemstack = "shooter:rocket_gun 1 "..itemstack:get_wear()
 		if pointed_thing.type ~= "nothing" then
 			local pointed = minetest.get_pointed_thing_position(pointed_thing)
-			if vector.distance(user:getpos(), pointed) < 8 then
+			if vector.distance(user:get_pos(), pointed) < 8 then
 				shooter:blast(pointed, 2, 50, 7)
 				return itemstack
 			end
 		end
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		local dir = user:get_look_dir()
-		local yaw = user:get_look_yaw()
+		local yaw = user:get_look_horizontal()
 		if pos and dir and yaw then
 			pos.y = pos.y + 1.5
 			local obj = minetest.add_entity(pos, "shooter:rocket_entity")
 			if obj then
 				minetest.sound_play("shooter_rocket_fire", {object=obj})
-				obj:setvelocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
-				obj:setacceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
-				obj:setyaw(yaw + math.pi)
+				obj:set_velocity({x=dir.x * 20, y=dir.y * 20, z=dir.z * 20})
+				obj:set_acceleration({x=dir.x * -3, y=-10, z=dir.z * -3})
+				obj:set_yaw(yaw + math.pi)
 				local ent = obj:get_luaentity()
 				if ent then
 					ent.player = ent.player or user

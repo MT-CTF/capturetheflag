@@ -22,7 +22,7 @@ minetest.register_entity("shooter:grenade_entity", {
 	on_step = function(self, dtime)
 		self.timer = self.timer + dtime
 		if self.timer > 0.1 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local above = {x=pos.x, y=pos.y + 1, z=pos.z}
 			if minetest.get_node(pos).name ~= "air" then
 				self.object:remove()
