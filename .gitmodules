@@ -1,6 +1,9 @@
 [submodule "mods/crafting"]
 	path = mods/crafting
-	url = https://github.com/rubenwardy/crafting
+	url = https://github.com/rubenwardy/crafting.git
 [submodule "mods/ctf/ctf_map/maps"]
 	path = mods/ctf/ctf_map/maps
 	url = https://github.com/MT-CTF/maps.git
+[submodule "mods/pvp/shooter"]
+	path = mods/pvp/shooter
+	url = https://github.com/MT-CTF/shooter.git

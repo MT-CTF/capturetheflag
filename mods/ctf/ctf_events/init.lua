@@ -127,7 +127,7 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 		if tool_caps.damage_groups.grenade then
 			type = "grenade"
 		end
-	elseif sname:sub(1, 8) == "shooter:" then
+	elseif sname:sub(1, 8) == "shooter_guns:" then
 		type = "bullet"
 	end
 
