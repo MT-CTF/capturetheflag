@@ -14,7 +14,7 @@ local function drop(pos, itemstack)
 	local obj = minetest.add_item(pos, it)
 
 	if obj then
-		obj:setvelocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
+		obj:set_velocity({x=math.random(-1,1), y=5, z=math.random(-1,1)})
 
 		local remi = minetest.settings:get("remove_items")
 		if minetest.is_yes(remi) then
@@ -33,7 +33,7 @@ local function drop_list(pos, inv, list)
 end
 
 local function drop_all(player)
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	pos.y = math.floor(pos.y + 0.5)
 
 	local inv = player:get_inventory()
