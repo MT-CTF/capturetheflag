@@ -1,3 +1,6 @@
+-- Number of entries to display in the player rankings table
+ctf_stats.rankings_display_count = 50
+
 -- Formspec element that governs table columns and their attributes
 local tablecolumns = {
 	"tablecolumns[color;",
@@ -20,8 +23,8 @@ local function render_team_stats(red, blue, stat, round)
 		blue_stat = math.floor(blue_stat * 10) / 10
 	end
 	return red_stat + blue_stat .. " (" ..
-			minetest.colorize(red.color, tostring(red_stat)) .. " - " ..
-			minetest.colorize(blue.color, tostring(blue_stat)) .. ")"
+	minetest.colorize(red.color, tostring(red_stat)) .. " - " ..
+	minetest.colorize(blue.color, tostring(blue_stat)) .. ")"
 end
 
 function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player, time)
@@ -90,7 +93,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	return ret
 end
 
-function ctf_stats.get_formspec(title, players, header, hlt_name)
+function ctf_stats.get_formspec(title, players, header, target)
 	table.sort(players, function(one, two)
 		return one.score > two.score
 	end)
@@ -105,14 +108,25 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 	ret = ret .. "table[0.5,0;13.25,6.1;scores;"
 	ret = ret .. "#ffffff,,Player,Kills,Deaths,K/D,Bounty Kills,Captures,Attempts,Score"
 
-	local player_in_top_50 = false
+	local hstat, hplace
+	if type(target) == "number" then
+		hstat  = players[target]
+		hplace = target
+	elseif type(target) == "string" then
+		for i, stat in pairs(players) do
+			if stat.name == target then
+				hplace = i
+				hstat  = stat
+				break
+			end
+		end
+	end
 
-	for i = 1, math.min(#players, 50) do
+	for i = 1, math.min(#players, ctf_stats.rankings_display_count) do
 		local pstat = players[i]
 		local color
-		if hlt_name and pstat.name == hlt_name then
+		if hplace == i then
 			color = "#ffff00"
-			player_in_top_50 = true
 		else
 			color = pstat.color or "#ffffff"
 		end
@@ -121,58 +135,46 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 			kd = kd / pstat.deaths
 		end
 		ret = ret ..
-			  "," .. string.gsub(color, "0x", "#") ..
-			  "," .. i ..
-			  "," .. pstat.name ..
-			  "," .. pstat.kills ..
-			  "," .. pstat.deaths ..
-			  "," .. math.floor(kd * 10) / 10  ..
-			  "," .. pstat.bounty_kills ..
-			  "," .. pstat.captures ..
-			  "," .. pstat.attempts ..
-			  "," .. math.floor(pstat.score * 10) / 10
+			"," .. string.gsub(color, "0x", "#") ..
+			"," .. i ..
+			"," .. pstat.name ..
+			"," .. pstat.kills ..
+			"," .. pstat.deaths ..
+			"," .. math.floor(kd * 10) / 10  ..
+			"," .. pstat.bounty_kills ..
+			"," .. pstat.captures ..
+			"," .. pstat.attempts ..
+			"," .. math.floor(pstat.score * 10) / 10
 	end
 	ret = ret .. ";-1]"
 
-	-- If hlt_name not in top 50, add a separate table
+	-- If target not in top 50, add a separate table
 	-- This would result in the player's score displayed at the bottom
 	-- of the list but yet be visible without having to scroll
-	if hlt_name and not player_in_top_50 then
-		local hlt_player, hlt_rank, hlt_kd
-
-		for i = 1, #players do
-			if players[i].name == hlt_name then
-				hlt_player = players[i]
-				hlt_rank = i
-				break
-			end
+	if hplace and hplace > ctf_stats.rankings_display_count then
+		local h_kd = hstat.kills
+		if hstat.deaths > 1 then
+			h_kd = h_kd / hstat.deaths
 		end
 
-		if hlt_player then
-			hlt_kd = hlt_player.kills
-			if hlt_player.deaths > 1 then
-				hlt_kd = hlt_kd / hlt_player.deaths
-			end
-
-			ret = ret .. tablecolumns
-			ret = ret .. "tableoptions[highlight=#00000000]"
-			ret = ret .. "table[0.5,6.1;13.25,0.4;hlt_score;"
-			ret = ret .. "#ffff00" ..
-				  "," .. hlt_rank ..
-				  "," .. hlt_player.name ..
-				  "," .. hlt_player.kills ..
-				  "," .. hlt_player.deaths ..
-				  "," .. math.floor(hlt_kd * 10) / 10 ..
-				  "," .. hlt_player.bounty_kills ..
-				  "," .. hlt_player.captures ..
-				  "," .. hlt_player.attempts ..
-				  "," .. math.floor(hlt_player.score * 10) / 10 .. ";-1]"
-		end
-	-- else
-		-- ret = ret .. "box[0.5,6.1;13.25,0.4;#101010]"
-		-- Adds a box where the extra table should be, in order to make it
-		-- appear as an extension of the main table, but the color can't be
-		-- matched, and looks slightly brighter or slightly darker than the table
+		ret = ret .. tablecolumns
+		ret = ret .. "tableoptions[highlight=#00000000]"
+		ret = ret .. "table[0.5,6.1;13.25,0.4;hlt_score;"
+		ret = ret .. "#ffff00" ..
+			"," .. hplace ..
+			"," .. hstat.name ..
+			"," .. hstat.kills ..
+			"," .. hstat.deaths ..
+			"," .. math.floor(h_kd * 10) / 10 ..
+			"," .. hstat.bounty_kills ..
+			"," .. hstat.captures ..
+			"," .. hstat.attempts ..
+			"," .. math.floor(hstat.score * 10) / 10 .. ";-1]"
+	--[[ else
+		ret = ret .. "box[0.5,6.1;13.25,0.4;#101010]"
+		Adds a box where the extra table should be, in order to make it
+		appear as an extension of the main table, but the color can't be
+		matched, and looks slightly brighter or slightly darker than the table]]
 	end
 
 	ret = ret .. "button_exit[10,6.5;3,1;close;Close]"
@@ -180,11 +182,8 @@ function ctf_stats.get_formspec(title, players, header, hlt_name)
 	return ret
 end
 
-function ctf_stats.get_html(title, players)
-	table.sort(players, function(one, two)
-		return one.score > two.score
-	end)
-
+function ctf_stats.get_html(title)
+	local players = ctf_stats.get_ordered_players()
 	local ret = "<h1>" .. title .. "</h1>"
 	ret = ret .. "<table>" ..
 		"<tr><th></th>" ..
@@ -220,13 +219,6 @@ function ctf_stats.get_html(title, players)
 end
 
 function ctf_stats.html_to_file(filepath)
-	local players = {}
-	for name, pstat in pairs(ctf_stats.players) do
-		pstat.name = name
-		pstat.color = nil
-		table.insert(players, pstat)
-	end
-	local html = ctf_stats.get_html("Player Rankings", players)
 	local f = io.open(filepath, "w")
 	f:write("<!doctype html>\n")
 	f:write("<html><head>\n")
@@ -234,7 +226,7 @@ function ctf_stats.html_to_file(filepath)
 	f:write("<title>Player Rankings</title>\n")
 	f:write("<link rel=\"stylesheet\" href=\"score_style.css\">\n")
 	f:write("</head><body>\n")
-	f:write(html)
+	f:write(ctf_stats.get_html("Player Rankings"))
 	f:write("</body></html>\n")
 	f:close()
 end

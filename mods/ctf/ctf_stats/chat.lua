@@ -2,47 +2,53 @@
 -- Helpers --
 -------------
 
-local function return_as_chat_result(to, name)
-	local players = {}
-	for pname, pstat in pairs(ctf_stats.players) do
-		pstat.name = pname
-		pstat.color = nil
-		table.insert(players, pstat)
+local function return_as_chat_result(to, target)
+	local players = ctf_stats.get_ordered_players()
+
+	local name, place, stat
+	if type(target) == "number" then
+		place = target
+		stat  = players[target]
+		name  = stat.name
+	elseif type(target) == "string" then
+		-- If target is a string, search through the player stats for a match
+		name = target
+		for i = 1, #players do
+			local pstat = players[i]
+			if pstat.name == name then
+				stat = pstat
+				place = i
+				break
+			end
+		end
+
+		-- If stat does not exist yet, set place to size of players + 1
+		if place < 1 then
+			place = #players + 1
+		end
+	else
+		error("Invalid type passed to return_as_chat_result!", 2)
 	end
 
-	table.sort(players, function(one, two)
-		return one.score > two.score
-	end)
+	-- Build return string
+	local result = (to == name and "You are in " or name .. " is in ") ..
+			place .. " place.\n"
 
-	local place = -1
-	local me = nil
-	for i = 1, #players do
-		local pstat = players[i]
-		if pstat.name == name then
-			me = pstat
-			place = i
-			break
+	if stat then
+		local kd = stat.kills
+		if stat.deaths > 1 then
+			kd = kd / stat.deaths
 		end
-	end
-	if place < 1 then
-		place = #players + 1
-	end
-	local you_are_in = (to == name) and "You are in " or name .. " is in "
-	local result = you_are_in .. place .. " place.\n"
-	if me then
-		local kd = me.kills
-		if me.deaths > 1 then
-			kd = kd / me.deaths
-		end
-		result = result .. "Kills: " .. me.kills ..
-			" | Deaths: " .. me.deaths ..
+		result = result ..
+			"Kills: " .. stat.kills ..
+			" | Deaths: " .. stat.deaths ..
 			" | K/D: " .. math.floor(kd * 10) / 10 ..
-			"\nBounty kills: " .. me.bounty_kills ..
-			" | Captures: " .. me.captures ..
-			" | Attempts: " .. me.attempts ..
-			"\nScore: " .. math.floor(me.score)
+			"\nBounty kills: " .. stat.bounty_kills ..
+			" | Captures: " .. stat.captures ..
+			" | Attempts: " .. stat.attempts ..
+			"\nScore: " .. math.floor(stat.score)
 	end
-	return true, result
+	return result
 end
 
 -------------------
@@ -62,56 +68,57 @@ minetest.register_chatcommand("summary", {
 })
 
 minetest.register_chatcommand("r", {
-	params = "[<name>]",
-	description = "Display rankings of yourself or another player as a chat result.",
+	params = "[<name> | <rank>]",
+	description = "Display rankings of yourself, or another player or rank, as a chat result.",
 	func = function(name, param)
-		local target
-		if param ~= "" then
-			param = param:trim()
-			if ctf_stats.players[param] then
-				target = param
-				minetest.log("action", name .. " ran /r " .. param)
-			else
-				return false, "Can't find player '" .. param .. "'"
-			end
-		else
-			target = name
-			minetest.log("action", name .. " ran /r")
+		local target, error = ctf_stats.get_target(name, param)
+		if not target then
+			return false, error
 		end
-		return return_as_chat_result(name, target)
+
+		minetest.log("action", name .. " runs /r " .. param)
+		return true, return_as_chat_result(name, target)
+	end
+})
+
+minetest.register_chatcommand("rn", {
+	params = "<rank>",
+	description = "Display rankings of player at the specified rank.",
+	func = function(name, param)
+		if not param or param == "" then
+			return false, "Empty arguments not allowed! Specify a rank."
+		end
+
+		param = tonumber(param)
+		if not param then
+			return false, "Argument isn't a valid number!"
+		elseif param <= 0 or param > #ctf_stats.get_ordered_players() or
+				param ~= math.floor(param) then
+			return false, "Invalid number or number out of bounds!"
+			-- TODO: This is the worst way to do it. FIX IT.
+		end
+
+		minetest.log("action", name .. " runs /rn " .. param)
+		return true, return_as_chat_result(name, param)
 	end
 })
 
 minetest.register_chatcommand("rankings", {
-	params = "[<name>]",
-	description = "Display rankings of yourself or another player.",
+	params = "[<name> | <rank>]",
+	description = "Display rankings of yourself, or another player or rank.",
 	func = function(name, param)
-		local target
-		if param ~= "" then
-			param = param:trim()
-			if ctf_stats.players[param] then
-				target = param
-				minetest.log("action", name .. " ran /rankings " .. param)
-			else
-				return false, "Can't find player '" .. param .. "'"
-			end
-		else
-			target = name
-			minetest.log("action", name .. " ran /rankings")
+		local target, error = ctf_stats.get_target(name, param)
+		if not target then
+			return false, error
 		end
 
+		minetest.log("action", name .. " runs /rankings " .. param)
 		if not minetest.get_player_by_name(name) then
-			return return_as_chat_result(name, target)
+			return true, return_as_chat_result(name, target)
 		else
-			local players = {}
-			for pname, pstat in pairs(ctf_stats.players) do
-				pstat.name = pname
-				pstat.color = nil
-				table.insert(players, pstat)
-			end
-
-			local fs = ctf_stats.get_formspec("Player Rankings", players, 0, target)
-			minetest.show_formspec(name, "ctf_stats:rankings", fs)
+			minetest.show_formspec(name, "ctf_stats:rankings", ctf_stats.get_formspec(
+					"Player Rankings", ctf_stats.get_ordered_players(), 0, target))
+			return true
 		end
 	end
 })

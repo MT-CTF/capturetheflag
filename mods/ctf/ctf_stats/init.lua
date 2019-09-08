@@ -137,6 +137,64 @@ function ctf_stats.player(name)
 	return player_stats, match_player_stats
 end
 
+function ctf_stats.get_ordered_players()
+	local players = {}
+
+	-- Copy player stats into new empty table
+	for pname, pstat in pairs(ctf_stats.players) do
+		pstat.name = pname
+		pstat.color = nil
+		table.insert(players, pstat)
+	end
+
+	-- Sort table in the order of descending scores
+	table.sort(players, function(one, two)
+		return one.score > two.score
+	end)
+
+	return players
+end
+
+function ctf_stats.get_target(name, param)
+	param = param:trim()
+
+	-- If param is not empty, check if it's a number or a string
+	if param ~= "" then
+		-- Order of the following checks are as given below:
+		--
+		-- * `param` is returned as a string if player's stats exists
+		-- * If no matching stats exist, `param` is checked if it's a number
+		-- * If `param` isn't a number, it is assumed to be invalid, and nil is returned
+		-- * If `param` is a number, `param` is checked if out of bounds
+		-- * If `param` is not out of bounds, `param` is returned as a number, else nil
+		--
+		-- This order of checks is important because, in the case of `param` matching
+		-- both a number and a player name, it would be considered as a player name.
+
+		-- Check if param matches a player name
+		if ctf_stats.players[param] then
+			return param
+		else
+			-- Check if param is a number
+			local rank = tonumber(param)
+			if rank then
+				-- Check if param is within range
+				-- TODO: Fix this hack by maintaining two tables - an ordered list, and a hashmap
+				if rank <= 0 or rank > #ctf_stats.get_ordered_players() or
+						rank ~= math.floor(rank) then
+					return nil, "Invalid number or number out of bounds!"
+				else
+					return rank
+				end
+			else
+				return nil, "Invalid player name specified!"
+			end
+		end
+	else
+		return name
+	end
+end
+
 ctf.register_on_join_team(function(name, tname)
 	ctf_stats.current[tname][name] = ctf_stats.current[tname][name] or {
 		kills = 0,
