@@ -2,88 +2,94 @@
 -- Code by 4aiman, textures by Calinou. Licensed under CC0.
 
 gauges = {}
+gauges.entities = {}
 
 local hp_bar = {
 	physical = false,
 	collisionbox = {x = 0, y = 0, z = 0},
 	visual = "sprite",
-	textures = {"20.png"}, -- The texture is changed later in the code.
+	textures = {"health_20.png"},
 	visual_size = {x = 1.5, y = 0.09375, z = 1.5}, -- Y value is (1 / 16) * 1.5.
 	wielder = nil,
+	set_hp = function(self, hp)
+		local wielder = self.wielder and minetest.get_player_by_name(self.wielder)
+		if not wielder then
+			minetest.log("warning", "[gauges] Gauge removed as null wielder! " .. self.wielder)
+			self.object:remove()
+			gauges.entities[self.wielder] = nil
+			return
+		end
+
+		self.object:set_properties({ textures = { "health_" .. tostring(hp) .. ".png" } })
+	end
 }
-
-function vector.sqdist(a, b)
-	local dx = a.x - b.x
-	local dy = a.y - b.y
-	local dz = a.z - b.z
-	return dx*dx + dy*dy + dz*dz
-end
-
-function hp_bar:on_step(dtime)
-	local wielder = self.wielder and minetest.get_player_by_name(self.wielder)
-	if wielder == nil then
-		minetest.log("warning", "[gauges] Gauge removed as null wielder! " .. dump(self.wielder))
-		self.object:remove()
-		return
-	end
-
-	if vector.sqdist(wielder:get_pos(), self.object:get_pos()) > 3 then
-		minetest.log("warning", "[gauges] Gauge removed as not attached! " .. dump(self.wielder))
-		self.object:remove()
-		return
-	end
-
-	local hp = wielder:get_hp()
-	local breath = wielder:get_breath()
-	self.object:set_properties({
-		textures = {
-			"health_" .. tostring(hp) .. ".png^breath_" .. tostring(breath) .. ".png",
-		},
-	})
-end
 
 minetest.register_entity("gauges:hp_bar", hp_bar)
 
 function gauges.add_HP_gauge(name)
 	local player = minetest.get_player_by_name(name)
-	if player then
-		local pos = player:get_pos()
-		local ent = minetest.add_entity(pos, "gauges:hp_bar")
-		assert(ent)
-		if ent ~= nil then
-			ent:set_attach(player, "", {x = 0, y = 19, z = 0}, {x = 0, y = 0, z = 0})
-			ent = ent:get_luaentity()
-			ent.wielder = player:get_player_name()
+	if not player then
+		return
+	end
+
+	local obj = minetest.add_entity(player:get_pos(), "gauges:hp_bar")
+	if not obj then
+		return
+	end
+
+	obj:set_attach(player, "", {x = 0, y = 19, z = 0}, {x = 0, y = 0, z = 0})
+	local ent = obj:get_luaentity()
+	ent.wielder = name
+	gauges.entities[name] = ent
+end
+
+function gauges.check_gauges()
+	for name, ent in pairs(gauges.entities) do
+		local obj = ent.object
+		if not obj:get_attach() then
+			-- If gauge entity isn't attached, try re-attaching or remove entity
+			local player = minetest.get_player_by_name(ent.wielder)
+			if player then
+				print("Detached gauge! Re-attaching to " .. ent.wielder)
+				obj:set_detach()
+				obj:set_attach(player, "", {x = 0, y = 19, z = 0}, {x = 0, y = 0, z = 0})
+			else
+				print("Detached gauge! Removing... (" .. ent.wielder .. ")")
+				obj:remove()
+				gauges.entities[name] = nil
+			end
 		end
 	end
+	minetest.after(5.1, gauges.check_gauges)
 end
+minetest.after(1.2, gauges.check_gauges)
 
 -- If health_bars not defined or set to true
 if minetest.settings:get_bool("health_bars") ~= false and
 		minetest.settings:get_bool("enable_damage") then
 	minetest.register_on_joinplayer(function(player)
-		minetest.after(2, gauges.add_HP_gauge, player:get_player_name())
+		minetest.after(1, gauges.add_HP_gauge, player:get_player_name())
+	end)
+
+	minetest.register_on_leaveplayer(function(player)
+		local name = player:get_player_name()
+		local ent = gauges.entities[name]
+		if ent then
+			ent.object:remove()
+			gauges.entities[name] = nil
+		end
 	end)
 end
 
-function gauges.check_gauges()
-	for _, player in pairs(minetest.get_connected_players()) do
-		local pname = player:get_player_name()
-		local found = false
-		local objects = minetest.get_objects_inside_radius(player:get_pos(), 1)
-		for _, object in pairs(objects) do
-			local le = object:get_luaentity()
-			if le and le.wielder == pname then
-				found = true
-				break
-			end
-		end
-
-		if not found then
-			minetest.log("warning", "[gauges] Gauge not found for player " .. pname)
-			gauges.add_HP_gauge(pname)
-		end
+minetest.register_on_player_hpchange(function(player, hp_change)
+	local ent = gauges.entities[player:get_player_name()]
+	if ent then
+		ent:set_hp(player:get_hp() + hp_change)
 	end
-	minetest.after(9.3, gauges.check_gauges)
-end
-minetest.after(2, gauges.check_gauges)
+end, false)
+
+minetest.register_chatcommand("ent", {
+	func = function(name)
+		minetest.chat_send_player(name, dump(gauges.entities))
+	end
+})
