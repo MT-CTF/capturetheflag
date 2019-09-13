@@ -2,10 +2,9 @@
 
 local indices = {}
 
-local function show_catalog(name, idx)
-	indices[name] = idx
-
+local function show_catalog(name)
 	-- Select map to be displayed
+	local idx = indices[name]
 	local map = ctf_map.available_maps[idx]
 
 	local fs = "size[10,9]"
@@ -23,7 +22,7 @@ local function show_catalog(name, idx)
 	fs = fs .. "label[1.75,0;" ..
 			minetest.colorize("#ffff00", minetest.formspec_escape(map.name)) .. "]"
 	fs = fs .. "label[1.75,0.5;" .. minetest.colorize("#cccccc",
-					"by " .. minetest.formspec_escape(map.author)) .. "]"
+			"by " .. minetest.formspec_escape(map.author)) .. "]"
 	fs = fs .. "container_end[]"
 
 	-- List of maps
@@ -77,14 +76,61 @@ local function show_catalog(name, idx)
 	end
 	fs = fs .. "container_end[]"
 
+	-- Add some special buttons, if player has ctf_admin priv
+	if minetest.check_player_privs(name, { ctf_admin = true }) then
+		fs = fs .. "button[4,8;2,1;btn_jump;Skip to map]"
+		fs = fs .. "button[6,8;2,1;btn_set;Set as next map]"
+	end
+
 	minetest.show_formspec(name, "ctf_map:maps_catalog", fs)
 end
 
-local function send_irc_catalog(name, idx)
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if not player or formname ~= "ctf_map:maps_catalog" then
+		return
+	end
+
+	local name = player:get_player_name()
+
+	if fields.btn_prev then
+		indices[name] = indices[name] - 1
+		show_catalog(name)
+	elseif fields.btn_next then
+		indices[name] = indices[name] + 1
+		show_catalog(name)
+	end
+
+	if fields.maps_list then
+		local evt = minetest.explode_textlist_event(fields.maps_list)
+		if evt.type ~= "INV" then
+			indices[name] = evt.index
+			show_catalog(name)
+		end
+	end
+
+	if minetest.check_player_privs(name, { ctf_admin = true }) then
+		if fields.btn_set then
+			ctf_map.next_idx = indices[name]
+			minetest.chat_send_player(name, "Selected " ..
+					ctf_map.available_maps[ctf_map.next_idx].name .. " as next map.")
+		end
+
+		if fields.btn_jump then
+			ctf_map.next_idx = indices[name]
+			minetest.chat_send_player(name, "Skipping to next map")
+			ctf_match.next()
+		end
+	end
+end)
+
+local function send_irc_catalog(name)
 	-- Select map to be displayed
-	local map = ctf_map.available_maps[idx]
+	local map = ctf_map.available_maps[indices[name]]
+
+	-- IRC color codes
 	local red = string.char(3) .. "4"
 	local normal = string.char(3)
+
 	minetest.chat_send_player(name, red .. "Map: " .. normal .. map.name)
 	minetest.chat_send_player(name, red .. "Author: " .. normal .. map.author)
 	if map.hint then
@@ -99,27 +145,6 @@ local function send_irc_catalog(name, idx)
 	end
 end
 
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if not player or formname ~= "ctf_map:maps_catalog" then
-		return
-	end
-
-	local name = player:get_player_name()
-
-	if fields.btn_prev then
-		show_catalog(name, indices[name] - 1)
-	elseif fields.btn_next then
-		show_catalog(name, indices[name] + 1)
-	end
-
-	if fields.maps_list then
-		local evt = minetest.explode_textlist_event(fields.maps_list)
-		if evt.type ~= "INV" then
-			show_catalog(name, evt.index)
-		end
-	end
-end)
-
 minetest.register_chatcommand("maps", {
 	privs = {interact = true},
 	func = function(name, param)
@@ -133,25 +158,27 @@ minetest.register_chatcommand("maps", {
 		end
 
 		local player = minetest.get_player_by_name(name)
-		local idx
 
-		-- If arg. supplied, set idx to index of the matching map name
-		-- or path. Else, set to indices[name] or index of current map
+		-- If param supplied, set to idx of specified map
 		if param then
-			idx = ctf_map.get_idx_and_map(param)
-		else
-			idx = (player and indices[name]) or ctf_map.map and ctf_map.map.idx or 1
+			indices[name] = ctf_map.get_idx_and_map(param)
+		end
+
+		-- If no player and no param supplied, or indices[name] doesn't
+		-- exist, set to idx of current map, or 1 as fallback
+		if not player and not param or not indices[name] then
+			indices[name] = ctf_map.map and ctf_map.map.idx or 1
 		end
 
 		if player then
-			show_catalog(name, idx or 1)
+			show_catalog(name)
 		else
-			minetest.chat_send_player(name, " *** CTF Map Catalog for IRC *** ")
+			minetest.chat_send_player(name, " *** CTF Maps Catalog for IRC *** ")
 			if not param then
 				minetest.chat_send_player(name,
-						"No param supplied, showing information for current map.")
+					"No param supplied, showing information for current map.")
 			end
-			send_irc_catalog(name, idx or 1)
+			send_irc_catalog(name)
 		end
 
 		minetest.log("action", name .. " views the map catalog")
