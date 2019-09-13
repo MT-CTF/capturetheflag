@@ -65,11 +65,11 @@ function ctf_map.get_idx_and_map(param)
 	end
 end
 
-local next_idx
+ctf_map.next_idx = nil
 local function set_next_by_param(name, param)
 	local idx, map = ctf_map.get_idx_and_map(param)
 	if idx then
-		next_idx = idx
+		ctf_map.next_idx = idx
 		return true, "Selected " .. map.name
 	else
 		return false, "Couldn't find any matching map!"
@@ -233,7 +233,7 @@ load_maps()
 minetest.register_chatcommand("maps_reload", {
 	privs = { ctf_admin = true },
 	func = function(name, param)
-		next_idx = nil
+		ctf_map.next_idx = nil
 
 		local maps = load_maps()
 		local ret = #maps .. " maps found:\n"
@@ -290,8 +290,8 @@ ctf_match.register_on_new_match(function()
 
 	-- Choose next map index, but don't select the same one again
 	local idx
-	if next_idx then
-		idx = next_idx
+	if ctf_map.next_idx then
+		idx = ctf_map.next_idx
 	elseif ctf_map.map then
 		idx = math.random(#ctf_map.available_maps - 1)
 		if idx >= ctf_map.map.idx then
@@ -300,7 +300,7 @@ ctf_match.register_on_new_match(function()
 	else
 		idx = math.random(#ctf_map.available_maps)
 	end
-	next_idx = (idx % #ctf_map.available_maps) + 1
+	ctf_map.next_idx = (idx % #ctf_map.available_maps) + 1
 
 	-- Load meta data
 	ctf_map.map = ctf_map.available_maps[idx]
