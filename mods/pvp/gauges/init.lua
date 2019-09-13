@@ -1,89 +1,71 @@
--- Adds health bars above players.
--- Code by 4aiman, textures by Calinou. Licensed under CC0.
-
-gauges = {}
+-- gauges: Adds health/breath bars above players
+--
+-- Copyright © 2014-2019 4aiman, Hugo Locurcio and contributors - MIT License
+-- See `LICENSE.md` included in the source distribution for details.
 
 local hp_bar = {
 	physical = false,
 	collisionbox = {x = 0, y = 0, z = 0},
 	visual = "sprite",
-	textures = {"20.png"}, -- The texture is changed later in the code.
-	visual_size = {x = 1.5, y = 0.09375, z = 1.5}, -- Y value is (1 / 16) * 1.5.
-	wielder = nil,
+	textures = {"health_20.png"}, -- The texture is changed later in the code
+	visual_size = {x = 1.5, y = 0.09375, z = 1.5}, -- Y value is (1 / 16) * 1.5
 }
 
-function vector.sqdist(a, b)
-	local dx = a.x - b.x
-	local dy = a.y - b.y
-	local dz = a.z - b.z
-	return dx*dx + dy*dy + dz*dz
-end
-
-function hp_bar:on_step(dtime)
-	local wielder = self.wielder and minetest.get_player_by_name(self.wielder)
-	if wielder == nil then
-		print("[gauges] Gauge removed as null wielder! " .. dump(self.wielder))
-		self.object:remove()
-		return
-	end
-
-	if vector.sqdist(wielder:get_pos(), self.object:get_pos()) > 3 then
-		print("[gauges] Gauge removed as not attached! " .. dump(self.wielder))
-		self.object:remove()
-		return
-	end
-
-	local hp = wielder:get_hp()
-	local breath = wielder:get_breath()
+function hp_bar:set_hp(hp)
 	self.object:set_properties({
 		textures = {
-			"health_" .. tostring(hp) .. ".png^breath_" .. tostring(breath) .. ".png",
+			"health_" .. tostring(hp) .. ".png",
 		},
 	})
+end
+function hp_bar:on_detach()
+  self.object:remove()
 end
 
 minetest.register_entity("gauges:hp_bar", hp_bar)
 
-function gauges.add_HP_gauge(name)
-	local player = minetest.get_player_by_name(name)
-	if player then
-		local pos = player:get_pos()
-		local ent = minetest.add_entity(pos, "gauges:hp_bar")
-		assert(ent)
-		if ent ~= nil then
-			ent:set_attach(player, "", {x = 0, y = 19, z = 0}, {x = 0, y = 0, z = 0})
-			ent = ent:get_luaentity()
-			ent.wielder = player:get_player_name()
-		end
-	end
+local gauge_list = {}
+
+local function add_hp_gauge(player)
+  local pos = player:get_pos()
+  local ent = minetest.add_entity(pos, "gauges:hp_bar")
+
+  if ent then
+    ent:set_attach(player, "", {x = 0, y = 19, z = 0}, {x = 0, y = 0, z = 0})
+    ent = ent:get_luaentity()
+    gauge_list[player:get_player_name()] = ent
+    ent:set_hp(player:get_hp())
+  end
 end
 
--- If health_bars not defined or set to true
-if minetest.settings:get_bool("health_bars") ~= false and
-		minetest.settings:get_bool("enable_damage") then
+local function cleanup()
+  -- Check for any detatched hp_bar on the map
+  for _, entity in pairs(minetest.luaentities) do
+    if entity.name == "gauges:hp_bar" and entity.object:get_attach() == nil then
+      entity.object:remove()
+    end
+  end
+end
+
+
+if
+	minetest.settings:get_bool("enable_damage") and
+	minetest.settings:get_bool("health_bars")
+then
 	minetest.register_on_joinplayer(function(player)
-		minetest.after(2, gauges.add_HP_gauge, player:get_player_name())
-	end)
+    -- If the server was shut down brutally (for example using Ctrl-c)
+    -- we didn't have the time to remove the detatched bars.
+    -- So every time a player joins, we check if there is
+    -- a detatched bar somewhere and we remove it
+    minetest.after(2, cleanup)
+    -- The player takes some time to spawn and get a correct position.
+    -- We need to wait, or the gauge will be stuck under the player
+    minetest.after(3, add_hp_gauge, player)
+  end)
+  minetest.register_on_player_hpchange(function (player, hpchange)
+    local name = player:get_player_name()
+    if gauge_list[name] then
+      gauge_list[name]:set_hp(player:get_hp() + hpchange)
+    end
+  end, false)
 end
-
-function gauges.check_gauges()
-	for _, player in pairs(minetest.get_connected_players()) do
-		local pname = player:get_player_name()
-		local found = false
-		local objects = minetest.get_objects_inside_radius(player:get_pos(), 1)
-		for _, object in pairs(objects) do
-			local le = object:get_luaentity()
-			if le and le.wielder == pname then
-				found = true
-				break
-			end
-		end
-
-		if not found then
-			print("Gauge not found!")
-			gauges.add_HP_gauge(pname)
-		end
-	end
-	minetest.after(9.3, gauges.check_gauges)
-end
-minetest.after(2, gauges.check_gauges)
