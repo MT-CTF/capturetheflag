@@ -66,21 +66,44 @@ function ctf_map.get_idx_and_map(param)
 end
 
 local next_idx
+local function set_next_by_param(name, param)
+	local idx, map = ctf_map.get_idx_and_map(param)
+	if idx then
+		next_idx = idx
+		return true, "Selected " .. map.name
+	else
+		return false, "Couldn't find any matching map!"
+	end
+end
+
 minetest.register_chatcommand("set_next", {
 	privs = { ctf_admin = true },
-	func = function(name, param)
-		local idx, map = ctf_map.get_idx_and_map(param)
-		if idx then
-			next_idx = idx
-			minetest.log("action", name .. " selected '" .. map.name .. "' as next map")
-			return true, "Selected " .. map.name
-		else
-			return false, "Couldn't find any matches"
-		end
-	end,
+	func = set_next_by_param
 })
 
+do
+	-- Override /ctf_next to support an optional map name as param
+	local old_func = minetest.registered_chatcommands["ctf_next"].func
+	minetest.override_chatcommand("ctf_next", {
+		params = "[map]",
+		description = "Start the next match. The map name can be optionally specified as param.",
+		func = function(name, param)
+			if param and param ~= "" then
+				local success, msg = set_next_by_param(name, param)
+				if not success then
+					return false, msg
+				else
+					minetest.chat_send_player(name, msg)
+				end
+			end
+
+			return old_func(name)
+		end
+	})
+end
+
 local function load_map_meta(idx, dirname, meta)
+	minetest.log("info", "load_map_meta: Loading map meta from '" .. dirname .. "/map.conf'")
 	if not meta:get("r") then
 		error("Map was not properly configured: " .. dirname .. "/map.conf")
 	end
