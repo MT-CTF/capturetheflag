@@ -150,11 +150,8 @@ function _doors.door_toggle(pos, node, clicker)
 
 	replace_old_owner_information(pos)
 
-	local tname = ctf.player(clicker:get_player_name()).team
-	local owner_team = meta:get_string("owner_team")
-	local is_right_team = tname == owner_team
 	if clicker and not minetest.check_player_privs(clicker, "protection_bypass") and
-			not is_right_team then
+			ctf.player(clicker:get_player_name()).team ~= meta:get_string("owner_team") then
 		return false
 	end
 
