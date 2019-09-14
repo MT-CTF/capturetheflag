@@ -6,6 +6,9 @@ local _doors = {}
 _doors.registered_doors = {}
 _doors.registered_trapdoors = {}
 
+local auto_closure_timeout =
+		tonumber(minetest.settings:get("doors.auto_closure_timeout")) or 3
+
 local function replace_old_owner_information(pos)
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("doors_owner")
@@ -155,11 +158,20 @@ function _doors.door_toggle(pos, node, clicker)
 		return false
 	end
 
-	-- until Lua-5.2 we have no bitwise operators :(
+	-- States according to left-hinged or right-hinged doors
+	--
+	-- Left-hinged : 0 = closed, 1 = open
+	-- Right-hinged: 2 = closed, 3 = open
+
+	local nodetimer = minetest.get_node_timer(pos)
+
+	-- If state is not divisible by two, door is open. Else, door is closed.
 	if state % 2 == 1 then
 		state = state - 1
+		nodetimer:stop()
 	else
 		state = state + 1
+		nodetimer:start(auto_closure_timeout)
 	end
 
 	local dir = node.param2
@@ -420,6 +432,10 @@ function doors.register(name, def)
 
 	def.on_destruct = function(pos)
 		minetest.remove_node({x = pos.x, y = pos.y + 1, z = pos.z})
+	end
+
+	def.on_timer = function(pos)
+		_doors.door_toggle(pos, minetest.get_node(pos))
 	end
 
 	def.drawtype = "mesh"
