@@ -57,7 +57,7 @@ grenades.register_grenade("grenades:frag", {
 		minetest.sound_play("grenades_explode", {
 			pos = pos,
 			gain = 1.0,
-			max_hear_distance = 32,
+			max_hear_distance = 64,
 		})
 
 		remove_flora(pos, radius/2)
@@ -67,7 +67,7 @@ grenades.register_grenade("grenades:frag", {
 
 			if hit and v:is_player() and v:get_hp() > 0 and hit.type == "object" and hit.ref:is_player() and
 			hit.ref:get_player_name() == v:get_player_name() then
-				v:punch(player, 2, {damage_groups = {grenade = 1, fleshy = 26 - (vector.distance(pos, v:get_pos()) * 2)}}, nil)
+				v:punch(player, 2, {damage_groups = {grenade = 1, fleshy = 30 * (0.707106 ^ vector.distance(pos, v:get_pos()) * 3)}}, nil)
 			end
 		end
 	end,
