@@ -11,6 +11,34 @@ function minetest.is_player_name_valid(name)
 	return name:match("^[%a%d_-]+$")
 end
 
+-- Implement coloured PMs by overriding /msg
+-- The following code has been adapted from the chat-command of the same name in
+-- builtin/game/chat.lua of Minetest <https://github.com/minetest/minetest> licensed
+-- under the GNU LGPLv2.1+ license
+minetest.override_chatcommand("msg", {
+	func = function(name, param)
+		local sendto, message = param:match("^(%S+)%s(.+)$")
+		if not sendto then
+			return false, "Invalid usage, see /help msg."
+		end
+		if not minetest.get_player_by_name(sendto) then
+			return false, "The player " .. sendto .. " is not online."
+		end
+
+		-- Message color
+		local color = minetest.settings:get("ctf_chat.message_color") or "#E043FF"
+
+		-- Colorized sender name and message
+		local str =  minetest.colorize(color, "PM from ")
+		str = str .. minetest.colorize(ctf_colors.get_color(ctf.player(name)).css, name)
+		str = str .. minetest.colorize(color, ": " .. message)
+		minetest.chat_send_player(sendto, str)
+
+		minetest.log("action", "PM from " .. name .. " to " .. sendto .. ": " .. message)
+		return true, "Message sent."
+	end
+})
+
 local function team_console_help(name)
 	minetest.chat_send_player(name, "Try:")
 	minetest.chat_send_player(name, "/team - show team panel")
