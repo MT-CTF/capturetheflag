@@ -1,6 +1,6 @@
 minetest.register_node("ctf_traps:dirt", {
 	description = "Unwalkable Dirt",
-	tiles = {"ctf_traps_dirt.png"},
+	tiles = {"default_dirt.png^[colorize:#bfff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {crumbly=3, soil=1}
@@ -8,7 +8,7 @@ minetest.register_node("ctf_traps:dirt", {
 
 minetest.register_node("ctf_traps:stone", {
 	description = "Unwalkable Stone",
-	tiles = {"ctf_traps_stone.png"},
+	tiles = {"default_stone.png^[colorize:#bfff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=1}
@@ -16,7 +16,7 @@ minetest.register_node("ctf_traps:stone", {
 
 minetest.register_node("ctf_traps:cobble", {
 	description = "Unwalkable Cobblestone",
-	tiles = {"ctf_traps_cobble.png"},
+	tiles = {"default_cobble.png^[colorize:#bfff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=2}
@@ -30,7 +30,7 @@ minetest.register_node("ctf_traps:spike", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
-	damage_per_second = 5,
+	damage_per_second = 7,
 	groups = {cracky=1, level=2},
 	selection_box = {
 		type = "fixed",
