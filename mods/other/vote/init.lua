@@ -164,8 +164,9 @@ vote.hud = hudkit()
 function vote.update_hud(player)
 	local name = player:get_player_name()
 	local voteset = vote.get_next_vote(name)
+	local player_stats, _ = ctf_stats.player(name)
 	if not voteset or not minetest.check_player_privs(name,
-			{interact=true, vote=true}) then
+			{interact=true, vote=true}) or voteset.can_vote and player_stats.score < 1000 then
 		vote.hud:remove(player, "vote:desc")
 		vote.hud:remove(player, "vote:bg")
 		vote.hud:remove(player, "vote:help")
