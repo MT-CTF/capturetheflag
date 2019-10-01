@@ -59,8 +59,8 @@ minetest.register_chatcommand("vote_kick", {
 			duration = 60,
 			perc_needed = 0.8,
 
-			can_vote = function(self, name)
-				local player_stats, _ = ctf_stats.player(name)
+			can_vote = function(self, pname)
+				local player_stats, _ = ctf_stats.player(pname)
 				local res = true
 					if player_stats.score < 1000 then
 						res = false
