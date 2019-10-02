@@ -164,11 +164,12 @@ vote.hud = hudkit()
 function vote.update_hud(player)
 	local name = player:get_player_name()
 	local voteset = vote.get_next_vote(name)
-	if not voteset or not minetest.check_player_privs(name,
-			{interact=true, vote=true}) or voteset.can_vote and not voteset:can_vote(name) then
-		vote.hud:remove(player, "vote:desc")
-		vote.hud:remove(player, "vote:bg")
-		vote.hud:remove(player, "vote:help")
+	if not voteset or
+		not minetest.check_player_privs(name,{interact=true, vote=true}) or
+		(voteset.can_vote and not voteset:can_vote(name)) then
+			vote.hud:remove(player, "vote:desc")
+			vote.hud:remove(player, "vote:bg")
+			vote.hud:remove(player, "vote:help")
 		return
 	end
 
