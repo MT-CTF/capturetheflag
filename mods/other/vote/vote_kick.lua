@@ -59,6 +59,10 @@ minetest.register_chatcommand("vote_kick", {
 			duration = 60,
 			perc_needed = 0.8,
 
+			can_vote = function(self, pname)
+				return ctf_stats.player(pname).score > 1000
+			end,
+
 			on_result = function(self, result, results)
 				if result == "yes" then
 					minetest.chat_send_all("Vote passed, " ..
