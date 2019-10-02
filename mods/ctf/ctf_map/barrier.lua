@@ -1,9 +1,7 @@
 local c_stone      = minetest.get_content_id("ctf_map:ind_stone")
-local c_stone_red  = minetest.get_content_id("ctf_map:ind_stone_red")
 local c_glass      = minetest.get_content_id("ctf_map:ind_glass")
 local c_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
 local c_map_ignore = minetest.get_content_id("ctf_map:ignore")
-local c_actual_st  = minetest.get_content_id("default:stone")
 local c_water      = minetest.get_content_id("default:water_source")
 -- local c_water_f    = minetest.get_content_id("default:water_flowing")
 local c_air        = minetest.get_content_id("air")
@@ -44,8 +42,6 @@ function ctf_map.remove_middle_barrier()
 				else
 					data[vi] = c_air
 				end
-			elseif data[vi] == c_stone_red then
-				data[vi] = c_actual_st
 			end
 		end
 	end

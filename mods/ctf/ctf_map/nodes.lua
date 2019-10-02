@@ -46,13 +46,6 @@ do
 		sounds = default.node_sound_glass_defaults()
 	})
 
-	minetest.register_node("ctf_map:ind_stone_red", {
-		description = "Indestructible Red Stone",
-		groups = {immortal = 1},
-		tiles = {"ctf_map_stone_red.png"},
-		is_ground_content = false
-	})
-
 	minetest.register_node("ctf_map:killnode", {
 		description = "Kill Node",
 		drawtype = "glasslike",

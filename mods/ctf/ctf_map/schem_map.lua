@@ -4,6 +4,7 @@ minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 minetest.register_alias("ctf_map:flag", "air")
 minetest.register_alias("ctf_map:ind_cobble", "ctf_map:cobble")
 minetest.register_alias("ctf_map:ind_stone", "ctf_map:stone")
+minetest.register_alias("ctf_map:ind_stone_red", "default:stone")
 
 minetest.register_alias_force("flowers:mushroom_red", "air")
 minetest.register_alias_force("flowers:mushroom_brown", "air")
