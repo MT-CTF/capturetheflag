@@ -64,6 +64,9 @@ Each map's metadata is stored in an accompanying .conf file containing the follo
 * `author`: Author of the map.
 * `hint`: [Optional] Helpful hint or tip for unique maps, to help players understand the map.
 * `rotation`: Rotation of the schem. [`x`|`z`]
+* `screenshot`: File name of screenshot of the map; should include file extension.
+* `license`: Name of the license of the map.
+* `other`: [Optional] Misc. information about the map. This is displayed in the maps catalog.
 * `base_node`: [Optional] Technical name of node to be used for the team base.
 * `schematic`: Name of the map's schematic.
 * `initial_stuff`: [Optional] Comma-separated list of itemstacks to be given to the player
