@@ -100,6 +100,7 @@ local function load_map_meta(idx, path)
 		screenshot    = meta:get("screenshot"),
 		license       = meta:get("license"),
 		others        = meta:get("others"),
+		base_node     = meta:get("base_node"),
 		schematic     = path .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
 		treasures     = treasures,
