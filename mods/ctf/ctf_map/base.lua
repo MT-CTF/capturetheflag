@@ -1,30 +1,30 @@
 function ctf_map.place_base(color, pos)
-	-- Spawn ind base
+	-- Spawn base
 	for x = pos.x - 2, pos.x + 2 do
-		for z = pos.z - 2, pos.z + 2 do
-			minetest.set_node({ x = x, y = pos.y - 1, z = z },
-				{ name = ctf_map.map.base_node or "ctf_map:ind_cobble" })
-		end
+	for z = pos.z - 2, pos.z + 2 do
+		minetest.set_node({ x = x, y = pos.y - 1, z = z },
+			{ name = ctf_map.map.base_node or "ctf_map:cobble" })
+	end
 	end
 
 	-- Check for trees
-	for y = pos.y, pos.y + 3 do
-		for x = pos.x - 3, pos.x + 3 do
-			for z = pos.z - 3, pos.z + 3 do
-				local pos2 = {x=x, y=y, z=z}
-				if minetest.get_node(pos2).name == "default:tree" then
-					minetest.set_node(pos2, {name="air"})
-				end
-			end
+	for y = pos.y,     pos.y + 3 do
+	for x = pos.x - 3, pos.x + 3 do
+	for z = pos.z - 3, pos.z + 3 do
+		local pos2 = { x = x, y = y, z = z }
+		if minetest.get_node(pos2).name == "default:tree" then
+			minetest.set_node(pos2, { name = "air" })
 		end
+	end
+	end
 	end
 
 	-- Spawn chest
-	local chest = {name = "ctf_map:chest_" .. color}
+	local chest = { name = "ctf_map:chest_" .. color }
 	local dz = 2
 	if pos.z < 0 then
 		dz = -2
-		chest.param2 = minetest.dir_to_facedir({x=0,y=0,z=-1})
+		chest.param2 = minetest.dir_to_facedir({ x = 0, y = 0, z = -1 })
 	end
 	local pos3 = {
 		x = pos.x,
