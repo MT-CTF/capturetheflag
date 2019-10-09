@@ -7,11 +7,11 @@ minetest.register_on_dieplayer(function(player)
 	end
 	player:set_properties({collisionbox = {0,0,0, 0,0,0}})
 end)
- 
+
 minetest.register_on_respawnplayer(function(player)
 	player:set_properties({collisionbox = collision_box[player:get_player_name()]})
 end)
- 
+
 minetest.register_on_leaveplayer(function(player)
 	collision_box[player:get_player_name()] = nil
 end)
