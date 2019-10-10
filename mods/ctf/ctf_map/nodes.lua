@@ -754,11 +754,13 @@ do
 	for name, nodedef in pairs(nodes) do
 		if name:find("stairs") then
 			nodedef = table.copy(nodedef)
+			nodedef.description = "Indestructible " .. nodedef.description
 			nodedef.groups = {immortal = 1}
 			minetest.register_node("ctf_map:" .. name:split(":")[2], nodedef)
 		elseif name:find("wool") then
 			local color = name:split(":")[2]
 			nodedef = table.copy(nodedef)
+			nodedef.description = "Indestructible " .. nodedef.description
 			nodedef.groups = {immortal = 1}
 			minetest.register_node("ctf_map:wool_" .. color, nodedef)
 			minetest.register_alias("ctf_map:" .. color, "ctf_map:wool_" .. color)
