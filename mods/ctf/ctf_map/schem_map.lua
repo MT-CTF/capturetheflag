@@ -97,7 +97,7 @@ local function load_map_meta(idx, path)
 		author        = meta:get("author"),
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
-		screenshot    = meta:get("screenshot"),
+		screenshot    = path .. ".png",
 		license       = meta:get("license"),
 		others        = meta:get("others"),
 		schematic     = path .. ".mts",
@@ -205,8 +205,9 @@ local function load_maps()
 	local idx = 1
 	ctf_map.available_maps = {}
 	for key, _ in pairs(files_hash) do
+		key = key:gsub("%./", "")
 		local conf = Settings(mapdir .. "/" .. key .. ".conf")
-		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
+		local val = minetest.settings:get("ctf.maps." .. key:gsub("/", "."))
 		if not conf:get_bool("disabled", false) and val ~= "false" then
 			local map = load_map_meta(idx, key)
 			map.path = key
