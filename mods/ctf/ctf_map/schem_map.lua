@@ -80,9 +80,9 @@ minetest.register_chatcommand("set_next", {
 	end,
 })
 
-local function load_map_meta(idx, path)
-	minetest.log("info", "load_map_meta: Loading map meta from \"" .. path .. "\"")
-	local conf_path = mapdir .. path .. ".conf"
+local function load_map_meta(idx, path, filename)
+	minetest.log("info", "load_map_meta: Loading map meta from \"" .. path .. filename .. "\"")
+	local conf_path = ctf_map.mapdir .. path .. filename .. ".conf"
 	local offset    = vector.new(600 * idx, 0, 0)
 	local meta      = Settings(conf_path)
 
@@ -97,6 +97,8 @@ local function load_map_meta(idx, path)
 
 	local map = {
 		name          = meta:get("name"),
+		path          = path,
+		filename      = filename,
 		author        = meta:get("author"),
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
@@ -198,7 +200,10 @@ local function load_maps()
 				local filename = parts[1]
 				local extension = parts[2]
 				if extension == "mts" then
-					files_hash[dir .. "/" .. filename] = true
+					files_hash[#files_hash + 1] = {
+						subdir   = dir .. "/",
+						filename = filename
+					}
 				else
 					if extension ~= "conf" and extension ~= "md" and extension ~= "png"
 							and files[i] ~= ".git" then
@@ -211,12 +216,13 @@ local function load_maps()
 
 	local idx = 1
 	ctf_map.available_maps = {}
-	for key, _ in pairs(files_hash) do
-		local conf = Settings(mapdir .. "/" .. key .. ".conf")
-		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
+	for i, path in pairs(files_hash) do
+		local conf = Settings(ctf_map.mapdir .. "/" ..
+			path.subdir .. path.filename .. ".conf")
+		local val = minetest.settings:get("ctf.maps." ..
+			string.gsub(path.subdir .. path.filename, "%./", ""):gsub("/", "."))
 		if not conf:get_bool("disabled", false) and val ~= "false" then
-			local map = load_map_meta(idx, key)
-			map.path = key
+			local map = load_map_meta(idx, path.subdir, path.filename)
 			table.insert(ctf_map.available_maps, map)
 			minetest.log("action", "Found map '" .. map.name .. "'")
 			minetest.log("info", dump(map))
