@@ -26,9 +26,9 @@ minetest.register_alias_force("default:bush_stem", "air")
 minetest.register_alias_force("default:stone_with_gold", "default:stone")
 
 
-local max_r  = 120
-local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
-ctf_map.map  = nil
+local max_r    = 120
+ctf_map.mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
+ctf_map.map    = nil
 
 -- Modify server status message to include map info
 local map_str
@@ -103,10 +103,11 @@ local function load_map_meta(idx, path, filename)
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
 		screenshot    = meta:get("screenshot"),
+		skybox        = ctf_map.skybox_exists(path, filename),
 		license       = meta:get("license"),
 		others        = meta:get("others"),
 		base_node     = meta:get("base_node"),
-		schematic     = path .. ".mts",
+		schematic     = path .. filename .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
 		treasures     = treasures and treasures:split(";"),
 		start_time    = start_time and tonumber(start_time),
@@ -190,11 +191,11 @@ end
 local function load_maps()
 	local files_hash = {}
 
-	local dirs = minetest.get_dir_list(mapdir, true)
+	local dirs = minetest.get_dir_list(ctf_map.mapdir, true)
 	table.insert(dirs, ".")
 	for _, dir in pairs(dirs) do
 		if dir ~= ".git" then
-			local files = minetest.get_dir_list(mapdir .. dir, false)
+			local files = minetest.get_dir_list(ctf_map.mapdir .. dir, false)
 			for i = 1, #files do
 				local parts = files[i]:split(".")
 				local filename = parts[1]
@@ -224,13 +225,14 @@ local function load_maps()
 		if not conf:get_bool("disabled", false) and val ~= "false" then
 			local map = load_map_meta(idx, path.subdir, path.filename)
 			table.insert(ctf_map.available_maps, map)
+
 			minetest.log("action", "Found map '" .. map.name .. "'")
 			minetest.log("info", dump(map))
 			idx = idx + 1
 		end
 	end
 	if not next(ctf_map.available_maps) then
-		error("No maps found in directory " .. mapdir)
+		error("No maps found in directory " .. ctf_map.mapdir)
 	end
 	return ctf_map.available_maps
 end
@@ -248,7 +250,7 @@ minetest.register_chatcommand("maps_reload", {
 
 local function place_map(map)
 	ctf_map.emerge_with_callbacks(nil, map.pos1, map.pos2, function()
-		local schempath = mapdir .. map.schematic
+		local schempath = ctf_map.mapdir .. map.schematic
 		local res = minetest.place_schematic(map.pos1, schempath,
 				map.rotation == "z" and "0" or "90")
 
@@ -356,11 +358,14 @@ ctf_match.register_on_new_match(function()
 		end
 	end
 
+	-- Place map
+	place_map(ctf_map.map)
+
 	-- Update time speed
 	ctf_map.update_time()
 
-	-- Place map
-	place_map(ctf_map.map)
+	-- Update players' skyboxes last
+	ctf_map.set_skybox_all()
 end)
 
 function ctf_match.create_teams()
@@ -387,3 +392,9 @@ function ctf_match.create_teams()
 		end
 	end
 end
+
+minetest.register_on_joinplayer(function(player)
+	if ctf_map.map then
+		ctf_map.set_skybox(player)
+	end
+end)
