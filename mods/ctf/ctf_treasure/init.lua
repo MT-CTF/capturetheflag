@@ -13,6 +13,8 @@ function ctf_treasure.get_default_treasures()
 		{"default:sword_steel",0.4,5,{1,4}},
 		{"default:shovel_stone",0.6,5,{1,10}},
 		{"default:shovel_steel",0.3,5,{1,10}},
+		{"default:axe_steel",0.4,5,{1,10}},
+		{"default:axe_stone",0.5,5,{1,10}},
 
 		{"shooter:crossbow",0.5,2,{1,5}},
 		{"shooter:pistol",0.4,2,{1,5}},
