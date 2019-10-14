@@ -20,7 +20,7 @@ function ctf_map.place_base(color, pos)
 	end
 
 	-- Spawn chest
-	local chest = { name = "ctf_map:chest_" .. color }
+	local chest = { name = "ctf_map_core:chest_" .. color }
 	local dz = 2
 	if pos.z < 0 then
 		dz = -2

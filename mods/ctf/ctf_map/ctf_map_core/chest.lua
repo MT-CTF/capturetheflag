@@ -17,7 +17,7 @@ end
 
 local colors = {"red", "blue"}
 for _, chest_color in pairs(colors) do
-	minetest.register_node("ctf_map:chest_" .. chest_color, {
+	minetest.register_node("ctf_map_core:chest_" .. chest_color, {
 		description = "Chest",
 		tiles = {
 			"default_chest_top_" .. chest_color .. ".png",
@@ -55,7 +55,7 @@ for _, chest_color in pairs(colors) do
 				end
 				ctf.warning("ctf_map", "Wrong chest, changing to " ..
 						territory_owner .. " from " .. chest_color)
-				minetest.set_node(pos, "ctf_map:chest_" .. territory_owner)
+				minetest.set_node(pos, "ctf_map_core:chest_" .. territory_owner)
 			end
 
 			local formspec = table.concat({
@@ -74,7 +74,7 @@ for _, chest_color in pairs(colors) do
 					"Try killing an enemy player, or at least try to capture the flag.\n" ..
 					"Find resources in chests scattered around the map."
 				formspec = formspec .. "label[0.75,3;" .. minetest.formspec_escape(msg) .. "]"
-				minetest.show_formspec(name, "ctf_map:no_access", formspec)
+				minetest.show_formspec(name, "ctf_map_core:no_access", formspec)
 				return
 			end
 
@@ -100,7 +100,7 @@ for _, chest_color in pairs(colors) do
 				"listring[" .. chestinv ..";main]" ..
 				"listring[current_player;main]"
 
-			minetest.show_formspec(name, "ctf_map:chest",  formspec)
+			minetest.show_formspec(name, "ctf_map_core:chest",  formspec)
 		end,
 
 		allow_metadata_inventory_move = function(pos, from_list, from_index,
