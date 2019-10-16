@@ -73,6 +73,8 @@ Each map's metadata is stored in an accompanying .conf file containing the follo
  on join and on respawn.
 * `treasures`: [Optional] List of treasures to be registered for the map, in a serialized
 format. Refer to the `treasures` sub-section for more details.
+* `start_time`: [Optional] Time at start of match. Defaults to `0.4` [`0` - `1`].
+* `time_speed`: [Optional] Time speed multiplier. Accepts any valid number. Defaults to 1.
 * `r`: Radius of the map.
 * `h`: Height of the map.
 * `team.i`: Name of team `i`.
