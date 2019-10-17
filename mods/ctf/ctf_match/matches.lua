@@ -41,8 +41,6 @@ function ctf_match.next()
 
 	ctf_alloc.set_all()
 
-	minetest.set_timeofday(0.4)
-
 	minetest.chat_send_all("Next round!")
 	if minetest.global_exists("chatplus") then
 		chatplus.log("Next round!")

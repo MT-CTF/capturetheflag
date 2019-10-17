@@ -91,7 +91,9 @@ local function load_map_meta(idx, path)
 
 	local initial_stuff = meta:get("initial_stuff")
 	local treasures = meta:get("treasures")
-	treasures = treasures and treasures:split(";")
+	local start_time = meta:get("start_time")
+	local time_speed = meta:get("time_speed")
+
 	local map = {
 		name          = meta:get("name"),
 		author        = meta:get("author"),
@@ -103,7 +105,9 @@ local function load_map_meta(idx, path)
 		base_node     = meta:get("base_node"),
 		schematic     = path .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
-		treasures     = treasures,
+		treasures     = treasures and treasures:split(";"),
+		start_time    = start_time and tonumber(start_time),
+		time_speed    = time_speed and tonumber(time_speed),
 		r             = tonumber(meta:get("r")),
 		h             = tonumber(meta:get("h")),
 		offset        = offset,
@@ -114,7 +118,7 @@ local function load_map_meta(idx, path)
 	assert(map.r <= max_r)
 
 	map.pos1 = vector.add(offset, { x = -map.r, y = -map.h / 2, z = -map.r })
-	map.pos2 = vector.add(offset, { x =  map.r, y = map.h / 2,  z =  map.r })
+	map.pos2 = vector.add(offset, { x =  map.r, y =  map.h / 2, z =  map.r })
 
 	-- Read teams from config
 	local i = 1
@@ -343,6 +347,9 @@ ctf_match.register_on_new_match(function()
 			end
 		end
 	end
+
+	-- Update time speed
+	ctf_map.update_time()
 
 	-- Place map
 	place_map(ctf_map.map)

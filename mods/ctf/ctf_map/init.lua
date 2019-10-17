@@ -20,6 +20,7 @@ if minetest.get_modpath("ctf") then
 	dofile(modpath .. "/base.lua")
 	dofile(modpath .. "/chest.lua")
 	dofile(modpath .. "/give_initial_stuff.lua")
+	dofile(modpath .. "/time.lua")
 	dofile(modpath .. "/schem_map.lua")
 	dofile(modpath .. "/maps_catalog.lua")
 
