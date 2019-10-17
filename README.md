@@ -1,11 +1,9 @@
-# CaptureTheFlag
+# Capture The Flag
 
-Uses the [CTF PvP engine](https://github.com/rubenwardy/ctf_pvp_engine)
+* Fast rounds of CTF games.
+* Removed nodes for focus.
 
-* Fast rounds of CTF games
-* Removed nodes for focus
-
-## USE RECURSIVE CLONING!
+## Installation
 
 Capture the flag uses several submodules. Make sure to grab them all by cloning like this:
 
@@ -17,17 +15,17 @@ git clone --recursive https://github.com/MT-CTF/capturetheflag.git
 
 ### Recommended
 
-Hosting your server using the dummy backend
+Hosting your server using the `dummy` backend.
 
-### minimum
+### Minimum
 
-Hosting your server using the leveldb or redis backend
+Hosting your server using the `leveldb` or `redis` backend.
 
-Hosting using sqlite on an SSD or ramdisk ([with this guide](https://forum.minetest.net/viewtopic.php?f=10&t=9588))
+Hosting using `sqlite3` on an SSD or ramdisk ([with this guide](https://forum.minetest.net/viewtopic.php?f=10&t=9588)).
 
 ## License
 
-Created by [rubenwardy](https://rubenwardy.com/)
+Created by [rubenwardy](https://rubenwardy.com/).
 Code: LGPLv2.1+
 Textures: CC-BY-SA 3.0
 
