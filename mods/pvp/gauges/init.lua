@@ -22,13 +22,13 @@ end
 function hp_bar:on_step(dtime)
 	local wielder = self.wielder and minetest.get_player_by_name(self.wielder)
 	if wielder == nil then
-		print("[gauges] Gauge removed as null wielder! " .. dump(self.wielder))
+		minetest.log("warning", "[gauges] Gauge removed as null wielder! " .. dump(self.wielder))
 		self.object:remove()
 		return
 	end
 
 	if vector.sqdist(wielder:get_pos(), self.object:get_pos()) > 3 then
-		print("[gauges] Gauge removed as not attached! " .. dump(self.wielder))
+		minetest.log("warning", "[gauges] Gauge removed as not attached! " .. dump(self.wielder))
 		self.object:remove()
 		return
 	end
@@ -80,7 +80,7 @@ function gauges.check_gauges()
 		end
 
 		if not found then
-			print("Gauge not found!")
+			minetest.log("warning", "[gauges] Gauge not found for player " .. pname)
 			gauges.add_HP_gauge(pname)
 		end
 	end

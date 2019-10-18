@@ -346,10 +346,11 @@ end)
 minetest.register_chatcommand("summary", {
 	func = function(name)
 		local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-						winner_team, winner_player, os.time() - ctf_stats.start)
+				winner_team, winner_player, os.time() - ctf_stats.start)
 
 		fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
 
+		minetest.log("action", name .. " requested match summary formspec")
 		minetest.show_formspec(name, "ctf_stats:match_summary", fs)
 	end
 })

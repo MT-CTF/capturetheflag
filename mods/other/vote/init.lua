@@ -34,7 +34,7 @@ function vote.start_vote(voteset)
 	if voteset.options then
 		for _, option in pairs(voteset.options) do
 			voteset.results[option] = {}
-			print(" - " .. option)
+			minetest.log("action", " - " .. option)
 		end
 	else
 		voteset.results.yes = {}

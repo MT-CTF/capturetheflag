@@ -72,6 +72,7 @@ minetest.register_chatcommand("set_next", {
 		local idx, map = ctf_map.get_idx_and_map(param)
 		if idx then
 			next_idx = idx
+			minetest.log("action", name .. " selected '" .. map.name .. "' as next map")
 			return true, "Selected " .. map.name
 		else
 			return false, "Couldn't find any matches"
@@ -80,7 +81,7 @@ minetest.register_chatcommand("set_next", {
 })
 
 local function load_map_meta(idx, path)
-	print("load_map_meta: Loading map meta from \"" .. path .. "\"")
+	minetest.log("info", "load_map_meta: Loading map meta from \"" .. path .. "\"")
 	local conf_path = mapdir .. path .. ".conf"
 	local offset    = vector.new(600 * idx, 0, 0)
 	local meta      = Settings(conf_path)
@@ -137,6 +138,7 @@ local function load_map_meta(idx, path)
 
 	-- Read custom chest zones from config
 	i = 1
+	minetest.log("info", "Parsing chest zones of " .. map.name .. "...")
 	while meta:get("chests." .. i .. ".from") do
 		local from  = minetest.string_to_pos(meta:get("chests." .. i .. ".from"))
 		local to    = minetest.string_to_pos(meta:get("chests." .. i .. ".to"))
@@ -149,7 +151,7 @@ local function load_map_meta(idx, path)
 			n    = tonumber(meta:get("chests." .. i .. ".n") or "23"),
 		}
 
-		minetest.log("warning", dump(map.chests[i]))
+		minetest.log("info", dump(map.chests[i]))
 
 		i = i + 1
 	end
@@ -252,7 +254,7 @@ local function place_map(map)
 
 		local seed = minetest.get_mapgen_setting("seed")
 		for _, chestzone in pairs(ctf_map.map.chests) do
-			minetest.log("warning", "Placing " .. chestzone.n .. " chests from " ..
+			minetest.log("info", "Placing " .. chestzone.n .. " chests from " ..
 					minetest.pos_to_string(chestzone.from) .. " to "..
 					minetest.pos_to_string(chestzone.to))
 			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
@@ -340,7 +342,7 @@ ctf_match.register_on_new_match(function()
 				end
 
 				if is_valid then
-					minetest.log("info",
+					minetest.log("action",
 							"ctf_map: Registering treasure - " .. def[1])
 					treasurer.register_treasure(def[1], def[2], def[3], def[4])
 				end
@@ -362,7 +364,7 @@ function ctf_match.create_teams()
 		local flag  = table.copy(value.pos)
 
 		if name and color and flag then
-			print(" - creating " .. key)
+			minetest.log("action", "Creating team " .. key)
 			ctf.team({
 				name     = name,
 				color    = color,
@@ -375,7 +377,7 @@ function ctf_match.create_teams()
 				ctf_flag.assert_flag(flag)
 			end)
 		else
-			minetest.log("error", " - Failed to create " .. key)
+			minetest.log("error", "Failed to create team " .. key)
 		end
 	end
 end

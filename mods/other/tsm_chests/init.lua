@@ -203,14 +203,14 @@ function place_chests(minp, maxp, seed, number_chests)
 				chest_pos.z = -1
 			end
 
-			local nn = minetest.get_node(chest_pos).name	-- chest node name (before it becomes a chest)
+			-- chest node name (before it becomes a chest)
+			local nn = minetest.get_node(chest_pos).name
 			if nn == "air" or nn == "default:water_source" then
 				placeChest(pos, chest_pos, ground, nn)
-
 				chests_placed = chests_placed + 1
 			end
 		end
 	end
 
-	minetest.log("warning", "Spawned " .. chests_placed .. "/" .. number_chests .. " chests after " .. attempts .. " attempts!")
+	minetest.log("info", "Spawned " .. chests_placed .. "/" .. number_chests .. " chests after " .. attempts .. " attempts!")
 end

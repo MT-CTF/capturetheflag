@@ -2,20 +2,20 @@ vote.kick_cooldown = 600
 local vlist = {} -- table storing player name, ip & lock status
 
 minetest.register_privilege("vote_kick", {
-	description = "Can (start) vote to kick a player",
+	description = "Can start vote to kick a player",
 	on_grant = function(name, granter)
 		if not granter then
 			granter = "<nil>"
 		end
-		minetest.log("warning", "Player '" .. name .. "' has been" ..
-						" granted 'vote_kick' by '" .. granter .. "'")
+		minetest.log("action", "Player '" .. name .. "' has been" ..
+				" granted 'vote_kick' by '" .. granter .. "'")
 	end,
 	on_revoke = function(name, revoker)
 		if not revoker then
 			revoker = "<nil>"
 		end
-		minetest.log("warning", "Player '" .. name .. "' has been" ..
-						" revoked of 'vote_kick' by '" .. revoker .. "'")
+		minetest.log("action", "Player '" .. name .. "' has been" ..
+				" revoked of 'vote_kick' by '" .. revoker .. "'")
 	end
 })
 
@@ -33,17 +33,14 @@ minetest.register_chatcommand("vote_kick", {
 		end
 
 		if not minetest.get_player_by_name(param) then
-			return false, "There is no player called '" ..
-					param .. "'"
+			return false, "There is no player called '" .. param .. "'"
 		end
 
 		if minetest.check_player_privs(param, {kick = true, ban = true}) then
 			return false, param .. " is a moderator, and can't be kicked!"
 		end
 
-		minetest.log("warning", "Player '" .. name .. "' started a vote" ..
-							" to kick '" .. param .. "'")
-
+		minetest.log("action", name .. " started a vote to kick " .. param)
 
 		if not vlist[param] then
 			vlist[param] = {
@@ -69,8 +66,8 @@ minetest.register_chatcommand("vote_kick", {
 							#results.yes .. " to " .. #results.no .. ", " ..
 							self.name .. " will be kicked.")
 					minetest.kick_player(self.name,
-						("The vote to kick you passed.\n You have been temporarily banned" ..
-						" for %s minutes."):format(tostring(vote.kick_cooldown / 60)))
+							("The vote to kick you passed.\n You have been temporarily banned" ..
+							" for %s minutes."):format(tostring(vote.kick_cooldown / 60)))
 					vlist[self.name].locked = true
 					minetest.after(vote.kick_cooldown, function()
 						vlist[self.name] = nil
@@ -108,6 +105,7 @@ minetest.register_chatcommand("unblock", {
 		end
 
 		vlist[param].locked = false
+		minetest.log("action", name .. " unblocked " .. param .. ", who was vote-kicked")
 		return true, param .. " has been successfully unblocked!"
 	end
 })
@@ -118,8 +116,8 @@ minetest.register_on_prejoinplayer(function(name, ip)
 	else
 		for k, v in pairs(vlist) do
 			if v.ip == ip and v.locked then
-				return "This IP has been temporarily blocked."..
-					" Please wait until the cool-down period has elapsed before rejoining."
+				return "This IP has been temporarily blocked." ..
+						" Please wait until the cool-down period has elapsed before rejoining."
 			end
 		end
 	end

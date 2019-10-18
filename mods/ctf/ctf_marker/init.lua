@@ -42,11 +42,13 @@ local function add_marker(name, tname, pos, str)
 		if tplayer then
 			teams[tname].players[pname] = tplayer:hud_add({
 				hud_elem_type = "waypoint",
-				name      = str,
-				number    = ctf.flag_colors[team.data.color],
-				world_pos = pos
+				name          = str,
+				number        = ctf.flag_colors[team.data.color],
+				world_pos     = pos
 			})
 		end
+		minetest.log("action", name .. " placed a marker at " ..
+				minetest.pos_to_string(pos) .. ": '" .. str .. "'")
 		minetest.chat_send_player(pname,
 				msg("Player " .. name .. " placed a marker!"))
 	end
@@ -68,7 +70,7 @@ end)
 minetest.register_chatcommand("m", {
 	param = "[Optional description]",
 	description = "Allows players to share the location of where " ..
-	              "they're looking at with their team-mates.",
+			"they're looking at with their team-mates.",
 	privs = { interact = true },
 	func = function(name, param)
 		local player = minetest.get_player_by_name(name)
@@ -79,7 +81,7 @@ minetest.register_chatcommand("m", {
 		-- Calculate marker pos
 		local dir = player:get_look_dir()
 		local p1 = vector.add(player:get_pos(),
-				   { x = 0, y = player:get_properties().eye_height, z = 0})
+				{ x = 0, y = player:get_properties().eye_height, z = 0 })
 		p1 = vector.add(p1, dir)
 		local p2 = vector.add(p1, vector.multiply(dir, 500))
 		local pointed = minetest.raycast(p1, p2, true, true):next()

@@ -50,8 +50,6 @@ function ctf_alloc.set_all()
 		return a.score > b.score
 	end)
 
-	minetest.log("warning", dump(players))
-
 	local to_red = math.random(2) == 2
 	for _, spair in pairs(players) do
 		local player     = spair.player

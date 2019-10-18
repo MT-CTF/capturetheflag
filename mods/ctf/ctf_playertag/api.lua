@@ -54,7 +54,6 @@ local function update(player, settings)
 
 	if settings.type == TYPE_BUILTIN then
 		remove_entity_tag(player)
-		print(dump(settings.color))
 		player:set_nametag_attributes({
 			color = settings.color
 		})

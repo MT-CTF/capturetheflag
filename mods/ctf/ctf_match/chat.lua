@@ -9,6 +9,7 @@ minetest.register_chatcommand("ctf_next", {
 	},
 	func = function(name, param)
 		ctf_match.next()
+		minetest.log("action", name .. " ran /ctf_next")
 	end
 })
 
@@ -18,7 +19,8 @@ minetest.register_chatcommand("ctf_start", {
 		ctf_match = true
 	},
 	func = function(name, param)
-	ctf_match.build_timer = 0.01
+		ctf_match.build_timer = 0.01
+		minetest.log("action", name .. " ran /ctf_start")
 	end
 })
 
@@ -58,6 +60,7 @@ minetest.register_chatcommand("ctf_queue_restart", {
 	func = function(name, param)
 		restart_on_next_match = true
 		restart_on_next_match_by = name
+		minetest.log("action", name .. " queued a restart")
 		return true, "Restart queued."
 	end
 })
@@ -69,6 +72,7 @@ minetest.register_chatcommand("ctf_unqueue_restart", {
 	},
 	func = function(name, param)
 		restart_on_next_match = false
+		minetest.log("action", name .. " un-queued a restart")
 		return true, "Restart cancelled."
 	end
 })

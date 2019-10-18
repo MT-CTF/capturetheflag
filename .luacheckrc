@@ -15,7 +15,7 @@ globals = {
 	"crafting", "vector", "table", "minetest", "worldedit", "ctf", "ctf_flag",
 	"ctf_colors", "hudkit", "default", "treasurer", "ChatCmdBuilder", "ctf_map",
 	"ctf_match", "ctf_stats", "ctf_treasure", "ctf_playertag", "chatplus", "irc",
-	"armor",
+	"armor", "vote", "give_initial_stuff"
 }
 
 read_globals = {

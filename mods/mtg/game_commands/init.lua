@@ -3,6 +3,7 @@ minetest.register_chatcommand("killme", {
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		if player then
+			minetest.log("action", name .. " ran /killme")
 			if minetest.settings:get_bool("enable_damage") then
 				player:set_hp(0)
 				return true
