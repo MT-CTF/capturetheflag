@@ -21,6 +21,7 @@ function grenades.register_grenade(name, def)
 
 	local grenade_entity = {
 		physical = true,
+		sliding = 0,
 		collide_with_objects = true,
 		timer = 0,
 		visual = "sprite",
@@ -44,15 +45,15 @@ function grenades.register_grenade(name, def)
 			-- Collision Check
 
 			if not vector.equals(self.last_vel, vel) and vector.distance(self.last_vel, vel) > 4 then
-				if math.abs(self.last_vel.z) - 5 > math.abs(vel.z) then
+				if math.abs(self.last_vel.z - vel.z) > 5 then
 					self.last_vel.z = self.last_vel.z * -0.5
 				end
 
-				if math.abs(self.last_vel.x) - 5 > math.abs(vel.x) then
+				if math.abs(self.last_vel.x - vel.x) > 5 then
 					self.last_vel.x = self.last_vel.x * -0.5
 				end
 
-				if math.abs(self.last_vel.y) - 5 > math.abs(vel.y) then
+				if math.abs(self.last_vel.y - vel.y) > 5 then
 					self.last_vel.y = self.last_vel.y * -0.3
 				end
 
@@ -60,9 +61,16 @@ function grenades.register_grenade(name, def)
 				vel = obj:get_velocity()
 			end
 
+			if self.sliding == 0 and vel.y == 0 then
+				self.sliding = 1
+			elseif self.sliding == 1 and vel.y ~= 0 then
+				self.sliding = 0
+			end
+
 			-- Can't use set_acceleration() because the grenade will shoot backwards once the velocity reaches 0
-			vel.x = vel.x / 1.04
-			vel.z = vel.z / 1.04
+
+			vel.x = vel.x / (1.04 + (self.sliding * 0.2))
+			vel.z = vel.z / (1.04 + (self.sliding * 0.2))
 
 			obj:set_velocity(vel)
 			self.last_vel = vel
@@ -92,10 +100,10 @@ function grenades.register_grenade(name, def)
 
 			if self.timer > def.clock or not self.thrower_name then
 				if self.thrower_name then
-					minetest.log("[Grenades] A grenade thrown by "..self.thrower_name..
-					" is exploding at "..minetest.pos_to_string(vector.round(pos)))
-                    def.on_explode(pos, self.thrower_name)
-                end
+					minetest.log("[Grenades] A grenade thrown by " .. self.thrower_name ..
+					" is exploding at " .. minetest.pos_to_string(vector.round(pos)))
+					def.on_explode(pos, self.thrower_name)
+				end
 
 				obj:remove()
 			end
