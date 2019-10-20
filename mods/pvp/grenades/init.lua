@@ -8,7 +8,7 @@ local function throw_grenade(name, player)
 
 	local m = 33
 	obj:set_velocity({x = dir.x * m, y = dir.y * m, z = dir.z * m})
-	obj:set_acceleration({x = 0, y = -30, z = 0})
+	obj:set_acceleration({x = 0, y = -27, z = 0})
 	self.dir = dir
 
 	return(obj:get_luaentity())
@@ -45,15 +45,15 @@ function grenades.register_grenade(name, def)
 			-- Collision Check
 
 			if not vector.equals(self.last_vel, vel) and vector.distance(self.last_vel, vel) > 4 then
-				if math.abs(self.last_vel.z - vel.z) > 5 then
+				if math.abs(self.last_vel.z - vel.z) > 6 then
 					self.last_vel.z = self.last_vel.z * -0.5
 				end
 
-				if math.abs(self.last_vel.x - vel.x) > 5 then
+				if math.abs(self.last_vel.x - vel.x) > 6 then
 					self.last_vel.x = self.last_vel.x * -0.5
 				end
 
-				if math.abs(self.last_vel.y - vel.y) > 5 then
+				if math.abs(self.last_vel.y - vel.y) > 6 then
 					self.last_vel.y = self.last_vel.y * -0.3
 				end
 
@@ -69,8 +69,8 @@ function grenades.register_grenade(name, def)
 
 			-- Can't use set_acceleration() because the grenade will shoot backwards once the velocity reaches 0
 
-			vel.x = vel.x / (1.04 + (self.sliding * 0.2))
-			vel.z = vel.z / (1.04 + (self.sliding * 0.2))
+			vel.x = vel.x / (1.036 + (self.sliding * 0.2))
+			vel.z = vel.z / (1.036 + (self.sliding * 0.2))
 
 			obj:set_velocity(vel)
 			self.last_vel = vel
