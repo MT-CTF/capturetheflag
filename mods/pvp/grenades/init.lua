@@ -101,7 +101,7 @@ function grenades.register_grenade(name, def)
 			if self.timer > def.clock or not self.thrower_name then
 				if self.thrower_name then
 					minetest.log("[Grenades] A grenade thrown by " .. self.thrower_name ..
-					" is exploding at " .. minetest.pos_to_string(vector.round(pos)))
+					" explodes at " .. minetest.pos_to_string(vector.round(pos)))
 					def.on_explode(pos, self.thrower_name)
 				end
 
