@@ -7,6 +7,7 @@ function ctf_treasure.get_default_treasures()
 		{"default:cobble",0.4,5,{45,99}},
 		{"default:wood",0.3,5,{30,60}},
 		{"doors:door_steel",0.3,5,{1,3}},
+		{"ctf_traps:damage_cobble",0.3,4,{10,20}},
 
 		{"default:pick_steel",0.5,5,{1,10}},
 		{"default:sword_stone",0.6,5,{1,10}},
