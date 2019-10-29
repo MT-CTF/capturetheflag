@@ -45,3 +45,9 @@ function ctf_map.set_skybox_all()
 		ctf_map.set_skybox(player)
 	end
 end
+
+minetest.register_on_joinplayer(function(player)
+	if ctf_map.map then
+		ctf_map.set_skybox(player)
+	end
+end)
