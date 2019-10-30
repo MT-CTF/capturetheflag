@@ -344,7 +344,7 @@ do
 				{-0.5, -0.5, -0.5, 0.5, -0.25, 0.5},
 			},
 		},
-		groups = {immortal = 1, slippery = 2},
+		groups = {immortal = 1},
 		sounds = default.node_sound_dirt_defaults({
 			footstep = {name = "default_snow_footstep", gain = 0.15},
 			dug = {name = "default_snow_footstep", gain = 0.2},
@@ -355,7 +355,7 @@ do
 	minetest.register_node("ctf_map:snowblock", {
 		description = "Indestructible Snow Block",
 		tiles = {"default_snow.png"},
-		groups = {immortal = 1, slippery = 2},
+		groups = {immortal = 1},
 		sounds = default.node_sound_dirt_defaults({
 			footstep = {name = "default_snow_footstep", gain = 0.15},
 			dug = {name = "default_snow_footstep", gain = 0.2},

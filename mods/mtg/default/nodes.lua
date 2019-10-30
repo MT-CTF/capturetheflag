@@ -583,7 +583,7 @@ minetest.register_node("default:snow", {
 			{-0.5, -0.5, -0.5, 0.5, -7 / 16, 0.5},
 		},
 	},
-	groups = {crumbly = 3, snowy = 1, slippery = 2},
+	groups = {crumbly = 3, snowy = 1},
 	sounds = default.node_sound_snow_defaults(),
 
 	on_construct = function(pos)
@@ -597,7 +597,7 @@ minetest.register_node("default:snow", {
 minetest.register_node("default:snowblock", {
 	description = "Snow Block",
 	tiles = {"default_snow.png"},
-	groups = {crumbly = 3, cools_lava = 1, snowy = 1, slippery = 2},
+	groups = {crumbly = 3, cools_lava = 1, snowy = 1},
 	sounds = default.node_sound_snow_defaults(),
 
 	on_construct = function(pos)
