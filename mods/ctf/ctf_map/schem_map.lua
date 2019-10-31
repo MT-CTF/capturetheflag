@@ -244,7 +244,16 @@ minetest.register_chatcommand("maps_reload", {
 	func = function(name, param)
 		local maps = load_maps()
 		next_idx = nil
-		return true, #maps .. " maps found: " .. table.concat(maps, ", ")
+
+		local ret = #maps .. " maps found:\n"
+		for i = 1, #maps do
+			ret = ret .. " * " .. ctf_map.available_maps[i].name
+			if i ~= #maps then
+				ret = ret .. "\n"
+			end
+		end
+
+		return true, ret
 	end,
 })
 
