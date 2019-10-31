@@ -1,4 +1,4 @@
-local c_stone      = minetest.get_content_id("ctf_map:ind_stone")
+local c_stone      = minetest.get_content_id("ctf_map:stone")
 local c_stone_red  = minetest.get_content_id("ctf_map:ind_stone_red")
 local c_glass      = minetest.get_content_id("ctf_map:ind_glass")
 local c_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
