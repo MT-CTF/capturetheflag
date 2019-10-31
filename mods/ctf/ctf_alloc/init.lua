@@ -1,6 +1,7 @@
 local storage = minetest.get_mod_storage()
 local data = minetest.parse_json(storage:get_string("locktoteam")) or {}
 
+-- Override autoalloc function to implement team-locking
 local ctf_autoalloc = ctf.autoalloc
 function ctf.autoalloc(name, alloc_mode)
 	if data[name] then
@@ -10,7 +11,7 @@ function ctf.autoalloc(name, alloc_mode)
 	return ctf_autoalloc(name, alloc_mode)
 end
 
-ChatCmdBuilder.new("ctf_lockpt", function(cmd)
+ChatCmdBuilder.new("ctf_lock_to_team", function(cmd)
 	cmd:sub(":name :team", function(name, pname, team)
 		if team == "!" then
 			data[pname] = nil
@@ -28,6 +29,59 @@ end, {
 		ctf_admin = true,
 	}
 })
+
+-- Struct containing the name and score of the team with lowest cumulative score
+local lowest = {}
+--[[
+	lowest = {
+		team  =,
+		score =
+	}
+]]
+
+-- List of cumulative team scores indexed by team name
+local scores = {}
+--[[
+	scores = {
+		red = ,
+		blue
+	}
+]]
+
+local function update_lowest()
+	-- Update lowest.score and lowest.team
+	lowest = {}
+	for tname, score in pairs(scores) do
+		if not lowest.score or score <= lowest.score then
+			lowest.score = score
+			lowest.team  = tname
+		end
+	end
+	print("\nlowest = " .. dump(lowest) .. "\n")
+end
+
+local function calc_scores()
+	-- Update the cumulative score of all teams
+	print("\n[calc_scores]")
+	for tname, team in pairs(ctf.teams) do
+		local score = 0
+		for pname, _ in pairs(team.players) do
+			score = score + ctf_stats.player(pname).score
+		end
+		scores[tname] = score
+		print("\t" .. tname .. " = " .. score)
+	end
+
+	update_lowest()
+	print("[calc_scores] ********\n")
+end
+
+-- Override team-allocation logic
+-- Allocate player into the team with the lowest cumulative score
+function ctf.custom_alloc(name)
+	calc_scores()
+	return lowest.team
+end
 
 function table.map_inplace(t, f) -- luacheck: ignore
 	for key, value in pairs(t) do
@@ -67,7 +121,6 @@ function ctf_alloc.set_all()
 			ctf.log("autoalloc", name .. " was allocated to " .. team)
 			ctf.join(name, team)
 		end
-
 		ctf.move_to_spawn(name)
 
 		if ctf.setting("match.clear_inv") then
