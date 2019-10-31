@@ -222,7 +222,7 @@ local function show_gui(name)
 		"label[0,2.8;2. Place Barriers]",
 		"label[0.1,3.3;This may take a few minutes.]",
 		"field[0.4,4.3;1,1;barrier_r;R;", config.barrier_r, "]",
-		"dropdown[1.15,4.05;1,1;config.barrier_rot;X=0,Z=0;", config.barrier_rot + 1, "]",
+		"dropdown[1.15,4.05;1,1;barrier_rot;X=0,Z=0;", config.barrier_rot + 1, "]",
 		"button[2.3,4;2,1;place_barrier;Place Barriers]",
 
 		"box[4.4,2.8;0.05,2.2;#111111BB]",
@@ -306,7 +306,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	if fields.barrier_rot and fields.barrier_rot ~= "" then
-		config.barrier_rot = fields.config.barrier_rot == "X=0" and 0 or 1
+		config.barrier_rot = fields.barrier_rot == "X=0" and 0 or 1
 		storage:set_int("config.barrier_rot", config.barrier_rot)
 	end
 
