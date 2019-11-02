@@ -92,7 +92,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y = y_max, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
-		if name == "air" or name == "default:water_source" or name == "default:lava_source" then
+		if name == "air" or name == "default:water_source" or name == "default:lava_source" or name == "ctf_map:ind_glass_red" then
 			top = y
 			break
 		end
@@ -100,7 +100,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y=top,y_min,-1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 					local name = get_node(p).name
-		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
+		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" and name ~= "ctf_map:ind_glass_red" then
 			ground = y
 			break
 		end
