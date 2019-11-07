@@ -306,7 +306,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	if fields.barrier_rot and fields.barrier_rot ~= "" then
-		config.barrier_rot = fields.barrier_rot == "X=0" and 0 or 1
+		config.barrier_rot = fields.barrier_rot == "X=0" and "x" or "z"
 		storage:set_int("config.barrier_rot", config.barrier_rot)
 	end
 
@@ -389,7 +389,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if config.mapinitial ~= "" then
 			meta:set("initial_stuff", config.mapinitial)
 		end
-		meta:set("rotation", config.barrier_rot == 0 and "x" or "z")
+		meta:set("rotation", config.barrier_rot)
 		meta:set("r", config.center.r)
 		meta:set("h", config.center.h)
 
