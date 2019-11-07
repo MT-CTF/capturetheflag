@@ -379,7 +379,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		storage:set_string("mapauthor", "")
 		storage:set_string("mapname", "")
 		storage:set_string("mapinitial", "")
-		storage:set_string("config.barrier_rot", "")
+		storage:set_string("barrier_rot", "")
 		storage:set_string("barrier_r", "")
 
 		-- Write to .conf
