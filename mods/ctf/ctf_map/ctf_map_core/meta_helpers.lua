@@ -1,6 +1,10 @@
+----------
+-- TIME --
+----------
+
 local BASE_TIME_SPEED = 72
 
-function ctf_map.update_time()
+local function update_time()
 	local time = ctf_map.map.start_time
 	local mult = ctf_map.map.time_speed or 1
 	if time then
@@ -11,6 +15,10 @@ function ctf_map.update_time()
 
 	minetest.settings:set("time_speed", BASE_TIME_SPEED * mult)
 end
+
+------------
+-- SKYBOX --
+------------
 
 function ctf_map.skybox_exists(subdir)
 	return ctf_map.file_exists(subdir, {
@@ -23,7 +31,7 @@ function ctf_map.skybox_exists(subdir)
 	})
 end
 
-function ctf_map.set_skybox(player)
+local function set_skybox(player)
 	if ctf_map.map.skybox then
 		local prefix = ctf_map.map.dirname .. "_skybox_"
 		local skybox_textures = {
@@ -40,14 +48,37 @@ function ctf_map.set_skybox(player)
 	end
 end
 
-function ctf_map.set_skybox_all()
-	for _, player in pairs(minetest.get_connected_players()) do
-		ctf_map.set_skybox(player)
-	end
+-------------
+-- PHYSICS --
+-------------
+
+local function update_physics(player)
+	physics.set(player:get_player_name(), "ctf_map:map_physics", {
+		speed   = ctf_map.map.phys_speed   or 1,
+		jump    = ctf_map.map.phys_jump    or 1,
+		gravity = ctf_map.map.phys_gravity or 1
+	})
 end
+
+---------------
+-- CALLBACKS --
+---------------
 
 minetest.register_on_joinplayer(function(player)
 	if ctf_map.map then
-		ctf_map.set_skybox(player)
+		set_skybox(player)
+		update_physics(player)
 	end
 end)
+
+function ctf_map.update_env()
+	if not ctf_map.map then
+		return
+	end
+
+	update_time()
+	for _, player in pairs(minetest.get_connected_players()) do
+		set_skybox(player)
+		update_physics(player)
+	end
+end
