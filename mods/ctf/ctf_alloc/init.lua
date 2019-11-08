@@ -57,23 +57,19 @@ local function update_lowest()
 			lowest.team  = tname
 		end
 	end
-	print("\nlowest = " .. dump(lowest) .. "\n")
 end
 
 local function calc_scores()
 	-- Update the cumulative score of all teams
-	print("\n[calc_scores]")
 	for tname, team in pairs(ctf.teams) do
 		local score = 0
 		for pname, _ in pairs(team.players) do
 			score = score + ctf_stats.player(pname).score
 		end
 		scores[tname] = score
-		print("\t" .. tname .. " = " .. score)
 	end
 
 	update_lowest()
-	print("[calc_scores] ********\n")
 end
 
 -- Override team-allocation logic
