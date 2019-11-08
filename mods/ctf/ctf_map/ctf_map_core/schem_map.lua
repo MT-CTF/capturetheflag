@@ -260,12 +260,11 @@ local function place_map(map)
 			ctf_map.place_base(value.color, value.pos)
 		end
 
-		local seed = minetest.get_mapgen_setting("seed")
 		for _, chestzone in pairs(ctf_map.map.chests) do
 			minetest.log("verbose", "Placing " .. chestzone.n .. " chests from " ..
 					minetest.pos_to_string(chestzone.from) .. " to "..
 					minetest.pos_to_string(chestzone.to))
-			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
+			tsm_chests.place_chests(chestzone.from, chestzone.to, chestzone.n)
 		end
 
 		minetest.after(2, function()
