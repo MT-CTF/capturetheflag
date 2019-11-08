@@ -99,13 +99,13 @@ end
 
 -- Debug helpers
 function ctf.error(area, msg)
-	minetest.log("error", "CTF::" .. area .. " - " ..msg)
+	minetest.log("error", "[CTF | " .. area .. "] " .. msg)
 end
 function ctf.log(area, msg)
 	if area and area ~= "" then
-		print("[CaptureTheFlag] (" .. area .. ") " .. msg)
+		minetest.log("[CTF | " .. area .. "] " .. msg)
 	else
-		print("[CaptureTheFlag] " .. msg)
+		minetest.log("[CTF]" .. msg)
 	end
 end
 function ctf.action(area, msg)
@@ -116,7 +116,7 @@ function ctf.action(area, msg)
 	end
 end
 function ctf.warning(area, msg)
-	print("WARNING: [CaptureTheFlag] (" .. area .. ") " .. msg)
+	minetest.log("warning", "[CTF | " .. area .. "] " .. msg)
 end
 
 function ctf.init()
