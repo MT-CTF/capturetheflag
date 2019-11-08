@@ -37,6 +37,4 @@ if minetest.global_exists("irc") then
 	end)
 end
 
-minetest.after(5, function()
-	ctf_match.next()
-end)
+minetest.after(0, ctf_match.next)
