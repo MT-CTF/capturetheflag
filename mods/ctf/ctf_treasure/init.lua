@@ -29,8 +29,8 @@ function ctf_treasure.get_default_treasures()
 
 		{ "medkits:medkit",       0.8, 5, 2 },
 
-		{"grenades_basic:regular",0.1,2,1},
+		{"grenades_basic:regular", 0.1, 2, 1},
+		{"grenades_basic:smoke",   0.1, 2, 1},
 		-- {"grenades_basic:flashbang",0.1,2,1},
-		{"grenades_basic:smoke",0.1,2,1},
 	}
 end
