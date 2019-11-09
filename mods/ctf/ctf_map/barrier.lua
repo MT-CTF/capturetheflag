@@ -1,11 +1,10 @@
-local c_stone      = minetest.get_content_id("ctf_map:stone")
-local c_stone_red  = minetest.get_content_id("ctf_map:ind_stone_red")
-local c_glass      = minetest.get_content_id("ctf_map:ind_glass")
-local c_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
-local c_map_ignore = minetest.get_content_id("ctf_map:ignore")
-local c_actual_st  = minetest.get_content_id("default:stone")
+local c_ind_stone      = minetest.get_content_id("ctf_map:stone")
+local c_ind_stone_red  = minetest.get_content_id("ctf_map:ind_stone_red")
+local c_ind_glass      = minetest.get_content_id("ctf_map:ind_glass")
+local c_ind_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
+local c_ignore = minetest.get_content_id("ctf_map:ignore")
+local c_stone = minetest.get_content_id("default:stone")
 local c_water      = minetest.get_content_id("default:water_source")
--- local c_water_f    = minetest.get_content_id("default:water_flowing")
 local c_air        = minetest.get_content_id("air")
 
 function ctf_map.remove_middle_barrier()
@@ -36,7 +35,7 @@ function ctf_map.remove_middle_barrier()
 			local adj1 = a:index(x, y,  1)
 			local adj2 = a:index(x, y, -1)
 
-			if data[vi] == c_glass_red then
+			if data[vi] == c_ind_glass_red then
 				-- If surrounding nodes are water, replace node with water
 				if data[adj1] == c_water and data[adj2] == c_water then
 					data[vi] = c_water
@@ -44,8 +43,8 @@ function ctf_map.remove_middle_barrier()
 				else
 					data[vi] = c_air
 				end
-			elseif data[vi] == c_stone_red then
-				data[vi] = c_actual_st
+			elseif data[vi] == c_ind_stone_red then
+				data[vi] = c_stone
 			end
 		end
 	end
@@ -97,7 +96,9 @@ function ctf_map.place_middle_barrier(center, r, h, direction)
 				vi = a:index(center.x, y, x)
 			end
 			if data[vi] == c_air or data[vi] == c_water then
-				data[vi] = c_glass_red
+				data[vi] = c_ind_glass_red
+			elseif data[vi] == c_stone then
+				data[vi] = c_ind_stone_red
 			end
 		end
 	end
@@ -132,10 +133,10 @@ function ctf_map.place_outer_barrier(center, r, h)
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
+				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
+					data[vi] = c_ind_glass
 				else
-					data[vi] = c_stone
+					data[vi] = c_ind_stone
 				end
 			end
 		end
@@ -149,10 +150,10 @@ function ctf_map.place_outer_barrier(center, r, h)
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
+				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
+					data[vi] = c_ind_glass
 				else
-					data[vi] = c_stone
+					data[vi] = c_ind_stone
 				end
 			end
 		end
@@ -166,10 +167,10 @@ function ctf_map.place_outer_barrier(center, r, h)
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
+				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
+					data[vi] = c_ind_glass
 				else
-					data[vi] = c_stone
+					data[vi] = c_ind_stone
 				end
 			end
 		end
@@ -183,10 +184,10 @@ function ctf_map.place_outer_barrier(center, r, h)
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
+				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
+					data[vi] = c_ind_glass
 				else
-					data[vi] = c_stone
+					data[vi] = c_ind_stone
 				end
 			end
 		end
@@ -199,7 +200,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		local y = minp.y
 		for x = minp.x, maxp.x do
 			for z = minp.z, maxp.z do
-				data[a:index(x, y, z)] = c_stone
+				data[a:index(x, y, z)] = c_ind_stone
 			end
 		end
 	end
@@ -211,7 +212,7 @@ function ctf_map.place_outer_barrier(center, r, h)
 		local y = maxp.y
 		for x = minp.x, maxp.x do
 			for z = minp.z, maxp.z do
-				data[a:index(x, y, z)] = c_glass
+				data[a:index(x, y, z)] = c_ind_glass
 			end
 		end
 	end
