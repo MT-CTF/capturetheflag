@@ -108,6 +108,16 @@ function ctf_map.place_middle_barrier(center, r, h, direction)
 	vm:update_map()
 end
 
+-- Returns the appropriate barrier node depending on the existing node
+local function get_barrier_node(c_id)
+	-- If existing node is air/ind. glass/CTF ignore, return ind. glass
+	-- Else return ind. stone
+	if c_id == c_air or c_id == c_ind_glass or c_id == c_ignore then
+		return c_ind_glass
+	else
+		return c_ind_stone
+	end
+end
 
 function ctf_map.place_outer_barrier(center, r, h)
 	local minp = vector.subtract(center, r)
@@ -125,77 +135,56 @@ function ctf_map.place_outer_barrier(center, r, h)
 	}
 	local data = vm:get_data()
 
-	minetest.log("action", "Map maker: Placing left wall")
-
 	-- Left
+	minetest.log("action", "Map maker: Placing left wall")
 	do
 		local x = center.x - r
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
-					data[vi] = c_ind_glass
-				else
-					data[vi] = c_ind_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing right wall")
-
 	-- Right
+	minetest.log("action", "Map maker: Placing right wall")
 	do
 		local x = center.x + r
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
-					data[vi] = c_ind_glass
-				else
-					data[vi] = c_ind_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing front wall")
-
 	-- Front
+	minetest.log("action", "Map maker: Placing front wall")
 	do
 		local z = center.z - r
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
-					data[vi] = c_ind_glass
-				else
-					data[vi] = c_ind_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing back wall")
-
 	-- Back
+	minetest.log("action", "Map maker: Placing back wall")
 	do
 		local z = center.z + r
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_ind_glass or data[vi] == c_ignore then
-					data[vi] = c_ind_glass
-				else
-					data[vi] = c_ind_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing bedrock")
-
 	-- Bedrock
+	minetest.log("action", "Map maker: Placing bedrock")
 	do
 		local y = minp.y
 		for x = minp.x, maxp.x do
@@ -205,9 +194,8 @@ function ctf_map.place_outer_barrier(center, r, h)
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing ceiling")
-
 	-- Ceiling
+	minetest.log("action", "Map maker: Placing ceiling")
 	do
 		local y = maxp.y
 		for x = minp.x, maxp.x do
