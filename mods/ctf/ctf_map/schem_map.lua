@@ -262,6 +262,11 @@ local function place_map(map)
 	end, nil)
 end
 
+ctf_map.registered_on_map_loaded = {}
+function ctf_map.register_on_map_loaded(func)
+	ctf_map.registered_on_map_loaded[#ctf_map.registered_on_map_loaded + 1] = func
+end
+
 ctf_match.register_on_new_match(function()
 	minetest.clear_objects({ mode = "quick" })
 
@@ -343,6 +348,11 @@ ctf_match.register_on_new_match(function()
 
 	-- Update players' skyboxes last
 	ctf_map.set_skybox_all()
+
+	-- Run on_map_loaded callbacks
+	for i = 1, #ctf_map.registered_on_map_loaded do
+		ctf_map.registered_on_map_loaded[i](ctf_map.map)
+	end
 end)
 
 function ctf_match.create_teams()

@@ -62,6 +62,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
 
+	-- Winning team and flag capturer name
 	if stats[winner_team] then
 		local winner_color = ctf.flag_colors[winner_team]:gsub("0x", "#")
 		ret = ret .. "item_image[0,0;1,1;ctf_flag:flag_top_"..winner_team.."]"
@@ -73,6 +74,9 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		ret = ret .. "label[1,0;NO WINNER]"
 	end
 
+	-- Map name
+	ret = ret .. "label[1,7.6;Map: " .. minetest.colorize("#EEEE00", stats.map) .. "]"
+
 	ret = ret .. "label[6.5,0;Kills]"
 	ret = ret .. "label[8,0;" .. render_team_stats(red, blue, "kills") .. "]"
 	ret = ret .. "label[6.5,0.5;Attempts]"
@@ -81,7 +85,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[12,0;" .. match_length .. "]"
 	ret = ret .. "label[10.5,0.5;Total score]"
 	ret = ret .. "label[12,0.5;" .. render_team_stats(red, blue, "score", true) .. "]"
-	ret = ret .. "label[2,7.75;Tip: type /rankings for league tables]"
+	ret = ret .. "label[8,7.2;Tip: type /rankings for league tables]"
 
 	return ret
 end

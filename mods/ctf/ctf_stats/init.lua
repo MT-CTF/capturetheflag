@@ -217,6 +217,14 @@ ctf_match.register_on_new_match(function()
 	_needs_save = true
 end)
 
+-- ctf_map can't be added as a dependency, as that'd result
+-- in cyclic dependencies between ctf_map and ctf_stats
+minetest.after(0, function()
+	ctf_map.register_on_map_loaded(function(map)
+		ctf_stats.current.map = map.name
+	end)
+end)
+
 ctf_flag.register_on_pick_up(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
