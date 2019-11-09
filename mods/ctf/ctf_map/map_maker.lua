@@ -20,7 +20,7 @@ local config = {
 	center = storage:get_string("center"),
 	flags = storage:get_string("flags"),
 	barrier_r = storage:get_int("barrier_r"),
-	barrier_rot = storage:get_int("barrier_rot"),
+	barrier_rot = storage:get_string("barrier_rot"),
 	barriers_placed = storage:get_int("barriers_placed") == 1
 }
 
@@ -222,7 +222,8 @@ local function show_gui(name)
 		"label[0,2.8;2. Place Barriers]",
 		"label[0.1,3.3;This may take a few minutes.]",
 		"field[0.4,4.3;1,1;barrier_r;R;", config.barrier_r, "]",
-		"dropdown[1.15,4.05;1,1;barrier_rot;X=0,Z=0;", config.barrier_rot + 1, "]",
+		"dropdown[1.15,4.05;1,1;barrier_rot;X=0,Z=0;",
+		config.barrier_rot == "x" and 1 or 2, "]",
 		"button[2.3,4;2,1;place_barrier;Place Barriers]",
 
 		"box[4.4,2.8;0.05,2.2;#111111BB]",
@@ -307,7 +308,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 	if fields.barrier_rot and fields.barrier_rot ~= "" then
 		config.barrier_rot = fields.barrier_rot == "X=0" and "x" or "z"
-		storage:set_int("config.barrier_rot", config.barrier_rot)
+		storage:set_string("barrier_rot", config.barrier_rot)
 	end
 
 	if fields.set_center then
