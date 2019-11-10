@@ -6,11 +6,10 @@ function ctf_match.register_on_skip_map(func)
 	table.insert(ctf_match.registered_on_skip_map, func)
 end
 
-function ctf_match.vote_next(name, params)
-	if minetest.global_exists("irc") then
-		local tname = ctf.player(name).team or "none"
-		irc:say("Vote started by " .. name .. " (team " .. tname .. ")")
-	end
+function ctf_match.vote_next(name)
+	local tcolor = ctf_colors.get_color(ctf.player(name)).css or "#FFFFFFFF"
+	minetest.chat_send_all(minetest.colorize("#FFAA11", "Vote started by ") ..
+		minetest.colorize(tcolor, name))
 
 	return vote.new_vote(name, {
 		description = "Skip to next match",
@@ -50,13 +49,31 @@ minetest.register_chatcommand("vote", {
 	func = ctf_match.vote_next
 })
 
-minetest.register_on_chat_message(function(name, msg)
-	if msg == "/vote_next" and minetest.check_player_privs(name,
-			{interact=true, vote_starter=true}) then
-		local _, vmsg = ctf_match.vote_next(name)
-		if vmsg then
-			minetest.chat_send_player(name, vmsg)
-		end
-		return true
+local same_match = true
+local function auto_vote(interval)
+	-- If not same match, set it to true and return
+	if not same_match then
+		same_match = true
+		return
 	end
+
+	-- Start vote
+	ctf_match.vote_next("[CTF automatic skip-vote]")
+
+	-- Recursively call the same function after `interval` seconds
+	minetest.after(interval, auto_vote, interval)
+end
+
+local function disable_auto_vote()
+	-- At the end of a match, set same_match to false to disable auto_vote
+	same_match = false
+end
+ctf_match.register_on_winner(disable_auto_vote)
+ctf_match.register_on_skip_map(disable_auto_vote)
+
+-- Automatically start a skip vote after 90m, and subsequent votes every 15m
+ctf_match.register_on_build_time_end(function()
+	local delay    = tonumber(minetest.settings:get("ctf_match.auto_skip_delay"))    or 30 * 120
+	local interval = tonumber(minetest.settings:get("ctf_match.auto_skip_interval")) or 30 *  15
+	minetest.after(delay, auto_vote, interval)
 end)
