@@ -201,3 +201,8 @@ function ctf.load()
 		ctf.registered_on_new_game[i]()
 	end
 end
+
+-- Disable knockback completely
+function minetest.calculate_knockback()
+	return 0
+end
