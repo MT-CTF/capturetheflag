@@ -16,7 +16,7 @@ function ctf_match.vote_next(name, params)
 		description = "Skip to next match",
 		help = "/yes,  /no  or  /abstain",
 		duration = 60,
-		perc_needed = 0.5,
+		perc_needed = 0.6,
 		unanimous = 5,
 
 		on_result = function(self, result, results)
