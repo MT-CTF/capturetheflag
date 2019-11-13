@@ -54,7 +54,7 @@ minetest.register_chatcommand("vote_kick", {
 			help = "/yes,  /no  or  /abstain",
 			name = param,
 			duration = 60,
-			perc_needed = 0.8,
+			perc_needed = 0.75,
 
 			can_vote = function(self, pname)
 				return ctf_stats.player(pname).score > 1000
