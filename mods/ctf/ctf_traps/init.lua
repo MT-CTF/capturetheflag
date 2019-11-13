@@ -30,7 +30,7 @@ minetest.register_node("ctf_traps:spike", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
-	damage_per_second = 10,
+	damage_per_second = 7,
 	groups = {cracky=1, level=2},
 	selection_box = {
 		type = "fixed",
