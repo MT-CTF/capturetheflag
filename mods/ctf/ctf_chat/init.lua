@@ -316,29 +316,6 @@ minetest.register_chatcommand("post", {
 	end,
 })
 
-minetest.register_chatcommand("all", {
-	params = "msg",
-	description = "Send a message on the global channel",
-	privs = {shout=true},
-	func = function(name, param)
-		if not ctf.setting("chat.global_channel") then
-			minetest.chat_send_player(name, "The global channel is disabled")
-			return
-		end
-
-		if ctf.player(name).team then
-			local tosend = ctf.player(name).team ..
-				" <" .. name .. "> " .. param
-			minetest.chat_send_all(tosend)
-			if minetest.global_exists("chatplus") then
-				chatplus.log(tosend)
-			end
-		else
-			minetest.chat_send_all("<"..name.."> "..param)
-		end
-	end
-})
-
 minetest.register_chatcommand("t", {
 	params = "msg",
 	description = "Send a message on the team channel",
