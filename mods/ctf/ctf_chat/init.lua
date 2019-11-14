@@ -319,6 +319,7 @@ minetest.register_chatcommand("post", {
 minetest.register_chatcommand("all", {
 	params = "msg",
 	description = "Send a message on the global channel",
+	privs = {shout=true},
 	func = function(name, param)
 		if not ctf.setting("chat.global_channel") then
 			minetest.chat_send_player(name, "The global channel is disabled")
