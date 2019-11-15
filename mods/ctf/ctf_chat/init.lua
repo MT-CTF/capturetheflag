@@ -293,28 +293,6 @@ minetest.register_chatcommand("team_owner", {
 	end
 })
 
-minetest.register_chatcommand("post", {
-	params = "message",
-	description = "Post a message on your team's message board",
-	func = function(name, param)
-		if ctf and ctf.players and ctf.players[name] and ctf.players[name].team and ctf.teams[ctf.players[name].team] then
-			if not ctf.player(name).auth then
-				minetest.chat_send_player(name, "You do not own that team")
-			end
-
-			if not ctf.teams[ctf.players[name].team].log then
-				ctf.teams[ctf.players[name].team].log = {}
-			end
-
-			table.insert(ctf.teams[ctf.players[name].team].log,{msg=param})
-
-			minetest.chat_send_player(name, "Posted: "..param)
-		else
-			minetest.chat_send_player(name, "Could not post message")
-		end
-	end,
-})
-
 minetest.register_chatcommand("t", {
 	params = "msg",
 	description = "Send a message on the team channel",
