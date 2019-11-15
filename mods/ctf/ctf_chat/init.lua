@@ -297,7 +297,6 @@ minetest.register_chatcommand("post", {
 	params = "message",
 	description = "Post a message on your team's message board",
 	func = function(name, param)
-
 		if ctf and ctf.players and ctf.players[name] and ctf.players[name].team and ctf.teams[ctf.players[name].team] then
 			if not ctf.player(name).auth then
 				minetest.chat_send_player(name, "You do not own that team")
@@ -341,6 +340,7 @@ minetest.register_chatcommand("all", {
 minetest.register_chatcommand("t", {
 	params = "msg",
 	description = "Send a message on the team channel",
+	privs = { interact = true, shout = true },
 	func = function(name, param)
 		if not ctf.setting("chat.team_channel") then
 			minetest.chat_send_player(name, "The team channel is disabled.")
