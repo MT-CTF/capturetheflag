@@ -61,7 +61,7 @@ function random_messages.read_messages()
 		"Craft 4 cobbles and 1 steel ingot together to make reinforced cobble.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
-		"Want to contribute maps? Visit ctf.rubenwardy.com to get involved.",
+		"Want to make your own map? Visit ctf.rubenwardy.com to get involved.",
 		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
 		"To report misbehaving players to moderators, please use /report <name> <action>",
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
