@@ -242,24 +242,6 @@ function ctf.can_mod(player,team)
 	return false
 end
 
--- post a message to a team board
-function ctf.post(team, msg)
-	if not ctf.team(team) then
-		return false
-	end
-
-	if not ctf.team(team).log then
-		ctf.team(team).log = {}
-	end
-
-
-	ctf.log("team", "message posted to team board")
-
-	table.insert(ctf.team(team).log, 1, msg)
-
-	return true
-end
-
 -- Automatic Allocation
 function ctf.autoalloc(name, alloc_mode)
 	alloc_mode = alloc_mode or ctf.setting("allocate_mode")
