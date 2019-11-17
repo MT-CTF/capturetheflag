@@ -67,8 +67,6 @@ minetest.register_chatcommand("team", {
 		local test   = string.match(param, "^player ([%a%d_-]+)")
 		local create = string.match(param, "^add ([%a%d_-]+)")
 		local remove = string.match(param, "^remove ([%a%d_-]+)")
-		local lock = string.match(param, "^lock ([%a%d_-]+)")
-		local unlock = string.match(param, "^unlock ([%a%d_-]+)")
 		local j_name, j_tname = string.match(param, "^join ([%a%d_-]+) ([%a%d_]+)")
 		local b_tname, b_pattern = string.match(param, "^bjoin ([%a%d_-]+) ([%a%d_-%*%! ]+)")
 		local l_name = string.match(param, "^removeplr ([%a%d_-]+)")
