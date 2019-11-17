@@ -99,32 +99,6 @@ minetest.register_chatcommand("team", {
 			else
 				return false, "You are not a ctf_admin!"
 			end
-		elseif lock then
-			local privs = minetest.get_player_privs(name)
-			if privs and privs.ctf_team_mgr then
-				local team = ctf.team(lock)
-				if team then
-					team.data.allow_joins = false
-					return true, "Locked team to new members"
-				else
-					return false, "Unable to find that team!"
-				end
-			else
-				return false, "You are not a ctf_team_mgr!"
-			end
-		elseif unlock then
-			local privs = minetest.get_player_privs(name)
-			if privs and privs.ctf_team_mgr then
-				local team = ctf.team(unlock)
-				if team then
-					team.data.allow_joins = true
-					return true, "Unlocked team to new members"
-				else
-					return false, "Unable to find that team!"
-				end
-			else
-				return false, "You are not a ctf_team_mgr!"
-			end
 		elseif param == "all" then
 			ctf.list_teams(name)
 		elseif ctf.team(param) then
