@@ -53,8 +53,6 @@ local function team_console_help(name)
 		minetest.chat_send_player(name, "/team remove <team> - add a team called name (ctf_admin only)")
 	end
 	if privs and privs.ctf_team_mgr == true then
-		minetest.chat_send_player(name, "/team lock <team> - closes a team to new players (ctf_team_mgr only)")
-		minetest.chat_send_player(name, "/team unlock <team> - opens a team to new players (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team bjoin <team> <commands> - Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team join <name> <team> - add 'player' to team 'team' (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team removeply <name> - add 'player' to team 'team' (ctf_team_mgr only)")
