@@ -102,10 +102,7 @@ minetest.register_chatcommand("team", {
 			local count = 0
 			for _, value in pairs(ctf.team(param).players) do
 				count = count + 1
-				if value.auth then
-					minetest.chat_send_player(name, count .. ">> " .. value.name
-							.. " (team owner)")
-				else
+				if value then
 					minetest.chat_send_player(name, count .. ">> " .. value.name)
 				end
 			end
@@ -114,13 +111,8 @@ minetest.register_chatcommand("team", {
 				test = param
 			end
 			if ctf.player(test).team then
-				if ctf.player(test).auth then
-					return true, test ..
-							" is in team " .. ctf.player(test).team.." (team owner)"
-				else
-					return true, test ..
-							" is in team " .. ctf.player(test).team
-				end
+				return true, test ..
+						" is in team " .. ctf.player(test).team
 			else
 				return true, test.." is not in a team"
 			end
