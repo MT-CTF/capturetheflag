@@ -9,12 +9,12 @@ function ctf_treasure.get_default_treasures()
 		{ "doors:door_steel",        0.3, 5, {  1,  3 } },
 		{ "ctf_traps:damage_cobble", 0.3, 4, { 10, 20 } },
 
-		{"default:pick_steel",   0.5, 5, { 1, 10 } },
-		{"default:sword_steel",  0.4, 5, { 1,  4 } },
-		{"default:shovel_stone", 0.6, 5, { 1, 10 } },
-		{"default:shovel_steel", 0.3, 5, { 1, 10 } },
-		{"default:axe_steel",    0.4, 5, { 1, 10 } },
-		{"default:axe_stone",    0.5, 5, { 1, 10 } },
+		{ "default:pick_steel",   0.5, 5, { 1, 10 } },
+		{ "default:sword_steel",  0.4, 5, { 1,  4 } },
+		{ "default:shovel_stone", 0.6, 5, { 1, 10 } },
+		{ "default:shovel_steel", 0.3, 5, { 1, 10 } },
+		{ "default:axe_steel",    0.4, 5, { 1, 10 } },
+		{ "default:axe_stone",    0.5, 5, { 1, 10 } },
 
 		{ "shooter:shotgun",     0.04, 2, 1 },
 		{ "shooter:grenade",     0.08, 2, 1 },
