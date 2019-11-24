@@ -145,6 +145,7 @@ function ctf.register_on_join_team(func)
 end
 
 ctf.player_last_team = {}
+local first_alloc = {}
 
 -- Player joins team
 -- Called by /join, /team join or auto allocate.
@@ -202,8 +203,20 @@ function ctf.join(name, team, force, by)
 	team_data.players[player.name] = player
 	ctf.player_last_team[name] = team
 
+	local tcolor = ctf_colors.get_color(player).css
+
+	local join_msg
+	if first_alloc[name] then
+		join_msg = minetest.colorize(tcolor, name) .. " has joined the game" ..
+			" (team " .. minetest.colorize(tcolor, team) .. ")"
+		first_alloc[name] = false
+	else
+		join_msg = minetest.colorize(tcolor, name) ..
+			" has joined team " .. minetest.colorize(tcolor, team)
+	end
+
+	minetest.chat_send_all("*** " .. join_msg)
 	minetest.log("action", name .. " joined team " .. team)
-	minetest.chat_send_all(name.." has joined team "..team)
 
 	for i = 1, #ctf.registered_on_join_team do
 		ctf.registered_on_join_team[i](name, team)
@@ -412,6 +425,12 @@ minetest.register_on_newplayer(function(player)
 	end
 end)
 
+minetest.after(0, function()
+	if ctf.setting("autoalloc_on_joinplayer") then
+		-- Disable engine join messages if autoalloc_on_joinplayer is enabled
+		function minetest.send_join_message() end
+	end
+end)
 
 minetest.register_on_joinplayer(function(player)
 	if not ctf.setting("autoalloc_on_joinplayer") then
@@ -423,6 +442,7 @@ minetest.register_on_joinplayer(function(player)
 		return
 	end
 
+	first_alloc[name] = true
 	local team = ctf.autoalloc(name)
 	if team then
 		ctf.log("autoalloc", name .. " was allocated to " .. team)
