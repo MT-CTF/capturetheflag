@@ -26,9 +26,9 @@ minetest.register_alias_force("default:bush_stem", "air")
 minetest.register_alias_force("default:stone_with_gold", "default:stone")
 
 
-local max_r  = 120
-local mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
-ctf_map.map  = nil
+local max_r    = 120
+ctf_map.mapdir = minetest.get_modpath("ctf_map") .. "/maps/"
+ctf_map.map    = nil
 
 -- Modify server status message to include map info
 local map_str
@@ -59,36 +59,56 @@ function ctf_map.get_idx_and_map(param)
 	param = param:lower():trim()
 	for i, map in pairs(ctf_map.available_maps) do
 		if map.name:lower():find(param, 1, true) or
-				map.path:lower():find(param, 1, true) then
+				map.dirname:lower():find(param, 1, true) then
 			return i, map
 		end
 	end
 end
 
-local next_idx
+ctf_map.next_idx = nil
+local function set_next_by_param(name, param)
+	local idx, map = ctf_map.get_idx_and_map(param)
+	if idx then
+		ctf_map.next_idx = idx
+		return true, "Selected " .. map.name
+	else
+		return false, "Couldn't find any matching map!"
+	end
+end
+
 minetest.register_chatcommand("set_next", {
 	privs = { ctf_admin = true },
-	func = function(name, param)
-		local idx, map = ctf_map.get_idx_and_map(param)
-		if idx then
-			next_idx = idx
-			minetest.log("action", name .. " selected '" .. map.name .. "' as next map")
-			return true, "Selected " .. map.name
-		else
-			return false, "Couldn't find any matches"
-		end
-	end,
+	func = set_next_by_param
 })
 
-local function load_map_meta(idx, path)
-	minetest.log("info", "load_map_meta: Loading map meta from \"" .. path .. "\"")
-	local conf_path = mapdir .. path .. ".conf"
-	local offset    = vector.new(600 * idx, 0, 0)
-	local meta      = Settings(conf_path)
+do
+	-- Override /ctf_next to support an optional map name as param
+	local old_func = minetest.registered_chatcommands["ctf_next"].func
+	minetest.override_chatcommand("ctf_next", {
+		params = "[map]",
+		description = "Start the next match. The map name can be optionally specified as param.",
+		func = function(name, param)
+			if param and param ~= "" then
+				local success, msg = set_next_by_param(name, param)
+				if not success then
+					return false, msg
+				else
+					minetest.chat_send_player(name, msg)
+				end
+			end
 
+			return old_func(name)
+		end
+	})
+end
+
+local function load_map_meta(idx, dirname, meta)
+	minetest.log("info", "load_map_meta: Loading map meta from '" .. dirname .. "/map.conf'")
 	if not meta:get("r") then
-		error("Map was not properly configured " .. conf_path)
+		error("Map was not properly configured: " .. dirname .. "/map.conf")
 	end
+
+	local offset = vector.new(600 * idx, 0, 0)
 
 	local initial_stuff = meta:get("initial_stuff")
 	local treasures = meta:get("treasures")
@@ -96,21 +116,21 @@ local function load_map_meta(idx, path)
 	local time_speed = meta:get("time_speed")
 
 	local map = {
+		dirname       = dirname,
+		r             = tonumber(meta:get("r")),
+		h             = tonumber(meta:get("h")),
 		name          = meta:get("name"),
 		author        = meta:get("author"),
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
-		screenshot    = meta:get("screenshot"),
 		license       = meta:get("license"),
 		others        = meta:get("others"),
 		base_node     = meta:get("base_node"),
-		schematic     = path .. ".mts",
 		initial_stuff = initial_stuff and initial_stuff:split(","),
 		treasures     = treasures and treasures:split(";"),
 		start_time    = start_time and tonumber(start_time),
 		time_speed    = time_speed and tonumber(time_speed),
-		r             = tonumber(meta:get("r")),
-		h             = tonumber(meta:get("h")),
+		skybox        = ctf_map.skybox_exists(dirname),
 		offset        = offset,
 		teams         = {},
 		chests        = {}
@@ -138,7 +158,7 @@ local function load_map_meta(idx, path)
 
 	-- Read custom chest zones from config
 	i = 1
-	minetest.log("info", "Parsing chest zones of " .. map.name .. "...")
+	minetest.log("verbose", "Parsing chest zones of " .. map.name .. "...")
 	while meta:get("chests." .. i .. ".from") do
 		local from  = minetest.string_to_pos(meta:get("chests." .. i .. ".from"))
 		local to    = minetest.string_to_pos(meta:get("chests." .. i .. ".to"))
@@ -150,8 +170,6 @@ local function load_map_meta(idx, path)
 			to   = vector.add(offset, to),
 			n    = tonumber(meta:get("chests." .. i .. ".n") or "23"),
 		}
-
-		minetest.log("info", dump(map.chests[i]))
 
 		i = i + 1
 	end
@@ -186,45 +204,26 @@ local function load_map_meta(idx, path)
 end
 
 local function load_maps()
-	local files_hash = {}
+	local idx = 1
+	ctf_map.available_maps = {}
+	for _, dirname in pairs(minetest.get_dir_list(ctf_map.mapdir, true)) do
+		if dirname ~= ".git" then
+			local conf = Settings(ctf_map.mapdir .. "/" .. dirname .. "/map.conf")
+			local val = minetest.settings:get("ctf_map." ..
+				string.gsub(dirname, "%./", ""):gsub("/", "."))
 
-	local dirs = minetest.get_dir_list(mapdir, true)
-	table.insert(dirs, ".")
-	for _, dir in pairs(dirs) do
-		if dir ~= ".git" then
-			local files = minetest.get_dir_list(mapdir .. dir, false)
-			for i = 1, #files do
-				local parts = files[i]:split(".")
-				local filename = parts[1]
-				local extension = parts[2]
-				if extension == "mts" then
-					files_hash[dir .. "/" .. filename] = true
-				else
-					if extension ~= "conf" and extension ~= "md" and extension ~= "png"
-							and files[i] ~= ".git" then
-						error("Map extension is not '.mts': " .. files[i])
-					end
-				end
+			-- If map isn't disabled, load map meta
+			if not conf:get_bool("disabled", false) and val ~= "false" then
+				local map = load_map_meta(idx, dirname, conf)
+				ctf_map.available_maps[idx] = map
+				idx = idx + 1
+
+				minetest.log("info", "Loaded map '" .. map.name .. "'")
 			end
 		end
 	end
-
-	local idx = 1
-	ctf_map.available_maps = {}
-	for key, _ in pairs(files_hash) do
-		local conf = Settings(mapdir .. "/" .. key .. ".conf")
-		local val = minetest.settings:get("ctf.maps." .. key:gsub("%./", ""):gsub("/", "."))
-		if not conf:get_bool("disabled", false) and val ~= "false" then
-			local map = load_map_meta(idx, key)
-			map.path = key
-			table.insert(ctf_map.available_maps, map)
-			minetest.log("action", "Found map '" .. map.name .. "'")
-			minetest.log("info", dump(map))
-			idx = idx + 1
-		end
-	end
 	if not next(ctf_map.available_maps) then
-		error("No maps found in directory " .. mapdir)
+		error("No maps found in directory " .. ctf_map.mapdir)
 	end
 	return ctf_map.available_maps
 end
@@ -234,15 +233,24 @@ load_maps()
 minetest.register_chatcommand("maps_reload", {
 	privs = { ctf_admin = true },
 	func = function(name, param)
+		ctf_map.next_idx = nil
+
 		local maps = load_maps()
-		next_idx = nil
-		return true, #maps .. " maps found: " .. table.concat(maps, ", ")
+		local ret = #maps .. " maps found:\n"
+		for i = 1, #maps do
+			ret = ret .. " * " .. maps[i].name
+			if i ~= #maps then
+				ret = ret .. "\n"
+			end
+		end
+
+		return true, ret
 	end,
 })
 
 local function place_map(map)
 	ctf_map.emerge_with_callbacks(nil, map.pos1, map.pos2, function()
-		local schempath = mapdir .. map.schematic
+		local schempath = ctf_map.mapdir .. map.dirname .. "/map.mts"
 		local res = minetest.place_schematic(map.pos1, schempath,
 				map.rotation == "z" and "0" or "90")
 
@@ -254,7 +262,7 @@ local function place_map(map)
 
 		local seed = minetest.get_mapgen_setting("seed")
 		for _, chestzone in pairs(ctf_map.map.chests) do
-			minetest.log("info", "Placing " .. chestzone.n .. " chests from " ..
+			minetest.log("verbose", "Placing " .. chestzone.n .. " chests from " ..
 					minetest.pos_to_string(chestzone.from) .. " to "..
 					minetest.pos_to_string(chestzone.to))
 			place_chests(chestzone.from, chestzone.to, seed, chestzone.n)
@@ -282,8 +290,8 @@ ctf_match.register_on_new_match(function()
 
 	-- Choose next map index, but don't select the same one again
 	local idx
-	if next_idx then
-		idx = next_idx
+	if ctf_map.next_idx then
+		idx = ctf_map.next_idx
 	elseif ctf_map.map then
 		idx = math.random(#ctf_map.available_maps - 1)
 		if idx >= ctf_map.map.idx then
@@ -292,7 +300,7 @@ ctf_match.register_on_new_match(function()
 	else
 		idx = math.random(#ctf_map.available_maps)
 	end
-	next_idx = (idx % #ctf_map.available_maps) + 1
+	ctf_map.next_idx = (idx % #ctf_map.available_maps) + 1
 
 	-- Load meta data
 	ctf_map.map = ctf_map.available_maps[idx]
@@ -335,14 +343,14 @@ ctf_match.register_on_new_match(function()
 					if b_stack:get_name() == t_stack:get_name() and
 							t_stack:get_count() == 1 then
 						is_valid = false
-						minetest.log("action",
+						minetest.log("info",
 								"ctf_map: Omitting treasure - " .. def[1])
 						break
 					end
 				end
 
 				if is_valid then
-					minetest.log("action",
+					minetest.log("info",
 							"ctf_map: Registering treasure - " .. def[1])
 					treasurer.register_treasure(def[1], def[2], def[3], def[4])
 				end
@@ -350,11 +358,14 @@ ctf_match.register_on_new_match(function()
 		end
 	end
 
+	-- Place map
+	place_map(ctf_map.map)
+
 	-- Update time speed
 	ctf_map.update_time()
 
-	-- Place map
-	place_map(ctf_map.map)
+	-- Update players' skyboxes last
+	ctf_map.set_skybox_all()
 end)
 
 function ctf_match.create_teams()

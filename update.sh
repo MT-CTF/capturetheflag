@@ -1,8 +1,11 @@
-git pull &&
-cd mods/crafting &&
-git pull origin master &&
-cd ../ctf/ctf_map/maps &&
-git pull origin master &&
-cp ./*.png ../textures/ &&
-cd ../../../.. &&
+# Update capturetheflag
+git pull
+
+# Update all submodules
+git submodule update --init --recursive
+
+# Run post-processing actions for maps
+./setup_maps.sh
+
+# Run build.sh
 ./build.sh ../games/capturetheflag

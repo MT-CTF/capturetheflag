@@ -64,7 +64,7 @@ crafting.register_recipe({
 	level  = 1,
 })
 
--- Wooden plank x4
+-- Reinforced Cobblestone
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_map:reinforced_cobble",
@@ -145,6 +145,7 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+-- Traps
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_traps:spike 1",

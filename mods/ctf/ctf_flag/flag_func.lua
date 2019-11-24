@@ -21,16 +21,6 @@ local function do_capture(attname, flag, returned)
 
 		ctf.action("flag", attname .. " picked up " .. flag_name)
 
-		-- Post to flag owner's board
-		ctf.post(team, {
-				msg = flag_name .. " has been taken by " .. attname .. " of ".. attacker.team,
-				icon="flag_red" })
-
-		-- Post to attacker's board
-		ctf.post(attacker.team, {
-				msg = attname .. " snatched '" .. flag_name .. "' from " .. team,
-				icon="flag_green"})
-
 		-- Add to claimed list
 		flag.claimed = {
 			team = attacker.team,
@@ -55,16 +45,6 @@ local function do_capture(attname, flag, returned)
 				" by "..attname.." (team "..attacker.team..")")
 
 		ctf.action("flag", attname .. " captured " .. flag_name)
-
-		-- Post to flag owner's board
-		ctf.post(team, {
-				msg = flag_name .. " has been captured by " .. attacker.team,
-				icon="flag_red"})
-
-		-- Post to attacker's board
-		ctf.post(attacker.team, {
-				msg = attname .. " captured '" .. flag_name .. "' from " .. team,
-				icon="flag_green"})
 
 		-- Take flag
 		if ctf.setting("flag.allow_multiple") then

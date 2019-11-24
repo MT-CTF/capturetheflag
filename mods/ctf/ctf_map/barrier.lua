@@ -1,11 +1,10 @@
-local c_stone      = minetest.get_content_id("ctf_map:ind_stone")
-local c_stone_red  = minetest.get_content_id("ctf_map:ind_stone_red")
-local c_glass      = minetest.get_content_id("ctf_map:ind_glass")
-local c_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
-local c_map_ignore = minetest.get_content_id("ctf_map:ignore")
-local c_actual_st  = minetest.get_content_id("default:stone")
+local c_ind_stone      = minetest.get_content_id("ctf_map:stone")
+local c_ind_stone_red  = minetest.get_content_id("ctf_map:ind_stone_red")
+local c_ind_glass      = minetest.get_content_id("ctf_map:ind_glass")
+local c_ind_glass_red  = minetest.get_content_id("ctf_map:ind_glass_red")
+local c_ignore = minetest.get_content_id("ctf_map:ignore")
+local c_stone = minetest.get_content_id("default:stone")
 local c_water      = minetest.get_content_id("default:water_source")
--- local c_water_f    = minetest.get_content_id("default:water_flowing")
 local c_air        = minetest.get_content_id("air")
 
 function ctf_map.remove_middle_barrier()
@@ -36,7 +35,7 @@ function ctf_map.remove_middle_barrier()
 			local adj1 = a:index(x, y,  1)
 			local adj2 = a:index(x, y, -1)
 
-			if data[vi] == c_glass_red then
+			if data[vi] == c_ind_glass_red then
 				-- If surrounding nodes are water, replace node with water
 				if data[adj1] == c_water and data[adj2] == c_water then
 					data[vi] = c_water
@@ -44,8 +43,8 @@ function ctf_map.remove_middle_barrier()
 				else
 					data[vi] = c_air
 				end
-			elseif data[vi] == c_stone_red then
-				data[vi] = c_actual_st
+			elseif data[vi] == c_ind_stone_red then
+				data[vi] = c_stone
 			end
 		end
 	end
@@ -97,7 +96,9 @@ function ctf_map.place_middle_barrier(center, r, h, direction)
 				vi = a:index(center.x, y, x)
 			end
 			if data[vi] == c_air or data[vi] == c_water then
-				data[vi] = c_glass_red
+				data[vi] = c_ind_glass_red
+			elseif data[vi] == c_stone then
+				data[vi] = c_ind_stone_red
 			end
 		end
 	end
@@ -107,6 +108,16 @@ function ctf_map.place_middle_barrier(center, r, h, direction)
 	vm:update_map()
 end
 
+-- Returns the appropriate barrier node depending on the existing node
+local function get_barrier_node(c_id)
+	-- If existing node is air/ind. glass/CTF ignore, return ind. glass
+	-- Else return ind. stone
+	if c_id == c_air or c_id == c_ind_glass or c_id == c_ignore then
+		return c_ind_glass
+	else
+		return c_ind_stone
+	end
+end
 
 function ctf_map.place_outer_barrier(center, r, h)
 	local minp = vector.subtract(center, r)
@@ -124,94 +135,72 @@ function ctf_map.place_outer_barrier(center, r, h)
 	}
 	local data = vm:get_data()
 
-	minetest.log("action", "Map maker: Placing left wall")
-
 	-- Left
+	minetest.log("action", "Map maker: Placing left wall")
 	do
 		local x = center.x - r
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
-				else
-					data[vi] = c_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing right wall")
-
 	-- Right
+	minetest.log("action", "Map maker: Placing right wall")
 	do
 		local x = center.x + r
 		for z = minp.z, maxp.z do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
-				else
-					data[vi] = c_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing front wall")
-
 	-- Front
+	minetest.log("action", "Map maker: Placing front wall")
 	do
 		local z = center.z - r
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
-				else
-					data[vi] = c_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing back wall")
-
 	-- Back
+	minetest.log("action", "Map maker: Placing back wall")
 	do
 		local z = center.z + r
 		for x = minp.x, maxp.x do
 			for y = minp.y, maxp.y do
 				local vi = a:index(x, y, z)
-				if data[vi] == c_air or data[vi] == c_glass or data[vi] == c_map_ignore then
-					data[vi] = c_glass
-				else
-					data[vi] = c_stone
-				end
+				data[vi] = get_barrier_node(data[vi])
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing bedrock")
-
 	-- Bedrock
+	minetest.log("action", "Map maker: Placing bedrock")
 	do
 		local y = minp.y
 		for x = minp.x, maxp.x do
 			for z = minp.z, maxp.z do
-				data[a:index(x, y, z)] = c_stone
+				data[a:index(x, y, z)] = c_ind_stone
 			end
 		end
 	end
 
-	minetest.log("action", "Map maker: Placing ceiling")
-
 	-- Ceiling
+	minetest.log("action", "Map maker: Placing ceiling")
 	do
 		local y = maxp.y
 		for x = minp.x, maxp.x do
 			for z = minp.z, maxp.z do
-				data[a:index(x, y, z)] = c_glass
+				data[a:index(x, y, z)] = c_ind_glass
 			end
 		end
 	end

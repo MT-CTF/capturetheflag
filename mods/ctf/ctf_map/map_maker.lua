@@ -20,7 +20,7 @@ local config = {
 	center = storage:get_string("center"),
 	flags = storage:get_string("flags"),
 	barrier_r = storage:get_int("barrier_r"),
-	barrier_rot = storage:get_int("barrier_rot"),
+	barrier_rot = storage:get_string("barrier_rot"),
 	barriers_placed = storage:get_int("barriers_placed") == 1
 }
 
@@ -222,7 +222,8 @@ local function show_gui(name)
 		"label[0,2.8;2. Place Barriers]",
 		"label[0.1,3.3;This may take a few minutes.]",
 		"field[0.4,4.3;1,1;barrier_r;R;", config.barrier_r, "]",
-		"dropdown[1.15,4.05;1,1;config.barrier_rot;X=0,Z=0;", config.barrier_rot + 1, "]",
+		"dropdown[1.15,4.05;1,1;barrier_rot;X=0,Z=0;",
+		config.barrier_rot == "x" and 1 or 2, "]",
 		"button[2.3,4;2,1;place_barrier;Place Barriers]",
 
 		"box[4.4,2.8;0.05,2.2;#111111BB]",
@@ -306,8 +307,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 
 	if fields.barrier_rot and fields.barrier_rot ~= "" then
-		config.barrier_rot = fields.config.barrier_rot == "X=0" and 0 or 1
-		storage:set_int("config.barrier_rot", config.barrier_rot)
+		config.barrier_rot = fields.barrier_rot == "X=0" and "x" or "z"
+		storage:set_string("barrier_rot", config.barrier_rot)
 	end
 
 	if fields.set_center then
@@ -370,7 +371,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		we_select(player_name)
 		show_progress_formspec(player_name, "Exporting...")
 
-		local path = minetest.get_worldpath() .. "/schems/"
+		local path = minetest.get_worldpath() .. "/schems/" .. config.mapname .. "/"
 		minetest.mkdir(path)
 
 		-- Reset mod_storage
@@ -379,17 +380,17 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		storage:set_string("mapauthor", "")
 		storage:set_string("mapname", "")
 		storage:set_string("mapinitial", "")
-		storage:set_string("config.barrier_rot", "")
+		storage:set_string("barrier_rot", "")
 		storage:set_string("barrier_r", "")
 
 		-- Write to .conf
-		local meta = Settings(path .. config.mapname .. ".conf")
+		local meta = Settings(path .. "map.conf")
 		meta:set("name", config.maptitle)
 		meta:set("author", config.mapauthor)
 		if config.mapinitial ~= "" then
 			meta:set("initial_stuff", config.mapinitial)
 		end
-		meta:set("rotation", config.barrier_rot == 0 and "x" or "z")
+		meta:set("rotation", config.barrier_rot)
 		meta:set("r", config.center.r)
 		meta:set("h", config.center.h)
 
@@ -409,7 +410,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		meta:write()
 
 		minetest.after(0.1, function()
-			local filepath = path .. config.mapname .. ".mts"
+			local filepath = path .. "map.mts"
 			if minetest.create_schematic(worldedit.pos1[player_name],
 					worldedit.pos2[player_name], worldedit.prob_list[player_name],
 					filepath) then

@@ -1,43 +1,43 @@
 -- Awaiting core support.
 local function __genOrderedIndex( t )
-    local orderedIndex = {}
-    for key in pairs(t) do
-        table.insert( orderedIndex, key )
-    end
-    table.sort( orderedIndex )
-    return orderedIndex
+	local orderedIndex = {}
+	for key in pairs(t) do
+		table.insert( orderedIndex, key )
+	end
+	table.sort( orderedIndex )
+	return orderedIndex
 end
 
 local function orderedNext(t, state)
-    -- Equivalent of the next function, but returns the keys in the alphabetic
-    -- order. We use a temporary ordered key table that is stored in the
-    -- table being iterated.
+	-- Equivalent of the next function, but returns the keys in the alphabetic
+	-- order. We use a temporary ordered key table that is stored in the
+	-- table being iterated.
 
-    local key = nil
-    if state == nil then
-        t.__orderedIndex = __genOrderedIndex( t )
-        key = t.__orderedIndex[1]
-    else
-        for i = 1,table.getn(t.__orderedIndex) do
-            if t.__orderedIndex[i] == state then
-                key = t.__orderedIndex[i+1]
-            end
-        end
-    end
+	local key = nil
+	if state == nil then
+		t.__orderedIndex = __genOrderedIndex( t )
+		key = t.__orderedIndex[1]
+	else
+		for i = 1,table.getn(t.__orderedIndex) do
+			if t.__orderedIndex[i] == state then
+				key = t.__orderedIndex[i+1]
+			end
+		end
+	end
 
-    if key then
-        return key, t[key]
-    end
+	if key then
+		return key, t[key]
+	end
 
-    -- no more value to return, cleanup
-    t.__orderedIndex = nil
-    return
+	-- no more value to return, cleanup
+	t.__orderedIndex = nil
+	return
 end
 
 function orderedPairs(t)
-    -- Equivalent of the pairs() function on tables. Allows to iterate
-    -- in order
-    return orderedNext, t, nil
+	-- Equivalent of the pairs() function on tables. Allows to iterate
+	-- in order
+	return orderedNext, t, nil
 end
 
 
@@ -99,13 +99,13 @@ end
 
 -- Debug helpers
 function ctf.error(area, msg)
-	minetest.log("error", "CTF::" .. area .. " - " ..msg)
+	minetest.log("error", "[CTF | " .. area .. "] " .. msg)
 end
 function ctf.log(area, msg)
 	if area and area ~= "" then
-		print("[CaptureTheFlag] (" .. area .. ") " .. msg)
+		minetest.log("[CTF | " .. area .. "] " .. msg)
 	else
-		print("[CaptureTheFlag] " .. msg)
+		minetest.log("[CTF]" .. msg)
 	end
 end
 function ctf.action(area, msg)
@@ -116,7 +116,7 @@ function ctf.action(area, msg)
 	end
 end
 function ctf.warning(area, msg)
-	print("WARNING: [CaptureTheFlag] (" .. area .. ") " .. msg)
+	minetest.log("warning", "[CTF | " .. area .. "] " .. msg)
 end
 
 function ctf.init()
@@ -200,4 +200,9 @@ function ctf.load()
 	for i = 1, #ctf.registered_on_new_game do
 		ctf.registered_on_new_game[i]()
 	end
+end
+
+-- Disable knockback completely
+function minetest.calculate_knockback()
+	return 0
 end
