@@ -10,7 +10,6 @@ function ctf_treasure.get_default_treasures()
 		{ "ctf_traps:damage_cobble", 0.3, 4, { 10, 20 } },
 
 		{ "default:pick_steel",   0.5, 5, { 1, 10 } },
-		{ "default:sword_stone",  0.6, 5, { 1, 10 } },
 		{ "default:sword_steel",  0.4, 5, { 1,  4 } },
 		{ "default:shovel_stone", 0.6, 5, { 1, 10 } },
 		{ "default:shovel_steel", 0.3, 5, { 1, 10 } },
