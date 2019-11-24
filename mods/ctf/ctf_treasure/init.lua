@@ -9,7 +9,6 @@ function ctf_treasure.get_default_treasures()
 		{"doors:door_steel",0.3,5,{1,3}},
 
 		{"default:pick_steel",0.5,5,{1,10}},
-		{"default:sword_stone",0.6,5,{1,10}},
 		{"default:sword_steel",0.4,5,{1,4}},
 		{"default:shovel_stone",0.6,5,{1,10}},
 		{"default:shovel_steel",0.3,5,{1,10}},
