@@ -237,24 +237,6 @@ function ctf.clean_player_lists()
 	end
 end
 
--- Sees if the player can change stuff in a team
-function ctf.can_mod(player,team)
-	local privs = minetest.get_player_privs(player)
-
-	if privs then
-		if privs.ctf_admin == true then
-			return true
-		end
-	end
-
-	if player and ctf.teams[team] and ctf.teams[team].players and ctf.teams[team].players[player] then
-		if ctf.teams[team].players[player].auth == true then
-			return true
-		end
-	end
-	return false
-end
-
 -- Automatic Allocation
 function ctf.autoalloc(name, alloc_mode)
 	alloc_mode = alloc_mode or ctf.setting("allocate_mode")

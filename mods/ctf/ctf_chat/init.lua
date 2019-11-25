@@ -53,8 +53,6 @@ local function team_console_help(name)
 		minetest.chat_send_player(name, "/team remove <team> - add a team called name (ctf_admin only)")
 	end
 	if privs and privs.ctf_team_mgr == true then
-		minetest.chat_send_player(name, "/team lock <team> - closes a team to new players (ctf_team_mgr only)")
-		minetest.chat_send_player(name, "/team unlock <team> - opens a team to new players (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team bjoin <team> <commands> - Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team join <name> <team> - add 'player' to team 'team' (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team removeply <name> - add 'player' to team 'team' (ctf_team_mgr only)")
@@ -67,8 +65,6 @@ minetest.register_chatcommand("team", {
 		local test   = string.match(param, "^player ([%a%d_-]+)")
 		local create = string.match(param, "^add ([%a%d_-]+)")
 		local remove = string.match(param, "^remove ([%a%d_-]+)")
-		local lock = string.match(param, "^lock ([%a%d_-]+)")
-		local unlock = string.match(param, "^unlock ([%a%d_-]+)")
 		local j_name, j_tname = string.match(param, "^join ([%a%d_-]+) ([%a%d_]+)")
 		local b_tname, b_pattern = string.match(param, "^bjoin ([%a%d_-]+) ([%a%d_-%*%! ]+)")
 		local l_name = string.match(param, "^removeplr ([%a%d_-]+)")
@@ -99,58 +95,26 @@ minetest.register_chatcommand("team", {
 			else
 				return false, "You are not a ctf_admin!"
 			end
-		elseif lock then
-			local privs = minetest.get_player_privs(name)
-			if privs and privs.ctf_team_mgr then
-				local team = ctf.team(lock)
-				if team then
-					team.data.allow_joins = false
-					return true, "Locked team to new members"
-				else
-					return false, "Unable to find that team!"
-				end
-			else
-				return false, "You are not a ctf_team_mgr!"
-			end
-		elseif unlock then
-			local privs = minetest.get_player_privs(name)
-			if privs and privs.ctf_team_mgr then
-				local team = ctf.team(unlock)
-				if team then
-					team.data.allow_joins = true
-					return true, "Unlocked team to new members"
-				else
-					return false, "Unable to find that team!"
-				end
-			else
-				return false, "You are not a ctf_team_mgr!"
-			end
 		elseif param == "all" then
 			ctf.list_teams(name)
 		elseif ctf.team(param) then
-			minetest.chat_send_player(name, "Team "..param..":")
-			local count = 0
-			for _, value in pairs(ctf.team(param).players) do
-				count = count + 1
-				if value.auth then
-					minetest.chat_send_player(name, count .. ">> " .. value.name
-							.. " (team owner)")
-				else
-					minetest.chat_send_player(name, count .. ">> " .. value.name)
-				end
+			local i = 0
+			local str = ""
+			local team = ctf.team(param)
+			local tcolor = "#" .. ctf.flag_colors[team.data.color]:sub(3, 8)
+			for pname, tplayer in pairs(team.players) do
+				i = i + 1
+				str = str .. "  " .. i .. ") " .. minetest.colorize(tcolor, pname) .. "\n"
 			end
+			str = "Team " .. minetest.colorize(tcolor, param) .. " (" .. i .. ") :\n" .. str
+			minetest.chat_send_player(name, str)
 		elseif ctf.player_or_nil(param) or test then
 			if not test then
 				test = param
 			end
 			if ctf.player(test).team then
-				if ctf.player(test).auth then
-					return true, test ..
-							" is in team " .. ctf.player(test).team.." (team owner)"
-				else
-					return true, test ..
-							" is in team " .. ctf.player(test).team
-				end
+				return true, test ..
+						" is in team " .. ctf.player(test).team
 			else
 				return true, test.." is not in a team"
 			end
@@ -271,25 +235,6 @@ minetest.register_chatcommand("ctf_ls", {
 			print("\"" .. set .. "\"   " .. dump(ctf.setting(set)))
 		end
 		return true
-	end
-})
-
-minetest.register_chatcommand("team_owner", {
-	params = "player name",
-	description = "Make player team owner",
-	privs = {ctf_admin=true},
-	func = function(name, param)
-		if ctf and ctf.players and ctf.player(param) and ctf.player(param).team and ctf.team(ctf.player(param).team) then
-			if ctf.player(param).auth == true then
-				ctf.player(param).auth = false
-				return true, param.." was downgraded from team admin status"
-			else
-				ctf.player(param).auth = true
-				return true, param.." was upgraded to an admin of "..ctf.player(name).team
-			end
-		else
-			return false, "Unable to do that :/ "..param.." does not exist, or is not part of a valid team."
-		end
 	end
 })
 
