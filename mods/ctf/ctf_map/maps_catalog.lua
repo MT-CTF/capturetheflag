@@ -7,6 +7,11 @@ local function show_catalog(name)
 	local idx = indices[name]
 	local map = ctf_map.available_maps[idx]
 
+	if not map then
+		minetest.chat_send_player(name, "No such map found.")
+		return
+	end
+
 	local fs = "size[10,9]"
 
 	fs = fs .. "container[0,0]"
@@ -126,6 +131,11 @@ end)
 local function send_irc_catalog(name)
 	-- Select map to be displayed
 	local map = ctf_map.available_maps[indices[name]]
+
+	if not map then
+		minetest.chat_send_player(name, "No such map found.")
+		return
+	end
 
 	-- IRC color codes
 	local red = string.char(3) .. "4"
