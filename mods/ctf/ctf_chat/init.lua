@@ -98,14 +98,16 @@ minetest.register_chatcommand("team", {
 		elseif param == "all" then
 			ctf.list_teams(name)
 		elseif ctf.team(param) then
-			minetest.chat_send_player(name, "Team "..param..":")
-			local count = 0
-			for _, value in pairs(ctf.team(param).players) do
-				count = count + 1
-				if value then
-					minetest.chat_send_player(name, count .. ">> " .. value.name)
-				end
+			local i = 0
+			local str = ""
+			local team = ctf.team(param)
+			local tcolor = "#" .. ctf.flag_colors[team.data.color]:sub(3, 8)
+			for pname, tplayer in pairs(team.players) do
+				i = i + 1
+				str = str .. "  " .. i .. ") " .. minetest.colorize(tcolor, pname) .. "\n"
 			end
+			str = "Team " .. minetest.colorize(tcolor, param) .. " (" .. i .. ") :\n" .. str
+			minetest.chat_send_player(name, str)
 		elseif ctf.player_or_nil(param) or test then
 			if not test then
 				test = param
