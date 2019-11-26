@@ -57,7 +57,7 @@ minetest.register_chatcommand("vote_kick", {
 			perc_needed = 0.8,
 
 			can_vote = function(self, pname)
-				return ctf_stats.player(pname).score > 1000
+				return ctf_stats.is_pro(name)
 			end,
 
 			on_result = function(self, result, results)
