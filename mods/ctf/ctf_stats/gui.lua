@@ -186,7 +186,6 @@ function ctf_stats.get_formspec(title, players, header, target)
 end
 
 function ctf_stats.get_html(title)
-	local players = ctf_stats.get_ordered_players()
 	local ret = "<h1>" .. title .. "</h1>"
 	ret = ret .. "<table>" ..
 		"<tr><th></th>" ..
@@ -199,8 +198,8 @@ function ctf_stats.get_html(title)
 		"<th>Attempts</th>" ..
 		"<th>Score</th></tr>"
 
-	for i = 1, math.min(#players, 50) do
-		local pstat = players[i]
+	for i = 1, math.min(#ctf_stats.ranks, 50) do
+		local pstat = ctf_stats.players[ctf_stats.ranks[i]]
 		local kd = pstat.kills
 		if pstat.deaths > 1 then
 			kd = kd / pstat.deaths

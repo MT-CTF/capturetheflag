@@ -3,52 +3,39 @@
 -------------
 
 local function return_as_chat_result(to, target)
-	local players = ctf_stats.get_ordered_players()
-
-	local name, place, stat
+	local name, pstat
 	if type(target) == "number" then
-		place = target
-		stat  = players[target]
-		name  = stat.name
+		name  = ctf_stats.ranks[target]
+		pstat = ctf_stats.player_by_rank(target)
 	elseif type(target) == "string" then
-		-- If target is a string, search through the player stats for a match
-		name = target
-		for i = 1, #players do
-			local pstat = players[i]
-			if pstat.name == name then
-				stat = pstat
-				place = i
-				break
-			end
-		end
-
-		-- If stat does not exist yet, set place to size of players + 1
-		if not place then
-			place = #players + 1
-		end
+		name  = target
+		pstat = ctf_stats.player_or_nil(name)
 	else
 		error("Invalid type passed to return_as_chat_result!", 2)
 	end
 
-	-- Build return string
-	local result = (to == name and "You are in " or name .. " is in ") ..
-			place .. " place.\n"
+	if pstat then
+		-- Build return string
+		local result = (to == name and "You are in " or name .. " is in ") ..
+			pstat.rank .. " place.\n"
 
-	if stat then
-		local kd = stat.kills
-		if stat.deaths > 1 then
-			kd = kd / stat.deaths
+		local kd = pstat.kills
+		if pstat.deaths > 1 then
+			kd = kd / pstat.deaths
 		end
 		result = result ..
-			"Kills: " .. stat.kills ..
-			" | Deaths: " .. stat.deaths ..
-			" | K/D: " .. math.floor(kd * 10) / 10 ..
-			"\nBounty kills: " .. stat.bounty_kills ..
-			" | Captures: " .. stat.captures ..
-			" | Attempts: " .. stat.attempts ..
-			"\nScore: " .. math.floor(stat.score)
+			"Kills: "          .. pstat.kills ..
+			" | Deaths: "      .. pstat.deaths ..
+			" | K/D: "         .. math.floor(kd * 10) / 10 ..
+			"\nBounty kills: " .. pstat.bounty_kills ..
+			" | Captures: "    .. pstat.captures ..
+			" | Attempts: "    .. pstat.attempts ..
+			"\nScore: "        .. math.floor(pstat.score)
+
+		return result
+	else
+		return "Invalid player stats!"
 	end
-	return result
 end
 
 local function summary_func(name)
@@ -97,13 +84,8 @@ minetest.register_chatcommand("rn", {
 			return false, "Empty arguments not allowed! Specify a rank."
 		end
 
-		param = tonumber(param)
-		if not param then
-			return false, "Argument isn't a valid number!"
-		elseif param <= 0 or param > #ctf_stats.get_ordered_players() or
-				param ~= math.floor(param) then
-			return false, "Invalid number or number out of bounds!"
-			-- TODO: This is the worst way to do it. FIX IT.
+		if not ctf_stats.player_by_rank(param) then
+			return false, "Invalid input!"
 		end
 
 		minetest.log("action", name .. " runs /rn " .. param)
@@ -124,8 +106,15 @@ minetest.register_chatcommand("rankings", {
 		if not minetest.get_player_by_name(name) then
 			return true, return_as_chat_result(name, target)
 		else
+			local players = table.copy(ctf_stats.ranks)
+			for i, pname in pairs(players) do
+				players[i] = ctf_stats.players[pname]
+				if i == ctf_stats.rankings_display_count then
+					break
+				end
+			end
 			minetest.show_formspec(name, "ctf_stats:rankings", ctf_stats.get_formspec(
-					"Player Rankings", ctf_stats.get_ordered_players(), 0, target))
+					"Player Rankings", players, 0, target))
 			return true
 		end
 	end

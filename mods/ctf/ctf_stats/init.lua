@@ -2,9 +2,43 @@ ctf_stats = {}
 
 local _needs_save = false
 local storage = minetest.get_mod_storage()
-local data_to_persist = { "matches", "players" }
+local data_to_persist = {
+	"matches",  -- Match stats
+	"players",  -- Player stats
+}
 
 ctf_stats.prev_match_summary = storage:get_string("prev_match_summary")
+
+local function regenerate_ranks()
+	local players = {}
+
+	-- Copy player stats into new empty table
+	for pname, pstat in pairs(ctf_stats.players) do
+		pstat.name = pname
+		pstat.color = nil
+		table.insert(players, pstat)
+	end
+
+	-- Sort table in the order of descending scores
+	table.sort(players, function(one, two)
+		return one.score > two.score
+	end)
+
+	ctf_stats.ranks = {}
+	for i, pstat in pairs(players) do
+		ctf_stats.ranks[i] = pstat.name
+		ctf_stats.players[pstat.name].rank = i
+	end
+end
+
+-- A separate function is used for recursion, because regenerate_ranks is also called while
+-- loading if migration is required, and there'd be two recursions running at the same time
+local function update_ranks()
+	minetest.log("verbose", "Regenerating ctf_stats.ranks")
+	regenerate_ranks()
+	minetest.after(60, update_ranks)
+end
+minetest.after(60, update_ranks)
 
 function ctf_stats.load_legacy()
 	local file = io.open(minetest.get_worldpath() .. "/ctf_stats.txt", "r")
@@ -79,7 +113,7 @@ function ctf_stats.load()
 		blue = {}
 	}
 
-	-- Strip players which have no score
+	-- Strip players who have no score
 	for name, player_stats in pairs(ctf_stats.players) do
 		if not player_stats.score or player_stats.score <= 0 then
 			ctf_stats.players[name] = nil
@@ -113,8 +147,10 @@ end
 function ctf_stats.player(name)
 	local player_stats = ctf_stats.players[name]
 	if not player_stats then
+		local rank = #ctf_stats.ranks + 1
 		player_stats = {
 			name = name,
+			rank = rank,
 			wins = {
 				red = 0,
 				blue = 0,
@@ -126,31 +162,25 @@ function ctf_stats.player(name)
 			score = 0,
 			bounty_kills = 0,
 		}
+
+		ctf_stats.ranks[rank]   = name
 		ctf_stats.players[name] = player_stats
 	end
 
-	local match_player_stats =
-			ctf_stats.current.red[name] or ctf_stats.current.blue[name]
-
-	return player_stats, match_player_stats
+	return player_stats, ctf_stats.current.red[name] or ctf_stats.current.blue[name]
 end
 
-function ctf_stats.get_ordered_players()
-	local players = {}
-
-	-- Copy player stats into new empty table
-	for pname, pstat in pairs(ctf_stats.players) do
-		pstat.name = pname
-		pstat.color = nil
-		table.insert(players, pstat)
+-- Returns a tuple, just like ctf_stats.player(name)
+function ctf_stats.player_by_rank(rank)
+	-- Return if param is an invalid rank
+	if not tonumber(rank) or rank ~= math.floor(rank) or
+			rank <= 0 or rank > #ctf_stats.ranks then
+		return
 	end
 
-	-- Sort table in the order of descending scores
-	table.sort(players, function(one, two)
-		return one.score > two.score
-	end)
-
-	return players
+	local name = ctf_stats.ranks[rank]
+	return ctf_stats.players[name],
+		ctf_stats.current.red[name] or ctf_stats.current.blue[name]
 end
 
 function ctf_stats.get_target(name, param)
@@ -163,7 +193,7 @@ function ctf_stats.get_target(name, param)
 		-- * `param` is returned as a string if player's stats exists
 		-- * If no matching stats exist, `param` is checked if it's a number
 		-- * If `param` isn't a number, it is assumed to be invalid, and nil is returned
-		-- * If `param` is a number, `param` is checked if out of bounds
+		-- * If `param` is a number, `param` is checked for validity.
 		-- * If `param` is not out of bounds, `param` is returned as a number, else nil
 		--
 		-- This order of checks is important because, in the case of `param` matching
@@ -176,10 +206,8 @@ function ctf_stats.get_target(name, param)
 			-- Check if param is a number
 			local rank = tonumber(param)
 			if rank then
-				-- Check if param is within range
-				-- TODO: Fix this hack by maintaining two tables - an ordered list, and a hashmap
-				if rank <= 0 or rank > #ctf_stats.get_ordered_players() or
-						rank ~= math.floor(rank) then
+				-- Check if param is valid
+				if not ctf_stats.player_by_rank(rank) then
 					return nil, "Invalid number or number out of bounds!"
 				else
 					return rank
@@ -415,7 +443,18 @@ minetest.register_on_dieplayer(function(player)
 	end
 end)
 
+-- Update ranks on shutdown to prevent data loss from the last 15 seconds
+minetest.register_on_shutdown(function()
+	ctf_stats.save()
+end)
+
 ctf_stats.load()
+
+-- Generate ranks-to-name mapping
+local start = os.time()
+regenerate_ranks()
+local elapsed = os.time() - start
+minetest.log("info", "Generated ctf_stats.ranks in " .. elapsed .. "s")
 
 dofile(minetest.get_modpath("ctf_stats") .. "/gui.lua")
 dofile(minetest.get_modpath("ctf_stats") .. "/chat.lua")
