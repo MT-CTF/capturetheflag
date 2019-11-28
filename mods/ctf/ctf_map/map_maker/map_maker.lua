@@ -52,19 +52,20 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	minetest.after(1, function(name)
-		minetest.chat_send_player(name, "*** CTF_MAP IS IN MAP MAKER MODE ***")
+		minetest.chat_send_player(name,
+			minetest.colorize("#BB33EE", "*** ctf_map is in map-maker mode ***"))
 	end, player:get_player_name())
 
 	local inv = player:get_inventory()
-	if not inv:contains_item("main", ItemStack("ctf_map:adminpick")) then
-		inv:add_item("main", ItemStack("ctf_map:adminpick"))
+	if not inv:contains_item("main", "map_maker:adminpick") then
+		inv:add_item("main", "map_maker:adminpick")
 	end
 end)
 
 minetest.register_on_respawnplayer(function(player)
 	local inv = player:get_inventory()
-	if not inv:contains_item("main", ItemStack("ctf_map:adminpick")) then
-		inv:add_item("main", ItemStack("ctf_map:adminpick"))
+	if not inv:contains_item("main", "map_maker:adminpick") then
+		inv:add_item("main", "map_maker:adminpick")
 	end
 end)
 
@@ -83,7 +84,7 @@ local function check_step()
 end
 minetest.after(1, check_step)
 
-minetest.register_node("ctf_map:flag", {
+minetest.register_node(":ctf_map:flag", {
 	description = "Flag",
 	drawtype="nodebox",
 	paramtype = "light",
@@ -93,8 +94,8 @@ minetest.register_node("ctf_map:flag", {
 		"default_wood.png",
 		"default_wood.png",
 		"default_wood.png",
-		"flag_grey2.png",
-		"flag_grey.png"
+		"map_maker_flag_grey.png",
+		"map_maker_flag_grey.png"
 	},
 	node_box = {
 		type = "fixed",
@@ -437,9 +438,9 @@ minetest.register_chatcommand("gui", {
 })
 
 -- Register special pickaxe to break indestructible nodes
-minetest.register_tool("ctf_map:adminpick", {
+minetest.register_tool("map_maker:adminpick", {
 	description = "Admin pickaxe used to break indestructible nodes.",
-	inventory_image = "ctf_map_adminpick.png",
+	inventory_image = "map_maker_adminpick.png",
 	range = 16,
 	tool_capabilities = {
 		full_punch_interval = 1.0,

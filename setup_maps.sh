@@ -1,6 +1,6 @@
-cd mods/ctf/ctf_map/maps/
+cd mods/ctf/ctf_map/ctf_map_core/maps/
 
-# Copy textures from map sub-dirs to ctf_map/textures
+# Copy textures from map sub-dirs to ctf_map_core/textures
 for f in *; do
 	if [ -d ${f} ]; then
 		# Screenshot

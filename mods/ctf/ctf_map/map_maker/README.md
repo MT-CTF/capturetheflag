@@ -1,30 +1,23 @@
-# CTF Map
-
-This mod handles creating and loading maps.
-
-## Attributions
-
-- Indestructible nodes adapted from various mods in `minetest_game`.
+# CTF Map - Map maker
 
 ## Creating a new map
 
 ### 1. Dependencies
 
-* Minetest 0.4.16 or later.
-* Mods
-  * ctf_map (by copying the folder from this game to `minetest/mods`)
-  * worldedit and worldedit_commands.
+* Minetest 5.0.0 or later.
+* `ctf_map` modpack (by copying the folder from this game to `minetest/mods`)
+* `worldedit` and `worldedit_commands`.
 
 ### 2. Find an area
 
 * Can use Minetest Game and any mapgen.
 * It must be a cube, and the barrier will be in the exact center.
-* It should be around 230x230 in surface area, but this can vary.
+* It should be around 230x230 in surface area, but this can be lesser.
 * Feel free to modify the area to your needs.
 
 ### 3. Select the area
 
-There are multiple ways do this, this is the simplist in most cases.
+There are multiple ways do this, this is the simplest in most cases.
 
 * If you haven't modified the map at all, do the following to speed up barrier placement:
   * Stop Minetest.
@@ -32,7 +25,7 @@ There are multiple ways do this, this is the simplist in most cases.
   * Set backend to "dummy".
   * Save.
 * Using worldedit, select the area.
-* Type /gui, and click "From WE" then "To WE".
+* Type `/gui`, and click "From WE" then "To WE".
 * Check that the center location is the right place for the barrier to go.
 * Check that the bounds extend far enough.
 
@@ -50,8 +43,7 @@ There are multiple ways do this, this is the simplist in most cases.
 ### 6. Export
 
 * Click export, and wait until completion.
-* Copy the two files from `worlddir/schems/` to `ctf_map/maps/`.
-* Rename the files so the two prefixed numbers are consistent to existing maps.
+* Copy the resultant folder from `worlddir/schems/` into `ctf_map/ctf_map_core/maps/`.
 * Profit!
 
 ## Documentation
@@ -94,16 +86,4 @@ An example `treasures` value that registers steel pick, shotgun, and grenade:
 treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
 ```
 
-(See [here](../../other/treasurer/README.md) to understand the magic numbers)
-
-## Indestructible nodes
-
-- `ctf_map` provides indestructible nodes for most nodes from default, and all nodes from
-stairs.
-
-- All indestructible nodes have the same item name with the mod prefix being `ctf_map:`
-instead of their original prefixes (e.g. `default:stone` -> `ctf_map:stone` and
-`stairs:stair_stone` -> `ctf_map:stair_stone`) with the exception of wool, whose
-indestructible nodes have slightly different names from the original node names -
-`ctf_map:wool_<color>`. This is because the original nomenclature becomes meaningless
-if the modname prefix is changed.
+(See [here](../../../other/treasurer/README.md) to understand the magic numbers)
