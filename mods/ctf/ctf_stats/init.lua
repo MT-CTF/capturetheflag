@@ -195,6 +195,12 @@ function ctf_stats.get_target(name, param)
 	end
 end
 
+function ctf_stats.is_pro(name)
+	local stats = ctf_stats.player(name)
+	local kd = stats.kills / (stats.deaths == 0 and 1 or stats.deaths)
+	return stats.score > 1000 and kd > 1.5
+end
+
 ctf.register_on_join_team(function(name, tname)
 	ctf_stats.current[tname][name] = ctf_stats.current[tname][name] or {
 		kills = 0,

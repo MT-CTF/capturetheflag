@@ -27,7 +27,7 @@ local function bounty_player(target)
 	-- bounty_score = -----------, or 500 (whichever is lesser)
 	--                   5000
 
-	local pstat, _ = ctf_stats.player(target)
+	local pstat = ctf_stats.player(target)
 	if pstat.deaths == 0 then
 		pstat.deaths = 1
 	end
@@ -44,7 +44,7 @@ local function bounty_player(target)
 		for _, player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
 			if bountied_player ~= name then
-				local prev_color = ctf_colors.get_color(prev, ctf.player(prev)).css
+				local prev_color = ctf_colors.get_color(ctf.player(prev)).css
 				minetest.chat_send_player(player:get_player_name(),
 					minetest.colorize("#fff326", "Player ") ..
 					minetest.colorize(prev_color, prev) ..
@@ -60,16 +60,13 @@ local function bounty_find_new_target()
 	local players = {}
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
-		local pstat, _ = ctf_stats.player(name)
-		pstat.name = name
-		pstat.color = nil
-		if pstat.score > 1000 and pstat.kills > pstat.deaths * 1.5 then
-			table.insert(players, pstat)
+		if ctf_stats.is_pro(name) then
+			table.insert(players, name)
 		end
 	end
 
 	if #players > 0 then
-		bounty_player(players[math.random(1, #players)].name)
+		bounty_player(players[math.random(1, #players)])
 	end
 
 	minetest.after(math.random(500, 1000), bounty_find_new_target)

@@ -6,15 +6,6 @@ local blacklist = {
 	"default:aspen_leaves"
 }
 
-local function max(a, b)
-	return (a > b) and a or b
-end
-
-local function get_is_player_pro(pstat)
-	local kd = pstat.kills / max(pstat.deaths, 1)
-	return pstat.score > 1000 and kd > 1.5
-end
-
 local colors = {"red", "blue"}
 for _, chest_color in pairs(colors) do
 	minetest.register_node("ctf_map_core:chest_" .. chest_color, {
@@ -68,8 +59,7 @@ for _, chest_color in pairs(colors) do
 				"list[current_player;main;0,9.08;8,3;8]",
 			}, "")
 
-			local pstat = ctf_stats.player(name)
-			if not pstat or not pstat.score or pstat.score < 10 then
+			if ctf_stats.player(name).score < 10 then
 				local msg = "You need at least 10 score to access the team chest.\n" ..
 					"Try killing an enemy player, or at least try to capture the flag.\n" ..
 					"Find resources in chests scattered around the map."
@@ -78,7 +68,7 @@ for _, chest_color in pairs(colors) do
 				return
 			end
 
-			local is_pro = get_is_player_pro(pstat)
+			local is_pro = ctf_stats.is_pro(name)
 			local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
 
 			formspec = formspec .. "list[" .. chestinv .. ";main;0,0.3;4,7;]" ..
@@ -111,12 +101,11 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			local pstat = ctf_stats.player(name)
-			if not pstat or not pstat.score or pstat.score < 10 then
+			if ctf_stats.player(name).score < 10 then
 				return 0
 			end
 
-			if (from_list ~= "pro" and to_list ~= "pro") or get_is_player_pro(pstat) then
+			if (from_list ~= "pro" and to_list ~= "pro") or ctf_stats.is_pro(name) then
 				if to_list == "helper" then
 					-- handle move & overflow
 					local chestinv = minetest.get_inventory({type = "node", pos = pos})
@@ -159,7 +148,7 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			if listname ~= "pro" or get_is_player_pro(pstat) then
+			if listname ~= "pro" or ctf_stats.is_pro(name) then
 				local chestinv = minetest.get_inventory({type = "node", pos = pos})
 				if chestinv:room_for_item("pro", stack) then
 					return stack:get_count()
@@ -188,12 +177,11 @@ for _, chest_color in pairs(colors) do
 				return 0
 			end
 
-			local pstat = ctf_stats.player(name)
-			if not pstat or not pstat.score or pstat.score < 10 then
+			if ctf_stats.player(name).score < 10 then
 				return 0
 			end
 
-			if listname ~= "pro" or get_is_player_pro(pstat) then
+			if listname ~= "pro" or ctf_stats.is_pro(name) then
 				return stack:get_count()
 			else
 				return 0
