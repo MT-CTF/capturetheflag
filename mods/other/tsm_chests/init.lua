@@ -15,6 +15,7 @@
 	For this, there is another example mod, called “trm_default_example”, which registers a bunch of items of the default mod, like default:gold_ingot.
 ]]
 
+tsm_chests = {}
 
 local chest_formspec =
 	"size[8,9]" ..
@@ -61,11 +62,11 @@ minetest.register_node("tsm_chests:chest", {
 		minetest.log("action", player:get_player_name() ..
 			" moves stuff in chest at " .. minetest.pos_to_string(pos))
 	end,
-    on_metadata_inventory_put = function(pos, listname, index, stack, player)
+	on_metadata_inventory_put = function(pos, listname, index, stack, player)
 		minetest.log("action", player:get_player_name() ..
 			" moves stuff to chest at " .. minetest.pos_to_string(pos))
 	end,
-    on_metadata_inventory_take = function(pos, listname, index, stack, player)
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		minetest.log("action", player:get_player_name() ..
 			" takes stuff from chest at " .. minetest.pos_to_string(pos))
 		local inv = minetest.get_inventory({type = "node", pos=pos})
@@ -78,12 +79,8 @@ minetest.register_node("tsm_chests:chest", {
 
 --[[ here are some configuration variables ]]
 
-local h_min = -65  		-- minimum chest spawning height, relative to water_level
-local h_max = 40		-- maximum chest spawning height, relative to water_level
-local t_min = 4			-- minimum amount of treasures found in a chest
-local t_max = 7			-- maximum amount of treasures found in a chest
-
-local water_level = tonumber(minetest.settings:get("water_level"))
+local t_min = 4  -- minimum amount of treasures found in a chest
+local t_max = 7  -- maximum amount of treasures found in a chest
 local get_node = minetest.get_node
 
 local function findGroundLevel(pos, y_min, y_max)
@@ -99,7 +96,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	end
 	for y=top,y_min,-1 do
 		local p = {x=pos.x,y=y,z=pos.z}
-					local name = get_node(p).name
+		local name = get_node(p).name
 		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
 			ground = y
 			break
@@ -170,19 +167,7 @@ end
 --[[ here comes the generation code
 	the interesting part which involes treasurer comes way below
 ]]
-function place_chests(minp, maxp, seed, number_chests)
-	minp = {x=minp.x, y=minp.y, z=minp.z}
-	maxp = {x=maxp.x, y=maxp.y, z=maxp.z}
-
-	-- chests minimum and maximum spawn height
-	local height_min = water_level + h_min
-	local height_max = water_level + h_max
-
-	if(maxp.y < height_min or minp.y > height_max) then
-		return
-	end
-	local y_min = math.max(minp.y, height_min)
-	local y_max = math.min(maxp.y, height_max)
+function tsm_chests.place_chests(minp, maxp, number_chests)
 	local attempts = 0
 	local chests_placed = 0
 	while chests_placed < number_chests and attempts < number_chests + 12 do
@@ -194,14 +179,9 @@ function place_chests(minp, maxp, seed, number_chests)
 		}
 
 		-- Find ground level
-		local ground = findGroundLevel(pos, y_min, y_max)
+		local ground = findGroundLevel(pos, minp.y, maxp.y)
 		if ground ~= nil then
 			local chest_pos = {x = pos.x, y = ground + 1, z = pos.z}
-
-			-- Don't spawn at barrier
-			if chest_pos.z == 0 then
-				chest_pos.z = -1
-			end
 
 			-- chest node name (before it becomes a chest)
 			local nn = minetest.get_node(chest_pos).name
