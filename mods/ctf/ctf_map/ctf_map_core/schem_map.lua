@@ -117,9 +117,9 @@ local function load_map_meta(idx, dirname, meta)
 
 	local map = {
 		dirname       = dirname,
+		name          = meta:get("name"),
 		r             = tonumber(meta:get("r")),
 		h             = tonumber(meta:get("h")),
-		name          = meta:get("name"),
 		author        = meta:get("author"),
 		hint          = meta:get("hint"),
 		rotation      = meta:get("rotation"),
@@ -131,6 +131,9 @@ local function load_map_meta(idx, dirname, meta)
 		start_time    = start_time and tonumber(start_time),
 		time_speed    = time_speed and tonumber(time_speed),
 		skybox        = ctf_map.skybox_exists(dirname),
+		phys_speed    = tonumber(meta:get("phys_speed")),
+		phys_jump     = tonumber(meta:get("phys_jump")),
+		phys_gravity  = tonumber(meta:get("phys_gravity")),
 		offset        = offset,
 		teams         = {},
 		chests        = {}
@@ -365,11 +368,8 @@ ctf_match.register_on_new_match(function()
 	-- Place map
 	place_map(ctf_map.map)
 
-	-- Update time speed
-	ctf_map.update_time()
-
-	-- Update players' skyboxes last
-	ctf_map.set_skybox_all()
+	-- Update per-map env. like time, time speed, skybox, physics, etc.
+	ctf_map.update_env()
 
 	-- Run on_map_loaded callbacks
 	for i = 1, #ctf_map.registered_on_map_loaded do

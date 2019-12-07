@@ -56,7 +56,14 @@ Each map's metadata is stored in an accompanying .conf file containing the follo
 * `author`: Author of the map.
 * `hint`: [Optional] Helpful hint or tip for unique maps, to help players understand the map.
 * `rotation`: Rotation of the schem. [`x`|`z`]
-* `screenshot`: File name of screenshot of the map; should include file extension.
+* `r`: Radius of the map.
+* `h`: Height of the map.
+* `team.i`: Name of team `i`.
+* `team.i.color`: Color of team `i`.
+* `team.i.pos`: Position of team `i`'s flag, relative to center of schem.
+* `chests.i.from`, `chests.i.to`: [Optional] Positions of diagonal corners of custom chest
+zone `i`, relative to the center of the schem.
+* `chests.i.n`: [Optional] Number of chests to place in custom chest zone `i`.
 * `license`: Name of the license of the map.
 * `other`: [Optional] Misc. information about the map. This is displayed in the maps catalog.
 * `base_node`: [Optional] Technical name of node to be used for the team base.
@@ -67,14 +74,9 @@ Each map's metadata is stored in an accompanying .conf file containing the follo
 format. Refer to the `treasures` sub-section for more details.
 * `start_time`: [Optional] Time at start of match. Defaults to `0.4` [`0` - `1`].
 * `time_speed`: [Optional] Time speed multiplier. Accepts any valid number. Defaults to 1.
-* `r`: Radius of the map.
-* `h`: Height of the map.
-* `team.i`: Name of team `i`.
-* `team.i.color`: Color of team `i`.
-* `team.i.pos`: Position of team `i`'s flag, relative to center of schem.
-* `chests.i.from`, `chests.i.to`: [Optional] Positions of diagonal corners of custom chest
-zone `i`, relative to the center of the schem.
-* `chests.i.n`: [Optional] Number of chests to place in custom chest zone `i`.
+* `phys_speed`: [Optional] Player speed multiplier. Accepts any valid number. Defaults to 1.
+* `phys_jump`: [Optional] Player jump multiplier. Accepts any valid number. Defaults to 1.
+* `phys_gravity`: [Optional] Player gravity multiplier. Accepts any valid number. Defaults to 1.
 
 #### `treasures`
 
