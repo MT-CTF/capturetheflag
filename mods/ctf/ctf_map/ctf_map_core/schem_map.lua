@@ -223,7 +223,6 @@ local function shuffle_maps(idx_to_avoid)
 	for i = 1, #ctf_map.available_maps, 1 do
 		shuffled_order[i] = i
 	end
-	print("\n\noriginal_order = " .. table.concat(shuffled_order, ", "))
 
 	-- Shuffle table
 	for i = #ctf_map.available_maps, 1, -1 do
@@ -233,11 +232,9 @@ local function shuffle_maps(idx_to_avoid)
 
 	-- Prevent the last map of the previous cycle from becoming the first in the next cycle
 	if shuffled_order[1] == idx_to_avoid then
-		print("BETWEEN_order = " .. table.concat(shuffled_order, ", ") .. "\n")
 		local k = math.random(#ctf_map.available_maps - 1)
 		shuffled_order[1], shuffled_order[k + 1] = shuffled_order[k + 1], shuffled_order[1]
 	end
-	print("shuffled_order = " .. table.concat(shuffled_order, ", ") .. "\n\n")
 end
 
 local random_selection_mode = false
@@ -306,12 +303,6 @@ local function load_maps()
 	if random_selection_mode then
 		shuffle_maps()
 	end
-
-	print("\n\n")
-	for i, map in pairs(ctf_map.available_maps) do
-		print("\t"..i.." | "..map.name)
-	end
-	print("\n\n")
 
 	return ctf_map.available_maps
 end
@@ -385,7 +376,6 @@ ctf_match.register_on_new_match(function()
 	ctf_map.map = ctf_map.available_maps[idx]
 	ctf_map.map.idx = idx
 
-	print("\t\tSelected map idx = "..idx)
 	map_str = "Map: " .. ctf_map.map.name .. " by " .. ctf_map.map.author
 
 	-- Register per-map treasures, or the default set of treasures
