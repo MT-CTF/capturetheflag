@@ -214,7 +214,7 @@ math.randomseed(os.time())
 
 -- Fisher-Yates shuffling algorithm, used for shuffling map selection order
 -- Adapted from snippet provided in https://stackoverflow.com/a/35574006
-local function shuffle_maps()
+local function shuffle_maps(idx_to_avoid)
 	-- Reset shuffled_idx
 	shuffled_idx = 1
 
@@ -229,6 +229,13 @@ local function shuffle_maps()
 	for i = #ctf_map.available_maps, 1, -1 do
 		local j = math.random(i)
 		shuffled_order[i], shuffled_order[j] = shuffled_order[j], shuffled_order[i]
+	end
+
+	-- Prevent the last map of the previous cycle from becoming the first in the next cycle
+	if shuffled_order[1] == idx_to_avoid then
+		print("BETWEEN_order = " .. table.concat(shuffled_order, ", ") .. "\n")
+		local k = math.random(#ctf_map.available_maps - 1)
+		shuffled_order[1], shuffled_order[k + 1] = shuffled_order[k + 1], shuffled_order[1]
 	end
 	print("shuffled_order = " .. table.concat(shuffled_order, ", ") .. "\n\n")
 end
@@ -248,7 +255,7 @@ local function select_map()
 
 		-- If shuffled_idx overflows, re-shuffle map selection order
 		if shuffled_idx > #ctf_map.available_maps then
-			shuffle_maps()
+			shuffle_maps(shuffled_order[#ctf_map.available_maps])
 		end
 	else
 		-- Choose next map index, but don't select the same one again
