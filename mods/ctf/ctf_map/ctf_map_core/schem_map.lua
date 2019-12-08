@@ -242,12 +242,15 @@ end
 
 local random_selection_mode = false
 local function select_map()
+	local idx
+
 	-- If next_idx exists, return the same
 	if ctf_map.next_idx then
-		return ctf_map.next_idx
+		idx = ctf_map.next_idx
+		ctf_map.next_idx = nil
+		return idx
 	end
 
-	local idx
 	if random_selection_mode then
 		-- Get the real idx stored in table shuffled_order at index [shuffled_idx]
 		idx = shuffled_order[shuffled_idx]
