@@ -206,6 +206,72 @@ local function load_map_meta(idx, dirname, meta)
 	return map
 end
 
+-- List of shuffled map indices, used in conjunction with random map selection
+local shuffled_order = {}
+local shuffled_idx
+
+math.randomseed(os.time())
+
+-- Fisher-Yates shuffling algorithm, used for shuffling map selection order
+-- Adapted from snippet provided in https://stackoverflow.com/a/35574006
+local function shuffle_maps(idx_to_avoid)
+	-- Reset shuffled_idx
+	shuffled_idx = 1
+
+	-- Create table of ordered indices
+	shuffled_order = {}
+	for i = 1, #ctf_map.available_maps, 1 do
+		shuffled_order[i] = i
+	end
+
+	-- Shuffle table
+	for i = #ctf_map.available_maps, 1, -1 do
+		local j = math.random(i)
+		shuffled_order[i], shuffled_order[j] = shuffled_order[j], shuffled_order[i]
+	end
+
+	-- Prevent the last map of the previous cycle from becoming the first in the next cycle
+	if shuffled_order[1] == idx_to_avoid then
+		local k = math.random(#ctf_map.available_maps - 1)
+		shuffled_order[1], shuffled_order[k + 1] = shuffled_order[k + 1], shuffled_order[1]
+	end
+end
+
+local random_selection_mode = false
+local function select_map()
+	local idx
+
+	-- If next_idx exists, return the same
+	if ctf_map.next_idx then
+		idx = ctf_map.next_idx
+		ctf_map.next_idx = nil
+		return idx
+	end
+
+	if random_selection_mode then
+		-- Get the real idx stored in table shuffled_order at index [shuffled_idx]
+		idx = shuffled_order[shuffled_idx]
+		shuffled_idx = shuffled_idx + 1
+
+		-- If shuffled_idx overflows, re-shuffle map selection order
+		if shuffled_idx > #ctf_map.available_maps then
+			shuffle_maps(shuffled_order[#ctf_map.available_maps])
+		end
+	else
+		-- Choose next map index, but don't select the same one again
+		if ctf_map.map then
+			idx = math.random(#ctf_map.available_maps - 1)
+			if idx >= ctf_map.map.idx then
+				idx = idx + 1
+			end
+		else
+			idx = math.random(#ctf_map.available_maps)
+		end
+		ctf_map.next_idx = (idx % #ctf_map.available_maps) + 1
+	end
+	return idx
+end
+
 local function load_maps()
 	local idx = 1
 	ctf_map.available_maps = {}
@@ -225,9 +291,19 @@ local function load_maps()
 			end
 		end
 	end
+
 	if not next(ctf_map.available_maps) then
 		error("No maps found in directory " .. ctf_map.mapdir)
 	end
+
+	-- Determine map selection mode depending on number of available maps
+	-- If random, then shuffle the map selection order
+	random_selection_mode = #ctf_map.available_maps >=
+		(tonumber(minetest.settings:get("ctf_map.random_selection_threshold")) or 10)
+	if random_selection_mode then
+		shuffle_maps()
+	end
+
 	return ctf_map.available_maps
 end
 
@@ -295,21 +371,8 @@ end
 ctf_match.register_on_new_match(function()
 	minetest.clear_objects({ mode = "quick" })
 
-	-- Choose next map index, but don't select the same one again
-	local idx
-	if ctf_map.next_idx then
-		idx = ctf_map.next_idx
-	elseif ctf_map.map then
-		idx = math.random(#ctf_map.available_maps - 1)
-		if idx >= ctf_map.map.idx then
-			idx = idx + 1
-		end
-	else
-		idx = math.random(#ctf_map.available_maps)
-	end
-	ctf_map.next_idx = (idx % #ctf_map.available_maps) + 1
-
-	-- Load meta data
+	-- Select map
+	local idx = select_map()
 	ctf_map.map = ctf_map.available_maps[idx]
 	ctf_map.map.idx = idx
 
