@@ -220,9 +220,9 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.captures  = main.captures  + 1
-		main.score     = main.score     + 25
+		main.score     = main.score     + 50
 		match.captures = match.captures + 1
-		match.score    = match.score    + 25
+		match.score    = match.score    + 50
 		_needs_save = true
 	end
 	ctf_stats.winner_player = name
@@ -230,7 +230,7 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	hud_score.new(name, {
 		name  = "ctf_stats:flag_capture",
 		color = "0xFF00FF",
-		value = 25
+		value = 50
 	})
 end)
 
@@ -292,16 +292,16 @@ ctf_flag.register_on_pick_up(function(name, flag)
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.attempts  = main.attempts  + 1
-		main.score     = main.score     + 10
+		main.score     = main.score     + 20
 		match.attempts = match.attempts + 1
-		match.score    = match.score    + 10
+		match.score    = match.score    + 20
 		_needs_save = true
 	end
 
 	hud_score.new(name, {
 		name  = "ctf_stats:flag_pick_up",
 		color = "0xAA00AA",
-		value = 10
+		value = 20
 	})
 end)
 
