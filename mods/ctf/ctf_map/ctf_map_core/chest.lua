@@ -82,7 +82,7 @@ for _, chest_color in pairs(colors) do
 					minetest.formspec_escape("Pro players only") .. "]"
 			else
 				formspec = formspec .. "label[4.75,3;" ..
-					minetest.formspec_escape("You need at least 1000" ..
+					minetest.formspec_escape("You need at least 10000" ..
 					"\nscore and 1.5+ KD to\naccess the pro section") .. "]"
 			end
 
