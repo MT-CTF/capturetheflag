@@ -1,3 +1,7 @@
+if not minetest.get_modpath("physics") then
+	error("Cannot find mod 'physics'!")
+end
+
 ----------
 -- TIME --
 ----------
