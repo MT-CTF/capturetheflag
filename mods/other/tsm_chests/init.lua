@@ -21,7 +21,8 @@ local non_ground_nodes = {
 	"air",
 	"default:water_source",
 	"default:lava_source",
-	"default:lava_flowing"
+	"default:lava_flowing",
+	"tsm_chests:chest"
 }
 
 local chest_formspec =
