@@ -58,7 +58,7 @@ minetest.register_globalstep(function(dtime)
 				--Kick player if he/she has been inactive for longer than MAX_INACTIVE_TIME seconds
 				if players[playerName]["lastAction"] + MAX_INACTIVE_TIME < currGameTime then
 					minetest.kick_player(playerName, "Kicked for inactivity")
-					minetest.chat_send_all("Player "..minetest.colorize("#006400",playerName).." has been kicked for inactivity.")
+					minetest.chat_send_all("*** "..playerName.." left the game (afk).")
 				end
 
 				--Warn player if he/she has less than WARN_TIME seconds to move or be kicked
