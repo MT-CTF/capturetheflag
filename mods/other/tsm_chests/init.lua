@@ -17,6 +17,13 @@
 
 tsm_chests = {}
 
+local non_ground_nodes = {
+	"air",
+	"default:water_source",
+	"default:lava_source",
+	"default:lava_flowing"
+}
+
 local chest_formspec =
 	"size[8,9]" ..
 	default.gui_bg ..
@@ -89,7 +96,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y = y_max, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
-		if name == "air" or name == "default:water_source" or name == "default:lava_source" then
+		if table.indexof(non_ground_nodes, name) ~= -1 then
 			top = y
 			break
 		end
@@ -97,7 +104,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y=top,y_min,-1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
-		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
+		if table.indexof(non_ground_nodes, name) == -1 then
 			ground = y
 			break
 		end
