@@ -60,7 +60,7 @@ local function bounty_find_new_target()
 	local players = {}
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
-		if ctf_stats.is_pro(name) then
+		if ctf_stats.is_pro(name) and name ~= bountied_player then
 			table.insert(players, name)
 		end
 	end
@@ -75,8 +75,7 @@ minetest.after(math.random(500, 1000), bounty_find_new_target)
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-	if bountied_player and
-			bountied_player ~= name then
+	if bountied_player and bountied_player ~= name then
 		announce(name)
 	end
 end)
