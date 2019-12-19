@@ -70,7 +70,7 @@ function grenades.register_grenade(name, def)
 			end
 
 			if self.sliding > 1 then -- Is the grenade sliding?
-				if vector.distance(vector.new(), vel) <= 1 and not vector.equals(vel, vector.new()) then -- Grenade is barely moving
+				if vector.distance(vector.new(), vel) <= 1 and not vector.equals(vel, vector.new()) then -- Grenade is barely moving, make sure it stays that way
 					obj:set_velocity(vector.new(0, -9.8, 0))
 					obj:set_acceleration(vector.new())
 				end
