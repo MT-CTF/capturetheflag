@@ -94,3 +94,9 @@ ctf_flag.register_on_capture(function(attname, flag)
 
 	ctf_match.check_for_winner()
 end)
+
+ctf_match.match_start_time = nil
+function ctf_match.get_match_duration()
+	return ctf_match.match_start_time and
+		(os.time() - ctf_match.match_start_time)
+end
