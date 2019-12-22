@@ -4,23 +4,19 @@ local bounty_score = 0
 local function announce(name)
 	local tcolor = ctf_colors.get_color(ctf.player(bountied_player))
 	minetest.chat_send_player(name,
-			minetest.colorize("#fff326", "The next person to kill ") ..
-			minetest.colorize(tcolor.css, bountied_player) ..
-			minetest.colorize("#fff326", " will receive " .. bounty_score .. " points!"))
+			minetest.colorize("#fff326", "Someone has") ..
+			minetest.colorize("#fff326", " been chosen as bounty!"))
 end
 
 local function announce_all()
 	if bountied_player then
 		for _, player in pairs(minetest.get_connected_players()) do
-			if bountied_player ~= player:get_player_name() then
-				announce(player:get_player_name())
-			end
+			announce(player:get_player_name())
 		end
 	end
 end
 
 local function bounty_player(target)
-	local prev = bountied_player
 	bountied_player = target
 
 	--                Score * K/D
@@ -40,16 +36,11 @@ local function bounty_player(target)
 	end
 	bounty_score = math.floor(bounty_score)
 
-	if prev then
+	if bountied_player then
 		for _, player in pairs(minetest.get_connected_players()) do
-			local name = player:get_player_name()
-			if bountied_player ~= name then
-				local prev_color = ctf_colors.get_color(ctf.player(prev)).css
-				minetest.chat_send_player(player:get_player_name(),
-					minetest.colorize("#fff326", "Player ") ..
-					minetest.colorize(prev_color, prev) ..
-					minetest.colorize("#fff326", " no longer has a bounty on their head!"))
-			end
+			minetest.chat_send_player(player:get_player_name(),
+				minetest.colorize("#fff326", "No one was able to kill") ..
+				minetest.colorize("#fff326", " the player who had bounty!"))
 		end
 	end
 
@@ -94,7 +85,13 @@ ctf.register_on_killedplayer(function(victim, killer)
 	end
 	bountied_player = nil
 
-	local msg = killer .. " has killed " .. victim .. " and received the prize!"
+	local killer_color = ctf_colors.get_color(ctf.player(killer)).css
+	local victim_color = ctf_colors.get_color(ctf.player(victim)).css
+	local msg = minetest.colorize(killer_color, killer) ..
+				minetest.colorize("#fff326"," has killed ") ..
+				minetest.colorize(victim_color, victim) ..
+				minetest.colorize("#fff326", " and received ") ..
+				minetest.colorize("#fff326", bounty_score .. " points!")
 	minetest.log("action", msg)
 	minetest.chat_send_all(msg)
 	hud_score.new(killer, {
