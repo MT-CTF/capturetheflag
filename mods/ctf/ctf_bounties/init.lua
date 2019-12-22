@@ -2,7 +2,6 @@ local bountied_player = nil
 local bounty_score = 0
 
 local function announce(name)
-	local tcolor = ctf_colors.get_color(ctf.player(bountied_player))
 	minetest.chat_send_player(name,
 			minetest.colorize("#fff326", "Someone has") ..
 			minetest.colorize("#fff326", " been chosen as bounty!"))
