@@ -51,20 +51,28 @@ local function return_as_chat_result(to, target)
 	return result
 end
 
+local function summary_func(name)
+	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
+	ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+
+	fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
+
+	minetest.log("action", name .. " requested match summary formspec")
+	minetest.show_formspec(name, "ctf_stats:match_summary", fs)
+end
+
 -------------------
 -- Chat-commands --
 -------------------
 
 minetest.register_chatcommand("summary", {
-	func = function(name)
-		local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-			ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+	description = "Display the match summary",
+	func = summary_func
+})
 
-		fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
-
-		minetest.log("action", name .. " requested match summary formspec")
-		minetest.show_formspec(name, "ctf_stats:match_summary", fs)
-	end
+minetest.register_chatcommand("s", {
+	description = "Display the match summary",
+	func = summary_func
 })
 
 minetest.register_chatcommand("r", {
