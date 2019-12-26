@@ -41,7 +41,7 @@ do
 		buildable_to = false,
 		use_texture_alpha = false,
 		alpha = 0,
-		pointable = false,
+		pointable = true,
 		groups = {immortal = 1},
 		sounds = default.node_sound_glass_defaults()
 	})
