@@ -351,20 +351,20 @@ local function calculateKillReward(victim, killer)
 
 	-- 30 * K/D ratio, with variable based on player's score
 	local kdreward = 30 * vmain.kills / (vmain.deaths + 1)
-	local max = vmain.score / 6
+	local max = vmain.score / 5
 	if kdreward > max then
 		kdreward = max
 	end
-	if kdreward > 80 then
-		kdreward = 80
+	if kdreward > 100 then
+		kdreward = 100
 	end
 	reward = reward + kdreward
 
-	-- Limited to  0 <= X <= 200
-	if reward > 200 then
-		reward = 200
-	elseif reward < 14 then
-		reward = 14
+	-- Limited to  5 <= X <= 250
+	if reward > 250 then
+		reward = 250
+	elseif reward < 5 then
+		reward = 5
 	end
 
 	-- Half if no good weapons
