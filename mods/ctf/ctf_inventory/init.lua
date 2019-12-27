@@ -1,5 +1,5 @@
 local items = {
-	minetest.colorize("#66a0ff", "Game Play"),
+	"Game Play",
 	"",
 	"*  Capture an enemy's flag by walking up to it, punching it, then",
 	"   running and punching your team's flag.",
@@ -12,21 +12,21 @@ local items = {
 	"   killing 2 people for every death.",
 	"",
 
-	minetest.colorize("#66a0ff", "Team Co-op"),
+	"Team Co-op",
 	"",
 	"*  Your team has a chest near your flag.",
 	"*  Your team name is displayed in the top left.",
 	"   to talk with only your team, type: /t message",
 	"",
 
-	minetest.colorize("#66a0ff", "Player Rankings"),
+	"Player Rankings",
 	"",
 	"*  See the league table by typing /rankings",
 	"*  See your position in it by typing /rankings me",
 	"*  Get to the top by capturing lots of flags, and having a high K/D ratio.",
 	"",
 
-	minetest.colorize("#66a0ff", "Contact Moderators"),
+	"Contact Moderators",
 	"",
 	"*  Report people who sabotage using /report."
 }
