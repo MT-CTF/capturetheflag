@@ -1,6 +1,6 @@
 local items = {
 	"",
-	"#66a0ffGame Play",
+	"#66a0ff" .. "Game Play",
 	"",
 	"*  Capture an enemy's flag by walking up to it, punching it, then",
 	"   running and punching your team's flag.",
@@ -13,21 +13,21 @@ local items = {
 	"   killing 2 people for every death.",
 	"",
 
-	"#66a0ffTeam Co-op",
+	"#66a0ff" .. "Team Co-op",
 	"",
 	"*  Your team has a chest near your flag.",
 	"*  Your team name is displayed in the top left.",
 	"   to talk with only your team, type: /t message",
 	"",
 
-	"#66a0ffPlayer Rankings",
+	"#66a0ff" .. "Player Rankings",
 	"",
 	"*  See the league table by typing /rankings",
 	"*  See your position in it by typing /rankings me",
 	"*  Get to the top by capturing lots of flags, and having a high K/D ratio.",
 	"",
 
-	"#66a0ffContact Moderators",
+	"#66a0ff" .. "Contact Moderators",
 	"",
 	"*  Report people who sabotage using /report."
 }
