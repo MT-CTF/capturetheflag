@@ -382,8 +382,8 @@ ctf_match.register_on_new_match(function()
 	-- if treasures field hasn't been defined in map meta
 	if ctf_treasure then
 		treasurer.treasures = {}
-		if ctf_map.treasures then
-			for _, item in pairs(ctf_map.treasures) do
+		if ctf_map.map.treasures then
+			for _, item in pairs(ctf_map.map.treasures) do
 				item = item:split(",")
 				-- treasurer.register_treasure(name, rarity, preciousness, count)
 				if #item == 4 then
