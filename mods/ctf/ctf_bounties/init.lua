@@ -97,9 +97,9 @@ ctf.register_on_killedplayer(function(victim, killer)
 	local killer_color = ctf_colors.get_color(ctf.player(killer)).css
 	local victim_color = ctf_colors.get_color(ctf.player(victim)).css
 	local msg = minetest.colorize(killer_color, killer) ..
-				minetest.colorize("#fff326", " has killed ") ..
-				minetest.colorize(victim_color, victim) ..
-				minetest.colorize("#fff326", " and received " .. bounty_score .. " points!")
+		minetest.colorize("#fff326", " has killed ") ..
+		minetest.colorize(victim_color, victim) ..
+		minetest.colorize("#fff326", " and received " .. bounty_score .. " points!")
 	minetest.log("action", minetest.strip_colors(msg))
 	minetest.chat_send_all(msg)
 	hud_score.new(killer, {
