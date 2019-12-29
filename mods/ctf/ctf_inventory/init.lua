@@ -1,7 +1,7 @@
-local colour = "#66A0FF"
+local color = "#66A0FF"
 local items = {
 	"",
-	colour .. "Game Play",
+	color .. "Game Play",
 	"",
 	"*  Capture an enemy's flag by walking up to it, punching it, then",
 	"   running and punching your team's flag.",
@@ -14,21 +14,21 @@ local items = {
 	"   killing 2 people for every death.",
 	"",
 
-	colour .. "Team Co-op",
+	color .. "Team Co-op",
 	"",
 	"*  Your team has a chest near your flag.",
 	"*  Your team name is displayed in the top left.",
 	"   to talk with only your team, type: /t message",
 	"",
 
-	colour .. "Player Rankings",
+	color .. "Player Rankings",
 	"",
 	"*  See the league table by typing /rankings",
 	"*  See your position in it by typing /rankings me",
 	"*  Get to the top by capturing lots of flags, and having a high K/D ratio.",
 	"",
 
-	colour .. "Contact Moderators",
+	color .. "Contact Moderators",
 	"",
 	"*  Report people who sabotage using /report."
 }
