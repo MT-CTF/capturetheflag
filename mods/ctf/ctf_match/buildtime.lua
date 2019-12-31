@@ -24,11 +24,22 @@ function ctf_match.is_in_build_time()
 	return ctf_match.build_timer > 0
 end
 
+local btime
+local mply = 0.5
+local n = 10 --Number of players required to set the build time to half of what it is
 ctf_match.register_on_new_match(function()
 	ctf_match.build_timer = ctf.setting("match.build_time")
+	if #minetest.get_connected_players() <= n then
+		ctf_match.build_timer = ctf_match.build_timer * mply
+	end
+	btime = ctf_match.build_timer
 end)
 ctf.register_on_new_game(function()
 	ctf_match.build_timer = ctf.setting("match.build_time")
+	if #minetest.get_connected_players() <= n then
+		ctf_match.build_timer = ctf_match.build_timer * mply
+	end
+	btime = ctf_match.build_timer
 	if ctf_match.build_timer > 0 then
 		for i = 1, #ctf_match.registered_on_build_time_start do
 			ctf_match.registered_on_build_time_start[i]()
@@ -71,7 +82,7 @@ end)
 
 ctf_match.register_on_build_time_start(function()
 	minetest.chat_send_all("Prepare your base! Match starts in " ..
-		ctf.setting("match.build_time") .. " seconds.")
+		btime .. " seconds.")
 end)
 
 ctf_match.register_on_build_time_end(function()
