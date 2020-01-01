@@ -58,3 +58,9 @@
 | name                       | default value | description                                                      |
 | -------------------------- | ------------- | ---------------------------------------------------------------- |
 | node_ownership             | true          | Whether node protection per team is enabled                      |
+
+# ctf_match
+
+| name                       | default value | description                                                      |
+| -------------------------- | ------------- | ---------------------------------------------------------------- |
+| match.restart_on_next_match| false         | Whether restart server on next match                             |
