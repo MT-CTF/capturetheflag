@@ -1,0 +1,61 @@
+
+
+License for Code
+----------------
+
+Copyright (C) 2016-2017 D00Med <heiselong@gmx.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+Updates and help:
+Wuzzy(aka Wuzzy2)
+Thomas--S
+zaoqi <zaoqiff@gmail.com>
+
+License for Textures, Models
+---------------------------------------
+
+CC BY-SA 3.0 UNPORTED. Created by D00Med
+
+policecar.b3d- CC BY-SA 3.0 UNPORTED. Created by Kdog14 and D00Med
+
+geep.b3d, vehicles_geep.png - CC BY-SA 3.0 UNPORTED. Created by Kdog14
+
+License for sounds:
+CC BY-NC 3.0 oniwe https://freesound.org/people/oniwe/sounds/32316/
+
+shot.ogg - CC BY-NC 3.0 by Kibblesbob http://soundbible.com/1804-M4A1-Single.html
+
+ambulance.ogg - CC BY-SA 4.0 by Demircimehmed https://commons.wikimedia.org/wiki/File:AmbulanceSound1.wav
+
+--License of lib_mount:
+-- Minetest mod: lib_mount
+-- =======================
+-- by blert2112
+
+-- Based on the Boats mod by PilzAdam.
+
+
+-- -----------------------------------------------------------
+-- -----------------------------------------------------------
+
+
+-- Minetest Game mod: boats
+-- ========================
+-- by PilzAdam
+
+-- License of source code:
+-- -----------------------
+-- WTFPL

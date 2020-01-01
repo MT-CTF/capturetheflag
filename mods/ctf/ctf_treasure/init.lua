@@ -25,6 +25,11 @@ function ctf_treasure.get_default_treasures()
 		{ "shooter:ammo",        0.3,  2, { 1, 10 } },
 		{ "shooter:arrow_white", 0.5,  2, { 2, 18 } },
 
+		{ "vehicles:missile_2_item"     , 0.01, 2, 2 },
+		{ "vehicles:rc"                 , 0.01, 2, 1 },
+		{ "vehicles:helicopter_spawner" , 0.01, 2, 1 },
+		{ "vehicles:plane_spawner"      , 0.01, 2, 1 },
+
 		{ "medkits:medkit",       0.8, 5, 2 },
 		{ "ctf_bandages:bandage", 0.8, 2, { 2, 4 } }
 	}
