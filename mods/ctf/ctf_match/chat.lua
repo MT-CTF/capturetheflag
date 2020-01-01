@@ -1,3 +1,9 @@
+-- Initialise
+ctf.register_on_init(function()
+	ctf.log("match", "Initialising...")
+	ctf._set("match.restart_on_next_match", false)
+end)
+
 minetest.register_privilege("ctf_match", {
 	description = "can skip matches"
 })
@@ -50,7 +56,7 @@ minetest.register_chatcommand("ctf_respawn", {
 	end
 })
 
-local restart_on_next_match = false
+local restart_on_next_match = ctf.setting("match.restart_on_next_match")
 local restart_on_next_match_by = nil
 minetest.register_chatcommand("ctf_queue_restart", {
 	description = "Queue server restart",
@@ -79,7 +85,9 @@ minetest.register_chatcommand("ctf_unqueue_restart", {
 
 ctf_match.register_on_new_match(function()
 	if restart_on_next_match then
-		minetest.chat_send_player(restart_on_next_match_by, "Shutting down now!")
+		if restart_on_next_match_by ~= nil then
+			minetest.chat_send_player(restart_on_next_match_by, "Shutting down now!")
+		fi
 		minetest.request_shutdown("Restarting server at operator request.", true)
 	end
 end)
