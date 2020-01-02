@@ -78,6 +78,21 @@ format. Refer to the `treasures` sub-section for more details.
 * `phys_jump`: [Optional] Player jump multiplier. Accepts any valid number. Defaults to 1.
 * `phys_gravity`: [Optional] Player gravity multiplier. Accepts any valid number. Defaults to 1.
 
+#### `license`
+
+* Every map must have its own license. Once you've chosen your license, simply add the following line to the map's `.conf` file:
+```lua
+license = <name>
+```
+* If license require something (for example if you modify other's map and you have to tell who is author of the original map) you have to include this in `license`.
+If you want to tell more infomation, you can use:
+```lua
+others = <description>
+```
+* Recommended is `CC BY-SA 4.0`, a very good all-rounder license, which most of our maps use.
+Unless you know what you're doing, we recommend choosing `CC BY-SA 4.0` and don't just use it without having read any information about it.
+
+
 #### `treasures`
 
 `treasures` is a list of treasures to be registered for this map in serialized format.
@@ -106,5 +121,7 @@ Six images which should be in map's folder.
 * `skybox_4.png` - west
 * `skybox_5.png` - south
 * `skybox_6.png` - north
+
+* You have to include skybox license in `license` in `.conf` file
 
 (You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
