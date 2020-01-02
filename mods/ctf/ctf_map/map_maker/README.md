@@ -94,14 +94,14 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 
 Six images which should be in map's folder.
 
-`skybox_1.png` - up
-`skybox_2.png` - down
-`skybox_3.png` - east
-`skybox_4.png` - west
-`skybox_5.png` - south
-`skybox_6.png` - north
+* `skybox_1.png` - up
+* `skybox_2.png` - down
+* `skybox_3.png` - east
+* `skybox_4.png` - west
+* `skybox_5.png` - south
+* `skybox_6.png` - north
 
-(You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
+You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
 
 
 
