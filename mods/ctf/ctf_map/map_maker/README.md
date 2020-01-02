@@ -90,6 +90,12 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
 
+#### `screenshot`
+
+Every map must have its own screenshot in map's folder. It should have ratio around 3:2 (screenshot 600x400 is suggested).
+
+It should be named `screenshot.png`.
+
 #### `skybox` [Optional]
 
 Six images which should be in map's folder.
@@ -101,7 +107,7 @@ Six images which should be in map's folder.
 * `skybox_5.png` - south
 * `skybox_6.png` - north
 
-You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
+(You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
 
 
 
