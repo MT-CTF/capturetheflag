@@ -125,3 +125,29 @@ Six images which should be in map's folder.
 * You have to include skybox license in `license` in `.conf` file
 
 (You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
+
+## Editing exported map
+
+The easiest way to edit exported maps is the following:
+* Create a world using `singlenode` mapgen. Enable `WorldEdit` and `ctf_map` mod,
+* Go in the world's folder, create a folder named `schems`, and place the `.mts` file inside,
+* Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
+* Do `//1` to set the position where you will generate the map,
+* Do `//mtschemplace yourschematic` (where `yourschematic` is the name of the mts file without `.mts`).
+
+* When you finish, place `//1` and `//2` exactly in opposite corners of map/cube,
+* Do `//mtschemcreate <new_name>` to create new edited `.mts` file. It will be saved in `schems` folder.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
