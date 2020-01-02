@@ -89,7 +89,7 @@ If you want to tell more infomation, you can use:
 ```lua
 others = <description>
 ```
-* Recommended is `CC BY-SA 4.0`, a very good all-rounder license, which most of our maps use.
+* Recommended license is `CC BY-SA 4.0`, a very good all-rounder license, which most of our maps use.
 Unless you know what you're doing, we recommend choosing `CC BY-SA 4.0` and don't just use it without having read any information about it.
 
 
@@ -122,7 +122,7 @@ Six images which should be in map's folder.
 * `skybox_5.png` - south
 * `skybox_6.png` - north
 
-* You have to include skybox license in `license` in `.conf` file
+You have to include skybox license in `license` in `.conf` file
 
 (You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
 
@@ -134,6 +134,7 @@ The easiest way to edit exported maps is the following:
 * Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
 * Do `//1` to set the position where you will generate the map,
 * Do `//mtschemplace yourschematic` (where `yourschematic` is the name of the mts file without `.mts`).
+
 
 * When you finish, place `//1` and `//2` exactly in opposite corners of map/cube,
 * Do `//mtschemcreate <new_name>` to create new edited `.mts` file. It will be saved in `schems` folder.
