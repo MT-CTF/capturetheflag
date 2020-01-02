@@ -90,13 +90,13 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
 
-#### `screenshot`
+### `screenshot`
 
 Every map must have its own screenshot in map's folder. It should have ratio around 3:2 (screenshot 600x400 is suggested).
 
 It should be named `screenshot.png`.
 
-#### `skybox` [Optional]
+### `skybox` [Optional]
 
 Six images which should be in map's folder.
 
