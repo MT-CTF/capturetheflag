@@ -92,7 +92,7 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 
 ### `screenshot`
 
-Every map must have its own screenshot in map's folder. It should have ratio around 3:2 (screenshot 600x400 is suggested).
+Every map must have its own screenshot in map's folder. It should have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
 
 It should be named `screenshot.png`.
 
