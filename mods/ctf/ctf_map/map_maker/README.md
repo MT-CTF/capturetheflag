@@ -124,4 +124,4 @@ Six images which should be in map's folder.
 
 * You have to include skybox license in `license` in `.conf` file
 
-(You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
+(You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
