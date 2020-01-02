@@ -108,14 +108,3 @@ Six images which should be in map's folder.
 * `skybox_6.png` - north
 
 (You can find some good skyboxes with suitable licenses [here](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
-
-
-
-
-
-
-
-
-
-
-
