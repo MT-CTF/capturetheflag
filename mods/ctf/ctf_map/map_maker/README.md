@@ -135,8 +135,9 @@ The easiest way to edit exported maps is the following:
 * Do `//1` to set the position where you will generate the map,
 * Do `//mtschemplace yourschematic` (where `yourschematic` is the name of the mts file without `.mts`).
 
+When you finish:
 
-* When you finish, place `//1` and `//2` exactly in opposite corners of map/cube,
+* Place `//1` and `//2` exactly in opposite corners of map (cube),
 * Do `//mtschemcreate <new_name>` to create new edited `.mts` file. It will be saved in `schems` folder.
 
 
