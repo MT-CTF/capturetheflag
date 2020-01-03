@@ -139,17 +139,3 @@ When you finish:
 
 * Place `//1` and `//2` exactly in opposite corners of map (cube),
 * Do `//mtschemcreate <new_name>` to create new edited `.mts` file. It will be saved in `schems` folder.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
