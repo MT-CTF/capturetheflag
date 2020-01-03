@@ -89,6 +89,7 @@ If you want to tell more infomation, you can use:
 ```lua
 others = <description>
 ```
+* If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
 * Recommended license is `CC BY-SA 4.0`, a very good all-rounder license, which most of our maps use.
 Unless you know what you're doing, we recommend choosing `CC BY-SA 4.0` and don't just use it without having read any information about it.
 
