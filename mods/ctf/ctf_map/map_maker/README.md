@@ -91,7 +91,7 @@ others = <description>
 ```
 * If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
 * We can only accept Free Software licenses, e.g.`CC BY-SA 4.0`.
-Unless you know what you're doing, we recommend choosing `CC BY-SA 4.0` and don't just use it without having read any information about it.
+* Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
 
 
 #### `treasures`
