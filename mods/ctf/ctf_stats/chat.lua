@@ -183,8 +183,8 @@ minetest.register_chatcommand("transfer_rankings", {
 		if not ctf_stats.players[dest] then
 			return false, "Player '" .. dest .. "' does not exist."
 		end
-		if ctf.player(src) == ctf.player(dest) then
-			return false, "You cannot transfer your own rankings!"
+		if src == dest then
+			return false, "Source name and destination name cannot be the same!"
 		end
 
 		ctf_stats.players[dest] = ctf_stats.players[src]
