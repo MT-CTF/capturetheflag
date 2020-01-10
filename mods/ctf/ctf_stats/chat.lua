@@ -23,7 +23,7 @@ local function return_as_chat_result(to, target)
 		end
 
 		-- If stat does not exist yet, set place to size of players + 1
-		if place < 1 then
+		if not place then
 			place = #players + 1
 		end
 	else
