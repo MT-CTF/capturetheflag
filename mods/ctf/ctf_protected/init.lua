@@ -6,7 +6,7 @@ function minetest.is_protected(pos, name)
 	if string.sub(minetest.get_node(pos).name, 1, 8) == "ctf_map:" then
 		return true
 	end
-	
+
 	if r <= 0 or rs == 0 then
 		return old_is_protected(pos, name)
 	end
