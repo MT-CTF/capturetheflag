@@ -44,7 +44,8 @@ end
 
 local old_is_protected = minetest.is_protected
 function minetest.is_protected(pos, name)
-	if string.sub(minetest.get_node(pos).name, 1, 8) == "ctf_map:" then
+	local node = minetest.get_node(pos).name
+	if string.sub(node, 1, 8) == "ctf_map:" and minetest.get_item_group(node, "immortal") == 1 then
 		return true
 	end
 	return old_is_protected(pos, name)
