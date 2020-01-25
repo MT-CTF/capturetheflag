@@ -41,3 +41,11 @@ if minetest.get_modpath("ctf") then
 
 	ctf_match.register_on_build_time_end(ctf_map.remove_middle_barrier)
 end
+
+local old_is_protected = minetest.is_protected
+function minetest.is_protected(pos, name)
+	if string.sub(minetest.get_node(pos).name, 1, 8) == "ctf_map:" then
+		return true
+	end
+	return old_is_protected(pos, name)
+end
