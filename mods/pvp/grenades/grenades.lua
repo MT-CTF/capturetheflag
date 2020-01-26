@@ -148,6 +148,7 @@ grenades.register_grenade("grenades:frag", {
 
 -- Smoke Grenade
 
+local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
@@ -165,12 +166,12 @@ grenades.register_grenade("grenades:smoke", {
 			max_hear_distance = 32,
 		})
 
-		minetest.after(40, minetest.sound_stop, hiss)
+		minetest.after(SMOKE_GRENADE_TIME, minetest.sound_stop, hiss)
 
 		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
 				amount = 40,
-				time = 45,
+				time = SMOKE_GRENADE_TIME + 3,
 				minpos = vector.subtract(pos, 2),
 				maxpos = vector.add(pos, 2),
 				minvel = {x = 0, y = 2, z = 0},
