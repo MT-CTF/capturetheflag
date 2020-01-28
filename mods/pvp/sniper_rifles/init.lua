@@ -109,3 +109,13 @@ shooter:register_weapon("sniper_rifles:rifle_magnum", {
 		}
 	}
 })
+
+-- shooter API doesn't allow for setting wield scale, so define it after registration
+
+minetest.override_item("sniper_rifles:rifle_762", {
+	wield_scale = vector.new(2, 2, 1.5)
+})
+
+minetest.override_item("sniper_rifles:rifle_magnum", {
+	wield_scale = vector.new(2, 2, 1.5)
+})
