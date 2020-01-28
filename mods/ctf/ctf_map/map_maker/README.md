@@ -81,14 +81,18 @@ format. Refer to the `treasures` sub-section for more details.
 #### `license`
 
 * Every map must have its own license. Once you've chosen your license, simply add the following line to the map's `.conf` file:
+
 ```lua
-license = <name>
+	license = <name>
 ```
+
 * If license require something (for example if you modify other's map and you have to tell who is author of the original map) you have to include this in `license`.
 If you want to tell more infomation, you can use:
+
 ```lua
-others = <description>
+	others = <description>
 ```
+
 * If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
 * We can only accept Free Software licenses, e.g.`CC BY-SA 4.0`.
 * Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
@@ -101,7 +105,7 @@ others = <description>
 An example `treasures` value that registers steel pick, shotgun, and grenade:
 
 ```lua
-treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
+	treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
 ```
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
