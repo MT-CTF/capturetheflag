@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("other")
+
 --[[
 RandomMessages mod by arsdragonfly.
 arsdragonfly@gmail.com
@@ -127,7 +130,7 @@ minetest.after(MESSAGE_INTERVAL, step)
 local register_chatcommand_table = {
 	params = "viewmessages | removemessage <number> | addmessage <number>",
 	privs = {server = true},
-	description = "View and/or alter the server's random messages",
+	description = S("View and/or alter the server's random messages"),
 	func = function(name,param)
 		local t = string.split(param, " ")
 		if t[1] == "viewmessages" then

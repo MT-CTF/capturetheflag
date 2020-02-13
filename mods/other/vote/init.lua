@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("other")
+
 vote = {
 	active = {},
 	queue = {},
@@ -143,7 +146,7 @@ function vote.vote(voteset, name, value)
 end
 
 minetest.register_privilege("vote_admin", {
-	description = "Allows a player to manage running votes."
+	description = S("Allows a player to manage running votes.")
 })
 
 function vote.clear()
@@ -228,11 +231,11 @@ end
 minetest.after(5, vote.update_all_hud)
 
 minetest.register_privilege("vote", {
-	description = "Can vote on issues",
+	description = S("Can vote on issues"),
 })
 
 minetest.register_privilege("vote_starter", {
-	description = "Can start votes on issues",
+	description = S("Can start votes on issues"),
 })
 
 minetest.register_chatcommand("yes", {

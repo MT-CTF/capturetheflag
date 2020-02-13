@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 local function throw_hook(itemstack, user, vel)
 	local inv = user:get_inventory()
 	local pos = user:getpos()
@@ -68,7 +71,7 @@ minetest.register_entity("shooter:hook", {
 })
 
 minetest.register_tool("shooter:grapple_hook", {
-	description = "Grappling Hook",
+	description = S("Grappling Hook"),
 	inventory_image = "shooter_hook.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "nothing" then
@@ -80,7 +83,7 @@ minetest.register_tool("shooter:grapple_hook", {
 })
 
 minetest.register_tool("shooter:grapple_gun", {
-	description = "Grappling Gun",
+	description = S("Grappling Gun"),
 	inventory_image = "shooter_hook_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()
@@ -98,7 +101,7 @@ minetest.register_tool("shooter:grapple_gun", {
 })
 
 minetest.register_tool("shooter:grapple_gun_loaded", {
-	description = "Grappling Gun",
+	description = S("Grappling Gun"),
 	inventory_image = "shooter_hook_gun_loaded.png",
 	groups = {not_in_creative_inventory=1},
 	on_use = function(itemstack, user, pointed_thing)

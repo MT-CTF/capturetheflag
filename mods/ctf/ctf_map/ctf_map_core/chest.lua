@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 local blacklist = {
 	"default:leaves",
 	"default:jungleleaves",
@@ -9,7 +12,7 @@ local blacklist = {
 local colors = {"red", "blue"}
 for _, chest_color in pairs(colors) do
 	minetest.register_node("ctf_map_core:chest_" .. chest_color, {
-		description = "Chest",
+		description = S("Chest"),
 		tiles = {
 			"default_chest_top_" .. chest_color .. ".png",
 			"default_chest_top_" .. chest_color .. ".png",

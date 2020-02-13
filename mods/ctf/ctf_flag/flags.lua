@@ -1,6 +1,9 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 -- The flag
 minetest.register_node("ctf_flag:flag", {
-	description = "Flag",
+	description = S("Flag"),
 	drawtype="nodebox",
 	paramtype = "light",
 	walkable = false,
@@ -29,7 +32,7 @@ minetest.register_node("ctf_flag:flag", {
 
 for color, _ in pairs(ctf.flag_colors) do
 	minetest.register_node("ctf_flag:flag_top_"..color,{
-		description = "You are not meant to have this! - flag top",
+		description = S("You are not meant to have this! - flag top"),
 		drawtype="nodebox",
 		paramtype = "light",
 		walkable = false,
@@ -55,7 +58,7 @@ for color, _ in pairs(ctf.flag_colors) do
 end
 
 minetest.register_node("ctf_flag:flag_captured_top",{
-	description = "You are not meant to have this! - flag captured",
+	description = S("You are not meant to have this! - flag captured"),
 	drawtype = "nodebox",
 	paramtype = "light",
 	walkable = false,

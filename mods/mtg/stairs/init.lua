@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("mtg")
+
 -- Minetest 0.4 mod: stairs
 -- See README.txt for licensing and other information.
 
@@ -308,7 +311,7 @@ function stairs.register_stair_inner(subname, recipeitem, groups, images,
 	local new_groups = table.copy(groups)
 	new_groups.stair = 1
 	minetest.register_node(":stairs:stair_inner_" .. subname, {
-		description = "Inner " .. description,
+		description = S("Inner ") .. description,
 		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",
@@ -389,7 +392,7 @@ function stairs.register_stair_outer(subname, recipeitem, groups, images,
 	local new_groups = table.copy(groups)
 	new_groups.stair = 1
 	minetest.register_node(":stairs:stair_outer_" .. subname, {
-		description = "Outer " .. description,
+		description = S("Outer ") .. description,
 		drawtype = "nodebox",
 		tiles = stair_images,
 		paramtype = "light",

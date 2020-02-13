@@ -1,5 +1,8 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 minetest.register_craftitem("shooter:flare", {
-	description = "Flare",
+	description = S("Flare"),
 	inventory_image = "shooter_flare_inv.png",
 })
 
@@ -96,7 +99,7 @@ minetest.register_entity("shooter:flare_entity", {
 })
 
 minetest.register_tool("shooter:flaregun", {
-	description = "Flare Gun",
+	description = S("Flare Gun"),
 	inventory_image = "shooter_flaregun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()

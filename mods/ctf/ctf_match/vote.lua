@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 ctf_match.registered_on_skip_map = {}
 function ctf_match.register_on_skip_map(func)
 	if ctf._mt_loaded then
@@ -13,7 +16,7 @@ function ctf_match.vote_next(name, params)
 	end
 
 	return vote.new_vote(name, {
-		description = "Skip to next match",
+		description = S("Skip to next match"),
 		help = "/yes,  /no  or  /abstain",
 		duration = 60,
 		perc_needed = 0.6,

@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("mtg")
+
 
 --
 -- Formspecs
@@ -255,7 +258,7 @@ end
 --
 
 minetest.register_node("furnace:furnace", {
-	description = "Furnace",
+	description = S("Furnace"),
 	tiles = {
 		"default_furnace_top.png", "default_furnace_bottom.png",
 		"default_furnace_side.png", "default_furnace_side.png",
@@ -303,7 +306,7 @@ minetest.register_node("furnace:furnace", {
 })
 
 minetest.register_node("furnace:furnace_active", {
-	description = "Furnace",
+	description = S("Furnace"),
 	tiles = {
 		"default_furnace_top.png", "default_furnace_bottom.png",
 		"default_furnace_side.png", "default_furnace_side.png",

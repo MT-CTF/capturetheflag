@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 local function get_turret_entity(pos)
 	local entity = nil
 	local objects = minetest.get_objects_inside_radius(pos, 1)
@@ -184,7 +187,7 @@ minetest.register_entity("shooter:turret_entity", {
 })
 
 minetest.register_node("shooter:turret", {
-	description = "Turret Gun",
+	description = S("Turret Gun"),
 	tiles = {"shooter_turret_base.png"},
 	inventory_image = "shooter_turret_gun.png",
 	wield_image = "shooter_turret_gun.png",

@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 ctf.register_on_init(function()
 	ctf.log("chat", "Initialising...")
 
@@ -182,7 +185,7 @@ minetest.register_chatcommand("team", {
 
 minetest.register_chatcommand("join", {
 	params = "team name",
-	description = "Add to team",
+	description = S("Add to team"),
 	func = function(name, param)
 		if ctf.join(name, param, false, name) then
 			return true, "Joined team " .. param .. "!"
@@ -193,7 +196,7 @@ minetest.register_chatcommand("join", {
 })
 
 minetest.register_chatcommand("ctf_clean", {
-	description = "Do admin cleaning stuff",
+	description = S("Do admin cleaning stuff"),
 	privs = {ctf_admin=true},
 	func = function(name, param)
 		ctf.log("chat", "Cleaning CTF...")
@@ -206,7 +209,7 @@ minetest.register_chatcommand("ctf_clean", {
 })
 
 minetest.register_chatcommand("ctf_reset", {
-	description = "Delete all CTF saved states and start again.",
+	description = S("Delete all CTF saved states and start again."),
 	privs = {ctf_admin=true},
 	func = function(name, param)
 		minetest.chat_send_all("The CTF core was reset by the admin. All team memberships," ..
@@ -217,7 +220,7 @@ minetest.register_chatcommand("ctf_reset", {
 })
 
 minetest.register_chatcommand("ctf_reload", {
-	description = "reload the ctf main frame and get settings",
+	description = S("reload the ctf main frame and get settings"),
 	privs = {ctf_admin=true},
 	func = function(name, param)
 		ctf.init()
@@ -226,7 +229,7 @@ minetest.register_chatcommand("ctf_reload", {
 })
 
 minetest.register_chatcommand("ctf_ls", {
-	description = "ctf: list settings",
+	description = S("ctf: list settings"),
 	privs = {ctf_admin=true},
 	func = function(name, param)
 		minetest.chat_send_player(name, "Settings:")
@@ -240,7 +243,7 @@ minetest.register_chatcommand("ctf_ls", {
 
 minetest.register_chatcommand("t", {
 	params = "msg",
-	description = "Send a message on the team channel",
+	description = S("Send a message on the team channel"),
 	privs = { interact = true, shout = true },
 	func = function(name, param)
 		if not ctf.setting("chat.team_channel") then

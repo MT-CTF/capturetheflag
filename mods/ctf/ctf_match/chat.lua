@@ -1,9 +1,12 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 minetest.register_privilege("ctf_match", {
-	description = "can skip matches"
+	description = S("can skip matches")
 })
 
 minetest.register_chatcommand("ctf_next", {
-	description = "Skip to the next match",
+	description = S("Skip to the next match"),
 	privs = {
 		ctf_match = true
 	},
@@ -14,7 +17,7 @@ minetest.register_chatcommand("ctf_next", {
 })
 
 minetest.register_chatcommand("ctf_start", {
-	description = "End build time",
+	description = S("End build time"),
 	privs = {
 		ctf_match = true
 	},
@@ -53,7 +56,7 @@ minetest.register_chatcommand("ctf_respawn", {
 local restart_on_next_match = false
 local restart_on_next_match_by = nil
 minetest.register_chatcommand("ctf_queue_restart", {
-	description = "Queue server restart",
+	description = S("Queue server restart"),
 	privs = {
 		server = true
 	},
@@ -66,7 +69,7 @@ minetest.register_chatcommand("ctf_queue_restart", {
 })
 
 minetest.register_chatcommand("ctf_unqueue_restart", {
-	description = "Unqueue server restart",
+	description = S("Unqueue server restart"),
 	privs = {
 		server = true
 	},

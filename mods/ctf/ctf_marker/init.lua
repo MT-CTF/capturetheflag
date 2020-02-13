@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 -- Locally cache list of team members when adding
 -- marker, because the members in the team needn't
 -- be the same within an extended duration of time
@@ -69,8 +72,8 @@ end)
 
 minetest.register_chatcommand("m", {
 	param = "[Optional description]",
-	description = "Allows players to share the location of where " ..
-			"they're looking at with their team-mates.",
+	description = S("Allows players to share the location of where " ..
+			"they're looking at with their team-mates."),
 	privs = { interact = true },
 	func = function(name, param)
 		local player = minetest.get_player_by_name(name)

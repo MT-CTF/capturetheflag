@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 SHOOTER_CROSSBOW_USES = 50
 SHOOTER_ARROW_TOOL_CAPS = {damage_groups={fleshy=2}}
 SHOOTER_ARROW_LIFETIME = 180 -- 3 minutes
@@ -170,12 +173,13 @@ minetest.register_entity("shooter:arrow_entity", {
 })
 
 for _, color in pairs(dye_basecolors) do
+	colorName = color:gsub("%a", string.upper, 1)
 	minetest.register_craftitem("shooter:arrow_"..color, {
-		description = color:gsub("%a", string.upper, 1).." Arrow",
+		description = S("@1 Arrow", colorName),
 		inventory_image = get_texture("arrow_inv", color),
 	})
 	minetest.register_tool("shooter:crossbow_loaded_"..color, {
-		description = "Crossbow",
+		description = S("Crossbow"),
 		inventory_image = get_texture("crossbow_loaded", color),
 		groups = {not_in_creative_inventory=1},
 		on_use = function(itemstack, user, pointed_thing)
@@ -237,7 +241,7 @@ for _, color in pairs(dye_basecolors) do
 end
 
 minetest.register_tool("shooter:crossbow", {
-	description = "Crossbow",
+	description = S("Crossbow"),
 	inventory_image = "shooter_crossbow.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()

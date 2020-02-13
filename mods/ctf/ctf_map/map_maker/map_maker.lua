@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 local storage = minetest.get_mod_storage()
 local randint = math.random(100)
 local defaults = {
@@ -75,7 +78,7 @@ assert(minetest.get_modpath("worldedit") and
 
 -- Register special pickaxe to break indestructible nodes
 minetest.register_tool("map_maker:adminpick", {
-	description = "Admin pickaxe used to break indestructible nodes.",
+	description = S("Admin pickaxe used to break indestructible nodes."),
 	inventory_image = "map_maker_adminpick.png",
 	range = 16,
 	tool_capabilities = {
@@ -89,7 +92,7 @@ minetest.register_tool("map_maker:adminpick", {
 })
 
 minetest.register_node(":ctf_map:flag", {
-	description = "Flag",
+	description = S("Flag"),
 	drawtype="nodebox",
 	paramtype = "light",
 	walkable = false,

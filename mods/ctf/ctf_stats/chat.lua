@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 -------------
 -- Helpers --
 -------------
@@ -69,7 +72,7 @@ minetest.register_chatcommand("summary", {
 
 minetest.register_chatcommand("r", {
 	params = "[<name> | <rank>]",
-	description = "Display rankings of yourself, or another player or rank, as a chat result.",
+	description = S("Display rankings of yourself, or another player or rank, as a chat result."),
 	func = function(name, param)
 		local target, error = ctf_stats.get_target(name, param)
 		if not target then
@@ -83,7 +86,7 @@ minetest.register_chatcommand("r", {
 
 minetest.register_chatcommand("rn", {
 	params = "<rank>",
-	description = "Display rankings of player at the specified rank.",
+	description = S("Display rankings of player at the specified rank."),
 	func = function(name, param)
 		if not param or param == "" then
 			return false, "Empty arguments not allowed! Specify a rank."
@@ -105,7 +108,7 @@ minetest.register_chatcommand("rn", {
 
 minetest.register_chatcommand("rankings", {
 	params = "[<name> | <rank>]",
-	description = "Display rankings of yourself, or another player or rank.",
+	description = S("Display rankings of yourself, or another player or rank."),
 	func = function(name, param)
 		local target, error = ctf_stats.get_target(name, param)
 		if not target then
@@ -126,7 +129,7 @@ minetest.register_chatcommand("rankings", {
 local reset_y = {}
 minetest.register_chatcommand("reset_rankings", {
 	params = "[<name>]",
-	description = "Reset the rankings of yourself or another player",
+	description = S("Reset the rankings of yourself or another player"),
 	func = function(name, param)
 		param = param:trim()
 		if param ~= "" and not minetest.check_player_privs(name, {ctf_admin = true}) then
@@ -166,7 +169,7 @@ minetest.register_chatcommand("reset_rankings", {
 
 minetest.register_chatcommand("transfer_rankings", {
 	params = "<src> <dest>",
-	description = "Transfer rankings of one player to another.",
+	description = S("Transfer rankings of one player to another."),
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		if not param then

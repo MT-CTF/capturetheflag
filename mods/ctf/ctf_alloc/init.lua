@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 local storage = minetest.get_mod_storage()
 local data = minetest.parse_json(storage:get_string("locktoteam")) or {}
 
@@ -24,7 +27,7 @@ ChatCmdBuilder.new("ctf_lock_to_team", function(cmd)
 		end
 	end)
 end, {
-	description = "Lock a player to a team",
+	description = S("Lock a player to a team"),
 	privs = {
 		ctf_admin = true,
 	}

@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 minetest.register_entity("shooter:grenade_entity", {
 	physical = false,
 	timer = 0,
@@ -37,7 +40,7 @@ minetest.register_entity("shooter:grenade_entity", {
 })
 
 minetest.register_tool("shooter:grenade", {
-	description = "Grenade",
+	description = S("Grenade"),
 	inventory_image = "shooter_hand_grenade.png",
 	on_use = function(itemstack, user, pointed_thing)
 		if not minetest.settings:get_bool("creative_mode") then

@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("other")
+
 email = {
 	log = function(msg) end
 }
@@ -198,7 +201,7 @@ end
 
 minetest.register_chatcommand("inbox", {
 	params = "[/clear/text]",
-	description = "Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only.",
+	description = S("Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only."),
 	func = function(name, param)
 		if param == "clear" then
 			email.clear_inbox(name)
@@ -214,7 +217,7 @@ minetest.register_chatcommand("inbox", {
 
 minetest.register_chatcommand("mail", {
 	params = "name msg",
-	description = "mail: add a message to a player's inbox",
+	description = S("mail: add a message to a player's inbox"),
 	func = function(name, param)
 		local to, msg = string.match(param, "^([%a%d_-]+) (.+)")
 		if to and msg then

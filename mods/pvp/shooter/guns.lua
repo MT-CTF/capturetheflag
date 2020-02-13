@@ -1,5 +1,8 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 shooter:register_weapon("shooter:pistol", {
-	description = "Pistol",
+	description = S("Pistol"),
 	inventory_image = "shooter_pistol.png",
 	rounds = 200,
 	spec = {
@@ -13,7 +16,7 @@ shooter:register_weapon("shooter:pistol", {
 })
 
 shooter:register_weapon("shooter:rifle", {
-	description = "Rifle",
+	description = S("Rifle"),
 	inventory_image = "shooter_rifle.png",
 	rounds = 100,
 	spec = {
@@ -27,7 +30,7 @@ shooter:register_weapon("shooter:rifle", {
 })
 
 shooter:register_weapon("shooter:shotgun", {
-	description = "Shotgun",
+	description = S("Shotgun"),
 	inventory_image = "shooter_shotgun.png",
 	rounds = 50,
 	spec = {
@@ -41,7 +44,7 @@ shooter:register_weapon("shooter:shotgun", {
 })
 
 shooter:register_weapon("shooter:machine_gun", {
-	description = "Sub Machine Gun",
+	description = S("Sub Machine Gun"),
 	inventory_image = "shooter_smgun.png",
 	rounds = 50,
 	shots = 4,
@@ -56,7 +59,7 @@ shooter:register_weapon("shooter:machine_gun", {
 })
 
 minetest.register_craftitem("shooter:ammo", {
-	description = "Ammo pack",
+	description = S("Ammo pack"),
 	inventory_image = "shooter_ammo.png",
 })
 

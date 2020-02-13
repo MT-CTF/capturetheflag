@@ -1,5 +1,8 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 minetest.register_craftitem("shooter:rocket", {
-	description = "Rocket",
+	description = S("Rocket"),
     stack_max = 1,
 	inventory_image = "shooter_rocket_inv.png",
 })
@@ -42,7 +45,7 @@ minetest.register_entity("shooter:rocket_entity", {
 })
 
 minetest.register_tool("shooter:rocket_gun_loaded", {
-	description = "Rocket Gun",
+	description = S("Rocket Gun"),
 	inventory_image = "shooter_rocket_gun_loaded.png",
 	groups = {not_in_creative_inventory=1},
 	on_use = function(itemstack, user, pointed_thing)
@@ -79,7 +82,7 @@ minetest.register_tool("shooter:rocket_gun_loaded", {
 })
 
 minetest.register_tool("shooter:rocket_gun", {
-	description = "Rocket Gun",
+	description = S("Rocket Gun"),
 	inventory_image = "shooter_rocket_gun.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local inv = user:get_inventory()

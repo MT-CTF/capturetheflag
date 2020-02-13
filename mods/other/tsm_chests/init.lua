@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("other")
+
 --[[
 	This is an example treasure spawning mod (TSM) for the default mod.
 	It needs the mods “treasurer” and “default” to work.
@@ -38,7 +41,7 @@ local chest_formspec =
 	default.get_hotbar_bg(0,4.85)
 
 minetest.register_node("tsm_chests:chest", {
-	description = "Chest",
+	description = S("Chest"),
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
 	paramtype2 = "facedir",

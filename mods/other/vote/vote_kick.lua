@@ -1,8 +1,11 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("other")
+
 vote.kick_cooldown = 600
 local vlist = {} -- table storing player name, ip & lock status
 
 minetest.register_privilege("vote_kick", {
-	description = "Can start vote to kick a player",
+	description = S("Can start vote to kick a player"),
 	on_grant = function(name, granter)
 		if not granter then
 			granter = "<nil>"
@@ -21,7 +24,7 @@ minetest.register_privilege("vote_kick", {
 
 minetest.register_chatcommand("vote_kick", {
 	params = "<name>",
-	description = "Start a vote to kick a player",
+	description = S("Start a vote to kick a player"),
 	privs = {
 		interact = true,
 		vote_kick = true,
@@ -50,7 +53,7 @@ minetest.register_chatcommand("vote_kick", {
 		end
 
 		return vote.new_vote(name, {
-			description = "Kick " .. param,
+			description = S("Kick @1", param),
 			help = "/yes,  /no  or  /abstain",
 			name = param,
 			duration = 60,
@@ -92,7 +95,7 @@ minetest.register_chatcommand("vote_kick", {
 
 minetest.register_chatcommand("unblock", {
 	params = "<name>",
-	description = "Unblock a vote-kicked player before the cooldown expires",
+	description = S("Unblock a vote-kicked player before the cooldown expires"),
 	privs = {kick = true, ban = true},
 	func = function(name, param)
 		param = param:trim()

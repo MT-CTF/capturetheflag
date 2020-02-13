@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 -- Initialise
 ctf.register_on_init(function()
 	ctf.log("flag", "Initialising...")
@@ -15,7 +18,7 @@ ctf.register_on_init(function()
 end)
 
 minetest.register_privilege("ctf_place_flag", {
-	description = "can place flag"
+	description = S("can place flag")
 })
 
 dofile(minetest.get_modpath("ctf_flag") .. "/hud.lua")

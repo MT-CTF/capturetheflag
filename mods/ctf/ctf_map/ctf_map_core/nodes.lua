@@ -1,7 +1,10 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 -- Special nodes
 do
 	minetest.register_node(":ctf_map:ignore", {
-		description = "Artificial Ignore", -- this may need to be given a more appropriate name
+		description = S("Artificial Ignore"), -- this may need to be given a more appropriate name
 		drawtype = "airlike",
 		paramtype = "light",
 		sunlight_propagates = true,
@@ -15,7 +18,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:ind_glass", {
-		description = "Indestructible Glass",
+		description = S("Indestructible Glass"),
 		drawtype = "glasslike_framed_optional",
 		tiles = {"default_glass.png", "default_glass_detail.png"},
 		inventory_image = minetest.inventorycube("default_glass.png"),
@@ -30,7 +33,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:ind_glass_red", {
-		description = "Indestructible Red Glass",
+		description = S("Indestructible Red Glass"),
 		drawtype = "glasslike",
 		tiles = {"ctf_map_glass_red.png"},
 		inventory_image = minetest.inventorycube("ctf_map_glass_red.png"),
@@ -47,14 +50,14 @@ do
 	})
 
 	minetest.register_node(":ctf_map:ind_stone_red", {
-		description = "Indestructible Red Stone",
+		description = S("Indestructible Red Stone"),
 		groups = {immortal = 1},
 		tiles = {"ctf_map_stone_red.png"},
 		is_ground_content = false
 	})
 
 	minetest.register_node(":ctf_map:killnode", {
-		description = "Kill Node",
+		description = S("Kill Node"),
 		drawtype = "glasslike",
 		tiles = {"ctf_map_killnode.png"},
 		paramtype = "light",
@@ -68,7 +71,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:reinforced_cobble", {
-		description = "Reinforced Cobblestone",
+		description = S("Reinforced Cobblestone"),
 		tiles = {"ctf_map_reinforced_cobble.png"},
 		is_ground_content = false,
 		groups = {cracky = 1, stone = 2},
@@ -81,14 +84,14 @@ do
 	-- Stone
 
 	minetest.register_node(":ctf_map:stone", {
-		description = "Indestructible Stone",
+		description = S("Indestructible Stone"),
 		tiles = {"default_stone.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:cobble", {
-		description = "Indestructible Cobblestone",
+		description = S("Indestructible Cobblestone"),
 		tiles = {"default_cobble.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -96,7 +99,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:stonebrick", {
-		description = "Indestructible Stone Brick",
+		description = S("Indestructible Stone Brick"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_stone_brick.png"},
@@ -106,7 +109,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:stone_block", {
-		description = "Indestructible Stone Block",
+		description = S("Indestructible Stone Block"),
 		tiles = {"default_stone_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -114,7 +117,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:mossycobble", {
-		description = "Indestructible Mossy Cobblestone",
+		description = S("Indestructible Mossy Cobblestone"),
 		tiles = {"default_mossycobble.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -123,7 +126,7 @@ do
 
 
 	minetest.register_node(":ctf_map:desert_stone", {
-		description = "Indestructible Desert Stone",
+		description = S("Indestructible Desert Stone"),
 		tiles = {"default_desert_stone.png"},
 		groups = {immortal = 1},
 
@@ -131,7 +134,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:desert_cobble", {
-		description = "Indestructible Desert Cobblestone",
+		description = S("Indestructible Desert Cobblestone"),
 		tiles = {"default_desert_cobble.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -139,7 +142,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:desert_stonebrick", {
-		description = "Indestructible Desert Stone Brick",
+		description = S("Indestructible Desert Stone Brick"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_desert_stone_brick.png"},
@@ -149,7 +152,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:desert_stone_block", {
-		description = "Indestructible Desert Stone Block",
+		description = S("Indestructible Desert Stone Block"),
 		tiles = {"default_desert_stone_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -157,14 +160,14 @@ do
 	})
 
 	minetest.register_node(":ctf_map:sandstone", {
-		description = "Indestructible Sandstone",
+		description = S("Indestructible Sandstone"),
 		tiles = {"default_sandstone.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:sandstonebrick", {
-		description = "Indestructible Sandstone Brick",
+		description = S("Indestructible Sandstone Brick"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_sandstone_brick.png"},
@@ -174,7 +177,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:sandstone_block", {
-		description = "Indestructible Sandstone Block",
+		description = S("Indestructible Sandstone Block"),
 		tiles = {"default_sandstone_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -182,14 +185,14 @@ do
 	})
 
 	minetest.register_node(":ctf_map:desert_sandstone", {
-		description = "Indestructible Desert Sandstone",
+		description = S("Indestructible Desert Sandstone"),
 		tiles = {"default_desert_sandstone.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:desert_sandstone_brick", {
-		description = "Indestructible Desert Sandstone Brick",
+		description = S("Indestructible Desert Sandstone Brick"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_desert_sandstone_brick.png"},
@@ -199,7 +202,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:desert_sandstone_block", {
-		description = "Indestructible Desert Sandstone Block",
+		description = S("Indestructible Desert Sandstone Block"),
 		tiles = {"default_desert_sandstone_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -207,14 +210,14 @@ do
 	})
 
 	minetest.register_node(":ctf_map:silver_sandstone", {
-		description = "Indestructible Silver Sandstone",
+		description = S("Indestructible Silver Sandstone"),
 		tiles = {"default_silver_sandstone.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:silver_sandstone_brick", {
-		description = "Indestructible Silver Sandstone Brick",
+		description = S("Indestructible Silver Sandstone Brick"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_silver_sandstone_brick.png"},
@@ -224,7 +227,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:silver_sandstone_block", {
-		description = "Indestructible Silver Sandstone Block",
+		description = S("Indestructible Silver Sandstone Block"),
 		tiles = {"default_silver_sandstone_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -234,14 +237,14 @@ do
 	-- Soft / Non-Stone
 
 	minetest.register_node(":ctf_map:dirt", {
-		description = "Indestructible Dirt",
+		description = S("Indestructible Dirt"),
 		tiles = {"default_dirt.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_dirt_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:dirt_with_grass", {
-		description = "Indestructible Dirt with Grass",
+		description = S("Indestructible Dirt with Grass"),
 		tiles = {"default_grass.png", "default_dirt.png",
 			{name = "default_dirt.png^default_grass_side.png",
 				tileable_vertical = false}},
@@ -253,7 +256,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:dirt_with_dry_grass", {
-		description = "Indestructible Dirt with Dry Grass",
+		description = S("Indestructible Dirt with Dry Grass"),
 		tiles = {"default_dry_grass.png",
 			"default_dirt.png",
 			{name = "default_dirt.png^default_dry_grass_side.png",
@@ -266,7 +269,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:dirt_with_snow", {
-		description = "Indestructible Dirt with Snow",
+		description = S("Indestructible Dirt with Snow"),
 		tiles = {"default_snow.png", "default_dirt.png",
 			{name = "default_dirt.png^default_snow_side.png",
 				tileable_vertical = false}},
@@ -278,7 +281,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:dirt_with_rainforest_litter", {
-		description = "Indestructible Dirt with Rainforest Litter",
+		description = S("Indestructible Dirt with Rainforest Litter"),
 		tiles = {
 			"default_rainforest_litter.png",
 			"default_dirt.png",
@@ -293,21 +296,21 @@ do
 	})
 
 	minetest.register_node(":ctf_map:sand", {
-		description = "Indestructible Sand",
+		description = S("Indestructible Sand"),
 		tiles = {"default_sand.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_sand_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:desert_sand", {
-		description = "Indestructible Desert Sand",
+		description = S("Indestructible Desert Sand"),
 		tiles = {"default_desert_sand.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_sand_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:silver_sand", {
-		description = "Indestructible Silver Sand",
+		description = S("Indestructible Silver Sand"),
 		tiles = {"default_silver_sand.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_sand_defaults(),
@@ -315,14 +318,14 @@ do
 
 
 	minetest.register_node(":ctf_map:gravel", {
-		description = "Indestructible Gravel",
+		description = S("Indestructible Gravel"),
 		tiles = {"default_gravel.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_gravel_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:clay", {
-		description = "Indestructible Clay",
+		description = S("Indestructible Clay"),
 		tiles = {"default_clay.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_dirt_defaults(),
@@ -330,7 +333,7 @@ do
 
 
 	minetest.register_node(":ctf_map:snow", {
-		description = "Indestructible Snow",
+		description = S("Indestructible Snow"),
 		tiles = {"default_snow.png"},
 		inventory_image = "default_snowball.png",
 		wield_image = "default_snowball.png",
@@ -353,7 +356,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:snowblock", {
-		description = "Indestructible Snow Block",
+		description = S("Indestructible Snow Block"),
 		tiles = {"default_snow.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_dirt_defaults({
@@ -364,7 +367,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:ice", {
-		description = "Indestructible Ice",
+		description = S("Indestructible Ice"),
 		tiles = {"default_ice.png"},
 		is_ground_content = false,
 		paramtype = "light",
@@ -375,7 +378,7 @@ do
 	-- Trees
 
 	minetest.register_node(":ctf_map:tree", {
-		description = "Indestructible Tree",
+		description = S("Indestructible Tree"),
 		tiles = {"default_tree_top.png", "default_tree_top.png", "default_tree.png"},
 		paramtype2 = "facedir",
 		is_ground_content = false,
@@ -385,7 +388,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:wood", {
-		description = "Indestructible Wooden Planks",
+		description = S("Indestructible Wooden Planks"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_wood.png"},
@@ -395,7 +398,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:leaves", {
-		description = "Indestructible Leaves",
+		description = S("Indestructible Leaves"),
 		drawtype = "allfaces_optional",
 		waving = 1,
 		tiles = {"default_leaves.png"},
@@ -407,7 +410,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:apple", {
-		description = "Indestructible Apple",
+		description = S("Indestructible Apple"),
 		drawtype = "plantlike",
 		tiles = {"default_apple.png"},
 		inventory_image = "default_apple.png",
@@ -426,7 +429,7 @@ do
 
 
 	minetest.register_node(":ctf_map:jungletree", {
-		description = "Indestructible Jungle Tree",
+		description = S("Indestructible Jungle Tree"),
 		tiles = {"default_jungletree_top.png", "default_jungletree_top.png",
 			"default_jungletree.png"},
 		paramtype2 = "facedir",
@@ -437,7 +440,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:junglewood", {
-		description = "Indestructible Jungle Wood Planks",
+		description = S("Indestructible Jungle Wood Planks"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_junglewood.png"},
@@ -447,7 +450,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:jungleleaves", {
-		description = "Indestructible Jungle Leaves",
+		description = S("Indestructible Jungle Leaves"),
 		drawtype = "allfaces_optional",
 		waving = 1,
 		tiles = {"default_jungleleaves.png"},
@@ -460,7 +463,7 @@ do
 
 
 	minetest.register_node(":ctf_map:pine_tree", {
-		description = "Indestructible Pine Tree",
+		description = S("Indestructible Pine Tree"),
 		tiles = {"default_pine_tree_top.png", "default_pine_tree_top.png",
 			"default_pine_tree.png"},
 		paramtype2 = "facedir",
@@ -471,7 +474,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:pine_wood", {
-		description = "Indestructible Pine Wood Planks",
+		description = S("Indestructible Pine Wood Planks"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_pine_wood.png"},
@@ -481,7 +484,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:pine_needles",{
-		description = "Indestructible Pine Needles",
+		description = S("Indestructible Pine Needles"),
 		drawtype = "allfaces_optional",
 		tiles = {"default_pine_needles.png"},
 		waving = 1,
@@ -492,7 +495,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:acacia_tree", {
-		description = "Indestructible Acacia Tree",
+		description = S("Indestructible Acacia Tree"),
 		tiles = {"default_acacia_tree_top.png", "default_acacia_tree_top.png",
 			"default_acacia_tree.png"},
 		paramtype2 = "facedir",
@@ -503,7 +506,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:acacia_wood", {
-		description = "Indestructible Acacia Wood Planks",
+		description = S("Indestructible Acacia Wood Planks"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_acacia_wood.png"},
@@ -513,7 +516,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:acacia_leaves", {
-		description = "Indestructible Acacia Leaves",
+		description = S("Indestructible Acacia Leaves"),
 		drawtype = "allfaces_optional",
 		tiles = {"default_acacia_leaves.png"},
 		special_tiles = {"default_acacia_leaves_simple.png"},
@@ -525,7 +528,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:aspen_tree", {
-		description = "Indestructible Aspen Tree",
+		description = S("Indestructible Aspen Tree"),
 		tiles = {"default_aspen_tree_top.png", "default_aspen_tree_top.png",
 			"default_aspen_tree.png"},
 		paramtype2 = "facedir",
@@ -536,7 +539,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:aspen_wood", {
-		description = "Indestructible Aspen Wood Planks",
+		description = S("Indestructible Aspen Wood Planks"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_aspen_wood.png"},
@@ -546,7 +549,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:aspen_leaves", {
-		description = "Indestructible Aspen Leaves",
+		description = S("Indestructible Aspen Leaves"),
 		drawtype = "allfaces_optional",
 		tiles = {"default_aspen_leaves.png"},
 		waving = 1,
@@ -561,14 +564,14 @@ do
 	--
 
 	minetest.register_node(":ctf_map:stone_with_coal", {
-		description = "Indestructible Coal Ore",
+		description = S("Indestructible Coal Ore"),
 		tiles = {"default_stone.png^default_mineral_coal.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:coalblock", {
-		description = "Indestructible Coal Block",
+		description = S("Indestructible Coal Block"),
 		tiles = {"default_coal_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -577,28 +580,28 @@ do
 
 
 	minetest.register_node(":ctf_map:stone_with_iron", {
-		description = "Indestructible Iron Ore",
+		description = S("Indestructible Iron Ore"),
 		tiles = {"default_stone.png^default_mineral_iron.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:stone_with_copper", {
-		description = "Indestructible Copper Ore",
+		description = S("Indestructible Copper Ore"),
 		tiles = {"default_stone.png^default_mineral_copper.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:stone_with_tin", {
-		description = "Indestructible Tin Ore",
+		description = S("Indestructible Tin Ore"),
 		tiles = {"default_stone.png^default_mineral_tin.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:bronzeblock", {
-		description = "Indestructible Bronze Block",
+		description = S("Indestructible Bronze Block"),
 		tiles = {"default_bronze_block.png"},
 		is_ground_content = false,
 		groups = {immortal = 1},
@@ -606,14 +609,14 @@ do
 	})
 
 	minetest.register_node(":ctf_map:stone_with_mese", {
-		description = "Indestructible Mese Ore",
+		description = S("Indestructible Mese Ore"),
 		tiles = {"default_stone.png^default_mineral_mese.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
 
 	minetest.register_node(":ctf_map:mese", {
-		description = "Indestructible Mese Block",
+		description = S("Indestructible Mese Block"),
 		tiles = {"default_mese_block.png"},
 		paramtype = "light",
 		groups = {immortal = 1},
@@ -622,7 +625,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:stone_with_diamond", {
-		description = "Indestructible Diamond Ore",
+		description = S("Indestructible Diamond Ore"),
 		tiles = {"default_stone.png^default_mineral_diamond.png"},
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
@@ -631,7 +634,7 @@ do
 	-- Plantlife (non-cubic)
 
 	minetest.register_node(":ctf_map:cactus", {
-		description = "Indestructible Cactus",
+		description = S("Indestructible Cactus"),
 		tiles = {"default_cactus_top.png", "default_cactus_top.png",
 			"default_cactus_side.png"},
 		paramtype2 = "facedir",
@@ -641,7 +644,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:ladder_wood", {
-		description = "Indestructible Wooden Ladder",
+		description = S("Indestructible Wooden Ladder"),
 		drawtype = "signlike",
 		tiles = {"default_ladder_wood.png"},
 		inventory_image = "default_ladder_wood.png",
@@ -664,7 +667,7 @@ do
 	})
 
 	default.register_fence(":ctf_map:fence_wood", {
-		description = "Indestructible Wooden Fence",
+		description = S("Indestructible Wooden Fence"),
 		texture = "default_fence_wood.png",
 		inventory_image = "default_fence_overlay.png^default_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
 		wield_image = "default_fence_overlay.png^default_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
@@ -674,7 +677,7 @@ do
 	})
 
 	default.register_fence(":ctf_map:fence_acacia_wood", {
-		description = "Indestructible Acacia Fence",
+		description = S("Indestructible Acacia Fence"),
 		texture = "default_fence_acacia_wood.png",
 		inventory_image = "default_fence_overlay.png^default_acacia_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
 		wield_image = "default_fence_overlay.png^default_acacia_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
@@ -684,7 +687,7 @@ do
 	})
 
 	default.register_fence(":ctf_map:fence_junglewood", {
-		description = "Indestructible Jungle Wood Fence",
+		description = S("Indestructible Jungle Wood Fence"),
 		texture = "default_fence_junglewood.png",
 		inventory_image = "default_fence_overlay.png^default_junglewood.png^default_fence_overlay.png^[makealpha:255,126,126",
 		wield_image = "default_fence_overlay.png^default_junglewood.png^default_fence_overlay.png^[makealpha:255,126,126",
@@ -694,7 +697,7 @@ do
 	})
 
 	default.register_fence(":ctf_map:fence_pine_wood", {
-		description = "Indestructible Pine Fence",
+		description = S("Indestructible Pine Fence"),
 		texture = "default_fence_pine_wood.png",
 		inventory_image = "default_fence_overlay.png^default_pine_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
 		wield_image = "default_fence_overlay.png^default_pine_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
@@ -704,7 +707,7 @@ do
 	})
 
 	default.register_fence(":ctf_map:fence_aspen_wood", {
-		description = "Indestructible Aspen Fence",
+		description = S("Indestructible Aspen Fence"),
 		texture = "default_fence_aspen_wood.png",
 		inventory_image = "default_fence_overlay.png^default_aspen_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
 		wield_image = "default_fence_overlay.png^default_aspen_wood.png^default_fence_overlay.png^[makealpha:255,126,126",
@@ -714,7 +717,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:glass", {
-		description = "Indestructible Glass",
+		description = S("Indestructible Glass"),
 		drawtype = "glasslike_framed_optional",
 		tiles = {"default_glass.png", "default_glass_detail.png"},
 		paramtype = "light",
@@ -726,7 +729,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:brick", {
-		description = "Indestructible Brick Block",
+		description = S("Indestructible Brick Block"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
 		tiles = {"default_brick.png"},
@@ -736,7 +739,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:meselamp", {
-		description = "Indestructible Mese Lamp",
+		description = S("Indestructible Mese Lamp"),
 		drawtype = "glasslike",
 		tiles = {"default_meselamp.png"},
 		paramtype = "light",
@@ -751,7 +754,7 @@ end
 -- Indestructible torches from MTG's default mod
 do
 	minetest.register_node(":ctf_map:torch", {
-		description = "Torch",
+		description = S("Torch"),
 		drawtype = "mesh",
 		mesh = "torch_floor.obj",
 		inventory_image = "default_torch_on_floor.png",
@@ -852,7 +855,7 @@ do
 		if name:find("stairs") then
 			nodedef = table.copy(nodedef)
 			if nodedef.description then
-				nodedef.description = "Indestructible " .. nodedef.description
+				nodedef.description = S("Indestructible ") .. nodedef.description
 			end
 			nodedef.groups = {immortal = 1}
 			minetest.register_node(":ctf_map:" .. name:split(":")[2], nodedef)
@@ -860,7 +863,7 @@ do
 			local color = name:split(":")[2]
 			nodedef = table.copy(nodedef)
 			if nodedef.description then
-				nodedef.description = "Indestructible " .. nodedef.description
+				nodedef.description = S("Indestructible ") .. nodedef.description
 			end
 			nodedef.groups = {immortal = 1}
 			minetest.register_node(":ctf_map:wool_" .. color, nodedef)

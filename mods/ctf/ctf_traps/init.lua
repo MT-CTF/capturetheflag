@@ -1,5 +1,8 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 minetest.register_node("ctf_traps:dirt", {
-	description = "Unwalkable Dirt",
+	description = S("Unwalkable Dirt"),
 	tiles = {"ctf_traps_dirt.png"},
 	is_ground_content = false,
 	walkable = false,
@@ -7,7 +10,7 @@ minetest.register_node("ctf_traps:dirt", {
 })
 
 minetest.register_node("ctf_traps:stone", {
-	description = "Unwalkable Stone",
+	description = S("Unwalkable Stone"),
 	tiles = {"ctf_traps_stone.png"},
 	is_ground_content = false,
 	walkable = false,
@@ -15,7 +18,7 @@ minetest.register_node("ctf_traps:stone", {
 })
 
 minetest.register_node("ctf_traps:cobble", {
-	description = "Unwalkable Cobblestone",
+	description = S("Unwalkable Cobblestone"),
 	tiles = {"ctf_traps_cobble.png"},
 	is_ground_content = false,
 	walkable = false,
@@ -23,7 +26,7 @@ minetest.register_node("ctf_traps:cobble", {
 })
 
 minetest.register_node("ctf_traps:spike", {
-	description = "Spike",
+	description = S("Spike"),
 	drawtype = "plantlike",
 	tiles = {"ctf_traps_spike.png"},
 	inventory_image = "ctf_traps_spike.png",
@@ -39,7 +42,7 @@ minetest.register_node("ctf_traps:spike", {
 })
 
 minetest.register_node("ctf_traps:damage_cobble", {
-	description = "Cobblestone that damages digger of enemy team",
+	description = S("Cobblestone that damages digger of enemy team"),
 	tiles = {"ctf_traps_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,

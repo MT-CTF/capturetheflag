@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("pvp")
+
 -- Table of tables indexed by player names, each having three fields:
 -- {
 --     hp:  HP at time of left-click + regen_max,
@@ -131,7 +134,7 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_craftitem("medkits:medkit", {
-	description = "Medkit",
+	description = S("Medkit"),
 	inventory_image = "medkit_medkit.png",
 	wield_image = "medkit_medkit.png",
 	stack_max = 10,

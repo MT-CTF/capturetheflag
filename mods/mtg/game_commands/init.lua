@@ -1,5 +1,8 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("mtg")
+
 minetest.register_chatcommand("killme", {
-	description = "Kill yourself to respawn",
+	description = S("Kill yourself to respawn"),
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		if player then

@@ -1,3 +1,6 @@
+-- Load support for MT game translation.
+local S = minetest.get_translator("ctf")
+
 assert(minetest.get_mapgen_setting("mg_name") == "singlenode", "singlenode mapgen is required.")
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
@@ -86,7 +89,7 @@ do
 	local old_func = minetest.registered_chatcommands["ctf_next"].func
 	minetest.override_chatcommand("ctf_next", {
 		params = "[map]",
-		description = "Start the next match. The map name can be optionally specified as param.",
+		description = S("Start the next match. The map name can be optionally specified as param."),
 		func = function(name, param)
 			if param and param ~= "" then
 				local success, msg = set_next_by_param(name, param)
