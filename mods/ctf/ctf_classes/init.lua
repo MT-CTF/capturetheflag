@@ -1,6 +1,8 @@
 ctf_classes = {
 	__classes = {},
 	__classes_ordered = {},
+
+	default_class = "knight",
 }
 
 dofile(minetest.get_modpath("ctf_classes") .. "/api.lua")
@@ -8,6 +10,7 @@ dofile(minetest.get_modpath("ctf_classes") .. "/gui.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/regen.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/ranged.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/items.lua")
+
 
 ctf_classes.register("knight", {
 	description = "Knight",
@@ -17,6 +20,12 @@ ctf_classes.register("knight", {
 	properties = {
 		max_hp = 30,
 		speed = 0.90,
+
+		allowed_guns = {
+			"shooter:pistol",
+			"shooter:smg",
+			"shooter:shotgun",
+		},
 
 		items = {
 			"default:sword_steel",
@@ -33,7 +42,19 @@ ctf_classes.register("shooter", {
 		items = {
 			"shooter:rifle",
 			"shooter:grapple_gun_loaded",
-		}
+		},
+
+		allowed_guns = {
+			"shooter:pistol",
+			"shooter:rifle",
+			"shooter:smg",
+			"shooter:shotgun",
+		},
+
+		shooter_multipliers = {
+			range = 1.5,
+			full_punch_interval = 0.8,
+		},
 	},
 })
 
@@ -47,6 +68,12 @@ ctf_classes.register("medic", {
 
 		items = {
 			"ctf_bandages:bandage 20",
+		},
+
+		allowed_guns = {
+			"shooter:pistol",
+			"shooter:smg",
+			"shooter:shotgun",
 		},
 	},
 })
@@ -76,7 +103,7 @@ minetest.register_chatcommand("class", {
 		end
 
 		if not ctf_classes.can_change(player) then
-			return false, "Move closer to the flag to change classes!"
+			return false, "Move closer to your flag to change classes!"
 		end
 
 		local cname = params:trim()

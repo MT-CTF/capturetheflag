@@ -1,37 +1,39 @@
-local shooter_specs = {}
+local specs_cache = {}
 
-
-shooter.get_weapon_spec = function(_, user, name)
-	local spec = shooter.registered_weapons[name]
+local function get_shooter_specs(weapon_name, multiplier)
+	local spec = shooter.registered_weapons[weapon_name]
 	if not spec then
 		return nil
 	end
 	spec = spec.spec
-	spec.name = user:get_player_name()
 
-	if not user then
-		return spec
-	end
+	-- this will convert the multipler to a table pointer
+	local idx = ("%s:%s"):format(multiplier or "nil", weapon_name)
 
-	local class = ctf_classes.get(user)
-	if class.name ~= "shooter" then
-		if name == "shooter:rifle" then
-			minetest.chat_send_player(user:get_player_name(),
-				"Only Shooters are skilled enough for rifles! Change your class at spawn")
-			return nil
-		end
-		return spec
-	end
-
-	if shooter_specs[name] then
-		return shooter_specs[name]
+	if specs_cache[idx] then
+		return specs_cache[idx]
 	end
 
 	spec = table.copy(spec)
-	shooter_specs[name] = spec
+	specs_cache[idx] = spec
 
 	spec.range = spec.range * 1.5
 	spec.tool_caps.full_punch_interval = spec.tool_caps.full_punch_interval * 0.8
+	return spec
+end
+
+shooter.get_weapon_spec = function(_, user, weapon_name)
+	local class = ctf_classes.get(user)
+
+	if table.indexof(class.properties.allowed_guns or {}, weapon_name) == -1 then
+		minetest.chat_send_player(user:get_player_name(),
+			"Your class can't use that weapon! Change your class at spawn")
+		return nil
+	end
+
+	local spec = get_shooter_specs(weapon_name, class.properties.shooter_multipliers)
+	spec.name = user and user:get_player_name()
+
 	return spec
 end
 
@@ -40,11 +42,10 @@ local function check_grapple(itemname)
 	local def = minetest.registered_items[itemname]
 	local old_func = def.on_use
 	minetest.override_item(itemname, {
-		description = def.description .. "\n\nCan only be used by Shooters",
 		on_use = function(itemstack, user, ...)
 			if ctf_classes.get(user).name ~= "shooter" then
 				minetest.chat_send_player(user:get_player_name(),
-					"Only Shooters are skilled enough for grapples! Change your class at spawn")
+					"Your class can't use that weapon! Change your class at spawn")
 
 				return itemstack
 			end
@@ -63,7 +64,3 @@ end
 
 check_grapple("shooter:grapple_gun_loaded")
 check_grapple("shooter:grapple_gun")
-
-minetest.override_item("shooter:rifle", {
-	description = "Rifle\n\nCan only be used by Shooters",
-})
