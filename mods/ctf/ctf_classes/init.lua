@@ -7,6 +7,7 @@ dofile(minetest.get_modpath("ctf_classes") .. "/api.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/gui.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/regen.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/ranged.lua")
+dofile(minetest.get_modpath("ctf_classes") .. "/items.lua")
 
 ctf_classes.register("knight", {
 	description = "Knight",
@@ -16,16 +17,23 @@ ctf_classes.register("knight", {
 	properties = {
 		max_hp = 30,
 		speed = 0.90,
+
+		items = {
+			"default:sword_steel",
+		},
 	},
 })
 
 ctf_classes.register("shooter", {
-	description = "Shooter",
-	pros = { "+10% ranged skill", "Rifles and grappling hooks" },
-	cons = { "Can't capture the flag" },
+	description = "Sharp Shooter",
+	pros = { "+10% ranged skill" },
+	cons = {},
 	color = "#c60",
 	properties = {
-		can_capture = false,
+		items = {
+			"shooter:rifle",
+			"shooter:grapple_gun_loaded",
+		}
 	},
 })
 
@@ -36,6 +44,10 @@ ctf_classes.register("medic", {
 	color = "#0af",
 	properties = {
 		max_hp = 10,
+
+		items = {
+			"ctf_bandages:bandage 20",
+		},
 	},
 })
 
@@ -46,6 +58,14 @@ minetest.register_on_joinplayer(function(player)
 	if minetest.check_player_privs(player, { interact = true }) then
 		ctf_classes.show_gui(player:get_player_name())
 	end
+end)
+
+ctf_flag.register_on_pick_up(function(name)
+	ctf_classes.update(minetest.get_player_by_name(name))
+end)
+
+ctf_flag.register_on_drop(function(name)
+	ctf_classes.update(minetest.get_player_by_name(name))
 end)
 
 minetest.register_chatcommand("class", {
@@ -114,3 +134,13 @@ for _, flagname in pairs(flags) do
 		on_rightclick = show,
 	})
 end
+
+ctf_classes.register_on_changed(function(player, old, new)
+	if not old then
+		return
+	end
+
+	local pname = player:get_player_name()
+	ctf.chat_send_team(ctf.player(pname).team,
+			minetest.colorize("#ABCDEF", pname .. " is now a " .. new.description))
+end)

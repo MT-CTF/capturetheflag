@@ -49,6 +49,13 @@ local function check_grapple(itemname)
 				return itemstack
 			end
 
+			if ctf_flag.has_flag(user:get_player_name()) then
+				minetest.chat_send_player(user:get_player_name(),
+					"You can't use grapples whilst carrying the flag")
+
+				return itemstack
+			end
+
 			return old_func(itemstack, user, ...)
 		end,
 	})

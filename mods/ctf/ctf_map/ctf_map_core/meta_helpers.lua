@@ -98,7 +98,7 @@ function ctf_map.register_treasures(map)
 		end
 	else
 		-- If treasure is a part of map's initial stuff, don't register it
-		local blacklist = ctf_map.map.initial_stuff or give_initial_stuff.get_stuff()
+		local blacklist = ctf_map.map.initial_stuff or {}
 		for _, def in pairs(ctf_treasure.get_default_treasures()) do
 			local is_valid = true
 			for _, b_item in pairs(blacklist) do

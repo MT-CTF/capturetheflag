@@ -34,10 +34,17 @@ dofile(modpath .. "/barrier.lua")
 if minetest.get_modpath("ctf") then
 	dofile(modpath .. "/base.lua")
 	dofile(modpath .. "/chest.lua")
-	dofile(modpath .. "/give_initial_stuff.lua")
 	dofile(modpath .. "/meta_helpers.lua")
 	dofile(modpath .. "/schem_map.lua")
 	dofile(modpath .. "/maps_catalog.lua")
 
 	ctf_match.register_on_build_time_end(ctf_map.remove_middle_barrier)
+
+	give_initial_stuff.register_stuff_provider(function(player)
+		return ctf_map.map and ctf_map.map.initial_stuff or {
+			"default:pick_stone",
+			"default:sword_stone",
+			"default:torch 3",
+		}
+	end)
 end

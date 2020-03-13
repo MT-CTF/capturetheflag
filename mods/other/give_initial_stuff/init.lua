@@ -12,7 +12,7 @@ setmetatable(give_initial_stuff, {
 		inv:set_size("craftresult", 0)
 		inv:set_size("hand", 0)
 
-		local items = give_initial_stuff.get_stuff()
+		local items = give_initial_stuff.get_stuff(player)
 
 		for _, item in pairs(items) do
 			inv:add_item("main", item)
@@ -20,12 +20,24 @@ setmetatable(give_initial_stuff, {
 	end
 })
 
-function give_initial_stuff.get_stuff()
-	return ctf_map.map and ctf_map.map.initial_stuff or {
-		"default:pick_stone",
-		"default:sword_stone",
-		"default:torch 3",
-	}
+local registered_stuff_providers = {}
+function give_initial_stuff.register_stuff_provider(func, priority)
+	table.insert(registered_stuff_providers,
+		priority or (#registered_stuff_providers + 1),
+		func)
+end
+
+function give_initial_stuff.get_stuff(player)
+	local stuff = {}
+	for i=1, #registered_stuff_providers do
+		local new_stuff = registered_stuff_providers[i](player)
+		assert(new_stuff)
+
+		for j=1, #new_stuff do
+			stuff[#stuff + 1] = new_stuff[j]
+		end
+	end
+	return stuff
 end
 
 minetest.register_on_joinplayer(function(player)

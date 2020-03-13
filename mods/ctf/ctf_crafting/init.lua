@@ -1,28 +1,33 @@
 local full_ores = {
-	{"diamond", "default:diamond"},
-	{"mese", "default:mese_crystal"},
-	{"bronze", "default:bronze_ingot"},
-	{"steel", "default:steel_ingot"},
-	{"stone", "default:cobble"},
+	diamond = "default:diamond",
+	mese = "default:mese_crystal",
+	bronze = "default:bronze_ingot",
+	steel = "default:steel_ingot",
+	stone = "default:cobble",
+}
+
+local upgrades = {
+	steel = "mese",
+	mese = "diamond",
 }
 
 -- Swords
-for _, orex in pairs(full_ores) do
+for from, to in pairs(upgrades) do
 	crafting.register_recipe({
 		type   = "inv",
-		output = "default:sword_" .. orex[1],
-		items  = { "default:stick", orex[2] .. " 2" },
+		output = "default:sword_" .. to,
+		items  = { "default:sword_" .. from, full_ores[to] .. " 2" },
 		always_known = true,
 		level  = 1,
 	})
 end
 
 -- Pickaxes
-for _, orex in pairs(full_ores) do
+for ore, ore_item in pairs(full_ores) do
 	crafting.register_recipe({
 		type   = "inv",
-		output = "default:pick_" .. orex[1],
-		items  = { "default:stick 2", orex[2] .. " 3" },
+		output = "default:pick_" .. ore,
+		items  = { "default:stick 2", ore_item .. " 3" },
 		always_known = true,
 		level  = 1,
 	})
@@ -187,22 +192,22 @@ crafting.register_recipe({
 })
 
 -- Shovels
-for _, orex in pairs(full_ores) do
+for ore, ore_item in pairs(full_ores) do
 	crafting.register_recipe({
 		type   = "inv",
-		output = "default:shovel_" .. orex[1],
-		items  = { "default:stick 2", orex[2] },
+		output = "default:shovel_" .. ore,
+		items  = { "default:stick 2", ore_item },
 		always_known = true,
 		level  = 1,
 	})
 end
 
 -- Axes
-for _, orex in pairs(full_ores) do
+for ore, ore_item in pairs(full_ores) do
 	crafting.register_recipe({
 		type   = "inv",
-		output = "default:axe_" .. orex[1],
-		items  = { "default:stick 2", orex[2] .. " 3" },
+		output = "default:axe_" .. ore,
+		items  = { "default:stick 2", ore_item .. " 3" },
 		always_known = true,
 		level  = 1,
 	})

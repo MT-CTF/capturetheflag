@@ -36,7 +36,7 @@ local function drop_all(player)
 	pos.y = math.floor(pos.y + 0.5)
 
 	local inv = player:get_inventory()
-	for _, item in pairs(give_initial_stuff.get_stuff()) do
+	for _, item in pairs(give_initial_stuff.get_stuff(player)) do
 		inv:remove_item("main", ItemStack(item))
 	end
 	drop_list(pos, inv, "main")

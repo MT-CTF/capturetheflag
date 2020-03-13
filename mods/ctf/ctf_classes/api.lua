@@ -15,6 +15,11 @@ function ctf_classes.register(cname, def)
 	def.properties.max_hp = def.properties.max_hp or 20
 end
 
+local registered_on_changed = {}
+function ctf_classes.register_on_changed(func)
+	table.insert(registered_on_changed, func)
+end
+
 function ctf_classes.set_skin(player, color, class)
 	player:set_properties({
 		textures = {"ctf_classes_skin_" .. class.name .. "_" .. (color or "blue") .. ".png"}
@@ -30,20 +35,22 @@ function ctf_classes.get(player)
 	return ctf_classes.__classes[cname]
 end
 
-function ctf_classes.set(player, cname)
-	assert(type(cname) == "string")
-	local class = ctf_classes.__classes[cname]
-	assert(class)
+function ctf_classes.set(player, new_name)
+	assert(type(new_name) == "string")
+	local new = ctf_classes.__classes[new_name]
+	assert(new)
 
 	local meta = player:get_meta()
-	local old = meta:get("ctf_classes:class")
-	meta:set_string("ctf_classes:class", cname)
+	local old_name = meta:get("ctf_classes:class")
+
+	meta:set_string("ctf_classes:class", new_name)
 	ctf_classes.update(player)
 
-	if old ~= nil and old ~= cname then
-		local pname = player:get_player_name()
-		ctf.chat_send_team(ctf.player(pname).team,
-				minetest.colorize("#ABCDEF", pname .. " is now a " .. class.description))
+	if old_name == nil or old_name ~= new_name then
+		local old = old_name and ctf_classes.__classes[old_name]
+		for i=1, #registered_on_changed do
+			registered_on_changed[i](player, old, new)
+		end
 	end
 end
 
@@ -68,13 +75,21 @@ local function set_max_hp(player, max_hp)
 end
 
 function ctf_classes.update(player)
+	local name = player:get_player_name()
+
 	local class = ctf_classes.get(player)
-	local color = ctf_colors.get_color(ctf.player(player:get_player_name())).text
+	local color = ctf_colors.get_color(ctf.player(name)).text
 
 	set_max_hp(player, class.properties.max_hp)
 	ctf_classes.set_skin(player, color, class)
+
+	local speed = class.properties.speed
+	if ctf_flag.has_flag(name) and speed > 0.9 then
+		speed = 0.9
+	end
+
 	physics.set(player:get_player_name(), "ctf_classes:speed", {
-		speed = class.properties.speed,
+		speed = speed,
 	})
 end
 
