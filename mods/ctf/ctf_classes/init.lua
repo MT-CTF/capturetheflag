@@ -21,21 +21,21 @@ ctf_classes.register("knight", {
 		max_hp = 30,
 		speed = 0.90,
 
+		items = {
+			"default:sword_steel",
+		},
+
 		allowed_guns = {
 			"shooter:pistol",
 			"shooter:smg",
 			"shooter:shotgun",
-		},
-
-		items = {
-			"default:sword_steel",
 		},
 	},
 })
 
 ctf_classes.register("shooter", {
 	description = "Sharp Shooter",
-	pros = { "+10% ranged skill" },
+	pros = { "+50% range", "+20% faster shooting" },
 	cons = {},
 	color = "#c60",
 	properties = {
@@ -61,11 +61,9 @@ ctf_classes.register("shooter", {
 ctf_classes.register("medic", {
 	description = "Medic",
 	pros = { "x2 regen for nearby friendlies" },
-	cons = { "-50% Health Points" },
+	cons = {},
 	color = "#0af",
 	properties = {
-		max_hp = 10,
-
 		items = {
 			"ctf_bandages:bandage 20",
 		},
