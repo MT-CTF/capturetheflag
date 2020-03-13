@@ -41,6 +41,24 @@ function ctf_classes.show_gui(name, player)
 			fs[#fs + 1] = ",#fcc," .. minetest.formspec_escape(item)
 		end
 		fs[#fs + 1] = "]"
+
+		for i, item in pairs(class.properties.items or {}) do
+			fs[#fs + 1] = "item_image["
+			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
+			fs[#fs + 1] = ",2.15;0.5,0.5;"
+			fs[#fs + 1] = minetest.formspec_escape(ItemStack(item):get_name())
+			fs[#fs + 1] = "]"
+
+			local desc = ItemStack(item):get_description():split("\n")[1]
+
+			fs[#fs + 1] = "tooltip["
+			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
+			fs[#fs + 1] = ",2.15;0.5,0.5;"
+			fs[#fs + 1] = minetest.formspec_escape(desc)
+			fs[#fs + 1] = "]"
+		end
+
+
 		fs[#fs + 1] = "button_exit[0.5,2.7;2,1;select_"
 		fs[#fs + 1] = class.name
 		fs[#fs + 1] = ";Select]"
