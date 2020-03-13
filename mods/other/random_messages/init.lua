@@ -75,7 +75,7 @@ function random_messages.read_messages()
 		"Use /summary to check scores of the current match and the previous match.",
 		"Use /maps to view the maps catalog. It also contains license info and attribution details.",
 		"Change your class in your base by right clicking the home flag or typing /class.",
-		"Medics cause nearby troops to regenerate health faster.",
+		"Medics cause troops within 10 metres to regenerate health faster.",
 	}
 end
 
