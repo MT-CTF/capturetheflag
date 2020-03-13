@@ -2,12 +2,12 @@ function ctf_classes.show_gui(name, player)
 	player = player or minetest.get_player_by_name(name)
 	assert(player.get_player_name)
 	if not ctf_classes.can_change(player) then
-		minetest.chat_send_player(name, "Move closer to your flag to change classes!")
+		minetest.chat_send_player(name, "Move closer to the flag to change classes!")
 		return
 	end
 
 	local fs = {
-		"size[9,3.2]"
+		"size[9,3.4]"
 	}
 
 
@@ -45,7 +45,7 @@ function ctf_classes.show_gui(name, player)
 		for i, item in pairs(class.properties.items or {}) do
 			fs[#fs + 1] = "item_image["
 			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
-			fs[#fs + 1] = ",2.15;0.5,0.5;"
+			fs[#fs + 1] = ",2.25;0.5,0.5;"
 			fs[#fs + 1] = minetest.formspec_escape(ItemStack(item):get_name())
 			fs[#fs + 1] = "]"
 
@@ -53,13 +53,13 @@ function ctf_classes.show_gui(name, player)
 
 			fs[#fs + 1] = "tooltip["
 			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
-			fs[#fs + 1] = ",2.15;0.5,0.5;"
+			fs[#fs + 1] = ",2.25;0.5,0.5;"
 			fs[#fs + 1] = minetest.formspec_escape(desc)
 			fs[#fs + 1] = "]"
 		end
 
 
-		fs[#fs + 1] = "button_exit[0.5,2.7;2,1;select_"
+		fs[#fs + 1] = "button_exit[0.5,2.9;2,1;select_"
 		fs[#fs + 1] = class.name
 		fs[#fs + 1] = ";Select]"
 		fs[#fs + 1] = "container_end[]"
