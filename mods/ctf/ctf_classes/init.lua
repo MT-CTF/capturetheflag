@@ -76,6 +76,26 @@ ctf_classes.register("medic", {
 	},
 })
 
+ctf_classes.register("rocketeer", {
+	description = "Rocketeer",
+	pros = { "Can craft rockets" },
+	cons = {},
+	color = "#fa0",
+	properties = {
+		items = {
+			"shooter:rocket_gun_loaded",
+			"shooter:rocket 4",
+		},
+
+		allowed_guns = {
+			"shooter:pistol",
+			"shooter:smg",
+			"shooter:shotgun",
+		},
+	},
+})
+
+
 
 minetest.register_on_joinplayer(function(player)
 	ctf_classes.update(player)
