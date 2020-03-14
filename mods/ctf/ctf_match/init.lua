@@ -40,3 +40,11 @@ end
 minetest.after(5, function()
 	ctf_match.next()
 end)
+
+ctf_match.register_on_build_time_start(function()
+	shooter.config.allow_players = false
+end)
+
+ctf_match.register_on_build_time_end(function()
+	shooter.config.allow_players = true
+end)

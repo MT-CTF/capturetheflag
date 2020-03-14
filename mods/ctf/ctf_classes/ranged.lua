@@ -1,30 +1,30 @@
-local specs_cache = {}
+local function recursive_multiply(source, multiplier)
+	for key, value in pairs(multiplier) do
+		assert(type(source[key]) == type(value))
+		if type(value) == "table" then
+			recursive_multiply(source[key], value)
+		else
+			source[key] = source[key] * value
+		end
+	end
+end
 
 local function get_shooter_specs(weapon_name, multiplier)
 	local spec = shooter.registered_weapons[weapon_name]
 	if not spec then
 		return nil
 	end
-	spec = spec.spec
 
-	-- this will convert the multipler to a table pointer
-	local idx = ("%s:%s"):format(multiplier or "nil", weapon_name)
+	spec = table.copy(spec.spec)
 
-	if specs_cache[idx] then
-		return specs_cache[idx]
-	end
-
-	spec = table.copy(spec)
-	specs_cache[idx] = spec
-
-	for key, value in pairs(multiplier) do
-		spec[key] = spec[key] * value
+	if multiplier then
+		recursive_multiply(spec, multiplier)
 	end
 
 	return spec
 end
 
-shooter.get_weapon_spec = function(_, user, weapon_name)
+shooter.get_weapon_spec = function(user, weapon_name)
 	local class = ctf_classes.get(user)
 
 	if table.indexof(class.properties.allowed_guns or {}, weapon_name) == -1 then
@@ -34,7 +34,9 @@ shooter.get_weapon_spec = function(_, user, weapon_name)
 	end
 
 	local spec = get_shooter_specs(weapon_name, class.properties.shooter_multipliers)
-	spec.name = user and user:get_player_name()
+	if not spec then
+		return nil
+	end
 
 	return spec
 end
@@ -64,6 +66,6 @@ local function check_grapple(itemname)
 	})
 end
 
-check_grapple("shooter:grapple_gun_loaded")
-check_grapple("shooter:grapple_gun")
-check_grapple("shooter:grapple_hook")
+check_grapple("shooter_hook:grapple_gun_loaded")
+check_grapple("shooter_hook:grapple_gun")
+check_grapple("shooter_hook:grapple_hook")

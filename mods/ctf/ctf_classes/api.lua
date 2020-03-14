@@ -17,14 +17,26 @@ function ctf_classes.register(cname, def)
 	if not def.properties.item_blacklist then
 		def.properties.item_blacklist = {}
 		for i=1, #def.properties.initial_stuff do
-			table.insert(def.properties.item_blacklist, def.properties.initial_stuff[i])
+			def.properties.item_blacklist[i] =
+				ItemStack(def.properties.initial_stuff[i]):get_name()
 		end
 	end
 
 	if def.properties.additional_item_blacklist then
 		for i=1, #def.properties.additional_item_blacklist do
-			table.insert(def.properties.item_blacklist, def.properties.additional_item_blacklist[i])
+			table.insert(def.properties.item_blacklist,
+				def.properties.additional_item_blacklist[i])
 		end
+	end
+
+	-- Validate items
+	for i=1, #def.properties.initial_stuff do
+		local item_name = ItemStack(def.properties.initial_stuff[i]):get_name()
+		assert(minetest.registered_items[item_name], "Item " .. item_name .. " not found")
+	end
+	for i=1, #def.properties.item_blacklist do
+		local item_name = def.properties.item_blacklist[i]
+		assert(minetest.registered_items[item_name], "Item " .. item_name .. " not found")
 	end
 
 	def.properties.speed  = def.properties.speed or 1
