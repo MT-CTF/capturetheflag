@@ -14,9 +14,9 @@ ctf_classes.register("knight", {
 		},
 
 		allowed_guns = {
-			"shooter:pistol",
-			"shooter:smg",
-			"shooter:shotgun",
+			"shooter_guns:pistol",
+			"shooter_guns:smg",
+			"shooter_guns:shotgun",
 		},
 	},
 })
@@ -30,25 +30,28 @@ ctf_classes.register("shooter", {
 		allow_grapples = true,
 
 		initial_stuff = {
-			"shooter:rifle",
-			"shooter:grapple_gun_loaded",
+			"shooter_guns:rifle_loaded",
+			"shooter_hook:grapple_gun_loaded",
 		},
 
 		additional_item_blacklist = {
-			"shooter:grapple_gun",
-			"shooter:grapple_hook",
+			"shooter_hook:grapple_gun",
+			"shooter_hook:grapple_hook",
+			"shooter_guns:rifle",
 		},
 
 		allowed_guns = {
-			"shooter:pistol",
-			"shooter:rifle",
-			"shooter:smg",
-			"shooter:shotgun",
+			"shooter_guns:pistol",
+			"shooter_guns:rifle",
+			"shooter_guns:smg",
+			"shooter_guns:shotgun",
 		},
 
 		shooter_multipliers = {
 			range = 1.5,
-			full_punch_interval = 0.8,
+			tool_caps = {
+				full_punch_interval = 0.8,
+			},
 		},
 	},
 })
@@ -66,9 +69,9 @@ ctf_classes.register("medic", {
 		},
 
 		allowed_guns = {
-			"shooter:pistol",
-			"shooter:smg",
-			"shooter:shotgun",
+			"shooter_guns:pistol",
+			"shooter_guns:smg",
+			"shooter_guns:shotgun",
 		},
 	},
 })
@@ -80,18 +83,18 @@ ctf_classes.register("rocketeer", {
 	color = "#fa0",
 	properties = {
 		initial_stuff = {
-			"shooter:rocket_gun_loaded",
-			"shooter:rocket 4",
+			"shooter_rocket:rocket_gun_loaded",
+			"shooter_rocket:rocket 4",
 		},
 
 		additional_item_blacklist = {
-			"shooter:rocket_gun",
+			"shooter_rocket:rocket_gun",
 		},
 
 		allowed_guns = {
-			"shooter:pistol",
-			"shooter:smg",
-			"shooter:shotgun",
+			"shooter_guns:pistol",
+			"shooter_guns:smg",
+			"shooter_guns:shotgun",
 		},
 	},
 })

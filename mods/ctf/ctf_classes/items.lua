@@ -9,30 +9,46 @@ end
 -- Returns true if  the item shouldn't be allowed to be dropped etc
 local function is_class_blacklisted(player, itemname)
 	local class = ctf_classes.get(player)
-	local items = stack_list_to_map(class.properties.item_blacklist or {})
+	local items = stack_list_to_map(class.properties.item_blacklist)
 	return items[itemname]
 end
 
 
 give_initial_stuff.register_stuff_provider(function(player)
 	local class = ctf_classes.get(player)
-	return class.properties.initial_stuff or {}
+	return class.properties.initial_stuff
 end, 1)
+
+
+local function remove_blacklist_in_list(list, blacklist_map)
+	local removed = false
+	for i=1, #list do
+		if blacklist_map[ItemStack(list[i]):get_name()] then
+			list[i] = ""
+			removed = true
+		end
+	end
+	return removed
+end
+
 
 ctf_classes.register_on_changed(function(player, old, new)
 	local inv = player:get_inventory()
 
-	if old then
-		local items = old.properties.item_blacklist or {}
-		for i = 1, #items do
-			inv:remove_item("main", ItemStack(items[i]))
+	local blacklist = old.properties.item_blacklist
+	if old and #blacklist > 0 then
+		local blacklist_map = stack_list_to_map(blacklist)
+		for listname, list in pairs(inv:get_lists()) do
+			if remove_blacklist_in_list(list, blacklist_map) then
+				inv:set_list(listname, list)
+			end
 		end
 	end
 
 	do
 		assert(new)
 
-		local items = new.properties.initial_stuff or {}
+		local items = new.properties.initial_stuff
 		for i = 1, #items do
 			inv:add_item("main", ItemStack(items[i]))
 		end
