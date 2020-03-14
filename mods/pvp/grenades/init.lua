@@ -5,10 +5,10 @@ grenades = {
 local function throw_grenade(name, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
-	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.6, z = pos.z + dir.z}, name)
+	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 2 + dir.y, z = pos.z + dir.z}, name)
 
-	local m = 30
-	obj:set_velocity({x = dir.x * m, y = dir.y * m/1.5, z = dir.z * m})
+	local m = 20
+	obj:set_velocity({x = dir.x * m, y = dir.y * (m / 2), z = dir.z * m})
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
 	return(obj:get_luaentity())
@@ -71,8 +71,8 @@ function grenades.register_grenade(name, def)
 
 			if self.sliding > 1 then -- Is the grenade sliding?
 				if vector.distance(vector.new(), vel) <= 1 and not vector.equals(vel, vector.new()) then -- Grenade is barely moving, make sure it stays that way
-					obj:set_velocity(vector.new(0, -9.8, 0))
-					obj:set_acceleration(vector.new())
+					obj:set_velocity(vector.new())
+					obj:set_acceleration(vector.new(0, -9.8, 0))
 				end
 			else
 				norm_vel = vector.normalize(vel)
