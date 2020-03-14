@@ -1,8 +1,6 @@
 ctf_classes = {
 	__classes = {},
 	__classes_ordered = {},
-
-	default_class = "knight",
 }
 
 dofile(minetest.get_modpath("ctf_classes") .. "/api.lua")
@@ -10,102 +8,8 @@ dofile(minetest.get_modpath("ctf_classes") .. "/gui.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/regen.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/ranged.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/items.lua")
-
-
-ctf_classes.register("knight", {
-	description = "Knight",
-	pros = { "+50% Health Points" },
-	cons = { "-10% speed" },
-	color = "#ccc",
-	properties = {
-		max_hp = 30,
-		speed = 0.90,
-
-		initial_stuff = {
-			"default:sword_steel",
-		},
-
-		allowed_guns = {
-			"shooter:pistol",
-			"shooter:smg",
-			"shooter:shotgun",
-		},
-	},
-})
-
-ctf_classes.register("shooter", {
-	description = "Sharp Shooter",
-	pros = { "+50% range", "+20% faster shooting" },
-	cons = {},
-	color = "#c60",
-	properties = {
-		allow_grapples = true,
-
-		initial_stuff = {
-			"shooter:rifle",
-			"shooter:grapple_gun_loaded",
-		},
-
-		additional_item_blacklist = {
-			"shooter:grapple_gun",
-			"shooter:grapple_hook",
-		},
-
-		allowed_guns = {
-			"shooter:pistol",
-			"shooter:rifle",
-			"shooter:smg",
-			"shooter:shotgun",
-		},
-
-		shooter_multipliers = {
-			range = 1.5,
-			full_punch_interval = 0.8,
-		},
-	},
-})
-
-ctf_classes.register("medic", {
-	description = "Medic",
-	pros = { "x2 regen for nearby friendlies" },
-	cons = {},
-	color = "#0af",
-	properties = {
-		initial_stuff = {
-			"ctf_bandages:bandage 20",
-		},
-
-		allowed_guns = {
-			"shooter:pistol",
-			"shooter:smg",
-			"shooter:shotgun",
-		},
-	},
-})
-
-ctf_classes.register("rocketeer", {
-	description = "Rocketeer",
-	pros = { "Can craft rockets" },
-	cons = {},
-	color = "#fa0",
-	properties = {
-		initial_stuff = {
-			"shooter:rocket_gun_loaded",
-			"shooter:rocket 4",
-		},
-
-		additional_item_blacklist = {
-			"shooter:rocket_gun",
-		},
-
-		allowed_guns = {
-			"shooter:pistol",
-			"shooter:smg",
-			"shooter:shotgun",
-		},
-	},
-})
-
+dofile(minetest.get_modpath("ctf_classes") .. "/flags.lua")
+dofile(minetest.get_modpath("ctf_classes") .. "/classes.lua")
 
 
 minetest.register_on_joinplayer(function(player)
@@ -114,14 +18,6 @@ minetest.register_on_joinplayer(function(player)
 	if minetest.check_player_privs(player, { interact = true }) then
 		ctf_classes.show_gui(player:get_player_name())
 	end
-end)
-
-ctf_flag.register_on_pick_up(function(name)
-	ctf_classes.update(minetest.get_player_by_name(name))
-end)
-
-ctf_flag.register_on_drop(function(name)
-	ctf_classes.update(minetest.get_player_by_name(name))
 end)
 
 minetest.register_chatcommand("class", {
@@ -152,30 +48,6 @@ minetest.register_chatcommand("class", {
 ctf_colors.set_skin = function(player, color)
 	ctf_classes.set_skin(player, color, ctf_classes.get(player))
 end
-
-local old_func = ctf_flag.on_punch
-local function on_punch(pos, node, player, ...)
-	local class = ctf_classes.get(player)
-	if not class.properties.can_capture then
-		local pname = player:get_player_name()
-		local flag = ctf_flag.get(pos)
-		local team = ctf.player(pname).team
-		if flag and flag.team and team and team ~= flag.team then
-			minetest.chat_send_player(pname,
-				"You need to change classes to capture the flag!")
-			return
-		end
-	end
-
-	return old_func(pos, node, player, ...)
-end
-
-local function show(_, _, player)
-	ctf_classes.show_gui(player:get_player_name(), player)
-end
-
-ctf_flag.on_rightclick = show
-ctf_flag.on_punch = on_punch
 
 ctf_classes.register_on_changed(function(player, old, new)
 	if not old then
