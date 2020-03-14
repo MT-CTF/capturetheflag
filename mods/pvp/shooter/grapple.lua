@@ -74,6 +74,7 @@ minetest.register_tool("shooter:grapple_hook", {
 		if pointed_thing.type ~= "nothing" then
 			return itemstack
 		end
+		itemstack:add_wear(65536 / 16)
 		throw_hook(itemstack, user, 14)
 		return ""
 	end,
