@@ -153,43 +153,29 @@ ctf_colors.set_skin = function(player, color)
 	ctf_classes.set_skin(player, color, ctf_classes.get(player))
 end
 
-local flags = {
-	"ctf_flag:flag",
-	"ctf_flag:flag_top_red",
-	"ctf_flag:flag_top_blue",
-}
-
-for _, flagname in pairs(flags) do
-	local old_func = minetest.registered_nodes[flagname].on_punch
-	local function on_punch(pos, node, player, ...)
-		local fpos = pos
-		if node.name:sub(1, 18) == "ctf_flag:flag_top_" then
-			fpos = vector.new(pos)
-			fpos.y = fpos.y - 1
+local old_func = ctf_flag.on_punch
+local function on_punch(pos, node, player, ...)
+	local class = ctf_classes.get(player)
+	if not class.properties.can_capture then
+		local pname = player:get_player_name()
+		local flag = ctf_flag.get(pos)
+		local team = ctf.player(pname).team
+		if flag and flag.team and team and team ~= flag.team then
+			minetest.chat_send_player(pname,
+				"You need to change classes to capture the flag!")
+			return
 		end
-
-		local class = ctf_classes.get(player)
-		if not class.properties.can_capture then
-			local pname = player:get_player_name()
-			local flag = ctf_flag.get(fpos)
-			local team = ctf.player(pname).team
-			if flag and flag.team and team and team ~= flag.team then
-				minetest.chat_send_player(pname,
-					"You need to change classes to capture the flag!")
-				return
-			end
-		end
-
-		return old_func(pos, node, player, ...)
 	end
-	local function show(_, _, player)
-		ctf_classes.show_gui(player:get_player_name(), player)
-	end
-	minetest.override_item(flagname, {
-		on_punch = on_punch,
-		on_rightclick = show,
-	})
+
+	return old_func(pos, node, player, ...)
 end
+
+local function show(_, _, player)
+	ctf_classes.show_gui(player:get_player_name(), player)
+end
+
+ctf_flag.on_rightclick = show
+ctf_flag.on_punch = on_punch
 
 ctf_classes.register_on_changed(function(player, old, new)
 	if not old then
