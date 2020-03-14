@@ -12,7 +12,7 @@ local function regen_update()
 		local class = get(player)
 		local tname = ctf.player(pname).team
 		tnames[pname] = tname
-		if class.name == "medic" then
+		if class.properties.nearby_hpregen then
 			if tname then
 				medic_by_team[tname][#medic_by_team[tname] + 1] = player:get_pos()
 				found_medic = true
