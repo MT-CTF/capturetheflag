@@ -21,7 +21,7 @@ ctf_classes.register("knight", {
 		max_hp = 30,
 		speed = 0.90,
 
-		items = {
+		initial_stuff = {
 			"default:sword_steel",
 		},
 
@@ -39,9 +39,14 @@ ctf_classes.register("shooter", {
 	cons = {},
 	color = "#c60",
 	properties = {
-		items = {
+		initial_stuff = {
 			"shooter:rifle",
 			"shooter:grapple_gun_loaded",
+		},
+
+		additional_item_blacklist = {
+			"shooter:grapple_gun",
+			"shooter:grapple_hook",
 		},
 
 		allowed_guns = {
@@ -64,7 +69,7 @@ ctf_classes.register("medic", {
 	cons = {},
 	color = "#0af",
 	properties = {
-		items = {
+		initial_stuff = {
 			"ctf_bandages:bandage 20",
 		},
 
@@ -82,9 +87,13 @@ ctf_classes.register("rocketeer", {
 	cons = {},
 	color = "#fa0",
 	properties = {
-		items = {
+		initial_stuff = {
 			"shooter:rocket_gun_loaded",
 			"shooter:rocket 4",
+		},
+
+		additional_item_blacklist = {
+			"shooter:rocket_gun",
 		},
 
 		allowed_guns = {

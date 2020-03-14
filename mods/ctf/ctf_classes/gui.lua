@@ -42,7 +42,7 @@ function ctf_classes.show_gui(name, player)
 		end
 		fs[#fs + 1] = "]"
 
-		for i, item in pairs(class.properties.items or {}) do
+		for i, item in pairs(class.properties.initial_stuff) do
 			fs[#fs + 1] = "item_image["
 			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
 			fs[#fs + 1] = ",2.25;0.5,0.5;"
