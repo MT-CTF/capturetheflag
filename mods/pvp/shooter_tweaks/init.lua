@@ -94,7 +94,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 					shooter.punch_object(obj, {
 						full_punch_interval = 1.0,
 						damage_groups = {fleshy=damage},
-					}, nil, true)
+					}, nil, true, user)
 				end
 			end
 		end
@@ -130,6 +130,5 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 		vm:write_to_map()
 	end
 end
-
 
 minetest.registered_entities["shooter_crossbow:arrow_entity"].collide_with_objects = false
