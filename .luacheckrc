@@ -30,6 +30,10 @@ read_globals = {
 	"prometheus", "hb",
 	"awards",
 
+	"VoxelArea",
+	"VoxelManip",
+	"PseudoRandom",
+
 
 	-- Testing
 	"describe",
