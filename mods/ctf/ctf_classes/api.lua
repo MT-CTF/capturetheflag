@@ -11,6 +11,22 @@ function ctf_classes.register(cname, def)
 	if def.properties.can_capture == nil then
 		def.properties.can_capture = true
 	end
+
+	def.properties.initial_stuff = def.properties.initial_stuff or {}
+
+	if not def.properties.item_blacklist then
+		def.properties.item_blacklist = {}
+		for i=1, #def.properties.initial_stuff do
+			table.insert(def.properties.item_blacklist, def.properties.initial_stuff[i])
+		end
+	end
+
+	if def.properties.additional_item_blacklist then
+		for i=1, #def.properties.additional_item_blacklist do
+			table.insert(def.properties.item_blacklist, def.properties.additional_item_blacklist[i])
+		end
+	end
+
 	def.properties.speed  = def.properties.speed or 1
 	def.properties.max_hp = def.properties.max_hp or 20
 end

@@ -194,3 +194,22 @@ minetest.register_chatcommand("transfer_rankings", {
 		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
 	end
 })
+
+
+minetest.register_chatcommand("makepro", {
+	description = "Make self a pro",
+	privs = {ctf_admin = true},
+	func = function(name, param)
+		local stats, _ = ctf_stats.player(name)
+
+		if stats.kills < 1.5 * (stats.deaths + 1) then
+			stats.kills = 1.51 * (stats.deaths + 1)
+		end
+
+		if stats.score < 10000 then
+			stats.score = 10000
+		end
+
+		return true, "Done"
+	end
+})
