@@ -35,6 +35,10 @@ end
 ctf_classes.register_on_changed(function(player, old, new)
 	local inv = player:get_inventory()
 
+	if not old then
+		old = ctf_classes.__classes[ctf_classes.default_class]
+	end
+
 	local blacklist = old.properties.item_blacklist
 	if old and #blacklist > 0 then
 		local blacklist_map = stack_list_to_map(blacklist)
