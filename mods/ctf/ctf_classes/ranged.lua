@@ -45,7 +45,7 @@ local function check_grapple(itemname)
 	local old_func = def.on_use
 	minetest.override_item(itemname, {
 		on_use = function(itemstack, user, ...)
-			if ctf_classes.get(user).name ~= "shooter" then
+			if not ctf_classes.get(user).properties.allow_grapples then
 				minetest.chat_send_player(user:get_player_name(),
 					"Your class can't use that weapon! Change your class at spawn")
 
@@ -66,3 +66,4 @@ end
 
 check_grapple("shooter:grapple_gun_loaded")
 check_grapple("shooter:grapple_gun")
+check_grapple("shooter:grapple_hook")

@@ -39,6 +39,8 @@ ctf_classes.register("shooter", {
 	cons = {},
 	color = "#c60",
 	properties = {
+		allow_grapples = true,
+
 		initial_stuff = {
 			"shooter:rifle",
 			"shooter:grapple_gun_loaded",
