@@ -132,3 +132,49 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 end
 
 minetest.registered_entities["shooter_crossbow:arrow_entity"].collide_with_objects = false
+
+minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime)
+	if not self.user then
+		return
+	end
+	self.timer = self.timer + dtime
+	if self.timer > 0.25 then
+		local pos = self.object:get_pos()
+		if minetest.get_node(pos).name ~= "air" then
+			pos.y = pos.y + 1
+		end
+
+		local below = {x=pos.x, y=pos.y - 1, z=pos.z}
+		local above = {x=pos.x, y=pos.y + 1, z=pos.z}
+		local node = minetest.get_node(below)
+		if node.name ~= "air" then
+			self.object:set_velocity({x=0, y=-10, z=0})
+			self.object:set_acceleration({x=0, y=0, z=0})
+
+			-- Check for teleportation
+			if minetest.get_item_group(node.name, "liquid") == 0 and
+					minetest.get_node(pos).name == "air" and
+					minetest.get_node(above).name == "air" then
+				local player = minetest.get_player_by_name(self.user)
+				if player then
+					player:move_to(pos)
+				end
+			else
+				-- Failed to teleport, return to inventory
+				local player = minetest.get_player_by_name(self.user)
+				if player then
+					self.itemstack = player:get_inventory():add_item("main", self.itemstack)
+				end
+			end
+
+			-- Drop remaining stack
+			if not self.itemstack:is_empty() and minetest.get_item_group(node.name, "lava") == 0 then
+				minetest.add_item(pos, self.itemstack)
+			end
+
+			-- Remove object
+			self.object:remove()
+		end
+		self.timer = 0
+	end
+end
