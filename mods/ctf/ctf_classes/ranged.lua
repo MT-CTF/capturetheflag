@@ -17,8 +17,10 @@ local function get_shooter_specs(weapon_name, multiplier)
 	spec = table.copy(spec)
 	specs_cache[idx] = spec
 
-	spec.range = spec.range * 1.5
-	spec.tool_caps.full_punch_interval = spec.tool_caps.full_punch_interval * 0.8
+	for key, value in pairs(multiplier) do
+		spec[key] = spec[key] * value
+	end
+
 	return spec
 end
 

@@ -2,12 +2,12 @@ function ctf_classes.show_gui(name, player)
 	player = player or minetest.get_player_by_name(name)
 	assert(player.get_player_name)
 	if not ctf_classes.can_change(player) then
-		minetest.chat_send_player(name, "Move closer to the flag to change classes!")
+		minetest.chat_send_player(name, "Move closer to your flag to change classes!")
 		return
 	end
 
 	local fs = {
-		"size[9,3.4]"
+		"size[", #ctf_classes.__classes_ordered * 3 , ",3.4]"
 	}
 
 

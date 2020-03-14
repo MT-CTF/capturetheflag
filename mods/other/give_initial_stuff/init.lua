@@ -28,13 +28,19 @@ function give_initial_stuff.register_stuff_provider(func, priority)
 end
 
 function give_initial_stuff.get_stuff(player)
+	local seen_stuff = {}
+
 	local stuff = {}
 	for i=1, #registered_stuff_providers do
 		local new_stuff = registered_stuff_providers[i](player)
 		assert(new_stuff)
 
 		for j=1, #new_stuff do
-			stuff[#stuff + 1] = new_stuff[j]
+			local name = ItemStack(new_stuff[j]):get_name()
+			if not seen_stuff[name] then
+				seen_stuff[name] = true
+				stuff[#stuff + 1] = new_stuff[j]
+			end
 		end
 	end
 	return stuff
