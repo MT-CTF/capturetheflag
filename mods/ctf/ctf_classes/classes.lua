@@ -59,6 +59,8 @@ ctf_classes.register("medic", {
 	cons = {},
 	color = "#0af",
 	properties = {
+		nearby_hpregen = true,
+
 		initial_stuff = {
 			"ctf_bandages:bandage 20",
 		},
