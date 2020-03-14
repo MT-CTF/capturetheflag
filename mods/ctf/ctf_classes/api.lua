@@ -119,6 +119,11 @@ function ctf_classes.update(player)
 	physics.set(player:get_player_name(), "ctf_classes:speed", {
 		speed = speed,
 	})
+
+	crafting.lock_all(player:get_player_name())
+	for i=1, #(class.properties.crafting or {}) do
+		crafting.unlock(player:get_player_name(), class.properties.crafting[i])
+	end
 end
 
 local function sqdist(a, b)

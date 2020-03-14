@@ -11,6 +11,24 @@ local upgrades = {
 	mese = "diamond",
 }
 
+-- Rocket <== Gold ingot x16 + Coal lump x5
+crafting.register_recipe({
+	type   = "inv",
+	output = "shooter_rocket:rocket",
+	items  = { "default:gold_ingot 16", "default:coal_lump 5" },
+	always_known = false,
+	level  = 1,
+})
+
+-- Rocket <== Mese x5 + Coal lump x5
+crafting.register_recipe({
+	type   = "inv",
+	output = "shooter_rocket:rocket",
+	items  = { "default:mese 5", "default:coal_lump 5" },
+	always_known = false,
+	level  = 1,
+})
+
 -- Swords
 for from, to in pairs(upgrades) do
 	crafting.register_recipe({

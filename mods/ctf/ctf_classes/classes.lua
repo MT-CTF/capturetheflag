@@ -96,5 +96,9 @@ ctf_classes.register("rocketeer", {
 			"shooter_guns:smg",
 			"shooter_guns:shotgun",
 		},
+
+		crafting = {
+			"shooter_rocket:rocket"
+		},
 	},
 })
