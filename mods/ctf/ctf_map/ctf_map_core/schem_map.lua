@@ -168,6 +168,8 @@ local function load_map_meta(idx, dirname, meta)
 		assert(from and to, "Positions needed for chest zone " ..
 				i .. " in map " .. map.name)
 
+		from, to = vector.sort(from, to)
+
 		map.chests[i] = {
 			from = vector.add(offset, from),
 			to   = vector.add(offset, to),
