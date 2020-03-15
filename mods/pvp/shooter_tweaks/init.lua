@@ -39,10 +39,13 @@ end)
 local config = shooter.config
 local v3d = vector
 
-shooter.blast = function(pos, radius, fleshy, distance, user)
+shooter.blast = function(pos, radius, fleshy, distance, user, groups)
 	if not user then
 		return
 	end
+
+	groups = groups or { "flesy" }
+
 	pos = v3d.round(pos)
 	local name = user:get_player_name()
 	local p1 = v3d.subtract(pos, radius)
@@ -82,18 +85,23 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 			local obj_pos = obj:get_pos()
 			local dist = v3d.distance(obj_pos, pos)
 
-			-- PATCH
-			local damage = fleshy * (0.707106 ^ dist) * 3
-			-- END PATCH
-
 			if dist ~= 0 then
 				obj_pos.y = obj_pos.y + 1
 				local blast_pos = {x=pos.x, y=pos.y + 4, z=pos.z}
 				if shooter.is_valid_object(obj) and
 						minetest.line_of_sight(obj_pos, blast_pos, 1) then
+
+					-- PATCH
+					local damage = (fleshy * 0.5 ^ dist) * 2 * config.damage_multiplier
+					local damage_groups = {}
+					for i=1, #groups do
+						damage_groups[groups[i]] = damage
+					end
+					-- END PATCH
+
 					shooter.punch_object(obj, {
 						full_punch_interval = 1.0,
-						damage_groups = {fleshy=damage},
+						damage_groups = damage_groups,
 					}, nil, true, user)
 				end
 			end
@@ -130,6 +138,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user)
 		vm:write_to_map()
 	end
 end
+
 
 minetest.registered_entities["shooter_crossbow:arrow_entity"].collide_with_objects = false
 
@@ -173,6 +182,42 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 			end
 
 			-- Remove object
+			self.object:remove()
+		end
+		self.timer = 0
+	end
+end
+
+minetest.registered_entities["shooter_rocket:rocket_entity"].on_step = function(self, dtime)
+	self.timer = self.timer + dtime
+	if self.timer > 0.2 then
+		local pos = self.object:get_pos()
+		local above = {x=pos.x, y=pos.y + 1, z=pos.z}
+		if minetest.get_node(pos).name ~= "air" then
+			if self.user then
+				local player = minetest.get_player_by_name(self.user)
+				if player then
+					shooter.blast(above, 4, 25, 8, player, { "fleshy", "rocket" })
+				end
+			end
+			self.object:remove()
+		end
+		self.timer = 0
+	end
+end
+
+minetest.registered_entities["shooter_grenade:grenade_entity"].on_step = function(self, dtime)
+	self.timer = self.timer + dtime
+	if self.timer > 0.2 then
+		local pos = self.object:get_pos()
+		local above = {x=pos.x, y=pos.y + 1, z=pos.z}
+		if minetest.get_node(pos).name ~= "air" then
+			if self.user then
+				local player = minetest.get_player_by_name(self.user)
+				if player then
+					shooter.blast(above, 2, 30, 5, player, { "fleshy", "grenade" })
+				end
+			end
 			self.object:remove()
 		end
 		self.timer = 0
