@@ -15,7 +15,7 @@ ctf_classes.register("knight", {
 
 		allowed_guns = {
 			"shooter_guns:pistol",
-			"shooter_guns:smg",
+			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
 		},
 	},
@@ -43,7 +43,7 @@ ctf_classes.register("shooter", {
 		allowed_guns = {
 			"shooter_guns:pistol",
 			"shooter_guns:rifle",
-			"shooter_guns:smg",
+			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
 		},
 
@@ -70,7 +70,7 @@ ctf_classes.register("medic", {
 
 		allowed_guns = {
 			"shooter_guns:pistol",
-			"shooter_guns:smg",
+			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
 		},
 	},
@@ -93,7 +93,7 @@ ctf_classes.register("rocketeer", {
 
 		allowed_guns = {
 			"shooter_guns:pistol",
-			"shooter_guns:smg",
+			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
 		},
 
