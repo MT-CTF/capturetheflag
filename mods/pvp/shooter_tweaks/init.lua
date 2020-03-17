@@ -142,10 +142,57 @@ end
 
 minetest.registered_entities["shooter_crossbow:arrow_entity"].collide_with_objects = false
 
+
+minetest.registered_entities["shooter_hook:hook"].on_activate = function(self, staticdata)
+	self.object:set_armor_groups({fleshy=0})
+	if staticdata == "expired" then
+		self.object:remove()
+		return
+	end
+end
+
+local function check_grapple(self, node, pos, above)
+	local player = minetest.get_player_by_name(self.user)
+	if not player then
+		return
+	end
+
+	local counter = player:get_meta():get_int("death_counter")
+	if self.counter ~= counter then
+		return
+	end
+
+	-- Check for teleportation
+	if minetest.get_item_group(node.name, "liquid") == 0 and
+			minetest.get_node(pos).name == "air" and
+			minetest.get_node(above).name == "air" then
+		player:move_to(pos)
+	else
+		-- Failed to teleport, return to inventory
+		self.itemstack = player:get_inventory():add_item("main", self.itemstack)
+	end
+
+	-- Drop remaining stack
+	if not self.itemstack:is_empty() and minetest.get_item_group(node.name, "lava") == 0 then
+		minetest.add_item(pos, self.itemstack)
+	end
+end
+
 minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime)
 	if not self.user then
 		return
 	end
+
+	if not self.counter then
+		local player = minetest.get_player_by_name(self.user)
+		if player then
+			self.counter = player:get_meta():get_int("death_counter")
+		else
+			self.object:remove()
+			return
+		end
+	end
+
 	self.timer = self.timer + dtime
 	if self.timer > 0.25 then
 		local pos = self.object:get_pos()
@@ -160,33 +207,21 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 			self.object:set_velocity({x=0, y=-10, z=0})
 			self.object:set_acceleration({x=0, y=0, z=0})
 
-			-- Check for teleportation
-			if minetest.get_item_group(node.name, "liquid") == 0 and
-					minetest.get_node(pos).name == "air" and
-					minetest.get_node(above).name == "air" then
-				local player = minetest.get_player_by_name(self.user)
-				if player then
-					player:move_to(pos)
-				end
-			else
-				-- Failed to teleport, return to inventory
-				local player = minetest.get_player_by_name(self.user)
-				if player then
-					self.itemstack = player:get_inventory():add_item("main", self.itemstack)
-				end
-			end
+			check_grapple(self, node, pos, above)
 
-			-- Drop remaining stack
-			if not self.itemstack:is_empty() and minetest.get_item_group(node.name, "lava") == 0 then
-				minetest.add_item(pos, self.itemstack)
-			end
-
-			-- Remove object
 			self.object:remove()
 		end
 		self.timer = 0
 	end
 end
+
+minetest.register_on_dieplayer(function(player)
+	local meta = player:get_meta()
+
+	local counter = meta:get_int("death_counter")
+	meta:set_int("death_counter", counter + 1)
+end)
+
 
 minetest.registered_entities["shooter_rocket:rocket_entity"].on_step = function(self, dtime)
 	self.timer = self.timer + dtime
