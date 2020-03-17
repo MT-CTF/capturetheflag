@@ -23,7 +23,12 @@ wrap_callback("shooter_hook:grapple_gun_loaded", "on_use", function(old, itemsta
 	return old(itemstack, ...)
 end)
 
-wrap_callback("shooter_hook:grapple_gun", "on_use", function(old, itemstack, user)
+wrap_callback("shooter_hook:grapple_gun", "on_use", function(old, itemstack, user, pointed_thing)
+	if pointed_thing.type == "object" then
+		pointed_thing.ref:punch(user, 1.0, { full_punch_interval=1.0 }, nil)
+		return user:get_wielded_item()
+	end
+
 	local inv = user:get_inventory()
 	if inv:contains_item("main", "shooter_hook:grapple_hook") then
 		minetest.sound_play("shooter_reload", {object=user})
