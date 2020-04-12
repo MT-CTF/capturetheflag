@@ -1,6 +1,6 @@
 # Sniper Rifles
 
-This mod adds sniper rifles which behave like over-powered rifles, with the addition of the ability to scope in using the `Z` key.
+This mod adds sniper rifles which behave like over-powered rifles, with the addition of the ability to toggle scoping using RMB (by default).
 
 ## Licenses
 

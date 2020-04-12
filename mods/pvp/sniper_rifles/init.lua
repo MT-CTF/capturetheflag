@@ -2,120 +2,54 @@
 -- Private data --
 ------------------
 
--- Locally cache online players for better performance
-local players = {}
+-- Keep track of players who are scoping in
+local scoped = {}
 
--- Store list of players who were previously wielding a sniper rifle
-local snipers = {}
+-------------
+-- Helpers --
+-------------
 
--- Use timer to limit frequency of wielditem checks
-local timer = 0
+local function show_scope(name, fov_mult)
+	minetest.get_player_by_name(name):set_fov(1 / fov_mult, true)
+	-- e.g. let default fov = 100, if fov_mult == 8, then final FOV = 1/8 * 100 = 12.5
+end
 
------------------------
--- Wielditem monitor --
------------------------
+local function hide_scope(name)
+	minetest.get_player_by_name(name):set_fov(0)
+end
 
-minetest.register_globalstep(function(dtime)
-	timer = timer + dtime
-	if timer < 0.05 then
+local function on_rclick(item, placer, pointed_thing)
+	if pointed_thing.type == "object" then
 		return
 	end
 
-	timer = 0
-	for name, player in pairs(players) do
-		local sname = player:get_wielded_item():get_name()
-		local prop  = player:get_properties()
-		local prop_changed = false
-
-		-- If they're wielding a sniper rifle, set zoom_fov. Otherwise, if
-		-- they were previously wielding a sniper rifle, reset zoom_fov
-		if sname:find("sniper_rifles:rifle_") then
-			local def = shooter.registered_weapons[sname]
-			if prop.zoom_fov ~= def.zoom_fov then
-				prop.zoom_fov = def.zoom_fov
-				prop_changed  = true
-			end
-
-			if not snipers[name] then
-				snipers[name] = sname
-			end
-		elseif snipers[name] then
-			local def = shooter.registered_weapons[snipers[name]]
-			if prop.zoom_fov == def.zoom_fov then
-				prop.zoom_fov = 0
-				prop_changed  = true
-			end
-			snipers[name] = nil
-		end
-
-		if prop_changed then
-			player:set_properties(prop)
-		end
+	local name = placer:get_player_name()
+	if scoped[name] then
+		hide_scope(name)
+		scoped[name] = nil
+	else
+		local fov_mult = shooter.registered_weapons[item:get_name()].fov_mult
+		show_scope(name, fov_mult)
+		scoped[name] = fov_mult
 	end
-end)
+end
 
----------------
--- Callbacks --
----------------
+----------------------------
+-- Rifle registration API --
+----------------------------
 
-minetest.register_on_joinplayer(function(player)
-	if player then
-		players[player:get_player_name()] = player
-	end
-end)
+sniper_rifles = {}
 
-minetest.register_on_leaveplayer(function(player)
-	players[player:get_player_name()] = nil
-end)
+function sniper_rifles.register_rifle(name, def)
+	assert(def.fov_mult, "Rifle def must contain FOV multiplier (fov_mult)!")
 
--------------------------
--- Rifle registrations --
--------------------------
+	shooter:register_weapon(name, def)
 
--- Basic 7.62mm rifle
-shooter:register_weapon("sniper_rifles:rifle_762", {
-	description = "Sniper rifle (7.62mm)",
-	inventory_image = "sniper_rifles_rifle_762.png",
-	rounds = 30,
-	zoom_fov = 40,
-	spec = {
-		range     = 300,
-		step      = 30,
-		tool_caps = { full_punch_interval = 1.5, damage_groups = { fleshy = 12 } },
-		sound     = { name = "sniper_rifles_rifle", gain = 0.8 },
-		particle  = "shooter_bullet.png",
-		groups    = {
-			cracky = 3, snappy = 2, crumbly = 2, choppy = 2,
-			fleshy = 1, oddly_breakable_by_hand = 1
-		}
-	}
-})
+	-- Manually add extra fields to itemdef that shooter doesn't allow
+	minetest.override_item(name, {
+		on_secondary_use = on_rclick,
+		wield_scale = vector.new(2, 2, 1.5)
+	})
+end
 
--- Magnum rifle
-shooter:register_weapon("sniper_rifles:rifle_magnum", {
-	description = "Sniper rifle (Magnum)",
-	inventory_image = "sniper_rifles_rifle_magnum.png",
-	rounds = 20,
-	zoom_fov = 25,
-	spec = {
-		range     = 400,
-		step      = 30,
-		tool_caps = { full_punch_interval = 2, damage_groups = { fleshy = 16 } },
-		sound     = { name = "sniper_rifles_rifle", gain = 0.8 },
-		particle  = "shooter_bullet.png",
-		groups    = {
-			cracky = 2, snappy = 1, crumbly = 1, choppy = 1,
-			fleshy = 1, oddly_breakable_by_hand = 1
-		}
-	}
-})
-
--- shooter API doesn't allow for setting wield scale, so define it after registration
-
-minetest.override_item("sniper_rifles:rifle_762", {
-	wield_scale = vector.new(2, 2, 1.5)
-})
-
-minetest.override_item("sniper_rifles:rifle_magnum", {
-	wield_scale = vector.new(2, 2, 1.5)
-})
+dofile(minetest.get_modpath(minetest.get_current_mod()) .. "/rifles.lua")
