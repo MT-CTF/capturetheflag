@@ -77,6 +77,7 @@ function random_messages.read_messages()
 		"Change your class in your base by right clicking the home flag or typing /class.",
 		"Medics cause troops within 10 metres to regenerate health faster.",
 		"Hitting your enemy does more damage than not hitting them.",
+		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle."
 	}
 end
 
