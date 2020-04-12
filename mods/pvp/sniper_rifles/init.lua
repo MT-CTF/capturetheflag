@@ -28,7 +28,9 @@ local function on_rclick(item, placer, pointed_thing)
 		hide_scope(name)
 		scoped[name] = nil
 	else
-		local fov_mult = shooter.registered_weapons[item:get_name()].fov_mult
+		-- Remove _loaded suffix added to item name by shooter
+		local item_name = item:get_name():gsub("_loaded", "")
+		local fov_mult = shooter.registered_weapons[item_name].fov_mult
 		show_scope(name, fov_mult)
 		scoped[name] = fov_mult
 	end
@@ -43,7 +45,7 @@ sniper_rifles = {}
 function sniper_rifles.register_rifle(name, def)
 	assert(def.fov_mult, "Rifle def must contain FOV multiplier (fov_mult)!")
 
-	shooter:register_weapon(name, def)
+	shooter.register_weapon(name, def)
 
 	-- Manually add extra fields to itemdef that shooter doesn't allow
 	minetest.override_item(name, {
@@ -52,4 +54,4 @@ function sniper_rifles.register_rifle(name, def)
 	})
 end
 
-dofile(minetest.get_modpath(minetest.get_current_mod()) .. "/rifles.lua")
+dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/rifles.lua")
