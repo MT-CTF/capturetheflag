@@ -48,10 +48,14 @@ function sniper_rifles.register_rifle(name, def)
 	shooter.register_weapon(name, def)
 
 	-- Manually add extra fields to itemdef that shooter doesn't allow
-	minetest.override_item(name, {
+	-- Also modify the _loaded variant
+	local overrides = {
 		on_secondary_use = on_rclick,
 		wield_scale = vector.new(2, 2, 1.5)
-	})
+	}
+	minetest.override_item(name, overrides)
+	minetest.override_item(name .. "_loaded", overrides)
+
 end
 
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/rifles.lua")
