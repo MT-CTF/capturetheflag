@@ -86,7 +86,7 @@ end)
 sniper_rifles = {}
 
 function sniper_rifles.register_rifle(name, def)
-	assert(def.fov_mult, "Rifle def must contain FOV multiplier (fov_mult)!")
+	assert(def.fov_mult, "Rifle definition must contain FOV multiplier (fov_mult)!")
 
 	shooter.register_weapon(name, def)
 
