@@ -21,7 +21,7 @@ local function show_scope(name, item_name, fov_mult)
 	scoped[name] = item_name
 	-- e.g. if fov_mult == 8, then FOV = 1/8 * current_FOV, a.k.a 8x zoom
 	player:set_fov(1 / fov_mult, true)
-	player:set_hud_flags({ wielditem = false })
+	player:hud_set_flags({ wielditem = false })
 end
 
 local function hide_scope(name)
@@ -32,7 +32,7 @@ local function hide_scope(name)
 
 	scoped[name] = nil
 	player:set_fov(0)
-	player:set_hud_flags({ wielditem = true })
+	player:hud_set_flags({ wielditem = true })
 end
 
 local function on_rclick(item, placer, pointed_thing)
@@ -71,7 +71,7 @@ minetest.register_globalstep(function(dtime)
 		if not player then
 			scoped[name] = nil
 		else
-			local wielded_item = player:get_wielded_item()
+			local wielded_item = player:get_wielded_item():get_name():gsub("_loaded", "")
 			if wielded_item ~= original_item then
 				hide_scope(name)
 			end
