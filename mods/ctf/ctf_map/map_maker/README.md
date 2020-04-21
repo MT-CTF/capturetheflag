@@ -104,9 +104,9 @@ If you want to tell more infomation, you can use:
 
 An example `treasures` value that registers steel pick, shotgun, and grenade:
 
-  ```lua
-  treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
-  ```
+```lua
+treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
+```
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
 
