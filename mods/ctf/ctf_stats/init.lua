@@ -79,8 +79,6 @@ function ctf_stats.load()
 		blue = {}
 	}
 
-	ctf_stats.start = os.time()
-
 	-- Strip players which have no score
 	for name, player_stats in pairs(ctf_stats.players) do
 		if not player_stats.score or player_stats.score <= 0 then
@@ -241,7 +239,7 @@ ctf_match.register_on_winner(function(winner)
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-		ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+		ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
 
 	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
@@ -258,7 +256,7 @@ ctf_match.register_on_skip_match(function()
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-		ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+		ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
 
 	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
@@ -276,8 +274,12 @@ ctf_match.register_on_new_match(function()
 	}
 	ctf_stats.winner_team = "-"
 	ctf_stats.winner_player = "-"
-	ctf_stats.start = os.time()
 	_needs_save = true
+end)
+
+ctf_stats.start = nil
+ctf_match.register_on_build_time_end(function()
+	ctf_stats.start = os.time()
 end)
 
 -- ctf_map can't be added as a dependency, as that'd result

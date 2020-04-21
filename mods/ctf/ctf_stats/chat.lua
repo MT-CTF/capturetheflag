@@ -53,7 +53,7 @@ end
 
 local function summary_func(name)
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-	ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+	ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
 
 	fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
 

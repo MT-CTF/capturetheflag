@@ -58,10 +58,13 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		blue.score = blue.score + pstat.score
 	end
 
-	local match_length = string.format("%02d:%02d:%02d",
-		math.floor(time / 3600),        -- hours
-		math.floor((time % 3600) / 60), -- minutes
-		math.floor(time % 60))          -- seconds
+	local match_length = "-"
+	if time then
+		match_length = string.format("%02d:%02d:%02d",
+			math.floor(time / 3600),        -- hours
+			math.floor((time % 3600) / 60), -- minutes
+			math.floor(time % 60))          -- seconds
+	end
 
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
 
@@ -242,7 +245,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		fs = fs .. "button[6,7.5;4,1;b_curr;Current match >>]"
 	elseif fields.b_curr then
 		fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-			ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+			ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
 		fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
 	else
 		return
