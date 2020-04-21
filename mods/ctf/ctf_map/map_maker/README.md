@@ -86,7 +86,7 @@ format. Refer to the `treasures` sub-section for more details.
   license = <name>
   ```
 
-* If license require something (for example if you modify other's map and you have to tell who is author of the original map) you have to include this in `license`.
+* If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
 If you want to tell more infomation, you can use:
 
   ```lua
