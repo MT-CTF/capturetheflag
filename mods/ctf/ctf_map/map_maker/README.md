@@ -129,7 +129,7 @@ Six images which should be in map's folder.
 
 You have to include skybox license in `license` in `.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
 
-(You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).)
+You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
 
 ## Editing exported map
 
