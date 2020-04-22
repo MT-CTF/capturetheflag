@@ -150,6 +150,24 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+-- 7.62mm sniper rifle (unloaded)
+crafting.register_recipe({
+	type   = "inv",
+	output = "sniper_rifles:rifle_762",
+	items  = { "default:steelblock", "default:bronze_ingot 5", "default:mese_crystal", "default:wood" },
+	always_known = true,
+	level  = 1
+})
+
+-- Magnum sniper rifle (unloaded)
+crafting.register_recipe({
+	type   = "inv",
+	output = "sniper_rifles:rifle_magnum",
+	items  = { "default:steelblock", "default:bronzeblock", "default:diamond", "default:wood" },
+	always_known = true,
+	level  = 1,
+})
+
 -- Wooden ladder x4
 crafting.register_recipe({
 	type   = "inv",

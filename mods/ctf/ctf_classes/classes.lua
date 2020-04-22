@@ -45,6 +45,8 @@ ctf_classes.register("shooter", {
 			"shooter_guns:rifle",
 			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
 		},
 
 		shooter_multipliers = {
