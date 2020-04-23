@@ -277,11 +277,6 @@ ctf_match.register_on_new_match(function()
 	_needs_save = true
 end)
 
-ctf_stats.start = nil
-ctf_match.register_on_build_time_end(function()
-	ctf_stats.start = os.time()
-end)
-
 -- ctf_map can't be added as a dependency, as that'd result
 -- in cyclic dependencies between ctf_map and ctf_stats
 minetest.after(0, function()
