@@ -49,7 +49,7 @@ shooter.blast = function(pos, radius, fleshy, distance, user, groups)
 		return
 	end
 
-	groups = groups or { "flesy" }
+	groups = groups or { "fleshy" }
 
 	pos = v3d.round(pos)
 	local name = user:get_player_name()
