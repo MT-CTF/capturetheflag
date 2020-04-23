@@ -10,7 +10,7 @@ end
 function ctf_map.file_exists(subdir, target)
 	local list = minetest.get_dir_list(ctf_map.mapdir .. subdir, false)
 	if type(target) == "string" then
-		return table.indexof(list, target) ~= 1
+		return table.indexof(list, target) ~= -1
 	elseif type(target) == "table" then
 		for _, filename in pairs(target) do
 			if table.indexof(list, filename) == -1 then

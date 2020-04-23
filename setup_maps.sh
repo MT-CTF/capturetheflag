@@ -5,7 +5,7 @@ for f in *; do
 	if [ -d ${f} ]; then
 		# Screenshot
 		if [ -f ${f}/screenshot.png ]; then
-			cp ${f}/screenshot.png ../textures/${f}.png
+			cp ${f}/screenshot.png ../textures/${f}_screenshot.png
 		fi
 
 		# Skybox textures
