@@ -15,8 +15,8 @@ local item = {
 
 	burn_up = function(self)
 		-- disappear in a smoke puff
-		self.object:remove()
 		local p = self.object:get_pos()
+		self.object:remove()
 		minetest.sound_play("default_item_smoke", {
 			pos = p,
 			max_hear_distance = 8,
