@@ -1,4 +1,5 @@
 # Capture The Flag
+[![Build Status](https://travis-ci.org/MT-CTF/capturetheflag.svg?branch=master)](https://travis-ci.org/MT-CTF/capturetheflag)
 
 * Fast rounds of CTF games.
 * Removed nodes for focus.
