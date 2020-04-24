@@ -48,7 +48,12 @@ local item = {
 			if self.ignite_timer > 10 then
 				self.ignite_timer = 0
 
-				local node = minetest.get_node_or_nil(self.object:get_pos())
+				local pos = self.object:get_pos()
+				if not pos then
+					return
+				end
+
+				local node = minetest.get_node_or_nil(pos)
 				if not node then
 					return
 				end
