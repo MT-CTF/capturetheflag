@@ -78,7 +78,7 @@ ctf_classes.register("medic", {
 	},
 })
 
-ctf_classes.register("rocketeer", {
+--[[ctf_classes.register("rocketeer", {
 	description = "Rocketeer",
 	pros = { "Can craft rockets" },
 	cons = {},
@@ -103,4 +103,4 @@ ctf_classes.register("rocketeer", {
 			"shooter_rocket:rocket"
 		},
 	},
-})
+})]]
