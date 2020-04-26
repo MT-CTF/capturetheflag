@@ -147,6 +147,10 @@ local function get_flag_pos(player)
 end
 
 function ctf_classes.can_change(player)
+	if minetest.check_player_privs(player, "ctf_admin") then
+		return true
+	end
+
 	local flag_pos = get_flag_pos(player)
 	if not flag_pos then
 		return false
