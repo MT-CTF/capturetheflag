@@ -60,12 +60,12 @@ ctf_classes.register("shooter", {
 
 ctf_classes.register("medic", {
 	description = "Medic",
-	pros = { "x2 regen for nearby friendlies", "+20% speed" },
+	pros = { "x2 regen for nearby friendlies", "+10% speed" },
 	cons = {},
 	color = "#0af",
 	properties = {
 		nearby_hpregen = true,
-		speed = 1.2,
+		speed = 1.1,
 
 		initial_stuff = {
 			"ctf_bandages:bandage 20",
