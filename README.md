@@ -1,5 +1,7 @@
 # Capture The Flag
 
+[![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
+
 * Fast rounds of CTF games.
 * Removed nodes for focus.
 
