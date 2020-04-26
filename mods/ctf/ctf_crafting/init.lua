@@ -69,6 +69,24 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+--Bronze block <== Bronze Ingot x9
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:bronzeblock",
+	items  = { "default:bronze_ingot 9" },
+	always_known = true,
+	level  = 1,
+})
+
+--Steel block <== Steel Ingot x9
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:steelblock",
+	items  = { "default:steel_ingot 9" },
+	always_known = true,
+	level  = 1,
+})
+
 -- Furnace <== group:stone x8
 crafting.register_recipe({
 	type   = "inv",
