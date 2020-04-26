@@ -125,11 +125,17 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 	local type = "sword"
 
 	if tool_caps.damage_groups.grenade then
+		-- Grenade
 		type = "grenade"
 	elseif tool_caps.damage_groups.rocket then
+		-- Rocket
 		type = "rocket"
-	elseif sname:sub(1, 8) == "shooter:" then
-		type = "bullet"
+	else
+		-- Guns and crossbow
+		local def = minetest.registered_items[sname]
+		if def and def.groups and (def.groups.ranged or def.groups.crossbow) then
+			type = "ranged"
+		end
 	end
 
 	ctf_events.post("kill_" .. type, killer, victim)
