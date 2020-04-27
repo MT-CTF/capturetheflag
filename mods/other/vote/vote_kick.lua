@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("other")
 
 vote.kick_cooldown = 600

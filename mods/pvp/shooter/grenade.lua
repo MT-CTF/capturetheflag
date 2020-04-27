@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("pvp")
 
 minetest.register_entity("shooter:grenade_entity", {

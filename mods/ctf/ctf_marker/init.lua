@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("ctf")
 
 -- Locally cache list of team members when adding

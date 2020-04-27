@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("pvp")
 
 SHOOTER_CROSSBOW_USES = 50

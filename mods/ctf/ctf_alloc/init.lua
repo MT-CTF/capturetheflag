@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("ctf")
 
 local storage = minetest.get_mod_storage()

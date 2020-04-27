@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("mtg")
 
 local function on_flood(pos, oldnode, newnode)

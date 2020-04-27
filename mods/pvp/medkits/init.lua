@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("pvp")
 
 -- Table of tables indexed by player names, each having three fields:

@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("mtg")
 
 -- This uses a trick: you can first define the recipes using all of the base

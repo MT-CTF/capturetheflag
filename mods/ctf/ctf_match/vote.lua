@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("ctf")
 
 ctf_match.registered_on_skip_map = {}

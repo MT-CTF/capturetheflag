@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("pvp")
 
 local function get_turret_entity(pos)

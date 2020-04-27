@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("ctf")
 
 assert(minetest.get_mapgen_setting("mg_name") == "singlenode", "singlenode mapgen is required.")

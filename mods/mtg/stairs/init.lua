@@ -1,4 +1,3 @@
--- Load support for MT game translation.
 local S = minetest.get_translator("mtg")
 
 -- Minetest 0.4 mod: stairs
