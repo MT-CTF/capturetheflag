@@ -74,13 +74,13 @@ function ctf_colors.update(player, name, tplayer)
 				position      = {x = 1, y = 0},
 				scale         = {x = 100, y = 100},
 				text          = "Team " .. tplayer.team,
-				number        = tcolor.hex,
+				number        = tonumber(tcolor.hex),
 				offset        = {x = -20, y = 20},
 				alignment     = {x = -1, y = 0}
 			})
 		else
 			ctf.hud:change(player, "ctf:hud_team", "text", "Team " .. tplayer.team)
-			ctf.hud:change(player, "ctf:hud_team", "number", tcolor.hex)
+			ctf.hud:change(player, "ctf:hud_team", "number", tonumber(tcolor.hex))
 		end
 	end
 end

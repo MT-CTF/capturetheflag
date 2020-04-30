@@ -48,7 +48,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
 				text          = evt.one,
-				number        = tcolor.hex,
+				number        = tonumber(tcolor.hex),
 				offset        = {x = 145, y = -y_pos},
 				alignment     = {x = -1, y = 0}
 			}
@@ -70,7 +70,7 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
 				text          = evt.two,
-				number        = tcolor.hex,
+				number        = tonumber(tcolor.hex),
 				offset        = {x = 175, y = -y_pos},
 				alignment     = {x = 1, y = 0}
 			}

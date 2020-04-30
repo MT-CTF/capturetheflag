@@ -7,7 +7,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 				local flag_name = flag.name or tname .. "'s base"
 				local color = ctf.flag_colors[team.data.color]
 				if not color then
-					color = "0x000000"
+					color = 0x000000
 				end
 
 				if ctf.hud:exists(player, hud) then
@@ -20,7 +20,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 					ctf.hud:add(player, hud, {
 						hud_elem_type = "waypoint",
 						name = flag_name,
-						number = color,
+						number = tonumber(color),
 						world_pos = {
 							x = flag.x,
 							y = flag.y,
@@ -91,7 +91,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 				position      = {x = 1, y = 0},
 				scale         = {x = 100, y = 100},
 				text          = alert,
-				number        = color,
+				number        = tonumber(color),
 				offset        = {x = -10, y = y},
 				alignment     = {x = -1, y = 0}
 			})

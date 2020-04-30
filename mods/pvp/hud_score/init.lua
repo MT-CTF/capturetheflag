@@ -41,7 +41,7 @@ local function update(name)
 				alignment = {x = 0, y = 0},
 				position = {x = 0.5, y = 0.6},
 				offset = {x = 0, y = i * 20},
-				number = def.color,
+				number = tonumber(def.color),
 				text = text
 			})
 		end
