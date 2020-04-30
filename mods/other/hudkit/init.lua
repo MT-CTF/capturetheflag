@@ -11,11 +11,6 @@ function hudkit()
 				elements = self.players[name]
 			end
 
-			if def.number and type(def.number) ~= "number" then
-				ctf.warning("hudkit", "type of def.number is "..dump(type(def.number))..". Should be a number")
-				def.number = tonumber(def.number)
-			end
-
 			elements[id] = {
 				id = player:hud_add(def),
 				def = def

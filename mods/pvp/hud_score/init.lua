@@ -32,6 +32,8 @@ local function update(name)
 			text = "+ " .. text
 		end
 
+		text = tostring(text)
+
 		if hud:exists(player, def.name) then
 			hud:change(player, def.name, "text", text)
 			hud:change(player, def.name, "offset", {x = 0, y = i * 20})
