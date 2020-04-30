@@ -27,12 +27,10 @@ local function update(name)
 
 	for i, def in ipairs(temp) do
 		-- If not the top-most element, prefix with "+ "
-		local text = def.value
+		local text = tostring(def.value)
 		if i > 1 then
 			text = "+ " .. text
 		end
-
-		text = tostring(text)
 
 		if hud:exists(player, def.name) then
 			hud:change(player, def.name, "text", text)
