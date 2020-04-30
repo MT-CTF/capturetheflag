@@ -5,7 +5,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 			for _, flag in pairs(team.flags) do
 				local hud = "ctf:hud_" .. tname
 				local flag_name = flag.name or tname .. "'s base"
-				local color = ctf.flag_colors[team.data.color]
+				local color = tonumber(ctf.flag_colors[team.data.color])
 				if not color then
 					color = 0x000000
 				end
@@ -20,7 +20,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 					ctf.hud:add(player, hud, {
 						hud_elem_type = "waypoint",
 						name = flag_name,
-						number = tonumber(color),
+						number = color,
 						world_pos = {
 							x = flag.x,
 							y = flag.y,
@@ -36,7 +36,7 @@ end)
 ctf.hud.register_part(function(player, name, tplayer)
 	-- Check all flags
 	local alert = nil
-	local color = "0xFFFFFF"
+	local color = 0xFFFFFF
 	if ctf.setting("flag.alerts") then
 		if ctf.setting("flag.alerts.neutral_alert") then
 			alert = "Punch the enemy flag! Protect your flag!"
@@ -55,22 +55,22 @@ ctf.hud.register_part(function(player, name, tplayer)
 		if teamHolder == name then
 			if enemyHolder then
 				alert = "You can't capture the flag until " .. enemyHolder .. " is killed!"
-				color = "0xFF0000"
+				color = 0xFF0000
 			else
 				alert = "You've got the flag! Run back and punch your flag!"
-				color = "0xFF0000"
+				color = 0xFF0000
 			end
 		elseif teamHolder then
 			if enemyHolder then
 				alert = "Kill " .. enemyHolder .. " to allow " .. teamHolder .. " to capture the flag!"
-				color = "0xFF0000"
+				color = 0xFF0000
 			else
 				alert = "Protect " .. teamHolder .. ", they've got the enemy flag!"
-				color = "0xFF0000"
+				color = 0xFF0000
 			end
 		elseif enemyHolder then
 			alert = "Kill " .. enemyHolder .. ", they've got your flag!"
-			color = "0xFF0000"
+			color = 0xFF0000
 		end
 	end
 
@@ -91,7 +91,7 @@ ctf.hud.register_part(function(player, name, tplayer)
 				position      = {x = 1, y = 0},
 				scale         = {x = 100, y = 100},
 				text          = alert,
-				number        = tonumber(color),
+				number        = color,
 				offset        = {x = -10, y = y},
 				alignment     = {x = -1, y = 0}
 			})

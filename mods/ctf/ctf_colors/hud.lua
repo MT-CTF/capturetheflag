@@ -6,14 +6,14 @@ function ctf_colors.get_color(tplayer)
 	end
 	local tcolor_hex = ctf.flag_colors[tcolor_text]
 	if not tcolor_hex then
-		tcolor_hex = "0x000000"
+		tcolor_hex = 0x000000
 	end
 
 	local tcolor_css = "#" .. tcolor_hex:sub(3, 8)
 
 	return {
 		text = tcolor_text,
-		hex = tcolor_hex,
+		hex = tonumber(tcolor_hex),
 		css = tcolor_css
 	}
 end
@@ -74,13 +74,13 @@ function ctf_colors.update(player, name, tplayer)
 				position      = {x = 1, y = 0},
 				scale         = {x = 100, y = 100},
 				text          = "Team " .. tplayer.team,
-				number        = tonumber(tcolor.hex),
+				number        = tcolor.hex,
 				offset        = {x = -20, y = 20},
 				alignment     = {x = -1, y = 0}
 			})
 		else
 			ctf.hud:change(player, "ctf:hud_team", "text", "Team " .. tplayer.team)
-			ctf.hud:change(player, "ctf:hud_team", "number", tonumber(tcolor.hex))
+			ctf.hud:change(player, "ctf:hud_team", "number", tcolor.hex)
 		end
 	end
 end
