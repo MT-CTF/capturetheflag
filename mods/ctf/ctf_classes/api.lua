@@ -111,13 +111,8 @@ function ctf_classes.update(player)
 	set_max_hp(player, class.properties.max_hp)
 	ctf_classes.set_skin(player, color, class)
 
-	local speed = class.properties.speed
-	if ctf_flag.has_flag(name) and speed > 0.9 then
-		speed = 0.9
-	end
-
 	physics.set(player:get_player_name(), "ctf_classes:speed", {
-		speed = speed,
+		speed = class.properties.speed,
 	})
 
 	crafting.lock_all(player:get_player_name())
