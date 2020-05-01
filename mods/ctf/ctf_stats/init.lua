@@ -327,6 +327,8 @@ local good_weapons = {
 	"shooter:shotgun",
 	"shooter:rifle",
 	"shooter:machine_gun",
+	"sniper_rifles:rifle_762",
+	"sniper_rifles:rifle_magnum",
 }
 
 local function invHasGoodWeapons(inv)
