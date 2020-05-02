@@ -80,7 +80,7 @@ minetest.override_item("ctf_bandages:bandage", {
 			local hp = object:get_hp()
 			local percentage = 0.75 --percentage of total HP to be healed
 			local limit = percentage * object:get_properties().hp_max
-			if hp > 0 and hp < limit then 
+			if hp > 0 and hp < limit then
 				local main, match = ctf_stats.player(name)
 				if main and match then
 					local reward = 5
