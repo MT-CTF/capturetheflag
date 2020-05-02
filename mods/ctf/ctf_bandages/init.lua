@@ -1,5 +1,7 @@
 --Inspired from Andrey's bandages mod
 
+heal_percent = 0.75 --Percentage of total HP to be healed
+
 minetest.register_craftitem("ctf_bandages:bandage", {
 	description = "Bandage\n\nHeals teammates for 3-4 HP until HP is equal to 75% of the total HP",
 	inventory_image = "ctf_bandages_bandage.png",
@@ -15,8 +17,7 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 		local name = player:get_player_name()
 		if ctf.player(pname).team == ctf.player(name).team then
 			local hp = object:get_hp()
-			local percentage = 0.75 --Percentage of total HP to be healed
-			local limit = percentage * object:get_properties().hp_max
+			local limit = heal_percent * object:get_properties().hp_max
 			if hp > 0 and hp < limit then
 				hp = hp + math.random(3,4)
 				if hp > limit then
