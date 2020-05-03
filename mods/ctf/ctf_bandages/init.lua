@@ -4,7 +4,9 @@ ctf_bandages = {}
 ctf_bandages.heal_percent = 0.75 --Percentage of total HP to be healed
 
 minetest.register_craftitem("ctf_bandages:bandage", {
-	description = "Bandage\n\nHeals teammates for 3-4 HP until HP is equal to 75% of the total HP",
+	description = "Bandage\n\n" .. 
+		"Heals teammates for 3-4 HP until target's HP is equal to " ..
+		ctf_bandages.heal_percent * 100 .. "% of their maximum HP",
 	inventory_image = "ctf_bandages_bandage.png",
 	on_use = function(itemstack, player, pointed_thing)
 		if pointed_thing.type ~= "object" then
@@ -18,7 +20,8 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 		local name = player:get_player_name()
 		if ctf.player(pname).team == ctf.player(name).team then
 			local hp = object:get_hp()
-			local limit = ctf_bandages.heal_percent * object:get_properties().hp_max
+			local limit = ctf_bandages.heal_percent *
+				object:get_properties().hp_max
 			if hp > 0 and hp < limit then
 				hp = hp + math.random(3,4)
 				if hp > limit then
