@@ -4,7 +4,7 @@ ctf_bandages = {}
 ctf_bandages.heal_percent = 0.75 --Percentage of total HP to be healed
 
 minetest.register_craftitem("ctf_bandages:bandage", {
-	description = "Bandage\n\n" .. 
+	description = "Bandage\n\n" ..
 		"Heals teammates for 3-4 HP until target's HP is equal to " ..
 		ctf_bandages.heal_percent * 100 .. "% of their maximum HP",
 	inventory_image = "ctf_bandages_bandage.png",
