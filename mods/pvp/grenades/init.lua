@@ -1,14 +1,14 @@
 grenades = {
-	grenade_accel = 13
+	grenade_deaccel = 9
 }
 
 local function throw_grenade(name, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
-	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 2 + dir.y, z = pos.z + dir.z}, name)
+	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5 + dir.y, z = pos.z + dir.z}, name)
 
 	local m = 20
-	obj:set_velocity({x = dir.x * m, y = dir.y * (m / 2), z = dir.z * m})
+	obj:set_velocity({x = dir.x * m, y = dir.y * m, z = dir.z * m})
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
 	return(obj:get_luaentity())
@@ -78,9 +78,9 @@ function grenades.register_grenade(name, def)
 				norm_vel = vector.normalize(vel)
 
 				obj:set_acceleration({
-					x = -norm_vel.x * grenades.grenade_accel * self.sliding,
+					x = -norm_vel.x * grenades.grenade_deaccel * self.sliding,
 					y = -9.8,
-					z = -norm_vel.z * grenades.grenade_accel * self.sliding,
+					z = -norm_vel.z * grenades.grenade_deaccel * self.sliding,
 				})
 			end
 
