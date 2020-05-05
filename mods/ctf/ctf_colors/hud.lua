@@ -9,7 +9,7 @@ function ctf_colors.get_color(tplayer)
 		tcolor_hex = 0x000000
 	end
 
-	local tcolor_css = "#" .. tcolor_hex:sub(3, 8)
+	local tcolor_css = "#" .. tostring(tcolor_hex):sub(3, 8)
 
 	return {
 		text = tcolor_text,
