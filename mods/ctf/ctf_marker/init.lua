@@ -44,7 +44,7 @@ local function add_marker(name, tname, pos, str)
 			teams[tname].players[pname] = tplayer:hud_add({
 				hud_elem_type = "waypoint",
 				name          = str,
-				number        = ctf.flag_colors[team.data.color],
+				number        = tonumber(ctf.flag_colors[team.data.color]),
 				world_pos     = pos
 			})
 		end
