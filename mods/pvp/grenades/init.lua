@@ -2,13 +2,12 @@ grenades = {
 	grenade_deaccel = 9
 }
 
-local function throw_grenade(name, player)
+function grenades.throw_grenade(name, startvel, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5 + dir.y, z = pos.z + dir.z}, name)
 
-	local m = 20
-	obj:set_velocity({x = dir.x * m, y = dir.y * m, z = dir.z * m})
+	obj:set_velocity({x = dir.x * startvel, y = dir.y * startvel, z = dir.z * startvel})
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
 	return(obj:get_luaentity())
@@ -132,11 +131,11 @@ function grenades.register_grenade(name, def)
 		local player_name = user:get_player_name()
 
 		if pointed_thing.type ~= "node" then
-			local grenade = throw_grenade(name, user)
+			local grenade = grenades.throw_grenade(name, 20, user)
 			grenade.thrower_name = player_name
 
 			if not minetest.settings:get_bool("creative_mode") then
-				itemstack = ""
+				itemstack:take_item(1)
 			end
 		end
 
