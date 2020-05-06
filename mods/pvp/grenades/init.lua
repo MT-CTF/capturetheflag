@@ -6,9 +6,10 @@ function grenades.throw_grenade(name, startvel, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5 + dir.y, z = pos.z + dir.z}, name)
-
 	obj:set_velocity({x = dir.x * startvel, y = dir.y * startvel, z = dir.z * startvel})
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
+
+	obj:get_luaentity().thrower_name = player:get_player_name()
 
 	return(obj:get_luaentity())
 end
@@ -128,11 +129,8 @@ function grenades.register_grenade(name, def)
 	newdef.range = 0
 	newdef.inventory_image = def.image
 	newdef.on_use = function(itemstack, user, pointed_thing)
-		local player_name = user:get_player_name()
-
 		if pointed_thing.type ~= "node" then
 			local grenade = grenades.throw_grenade(name, 20, user)
-			grenade.thrower_name = player_name
 
 			if not minetest.settings:get_bool("creative_mode") then
 				itemstack:take_item(1)
