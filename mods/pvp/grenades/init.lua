@@ -130,7 +130,7 @@ function grenades.register_grenade(name, def)
 	newdef.inventory_image = def.image
 	newdef.on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
-			local grenade = grenades.throw_grenade(name, 20, user)
+			grenades.throw_grenade(name, 20, user)
 
 			if not minetest.settings:get_bool("creative_mode") then
 				itemstack:take_item(1)
