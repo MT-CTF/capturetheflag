@@ -22,7 +22,7 @@ function grenades.register_grenade(name, def)
 	local grenade_entity = {
 		physical = true,
 		sliding = 1,
-		collide_with_objects = true,
+		collide_with_objects = false,
 		visual = "sprite",
 		visual_size = {x = 0.5, y = 0.5, z = 0.5},
 		textures = {def.image},
