@@ -59,7 +59,11 @@ function ctf_classes.get(player)
 		player = minetest.get_player_by_name(player)
 	end
 
-	local cname = player:get_meta():get("ctf_classes:class") or ctf_classes.default_class
+	-- Return class from player meta if valid, or default class
+	local cname = player:get_meta():get("ctf_classes:class")
+	if not ctf_classes.__classes[cname] then
+		cname = ctf_classes.default_class
+	end
 	return ctf_classes.__classes[cname]
 end
 
