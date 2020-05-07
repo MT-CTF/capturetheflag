@@ -16,7 +16,7 @@ globals = {
 	"ctf_colors", "hudkit", "default", "treasurer", "ChatCmdBuilder", "ctf_map",
 	"ctf_match", "ctf_stats", "ctf_treasure", "ctf_playertag", "chatplus", "irc",
 	"armor", "vote", "give_initial_stuff", "hud_score", "physics", "tsm_chests",
-	"armor", "shooter"
+	"armor", "shooter", "grenades", "ctf_classes"
 }
 
 read_globals = {
