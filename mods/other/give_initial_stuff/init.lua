@@ -1,5 +1,15 @@
 give_initial_stuff = {}
 
+-- Add item to inv. Split item if count > stack_max using recursion
+function give_initial_stuff.give_item(inv, item)
+	inv:add_item("main", item:take_item(item:get_stack_max()))
+
+	-- If item isn't empty, add the leftovers again
+	if not item:is_empty() then
+		give_initial_stuff.give_item(inv, item)
+	end
+end
+
 setmetatable(give_initial_stuff, {
 	__call = function(self, player)
 		minetest.log("action", "Giving initial stuff to player "
@@ -15,7 +25,7 @@ setmetatable(give_initial_stuff, {
 		local items = give_initial_stuff.get_stuff(player)
 
 		for _, item in pairs(items) do
-			inv:add_item("main", item)
+			give_initial_stuff.give_item(inv, ItemStack(item))
 		end
 	end
 })
