@@ -54,7 +54,7 @@ ctf_classes.register_on_changed(function(player, old, new)
 
 		local items = new.properties.initial_stuff
 		for i = 1, #items do
-			inv:add_item("main", ItemStack(items[i]))
+			give_initial_stuff.give_item(inv, ItemStack(items[i]))
 		end
 	end
 end)
