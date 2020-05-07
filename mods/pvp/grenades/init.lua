@@ -2,11 +2,12 @@ grenades = {
 	grenade_deaccel = 9
 }
 
-function grenades.throw_grenade(name, startvel, player)
+function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5 + dir.y, z = pos.z + dir.z}, name)
-	obj:set_velocity({x = dir.x * startvel, y = dir.y * startvel, z = dir.z * startvel})
+
+	obj:set_velocity(vector.multiply(dir, startspeed))
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
 	obj:get_luaentity().thrower_name = player:get_player_name()
@@ -46,6 +47,16 @@ function grenades.register_grenade(name, def)
 			-- Check for a collision on the x/y/z axis
 
 			if not vector.equals(self.last_vel, vel) and vector.distance(self.last_vel, vel) > 4 then
+				if def.on_collide and def.on_collide(obj, self.thrower_name) then
+					if self.thrower_name then
+						minetest.log("[Grenades] A grenade thrown by " .. self.thrower_name ..
+						" explodes at " .. minetest.pos_to_string(vector.round(pos)))
+						def.on_explode(pos, self.thrower_name)
+					end
+
+					obj:remove()
+				end
+
 				if math.abs(self.last_vel.x - vel.x) > 5 then -- Check for a large reduction in velocity
 					vel.x = self.last_vel.x * -0.3 -- Invert velocity and reduce it a bit
 				end
@@ -87,13 +98,13 @@ function grenades.register_grenade(name, def)
 
 			-- Grenade Particles
 
-			if def.particle and self.particle >= 4 then
+			if def.particle and self.particle >= def.particle.interval then
 				self.particle = 0
 
 				minetest.add_particle({
 					pos = obj:get_pos(),
 					velocity = vector.divide(vel, 2),
-					acceleration = vector.divide(obj:get_acceleration(), -5),
+					acceleration = vector.divide(obj:get_acceleration() or vector.new(1, 1, 1), -5),
 					expirationtime = def.particle.life,
 					size = def.particle.size,
 					collisiondetection = false,
@@ -103,7 +114,7 @@ function grenades.register_grenade(name, def)
 					glow = def.particle.glow
 				})
 			elseif def.particle and self.particle < def.particle.interval then
-				self.particle = self.particle + 1
+				self.particle = self.particle + dtime
 			end
 
 			-- Explode when clock is up
