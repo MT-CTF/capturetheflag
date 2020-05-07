@@ -90,8 +90,8 @@ function ctf_stats.load()
 	end
 end
 
-function ctf_stats.save()
-	if not _needs_save then
+function ctf_stats.save(force_save)
+	if not _needs_save and not force_save then
 		return
 	end
 
@@ -233,7 +233,6 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 end)
 
 ctf_match.register_on_winner(function(winner)
-	_needs_save = true
 	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
 	ctf_stats.winner_team = winner
 
@@ -248,10 +247,11 @@ ctf_match.register_on_winner(function(winner)
 	-- Set prev_match_summary and write to mod_storage
 	ctf_stats.prev_match_summary = fs
 	storage:set_string("prev_match_summary", fs)
+
+	ctf_stats.save(true)
 end)
 
 ctf_match.register_on_skip_match(function()
-	_needs_save = true
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 
 	-- Show match summary
@@ -265,6 +265,8 @@ ctf_match.register_on_skip_match(function()
 	-- Set prev_match_summary and write to mod_storage
 	ctf_stats.prev_match_summary = fs
 	storage:set_string("prev_match_summary", fs)
+
+	ctf_stats.save(true)
 end)
 
 ctf_match.register_on_new_match(function()
