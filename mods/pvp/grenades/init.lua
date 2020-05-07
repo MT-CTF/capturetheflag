@@ -12,7 +12,7 @@ function grenades.throw_grenade(name, startspeed, player)
 
 	obj:get_luaentity().thrower_name = player:get_player_name()
 
-	return(obj:get_luaentity())
+	return obj:get_luaentity()
 end
 
 function grenades.register_grenade(name, def)
