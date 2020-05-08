@@ -29,6 +29,11 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_on_chat_message(function(playerName, message)
+	-- Verify that there is a player, and that the player is online
+	if not playerName or not minetest.get_player_by_name(playerName) then
+		return
+	end
+
 	players[playerName]["lastAction"] = minetest.get_gametime()
 end)
 
