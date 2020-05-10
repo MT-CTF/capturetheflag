@@ -49,7 +49,7 @@ function grenades.register_grenade(name, def)
 			if not vector.equals(self.last_vel, vel) and vector.distance(self.last_vel, vel) > 4 then
 				if def.on_collide and def.on_collide(obj, self.thrower_name) then
 					if self.thrower_name then
-						minetest.log("[Grenades] A grenade thrown by " .. self.thrower_name ..
+						minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 						" explodes at " .. minetest.pos_to_string(vector.round(pos)))
 						def.on_explode(pos, self.thrower_name)
 					end
@@ -121,7 +121,7 @@ function grenades.register_grenade(name, def)
 
 			if self.timer > def.clock or not self.thrower_name then
 				if self.thrower_name then
-					minetest.log("[Grenades] A grenade thrown by " .. self.thrower_name ..
+					minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 					" explodes at " .. minetest.pos_to_string(vector.round(pos)))
 					def.on_explode(pos, self.thrower_name)
 				end
