@@ -68,7 +68,7 @@ ctf_classes.register("medic", {
 		speed = 1.1,
 
 		initial_stuff = {
-			"ctf_bandages:bandage 20",
+			"ctf_bandages:bandage 50",
 		},
 
 		allowed_guns = {
