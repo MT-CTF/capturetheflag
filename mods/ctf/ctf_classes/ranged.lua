@@ -69,3 +69,21 @@ end
 check_grapple("shooter_hook:grapple_gun_loaded")
 check_grapple("shooter_hook:grapple_gun")
 check_grapple("shooter_hook:grapple_hook")
+
+-- Override grappling hook entity to check if player has flag before teleporting
+local old_grapple_step = minetest.registered_entities["shooter_hook:hook"].on_step
+minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime, ...)
+	-- Remove entity if player has flag
+	-- This is to prevent players from firing the hook, and then punching the flag
+	if ctf_flag.has_flag(self.user) then
+		local player = minetest.get_player_by_name(self.user)
+		if player then
+			player:get_inventory():add_item("main", "shooter_hook:grapple_hook")
+		end
+		minetest.chat_send_player(self.user,
+			"You can't use grapples whilst carrying the flag")
+		self.object:remove()
+		return
+	end
+	return old_grapple_step(self, dtime, ...)
+end
