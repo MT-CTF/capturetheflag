@@ -21,15 +21,17 @@ function grenades.register_grenade(name, def)
 	end
 
 	local grenade_entity = {
-		physical = true,
+		initial_properties = {
+			physical = true,
+			collide_with_objects = false,
+			visual = "sprite",
+			visual_size = {x = 0.5, y = 0.5, z = 0.5},
+			textures = {def.image},
+			collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.15, 0.2},
+			pointable = false,
+			static_save = false,
+		},
 		sliding = 1,
-		collide_with_objects = false,
-		visual = "sprite",
-		visual_size = {x = 0.5, y = 0.5, z = 0.5},
-		textures = {def.image},
-		collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.15, 0.2},
-		pointable = false,
-		static_save = false,
 		particle = 0,
 		timer = 0,
 		on_step = function(self, dtime)
