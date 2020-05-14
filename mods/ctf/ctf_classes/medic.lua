@@ -91,6 +91,8 @@ minetest.override_item("ctf_bandages:bandage", {
 						color = "0x00FF00",
 						value = reward
 					})
+
+					ctf_stats.request_save()
 				end
 			end
 		end

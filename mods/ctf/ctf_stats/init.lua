@@ -110,7 +110,10 @@ local function check_if_save_needed()
 end
 minetest.after(13, check_if_save_needed)
 
-	minetest.after(13, ctf_stats.save)
+-- API function to allow other mods to request a save
+-- TODO: This should be done automatically once a proper API is in place
+function ctf_stats.request_save()
+	_needs_save = true
 end
 
 function ctf_stats.player_or_nil(name)
