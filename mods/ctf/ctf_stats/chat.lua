@@ -161,6 +161,7 @@ minetest.register_chatcommand("reset_rankings", {
 
 		ctf_stats.players[reset_name] = nil
 		ctf_stats.player(reset_name)
+		ctf_stats.request_save()
 
 		if reset_name == name then
 			minetest.log("action", name .. " reset their rankings")
@@ -197,6 +198,8 @@ minetest.register_chatcommand("transfer_rankings", {
 
 		ctf_stats.players[dest] = ctf_stats.players[src]
 		ctf_stats.players[src] = nil
+
+		ctf_stats.request_save()
 
 		minetest.log("action", name .. " transferred stats of " .. src .. " to " .. dest)
 		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
