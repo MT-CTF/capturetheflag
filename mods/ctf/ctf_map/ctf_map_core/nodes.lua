@@ -15,7 +15,7 @@ do
 	})
 
 	minetest.register_node(":ctf_map:ind_glass", {
-		description = "Indestructible Glass",
+		description = "Indestructible Barrier Glass",
 		drawtype = "glasslike_framed_optional",
 		tiles = {"default_glass.png", "default_glass_detail.png"},
 		inventory_image = minetest.inventorycube("default_glass.png"),
@@ -25,12 +25,12 @@ do
 		walkable = true,
 		buildable_to = false,
 		pointable = false,
-		groups = {immortal = 1},
+		groups = {immortal = 1, not_in_creative_inventory = 1},
 		sounds = default.node_sound_glass_defaults()
 	})
 
 	minetest.register_node(":ctf_map:ind_glass_red", {
-		description = "Indestructible Red Glass",
+		description = "Indestructible Red Barrier Glass",
 		drawtype = "glasslike",
 		tiles = {"ctf_map_glass_red.png"},
 		inventory_image = minetest.inventorycube("ctf_map_glass_red.png"),
@@ -42,13 +42,13 @@ do
 		use_texture_alpha = false,
 		alpha = 0,
 		pointable = false,
-		groups = {immortal = 1},
+		groups = {immortal = 1, not_in_creative_inventory = 1},
 		sounds = default.node_sound_glass_defaults()
 	})
 
 	minetest.register_node(":ctf_map:ind_stone_red", {
-		description = "Indestructible Red Stone",
-		groups = {immortal = 1},
+		description = "Indestructible Red Barrier Stone",
+		groups = {immortal = 1, not_in_creative_inventory = 1},
 		tiles = {"ctf_map_stone_red.png"},
 		is_ground_content = false
 	})
