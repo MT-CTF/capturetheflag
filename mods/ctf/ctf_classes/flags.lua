@@ -24,7 +24,12 @@ local function on_punch(pos, node, player, ...)
 end
 
 local function show(_, _, player)
-	ctf_classes.show_gui(player:get_player_name(), player)
+	local can_change, reason = ctf_classes.can_change(player)
+	if not can_change then
+		minetest.chat_send_player(player:get_player_name(), reason)
+	else
+		ctf_classes.show_gui(player:get_player_name(), player)
+	end
 end
 
 ctf_flag.on_rightclick = show

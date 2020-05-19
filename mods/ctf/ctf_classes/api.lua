@@ -78,6 +78,8 @@ function ctf_classes.set(player, new_name)
 	meta:set_string("ctf_classes:class", new_name)
 	ctf_classes.update(player)
 
+	ctf_classes.set_cooldown(player:get_player_name())
+
 	if old_name == nil or old_name ~= new_name then
 		local old = old_name and ctf_classes.__classes[old_name]
 		for i=1, #registered_on_changed do
@@ -150,10 +152,34 @@ function ctf_classes.can_change(player)
 		return true
 	end
 
-	local flag_pos = get_flag_pos(player)
-	if not flag_pos then
-		return false
+	if ctf_classes.get_cooldown(player:get_player_name()) then
+		return false, "You need to wait to change classes again!"
 	end
 
-	return sqdist(player:get_pos(), flag_pos) < 25
+	local flag_pos = get_flag_pos(player)
+	if flag_pos then
+		return sqdist(player:get_pos(), flag_pos) < 25,
+			"Move closer to the flag to change classes!"
+	end
+
+	return false, "Flag does not exist!"
 end
+
+-- Cooldown time to prevent consumables abuse by changing to a class and back
+local COOLDOWN_TIME = 30
+local cooldown = {}
+
+function ctf_classes.get_cooldown(name)
+	return cooldown[name]
+end
+
+function ctf_classes.set_cooldown(name)
+	cooldown[name] = true
+	minetest.after(COOLDOWN_TIME, function()
+		cooldown[name] = nil
+	end)
+end
+
+minetest.register_on_dieplayer(function(player)
+	cooldown[player:get_player_name()] = nil
+end)
