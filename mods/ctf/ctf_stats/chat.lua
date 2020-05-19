@@ -178,9 +178,9 @@ minetest.register_chatcommand("transfer_rankings", {
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		if not param then
-			return false, "Invalid syntax. Provide source and destination player names."
+			return false, "Invalid usage, see /help transfer_rankings"
 		end
-		param = param:trim()
+
 		local src, dest = param:trim():match("([%a%d_-]+) ([%a%d_-]+)")
 		if not src or not dest then
 			return false, "Invalid usage, see /help transfer_rankings"
@@ -205,19 +205,34 @@ minetest.register_chatcommand("transfer_rankings", {
 
 
 minetest.register_chatcommand("makepro", {
-	description = "Make self a pro",
+	params = "[player_name]",
+	description = "Make player a pro",
 	privs = {ctf_admin = true},
 	func = function(name, param)
-		local stats, _ = ctf_stats.player(name)
+		-- Check if param is specified, else target the caller
+		param = param:trim()
+		if param == "" then
+			param = name
+		end
 
-		if stats.kills < 1.5 * (stats.deaths + 1) then
-			stats.kills = 1.51 * (stats.deaths + 1)
+		local modified = false
+		local stats = ctf_stats.player(param)
+
+		local deaths = math.max(stats.deaths, 1)
+		if stats.kills < 1.5 * deaths then
+			stats.kills = math.ceil(1.51 * deaths)
+			modified = true
 		end
 
 		if stats.score < 10000 then
 			stats.score = 10000
+			modified = true
 		end
 
-		return true, "Done"
+		if modified then
+			return true, "Made " .. param .. " a pro!"
+		else
+			return false, param .. " is already a pro!"
+		end
 	end
 })
