@@ -214,6 +214,14 @@ for _, chest_color in pairs(colors) do
 	end
 
 	function def.on_metadata_inventory_take(pos, listname, index, stack, player)
+		local chestinv = minetest.get_inventory({type = "node", pos = pos})
+		local swapped_item = chestinv:get_stack(listname, index)
+
+		if not ctf_map.is_item_allowed_in_team_chest(listname, swapped_item, player) then
+			chestinv:remove_item(listname, swapped_item)
+			player:get_inventory():add_item(listname, swapped_item)
+		end
+
 		minetest.log("action", player:get_player_name() ..
 			" takes " .. (stack:get_name() or "stuff") .. " " ..
 			(stack:get_count() or 0) .. " from chest at " ..
