@@ -460,6 +460,8 @@ minetest.register_on_prejoinplayer(function(name, ip)
 
 		if time > 0 then
 			return "Kicked: Reason: Leaving the game during respawn timer. You may join again in " .. math.ceil(time) .. " seconds."
+		else
+			respawns[name] = nil
 		end
 	end
 end)
