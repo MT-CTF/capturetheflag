@@ -358,25 +358,64 @@ function ctf.get_spawn(team)
 	end
 end
 
+-- Handle respawning
+
+local respawns = {}
+local respawn_time = 5
+local respawn_formname = "teams:respawn"
+
+local respawn_form = {
+    "size[4,2]",
+	"real_coordinates[true]",
+	"label[1,1;Respawn in " .. respawn_time .. " seconds]",
+}
+respawn_form = table.concat(respawn_form, "")
+
+function handle_respawn(player, name, spawn)
+	minetest.close_formspec(name, respawn_formname)
+	player:move_to(spawn, false)
+
+	respawns[name] = nil
+end
+
 function ctf.move_to_spawn(name)
 	local player = minetest.get_player_by_name(name)
 	local tplayer = ctf.player(name)
 	if ctf.team(tplayer.team) then
 		local spawn = ctf.get_spawn(tplayer.team)
 		if spawn then
-			player:move_to(spawn, false)
+			minetest.after(respawn_time, handle_respawn, player, name, spawn)
 			return true
 		end
 	end
 	return false
 end
 
+minetest.register_on_player_receive_fields(
+	function(player, formname, fields)
+		local name = player:get_player_name()
+		local time = minetest.get_us_time() / 1000000
+
+        if formname ~= respawn_formname then
+            return
+        end
+		if fields['quit'] and (respawns[name] and respawns[name] - time < respawn_time) then
+			--delay so players can still get to menu to leave game if they press esc twice real fast
+            minetest.after(0.1, minetest.show_formspec, player:get_player_name(), respawn_formname, respawn_form)
+        end
+    end)
+
 minetest.register_on_respawnplayer(function(player)
 	if not player then
 		return false
 	end
 
-	return ctf.move_to_spawn(player:get_player_name())
+	local name = player:get_player_name()
+	respawns[name] = minetest.get_us_time() / 1000000
+
+	minetest.show_formspec(name, respawn_formname, respawn_form)
+
+	return ctf.move_to_spawn(name)
 end)
 
 function ctf.get_territory_owner(pos)
