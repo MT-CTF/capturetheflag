@@ -362,48 +362,73 @@ end
 
 local respawns = {}
 local respawn_time = 5
-local respawn_formname = "teams:respawn"
+local respawn_formname = "ctf:respawn"
 
 local respawn_form = {
-    "size[4,2]",
+	"formspec_version[3]",
+	"size[11,5.5]",
 	"real_coordinates[true]",
-	"label[1,1;Respawn in " .. respawn_time .. " seconds]",
 }
-respawn_form = table.concat(respawn_form, "")
 
-function handle_respawn(player, name, spawn)
+local function handle_respawn(player, name, spawn)
 	minetest.close_formspec(name, respawn_formname)
+	player:set_detach()
 	player:move_to(spawn, false)
 
 	respawns[name] = nil
 end
 
-function ctf.move_to_spawn(name)
+function ctf.move_to_spawn(name, time)
 	local player = minetest.get_player_by_name(name)
 	local tplayer = ctf.player(name)
 	if ctf.team(tplayer.team) then
 		local spawn = ctf.get_spawn(tplayer.team)
 		if spawn then
-			minetest.after(respawn_time, handle_respawn, player, name, spawn)
+			if time then
+				minetest.after(time, handle_respawn, player, name, spawn)
+			else
+				handle_respawn(player, name, spawn)
+			end
 			return true
 		end
 	end
 	return false
 end
 
-minetest.register_on_player_receive_fields(
-	function(player, formname, fields)
-		local name = player:get_player_name()
-		local time = minetest.get_us_time() / 1000000
+minetest.register_entity("ctf:respawn_freeze", {
+	initial_properties = {
+		is_visible = false,
+		static_save = false,
+	},
 
-        if formname ~= respawn_formname then
-            return
-        end
-		if fields['quit'] and (respawns[name] and respawns[name] - time < respawn_time) then
-			--delay so players can still get to menu to leave game if they press esc twice real fast
-            minetest.after(0.1, minetest.show_formspec, player:get_player_name(), respawn_formname, respawn_form)
-        end
-    end)
+	on_activate = function(self)
+		self.object:set_armor_groups({immortal = 1})
+	end,
+
+	on_detach_child = function(self, child)
+		self.object:remove()
+	end
+})
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if formname ~= respawn_formname then
+		return
+	end
+
+	if fields['quit'] and respawns[name] then
+		--delay so players can still get to menu to leave game if they press esc twice real fast
+		minetest.after(0.1, minetest.show_formspec, name, respawn_formname, respawns[name].form)
+	end
+end)
+
+minetest.register_on_dieplayer(function(player)
+	local name = player:get_player_name()
+
+	if not respawns[name] then
+		respawns[name] = {}
+		respawns[name].time = minetest.get_us_time() / 1000000
+	end
+end)
 
 minetest.register_on_respawnplayer(function(player)
 	if not player then
@@ -411,12 +436,45 @@ minetest.register_on_respawnplayer(function(player)
 	end
 
 	local name = player:get_player_name()
-	respawns[name] = minetest.get_us_time() / 1000000
+	local time = respawn_time - ((minetest.get_us_time() / 1000000) - respawns[name].time)
 
-	minetest.show_formspec(name, respawn_formname, respawn_form)
+	if time < 0 then
+		time = 0
+	end
 
-	return ctf.move_to_spawn(name)
+	local form = respawn_form
+	table.insert(form, "label[4.5,2.25;Respawn in " .. math.ceil(time) .. " seconds]")
+	respawns[name].form = table.concat(form, "")
+
+	local obj = minetest.add_entity(player:get_pos(), "ctf:respawn_freeze", nil)
+	player:set_attach(obj, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+
+	minetest.show_formspec(name, respawn_formname, respawns[name].form)
+
+	return ctf.move_to_spawn(name, time)
 end)
+
+minetest.register_on_prejoinplayer(function(name, ip)
+	if respawns[name] then
+		local time = respawn_time - ((minetest.get_us_time() / 1000000) - respawns[name].time)
+
+		if time > 0 then
+			return "Kicked: Reason: Leaving the game during respawn timer. You may join again in " .. math.ceil(time) .. " seconds."
+		end
+	end
+end)
+
+local function clear_respawn()
+	for name, tbl in pairs(respawns) do
+		if respawn_time - ((minetest.get_us_time() / 1000000) - tbl.time) <= 0 then
+			respawns[name] = nil
+		end
+	end
+
+	minetest.after(10, clear_respawn)
+end
+
+clear_respawn()
 
 function ctf.get_territory_owner(pos)
 	local largest = nil
