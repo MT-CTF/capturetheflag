@@ -233,6 +233,7 @@ minetest.register_chatcommand("makepro", {
 		end
 
 		if modified then
+			ctf_stats.request_save()
 			return true, "Made " .. param .. " a pro!"
 		else
 			return false, param .. " is already a pro!"
