@@ -50,15 +50,15 @@ local function update(name)
 end
 
 function hud_score.new(name, def)
-	local player = minetest.get_player_by_name(name)
-	if not player then
-		return
-	end
-
 	-- Verify HUD score element def
 	if not name or not def or type(def) ~= "table" or
 			not def.name or not def.value or not def.color then
 		error("hud_score: Invalid HUD score element definition", 2)
+	end
+
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		return
 	end
 
 	-- Store element expiration time in def.time
