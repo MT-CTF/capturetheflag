@@ -28,15 +28,15 @@ Example definition:
 ## `players` table
 
 This is a table of tables, indexed by player names. This table holds the HUD
-data of all online players. Each sub-table is a list of score tables, which
-are added by `hud_score.new`.
+data of all online players. Each sub-table is a list of HUD score elements,
+which are added by `hud_score.new`.
 
 ```lua
 local players = {
     ["name"] = {
-        [1] = <score_def>,
-        [2] = <score_def>,
-        [3] = <score_def>
+        [1] = <hud_score_element>,
+        [2] = <hud_score_element>,
+        [3] = <hud_score_element>
         ...
     },
     ["name2"] = {
