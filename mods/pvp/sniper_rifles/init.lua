@@ -36,11 +36,13 @@ local function hide_scope(name)
 end
 
 local function on_rclick(item, placer, pointed_thing)
-	if pointed_thing.type == "object" then
-		return
+	local name = placer:get_player_name()
+
+	-- Prioritize on "un-scoping", if player is using the scope
+	if not scoped[name] and pointed_thing.type == "node" then
+		return minetest.item_place(item, placer, pointed_thing)
 	end
 
-	local name = placer:get_player_name()
 	if scoped[name] then
 		hide_scope(name)
 	else
@@ -93,6 +95,7 @@ function sniper_rifles.register_rifle(name, def)
 	-- Manually add extra fields to itemdef that shooter doesn't allow
 	-- Also modify the _loaded variant
 	local overrides = {
+		on_place = on_rclick,
 		on_secondary_use = on_rclick,
 		wield_scale = vector.new(2, 2, 1.5)
 	}
