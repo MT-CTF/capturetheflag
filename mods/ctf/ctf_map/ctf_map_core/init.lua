@@ -26,6 +26,16 @@ function ctf_map.can_cross(player)
 	return false
 end
 
+-- Modify MTG's stone pickaxe to be capable of breaking cracky=1 nodes
+-- Do it here, for lack of a better place
+do
+local tool_caps = minetest.registered_items["default:pick_stone"].tool_capabilities
+tool_caps.groupcaps.cracky.times[1] = 12.0
+minetest.override_item("default:pick_stone", {
+	tool_capabilities = tool_caps
+})
+end
+
 local modpath = minetest.get_modpath(minetest.get_current_modname())
 dofile(modpath .. "/nodes.lua")
 dofile(modpath .. "/emerge.lua")
