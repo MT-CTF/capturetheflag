@@ -53,7 +53,6 @@ if minetest.get_modpath("ctf") then
 	give_initial_stuff.register_stuff_provider(function(player)
 		return ctf_map.map and ctf_map.map.initial_stuff or {
 			"default:pick_stone",
-			"default:sword_stone",
 			"default:torch 3",
 		}
 	end)
