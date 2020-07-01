@@ -5,7 +5,7 @@ ctf_classes = {
 
 dofile(minetest.get_modpath("ctf_classes") .. "/api.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/gui.lua")
-dofile(minetest.get_modpath("ctf_classes") .. "/regen.lua")
+dofile(minetest.get_modpath("ctf_classes") .. "/medic.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/ranged.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/items.lua")
 dofile(minetest.get_modpath("ctf_classes") .. "/flags.lua")
@@ -15,8 +15,9 @@ dofile(minetest.get_modpath("ctf_classes") .. "/classes.lua")
 minetest.register_on_joinplayer(function(player)
 	ctf_classes.update(player)
 
-	if minetest.check_player_privs(player, { interact = true }) then
-		ctf_classes.show_gui(player:get_player_name())
+	if ctf_classes.can_change(player) and
+			minetest.check_player_privs(player, { interact = true }) then
+		ctf_classes.show_gui(player:get_player_name(), player)
 	end
 end)
 
@@ -27,8 +28,9 @@ minetest.register_chatcommand("class", {
 			return false, "You must be online to do this!"
 		end
 
-		if not ctf_classes.can_change(player) then
-			return false, "Move closer to your flag to change classes!"
+		local can_change, reason = ctf_classes.can_change(player)
+		if not can_change then
+			return false, reason
 		end
 
 		local cname = params:trim()

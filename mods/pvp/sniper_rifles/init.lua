@@ -2,11 +2,19 @@
 -- Private data --
 ------------------
 
+-- Locally cache rifle defs for fast and easy access
+local rifles = {}
+
 -- Keep track of players who are scoping in, and their wielded item
 local scoped = {}
 
 -- Timer for scope-check globalstep
 local timer = 0.2
+
+local default_physics_overrides = {
+	speed = 0.1,
+	jump = 0
+}
 
 -------------
 -- Helpers --
@@ -21,6 +29,7 @@ local function show_scope(name, item_name, fov_mult)
 	scoped[name] = item_name
 	-- e.g. if fov_mult == 8, then FOV = 1/8 * current_FOV, a.k.a 8x zoom
 	player:set_fov(1 / fov_mult, true)
+	physics.set(name, "sniper_rifles:scoping", rifles[item_name].physics_overrides)
 	player:hud_set_flags({ wielditem = false })
 end
 
@@ -32,7 +41,16 @@ local function hide_scope(name)
 
 	scoped[name] = nil
 	player:set_fov(0)
+	physics.remove(name, "sniper_rifles:scoping")
 	player:hud_set_flags({ wielditem = true })
+end
+
+local function on_use(stack, user, pointed)
+	if scoped[user:get_player_name()] then
+		-- shooter checks for the return value of def.on_use, and executes
+		-- the rest of the code only if this function returns non-nil
+		return stack
+	end
 end
 
 local function on_rclick(item, placer, pointed_thing)
@@ -88,6 +106,9 @@ sniper_rifles = {}
 function sniper_rifles.register_rifle(name, def)
 	assert(def.fov_mult, "Rifle definition must contain FOV multiplier (fov_mult)!")
 
+	-- Override on_use to allow firing weapon only when using the scope
+	def.on_use = on_use
+
 	shooter.register_weapon(name, def)
 
 	-- Manually add extra fields to itemdef that shooter doesn't allow
@@ -99,6 +120,9 @@ function sniper_rifles.register_rifle(name, def)
 	minetest.override_item(name, overrides)
 	minetest.override_item(name .. "_loaded", overrides)
 
+	def.physics_overrides = def.physics_overrides or default_physics_overrides
+
+	rifles[name] = table.copy(def)
 end
 
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/rifles.lua")

@@ -45,8 +45,6 @@ ctf_classes.register("shooter", {
 			"shooter_guns:rifle",
 			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
-			"sniper_rifles:rifle_762",
-			"sniper_rifles:rifle_magnum"
 		},
 
 		shooter_multipliers = {
@@ -68,7 +66,7 @@ ctf_classes.register("medic", {
 		speed = 1.1,
 
 		initial_stuff = {
-			"ctf_bandages:bandage 20",
+			"ctf_bandages:bandage 50",
 		},
 
 		allowed_guns = {
@@ -77,6 +75,53 @@ ctf_classes.register("medic", {
 			"shooter_guns:shotgun",
 		},
 	},
+})
+
+ctf_classes.register("sniper", {
+	description = "Sniper",
+	pros = { "+25% range", "+25% faster shooting" },
+	cons = {},
+	color = "#96a",
+	properties = {
+		-- Disallow snipers from capturing flags - they're intended to be support
+		can_capture = false,
+
+		initial_stuff = {
+			"sniper_rifles:rifle_762_loaded",
+			"grenades:smoke 2",
+			"shooter:ammo 3"
+		},
+
+		item_blacklist = {
+			"sniper_rifles:rifle_762_loaded",
+			"shooter_grenade:grenade",
+		},
+
+		additional_item_blacklist = {
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum",
+			"sniper_rifles:rifle_magnum_loaded",
+		},
+
+		allowed_guns = {
+			"shooter_guns:pistol",
+			"shooter_guns:machine_gun",
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
+		},
+
+		crafting = {
+			"sniper_rifle:rifle_762",
+			"sniper_rifle:rifle_magnum"
+		},
+
+		shooter_multipliers = {
+			range = 1.25,
+			tool_caps = {
+				full_punch_interval = 0.75,
+			},
+		},
+	}
 })
 
 --[[ctf_classes.register("rocketeer", {

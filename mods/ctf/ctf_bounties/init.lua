@@ -91,6 +91,14 @@ ctf.register_on_killedplayer(function(victim, killer)
 		match.score = match.score + bounty_score
 		main.bounty_kills = main.bounty_kills + 1
 		match.bounty_kills = match.bounty_kills + 1
+
+		ctf_stats.request_save()
+
+		hud_score.new(killer, {
+			name = "ctf_bounty:prize",
+			color = 0x4444FF,
+			value = bounty_score
+		})
 	end
 	bountied_player = nil
 
@@ -102,11 +110,6 @@ ctf.register_on_killedplayer(function(victim, killer)
 		minetest.colorize("#fff326", " and received " .. bounty_score .. " points!")
 	minetest.log("action", minetest.strip_colors(msg))
 	minetest.chat_send_all(msg)
-	hud_score.new(killer, {
-		name = "ctf_bounty:prize",
-		color = 0x4444FF,
-		value = bounty_score
-	})
 end)
 
 minetest.register_privilege("bounty_admin")

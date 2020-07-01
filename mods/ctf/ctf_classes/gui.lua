@@ -1,15 +1,10 @@
 function ctf_classes.show_gui(name, player)
 	player = player or minetest.get_player_by_name(name)
 	assert(player.get_player_name)
-	if not ctf_classes.can_change(player) then
-		minetest.chat_send_player(name, "Move closer to your flag to change classes!")
-		return
-	end
 
 	local fs = {
 		"size[", #ctf_classes.__classes_ordered * 3 , ",3.4]"
 	}
-
 
 	local x = 0
 	local y = 0
@@ -79,9 +74,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		return false
 	end
 
-	if not ctf_classes.can_change(player) then
-		minetest.chat_send_player(player:get_player_name(),
-				"Move closer to the flag to change classes!")
+	local can_change, reason = ctf_classes.can_change(player)
+	if not can_change then
+		minetest.chat_send_player(player:get_player_name(), reason)
+		return
 	end
 
 	for name in pairs(ctf_classes.__classes) do

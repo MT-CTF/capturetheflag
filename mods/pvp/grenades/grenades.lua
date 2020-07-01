@@ -194,6 +194,6 @@ grenades.register_grenade("grenades:smoke", {
 		life = 1,
 		size = 4,
 		glow = 0,
-		interval = 5,
+		interval = 0.3,
 	}
 })

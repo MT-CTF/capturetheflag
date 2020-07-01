@@ -1,6 +1,6 @@
 ctf_respawn_immunity = {}
 
-local IMMUNE_TIME = 15
+local IMMUNE_TIME = 5
 local immune_serial = 0
 local immune_players = {}
 

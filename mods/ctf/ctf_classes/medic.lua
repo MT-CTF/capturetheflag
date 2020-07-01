@@ -63,3 +63,39 @@ minetest.register_globalstep(function(delta)
 
 	regen_update()
 end)
+
+local bandage_on_use = minetest.registered_items["ctf_bandages:bandage"].on_use
+minetest.override_item("ctf_bandages:bandage", {
+	on_use = function(stack, user, pointed_thing)
+		if pointed_thing.type ~= "object" then
+			return
+		end
+		local object = pointed_thing.ref
+		if not object:is_player() then
+			return
+		end
+		local pname = object:get_player_name()
+		local name = user:get_player_name()
+		if ctf.player(pname).team == ctf.player(name).team then
+			local hp = object:get_hp()
+			local limit = ctf_bandages.heal_percent * object:get_properties().hp_max
+			if hp > 0 and hp < limit and ctf_classes.get(user).name == "medic" then
+				local main, match = ctf_stats.player(name)
+				if main and match then
+					local reward = 1
+					main.score  = main.score  + reward
+					match.score = match.score + reward
+
+					hud_score.new(name, {
+						name = "ctf_classes:medic_heal",
+						color = "0x00FF00",
+						value = reward
+					})
+
+					ctf_stats.request_save()
+				end
+			end
+		end
+		return bandage_on_use(stack, user, pointed_thing)
+	end
+})

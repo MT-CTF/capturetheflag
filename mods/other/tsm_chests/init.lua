@@ -75,9 +75,17 @@ minetest.register_node("tsm_chests:chest", {
 			" moves stuff to chest at " .. minetest.pos_to_string(pos))
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local inv = minetest.get_inventory({type = "node", pos = pos})
+		local swapped_item = inv:get_stack(listname, index)
+
+		if swapped_item:get_name() ~= "" then
+			inv:remove_item(listname, swapped_item)
+			player:get_inventory():add_item(listname, swapped_item)
+		end
+
 		minetest.log("action", player:get_player_name() ..
 			" takes stuff from chest at " .. minetest.pos_to_string(pos))
-		local inv = minetest.get_inventory({type = "node", pos=pos})
+
 		if not inv or inv:is_empty("main") then
 			minetest.set_node(pos, {name="air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())

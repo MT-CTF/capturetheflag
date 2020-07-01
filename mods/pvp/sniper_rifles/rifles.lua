@@ -8,11 +8,10 @@ sniper_rifles.register_rifle("sniper_rifles:rifle_762", {
 		range     = 300,
 		step      = 30,
 		tool_caps = { full_punch_interval = 1.5, damage_groups = { fleshy = 12 } },
-		sounds    = { shot = "sniper_rifles_rifle" },
+		sounds    = { shot = "sniper_rifles_shot" },
 		particle  = "shooter_bullet.png",
 		groups    = {
-			cracky = 3, snappy = 2, crumbly = 2, choppy = 2,
-			fleshy = 1, oddly_breakable_by_hand = 1
+			snappy = 2, fleshy = 1, oddly_breakable_by_hand = 1
 		}
 	}
 })
@@ -27,11 +26,10 @@ sniper_rifles.register_rifle("sniper_rifles:rifle_magnum", {
 		range     = 400,
 		step      = 30,
 		tool_caps = { full_punch_interval = 2, damage_groups = { fleshy = 16 } },
-		sounds    = { shot = "sniper_rifles_rifle" },
+		sounds    = { shot = "sniper_rifles_shot" },
 		particle  = "shooter_bullet.png",
 		groups    = {
-			cracky = 2, snappy = 1, crumbly = 1, choppy = 1,
-			fleshy = 1, oddly_breakable_by_hand = 1
+			snappy = 1, fleshy = 1, oddly_breakable_by_hand = 1
 		}
 	}
 })

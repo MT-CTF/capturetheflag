@@ -57,6 +57,8 @@ function ctf_stats.load_legacy()
 	return true
 end
 
+-- Load persistant data from mod storage (or legacy file)
+-- and initialize empty tables where required
 function ctf_stats.load()
 	if not ctf_stats.load_legacy() then
 		for _, key in pairs(data_to_persist) do
@@ -90,20 +92,29 @@ function ctf_stats.load()
 	end
 end
 
-function ctf_stats.save(force_save)
-	if not _needs_save and not force_save then
-		return
-	end
-
-	_needs_save = false
-
+-- Save persistant data to mod storage
+function ctf_stats.save()
 	for _, key in pairs(data_to_persist) do
 		storage:set_string(key, minetest.write_json(ctf_stats[key]))
 	end
-
-	minetest.after(13, ctf_stats.save)
 end
-minetest.after(13, ctf_stats.save)
+
+-- Separate recursion to check if save required and then call ctf_stats.save
+-- This allows ctf_stats.save to be called directly when an immediate save is required
+local function check_if_save_needed()
+	if _needs_save then
+		ctf_stats.save()
+		_needs_save = false
+	end
+	minetest.after(13, check_if_save_needed)
+end
+minetest.after(13, check_if_save_needed)
+
+-- API function to allow other mods to request a save
+-- TODO: This should be done automatically once a proper API is in place
+function ctf_stats.request_save()
+	_needs_save = true
+end
 
 function ctf_stats.player_or_nil(name)
 	return ctf_stats.players[name], ctf_stats.current.red[name] or ctf_stats.current.blue[name]
@@ -248,7 +259,8 @@ ctf_match.register_on_winner(function(winner)
 	ctf_stats.prev_match_summary = fs
 	storage:set_string("prev_match_summary", fs)
 
-	ctf_stats.save(true)
+	-- Flush data to mod_storage at the end of each match
+	ctf_stats.save()
 end)
 
 ctf_match.register_on_skip_match(function()
@@ -266,7 +278,7 @@ ctf_match.register_on_skip_match(function()
 	ctf_stats.prev_match_summary = fs
 	storage:set_string("prev_match_summary", fs)
 
-	ctf_stats.save(true)
+	ctf_stats.save()
 end)
 
 ctf_match.register_on_new_match(function()
