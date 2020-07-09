@@ -64,6 +64,63 @@ local function update_physics(player)
 	})
 end
 
+---------------------------
+-- TREASURE REGISTRATION --
+---------------------------
+
+function ctf_map.register_treasures(map)
+	if not ctf_treasure then
+		return
+	end
+
+	treasurer.treasures = {}
+	if map.treasures then
+		for _, item in pairs(map.treasures) do
+			item = item:split(",")
+			-- treasurer.register_treasure(name, rarity, preciousness, count)
+			if #item == 4 then
+				treasurer.register_treasure(item[1],
+					tonumber(item[2]),
+					tonumber(item[3]),
+					tonumber(item[4])
+				)
+			-- treasurer.register_treasure(name, rarity, preciousness, {min, max})
+			elseif #item == 5 then
+				treasurer.register_treasure(item[1],
+					tonumber(item[2]),
+					tonumber(item[3]),
+					{
+						tonumber(item[4]),
+						tonumber(item[5])
+					}
+				)
+			end
+		end
+	else
+		-- If treasure is a part of map's initial stuff, don't register it
+		local blacklist = ctf_map.map.initial_stuff or {}
+		for _, def in pairs(ctf_treasure.get_default_treasures()) do
+			local is_valid = true
+			for _, b_item in pairs(blacklist) do
+				local b_stack = ItemStack(b_item)
+				local t_stack = ItemStack(def[1])
+				if b_stack:get_name() == t_stack:get_name() and
+						t_stack:get_count() == 1 then
+					is_valid = false
+					minetest.log("info",
+						"ctf_map: Omitting treasure - " .. def[1])
+					break
+				end
+			end
+			if is_valid then
+				minetest.log("info",
+					"ctf_map: Registering treasure - " .. def[1])
+				treasurer.register_treasure(def[1], def[2], def[3], def[4])
+			end
+		end
+	end
+end
+
 ---------------
 -- CALLBACKS --
 ---------------

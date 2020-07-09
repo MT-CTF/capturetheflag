@@ -20,8 +20,10 @@ minetest.register_node("ctf_flag:flag", {
 		}
 	},
 	groups = {immortal=1,is_flag=1,flag_bottom=1},
-	on_punch = ctf_flag.on_punch,
-	on_rightclick = ctf_flag.on_rightclick,
+
+	-- Wrap fuctions to allow overriding
+	on_punch = function(...) ctf_flag.on_punch(...) end,
+	on_rightclick = function(...) ctf_flag.on_rightclick(...) end,
 	on_construct = ctf_flag.on_construct,
 	after_place_node = ctf_flag.after_place_node,
 	on_timer = ctf_flag.flag_tick

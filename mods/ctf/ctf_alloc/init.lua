@@ -126,6 +126,6 @@ function ctf_alloc.set_all()
 			give_initial_stuff(player)
 		end
 
-		player:set_hp(20)
+		player:set_hp(player:get_properties().hp_max)
 	end
 end

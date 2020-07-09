@@ -1,4 +1,5 @@
 # Capture The Flag
+[![Build Status](https://travis-ci.org/MT-CTF/capturetheflag.svg?branch=master)](https://travis-ci.org/MT-CTF/capturetheflag)
 
 * Fast rounds of CTF games.
 * Removed nodes for focus.
@@ -28,6 +29,11 @@ Hosting using `sqlite3` on an SSD or ramdisk ([with this guide](https://forum.mi
 Created by [rubenwardy](https://rubenwardy.com/).
 Code: LGPLv2.1+
 Textures: CC-BY-SA 3.0
+
+### Textures
+
+* ctf_classes_skin_* created by GreenDimond/GreenXenith
+    * ctf_classes_skin_rocketeer with help from Lone_Wolf
 
 ### Mods
 

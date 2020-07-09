@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Update capturetheflag
 git pull
 
@@ -9,3 +11,8 @@ git submodule update --init --recursive
 
 # Run build.sh
 ./build.sh ../games/capturetheflag
+
+# Queue restart
+if [[ -d ../worlds/ctf ]]; then
+	touch ../worlds/ctf/queue_restart.txt
+fi

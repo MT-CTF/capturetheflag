@@ -55,7 +55,7 @@ function random_messages.read_messages()
 		"Gain more score by killing more than you die, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
-		"Players are immune to attack for 15 seconds after they respawn.",
+		"Players are immune to attack for 5 seconds after they respawn.",
 		"Access the pro section of the chest by achieving a 10k+ score and killing 3 people for every 2 deaths.",
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Craft 4 cobbles and 1 steel ingot together to make reinforced cobble.",
@@ -73,7 +73,11 @@ function random_messages.read_messages()
 		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
 		"Use /m to add a team marker at pointed location, that's visible only to team-mates.",
 		"Use /summary to check scores of the current match and the previous match.",
-		"Use /maps to view the maps catalog. It also contains license info and attribution details."
+		"Use /maps to view the maps catalog. It also contains license info and attribution details.",
+		"Change your class in your base by right clicking the home flag or typing /class.",
+		"Medics cause troops within 10 metres to regenerate health faster.",
+		"Hitting your enemy does more damage than not hitting them.",
+		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle."
 	}
 end
 

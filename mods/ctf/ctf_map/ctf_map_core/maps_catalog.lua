@@ -50,9 +50,9 @@ local function show_catalog(name)
 	-- Display screenshot if present, and move other elements down
 	local y = 1
 	if ctf_map.file_exists(map.dirname, "screenshot.png") then
-		-- Check for mapdir .. "/screenshot.png", but pass in the texture
-		-- name, which would've been renamed to mapdir .. ".png"
-		fs = fs .. "image[4,1.5;6.5,3.5;" .. map.dirname .. ".png" .. "]"
+		-- Check for mapdir .. "/screenshot.png", but pass in the texture name,
+		-- which would've been renamed to "<mapdir>_screenshot.png"
+		fs = fs .. "image[4,1.5;6.5,3.5;" .. map.dirname .. "_screenshot.png" .. "]"
 		y = y + 3.5
 	end
 

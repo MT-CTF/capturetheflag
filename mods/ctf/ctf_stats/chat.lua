@@ -23,7 +23,7 @@ local function return_as_chat_result(to, target)
 		end
 
 		-- If stat does not exist yet, set place to size of players + 1
-		if place < 1 then
+		if not place then
 			place = #players + 1
 		end
 	else
@@ -51,20 +51,28 @@ local function return_as_chat_result(to, target)
 	return result
 end
 
+local function summary_func(name)
+	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
+	ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
+
+	fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
+
+	minetest.log("action", name .. " requested match summary formspec")
+	minetest.show_formspec(name, "ctf_stats:match_summary", fs)
+end
+
 -------------------
 -- Chat-commands --
 -------------------
 
 minetest.register_chatcommand("summary", {
-	func = function(name)
-		local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-			ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+	description = "Display the match summary",
+	func = summary_func
+})
 
-		fs = fs .. "button[6,7.5;4,1;b_prev;<< Previous match]"
-
-		minetest.log("action", name .. " requested match summary formspec")
-		minetest.show_formspec(name, "ctf_stats:match_summary", fs)
-	end
+minetest.register_chatcommand("s", {
+	description = "Display the match summary",
+	func = summary_func
 })
 
 minetest.register_chatcommand("r", {
@@ -153,6 +161,7 @@ minetest.register_chatcommand("reset_rankings", {
 
 		ctf_stats.players[reset_name] = nil
 		ctf_stats.player(reset_name)
+		ctf_stats.request_save()
 
 		if reset_name == name then
 			minetest.log("action", name .. " reset their rankings")
@@ -170,9 +179,9 @@ minetest.register_chatcommand("transfer_rankings", {
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		if not param then
-			return false, "Invalid syntax. Provide source and destination player names."
+			return false, "Invalid usage, see /help transfer_rankings"
 		end
-		param = param:trim()
+
 		local src, dest = param:trim():match("([%a%d_-]+) ([%a%d_-]+)")
 		if not src or not dest then
 			return false, "Invalid usage, see /help transfer_rankings"
@@ -183,11 +192,51 @@ minetest.register_chatcommand("transfer_rankings", {
 		if not ctf_stats.players[dest] then
 			return false, "Player '" .. dest .. "' does not exist."
 		end
+		if src == dest then
+			return false, "Source name and destination name cannot be the same!"
+		end
 
 		ctf_stats.players[dest] = ctf_stats.players[src]
 		ctf_stats.players[src] = nil
 
+		ctf_stats.request_save()
+
 		minetest.log("action", name .. " transferred stats of " .. src .. " to " .. dest)
 		return true, "Stats of '" .. src .. "' have been transferred to '" .. dest .. "'."
+	end
+})
+
+
+minetest.register_chatcommand("makepro", {
+	params = "[player_name]",
+	description = "Make player a pro",
+	privs = {ctf_admin = true},
+	func = function(name, param)
+		-- Check if param is specified, else target the caller
+		param = param:trim()
+		if param == "" then
+			param = name
+		end
+
+		local modified = false
+		local stats = ctf_stats.player(param)
+
+		local deaths = math.max(stats.deaths, 1)
+		if stats.kills < 1.5 * deaths then
+			stats.kills = math.ceil(1.51 * deaths)
+			modified = true
+		end
+
+		if stats.score < 10000 then
+			stats.score = 10000
+			modified = true
+		end
+
+		if modified then
+			ctf_stats.request_save()
+			return true, "Made " .. param .. " a pro!"
+		else
+			return false, param .. " is already a pro!"
+		end
 	end
 })

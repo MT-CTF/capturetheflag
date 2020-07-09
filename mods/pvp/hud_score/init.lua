@@ -27,7 +27,7 @@ local function update(name)
 
 	for i, def in ipairs(temp) do
 		-- If not the top-most element, prefix with "+ "
-		local text = def.value
+		local text = tostring(def.value)
 		if i > 1 then
 			text = "+ " .. text
 		end
@@ -41,7 +41,7 @@ local function update(name)
 				alignment = {x = 0, y = 0},
 				position = {x = 0.5, y = 0.6},
 				offset = {x = 0, y = i * 20},
-				number = def.color,
+				number = tonumber(def.color),
 				text = text
 			})
 		end

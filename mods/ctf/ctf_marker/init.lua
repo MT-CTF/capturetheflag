@@ -37,13 +37,14 @@ local function add_marker(name, tname, pos, str)
 		players = {},
 		time = 0
 	}
+
 	for pname, _ in pairs(team.players) do
 		local tplayer = minetest.get_player_by_name(pname)
 		if tplayer then
 			teams[tname].players[pname] = tplayer:hud_add({
 				hud_elem_type = "waypoint",
 				name          = str,
-				number        = ctf.flag_colors[team.data.color],
+				number        = tonumber(ctf.flag_colors[team.data.color]),
 				world_pos     = pos
 			})
 		end
@@ -98,15 +99,18 @@ minetest.register_chatcommand("m", {
 		if pointed.type == "object" then
 			local concat
 			local obj = pointed.ref
+			local entity = obj:get_luaentity()
+
+			-- If object is a player, append player name to display text
+			-- Else if obj is item entity, append item description and count to str.
 			if obj:is_player() then
 				concat = obj:get_player_name()
-			else
-				local entity = obj:get_luaentity()
-				-- If obj is item entity, append item description and count to str.
-				-- Fallback to itemstring if description doesn't exist
+			elseif entity then
 				if entity.name == "__builtin:item" then
 					local stack = ItemStack(entity.itemstring)
 					local itemdef = minetest.registered_items[stack:get_name()]
+
+					-- Fallback to itemstring if description doesn't exist
 					concat = itemdef.description or entity.itemstring
 					concat = concat .. " " .. stack:get_count()
 				else

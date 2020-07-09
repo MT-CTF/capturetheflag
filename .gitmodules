@@ -4,3 +4,6 @@
 [submodule "mods/ctf/ctf_map/ctf_map_core/maps"]
 	path = mods/ctf/ctf_map/ctf_map_core/maps
 	url = https://github.com/MT-CTF/maps
+[submodule "mods/pvp/shooter"]
+	path = mods/pvp/shooter
+	url = https://github.com/MT-CTF/shooter

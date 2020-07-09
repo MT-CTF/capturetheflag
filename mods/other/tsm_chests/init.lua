@@ -17,6 +17,14 @@
 
 tsm_chests = {}
 
+local non_ground_nodes = {
+	"air",
+	"default:water_source",
+	"default:lava_source",
+	"default:lava_flowing",
+	"tsm_chests:chest"
+}
+
 local chest_formspec =
 	"size[8,9]" ..
 	default.gui_bg ..
@@ -67,9 +75,17 @@ minetest.register_node("tsm_chests:chest", {
 			" moves stuff to chest at " .. minetest.pos_to_string(pos))
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		local inv = minetest.get_inventory({type = "node", pos = pos})
+		local swapped_item = inv:get_stack(listname, index)
+
+		if swapped_item:get_name() ~= "" then
+			inv:remove_item(listname, swapped_item)
+			player:get_inventory():add_item(listname, swapped_item)
+		end
+
 		minetest.log("action", player:get_player_name() ..
 			" takes stuff from chest at " .. minetest.pos_to_string(pos))
-		local inv = minetest.get_inventory({type = "node", pos=pos})
+
 		if not inv or inv:is_empty("main") then
 			minetest.set_node(pos, {name="air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
@@ -89,7 +105,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y = y_max, y_min, -1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
-		if name == "air" or name == "default:water_source" or name == "default:lava_source" then
+		if table.indexof(non_ground_nodes, name) ~= -1 then
 			top = y
 			break
 		end
@@ -97,7 +113,7 @@ local function findGroundLevel(pos, y_min, y_max)
 	for y=top,y_min,-1 do
 		local p = {x=pos.x,y=y,z=pos.z}
 		local name = get_node(p).name
-		if name ~= "air" and name ~= "default:water_source" and name ~= "default:lava_source" then
+		if table.indexof(non_ground_nodes, name) == -1 then
 			ground = y
 			break
 		end

@@ -1,9 +1,9 @@
-ctf_match.registered_on_skip_map = {}
-function ctf_match.register_on_skip_map(func)
+ctf_match.registered_on_skip_match = {}
+function ctf_match.register_on_skip_match(func)
 	if ctf._mt_loaded then
 		error("You can't register callbacks at game time!")
 	end
-	table.insert(ctf_match.registered_on_skip_map, func)
+	table.insert(ctf_match.registered_on_skip_match, func)
 end
 
 function ctf_match.vote_next(name, params)
@@ -23,8 +23,8 @@ function ctf_match.vote_next(name, params)
 			if result == "yes" then
 				minetest.chat_send_all("Vote to skip match passed, " ..
 						#results.yes .. " to " .. #results.no)
-				for i = 1, #ctf_match.registered_on_skip_map do
-					ctf_match.registered_on_skip_map[i]()
+				for i = 1, #ctf_match.registered_on_skip_match do
+					ctf_match.registered_on_skip_match[i]()
 				end
 				ctf_match.next()
 			else

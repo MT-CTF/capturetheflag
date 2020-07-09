@@ -1,13 +1,26 @@
-local blacklist_drop = {}
+dropondie = {}
 
-local function drop(pos, itemstack)
+local registered_drop_filters = {}
+
+-- return true to drop, false to destroy
+function dropondie.register_drop_filter(func, priority)
+	table.insert(registered_drop_filters,
+	priority or (#registered_drop_filters + 1),
+	func)
+end
+
+local blacklist_drop = {}
+dropondie.register_drop_filter(function(player, itemname)
+	return table.indexof(blacklist_drop, itemname) == -1
+end)
+
+local function drop(player, pos, itemstack)
 	local it = itemstack:take_item(itemstack:get_count())
 	local sname = it:get_name()
 
-	for _, item in pairs(blacklist_drop) do
-		if sname == item then
-			minetest.log("info", "[dropondie] Not dropping " .. sname)
-			return
+	for i=1, #registered_drop_filters do
+		if not registered_drop_filters[i](player, sname) then
+			return itemstack
 		end
 	end
 
@@ -24,9 +37,9 @@ local function drop(pos, itemstack)
 	return itemstack
 end
 
-local function drop_list(pos, inv, list)
+local function drop_list(player, pos, inv, list)
 	for i = 1, inv:get_size(list) do
-		drop(pos, inv:get_stack(list, i))
+		drop(player, pos, inv:get_stack(list, i))
 		inv:set_stack(list, i, nil)
 	end
 end
@@ -36,11 +49,11 @@ local function drop_all(player)
 	pos.y = math.floor(pos.y + 0.5)
 
 	local inv = player:get_inventory()
-	for _, item in pairs(give_initial_stuff.get_stuff()) do
+	for _, item in pairs(give_initial_stuff.get_stuff(player)) do
 		inv:remove_item("main", ItemStack(item))
 	end
-	drop_list(pos, inv, "main")
-	drop_list(pos, inv, "craft")
+	drop_list(player, pos, inv, "main")
+	drop_list(player, pos, inv, "craft")
 end
 
 minetest.register_on_dieplayer(drop_all)

@@ -57,6 +57,8 @@ function ctf_stats.load_legacy()
 	return true
 end
 
+-- Load persistant data from mod storage (or legacy file)
+-- and initialize empty tables where required
 function ctf_stats.load()
 	if not ctf_stats.load_legacy() then
 		for _, key in pairs(data_to_persist) do
@@ -79,8 +81,6 @@ function ctf_stats.load()
 		blue = {}
 	}
 
-	ctf_stats.start = os.time()
-
 	-- Strip players which have no score
 	for name, player_stats in pairs(ctf_stats.players) do
 		if not player_stats.score or player_stats.score <= 0 then
@@ -92,20 +92,29 @@ function ctf_stats.load()
 	end
 end
 
+-- Save persistant data to mod storage
 function ctf_stats.save()
-	if not _needs_save then
-		return
-	end
-
-	_needs_save = false
-
 	for _, key in pairs(data_to_persist) do
 		storage:set_string(key, minetest.write_json(ctf_stats[key]))
 	end
-
-	minetest.after(13, ctf_stats.save)
 end
-minetest.after(13, ctf_stats.save)
+
+-- Separate recursion to check if save required and then call ctf_stats.save
+-- This allows ctf_stats.save to be called directly when an immediate save is required
+local function check_if_save_needed()
+	if _needs_save then
+		ctf_stats.save()
+		_needs_save = false
+	end
+	minetest.after(13, check_if_save_needed)
+end
+minetest.after(13, check_if_save_needed)
+
+-- API function to allow other mods to request a save
+-- TODO: This should be done automatically once a proper API is in place
+function ctf_stats.request_save()
+	_needs_save = true
+end
 
 function ctf_stats.player_or_nil(name)
 	return ctf_stats.players[name], ctf_stats.current.red[name] or ctf_stats.current.blue[name]
@@ -235,13 +244,12 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 end)
 
 ctf_match.register_on_winner(function(winner)
-	_needs_save = true
 	ctf_stats.matches.wins[winner] = ctf_stats.matches.wins[winner] + 1
 	ctf_stats.winner_team = winner
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-		ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+		ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
 
 	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
@@ -250,15 +258,17 @@ ctf_match.register_on_winner(function(winner)
 	-- Set prev_match_summary and write to mod_storage
 	ctf_stats.prev_match_summary = fs
 	storage:set_string("prev_match_summary", fs)
+
+	-- Flush data to mod_storage at the end of each match
+	ctf_stats.save()
 end)
 
-ctf_match.register_on_skip_map(function()
-	_needs_save = true
+ctf_match.register_on_skip_match(function()
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 
 	-- Show match summary
 	local fs = ctf_stats.get_formspec_match_summary(ctf_stats.current,
-		ctf_stats.winner_team, ctf_stats.winner_player, os.time() - ctf_stats.start)
+		ctf_stats.winner_team, ctf_stats.winner_player, ctf_match.get_match_duration())
 
 	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.show_formspec(player:get_player_name(), "ctf_stats:eom", fs)
@@ -267,6 +277,8 @@ ctf_match.register_on_skip_map(function()
 	-- Set prev_match_summary and write to mod_storage
 	ctf_stats.prev_match_summary = fs
 	storage:set_string("prev_match_summary", fs)
+
+	ctf_stats.save()
 end)
 
 ctf_match.register_on_new_match(function()
@@ -276,7 +288,6 @@ ctf_match.register_on_new_match(function()
 	}
 	ctf_stats.winner_team = "-"
 	ctf_stats.winner_player = "-"
-	ctf_stats.start = os.time()
 	_needs_save = true
 end)
 
@@ -330,6 +341,8 @@ local good_weapons = {
 	"shooter:shotgun",
 	"shooter:rifle",
 	"shooter:machine_gun",
+	"sniper_rifles:rifle_762",
+	"sniper_rifles:rifle_magnum",
 }
 
 local function invHasGoodWeapons(inv)
@@ -351,20 +364,20 @@ local function calculateKillReward(victim, killer)
 
 	-- 30 * K/D ratio, with variable based on player's score
 	local kdreward = 30 * vmain.kills / (vmain.deaths + 1)
-	local max = vmain.score / 6
+	local max = vmain.score / 5
 	if kdreward > max then
 		kdreward = max
 	end
-	if kdreward > 80 then
-		kdreward = 80
+	if kdreward > 100 then
+		kdreward = 100
 	end
 	reward = reward + kdreward
 
-	-- Limited to  0 <= X <= 200
-	if reward > 200 then
-		reward = 200
-	elseif reward < 14 then
-		reward = 14
+	-- Limited to  5 <= X <= 250
+	if reward > 250 then
+		reward = 250
+	elseif reward < 5 then
+		reward = 5
 	end
 
 	-- Half if no good weapons

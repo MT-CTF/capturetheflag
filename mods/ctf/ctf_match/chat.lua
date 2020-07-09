@@ -77,9 +77,29 @@ minetest.register_chatcommand("ctf_unqueue_restart", {
 	end
 })
 
+
+local function file_exists(path)
+	local file = io.open(path, "r")
+	if file then
+		file:close()
+		return true
+	end
+
+	return false
+end
+
 ctf_match.register_on_new_match(function()
 	if restart_on_next_match then
 		minetest.chat_send_player(restart_on_next_match_by, "Shutting down now!")
 		minetest.request_shutdown("Restarting server at operator request.", true)
+		return
+	end
+
+	local path = minetest.get_worldpath() .. "/queue_restart.txt"
+	if file_exists(path) then
+		assert(os.remove(path))
+
+		minetest.request_shutdown("Restarting server at operator request.", true)
+		return
 	end
 end)

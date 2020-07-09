@@ -78,6 +78,26 @@ format. Refer to the `treasures` sub-section for more details.
 * `phys_jump`: [Optional] Player jump multiplier. Accepts any valid number. Defaults to 1.
 * `phys_gravity`: [Optional] Player gravity multiplier. Accepts any valid number. Defaults to 1.
 
+#### `license`
+
+* Every map must have its own license. Once you've chosen your license, simply add the following line to the map's `.conf` file:
+
+  ```lua
+  license = <name>
+  ```
+
+* If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
+If you want to tell more infomation, you can use:
+
+  ```lua
+  others = <description>
+  ```
+
+* If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
+* We can only accept Free Software licenses, e.g.`CC BY-SA 4.0`.
+* Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
+
+
 #### `treasures`
 
 `treasures` is a list of treasures to be registered for this map in serialized format.
@@ -89,3 +109,38 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 ```
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
+
+### `screenshot`
+
+Every map must have its own screenshot in map's folder. It should have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
+
+It should be named `screenshot.png`.
+
+### `skybox` [Optional]
+
+Six images which should be in map's folder.
+
+* `skybox_1.png` - up
+* `skybox_2.png` - down
+* `skybox_3.png` - east
+* `skybox_4.png` - west
+* `skybox_5.png` - south
+* `skybox_6.png` - north
+
+You have to include skybox license in `license` in `.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
+
+You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
+
+## Editing exported map
+
+The easiest way to edit exported maps is the following:
+* Create a world using `singlenode` mapgen. Enable `WorldEdit` and `ctf_map` mod,
+* Go in the world's folder, create a folder named `schems`, and place the `.mts` file inside,
+* Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
+* Do `//1` to set the position where you will generate the map,
+* Do `//mtschemplace yourschematic` (where `yourschematic` is the name of the mts file without `.mts`).
+
+When you finish:
+
+* Place `//1` and `//2` exactly in opposite corners of map (cube),
+* Do `//mtschemcreate <new_name>` to create new edited `.mts` file. It will be saved in `schems` folder.

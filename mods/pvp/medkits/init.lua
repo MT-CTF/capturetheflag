@@ -6,10 +6,9 @@
 -- }
 local players = {}
 
-local regen_max = 20       -- Max HP provided by one medkit
-local regen_interval = 0.5 -- Time in seconds between each iteration
+local regen_interval = 0.5 -- Time in seconds between each step
 local regen_timer = 0      -- Timer to keep track of regen_interval
-local regen_step = 1       -- Number of HP added every iteration
+local regen_step = 1       -- Number of HP added every step
 
 -- Boolean function for use by other mods to check if a player is healing
 medkits = {}
@@ -26,11 +25,13 @@ local function start_healing(stack, player)
 	local name = player:get_player_name()
 	local hp = player:get_hp()
 
-	if players[name] or hp >= regen_max then
+	local hp_max = player:get_properties().hp_max
+	if players[name] or hp == hp_max then
 		return
 	end
 
 	players[name] = {
+		regen_max = hp_max,
 		hp  = hp,
 		pos = player:get_pos(),
 		hud = player:hud_add({
@@ -54,7 +55,7 @@ local function stop_healing(player, interrupted)
 	players[name] = nil
 	if interrupted then
 		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-		                                "Your healing was interrupted!"))
+			"Your healing was interrupted!"))
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end
@@ -74,8 +75,8 @@ ctf_flag.register_on_precapture(function()
 	return true
 end)
 
--- Called after left-click every n seconds (determined by regen_interval)
--- heals player for a total of regen_max, limited by player's max hp
+-- Called after left-click every n seconds (determined by
+-- regen_interval); heals player until player's hp_max
 minetest.register_globalstep(function(dtime)
 	regen_timer = regen_timer + dtime
 	if regen_timer < regen_interval then
@@ -95,12 +96,12 @@ minetest.register_globalstep(function(dtime)
 			end
 
 			-- Stop healing if target reached
-			if players[name] then
+			local pstat = players[name]
+			if pstat then
 				local hp = player:get_hp()
-				if hp < regen_max then
-					player:set_hp(math.min(hp + regen_step, regen_max))
+				if hp < pstat.regen_max then
+					player:set_hp(math.min(hp + regen_step, pstat.regen_max))
 				else
-					player:set_hp(regen_max)
 					stop_healing(player)
 				end
 			end

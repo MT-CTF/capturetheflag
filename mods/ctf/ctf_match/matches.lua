@@ -80,10 +80,20 @@ function ctf_match.create_teams()
 	error("Error! Unimplemented")
 end
 
+ctf_flag.register_on_pick_up(function(name)
+	physics.set(name, "ctf_match:flag_mult", { speed = 0.9 })
+end)
+
+ctf_flag.register_on_drop(function(name)
+	physics.remove(name, "ctf_match:flag_mult")
+end)
+
 ctf_flag.register_on_capture(function(attname, flag)
 	if not ctf.setting("match.destroy_team") then
 		return
 	end
+
+	physics.remove(attname, "ctf_match:flag_mult")
 
 	local fl_team = ctf.team(flag.team)
 	if fl_team and #fl_team.flags == 0 then
@@ -94,3 +104,9 @@ ctf_flag.register_on_capture(function(attname, flag)
 
 	ctf_match.check_for_winner()
 end)
+
+ctf_match.match_start_time = nil
+function ctf_match.get_match_duration()
+	return ctf_match.match_start_time and
+		(os.time() - ctf_match.match_start_time)
+end

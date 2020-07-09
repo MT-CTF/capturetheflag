@@ -15,7 +15,12 @@ ctf.register_on_init(function()
 	minetest.settings:set_bool("enable_pvp", true)
 end)
 
+ctf_match.register_on_build_time_start(function()
+	ctf_match.match_start_time = nil
+end)
+
 ctf_match.register_on_build_time_end(function()
+	ctf_match.match_start_time = os.time()
 	minetest.sound_play({name="ctf_match_attack"}, { gain = 1.0 })
 end)
 
@@ -39,4 +44,12 @@ end
 
 minetest.after(5, function()
 	ctf_match.next()
+end)
+
+ctf_match.register_on_build_time_start(function()
+	shooter.config.allow_players = false
+end)
+
+ctf_match.register_on_build_time_end(function()
+	shooter.config.allow_players = true
 end)
