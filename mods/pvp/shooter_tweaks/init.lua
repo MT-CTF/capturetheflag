@@ -13,14 +13,30 @@ local function wrap_callback(name, callback, func)
 	minetest.override_item(name, overrides)
 end
 
-wrap_callback("shooter_hook:grapple_hook", "on_use", function(old, itemstack, ...)
-	itemstack:add_wear(65536 / 16)
-	return old(itemstack, ...)
+wrap_callback("shooter_hook:grapple_hook", "on_use", function(old, itemstack, user, pointed_thing, ...)
+	if pointed_thing.type == "nothing" then
+		local before = itemstack:get_wear()
+		itemstack:add_wear(65536 / 16)
+
+		if itemstack:get_wear() < before then
+			itemstack:set_wear(65535)
+		end
+	end
+
+	return old(itemstack, user, pointed_thing, ...)
 end)
 
-wrap_callback("shooter_hook:grapple_gun_loaded", "on_use", function(old, itemstack, ...)
-	itemstack:add_wear(65536 / 8)
-	return old(itemstack, ...)
+wrap_callback("shooter_hook:grapple_gun_loaded", "on_use", function(old, itemstack, user, pointed_thing, ...)
+	if pointed_thing.type == "nothing" then
+		local before = itemstack:get_wear()
+		itemstack:add_wear(65536 / 8)
+
+		if itemstack:get_wear() < before then
+			itemstack:set_wear(65535)
+		end
+	end
+
+	return old(itemstack, user, pointed_thing, ...)
 end)
 
 wrap_callback("shooter_hook:grapple_gun", "on_use", function(old, itemstack, user, pointed_thing)
@@ -178,12 +194,12 @@ local function check_grapple(self, node, pos, above)
 	end
 
 	-- Drop remaining stack
-	if not self.itemstack:is_empty() and minetest.get_item_group(node.name, "lava") == 0 then
+	if self.itemstack and not self.itemstack:is_empty() and minetest.get_item_group(node.name, "lava") == 0 then
 		minetest.add_item(pos, self.itemstack)
 	end
 end
 
-minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime)
+minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime, moveresult)
 	if not self.user then
 		return
 	end
@@ -198,25 +214,24 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 		end
 	end
 
-	self.timer = self.timer + dtime
-	if self.timer > 0.25 then
+	if moveresult.collides and (moveresult.axis == "y" or
+			(moveresult.touching_ground or moveresult.standing_on_object)) then
+
 		local pos = self.object:get_pos()
 		if minetest.get_node(pos).name ~= "air" then
 			pos.y = pos.y + 1
 		end
 
-		local below = {x=pos.x, y=pos.y - 1, z=pos.z}
 		local above = {x=pos.x, y=pos.y + 1, z=pos.z}
-		local node = minetest.get_node(below)
-		if node.name ~= "air" then
-			self.object:set_velocity({x=0, y=-10, z=0})
-			self.object:set_acceleration({x=0, y=0, z=0})
+		local node = minetest.get_node(pos)
 
-			check_grapple(self, node, pos, above)
+		self.object:set_velocity({x=0, y=-10, z=0})
+		self.object:set_acceleration({x=0, y=0, z=0})
 
-			self.object:remove()
-		end
-		self.timer = 0
+		check_grapple(self, node, pos, above)
+
+		self.object:remove()
+
 	end
 end
 
