@@ -1,3 +1,5 @@
+local S = minetest.get_translator("ctf")
+
 local function stack_list_to_map(stacks)
 	local map = {}
 	for i = 1, #stacks do
@@ -84,3 +86,29 @@ end
 dropondie.register_drop_filter(function(player, itemname)
 	return not is_class_blacklisted(player, itemname)
 end)
+
+
+local function protect_metadata_inventory(nodename)
+	local def = assert(minetest.registered_nodes[nodename])
+
+	local function wrap(defname)
+		local old = def[defname]
+		def[defname] = function(pos, listname, index, stack, player, ...)
+			if is_class_blacklisted(player, stack:get_name()) then
+				minetest.chat_send_player(player:get_player_name(),
+					S("You're not allowed to put class items in @1!", def.description or "?"))
+				return 0
+			end
+
+			return old(pos, listname, index, stack, player, ...)
+		end
+	end
+
+	wrap("allow_metadata_inventory_put")
+	wrap("allow_metadata_inventory_take")
+
+	minetest.register_node(":" .. nodename, def)
+end
+
+protect_metadata_inventory("furnace:furnace")
+protect_metadata_inventory("furnace:furnace_active")
