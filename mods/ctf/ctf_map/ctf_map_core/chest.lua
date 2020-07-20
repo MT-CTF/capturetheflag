@@ -219,7 +219,7 @@ for _, chest_color in pairs(colors) do
 
 		if not ctf_map.is_item_allowed_in_team_chest(listname, swapped_item, player) then
 			chestinv:remove_item(listname, swapped_item)
-			player:get_inventory():add_item(listname, swapped_item)
+			player:get_inventory():add_item("main", swapped_item)
 		end
 
 		minetest.log("action", player:get_player_name() ..
