@@ -80,7 +80,7 @@ minetest.register_node("tsm_chests:chest", {
 
 		if swapped_item:get_name() ~= "" then
 			inv:remove_item(listname, swapped_item)
-			player:get_inventory():add_item(listname, swapped_item)
+			player:get_inventory():add_item("main", swapped_item)
 		end
 
 		minetest.log("action", player:get_player_name() ..

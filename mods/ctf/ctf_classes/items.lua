@@ -89,10 +89,11 @@ end)
 
 
 local function protect_metadata_inventory(nodename)
-	local def = assert(minetest.registered_nodes[nodename])
+	local def = table.copy(assert(minetest.registered_nodes[nodename]))
+	local old
 
 	local function wrap(defname)
-		local old = def[defname]
+		old = def[defname]
 		def[defname] = function(pos, listname, index, stack, player, ...)
 			if is_class_blacklisted(player, stack:get_name()) then
 				minetest.chat_send_player(player:get_player_name(),
@@ -100,6 +101,21 @@ local function protect_metadata_inventory(nodename)
 				return 0
 			end
 
+			return old(pos, listname, index, stack, player, ...)
+		end
+	end
+
+	old = def.on_metadata_inventory_take
+	function def.on_metadata_inventory_take(pos, listname, index, stack, player, ...)
+		local furnaceinv = minetest.get_inventory({type = "node", pos = pos})
+		local swapped_item = furnaceinv:get_stack(listname, index)
+
+		if is_class_blacklisted(player, swapped_item:get_name()) then
+			furnaceinv:remove_item(listname, swapped_item)
+			player:get_inventory():add_item("main", swapped_item)
+		end
+
+		if type(old) == "function" then
 			return old(pos, listname, index, stack, player, ...)
 		end
 	end
