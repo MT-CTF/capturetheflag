@@ -3,7 +3,7 @@ function ctf_classes.show_gui(name, player)
 	assert(player.get_player_name)
 
 	local fs = {
-		"size[", #ctf_classes.__classes_ordered * 3 , ",3.4]"
+		"size[", #ctf_classes.__classes_ordered * 3 , ",4.5]"
 	}
 
 	local x = 0
@@ -24,7 +24,7 @@ function ctf_classes.show_gui(name, player)
 		fs[#fs + 1] = "]"
 		fs[#fs + 1] = "tableoptions[background=#00000000;highlight=#00000000;border=false]"
 		fs[#fs + 1] = "tablecolumns[color;text]"
-		fs[#fs + 1] = "table[0,0.9;2.8,1.7;;"
+		fs[#fs + 1] = "table[0,0.9;2.8,2.2;;"
 		fs[#fs + 1] = class.color
 		fs[#fs + 1] = ","
 		fs[#fs + 1] = minetest.formspec_escape(class.description)
@@ -37,24 +37,26 @@ function ctf_classes.show_gui(name, player)
 		end
 		fs[#fs + 1] = "]"
 
+		fs[#fs + 1] = "box[0,3.1;2.75,0.75;#2b2b2bFF]"
+
 		for i, item in pairs(class.properties.initial_stuff) do
 			fs[#fs + 1] = "item_image["
-			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
-			fs[#fs + 1] = ",2.25;0.5,0.5;"
+			fs[#fs + 1] = tostring(((i + 0.85) - ((#class.properties.initial_stuff-1) * 0.85)/2) * 0.6)
+			fs[#fs + 1] = ",3.17;0.7,0.7;"
 			fs[#fs + 1] = minetest.formspec_escape(ItemStack(item):get_name())
 			fs[#fs + 1] = "]"
 
 			local desc = ItemStack(item):get_description():split("\n")[1]
 
 			fs[#fs + 1] = "tooltip["
-			fs[#fs + 1] = tostring(i * 0.5 - 0.4)
-			fs[#fs + 1] = ",2.25;0.5,0.5;"
+			fs[#fs + 1] = tostring(((i + 0.85) - ((#class.properties.initial_stuff-1) * 0.85)/2) * 0.6)
+			fs[#fs + 1] = ",3.17;0.7,0.7;"
 			fs[#fs + 1] = minetest.formspec_escape(desc)
 			fs[#fs + 1] = "]"
 		end
 
 
-		fs[#fs + 1] = "button_exit[0.5,2.9;2,1;select_"
+		fs[#fs + 1] = "button_exit[0.5,4;2,1;select_"
 		fs[#fs + 1] = class.name
 		fs[#fs + 1] = ";Select]"
 		fs[#fs + 1] = "container_end[]"

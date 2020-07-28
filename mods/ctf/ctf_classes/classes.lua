@@ -2,7 +2,7 @@ ctf_classes.default_class = "knight"
 
 ctf_classes.register("knight", {
 	description = "Knight",
-	pros = { "+50% Health Points" },
+	pros = { "+50% health points" },
 	cons = { "-10% speed" },
 	color = "#ccc",
 	properties = {
