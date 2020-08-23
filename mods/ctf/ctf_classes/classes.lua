@@ -80,11 +80,12 @@ ctf_classes.register("medic", {
 ctf_classes.register("sniper", {
 	description = "Sniper",
 	pros = { "+25% range", "+25% faster shooting" },
-	cons = {},
+	cons = {"-50% health points"},
 	color = "#96a",
 	properties = {
 		-- Disallow snipers from capturing flags - they're intended to be support
 		can_capture = false,
+		max_hp = 10,
 
 		initial_stuff = {
 			"sniper_rifles:rifle_762_loaded",
