@@ -6,9 +6,10 @@ local full_ores = {
 	stone = "default:cobble",
 }
 
-local upgrades = {
-	steel = "mese",
-	mese = "diamond",
+local sword_materials = {
+	steel   = "default:steel_ingot",
+	mese    = "default:mese_crystal",
+	diamond = "default:diamond",
 }
 
 -- Rocket <== Gold ingot x16 + Coal lump x5
@@ -30,11 +31,11 @@ crafting.register_recipe({
 })
 
 -- Swords
-for from, to in pairs(upgrades) do
+for material, craft_material in pairs(sword_materials) do
 	crafting.register_recipe({
 		type   = "inv",
-		output = "default:sword_" .. to,
-		items  = { "default:sword_" .. from, full_ores[to] .. " 2" },
+		output = "default:sword_" .. material,
+		items  = { "default:stick", craft_material .. " 2" },
 		always_known = true,
 		level  = 1,
 	})
