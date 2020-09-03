@@ -1,16 +1,15 @@
-ctf_match.registered_on_skip_match = {}
-function ctf_match.register_on_skip_match(func)
+ctf_match.registered_on_skip_map = {}
+function ctf_match.register_on_skip_map(func)
 	if ctf._mt_loaded then
 		error("You can't register callbacks at game time!")
 	end
-	table.insert(ctf_match.registered_on_skip_match, func)
+	table.insert(ctf_match.registered_on_skip_map, func)
 end
 
-function ctf_match.vote_next(name, params)
-	if minetest.global_exists("irc") then
-		local tname = ctf.player(name).team or "none"
-		irc:say("Vote started by " .. name .. " (team " .. tname .. ")")
-	end
+function ctf_match.vote_next(name)
+	local tcolor = ctf_colors.get_color(ctf.player(name)).css or "#FFFFFFFF"
+	minetest.chat_send_all(minetest.colorize("#FFAA11", "Vote started by ") ..
+		minetest.colorize(tcolor, name))
 
 	return vote.new_vote(name, {
 		description = "Skip to next match",
@@ -23,8 +22,8 @@ function ctf_match.vote_next(name, params)
 			if result == "yes" then
 				minetest.chat_send_all("Vote to skip match passed, " ..
 						#results.yes .. " to " .. #results.no)
-				for i = 1, #ctf_match.registered_on_skip_match do
-					ctf_match.registered_on_skip_match[i]()
+				for i = 1, #ctf_match.registered_on_skip_map do
+					ctf_match.registered_on_skip_map[i]()
 				end
 				ctf_match.next()
 			else
@@ -50,13 +49,37 @@ minetest.register_chatcommand("vote", {
 	func = ctf_match.vote_next
 })
 
-minetest.register_on_chat_message(function(name, msg)
-	if msg == "/vote_next" and minetest.check_player_privs(name,
-			{interact=true, vote_starter=true}) then
-		local _, vmsg = ctf_match.vote_next(name)
-		if vmsg then
-			minetest.chat_send_player(name, vmsg)
-		end
-		return true
+-- Automatically start a skip vote after 90m, and subsequent votes every 15m
+
+local matchskip_time
+local matchskip_timer = 0
+local can_skip = false
+minetest.register_globalstep(function(dtime)
+	if not can_skip then return end
+
+	matchskip_timer = matchskip_timer + dtime
+
+	if matchskip_timer > matchskip_time then
+		matchskip_timer = 0
+
+		-- Start vote and decrease time until next vote skip
+		ctf_match.vote_next("[CTF automatic skip-vote]"..matchskip_time)
+		matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_interval")) or 5-- * 60
 	end
+end)
+
+local function prevent_autoskip()
+	can_skip = false
+end
+
+ctf.register_on_new_game(prevent_autoskip)
+ctf_flag.register_on_pick_up(prevent_autoskip)
+ctf_flag.register_on_drop(function()
+	can_skip = true
+end)
+
+ctf_match.register_on_build_time_end(function()
+	can_skip = true
+	matchskip_timer = 0
+	matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_delay")) or 15-- * 60
 end)
