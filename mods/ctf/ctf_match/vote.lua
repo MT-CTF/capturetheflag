@@ -64,7 +64,7 @@ minetest.register_globalstep(function(dtime)
 
 		-- Start vote and decrease time until next vote skip
 		ctf_match.vote_next("[CTF automatic skip-vote]"..matchskip_time)
-		matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_interval")) or 5-- * 60
+		matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_interval")) or 15 * 60
 	end
 end)
 
@@ -81,5 +81,6 @@ end)
 ctf_match.register_on_build_time_end(function()
 	can_skip = true
 	matchskip_timer = 0
-	matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_delay")) or 15-- * 60
+	-- Set to initial vote time
+	matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_delay")) or 90 * 60
 end)
