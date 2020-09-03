@@ -263,7 +263,7 @@ ctf_match.register_on_winner(function(winner)
 	ctf_stats.save()
 end)
 
-ctf_match.register_on_skip_match(function()
+ctf_match.register_on_skip_map(function()
 	ctf_stats.matches.skipped = ctf_stats.matches.skipped + 1
 
 	-- Show match summary
