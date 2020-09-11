@@ -281,6 +281,14 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "grenades:frag_sticky 1",
+	items  = { "grenades:frag", "default:stick 4" },
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "grenades:smoke 1",
 	items  = { "default:steel_ingot 5", "default:coal_lump 4" },
 	always_known = true,
