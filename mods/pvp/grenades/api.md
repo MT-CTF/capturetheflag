@@ -18,6 +18,7 @@ grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'fla
 	-- <obj> the grenade object
 	-- <name> the name of the player that threw the grenade
 	-- return true to cause grenade explosion
+	-- return "stop" to stop the grenade from moving
 	end,
 	clock = 3, -- Optional, controls how long until grenade detonates. Default is 3
 	particle = { -- Adds particles in the grenade's trail

@@ -34,7 +34,7 @@ function grenades.register_grenade(name, def)
 		sliding = 1,
 		particle = 0,
 		timer = 0,
-		on_step = function(self, dtime)
+		on_step = function(self, dtime, moveresult)
 			local obj = self.object
 			local vel = obj:get_velocity()
 			local pos = obj:get_pos()
@@ -48,27 +48,29 @@ function grenades.register_grenade(name, def)
 
 			-- Check for a collision on the x/y/z axis
 
-			if not vector.equals(self.last_vel, vel) and vector.distance(self.last_vel, vel) > 4 then
-				if def.on_collide and def.on_collide(obj, self.thrower_name) then
-					if self.thrower_name then
-						minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
-						" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-						def.on_explode(pos, self.thrower_name)
+			if moveresult.collides and moveresult.collisions then
+				if def.on_collide then
+					local c_result = def.on_collide(obj, self.thrower_name)
+
+					if c_result == true then
+						if self.thrower_name then
+							minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
+									" explodes at " .. minetest.pos_to_string(vector.round(pos)))
+							def.on_explode(pos, self.thrower_name)
+						end
+						obj:remove()
+					elseif c_result == "stop" then
+						vel = vector.new()
+						self.last_vel = vector.new()
+						obj:set_velocity(vector.new())
+						obj:set_acceleration(vector.new(0, 0, 0))
 					end
-
-					obj:remove()
 				end
 
-				if math.abs(self.last_vel.x - vel.x) > 5 then -- Check for a large reduction in velocity
-					vel.x = self.last_vel.x * -0.3 -- Invert velocity and reduce it a bit
-				end
+				if moveresult.collisions[1] and moveresult.collisions[1].axis then
+					local axis = moveresult.collisions[1].axis
 
-				if math.abs(self.last_vel.y - vel.y) > 5 then -- Check for a large reduction in velocity
-					vel.y = self.last_vel.y * -0.2 -- Invert velocity and reduce it a bit
-				end
-
-				if math.abs(self.last_vel.z - vel.z) > 5 then -- Check for a large reduction in velocity
-					vel.z = self.last_vel.z * -0.3 -- Invert velocity and reduce it a bit
+					vel[axis] = self.last_vel[axis] * -0.3
 				end
 
 				obj:set_velocity(vel)
@@ -76,27 +78,22 @@ function grenades.register_grenade(name, def)
 
 			self.last_vel = vel
 
-			if self.sliding == 1 and vel.y == 0 then -- Check if grenade is sliding
-				self.sliding = 2 -- Multiplies drag by 2
-			elseif self.sliding > 1 and vel.y ~= 0 then
-				self.sliding = 1 -- Doesn't affect drag
-			end
+			norm_vel = vector.normalize(vel)
 
-			if self.sliding > 1 then -- Is the grenade sliding?
-				if vector.distance(vector.new(), vel) <= 1 and not vector.equals(vel, vector.new()) then -- Grenade is barely moving, make sure it stays that way
-					obj:set_velocity(vector.new())
-					obj:set_acceleration(vector.new(0, -9.8, 0))
-				end
-			else
-				norm_vel = vector.normalize(vel)
-
+			if not vector.equals(vel, vector.new()) then
 				obj:set_acceleration({
-					x = -norm_vel.x * grenades.grenade_deaccel * self.sliding,
+					x = -norm_vel.x * grenades.grenade_deaccel * (moveresult.touching_ground and 2 or 1),
 					y = -9.8,
-					z = -norm_vel.z * grenades.grenade_deaccel * self.sliding,
+					z = -norm_vel.z * grenades.grenade_deaccel * (moveresult.touching_ground and 2 or 1),
 				})
 			end
 
+			if moveresult.touching_ground then -- Is the grenade sliding?
+				if vector.distance(vector.new(), vel) <= 2 and not vector.equals(vel, vector.new()) then -- Grenade is barely moving, make sure it stays that way
+					obj:set_velocity(vector.new())
+					obj:set_acceleration(vector.new(0, -9.8, 0))
+				end
+			end
 
 			-- Grenade Particles
 
