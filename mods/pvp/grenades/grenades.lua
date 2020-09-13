@@ -9,7 +9,7 @@ local function remove_flora(pos, radius)
 	end
 end
 
-grenades.register_grenade("grenades:frag", {
+local fragdef = {
 	description = "Frag grenade (Kills anyone near blast)",
 	image = "grenades_frag.png",
 	on_explode = function(pos, name)
@@ -71,7 +71,16 @@ grenades.register_grenade("grenades:frag", {
 			end
 		end
 	end,
-})
+}
+
+grenades.register_grenade("grenades:frag", table.copy(fragdef))
+
+fragdef.description = "Sticky Frag grenade (Sticks to surfaces)"
+fragdef.image = "grenades_frag_sticky.png"
+fragdef.on_collide = function(obj)
+	return "stop"
+end
+grenades.register_grenade("grenades:frag_sticky", fragdef)
 
 -- Flashbang Grenade
 
