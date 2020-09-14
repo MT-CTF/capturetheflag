@@ -50,15 +50,15 @@ local function update(name)
 end
 
 function hud_score.new(name, def)
-	local player = minetest.get_player_by_name(name)
-	if not player then
-		return
-	end
-
 	-- Verify HUD score element def
 	if not name or not def or type(def) ~= "table" or
 			not def.name or not def.value or not def.color then
 		error("hud_score: Invalid HUD score element definition", 2)
+	end
+
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		return
 	end
 
 	-- Store element expiration time in def.time
@@ -67,7 +67,21 @@ function hud_score.new(name, def)
 	if next_check > duration then
 		next_check = duration
 	end
-	table.insert(players[name], def)
+
+	-- If a HUD score element with the same name exists already,
+	-- reuse it instead of creating a new element
+	local is_new = true
+	for i, hud_score_spec in ipairs(players[name]) do
+		if hud_score_spec.name == def.name then
+			is_new = false
+			players[name][i] = def
+			break
+		end
+	end
+
+	if is_new then
+		table.insert(players[name], def)
+	end
 
 	-- If more than `max` active elements, mark oldest element for deletion
 	if #players[name] > max then
