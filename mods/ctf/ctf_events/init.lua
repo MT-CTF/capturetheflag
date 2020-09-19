@@ -131,6 +131,12 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 		type = "bullet"
 	end
 
+	if tool_caps.damage_groups.combat_log then
+		victim = victim .. " (Combat Log)"
+	elseif tool_caps.damage_groups.suicide then
+		victim = victim .. " (Suicide)"
+	end
+
 	ctf_events.post("kill_" .. type, killer, victim)
 	ctf_events.update_all()
 end)
