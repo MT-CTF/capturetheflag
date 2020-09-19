@@ -31,8 +31,8 @@ time_from_last_punch, tool_capabilities, dir, damage)
 			return
 		end
 
-		local hp = player:get_hp()
-		if hp == 0 then
+		local hp = player:get_hp() - damage
+		if hp <= 0 then
 			if potential_cowards[pname] then
 				player:hud_remove(potential_cowards[pname].hud or 0)
 				potential_cowards[pname] = nil
