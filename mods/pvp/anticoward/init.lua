@@ -31,6 +31,10 @@ time_from_last_punch, tool_capabilities, dir, damage)
 			return
 		end
 
+		if ctf_respawn_immunity.is_immune(player) then
+			return
+		end
+
 		local hp = player:get_hp() - damage
 		if hp <= 0 then
 			if potential_cowards[pname] then
