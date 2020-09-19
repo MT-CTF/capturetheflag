@@ -42,6 +42,11 @@ time_from_last_punch, tool_capabilities, dir, damage)
 				potential_cowards[pname] = nil
 			end
 
+			if potential_cowards[hname] and potential_cowards[hname].puncher == pname then
+				hitter:hud_remove(potential_cowards[hname].hud or 0)
+				potential_cowards[hname] = nil
+			end
+
 			return false
 		end
 
@@ -72,28 +77,34 @@ end)
 minetest.register_on_dieplayer(function(player, reason)
 	local pname = player:get_player_name()
 
-	if reason.type == "node_damage" then
+	if reason.type ~= "punch" and reason.type ~= "fall" and reason.type ~= "respawn" then
 		if potential_cowards[pname] then
-			local last_attacker = minetest.get_player_by_name(potential_cowards[pname].puncher)
+			local hname = potential_cowards[pname].puncher
+			local last_attacker = minetest.get_player_by_name(hname)
 
-			if not last_attacker then return end
+			if not last_attacker then
+				player:hud_remove(potential_cowards[pname].hud or 0)
+				potential_cowards[pname] = nil
+
+				return
+			end
 
 			potential_cowards[pname].toolcaps.damage_groups.suicide = 1
 
 			for i = 1, #ctf.registered_on_killedplayer do
 				ctf.registered_on_killedplayer[i](
 					pname,
-					potential_cowards[pname].puncher,
+					hname,
 					last_attacker:get_wielded_item(),
 					potential_cowards[pname].toolcaps
 				)
 			end
 
-			player:hud_remove(potential_cowards[pname].hud or 0)
-			potential_cowards[pname] = nil
-		end
-	elseif reason.type ~= "punch" then
-		if potential_cowards[pname] then
+			if potential_cowards[hname] and potential_cowards[hname].puncher == pname then
+				last_attacker:hud_remove(potential_cowards[hname].hud or 0)
+				potential_cowards[hname] = nil
+			end
+
 			player:hud_remove(potential_cowards[pname].hud or 0)
 			potential_cowards[pname] = nil
 		end
