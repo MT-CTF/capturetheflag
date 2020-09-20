@@ -2,7 +2,7 @@
 
 local potential_cowards = {}
 local TIMER_UPDATE_INTERVAL = 2
-local COMBAT_TIMEOUT_TIME = 10
+local COMBAT_TIMEOUT_TIME = 16
 
 -- Prevent fall damage from killing players
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
@@ -65,7 +65,6 @@ time_from_last_punch, tool_capabilities, dir, damage)
 					z_index = 100,
 				})
 			}
-			potential_cowards[pname].player = pname
 		end
 
 		potential_cowards[pname].timer = 0
@@ -77,7 +76,7 @@ end)
 minetest.register_on_dieplayer(function(player, reason)
 	local pname = player:get_player_name()
 
-	if reason.type ~= "punch" and reason.type ~= "fall" and reason.type ~= "respawn" then
+	if reason.type == "node_damage" or reason.type == "drown" then
 		if potential_cowards[pname] then
 			local hname = potential_cowards[pname].puncher
 			local last_attacker = minetest.get_player_by_name(hname)
@@ -107,11 +106,25 @@ minetest.register_on_dieplayer(function(player, reason)
 
 			player:hud_remove(potential_cowards[pname].hud or 0)
 			potential_cowards[pname] = nil
+		else
+			for victim in pairs(potential_cowards) do
+				if potential_cowards[victim].puncher == pname then
+					local victimobj = minetest.get_player_by_name(victim)
+
+					if victimobj then
+						victimobj:hud_remove(potential_cowards[victim].hud or 0)
+					end
+
+					potential_cowards[victim] = nil
+					break
+				end
+			end
 		end
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+minetest.register_on_leaveplayer(function(player, timeout)
+	if timeout == true then return end
 	local pname = player:get_player_name()
 
 	if potential_cowards[pname] then
@@ -143,7 +156,7 @@ minetest.register_globalstep(function(dtime)
 			potential_cowards[k].timer = potential_cowards[k].timer + globtimer
 
 			if potential_cowards[k].timer >= COMBAT_TIMEOUT_TIME then
-				local player = minetest.get_player_by_name(potential_cowards[k].player)
+				local player = minetest.get_player_by_name(k)
 
 				if player then
 					player:hud_remove(potential_cowards[k].hud or 0)
