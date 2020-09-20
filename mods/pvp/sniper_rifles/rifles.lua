@@ -7,7 +7,7 @@ sniper_rifles.register_rifle("sniper_rifles:rifle_762", {
 		rounds    = 30,
 		range     = 300,
 		step      = 30,
-		tool_caps = { full_punch_interval = 1.5, damage_groups = { fleshy = 12 } },
+		tool_caps = { full_punch_interval = 1.5, damage_groups = { fleshy = 12, sniper = 1 } },
 		sounds    = { shot = "sniper_rifles_shot" },
 		particle  = "shooter_bullet.png",
 		groups    = {
@@ -25,7 +25,7 @@ sniper_rifles.register_rifle("sniper_rifles:rifle_magnum", {
 		rounds    = 20,
 		range     = 400,
 		step      = 30,
-		tool_caps = { full_punch_interval = 2, damage_groups = { fleshy = 16 } },
+		tool_caps = { full_punch_interval = 2, damage_groups = { fleshy = 16, sniper = 1 } },
 		sounds    = { shot = "sniper_rifles_shot" },
 		particle  = "shooter_bullet.png",
 		groups    = {
