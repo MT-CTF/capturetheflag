@@ -2,7 +2,7 @@
 
 local potential_cowards = {}
 local TIMER_UPDATE_INTERVAL = 2
-local COMBAT_TIMEOUT_TIME = 16
+local COMBAT_TIMEOUT_TIME = 20
 
 -- Prevent fall damage from killing players
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
