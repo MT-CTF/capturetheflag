@@ -6,7 +6,7 @@ function ctf_colors.get_color(tplayer)
 	end
 	local tcolor_hex = ctf.flag_colors[tcolor_text]
 	if not tcolor_hex then
-		tcolor_hex = 0x000000
+		tcolor_hex = 0x777777
 	end
 
 	local tcolor_css = "#" .. tostring(tcolor_hex):sub(3, 8)
