@@ -73,9 +73,6 @@ for _, chest_color in pairs(colors) do
 
 		local formspec = table.concat({
 			"size[8,12]",
-			default.gui_bg,
-			default.gui_bg_img,
-			default.gui_slots,
 			default.get_hotbar_bg(0,7.85),
 			"list[current_player;main;0,7.85;8,1;]",
 			"list[current_player;main;0,9.08;8,3;8]",
