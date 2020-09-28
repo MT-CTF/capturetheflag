@@ -2,6 +2,10 @@
 
 ## Creating a new map
 
+### Youtube tutorial
+https://youtu.be/orBsC9wViUw
+
+
 ### 1. Dependencies
 
 * Minetest 5.0.0 or later.
@@ -46,10 +50,6 @@ There are multiple ways do this, this is the simplest in most cases.
 * Click export, and wait until completion.
 * Copy the resultant folder from `worlddir/schems/` into `ctf_map/ctf_map_core/maps/`.
 * Profit!
-
-
-### Youtube tutorial
-https://youtu.be/orBsC9wViUw
 
 
 ## Documentation
