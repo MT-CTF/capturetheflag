@@ -25,7 +25,7 @@ There are multiple ways do this, this is the simplest in most cases.
   * Set backend to "dummy".
   * Save.
 * Using worldedit, select the area.
-* Type `/gui`, and click "From WE" then "To WE".
+* Type `/gui`, and click `Player pos` then `From WE` and then `To WE`.
 * Check that the center location is the right place for the barrier to go.
 * Check that the bounds extend far enough.
 
