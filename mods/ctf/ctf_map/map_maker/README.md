@@ -35,6 +35,7 @@ There are multiple ways do this, this is the simplest in most cases.
   If the barrier is X=0, then it will placed with every node of the barrier having X=0.
   If the barrier is Z=0, then it will placed with every node of the barrier having Z=0.
 * Click "place barrier". Note that this command does not have an undo.
+* After placing barriers you should place 2 flags where you want bases to be. You get flags in `/gui` --> `Giveme flags`
 
 ### 5. Meta data
 
@@ -45,6 +46,11 @@ There are multiple ways do this, this is the simplest in most cases.
 * Click export, and wait until completion.
 * Copy the resultant folder from `worlddir/schems/` into `ctf_map/ctf_map_core/maps/`.
 * Profit!
+
+
+### Youtube tutorial
+https://youtu.be/orBsC9wViUw
+
 
 ## Documentation
 
