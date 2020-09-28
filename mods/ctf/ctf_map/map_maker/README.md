@@ -2,6 +2,10 @@
 
 ## Creating a new map
 
+### Youtube tutorial
+https://youtu.be/orBsC9wViUw
+
+
 ### 1. Dependencies
 
 * Minetest 5.0.0 or later.
@@ -25,7 +29,7 @@ There are multiple ways do this, this is the simplest in most cases.
   * Set backend to "dummy".
   * Save.
 * Using worldedit, select the area.
-* Type `/gui`, and click "From WE" then "To WE".
+* Type `/gui`, and click `Player pos` then `From WE` and then `To WE`.
 * Check that the center location is the right place for the barrier to go.
 * Check that the bounds extend far enough.
 
@@ -35,6 +39,7 @@ There are multiple ways do this, this is the simplest in most cases.
   If the barrier is X=0, then it will placed with every node of the barrier having X=0.
   If the barrier is Z=0, then it will placed with every node of the barrier having Z=0.
 * Click "place barrier". Note that this command does not have an undo.
+* After placing barriers you should place 2 flags where you want bases to be. You get flags in `/gui` --> `Giveme flags`
 
 ### 5. Meta data
 
@@ -45,6 +50,7 @@ There are multiple ways do this, this is the simplest in most cases.
 * Click export, and wait until completion.
 * Copy the resultant folder from `worlddir/schems/` into `ctf_map/ctf_map_core/maps/`.
 * Profit!
+
 
 ## Documentation
 
