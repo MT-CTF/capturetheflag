@@ -82,7 +82,7 @@ minetest.override_item("ctf_bandages:bandage", {
 			if hp > 0 and hp < limit and ctf_classes.get(user).name == "medic" then
 				local main, match = ctf_stats.player(name)
 				if main and match then
-					local reward = 1
+					local reward = 2
 					main.score  = main.score  + reward
 					match.score = match.score + reward
 
