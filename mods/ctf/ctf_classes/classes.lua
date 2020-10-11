@@ -23,7 +23,7 @@ ctf_classes.register("knight", {
 
 ctf_classes.register("shooter", {
 	description = "Sharp Shooter",
-	pros = { "Skilled with ranged weapons", "Can use sniper rifles"},
+	pros = { "Skilled with ranged weapons", "Can craft/use sniper rifles"},
 	cons = {"-25% health points"},
 	color = "#c60",
 	properties = {
@@ -39,6 +39,10 @@ ctf_classes.register("shooter", {
 			"shooter_hook:grapple_gun",
 			"shooter_hook:grapple_hook",
 			"shooter_guns:rifle",
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_762_loaded",
+			"sniper_rifles:rifle_magnum",
+			"sniper_rifles:rifle_magnum_loaded",
 		},
 
 		allowed_guns = {
@@ -51,8 +55,8 @@ ctf_classes.register("shooter", {
 		},
 
 		crafting = {
-			"sniper_rifle:rifle_762",
-			"sniper_rifle:rifle_magnum"
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
 		},
 
 		shooter_multipliers = {
@@ -121,8 +125,8 @@ ctf_classes.register("sniper", {
 		},
 
 		crafting = {
-			"sniper_rifle:rifle_762",
-			"sniper_rifle:rifle_magnum"
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
 		},
 
 		shooter_multipliers = {

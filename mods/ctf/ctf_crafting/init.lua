@@ -173,7 +173,7 @@ crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_762",
 	items  = { "default:steelblock", "default:bronze_ingot 5", "default:mese_crystal", "default:wood" },
-	always_known = true,
+	always_known = false,
 	level  = 1
 })
 
@@ -182,7 +182,7 @@ crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_magnum",
 	items  = { "default:steelblock", "default:bronzeblock", "default:diamond", "default:wood" },
-	always_known = true,
+	always_known = false,
 	level  = 1,
 })
 
