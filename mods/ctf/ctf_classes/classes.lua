@@ -23,12 +23,12 @@ ctf_classes.register("knight", {
 
 ctf_classes.register("shooter", {
 	description = "Sharp Shooter",
-	pros = { "+50% range", "+20% faster shooting", "Can use sniper rifles"},
-	cons = {"-25% hp"},
+	pros = { "Skilled with ranged weapons", "Can use sniper rifles"},
+	cons = {"-25% health points"},
 	color = "#c60",
 	properties = {
 		allow_grapples = true,
-		max_hp = 15
+		max_hp = 15,
 
 		initial_stuff = {
 			"shooter_guns:rifle_loaded",
