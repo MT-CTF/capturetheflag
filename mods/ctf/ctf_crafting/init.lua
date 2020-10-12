@@ -7,6 +7,7 @@ local full_ores = {
 }
 
 local sword_materials = {
+	steel   = "default:steel_ingot",
 	mese    = "default:mese_crystal",
 	diamond = "default:diamond",
 }
