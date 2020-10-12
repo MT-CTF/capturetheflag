@@ -2,12 +2,13 @@ ctf_classes.default_class = "knight"
 
 ctf_classes.register("knight", {
 	description = "Knight",
-	pros = { "+50% health points" },
+	pros = { "Skilled with swords", "+50% health points" },
 	cons = { "-10% speed" },
 	color = "#ccc",
 	properties = {
 		max_hp = 30,
 		speed = 0.90,
+		melee_bonus = 1,
 
 		initial_stuff = {
 			"default:sword_steel",
