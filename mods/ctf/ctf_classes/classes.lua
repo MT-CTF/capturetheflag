@@ -23,11 +23,12 @@ ctf_classes.register("knight", {
 
 ctf_classes.register("shooter", {
 	description = "Sharp Shooter",
-	pros = { "+50% range", "+20% faster shooting" },
-	cons = {},
+	pros = { "Skilled with ranged weapons", "Can craft/use sniper rifles"},
+	cons = {"-25% health points"},
 	color = "#c60",
 	properties = {
 		allow_grapples = true,
+		max_hp = 15,
 
 		initial_stuff = {
 			"shooter_guns:rifle_loaded",
@@ -38,6 +39,10 @@ ctf_classes.register("shooter", {
 			"shooter_hook:grapple_gun",
 			"shooter_hook:grapple_hook",
 			"shooter_guns:rifle",
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_762_loaded",
+			"sniper_rifles:rifle_magnum",
+			"sniper_rifles:rifle_magnum_loaded",
 		},
 
 		allowed_guns = {
@@ -45,6 +50,13 @@ ctf_classes.register("shooter", {
 			"shooter_guns:rifle",
 			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
+		},
+
+		crafting = {
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
 		},
 
 		shooter_multipliers = {
@@ -77,6 +89,7 @@ ctf_classes.register("medic", {
 	},
 })
 
+--[[
 ctf_classes.register("sniper", {
 	description = "Sniper",
 	pros = { "+25% range", "+25% faster shooting" },
@@ -112,8 +125,8 @@ ctf_classes.register("sniper", {
 		},
 
 		crafting = {
-			"sniper_rifle:rifle_762",
-			"sniper_rifle:rifle_magnum"
+			"sniper_rifles:rifle_762",
+			"sniper_rifles:rifle_magnum"
 		},
 
 		shooter_multipliers = {
@@ -124,6 +137,7 @@ ctf_classes.register("sniper", {
 		},
 	}
 })
+]]--
 
 --[[ctf_classes.register("rocketeer", {
 	description = "Rocketeer",
