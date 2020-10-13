@@ -39,10 +39,6 @@ ctf_classes.register("shooter", {
 			"shooter_hook:grapple_gun",
 			"shooter_hook:grapple_hook",
 			"shooter_guns:rifle",
-			"sniper_rifles:rifle_762",
-			"sniper_rifles:rifle_762_loaded",
-			"sniper_rifles:rifle_magnum",
-			"sniper_rifles:rifle_magnum_loaded",
 		},
 
 		allowed_guns = {
