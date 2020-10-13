@@ -16,9 +16,13 @@ function ctf_classes.register(cname, def)
 
 	if not def.properties.item_blacklist then
 		def.properties.item_blacklist = {}
-		for i=1, #def.properties.initial_stuff do
-			def.properties.item_blacklist[i] =
-				ItemStack(def.properties.initial_stuff[i]):get_name()
+		for i, item in ipairs(def.properties.initial_stuff) do
+			local iname = ItemStack(item):get_name()
+
+			-- Only add to item blacklist if not in the whitelist
+			if table.indexof(def.properties.item_whitelist or {}, iname) == -1 then
+				def.properties.item_blacklist[i] = iname
+			end
 		end
 	end
 
@@ -117,8 +121,10 @@ function ctf_classes.update(player)
 	set_max_hp(player, class.properties.max_hp)
 	ctf_classes.set_skin(player, color, class)
 
-	physics.set(player:get_player_name(), "ctf_classes:speed", {
+	physics.set(player:get_player_name(), "ctf_classes:physics", {
 		speed = class.properties.speed,
+		jump = class.properties.jump,
+		gravity = class.properties.gravity,
 	})
 
 	crafting.lock_all(player:get_player_name())

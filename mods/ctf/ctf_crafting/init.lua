@@ -248,22 +248,32 @@ crafting.register_recipe({
 
 -- Shovels
 for ore, ore_item in pairs(full_ores) do
+	local show = true
+	if ore == "diamond" or ore == "mese" or ore == "bronze" then
+		show = false
+	end
+
 	crafting.register_recipe({
 		type   = "inv",
 		output = "default:shovel_" .. ore,
 		items  = { "default:stick 2", ore_item },
-		always_known = true,
+		always_known = show,
 		level  = 1,
 	})
 end
 
 -- Axes
 for ore, ore_item in pairs(full_ores) do
+	local show = true
+	if ore == "diamond" or ore == "mese" or ore == "bronze" then
+		show = false
+	end
+
 	crafting.register_recipe({
 		type   = "inv",
 		output = "default:axe_" .. ore,
-		items  = { "default:stick 2", ore_item .. " 3" },
-		always_known = true,
+		items  = { "default:stick 2", ore_item},
+		always_known = show,
 		level  = 1,
 	})
 end

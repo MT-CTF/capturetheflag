@@ -67,7 +67,7 @@ ctf_classes.register("shooter", {
 
 ctf_classes.register("medic", {
 	description = "Medic",
-	pros = { "x2 regen for nearby friendlies", "+10% speed" },
+	pros = { "x2 regen for nearby friendlies", "Building supplies", "+10% speed" },
 	cons = {},
 	color = "#0af",
 	properties = {
@@ -76,13 +76,27 @@ ctf_classes.register("medic", {
 
 		initial_stuff = {
 			"ctf_bandages:bandage 50",
+			"default:pick_steel",
+			"default:shovel_steel",
+			"default:cobble 99"
+		},
+
+		item_whitelist = {
+			"default:cobble"
 		},
 
 		allowed_guns = {
 			"shooter_guns:pistol",
-			"shooter_guns:machine_gun",
-			"shooter_guns:shotgun",
 		},
+
+		crafting = {
+			"default:axe_bronze",
+			"default:axe_mese",
+			"default:axe_diamond",
+			"default:shovel_bronze",
+			"default:shovel_mese",
+			"default:shovel_diamond",
+		}
 	},
 })
 
