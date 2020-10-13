@@ -4,15 +4,6 @@ local potential_cowards = {}
 local TIMER_UPDATE_INTERVAL = 2
 local COMBAT_TIMEOUT_TIME = 20
 
--- Prevent fall damage from killing players
-minetest.register_on_player_hpchange(function(player, hp_change, reason)
-	if reason.type == "fall" and player:get_hp() + hp_change <= 0 then
-		return (-player:get_hp()) + 1
-	end
-
-	return hp_change
-end, true)
-
 --
 --- Make suicides and combat logs award last puncher with kill
 --
@@ -76,7 +67,7 @@ end)
 minetest.register_on_dieplayer(function(player, reason)
 	local pname = player:get_player_name()
 
-	if reason.type == "node_damage" or reason.type == "drown" then
+	if reason.type == "node_damage" or reason.type == "drown" or reason.type == "fall" then
 		if potential_cowards[pname] then
 			local hname = potential_cowards[pname].puncher
 			local last_attacker = minetest.get_player_by_name(hname)
