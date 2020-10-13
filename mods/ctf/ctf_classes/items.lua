@@ -8,7 +8,7 @@ local function stack_list_to_map(stacks)
 	return map
 end
 
--- Returns true if  the item shouldn't be allowed to be dropped etc
+-- Returns true if the item shouldn't be allowed to be dropped etc
 local function is_class_blacklisted(player, itemname)
 	local class = ctf_classes.get(player)
 	local items = stack_list_to_map(class.properties.item_blacklist)
@@ -58,6 +58,8 @@ ctf_classes.register_on_changed(function(player, old, new)
 		for i = 1, #items do
 			give_initial_stuff.give_item(inv, ItemStack(items[i]))
 		end
+
+		give_initial_stuff(player, "replace_tools")
 	end
 end)
 
