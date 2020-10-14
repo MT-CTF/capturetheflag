@@ -16,7 +16,6 @@ ctf_classes.register("knight", {
 
 		allowed_guns = {
 			"shooter_guns:pistol",
-			"shooter_guns:machine_gun",
 			"shooter_guns:shotgun",
 		},
 	},
