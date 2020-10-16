@@ -51,8 +51,8 @@ function random_messages.read_messages()
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
 		"Use medkits to gradually restore your health.",
 		"Moving or fighting while using medkits will interrupt the healing process.",
-		"Steel swords do more damage than guns, but you need to be up close.",
-		"Gain more score by killing more than you die, or by capturing the flag.",
+		"Knights have a slight damage bonus when attacking with swords.",
+		"Gain more score by killing more than you die, by healing teammates as a medic, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
 		"Players are immune to attack for 5 seconds after they respawn.",
@@ -60,10 +60,10 @@ function random_messages.read_messages()
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Craft 4 cobbles and 1 steel ingot together to make reinforced cobble.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
-		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
+		"Like CTF? Give feedback using /report or @report, and consider donating at rubenwardy.com/donate",
 		"Want to submit your own map? Visit ctf.rubenwardy.com to get involved.",
 		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
-		"To report misbehaving players to moderators, please use /report <name> <action>",
+		"To report misbehaving players to moderators, please use /report <name> <action> or @report <name> <action>",
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
 		"Trapping team mates on purpose is strictly against the rules and you will be kicked immediately.",
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
@@ -77,7 +77,8 @@ function random_messages.read_messages()
 		"Change your class in your base by right clicking the home flag or typing /class.",
 		"Medics cause troops within 10 metres to regenerate health faster.",
 		"Hitting your enemy does more damage than not hitting them.",
-		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle."
+		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
+		"The 'Updates' tab in your inventory will show some of the latest updates to CTF"
 	}
 end
 
