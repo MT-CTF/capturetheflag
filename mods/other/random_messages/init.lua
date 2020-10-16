@@ -51,7 +51,7 @@ function random_messages.read_messages()
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
 		"Use medkits to gradually restore your health.",
 		"Moving or fighting while using medkits will interrupt the healing process.",
-		"Knights have a slight damage bonus when attacking with swords.",
+		"Knights have a slight damage bonus (up to 1.5 hp) when attacking with swords.",
 		"Gain more score by killing more than you die, by healing teammates as a medic, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
@@ -78,7 +78,7 @@ function random_messages.read_messages()
 		"Medics cause troops within 10 metres to regenerate health faster.",
 		"Hitting your enemy does more damage than not hitting them.",
 		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
-		"The 'Updates' tab in your inventory will show some of the latest updates to CTF"
+		"The 'Updates' tab in your inventory will show some of the latest updates to CTF",
 	}
 end
 
