@@ -95,8 +95,10 @@ minetest.register_on_dieplayer(function(player, reason)
 				potential_cowards[hname] = nil
 			end
 
-			player:hud_remove(potential_cowards[pname].hud or 0)
-			potential_cowards[pname] = nil
+			if potential_cowards[pname] then
+				player:hud_remove(potential_cowards[pname].hud or 0)
+				potential_cowards[pname] = nil
+			end
 		else
 			for victim in pairs(potential_cowards) do
 				if potential_cowards[victim].puncher == pname then
