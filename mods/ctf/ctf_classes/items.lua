@@ -14,6 +14,7 @@ local function is_class_blacklisted(player, itemname)
 	local items = stack_list_to_map(class.properties.item_blacklist)
 	return items[itemname]
 end
+ctf_classes.item_is_class_blacklisted = is_class_blacklisted
 
 
 give_initial_stuff.register_stuff_provider(function(player)
