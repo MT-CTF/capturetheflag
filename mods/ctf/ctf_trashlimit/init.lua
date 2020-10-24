@@ -1,3 +1,5 @@
+minetest.unregister_chatcommand("pulverize")
+
 local callbacks = assert(minetest.detached_inventories.crafting_trash)
 local allow_put = callbacks.allow_put
 function callbacks.allow_put(inv, listname, index, stack, player)
