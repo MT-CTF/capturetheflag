@@ -7,3 +7,6 @@
 [submodule "mods/pvp/shooter"]
 	path = mods/pvp/shooter
 	url = https://github.com/MT-CTF/shooter
+[submodule "mods/pvp/disable_build_where_they_stand"]
+	path = mods/pvp/disable_build_where_they_stand
+	url = https://github.com/appgurueu/disable_build_where_they_stand.git
