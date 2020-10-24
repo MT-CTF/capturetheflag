@@ -8,6 +8,7 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 		"Heals teammates for 3-4 HP until target's HP is equal to " ..
 		ctf_bandages.heal_percent * 100 .. "% of their maximum HP",
 	inventory_image = "ctf_bandages_bandage.png",
+	stack_max = 1,
 	on_use = function(itemstack, player, pointed_thing)
 		if pointed_thing.type ~= "object" then
 			return
@@ -28,7 +29,6 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 					hp = limit
 				end
 				object:set_hp(hp)
-				itemstack:take_item()
 				minetest.chat_send_player(pname, minetest.colorize("#C1FF44", name .. " has healed you!"))
 				return itemstack
 			else
