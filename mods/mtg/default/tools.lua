@@ -32,6 +32,7 @@ minetest.register_tool("default:pick_stone", {
 		},
 		damage_groups = {fleshy=3},
 	},
+	groups = {trashable = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -107,6 +108,7 @@ minetest.register_tool("default:shovel_stone", {
 		},
 		damage_groups = {fleshy=2},
 	},
+	groups = {trashable = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -185,6 +187,7 @@ minetest.register_tool("default:axe_stone", {
 		},
 		damage_groups = {fleshy=3},
 	},
+	groups = {trashable = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -259,6 +262,7 @@ minetest.register_tool("default:sword_stone", {
 		},
 		damage_groups = {fleshy=4},
 	},
+	groups = {trashable = 1},
 	sound = {breaks = "default_tool_breaks"},
 })
 
