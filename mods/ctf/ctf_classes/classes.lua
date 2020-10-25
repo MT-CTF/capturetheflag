@@ -74,7 +74,6 @@ ctf_classes.register("medic", {
 		speed = 1.1,
 
 		initial_stuff = {
-
 			"ctf_bandages:bandage",
 			"default:pick_steel",
 			"default:shovel_steel",
