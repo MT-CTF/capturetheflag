@@ -70,17 +70,25 @@ minetest.override_item("ctf_bandages:bandage", {
 		if pointed_thing.type ~= "object" then
 			return
 		end
+
 		local object = pointed_thing.ref
 		if not object:is_player() then
 			return
 		end
+
 		local pname = object:get_player_name()
 		local name = user:get_player_name()
 		if ctf.player(pname).team == ctf.player(name).team then
+			if minetest.get_node(object:get_pos()).name:find("lava") then
+				return -- Can't heal players in lava
+			end
+
 			local hp = object:get_hp()
 			local limit = ctf_bandages.heal_percent * object:get_properties().hp_max
+
 			if hp > 0 and hp < limit and ctf_classes.get(user).name == "medic" then
 				local main, match = ctf_stats.player(name)
+
 				if main and match then
 					local reward = 3
 					main.score  = main.score  + reward
@@ -96,6 +104,7 @@ minetest.override_item("ctf_bandages:bandage", {
 				end
 			end
 		end
+
 		return bandage_on_use(stack, user, pointed_thing)
 	end
 })
