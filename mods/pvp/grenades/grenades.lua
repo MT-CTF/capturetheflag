@@ -73,14 +73,14 @@ local fragdef = {
 	end,
 }
 
-grenades.register_grenade("grenades:frag", table.copy(fragdef))
 
-fragdef.description = "Sticky Frag grenade (Sticks to surfaces)"
-fragdef.image = "grenades_frag_sticky.png"
+-- fragdef.description = "Sticky Frag grenade (Sticks to surfaces)"
+-- fragdef.image = "grenades_frag_sticky.png"
 fragdef.on_collide = function(obj)
-	return "stop"
+	return true
 end
-grenades.register_grenade("grenades:frag_sticky", fragdef)
+grenades.register_grenade("grenades:frag", table.copy(fragdef))
+--grenades.register_grenade("grenades:frag_sticky", fragdef)
 
 -- Flashbang Grenade
 

@@ -290,13 +290,13 @@ crafting.register_recipe({
 	level  = 1,
 })
 
-crafting.register_recipe({
-	type   = "inv",
-	output = "grenades:frag_sticky 1",
-	items  = { "grenades:frag", "default:stick 4" },
-	always_known = true,
-	level  = 1,
-})
+-- crafting.register_recipe({
+-- 	type   = "inv",
+-- 	output = "grenades:frag_sticky 1",
+-- 	items  = { "grenades:frag", "default:stick 4" },
+-- 	always_known = true,
+-- 	level  = 1,
+-- })
 
 crafting.register_recipe({
 	type   = "inv",
