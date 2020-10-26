@@ -65,7 +65,7 @@ local fragdef = {
 		for _, v in ipairs(minetest.get_objects_inside_radius(pos, radius)) do
 			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
 
-			if hit and v:is_player() and v:get_hp() > 0 and hit.type == "object" and hit.ref:is_player() and
+			if hit and player and v:is_player() and v:get_hp() > 0 and hit.type == "object" and hit.ref:is_player() and
 			hit.ref:get_player_name() == v:get_player_name() then
 				v:punch(player, 2, {damage_groups = {grenade = 1, fleshy = 90 * 0.707106 ^ vector.distance(pos, v:get_pos())}}, nil)
 			end
