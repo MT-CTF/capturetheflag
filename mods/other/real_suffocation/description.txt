@@ -1,1 +1,0 @@
-The player will lose breath inside solid blocks.
