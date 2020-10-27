@@ -1,0 +1,4 @@
+# How much damage is caused by “suffocation” by default, that is, running
+# out of breath while being inside solid blocks like dirt, gravel, sand,
+# etc. Like for drowning, damage is caused every 2 seconds.
+real_suffocation_damage (Suffocation damage) int 10 0
