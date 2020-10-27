@@ -91,6 +91,7 @@ minetest.override_item("ctf_bandages:bandage", {
 
 				if main and match then
 					local reward = 3
+					if ctf_flag.has_flag(pname) then reward = 6 end
 					main.score  = main.score  + reward
 					match.score = match.score + reward
 
