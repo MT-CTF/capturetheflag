@@ -109,7 +109,7 @@ minetest.override_item("ctf_bandages:bandage", {
 
 					if ctf_flag.has_flag(pname) then reward = 6 end
 
-					if dont_heal(pname) then reward = 0 end
+					if dont_heal[pname] then reward = 0 end
 
 					main.score  = main.score  + reward
 					match.score = match.score + reward
