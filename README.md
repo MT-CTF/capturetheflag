@@ -1,5 +1,4 @@
 # Capture The Flag
-[![Build Status](https://travis-ci.org/MT-CTF/capturetheflag.svg?branch=master)](https://travis-ci.org/MT-CTF/capturetheflag)
 
 [![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
 
