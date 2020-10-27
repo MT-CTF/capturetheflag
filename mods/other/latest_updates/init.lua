@@ -1,4 +1,9 @@
 local latest_updates = minetest.formspec_escape([[
++ Made lava instantly heal players
++ Made bandages give 6 score when healing flag holder
++ Made grenades work like the old CTF grenades
++ Increased score medics get from using bandages
++ Gave medic bandages infinite uses
 - Prevented knights from using the SMG
 - Gave medic class building tools and prevented them from using SMG/Shotgun
 - Changed fall damage to use the combat system
