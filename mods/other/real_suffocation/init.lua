@@ -24,7 +24,7 @@ local function add_suffocation()
 			Everything else is probably too small for suffocation to seem real.
 		- disable_suffocation group: If set to 1, we bail out. This makes it possible for nodes to defend themselves against hacking. :-)
 		]]
-		if (def.walkable == nil or def.walkable == true) 
+		if (def.walkable == nil or def.walkable == true)
 		and (def.drowning == nil or def.drowning == 0)
 		and (def.damage_per_second == nil or def.damage_per_second <= 0)
 		and (def.collision_box == nil or def.collision_box.type == "regular")
