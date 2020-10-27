@@ -21,4 +21,4 @@ This mod adds the group `real_suffocation=1` to all nodes it has modified,
 this is mostly done for informational purposes.
 
 ## License
-Everything is under WTFPL.
+Everything is under the MIT license. Forked from https://repo.or.cz/minetest_real_suffocation.git.
