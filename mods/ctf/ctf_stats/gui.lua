@@ -83,14 +83,14 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	-- Map name
 	ret = ret .. "label[1,7.6;Map: " .. minetest.colorize("#EEEE00", stats.map) .. "]"
 
-	ret = ret .. "label[6.5,0;Kills]"
-	ret = ret .. "label[8,0;" .. render_team_stats(red, blue, "kills") .. "]"
-	ret = ret .. "label[6.5,0.5;Attempts]"
-	ret = ret .. "label[8,0.5;" .. render_team_stats(red, blue, "attempts") .. "]"
-	ret = ret .. "label[10.5,0;Duration]"
-	ret = ret .. "label[12,0;" .. match_length .. "]"
-	ret = ret .. "label[10.5,0.5;Total score]"
-	ret = ret .. "label[12,0.5;" .. render_team_stats(red, blue, "score", true) .. "]"
+	ret = ret .. "label[6,0;Kills]"
+	ret = ret .. "label[7.5,0;" .. render_team_stats(red, blue, "kills") .. "]"
+	ret = ret .. "label[6,0.5;Attempts]"
+	ret = ret .. "label[7.5,0.5;" .. render_team_stats(red, blue, "attempts") .. "]"
+	ret = ret .. "label[9.5,0;Duration]"
+	ret = ret .. "label[11,0;" .. match_length .. "]"
+	ret = ret .. "label[9.5,0.5;Total score]"
+	ret = ret .. "label[11,0.5;" .. render_team_stats(red, blue, "score", true) .. "]"
 	ret = ret .. "label[8,7.2;Tip: type /rankings for league tables]"
 
 	return ret
