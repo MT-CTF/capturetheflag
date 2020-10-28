@@ -64,6 +64,21 @@ minetest.register_globalstep(function(delta)
 	regen_update()
 end)
 
+local dont_heal = {}
+minetest.register_on_player_hpchange(function(player, hp_change, reason)
+	local name = player:get_player_name()
+
+	if reason.type == "drown" or reason.type == "mode_damage" then
+		dont_heal[name] = true
+	elseif dont_heal[name] then
+		dont_heal[name] = nil
+	end
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	dont_heal[player:get_player_name()] = nil
+end)
+
 local bandage_on_use = minetest.registered_items["ctf_bandages:bandage"].on_use
 minetest.override_item("ctf_bandages:bandage", {
 	on_use = function(stack, user, pointed_thing)
@@ -79,8 +94,9 @@ minetest.override_item("ctf_bandages:bandage", {
 		local pname = object:get_player_name()
 		local name = user:get_player_name()
 		if ctf.player(pname).team == ctf.player(name).team then
-			if minetest.get_node(object:get_pos()).name:find("lava") then
-				return -- Can't heal players in lava
+			local nodename = minetest.get_node(object:get_pos()).name
+			if dont_heal[pname] or nodename:find("lava") or nodename:find("water") then
+				return -- Can't heal players in lava/water
 			end
 
 			local hp = object:get_hp()
@@ -91,7 +107,9 @@ minetest.override_item("ctf_bandages:bandage", {
 
 				if main and match then
 					local reward = 3
+
 					if ctf_flag.has_flag(pname) then reward = 6 end
+
 					main.score  = main.score  + reward
 					match.score = match.score + reward
 
