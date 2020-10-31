@@ -237,6 +237,7 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	ctf_stats.winner_player = name
     local capturereward = math.floor(match.score * 10) / 100
     if capturereward < 50 then capturereward = 50 end
+    if capturereward > 750 then capturereward = 750 end
 
 	hud_score.new(name, {
 		name  = "ctf_stats:flag_capture",
