@@ -35,7 +35,7 @@ ctf_classes.register("shooter", {
 			"shooter_hook:grapple_gun_loaded",
 			"shooter:ammo 2"
 		},
-		
+
 		item_blacklist = {
 			"shooter_guns:rifle_loaded",
 			"shooter_hook:grapple_gun_loaded",
