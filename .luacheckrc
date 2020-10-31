@@ -29,6 +29,7 @@ read_globals = {
 	"Settings",
 	"prometheus", "hb",
 	"awards",
+	"potential_cowards",
 
 	"VoxelArea",
 	"VoxelManip",

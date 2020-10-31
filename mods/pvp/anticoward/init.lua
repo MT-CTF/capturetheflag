@@ -1,6 +1,6 @@
 -- Capture The Flag mod: anticoward
 
-local potential_cowards = {}
+potential_cowards = {}
 local TIMER_UPDATE_INTERVAL = 2
 local COMBAT_TIMEOUT_TIME = 20
 
