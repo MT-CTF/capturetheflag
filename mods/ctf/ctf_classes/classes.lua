@@ -28,7 +28,7 @@ ctf_classes.register("shooter", {
 	color = "#c60",
 	properties = {
 		allow_grapples = true,
-		max_hp = 15,
+		max_hp = 16,
 
 		initial_stuff = {
 			"shooter_guns:rifle_loaded",
