@@ -14,9 +14,9 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		end
 
 		if php - damage > 0 then
-			player:set_hp(php - damage)
-			player:punch(hitter, 1, {damage_groups = {fleshy = time_from_last_punch*2, nopunch = 1}}, dir)
-			return true
+			minetest.after(0, function()
+				player:punch(hitter, 1, {damage_groups = {fleshy = time_from_last_punch*2, nopunch = 1}}, dir)
+			end)
 		end
 	end
 end)
