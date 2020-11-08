@@ -9,6 +9,8 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 			time_from_last_punch = 0.5
 		end
 
-		player:punch(hitter, 1, {damage_groups = {fleshy = time_from_last_punch*2, nopunch = 1}}, dir)
+		if hitter:get_hp() > 0 then
+			player:punch(hitter, 1, {damage_groups = {fleshy = time_from_last_punch*2, nopunch = 1}}, dir)
+		end
 	end
 end)
