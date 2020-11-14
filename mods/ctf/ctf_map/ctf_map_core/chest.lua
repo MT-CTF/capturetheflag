@@ -22,6 +22,7 @@ function ctf_map.is_item_allowed_in_team_chest(listname, stack, player)
 end
 
 local colors = {"red", "blue"}
+ctf_map.chest_locations = {}
 for _, chest_color in pairs(colors) do
 	local def = {
 		description = "Chest",
@@ -40,6 +41,7 @@ for _, chest_color in pairs(colors) do
 	}
 
 	function def.on_construct(pos)
+		ctf_map.chest_locations[chest_color] = pos
 		local meta = minetest.get_meta(pos)
 		meta:set_string("infotext", "Chest")
 		local inv = meta:get_inventory()

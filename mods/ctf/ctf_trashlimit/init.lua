@@ -5,6 +5,11 @@ local callbacks = assert(minetest.detached_inventories.crafting_trash)
 local allow_put = callbacks.allow_put
 function callbacks.allow_put(inv, listname, index, stack, player)
 	local name = player:get_player_name()
+	local chest_pos = ctf_map.chest_locations[ctf.player(name).team]
+	if chest_pos and vector.distance(player:get_pos(), chest_pos) > 5 then
+		minetest.chat_send_player(name, "Move closer to your team chest to trash items!")
+		return 0
+	end
 	if not ctf_stats.is_pro(name) then
 		return 0
 	end
