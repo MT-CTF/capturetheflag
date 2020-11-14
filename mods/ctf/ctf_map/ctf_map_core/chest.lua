@@ -100,7 +100,7 @@ for _, chest_color in pairs(colors) do
 				"listring[" .. chestinv ..";pro]" ..
 				"listring[" .. chestinv .. ";helper]" ..
 				"list[detached:crafting_trash;main;7,6.3;1,1;]" ..
-				"image[7.05,6.5;0.8,0.8;crafting_trash_icon.png]" ..
+				"image[7.05,6.4;0.8,0.8;crafting_trash_icon.png]" ..
 				"label[5,-0.2;" ..
 				minetest.formspec_escape("Pro players only") .. "]"
 		else
