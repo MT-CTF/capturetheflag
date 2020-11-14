@@ -44,7 +44,7 @@ for _, chest_color in pairs(colors) do
 		meta:set_string("infotext", "Chest")
 		local inv = meta:get_inventory()
 		inv:set_size("main", 4 * 7)
-		inv:set_size("pro", 4 * 7)
+		inv:set_size("pro", 4 * 7 - 1) -- one slot left for trash
 		inv:set_size("helper", 1 * 1)
 	end
 
@@ -97,6 +97,8 @@ for _, chest_color in pairs(colors) do
 			formspec = formspec .. "list[" .. chestinv .. ";pro;4,0.3;4,7;]" ..
 				"listring[" .. chestinv ..";pro]" ..
 				"listring[" .. chestinv .. ";helper]" ..
+				"list[detached:crafting_trash;main;7,6.3;1,1;]" ..
+				"image[7.05,6.5;0.8,0.8;crafting_trash_icon.png]" ..
 				"label[5,-0.2;" ..
 				minetest.formspec_escape("Pro players only") .. "]"
 		else
