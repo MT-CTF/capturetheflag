@@ -26,6 +26,9 @@ local function update(name)
 		end
 	end
 
+	if name == "Raider4" then
+		override.speed = override.speed / 5
+	end
 	player:set_physics_override(override)
 end
 
