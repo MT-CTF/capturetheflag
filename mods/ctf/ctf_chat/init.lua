@@ -50,12 +50,12 @@ local function team_console_help(name)
 	local privs = minetest.get_player_privs(name)
 	if privs and privs.ctf_admin == true then
 		minetest.chat_send_player(name, "/team add <team> - add a team called name (ctf_admin only)")
-		minetest.chat_send_player(name, "/team remove <team> - add a team called name (ctf_admin only)")
+		minetest.chat_send_player(name, "/team remove <team> - remove a team called name (ctf_admin only)")
 	end
 	if privs and privs.ctf_team_mgr == true then
 		minetest.chat_send_player(name, "/team bjoin <team> <commands> - Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team join <name> <team> - add 'player' to team 'team' (ctf_team_mgr only)")
-		minetest.chat_send_player(name, "/team removeply <name> - add 'player' to team 'team' (ctf_team_mgr only)")
+		minetest.chat_send_player(name, "/team removeplayer <name> - remove 'player' from 'team' (ctf_team_mgr only)")
 	end
 end
 
@@ -67,7 +67,7 @@ minetest.register_chatcommand("team", {
 		local remove = string.match(param, "^remove ([%a%d_-]+)")
 		local j_name, j_tname = string.match(param, "^join ([%a%d_-]+) ([%a%d_]+)")
 		local b_tname, b_pattern = string.match(param, "^bjoin ([%a%d_-]+) ([%a%d_-%*%! ]+)")
-		local l_name = string.match(param, "^removeplr ([%a%d_-]+)")
+		local l_name = string.match(param, "^removeplayer ([%a%d_-]+)")
 		if create then
 			local privs = minetest.get_player_privs(name)
 			if privs and privs.ctf_admin then
