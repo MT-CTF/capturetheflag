@@ -68,7 +68,7 @@ local dont_heal = {}
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	local name = player:get_player_name()
 
-	if reason.type == "drown" or reason.type == "mode_damage" then
+	if reason.type == "drown" or reason.type == "node_damage" then
 		dont_heal[name] = true
 	elseif dont_heal[name] then
 		dont_heal[name] = nil
@@ -95,8 +95,8 @@ minetest.override_item("ctf_bandages:bandage", {
 		local name = user:get_player_name()
 		if ctf.player(pname).team == ctf.player(name).team then
 			local nodename = minetest.get_node(object:get_pos()).name
-			if dont_heal[pname] or nodename:find("lava") or nodename:find("water") then
-				return -- Can't heal players in lava/water
+			if dont_heal[pname] or nodename:find("lava") or nodename:find("water") or nodename:find("spike") then
+				return -- Can't heal players in lava/water/spikes
 			end
 
 			local hp = object:get_hp()

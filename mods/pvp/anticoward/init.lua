@@ -11,6 +11,10 @@ local COMBAT_TIMEOUT_TIME = 20
 minetest.register_on_punchplayer(function(player, hitter,
 time_from_last_punch, tool_capabilities, dir, damage)
 	if player and hitter then
+		if ctf_respawn_immunity.is_immune(player) or ctf_match.is_in_build_time() then
+			return
+		end
+
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
 
@@ -19,10 +23,6 @@ time_from_last_punch, tool_capabilities, dir, damage)
 
 		if to.team == from.team and to.team ~= "" and
 				to.team ~= nil and to.name ~= from.name then
-			return
-		end
-
-		if ctf_respawn_immunity.is_immune(player) then
 			return
 		end
 
