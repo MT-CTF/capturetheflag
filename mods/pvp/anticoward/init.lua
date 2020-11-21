@@ -10,6 +10,9 @@ local COMBAT_TIMEOUT_TIME = 20
 
 minetest.register_on_punchplayer(function(player, hitter,
 time_from_last_punch, tool_capabilities, dir, damage)
+	if damage == 0 then
+		return
+	end
 	if player and hitter then
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
