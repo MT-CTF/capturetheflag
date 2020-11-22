@@ -130,7 +130,8 @@ minetest.override_item("ctf_bandages:bandage", {
 
 local diggers = {}
 local DIG_COOLDOWN = 60
-local DIG_DIST_LIMIT = 20
+local DIG_DIST_LIMIT = 30
+local DIG_SPEED = 0.5
 
 local function isdiggable(name)
 	return (
@@ -154,7 +155,7 @@ local function remove_pillar(pos, pname)
 		if player and diggers[pname] and type(diggers[pname]) ~= "table" then
 			if vector.distance(player:get_pos(), pos) <= DIG_DIST_LIMIT then
 				pos.y = pos.y + 1
-				minetest.after(1, remove_pillar, pos, pname)
+				minetest.after(DIG_SPEED, remove_pillar, pos, pname)
 			else
 				minetest.chat_send_player(pname, "Pillar digging stopped, too far away from digging pos. Can activate again in 1 minute")
 				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
@@ -170,14 +171,14 @@ minetest.register_tool("ctf_classes:paxel_steel", {
 	description = "Steel Paxel\n" ..
 		"Rightclick bottom of pillar to start destroying it, hold rightclick to stop\n"..
 		"Can't use during build time",
-	inventory_image = "default_tool_steelaxe.png^default_tool_steelpick.png^default_tool_steelshovel.png",
+	inventory_image = "default_tool_steelpick.png^default_tool_steelshovel.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
 		groupcaps={
-			cracky = {times={[1]=4.00, [2]=1.60, [3]=0.80}, uses=20, maxlevel=2},
-			crumbly = {times={[1]=1.50, [2]=0.90, [3]=0.40}, uses=30, maxlevel=2},
-			choppy={times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=20, maxlevel=2},
+			cracky = {times={[1]=4.00, [2]=1.60, [3]=0.80}, uses=0, maxlevel=2},
+			crumbly = {times={[1]=1.50, [2]=0.90, [3]=0.40}, uses=0, maxlevel=2},
+			choppy={times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=0, maxlevel=2},
 		},
 		damage_groups = {fleshy=4},
 	},
@@ -207,7 +208,7 @@ minetest.register_tool("ctf_classes:paxel_steel", {
 		local pname = user:get_player_name()
 
 		if diggers[pname] and type(diggers[pname]) ~= "table" then
-			minetest.after(0.5, function()
+			minetest.after(1, function()
 				if user and user:get_player_control().RMB then
 					if diggers[pname] and type(diggers[pname]) ~= "table" then
 						minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in 1 minute")
@@ -221,7 +222,7 @@ minetest.register_tool("ctf_classes:paxel_steel", {
 
 minetest.register_on_dieplayer(function(player)
 	local pname = player:get_player_name()
-	minetest.log(dump(type(diggers[pname])))
+
 	if type(diggers[pname]) == "table" then
 		diggers[pname]:cancel()
 	end
