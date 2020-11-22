@@ -1,4 +1,5 @@
 local latest_updates = minetest.formspec_escape([[
+[!] Gave medics a paxel with the ability to take down pillars
 + Changed build time to 3 minutes
 + Added darkness_nerf until MTE fixes their lighting
 + Gave shooter class 2 ammo packs

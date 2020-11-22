@@ -127,3 +127,138 @@ minetest.override_item("ctf_bandages:bandage", {
 		return bandage_on_use(stack, user, pointed_thing)
 	end
 })
+
+local diggers = {}
+local DIG_COOLDOWN = 60
+local DIG_DIST_LIMIT = 20
+
+local function isdiggable(name)
+	return (
+		name:find("default:") and (
+			name:find("cobble") or name:find("wood" ) or
+			name:find("leaves") or name:find("dirt" ) or
+			name:find("gravel") or name:find("sand" ) or
+			name:find("tree"  ) or name:find("brick") or
+			name:find("glass" )
+		)
+	) or name:find("wool:")
+end
+
+local function remove_pillar(pos, pname)
+	local name = minetest.get_node(pos).name
+
+	if name:find("default") and isdiggable(name) then
+		minetest.dig_node(pos)
+
+		local player = minetest.get_player_by_name(pname)
+		if player and diggers[pname] and type(diggers[pname]) ~= "table" then
+			if vector.distance(player:get_pos(), pos) <= DIG_DIST_LIMIT then
+				pos.y = pos.y + 1
+				minetest.after(1, remove_pillar, pos, pname)
+			else
+				minetest.chat_send_player(pname, "Pillar digging stopped, too far away from digging pos. Can activate again in 1 minute")
+				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+			end
+		end
+	else
+		minetest.chat_send_player(pname, "Pillar digging stopped at undiggable node. Can activate again in 1 minute")
+		diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+	end
+end
+
+minetest.register_tool("ctf_classes:paxel_steel", {
+	description = "Steel Paxel\n" ..
+		"Rightclick bottom of pillar to start destroying it, hold rightclick to stop\n"..
+		"Can't use during build time",
+	inventory_image = "default_tool_steelaxe.png^default_tool_steelpick.png^default_tool_steelshovel.png",
+	tool_capabilities = {
+		full_punch_interval = 1.0,
+		max_drop_level=1,
+		groupcaps={
+			cracky = {times={[1]=4.00, [2]=1.60, [3]=0.80}, uses=20, maxlevel=2},
+			crumbly = {times={[1]=1.50, [2]=0.90, [3]=0.40}, uses=30, maxlevel=2},
+			choppy={times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=20, maxlevel=2},
+		},
+		damage_groups = {fleshy=4},
+	},
+	sound = {breaks = "default_tool_breaks"},
+	on_place = function(itemstack, placer, pointed_thing)
+		if pointed_thing.type == "node" then
+			local pname = placer:get_player_name()
+
+			if not isdiggable(minetest.get_node(pointed_thing.under).name) or ctf_match.is_in_build_time() then
+				minetest.chat_send_player(pname, "Can't dig node or build time active")
+				return minetest.item_place(itemstack, placer, pointed_thing)
+			end
+
+			if not diggers[pname] then
+				minetest.chat_send_player(pname, "Pillar digging started")
+				diggers[pname] = true
+				remove_pillar(pointed_thing.under, pname)
+			elseif type(diggers[pname]) ~= "table" then
+				minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in 1 minute")
+				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+			else
+				minetest.chat_send_player(pname, "You can't activate yet")
+			end
+		end
+	end,
+	on_secondary_use = function(itemstack, user, pointed_thing)
+		local pname = user:get_player_name()
+
+		if diggers[pname] and type(diggers[pname]) ~= "table" then
+			minetest.after(0.5, function()
+				if user and user:get_player_control().RMB then
+					if diggers[pname] and type(diggers[pname]) ~= "table" then
+						minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in 1 minute")
+						diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+					end
+				end
+			end)
+		end
+	end,
+})
+
+minetest.register_on_dieplayer(function(player)
+	local pname = player:get_player_name()
+	minetest.log(dump(type(diggers[pname])))
+	if type(diggers[pname]) == "table" then
+		diggers[pname]:cancel()
+	end
+
+	diggers[pname] = nil
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	local pname = player:get_player_name()
+
+	if type(diggers[pname]) == "table" then
+		diggers[pname]:cancel()
+	end
+
+	diggers[pname] = nil
+end)
+
+ctf_match.register_on_new_match(function()
+	if diggers and #diggers > 0 then
+		for _, v in pairs(diggers) do
+			if type(v) == "table" then
+				v:cancel()
+			end
+		end
+	end
+
+	diggers = {}
+end)
+
+ctf.register_on_new_game(function()
+	if diggers and #diggers > 0 then
+		for _, v in pairs(diggers) do
+			if type(v) == "table" then
+				v:cancel()
+			end
+		end
+	end
+
+	diggers = {}
+end)

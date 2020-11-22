@@ -72,7 +72,7 @@ ctf_classes.register("shooter", {
 
 ctf_classes.register("medic", {
 	description = "Medic",
-	pros = { "x2 regen for nearby friendlies", "Building supplies", "+10% speed" },
+	pros = { "x2 regen for nearby friendlies", "Building supplies + Paxel", "+10% speed" },
 	cons = {},
 	color = "#0af",
 	properties = {
@@ -81,8 +81,7 @@ ctf_classes.register("medic", {
 
 		initial_stuff = {
 			"ctf_bandages:bandage",
-			"default:pick_steel",
-			"default:shovel_steel",
+			"ctf_classes:paxel_steel",
 			"default:cobble 99"
 		},
 
