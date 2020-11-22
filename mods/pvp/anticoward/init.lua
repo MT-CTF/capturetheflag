@@ -162,3 +162,11 @@ minetest.register_globalstep(function(dtime)
 		globtimer = 0
 	end
 end)
+
+ctf_match.register_on_new_match(function()
+	potential_cowards = {}
+end)
+
+ctf.register_on_new_game(function()
+	potential_cowards = {}
+end)
