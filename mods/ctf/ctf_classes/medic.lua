@@ -129,20 +129,19 @@ minetest.override_item("ctf_bandages:bandage", {
 })
 
 local diggers = {}
-local DIG_COOLDOWN = 60
+local DIG_COOLDOWN = 45
 local DIG_DIST_LIMIT = 30
 local DIG_SPEED = 0.5
 
 local function isdiggable(name)
-	return (
-		name:find("default:") and (
-			name:find("cobble") or name:find("wood" ) or
-			name:find("leaves") or name:find("dirt" ) or
-			name:find("gravel") or name:find("sand" ) or
-			name:find("tree"  ) or name:find("brick") or
-			name:find("glass" )
-		)
-	) or name:find("wool:")
+	return name:find("default:") and (
+		name:find("cobble") or name:find("wood" ) or
+		name:find("leaves") or name:find("dirt" ) or
+		name:find("gravel") or name:find("sand" ) or
+		name:find("tree"  ) or name:find("brick") or
+		name:find("glass" ) or name:find("ice"  ) or
+		name:find("snow"  )
+	)
 end
 
 local function remove_pillar(pos, pname)
@@ -157,12 +156,12 @@ local function remove_pillar(pos, pname)
 				pos.y = pos.y + 1
 				minetest.after(DIG_SPEED, remove_pillar, pos, pname)
 			else
-				minetest.chat_send_player(pname, "Pillar digging stopped, too far away from digging pos. Can activate again in 1 minute")
+				minetest.chat_send_player(pname, "Pillar digging stopped, too far away from digging pos. Can activate again in "..DIG_COOLDOWN.." seconds")
 				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 			end
 		end
 	else
-		minetest.chat_send_player(pname, "Pillar digging stopped at undiggable node. Can activate again in 1 minute")
+		minetest.chat_send_player(pname, "Pillar digging stopped at undiggable node. Can activate again in "..DIG_COOLDOWN.." seconds")
 		diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 	end
 end
@@ -197,7 +196,7 @@ minetest.register_tool("ctf_classes:paxel_steel", {
 				diggers[pname] = true
 				remove_pillar(pointed_thing.under, pname)
 			elseif type(diggers[pname]) ~= "table" then
-				minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in 1 minute")
+				minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in "..DIG_COOLDOWN.." seconds")
 				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 			else
 				minetest.chat_send_player(pname, "You can't activate yet")
@@ -207,11 +206,12 @@ minetest.register_tool("ctf_classes:paxel_steel", {
 	on_secondary_use = function(itemstack, user, pointed_thing)
 		local pname = user:get_player_name()
 
-		if diggers[pname] and type(diggers[pname]) ~= "table" then
-			minetest.after(1, function()
+		if diggers[pname] and diggers[pname] == true and type(diggers[pname]) ~= "table" then
+			diggers[pname] = 1
+			minetest.after(2, function()
 				if user and user:get_player_control().RMB then
 					if diggers[pname] and type(diggers[pname]) ~= "table" then
-						minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in 1 minute")
+						minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in "..DIG_COOLDOWN.." seconds")
 						diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 					end
 				end
