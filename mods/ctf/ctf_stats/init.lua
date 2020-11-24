@@ -226,15 +226,6 @@ ctf_stats.winner_team = "-"
 ctf_stats.winner_player = "-"
 
 table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
-	local main, match = ctf_stats.player(name)
-	if main and match then
-		main.captures  = main.captures  + 1
-		main.score     = main.score     + 50
-		match.captures = match.captures + 1
-		match.score    = match.score    + 50
-		_needs_save = true
-	end
-	ctf_stats.winner_player = name
     local score = 0
     for i, pstat in pairs(ctf_stats.current.red) do
 		score = score + pstat.score
@@ -245,6 +236,16 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
     local capturereward = math.floor(score * 10) / 100
     if capturereward < 50 then capturereward = 50 end
     if capturereward > 750 then capturereward = 750 end
+
+	local main, match = ctf_stats.player(name)
+	if main and match then
+		main.captures  = main.captures  + 1
+		main.score     = main.score     + capturereward
+		match.captures = match.captures + 1
+		match.score    = match.score    + capturereward
+		_needs_save = true
+	end
+	ctf_stats.winner_player = name
 
 	hud_score.new(name, {
 		name  = "ctf_stats:flag_capture",
