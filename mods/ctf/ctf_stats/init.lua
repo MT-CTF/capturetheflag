@@ -235,7 +235,14 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 		_needs_save = true
 	end
 	ctf_stats.winner_player = name
-    local capturereward = math.floor(match.score * 10) / 100
+    local score = 0
+    for name, pstat in pairs(ctf_stats.current.red) do
+		score = score + pstat.score
+	end
+    for name, pstat in pairs(ctf_stats.current.blue) do
+		score = score + pstat.score
+	end
+    local capturereward = math.floor(score * 10) / 100
     if capturereward < 50 then capturereward = 50 end
     if capturereward > 750 then capturereward = 750 end
 
