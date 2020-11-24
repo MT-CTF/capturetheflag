@@ -69,13 +69,15 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 			math.floor((time % 3600) / 60), -- minutes
 			math.floor(time % 60))          -- seconds
 	end
-		local red_kd = math.floor(red.kills / red.deaths * 10) / 10
-		if red.deaths <1 then
-			red_kd = red.kills
+
+	local red_kd = math.floor(red.kills / red.deaths * 10) / 10
+	if red.deaths <1 then
+		red_kd = red.kills
 	end
+
 	local blue_kd = math.floor(blue.kills / blue.deaths * 10) / 10
-		if blue.deaths <1 then
-			blue_kd = blue.kills
+	if blue.deaths <1 then
+		blue_kd = blue.kills
 	end
 
 	local ret = ctf_stats.get_formspec("Match Summary", players, 1)
@@ -98,8 +100,8 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[6.5,0;Kills]"
 	ret = ret .. "label[8,0;" .. render_team_stats(red, blue, "kills") .. "]"
 	ret = ret .. "label[3.5,0;Team K/D]"
-	ret = ret .. "label[5,0;" .. minetest.colorize(red.color, tostring(red_kd))
-		.. " - " .. " " .. minetest.colorize(blue.color, tostring(blue_kd)) .. "]"
+	ret = ret .. "label[5,0;" .. minetest.colorize(red.color, tostring(red_kd)) ..
+			" - " .. " " .. minetest.colorize(blue.color, tostring(blue_kd)) .. "]"
 	ret = ret .. "label[6.5,0.5;Attempts]"
 	ret = ret .. "label[8,0.5;" .. render_team_stats(red, blue, "attempts") .. "]"
 	ret = ret .. "label[9.5,0;Duration]"
