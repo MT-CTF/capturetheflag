@@ -236,10 +236,10 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	end
 	ctf_stats.winner_player = name
     local score = 0
-    for name, pstat in pairs(ctf_stats.current.red) do
+    for i, pstat in pairs(ctf_stats.current.red) do
 		score = score + pstat.score
 	end
-    for name, pstat in pairs(ctf_stats.current.blue) do
+    for i, pstat in pairs(ctf_stats.current.blue) do
 		score = score + pstat.score
 	end
     local capturereward = math.floor(score * 10) / 100
