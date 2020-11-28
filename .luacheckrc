@@ -7,6 +7,7 @@ exclude_files = {
 	"mods/pvp/shooter",
 	"mods/other/wield3d",
 	"mods/other/treasurer",
+	"mods/other/hudbars",
 }
 
 ignore = {"631"}
