@@ -7,3 +7,6 @@
 [submodule "mods/pvp/shooter"]
 	path = mods/pvp/shooter
 	url = https://github.com/MT-CTF/shooter
+[submodule "mods/pvp/respawn_timer"]
+	path = mods/pvp/respawn_timer
+	url = https://github.com/appgurueu/respawn_timer.git
