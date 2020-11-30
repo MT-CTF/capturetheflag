@@ -168,10 +168,10 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 		format_string_config.format_max_value = "%d"
 	end
 
-	hudtable.add_all = function(player, hudtable, start_value, start_max, start_hidden)
-		if start_value == nil then start_value = hudtable.default_start_value end
-		if start_max == nil then start_max = hudtable.default_start_max end
-		if start_hidden == nil then start_hidden = hudtable.default_start_hidden end
+	hudtable.add_all = function(player, hudtable2, start_value, start_max, start_hidden)
+		if start_value == nil then start_value = hudtable2.default_start_value end
+		if start_max == nil then start_max = hudtable2.default_start_max end
+		if start_hidden == nil then start_hidden = hudtable2.default_start_hidden end
 		local ids = {}
 		local state = {}
 		local name = player:get_player_name()
@@ -293,7 +293,7 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 	hudtable.default_start_max = default_start_max
 
 	hb.hudbars_count= hb.hudbars_count + 1
-	
+
 	hb.hudtables[identifier] = hudtable
 end
 
@@ -515,7 +515,7 @@ local function update_hud(player)
 		--air
 		local breath_max = player:get_properties().breath_max
 		local breath = player:get_breath()
-		
+
 		if breath >= breath_max and hb.settings.autohide_breath == true then
 			hb.hide_hudbar(player, "breath")
 		else
