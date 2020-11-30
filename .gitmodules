@@ -10,3 +10,9 @@
 [submodule "mods/pvp/respawn_timer"]
 	path = mods/pvp/respawn_timer
 	url = https://github.com/appgurueu/respawn_timer.git
+[submodule "mods/lib/modlib"]
+	path = mods/lib/modlib
+	url = https://github.com/appgurueu/modlib.git
+[submodule "mods/lib/hud_timers"]
+	path = mods/lib/hud_timers
+	url = https://github.com/appgurueu/hud_timers.git
