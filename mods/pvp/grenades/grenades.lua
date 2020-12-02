@@ -19,7 +19,7 @@ local fragdef = {
 
 		local player = minetest.get_player_by_name(name)
 
-		local radius = 8
+		local radius = 10
 
 		minetest.add_particlespawner({
 			amount = 20,
@@ -67,7 +67,7 @@ local fragdef = {
 
 			if hit and player and v:is_player() and v:get_hp() > 0 and hit.type == "object" and hit.ref:is_player() and
 			hit.ref:get_player_name() == v:get_player_name() then
-				v:punch(player, 2, {damage_groups = {grenade = 1, fleshy = 34 - ((25/radius) * vector.distance(pos, v:get_pos()))}}, nil)
+				v:punch(player, 2, {damage_groups = {grenade = 1, fleshy = 30 - ((radius/3) * vector.distance(pos, v:get_pos()))}}, nil)
 			end
 		end
 	end,
