@@ -115,6 +115,8 @@ end)
 minetest.register_privilege("bounty_admin")
 
 minetest.register_chatcommand("place_bounty", {
+	description = "Place a bounty on a player",
+	params = "<player name>",
 	privs = { bounty_admin = true },
 	func = function(name, target)
 		target = target:trim()
