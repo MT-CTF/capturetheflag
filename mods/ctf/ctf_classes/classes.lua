@@ -11,7 +11,7 @@ ctf_classes.register("knight", {
 		melee_bonus = 1,
 
 		initial_stuff = {
-			"default:sword_steel",
+			"ctf_classes:sword_steel",
 		},
 
 		allowed_guns = {
