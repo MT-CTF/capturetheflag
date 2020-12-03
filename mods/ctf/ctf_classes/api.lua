@@ -140,7 +140,7 @@ local function sqdist(a, b)
 	return x*x + y*y + z*z
 end
 
-local function get_flag_pos(player)
+function ctf_classes.get_flag_pos(player)
 	local tplayer = ctf.player(player:get_player_name())
 	if not tplayer or not tplayer.team then
 		return nil
@@ -162,7 +162,7 @@ function ctf_classes.can_change(player)
 		return false, "You need to wait to change classes again!"
 	end
 
-	local flag_pos = get_flag_pos(player)
+	local flag_pos = ctf_classes.get_flag_pos(player)
 	if flag_pos then
 		return sqdist(player:get_pos(), flag_pos) < 25,
 			"Move closer to the flag to change classes!"
