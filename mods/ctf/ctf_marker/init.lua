@@ -1,3 +1,5 @@
+ctf_marker = {}
+
 -- Locally cache list of team members when adding
 -- marker, because the members in the team needn't
 -- be the same within an extended duration of time
@@ -14,7 +16,9 @@ local function msg(str)
 end
 
 -- Remove waypoint element for valid players in team tname
-local function remove_marker(tname)
+function ctf_marker.remove_marker(tname)
+	if not teams[tname] then return end
+
 	for name, hud in pairs(teams[tname].players) do
 		local player = minetest.get_player_by_name(name)
 		if player then
@@ -25,7 +29,7 @@ local function remove_marker(tname)
 end
 
 -- Add waypoint element to all players in the same team as name
-local function add_marker(name, tname, pos, str)
+function ctf_marker.add_marker(name, tname, pos, str)
 	local player = minetest.get_player_by_name(name)
 	if not player then
 		return
@@ -63,7 +67,7 @@ minetest.register_globalstep(function(dtime)
 
 		-- If time > visibility_time, destroy team marker
 		if time >= visibility_time then
-			remove_marker(tname)
+			ctf_marker.remove_marker(tname)
 		end
 	end
 end)
@@ -125,10 +129,8 @@ minetest.register_chatcommand("m", {
 		str = "[" .. str .. "]"
 
 		-- Remove existing marker if it exists
-		if teams[tname] then
-			remove_marker(tname)
-		end
+		ctf_marker.remove_marker(tname)
 
-		add_marker(name, tname, minetest.get_pointed_thing_position(pointed), str)
+		ctf_marker.add_marker(name, tname, minetest.get_pointed_thing_position(pointed), str)
 	end
 })
