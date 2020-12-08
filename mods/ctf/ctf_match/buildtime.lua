@@ -70,15 +70,15 @@ minetest.register_on_punchplayer(function(_, hitter)
 end)
 
 ctf_match.register_on_build_time_start(function()
-	minetest.chat_send_all("Prepare your base! Match starts in " ..
-		ctf.setting("match.build_time") .. " seconds.")
+	minetest.chat_send_all(minetest.colorize("#9811ff", ("Prepare your base! Match starts in " ..
+		ctf.setting("match.build_time") .. " seconds.")))
 end)
 
 ctf_match.register_on_build_time_end(function()
 	if minetest.global_exists("chatplus") then
 		chatplus.log("Build time over!")
 	end
-	minetest.chat_send_all("Build time over! Attack and defend!")
+	minetest.chat_send_all(minetest.colorize("#9811ff", "Build time over! Attack and defend!"))
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf.hud:remove(player, "ctf_match:countdown")
 	end
