@@ -349,10 +349,10 @@ local function place_map(map)
 		end
 
 		minetest.after(2, function()
-			local msg = (minetest.colorize("#9811ff", "Map: ") .. minetest.colorize("#ff5811", map.name) ..
-				minetest.colorize("#9811ff", " by ") .. minetest.colorize("#ff5811", map.author))
+			local msg = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", map.name) ..
+				minetest.colorize("#fcdb05", " by ") .. minetest.colorize("#f49200", map.author))
 			if map.hint then
-				msg = msg .. "\n" .. minetest.colorize("#ffcf11", map.hint)
+				msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 			end
 			minetest.chat_send_all(msg)
 			if minetest.global_exists("irc") and irc.connected then
