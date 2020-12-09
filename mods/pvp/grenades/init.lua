@@ -135,7 +135,7 @@ function grenades.register_grenade(name, def)
 	local newdef = {}
 
 	newdef.description = def.description
-	newdef.stack_max = 1
+	newdef.stack_max = def.stack_max or 1
 	newdef.range = 0
 	newdef.inventory_image = def.image
 	newdef.on_use = function(itemstack, user, pointed_thing)
