@@ -16,8 +16,19 @@ local function do_capture(attname, flag, returned)
 			end
 		end
 
-		minetest.chat_send_all(flag_name.." has been picked up by "..
-				attname.." (team "..attacker.team..")")
+		local team_has_flag_color = "#ffffff"
+		local team_lose_flag_color = "#ffffff"
+		if attacker.team == "red" then
+			team_has_flag_color = "#ff4444"
+			team_lose_flag_color = "#4466ff"
+		end
+		if attacker.team == "blue" then
+			team_has_flag_color = "#4466ff"
+			team_lose_flag_color = "#ff4444"
+		end
+
+		minetest.chat_send_all((minetest.colorize(team_lose_flag_color, flag_name)).." has been picked up by "..
+				(minetest.colorize(team_has_flag_color, (attname.." (team "..attacker.team..")"))))
 
 		ctf.action("flag", attname .. " picked up " .. flag_name)
 
@@ -40,9 +51,19 @@ local function do_capture(attname, flag, returned)
 				return
 			end
 		end
+		local team_win_color = "#ffffff"
+		local team_lose_color = "#ffffff"
+		if attacker.team == "red" then
+			team_win_color = "#ff4444"
+			team_lose_color = "#4466ff"
+		end
+		if attacker.team == "blue" then
+			team_win_color = "#4466ff"
+			team_lose_color = "#ff4444"
+		end
 
-		minetest.chat_send_all(flag_name.." has been captured "..
-				" by "..attname.." (team "..attacker.team..")")
+		minetest.chat_send_all((minetest.colorize(team_lose_color, flag_name)).." has been captured "..
+				"by "..(minetest.colorize(team_win_color, (attname.." (team "..attacker.team..")"))))
 
 		ctf.action("flag", attname .. " captured " .. flag_name)
 

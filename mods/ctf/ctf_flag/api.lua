@@ -80,7 +80,16 @@ function ctf_flag.player_drop_flag(name)
 			ctf.hud.updateAll()
 
 			ctf.action("flag", name .. " dropped " .. flag_name)
-			minetest.chat_send_all(flag_name.." has returned.")
+
+			local flag_return_color = "#ffffff"
+			if flag_name == "red's flag" then
+			flag_return_color = "#ff4444"
+			end
+			if flag_name == "blue's flag" then
+				flag_return_color = "#4466ff"
+			end
+
+			minetest.chat_send_all(minetest.colorize(flag_return_color, (flag_name.." has returned.")))
 
 			for j = 1, #ctf_flag.registered_on_drop do
 				ctf_flag.registered_on_drop[j](name, flag)

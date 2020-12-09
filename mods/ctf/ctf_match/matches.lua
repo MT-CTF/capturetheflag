@@ -62,7 +62,14 @@ function ctf_match.check_for_winner()
 	if not game_won then
 		game_won = true
 		ctf.action("match", winner .. " won!")
-		minetest.chat_send_all(minetest.colorize("#028704", ("Team " .. winner .. " won!")))
+		local winner_color = "#ffffff"
+		if winner == "red" then
+			winner_color = "#ff4444"
+		end
+		if winner == "blue" then
+			winner_color = "#4466ff"
+		end
+		minetest.chat_send_all(minetest.colorize(winner_color, ("Team " .. winner .. " won!")))
 		for i = 1, #ctf_match.registered_on_winner do
 			ctf_match.registered_on_winner[i](winner)
 		end
@@ -99,7 +106,7 @@ ctf_flag.register_on_capture(function(attname, flag)
 	if fl_team and #fl_team.flags == 0 then
 		ctf.action("match", flag.team .. " was defeated.")
 		ctf.remove_team(flag.team)
-		minetest.chat_send_all(minetest.colorize("#028704", (flag.team .. " has been defeated!")))
+		minetest.chat_send_all(minetest.colorize("#808080", (flag.team .. " has been defeated!")))
 	end
 
 	ctf_match.check_for_winner()
