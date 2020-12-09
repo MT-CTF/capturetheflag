@@ -39,11 +39,11 @@ minetest.register_on_mods_loaded(function()
 		local pname = player:get_player_name()
 
 		if ctf_respawn_delay.players[pname] and ctf_respawn_delay.players[pname].timeleft == "waiting" then
+			ctf_respawn_delay.players[pname].timeleft = RESPAWN_DELAY
 			local pos = player:get_pos()
-			pos.y = 500
+			pos.y = ctf_map.map.h/2 + 10
 
 			player:set_pos(pos) -- Player will be stuck there because CTF 'air' is walkable
-			ctf_respawn_delay.players[pname].timeleft = RESPAWN_DELAY
 			minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
 
 			return true
@@ -62,6 +62,12 @@ function respawnfunc(pname)
 
 	if not player then
 		ctf_respawn_delay.players[pname] = nil
+		return
+	end
+
+	if type(ctf_respawn_delay.players[pname].timeleft) == "string" then
+		minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
+
 		return
 	end
 
