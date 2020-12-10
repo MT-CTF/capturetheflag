@@ -15,8 +15,7 @@ ctf_classes.register("knight", {
 		},
 
 		allowed_guns = {
-			"shooter_guns:pistol",
-			"shooter_guns:shotgun",
+			"shooter_guns:pistol"
 		},
 	},
 })
@@ -51,9 +50,9 @@ ctf_classes.register("shooter", {
 			"shooter_guns:pistol",
 			"shooter_guns:rifle",
 			"shooter_guns:machine_gun",
-			"shooter_guns:shotgun",
 			"sniper_rifles:rifle_762",
-			"sniper_rifles:rifle_magnum"
+			"sniper_rifles:rifle_magnum",
+                        "shooter_guns:shotgun"
 		},
 
 		crafting = {
@@ -82,7 +81,7 @@ ctf_classes.register("medic", {
 		initial_stuff = {
 			"ctf_bandages:bandage",
 			"ctf_classes:paxel_steel",
-			"default:cobble 99"
+			"default:cobble 99",
 		},
 
 		item_whitelist = {
