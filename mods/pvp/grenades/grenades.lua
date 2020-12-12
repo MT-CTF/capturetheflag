@@ -95,7 +95,11 @@ grenades.register_grenade("grenades:smoke", {
 		local player = minetest.get_player_by_name(pname)
 		if not player or not pos then return end
 
-		if vector.distance(pos, ctf_classes.get_flag_pos(player)) <= 15 then
+		local fpos = ctf_classes.get_flag_pos(player)
+
+		if not fpos then return end
+
+		if vector.distance(pos, fpos) <= 15 then
 			minetest.chat_send_player(pname, "You can't explode smoke grenades so close to your flag!")
 			player:get_inventory():add_item("main", "grenades:smoke")
 			return
