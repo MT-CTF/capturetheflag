@@ -66,8 +66,8 @@ local function do_capture(attname, flag, returned)
 			team_win_color = ctf_colors.colors["blue"]
 			team_lose_color = ctf_colors.colors["red"]
 		end
-		team_win_color = "#" .. tostring(team_has_flag_color):sub(3, 8)
-		team_lose_color = "#" .. tostring(team_lose_flag_color):sub(3, 8)
+		team_win_color = "#" .. tostring(team_win_color):sub(3, 8)
+		team_lose_color = "#" .. tostring(team_win_color):sub(3, 8)
 
 		minetest.chat_send_all((minetest.colorize(team_lose_color, flag_name)).." has been captured "..
 				"by "..(minetest.colorize(team_win_color, (attname.." (team "..attacker.team..")"))))
