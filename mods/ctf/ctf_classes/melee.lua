@@ -41,7 +41,7 @@ local function sword_special_timer_func(pname, timeleft)
 end
 
 minetest.register_tool("ctf_classes:sword_steel", {
-	description = "Knight's Sword\nRightclick enemies/items/air to place marker\nMark enemies to show all enemies in area",
+	description = "Knight's Sword\nSneak+Rightclick items/air to place marker\nRightclick enemies to place marker listing all enemies in area",
 	inventory_image = "default_tool_steelsword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.8,
@@ -94,6 +94,9 @@ minetest.register_tool("ctf_classes:sword_steel", {
 
 			return
 		end
+
+		-- Check if player is sneaking before placing marker
+		if not placer:get_player_control().sneak then return end
 
 		if pointed_thing.type == "node" then
 			return minetest.item_place(itemstack, placer, pointed_thing)
