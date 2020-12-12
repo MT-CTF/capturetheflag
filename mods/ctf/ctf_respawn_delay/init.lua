@@ -60,7 +60,7 @@ end)
 function respawnfunc(pname)
 	local player = minetest.get_player_by_name(pname)
 
-	if not player then
+	if not player or not ctf_respawn_delay.players[pname] then
 		ctf_respawn_delay.players[pname] = nil
 		return
 	end
