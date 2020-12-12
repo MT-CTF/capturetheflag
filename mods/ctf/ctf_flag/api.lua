@@ -83,11 +83,12 @@ function ctf_flag.player_drop_flag(name)
 
 			local flag_return_color = "#ffffff"
 			if flag_name == "red's flag" then
-			flag_return_color = "#ff4444"
+				flag_return_color = ctf_colors.colors["red"]
 			end
 			if flag_name == "blue's flag" then
-				flag_return_color = "#4466ff"
+				flag_return_color = ctf_colors.colors["blue"]
 			end
+			flag_return_color = "#" .. tostring(flag_return_color):sub(3, 8)
 
 			minetest.chat_send_all(minetest.colorize(flag_return_color, (flag_name.." has returned.")))
 
