@@ -62,14 +62,18 @@ function ctf_match.check_for_winner()
 	if not game_won then
 		game_won = true
 		ctf.action("match", winner .. " won!")
+
 		local winner_color = "#ffffff"
 		if winner == "red" then
-			winner_color = "#ff4444"
+			winner_color = ctf_colors.colors["red"]
 		end
 		if winner == "blue" then
-			winner_color = "#4466ff"
+			winner_color = ctf_colors.colors["blue"]
 		end
+		winner_color = "#" .. tostring(winner_color):sub(3, 8)
+
 		minetest.chat_send_all(minetest.colorize(winner_color, ("Team " .. winner .. " won!")))
+
 		for i = 1, #ctf_match.registered_on_winner do
 			ctf_match.registered_on_winner[i](winner)
 		end
