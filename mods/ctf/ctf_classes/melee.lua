@@ -95,12 +95,12 @@ minetest.register_tool("ctf_classes:sword_steel", {
 			return
 		end
 
-		-- Check if player is sneaking before placing marker
-		if not placer:get_player_control().sneak then return end
-
 		if pointed_thing.type == "node" then
 			return minetest.item_place(itemstack, placer, pointed_thing)
 		end
+
+		-- Check if player is sneaking before placing marker
+		if not placer:get_player_control().sneak then return end
 
 		sword_special_timer[pname] = 20
 		sword_special_timer_func(pname, 20)
