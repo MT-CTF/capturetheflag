@@ -48,7 +48,7 @@ local function bounty_player(target)
 
 	if pstat.score <= 20000 then
 		bounty_score = 50
-	elseif ((pstat.score > 20000) and (pstat.score <= 50000)) then
+	elseif pstat.score <= 50000 then
 		bounty_score = (pstat.score / pstat.deaths)
 	else
 		bounty_score = ((pstat.score * 2) / pstat.deaths)
