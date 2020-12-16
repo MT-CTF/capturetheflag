@@ -1,6 +1,7 @@
 ctf_reports = {}
 
 local storage = minetest.get_mod_storage()
+local http = minetest.request_http_api()
 
 local function get_irc_mods()
 	return storage:get_string("irc_mods"):split(",")
@@ -73,7 +74,7 @@ function ctf_reports.send_report(report)
 		end
 	end
 
-	if not minetest.global_exists("irc") then
+	if not minetest.global_exists("irc") and not http then
 		return
 	end
 
@@ -86,10 +87,27 @@ function ctf_reports.send_report(report)
 	end
 
 	-- Send to IRC moderators
-	for _, toname in pairs(get_irc_mods()) do
-		if not minetest.get_player_by_name(toname) then
-			minetest.chat_send_player(toname, msg)
+	if minetest.global_exists("irc") then
+		for _, toname in pairs(get_irc_mods()) do
+			if not minetest.get_player_by_name(toname) then
+				minetest.chat_send_player(toname, msg)
+			end
 		end
+	end
+
+	-- Send to discord
+	if http and minetest.settings:get("reports_webhook") then
+		http.fetch({
+			method = "POST",
+			url = minetest.settings:get("reports_webhook"),
+			extra_headers = {"Content-Type: application/json"},
+			timeout = 5,
+			data = minetest.write_json({
+				username = "Ingame Report",
+				avatar_url = "https://cdn.discordapp.com/avatars/447857790589992966/7ab615bae6196346bac795e66ba873dd.png",
+				content = msg,
+			}),
+		}, function() end)
 	end
 end
 
