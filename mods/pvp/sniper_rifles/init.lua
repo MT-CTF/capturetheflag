@@ -15,7 +15,7 @@ local timer = 0.2
 local scoped_hud_id = {}
 
 -- Scale constant, for crosshair. This is to ensure the crosshair will be centered.
-local scale_const = 4
+local scale_const = 6
 
 local default_physics_overrides = {
 	speed = 0.1,
