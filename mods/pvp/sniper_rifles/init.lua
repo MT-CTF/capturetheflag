@@ -11,6 +11,12 @@ local scoped = {}
 -- Timer for scope-check globalstep
 local timer = 0.2
 
+-- List of IDs for players scoped, for use in hide_scope(). NOTE: for HUD overlay
+local scoped_hud_id = {}
+
+-- Scale constant, for crosshair. This is to ensure the crosshair will be centered.
+local scale_const = 6
+
 local default_physics_overrides = {
 	speed = 0.1,
 	jump = 0
@@ -27,10 +33,19 @@ local function show_scope(name, item_name, fov_mult)
 	end
 
 	scoped[name] = item_name
+	scoped_hud_id[name] = player:hud_add({
+		hud_elem_type = "image",
+		position = {x = 0.5, y = 0.5},
+		offset = {x = (-65*scale_const)/2, y = (-65*scale_const)/2},
+		text = "rifle_crosshair.png",
+		scale = {x = scale_const, y = scale_const},
+		alignment = {x = 1, y = 1},
+	})
 	-- e.g. if fov_mult == 8, then FOV = 1/8 * current_FOV, a.k.a 8x zoom
 	player:set_fov(1 / fov_mult, true)
 	physics.set(name, "sniper_rifles:scoping", rifles[item_name].physics_overrides)
 	player:hud_set_flags({ wielditem = false })
+
 end
 
 local function hide_scope(name)
@@ -40,9 +55,12 @@ local function hide_scope(name)
 	end
 
 	scoped[name] = nil
+	player:hud_remove(scoped_hud_id[name])
+	scoped_hud_id[name] = nil
 	player:set_fov(0)
 	physics.remove(name, "sniper_rifles:scoping")
 	player:hud_set_flags({ wielditem = true })
+
 end
 
 local function on_use(stack, user, pointed)
