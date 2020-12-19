@@ -335,7 +335,7 @@ local function place_map(map)
 		local res = minetest.place_schematic(map.pos1, schempath,
 				map.rotation == "z" and "0" or "90")
 
-		assert(res)
+		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 
 		for _, value in pairs(ctf_map.map.teams) do
 			ctf_map.place_base(value.color, value.pos)
