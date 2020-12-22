@@ -201,6 +201,7 @@ function ctf.join(name, team, force, by)
 		end
 	end
 
+	local prevteam = player.team
 	player.team = team
 	team_data.players[player.name] = player
 	ctf.player_last_team[name] = team
@@ -221,7 +222,7 @@ function ctf.join(name, team, force, by)
 	minetest.log("action", name .. " joined team " .. team)
 
 	for i = 1, #ctf.registered_on_join_team do
-		ctf.registered_on_join_team[i](name, team)
+		ctf.registered_on_join_team[i](name, team, prevteam)
 	end
 	return true
 end

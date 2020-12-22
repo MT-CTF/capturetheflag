@@ -210,9 +210,13 @@ function ctf_stats.is_pro(name)
 	return stats.score >= 10000 and kd >= 1.5
 end
 
-ctf.register_on_join_team(function(name, tname)
+ctf.register_on_join_team(function(name, tname, oldteam)
 	if not ctf_stats.current[tname] then
 		ctf_stats.current[tname] = {}
+	end
+
+	if oldteam and ctf_stats.current[oldteam] then
+		ctf_stats.current[oldteam][name] = nil
 	end
 
 	ctf_stats.current[tname][name] = ctf_stats.current[tname][name] or {
