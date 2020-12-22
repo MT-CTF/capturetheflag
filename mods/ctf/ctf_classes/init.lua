@@ -48,9 +48,17 @@ minetest.register_chatcommand("class", {
 	end
 })
 
-ctf_colors.set_skin = function(player, color)
-	ctf_classes.set_skin(player, color, ctf_classes.get(player))
+local old_set_skin = ctf_colors.set_skin
+ctf_colors.set_skin = function(player, color, ...)
+	if color == "blue" or color == "red" then
+		player:set_properties({
+			textures = {"ctf_classes_skin_" .. ctf_classes.get(player).name .. "_" .. (color or "blue") .. ".png"}
+		})
+	elseif color then
+		old_set_skin(player, color, ...)
+	end
 end
+ctf_classes.set_skin = ctf_colors.set_skin
 
 ctf_classes.register_on_changed(function(player, old, new)
 	if not old then

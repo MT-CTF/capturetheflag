@@ -211,6 +211,10 @@ function ctf_stats.is_pro(name)
 end
 
 ctf.register_on_join_team(function(name, tname)
+	if not ctf_stats.current[tname] then
+		ctf_stats.current[tname] = {}
+	end
+
 	ctf_stats.current[tname][name] = ctf_stats.current[tname][name] or {
 		kills = 0,
 		kills_since_death = 0,
@@ -226,16 +230,16 @@ ctf_stats.winner_team = "-"
 ctf_stats.winner_player = "-"
 
 table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
-    local score = 0
-    for i, pstat in pairs(ctf_stats.current.red) do
+	local score = 0
+	for i, pstat in pairs(ctf_stats.current.red) do
 		score = score + pstat.score
 	end
-    for i, pstat in pairs(ctf_stats.current.blue) do
+	for i, pstat in pairs(ctf_stats.current.blue) do
 		score = score + pstat.score
 	end
-    local capturereward = math.floor(score * 10) / 100
-    if capturereward < 50 then capturereward = 50 end
-    if capturereward > 750 then capturereward = 750 end
+	local capturereward = math.floor(score * 10) / 100
+	if capturereward < 50 then capturereward = 50 end
+	if capturereward > 750 then capturereward = 750 end
 
 	local main, match = ctf_stats.player(name)
 	if main and match then

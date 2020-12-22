@@ -75,7 +75,7 @@ minetest.register_chatcommand("team", {
 					string.match(create, "([%a%b_]-)")
 					and create ~= ""
 					and create ~= nil
-					and ctf.team({name=create, add_team=true})
+					and ctf.team({name=create, add_team=true, color=create, allow_joins=false})
 				) then
 					return true, "Added team '"..create.."'"
 				else

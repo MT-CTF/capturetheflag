@@ -116,6 +116,8 @@ function ctf.chat_send_team(team, msg)
 		team = ctf.team(team)
 	end
 
+	if not team then return end
+
 	for pname, _ in pairs(team.players) do
 		minetest.chat_send_player(pname, msg)
 	end
@@ -421,6 +423,7 @@ minetest.register_on_joinplayer(function(player)
 
 	local name = player:get_player_name()
 	if ctf.team(ctf.player(name).team) then
+		minetest.log("action", name.." already in team so not allocating")
 		return
 	end
 

@@ -11,6 +11,9 @@ local function regen_update()
 		local pname = player:get_player_name()
 		local class = get(player)
 		local tname = ctf.player(pname).team
+
+		if medic_by_team[tname] == nil then return end
+
 		tnames[pname] = tname
 		if class.properties.nearby_hpregen then
 			if tname then
