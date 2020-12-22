@@ -68,7 +68,7 @@ function ctf_reports.send_report(report)
 
 	for _, player in pairs(minetest.get_connected_players()) do
 		local toname = player:get_player_name()
-		if minetest.check_player_privs(toname, { kick = true, ban = true }) then
+		if minetest.check_player_privs(toname, { kick = true}) then
 			table.insert(mods, toname)
 			minetest.chat_send_player(toname, ingame_report)
 		end

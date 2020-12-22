@@ -36,7 +36,7 @@ minetest.register_chatcommand("vote_kick", {
 			return false, "There is no player called '" .. param .. "'"
 		end
 
-		if minetest.check_player_privs(param, {kick = true, ban = true}) then
+		if minetest.check_player_privs(param, {kick = true}) then
 			return false, param .. " is a moderator, and can't be kicked!"
 		end
 
@@ -93,7 +93,7 @@ minetest.register_chatcommand("vote_kick", {
 minetest.register_chatcommand("unblock", {
 	params = "<name>",
 	description = "Unblock a vote-kicked player before the cooldown expires",
-	privs = {kick = true, ban = true},
+	privs = {kick = true},
 	func = function(name, param)
 		param = param:trim()
 		if param == "" then
