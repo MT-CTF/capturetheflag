@@ -376,6 +376,8 @@ end
 local function calculateKillReward(victim, killer)
 	local vmain, victim_match = ctf_stats.player(victim)
 
+	if not vmain or not victim_match then return end
+
 	-- +5 for every kill they've made since last death in this match.
 	local reward = victim_match.kills_since_death * 5
 	ctf.log("ctf_stats", "Player " .. victim .. " has made " .. reward ..
