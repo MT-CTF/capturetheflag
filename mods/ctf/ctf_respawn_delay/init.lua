@@ -57,6 +57,21 @@ minetest.register_on_mods_loaded(function()
 	end)
 end)
 
+function ctf_respawn_delay.respawnplayer(name)
+	local player = minetest.get_player_by_name(name)
+
+	if not player then return end
+
+	player:hud_remove(ctf_respawn_delay.players[name].hudid)
+	player:set_properties({hp_max = ctf_respawn_delay.players[name].old_max})
+	player:set_hp(ctf_respawn_delay.players[name].old_max)
+	ctf_respawn_delay.players[name] = nil
+
+	for k, func in ipairs(ctf_respawn_delay.registered_on_respawnplayers) do
+		func(player)
+	end
+end
+
 function respawnfunc(pname)
 	local player = minetest.get_player_by_name(pname)
 
@@ -79,13 +94,12 @@ function respawnfunc(pname)
 
 		minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
 	else
-		player:hud_remove(ctf_respawn_delay.players[pname].hudid)
-		player:set_properties({hp_max = ctf_respawn_delay.players[pname].old_max})
-		player:set_hp(ctf_respawn_delay.players[pname].old_max)
-		ctf_respawn_delay.players[pname] = nil
-
-		for k, func in ipairs(ctf_respawn_delay.registered_on_respawnplayers) do
-			func(player)
-		end
+		ctf_respawn_delay.respawnplayer(pname)
 	end
 end
+
+ctf_match.register_on_new_match(function()
+	for name in pairs(ctf_respawn_delay.players) do
+		ctf_respawn_delay.respawnplayer(name)
+	end
+end)
