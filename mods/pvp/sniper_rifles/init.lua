@@ -22,6 +22,13 @@ local default_physics_overrides = {
 	jump = 0
 }
 
+-- Fix crosshair still showing after death with a simple check
+minetest.register_on_dieplayer(function(player)
+	if scoped_hud_id[player:get_player_name()] then
+		scoped_hud_id[player:get_player_name()] = nil
+	end
+end)
+
 -------------
 -- Helpers --
 -------------
