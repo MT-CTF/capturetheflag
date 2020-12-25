@@ -116,6 +116,8 @@ function ctf.chat_send_team(team, msg)
 		team = ctf.team(team)
 	end
 
+	if not team then return end
+
 	for pname, _ in pairs(team.players) do
 		minetest.chat_send_player(pname, msg)
 	end
@@ -199,6 +201,7 @@ function ctf.join(name, team, force, by)
 		end
 	end
 
+	local prevteam = player.team
 	player.team = team
 	team_data.players[player.name] = player
 	ctf.player_last_team[name] = team
@@ -219,7 +222,7 @@ function ctf.join(name, team, force, by)
 	minetest.log("action", name .. " joined team " .. team)
 
 	for i = 1, #ctf.registered_on_join_team do
-		ctf.registered_on_join_team[i](name, team)
+		ctf.registered_on_join_team[i](name, team, prevteam)
 	end
 	return true
 end
@@ -421,6 +424,7 @@ minetest.register_on_joinplayer(function(player)
 
 	local name = player:get_player_name()
 	if ctf.team(ctf.player(name).team) then
+		minetest.log("action", name.." already in team so not allocating")
 		return
 	end
 

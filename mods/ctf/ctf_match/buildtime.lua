@@ -89,6 +89,8 @@ ctf_flag.register_on_prepick_up(function(name, flag)
 		minetest.chat_send_player(name, "Match hasn't started yet!")
 		ctf.move_to_spawn(name)
 		return false
+	elseif not ctf.get_spawn(ctf.player(name).team) then
+		return false
 	else
 		return true
 	end

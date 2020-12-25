@@ -52,12 +52,6 @@ function ctf_classes.register_on_changed(func)
 	table.insert(registered_on_changed, func)
 end
 
-function ctf_classes.set_skin(player, color, class)
-	player:set_properties({
-		textures = {"ctf_classes_skin_" .. class.name .. "_" .. (color or "blue") .. ".png"}
-	})
-end
-
 function ctf_classes.get(player)
 	if type(player) == "string" then
 		player = minetest.get_player_by_name(player)

@@ -51,7 +51,7 @@ end
 local game_won = false
 function ctf_match.check_for_winner()
 	local winner
-	for name, team in pairs(ctf.teams) do
+	for name, team in pairs({red = ctf.teams.red, blue = ctf.teams.blue}) do
 		if winner then
 			return
 		end

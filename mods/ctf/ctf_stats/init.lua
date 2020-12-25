@@ -210,7 +210,15 @@ function ctf_stats.is_pro(name)
 	return stats.score >= 10000 and kd >= 1.5
 end
 
-ctf.register_on_join_team(function(name, tname)
+ctf.register_on_join_team(function(name, tname, oldteam)
+	if not ctf_stats.current[tname] then
+		ctf_stats.current[tname] = {}
+	end
+
+	if oldteam and ctf_stats.current[oldteam] then
+		ctf_stats.current[oldteam][name] = nil
+	end
+
 	ctf_stats.current[tname][name] = ctf_stats.current[tname][name] or {
 		kills = 0,
 		kills_since_death = 0,
@@ -226,16 +234,16 @@ ctf_stats.winner_team = "-"
 ctf_stats.winner_player = "-"
 
 table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
-    local score = 0
-    for i, pstat in pairs(ctf_stats.current.red) do
+	local score = 0
+	for i, pstat in pairs(ctf_stats.current.red) do
 		score = score + pstat.score
 	end
-    for i, pstat in pairs(ctf_stats.current.blue) do
+	for i, pstat in pairs(ctf_stats.current.blue) do
 		score = score + pstat.score
 	end
-    local capturereward = math.floor(score * 10) / 100
-    if capturereward < 50 then capturereward = 50 end
-    if capturereward > 750 then capturereward = 750 end
+	local capturereward = math.floor(score * 10) / 100
+	if capturereward < 50 then capturereward = 50 end
+	if capturereward > 750 then capturereward = 750 end
 
 	local main, match = ctf_stats.player(name)
 	if main and match then
@@ -367,6 +375,8 @@ end
 
 local function calculateKillReward(victim, killer)
 	local vmain, victim_match = ctf_stats.player(victim)
+
+	if not vmain or not victim_match then return 5 end
 
 	-- +5 for every kill they've made since last death in this match.
 	local reward = victim_match.kills_since_death * 5
