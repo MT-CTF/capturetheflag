@@ -63,7 +63,7 @@ local function hide_scope(name)
 
 end
 
--- Fix crosshair still showing after death with a simple check
+-- Be absolutely certain crosshair HUD gets removed on death
 minetest.register_on_dieplayer(function(player)
 	if scoped_hud_id[player:get_player_name()] then
 		hide_scope(player:get_player_name())
@@ -97,7 +97,7 @@ local function on_rclick(item, placer, pointed_thing)
 end
 
 ------------------
--- Sccope-check --
+-- Scope-check --
 ------------------
 
 -- Hide scope if currently wielded item is not the same item
