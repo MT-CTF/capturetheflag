@@ -373,7 +373,7 @@ local function invHasGoodWeapons(inv)
 	return false
 end
 
-local function calculateKillReward(victim, killer)
+local function calculateKillReward(victim, killer, toolcaps)
 	local vmain, victim_match = ctf_stats.player(victim)
 
 	if not vmain or not victim_match then return 5 end
@@ -401,9 +401,13 @@ local function calculateKillReward(victim, killer)
 		reward = 5
 	end
 
-	-- Half if no good weapons
+	-- Half if no good weapons, +50% if combat logger
 	local inv = minetest.get_inventory({ type = "player", name = victim })
-	if not invHasGoodWeapons(inv) then
+
+	if toolcaps.damage_groups.combat_log == 1 then
+		ctf.log("ctf_stats", "Player " .. victim .. " is a combat logger")
+		reward = reward * 1.5
+	elseif not invHasGoodWeapons(inv) then
 		ctf.log("ctf_stats", "Player " .. victim .. " has no good weapons")
 		reward = reward * 0.5
 	else
@@ -413,14 +417,14 @@ local function calculateKillReward(victim, killer)
 	return reward
 end
 
-ctf.register_on_killedplayer(function(victim, killer)
+ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 	-- Suicide is not encouraged here at CTF
 	if victim == killer then
 		return
 	end
 	local main, match = ctf_stats.player(killer)
 	if main and match then
-		local reward = calculateKillReward(victim, killer)
+		local reward = calculateKillReward(victim, killer, toolcaps)
 		main.kills  = main.kills  + 1
 		main.score  = main.score  + reward
 		match.kills = match.kills + 1
