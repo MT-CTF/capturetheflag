@@ -63,6 +63,13 @@ local function hide_scope(name)
 
 end
 
+-- Be absolutely certain crosshair HUD gets removed on death
+minetest.register_on_dieplayer(function(player)
+	if scoped_hud_id[player:get_player_name()] then
+		hide_scope(player:get_player_name())
+	end
+end)
+
 local function on_use(stack, user, pointed)
 	if scoped[user:get_player_name()] then
 		-- shooter checks for the return value of def.on_use, and executes
@@ -90,7 +97,7 @@ local function on_rclick(item, placer, pointed_thing)
 end
 
 ------------------
--- Sccope-check --
+-- Scope-check --
 ------------------
 
 -- Hide scope if currently wielded item is not the same item
