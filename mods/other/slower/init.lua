@@ -1,4 +1,4 @@
-minetest.register_node("ctf_slow:cobweb", {
+minetest.register_node("slower:cobweb", {
     description = "Sticky Cobweb",
     drawtype = "plantlike",
     tiles = {"cobweb.png"},
@@ -10,7 +10,7 @@ minetest.register_node("ctf_slow:cobweb", {
     buildable_to = false,
 })
 
-minetest.register_node("ctf_slow:quicksand", {
+minetest.register_node("slower:quicksand", {
 	description = "Quicksand",
     tiles = {"quicksand.png"},
     inventory_image = "cobweb.png",
@@ -47,13 +47,13 @@ minetest.register_globalstep(function(dtime)
         local node_below = minetest.get_node({x = pos.x, y = pos.y - 1, z = pos.z})
         local node_feet = minetest.get_node({x = pos.x, y = pos.y, z = pos.z})
         local node_head = minetest.get_node({x = pos.x, y = pos.y + 1, z = pos.z})
-        if node_below.name == "ctf_slow:quicksand" then
+        if node_below.name == "slower:quicksand" then
             physics.set(name, "quicksand", quicksand_modifier)
         else
             physics.remove(name, "quicksand")
         end
 
-        if node_feet.name == "ctf_slow:cobweb" or node_head.name == "ctf_slow:cobweb" then
+        if node_feet.name == "slower:cobweb" or node_head.name == "slower:cobweb" then
             physics.set(name, "cobweb", cobweb_modifier)
         else
             physics.remove(name, "cobweb")
