@@ -46,6 +46,23 @@ local function start_healing(stack, player)
 	return stack
 end
 
+
+-- Interrupt reason can be:
+-- damage: get damage from another player
+-- move: move more then 1m
+-- die: die because any reason
+local function reason_handler(reason)
+	if reason == "damage" then
+		return " because someone damaged you!"
+	elseif reason == "move" then
+		return " because you moved!"
+	elseif reason == "die" then
+		return "because you died!"
+	else
+		return "!"
+	end
+end
+
 -- Called after regen is complete. Remove additional effects
 -- If interrupted == true, revert to original HP and give back one medkit.
 local function stop_healing(player, interrupted)
@@ -55,7 +72,7 @@ local function stop_healing(player, interrupted)
 	players[name] = nil
 	if interrupted then
 		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-			"Your healing was interrupted!"))
+			"Your healing was interrupted"..reason_handler(interrupted)))
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end
@@ -92,7 +109,7 @@ minetest.register_globalstep(function(dtime)
 			-- allow players to manually interrupt healing if necessary
 			local pos = player:get_pos()
 			if vector.distance(pos, info.pos) >= 1 then
-				stop_healing(player, true)
+				stop_healing(player, "move")
 			end
 
 			-- Stop healing if target reached
@@ -115,12 +132,12 @@ end)
 minetest.register_on_player_hpchange(function(player, hp, reason)
 	if hp < 0 then
 		if players[player:get_player_name()] then
-			stop_healing(player, true)
+			stop_healing(player, "die")
 		end
 		if reason and reason.type == "punch" then
 			local hitter = reason.object
 			if hitter and players[hitter:get_player_name()] then
-				stop_healing(hitter, true)
+				stop_healing(hitter, "damage")
 			end
 		end
 	end
