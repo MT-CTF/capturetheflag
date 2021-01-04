@@ -1,4 +1,4 @@
--- Code by Apelta. Mutelated by Lone_Wolf
+-- Code by Apelta. Mutelated by Lone_Wolf. Mutelated again by Apelta.
 
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if not digger:is_player() then return end
@@ -12,7 +12,9 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 
 			if math.floor(player_pos.y) == pos.y and vector.distance(player_pos, pos) <= 1.5 then
 				minetest.set_node(pos, oldnode)
-				digger:get_inventory():remove_item("main", ItemStack(oldnode))
+				for _, item in pairs(minetest.get_node_drops(oldnode)) do -- Properly remove items dropped by nodes, now also protects against possible crash by nodes dropping more than one item.
+					digger:get_inventory():remove_item("main", ItemStack(item))
+				end
 				minetest.chat_send_player(dname, "You can't mine blocks under your teammates!")
 				return
 			end
