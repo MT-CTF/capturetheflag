@@ -36,6 +36,7 @@ local function return_as_chat_result(to, target)
 
 	if stat then
 		local kd = stat.kills
+		local cr = stat.captures / stat.attempts
 		if stat.deaths > 1 then
 			kd = kd / stat.deaths
 		end
@@ -46,6 +47,7 @@ local function return_as_chat_result(to, target)
 			"\nBounty kills: " .. stat.bounty_kills ..
 			" | Captures: " .. stat.captures ..
 			" | Attempts: " .. stat.attempts ..
+			"\nCapture rate: " .. math.floor(cr * 100) .. "%" ..
 			"\nScore: " .. math.floor(stat.score)
 	end
 	return result
