@@ -152,7 +152,7 @@ local function remove_pillar(pos, pname)
 
 	if name:find("default") and isdiggable(name) then
 		local player = minetest.get_player_by_name(pname)
-		if isSabotage(pos, minetest.get_node(pos), player) then return end -- Fix paxel being capable of mining blocks under teammates
+		if antisabotage.is_sabotage(pos, minetest.get_node(pos), player) then return end -- Fix paxel being capable of mining blocks under teammates
 
 		minetest.dig_node(pos)
 
