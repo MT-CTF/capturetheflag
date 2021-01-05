@@ -52,15 +52,15 @@ end
 -- move: move more then 1m
 -- die: die because any reason
 local function reason_handler(reason)
-	if reason == "damage" then
-		return " because someone damaged you!"
+	if reason == "attack" then
+		return " because you attacked other player!"
 	elseif reason == "move" then
 		return " because you moved!"
 	elseif reason == "die" then
 		return " because you died!"
 	else
 		return "!"
-	end
+	end 
 end
 
 -- Called after regen is complete. Remove additional effects
@@ -132,12 +132,12 @@ end)
 minetest.register_on_player_hpchange(function(player, hp, reason)
 	if hp < 0 then
 		if players[player:get_player_name()] then
-			stop_healing(player, "die")
+			stop_healing(player, "damage")
 		end
 		if reason and reason.type == "punch" then
 			local hitter = reason.object
 			if hitter and players[hitter:get_player_name()] then
-				stop_healing(hitter, "damage")
+				stop_healing(hitter, "attack")
 			end
 		end
 	end
