@@ -20,7 +20,6 @@ function isSabotage(pos, oldnode, digger) -- used for paxel, hence why it is now
 	end
 end
 
-
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if not digger:is_player() then return end
 	isSabotage(pos, oldnode, digger)
