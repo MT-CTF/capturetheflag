@@ -1,6 +1,7 @@
 -- Code by Apelta. Mutelated by Lone_Wolf. Mutelated again by Apelta.
+antisabotage = {}
 
-function isSabotage(pos, oldnode, digger) -- used for paxel, hence why it is now a separate function
+function antisabotage.is_sabotage(pos, oldnode, digger) -- used for paxel, hence why it is now a separate function
 	local dname = digger:get_player_name()
 	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
@@ -20,7 +21,8 @@ function isSabotage(pos, oldnode, digger) -- used for paxel, hence why it is now
 	end
 end
 
+
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if not digger:is_player() then return end
-	isSabotage(pos, oldnode, digger)
+	antisabotage.is_sabotage(pos, oldnode, digger)
 end)
