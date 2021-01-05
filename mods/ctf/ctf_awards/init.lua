@@ -50,8 +50,8 @@ minetest.register_on_dieplayer(function(ObjectRef, reason)
 end)
 
 awards.register_award("award_lumberjack", {
-  title = S("Lumberjack"),
-  description = S("Dig 36 tree blocks."),
+  title = "Lumberjack",
+  description = "Dig 36 tree blocks.",
   icon = "awards_lumberjack.png",
   difficulty = 0.03,
   trigger = {
@@ -62,8 +62,8 @@ awards.register_award("award_lumberjack", {
 })
 
 awards.register_award("award_junglebaby", {
-  title = S("Junglebaby"),
-  description = S("Dig 36 jungle tree blocks."),
+  title = "Junglebaby",
+  description = "Dig 36 jungle tree blocks.",
   icon = "awards_junglebaby.png",
   difficulty = 0.05,
   trigger = {
@@ -74,8 +74,8 @@ awards.register_award("award_junglebaby", {
 })
 
 awards.register_award("award_mine2", {
-  title = S("Mini Miner"),
-  description = S("Dig 100 stone blocks."),
+  title = "Mini Miner",
+  description = "Dig 100 stone blocks.",
   icon = "awards_mini_miner.png^awards_level1.png",
   background = "awards_bg_mining.png",
   difficulty = 0.02,
