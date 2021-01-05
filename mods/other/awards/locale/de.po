@@ -1,0 +1,824 @@
+# German translations for PACKAGE package.
+# Copyright (C) 2017 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Wuzzy2, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-02-21 05:35-0300\n"
+"PO-Revision-Date: 2017-02-21 04:19-0300\n"
+"Last-Translator: Wuzzy2\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: api.lua
+msgid "Secret Achievement Unlocked:"
+msgstr "Geheime Auszeichnung erhalten:"
+
+#: api.lua
+msgid "Achievement Unlocked:"
+msgstr "Auszeichnung erhalten:"
+
+#: api.lua
+#, lua-format
+msgid "Secret Achievement Unlocked: %s"
+msgstr "Geheime Auszeichnung erhalten: %s"
+
+#: api.lua
+#, lua-format
+msgid "Achievement Unlocked: %s"
+msgstr "Auszeichnung erhalten: %s"
+
+#: api.lua
+msgid "Secret Achievement Unlocked!"
+msgstr "Geheime Auszeichnung erhalten!"
+
+#: api.lua
+msgid "Achievement Unlocked!"
+msgstr "Auszeichnung erhalten:"
+
+#: api.lua
+msgid "Error: No awards available."
+msgstr "Fehler: Keine Auszeichnungen vorhanden."
+
+#: api.lua
+msgid "OK"
+msgstr "OK"
+
+#: api.lua
+msgid "(Secret Award)"
+msgstr "(Geheime Auszeichnung)"
+
+#: api.lua
+msgid "Unlock this award to find out what it is."
+msgstr "Verdienen Sie sich diese Auszeichnung, um herauszufinden, was sie ist."
+
+#: api.lua
+#, lua-format
+msgid "%s (got)"
+msgstr "%s (erhalten)"
+
+#: api.lua
+msgid "You've disabled awards. Type /awards enable to reenable."
+msgstr ""
+"Sie haben die Auszeichnungen deaktiviert. Geben Sie »/awards enable« ein, um "
+"sie wieder zu aktivieren."
+
+#: api.lua
+msgid "You have not unlocked any awards."
+msgstr "Sie haben noch keine Auszeichnungen."
+
+#: api.lua
+#, lua-format
+msgid "%s’s awards:"
+msgstr "%ss Auszeichnungen:"
+
+#: api.lua chat_commands.lua
+#, lua-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: sfinv.lua unified_inventory.lua
+msgid "Awards"
+msgstr "Auszeichnungen"
+
+#: triggers.lua
+msgid "@1/@2 dug"
+msgstr "@1/@2 abgebaut"
+
+#. Translators: @1 is count, @2 is description.
+#: triggers.lua
+msgid "Mine: @2"
+msgid_plural "Mine: @1×@2"
+msgstr[0] "Bauen Sie einen Block ab: @2"
+msgstr[1] "Bauen Sie Blöcke ab: @1×@2"
+
+#: triggers.lua
+msgid "Mine @1 block."
+msgid_plural "Mine @1 blocks."
+msgstr[0] "Bauen Sie einen @1 Block ab."
+msgstr[1] "Bauen Sie @1 Blöcke ab."
+
+#: triggers.lua
+msgid "@1/@2 placed"
+msgstr "@1/@2 platziert"
+
+#. Translators: @1 is count, @2 is description.
+#: triggers.lua
+msgid "Place: @2"
+msgid_plural "Place: @1×@2"
+msgstr[0] "Platzieren Sie einen Block: @2"
+msgstr[1] "Platzieren Sie Blöcke: @1×@2"
+
+#: triggers.lua
+msgid "Place a block."
+msgid_plural "Place @1 blocks."
+msgstr[0] "Platzieren Sie einen Block."
+msgstr[1] "Platzieren Sie @1 Blöcke."
+
+#: triggers.lua
+msgid "@1/@2 eaten"
+msgstr "@1/@2 gegessen"
+
+#. Translators: @1 is count, @2 is description.
+#: triggers.lua
+msgid "Eat: @2"
+msgid_plural "Eat: @1×@2"
+msgstr[0] "Essen Sie: @2"
+msgstr[1] "Essen Sie: @1×@2"
+
+#: triggers.lua
+msgid "Eat an item."
+msgid_plural "Eat @1 items."
+msgstr[0] ""
+msgstr[1] ""
+
+#: triggers.lua
+msgid "@1/@2 deaths"
+msgstr "@1/@2 Tode"
+
+#: triggers.lua
+msgid "Die."
+msgid_plural "Die @1 times."
+msgstr[0] "Sterben Sie."
+msgstr[1] "Sterben Sie @1 mal."
+
+#: triggers.lua
+msgid "@1/@2 chat messages"
+msgstr "@1/@2 Chatnachrichten"
+
+#: triggers.lua
+msgid "Write something in chat."
+msgid_plural "Write @1 chat messages."
+msgstr[0] "Schreiben Sie etwas im Chat."
+msgstr[1] "Schreiben Sie @1 Chatnachrichten."
+
+#: triggers.lua
+msgid "@1/@2 game joins"
+msgstr "@1/@2 Spielen beigetreten"
+
+#: triggers.lua
+msgid "Join the game."
+msgid_plural "Join the game @1 times."
+msgstr[0] "Treten Sie dem Spiel bei."
+msgstr[1] "Treten Sie dem Spiel @1 mal bei."
+
+#: triggers.lua
+msgid "@1/@2 crafted"
+msgstr "@1/@2 gefertigt"
+
+#. Translators: @1 is count, @2 is description.
+#: triggers.lua
+msgid "Craft: @2"
+msgid_plural "Craft: @1×@2"
+msgstr[0] "Fertigen Sie an: @2"
+msgstr[1] "Fertigen Sie an: @1×@2"
+
+#: triggers.lua
+msgid "Craft an item."
+msgid_plural "Craft @1 items."
+msgstr[0] ""
+msgstr[1] ""
+
+#: init.lua
+msgid "Saint-Maclou"
+msgstr "Saint-Maclou"
+
+#: init.lua
+msgid "Place 20 coal checkers."
+msgstr "Platzieren Sie 20 Kohlenschachbrettmuster."
+
+#: init.lua
+msgid "Castorama"
+msgstr "Gießmeister"
+
+#: init.lua
+msgid "Place 20 iron checkers."
+msgstr "Platzieren Sie 20 Eisenschachbrettmuster."
+
+#: init.lua
+msgid "Sam the Trapper"
+msgstr "Sam der Fallensteller"
+
+#: init.lua
+msgid "Place 2 trap stones."
+msgstr "Platzieren Sie 2 Fallensteine."
+
+#: init.lua
+msgid "Backpacker"
+msgstr "Rucksacktourist"
+
+#: init.lua
+msgid "Craft 4 large bags."
+msgstr "Fertigen Sie 4 große Taschen."
+
+#: init.lua
+msgid "Pyromaniac"
+msgstr "Pyromane"
+
+#: init.lua
+msgid "Craft 8 times flint and steel."
+msgstr "Fertigen Sie 8 mal einen Feuerstein und Stahl an."
+
+#: init.lua
+msgid "Firefighter"
+msgstr "Feuerwehr"
+
+#: init.lua
+msgid "Put out 1000 fires."
+msgstr "Löschen Sie 1000 Flammen."
+
+#: init.lua
+msgid "Light It Up"
+msgstr "Licht an!"
+
+#: init.lua
+msgid "Place 100 torches."
+msgstr "Platzieren Sie 100 Fackeln."
+
+#: init.lua
+msgid "Well Lit"
+msgstr "Gut ausgeleuchtet"
+
+#: init.lua
+msgid "Place 1,000 torches."
+msgstr "Platzieren Sie 1000 Fackeln."
+
+#: init.lua
+msgid "Really Well Lit"
+msgstr "Sehr gute Beleuchtung"
+
+#: init.lua
+msgid "Craft 10 mese lamps."
+msgstr "Fertigen Sie 10 Meselampen."
+
+#: init.lua
+msgid "Outpost"
+msgstr "Außenposten"
+
+#: init.lua
+msgid "Craft 200 stone bricks."
+msgstr "Fertigen Sie 200 Steinziegel."
+
+#: init.lua
+msgid "Watchtower"
+msgstr "Wachturm"
+
+#: init.lua
+msgid "Craft 800 stone bricks."
+msgstr "Fertigen Sie 800 Steinziegel an."
+
+#: init.lua
+msgid "Fortress"
+msgstr "Burg"
+
+#: init.lua
+msgid "Craft 3,200 stone bricks."
+msgstr "Fertigen Sie 3200 Steinziegel."
+
+#: init.lua
+msgid "Desert Dweller"
+msgstr "Wüstenbewohner"
+
+#: init.lua
+msgid "Craft 400 desert stone bricks."
+msgstr "Fertigen Sie 400 Wüstensteinziegel."
+
+#: init.lua
+msgid "Pharaoh"
+msgstr "Pharao"
+
+#: init.lua
+msgid "Craft 100 sandstone bricks."
+msgstr "Fertigen Sie 100 Sandsteinziegel."
+
+#: init.lua
+msgid "Little Library"
+msgstr "Kleine Bücherei"
+
+#: init.lua
+msgid "Craft 7 bookshelves."
+msgstr "Fertigen Sie 7 Bücherregale."
+
+#: init.lua
+msgid "Lava and Water"
+msgstr "Lava und Wasser"
+
+#: init.lua
+msgid "Mine your first obsidian."
+msgstr "Bauen Sie Ihr erstes Obsidian ab."
+
+#: init.lua
+msgid "Obsessed with Obsidian"
+msgstr "Von Obsidian besessen"
+
+#: init.lua
+msgid "Mine 50 obsidian."
+msgstr "Bauen Sie 50 Obsidian ab."
+
+#: init.lua
+msgid "Lava Miner"
+msgstr "Lavagräber"
+
+#: init.lua
+msgid "Mine any block while being very close to lava."
+msgstr ""
+"Bauen Sie einen beliebigen Block ab, während Sie sehr nahe an der Lava "
+"stehen."
+
+#: init.lua
+msgid "On The Way"
+msgstr "Auf dem Weg"
+
+#: init.lua
+msgid "Place 100 rails."
+msgstr "Platzieren Sie 100 Gleise."
+
+#: init.lua
+msgid "First Day in the Woods"
+msgstr "Erster Tag im Wald"
+
+#: init.lua
+msgid "Dig 6 tree blocks."
+msgstr "Bauen Sie 6 Baumblöcke ab."
+
+#: init.lua
+msgid "Lumberjack"
+msgstr "Holzfäller"
+
+#: init.lua
+msgid "Dig 36 tree blocks."
+msgstr "Bauen Sie 36 Baumblöcke ab."
+
+#: init.lua
+msgid "Semi-pro Lumberjack"
+msgstr "Fortgeschrittener Holzfäller"
+
+#: init.lua
+msgid "Dig 216 tree blocks."
+msgstr "Bauen Sie 216 Baumblöcke ab."
+
+#: init.lua
+msgid "Professional Lumberjack"
+msgstr "Profiholzfäller"
+
+#: init.lua
+msgid "Dig 1,296 tree blocks."
+msgstr "Bauen Sie 1296 Baumblöcke ab."
+
+#: init.lua
+msgid "Junglebaby"
+msgstr "Dschungelbaby"
+
+#: init.lua
+msgid "Dig 100 jungle tree blocks."
+msgstr "Bauen Sie 100 Dschungelbaumblöcke ab."
+
+#: init.lua
+msgid "Jungleman"
+msgstr "Dschungelmann"
+
+#: init.lua
+msgid "Dig 1,000 jungle tree blocks."
+msgstr "Bauen Sie 1000 Dschungelbaumblöcke ab."
+
+#: init.lua
+msgid "First Mese Find"
+msgstr "Erster Mesefund"
+
+#: init.lua
+msgid "Mine your first mese ore."
+msgstr "Bauen Sie Ihr erstes Meseerz ab."
+
+#: init.lua
+msgid "Mese Mastery"
+msgstr "Mesemeister"
+
+#: init.lua
+msgid "Mine a mese block."
+msgstr "Bauen Sie einen Meseblock ab."
+
+#: init.lua
+msgid "You’re a copper"
+msgstr "Du Kupfer!"
+
+#: init.lua
+msgid "Dig 1,000 copper ores."
+msgstr "Bauen Sie 1000 Kupfererze ab."
+
+#: init.lua
+msgid "A Cat in a Pop-Tart?!"
+msgstr "Eine Katze im Pop-Tart?!"
+
+#: init.lua
+msgid "Mine a nyan cat."
+msgstr "Bauen Sie eine Nyan Cat ab."
+
+#: init.lua
+msgid "Mini Miner"
+msgstr "Berganfänger"
+
+#: init.lua
+msgid "Dig 100 stone blocks."
+msgstr "Bauen Sie 100 Steinblöcke ab."
+
+#: init.lua
+msgid "Hardened Miner"
+msgstr "Abhehärteter Bergarbeiter"
+
+#: init.lua
+msgid "Dig 1,000 stone blocks."
+msgstr "Bauen Sie 1000 Steine ab."
+
+#: init.lua
+msgid "Master Miner"
+msgstr "Profibergarbeiter"
+
+#: init.lua
+msgid "Dig 10,000 stone blocks."
+msgstr "Bauen Sie 10000 Steine ab."
+
+#: init.lua
+msgid "Marchand De Sable"
+msgstr ""
+
+#: init.lua
+msgid "Dig 1,000 sand."
+msgstr "Bauen Sie 1000 Sand ab."
+
+#: init.lua
+msgid "Crafter of Sticks"
+msgstr "Stockmacher"
+
+#: init.lua
+msgid "Craft 100 sticks."
+msgstr "Fertigen Sie 100 Stöcke."
+
+#: init.lua
+msgid "Jungle Discoverer"
+msgstr "Dschungelerkunder"
+
+#: init.lua
+msgid "Mine your first jungle grass."
+msgstr "Bauen Sie Ihr erstes Dschungelgras ab."
+
+#: init.lua
+msgid "Grasslands Discoverer"
+msgstr "Prärieerkunder"
+
+#: init.lua
+msgid "Mine some grass."
+msgstr "Bauen Sie etwas Gras ab."
+
+#: init.lua
+msgid "Savannah Discoverer"
+msgstr "Savannenerkunder"
+
+#: init.lua
+msgid "Mine some dry grass."
+msgstr "Bauen Sie etwas trockenes Gras ab."
+
+#: init.lua
+msgid "Desert Discoverer"
+msgstr "Wüstenerkunder"
+
+#: init.lua
+msgid "Mine your first cactus."
+msgstr "Bauen Sie Ihren ersten Kaktus ab."
+
+#: init.lua
+msgid "Far Lands"
+msgstr "Ferne Lande"
+
+#: init.lua
+msgid "Mine your first dry shrub."
+msgstr "Bauen Sie Ihren ersten vertrockneten Strauch ab."
+
+#: init.lua
+msgid "Glacier Discoverer"
+msgstr "Gletschererkunder"
+
+#: init.lua
+msgid "Mine your first ice."
+msgstr "Bauen Sie Ihr erstes Eis ab."
+
+#: init.lua
+msgid "Very Simple Snow Man"
+msgstr "Sehr simpler Schneemann"
+
+#: init.lua
+msgid "Place two snow blocks."
+msgstr "Platzieren Sie zwei Schneeblöcke."
+
+#: init.lua
+msgid "First Gold Find"
+msgstr "Erster Goldfund"
+
+#: init.lua
+msgid "Mine your first gold ore."
+msgstr "Bauen Sie Ihr erstes Golderz ab."
+
+#: init.lua
+msgid "Gold Rush"
+msgstr "Goldrausch"
+
+#: init.lua
+msgid "Mine 45 gold ores."
+msgstr "Bauen Sie 18 Diamanterze ab."
+
+#: init.lua
+msgid "Wow, I am Diamonds!"
+msgstr "Wow, ich bin Diamanten!"
+
+#: init.lua
+msgid "Mine your first diamond ore."
+msgstr "Bauen Sie Ihr erstes Diamanterz ab."
+
+#: init.lua
+msgid "Girl's Best Friend"
+msgstr "Bester Freund der Mädchen"
+
+#: init.lua
+msgid "Mine 18 diamond ores."
+msgstr "Bauen Sie 18 Diamanterze ab."
+
+#: init.lua
+msgid "Hardest Block on Earth"
+msgstr "Härtester Block der Welt"
+
+#: init.lua
+msgid "Craft a diamond block."
+msgstr "Fertigen Sie einen Diamantblock an."
+
+#: init.lua
+msgid "In the Dungeon"
+msgstr "Im Verlies"
+
+#: init.lua
+msgid "Mine a mossy cobblestone."
+msgstr "Bauen Sie ein bemoostes Kopfsteinpflaster ab."
+
+#: init.lua
+msgid "Smelter"
+msgstr "Schmelzer"
+
+#: init.lua
+msgid "Craft 10 furnaces."
+msgstr "Fertigen Sie 10 Öfen."
+
+#: init.lua
+msgid "Treasurer"
+msgstr "Schatzmeister"
+
+#: init.lua
+msgid "Craft 15 chests."
+msgstr "Fertigen Sie 15 Truhen."
+
+#: init.lua
+msgid "Bankier"
+msgstr "Bankier"
+
+#: init.lua
+msgid "Craft 30 locked chests."
+msgstr "Fertigen Sie 30 abgeschlossene Truhen."
+
+#: init.lua
+msgid "Bricker"
+msgstr "Ziegler"
+
+#: init.lua
+msgid "Craft 200 brick blocks."
+msgstr "Fertigen Sie 200 Ziegelblöcke."
+
+#: init.lua
+msgid "House of Obsidian"
+msgstr "Haus aus Obsidian"
+
+#: init.lua
+msgid "Craft 100 obsidian bricks."
+msgstr "Fertigen Sie 100 Obsidianziegel."
+
+#: init.lua
+msgid "Build a Cave"
+msgstr "Höhlenbauer"
+
+#: init.lua
+msgid "Place 100 stone."
+msgstr "Platzieren Sie 100 Steine."
+
+#: init.lua
+msgid "Long Ladder"
+msgstr "Lange Leiter"
+
+#: init.lua
+msgid "Place 400 wooden ladders."
+msgstr "Platzieren Sie 400 Holzleitern."
+
+#: init.lua
+msgid "Industrial Age"
+msgstr "Industriezeitalter"
+
+#: init.lua
+msgid "Place 40 steel ladders."
+msgstr "Platzieren Sie 40 Stahlleitern."
+
+#: init.lua
+msgid "Yummy!"
+msgstr "Lecker!"
+
+#: init.lua
+msgid "Eat 80 apples."
+msgstr "Essen Sie 80 Äpfel."
+
+#: init.lua
+msgid "Glasser"
+msgstr "Glasmacher"
+
+#: init.lua
+msgid "Craft 14 vessels shelves."
+msgstr "Fertigen Sie 14 Gefäßregale."
+
+#: init.lua
+msgid "Farming Skills Acquired"
+msgstr "Landwirtschaft erlernt"
+
+#: init.lua
+msgid "Harvest a fully grown wheat plant."
+msgstr "Ernten Sie eine voll ausgewachsene Getreidepflanze."
+
+#: init.lua
+msgid "Field Worker"
+msgstr "Feldarbeiter"
+
+#: init.lua
+msgid "Harvest 25 fully grown wheat plants."
+msgstr "Ernten Sie 25 voll ausgewachsene Getreidepflanzen."
+
+#: init.lua
+msgid "Aspiring Farmer"
+msgstr "Aufstrebender Bauer"
+
+#: init.lua
+msgid "Harvest 125 fully grown wheat plants."
+msgstr "Ernten Sie 125 voll ausgewachsene Getreidepflanzen."
+
+#: init.lua
+msgid "Wheat Magnate"
+msgstr "Getreidemagnat"
+
+#: init.lua
+msgid "Harvest 625 fully grown wheat plants."
+msgstr "Ernten Sie 625 voll ausgewachsene Getreidepflanzen."
+
+#: init.lua
+msgid "Baker"
+msgstr "Bäcker"
+
+#: init.lua
+msgid "Eat 10 loaves of bread."
+msgstr "Essen Sie 10 Brote."
+
+#: init.lua
+msgid "Wool Over Your Eyes"
+msgstr "Wollige Augen"
+
+#: init.lua
+msgid "Craft 250 white wool."
+msgstr "Fertigen Sie 250 weiße Wolle."
+
+#: init.lua
+msgid "Hotelier"
+msgstr "Hotelier"
+
+#: init.lua
+msgid "Craft 15 fancy beds."
+msgstr "Fertigen Sie 15 schicke Betten."
+
+#: init.lua
+msgid "Filthy Rich"
+msgstr "Stinkreich"
+
+#: init.lua
+msgid "Craft 24 gold block stairs."
+msgstr "Fertigen Sie 24 Goldblockstufen."
+
+#: init.lua
+msgid "Roses Are Red"
+msgstr "Rosen sind rot"
+
+#: init.lua
+msgid "Craft 400 red dyes."
+msgstr "Fertigen Sie 400 rote Farbstoffe."
+
+#: init.lua
+msgid "Dandelions are Yellow"
+msgstr "Löwenzahn ist gelb"
+
+#: init.lua
+msgid "Craft 400 yellow dyes."
+msgstr "Fertigen Sie 400 gelbe Farbstoffe."
+
+#: init.lua
+msgid "Geraniums are Blue"
+msgstr "Geranien sind blau"
+
+#: init.lua
+msgid "Craft 400 blue dyes."
+msgstr "Fertigen Sie 400 blaue Farbstoffe."
+
+#: init.lua
+msgid "White Color Stock"
+msgstr "Weißer Farbstoffvorrat"
+
+#: init.lua
+msgid "Craft 100 white dyes."
+msgstr "Fertigen Sie 100 weiße Farbstoffe."
+
+#: init.lua
+msgid "Tasty Mushrooms"
+msgstr "Leckere Pilze"
+
+#: init.lua
+msgid "Eat 3 brown mushrooms."
+msgstr "Essen Sie 3 braune Pilze."
+
+#: init.lua
+msgid "Mushroom Lover"
+msgstr "Pilzfreund"
+
+#: init.lua
+msgid "Eat 33 brown mushrooms."
+msgstr "Essen Sie 33 braune Pilze."
+
+#: init.lua
+msgid "Underground Mushroom Farmer"
+msgstr "Unterirdischer Pilzbauer"
+
+#: init.lua
+msgid "Eat 333 brown mushrooms."
+msgstr "Essen Sie 333 braune Pilze."
+
+#: init.lua
+msgid "Builder"
+msgstr "Bauarbeiter"
+
+#: init.lua
+msgid "Constructor"
+msgstr "Konstrukteur"
+
+#: init.lua
+msgid "Architect"
+msgstr "Architekt"
+
+#: init.lua
+msgid "Master Architect"
+msgstr "Meisterarchitekt"
+
+#: chat_commands.lua
+msgid "[c|clear|disable|enable]"
+msgstr "[c|clear|disable|enable]"
+
+#: chat_commands.lua
+msgid "Show, clear, disable or enable your achievements"
+msgstr "Zeigen, löschen, deaktivieren oder aktivieren Sie Ihre Auszeichnungen"
+
+#: chat_commands.lua
+msgid ""
+"All your awards and statistics have been cleared. You can now start again."
+msgstr ""
+"All Ihre Auszeichnugen und Statistiken wurden zurückgesetzt. Sie können nun "
+"von vorne anfangen."
+
+#: chat_commands.lua
+msgid "You have disabled your achievements."
+msgstr "Sie haben Ihre Auszeichnungen deaktiviert."
+
+#: chat_commands.lua
+msgid "You have enabled your achievements."
+msgstr "Sie haben Ihre Auszeichnungen aktiviert."
+
+#: chat_commands.lua
+msgid "<achievement ID>"
+msgstr "<Auszeichnungs-ID>"
+
+#: chat_commands.lua
+msgid "Show details of an achievement"
+msgstr "Details einer Auszeichnung anzeigen"
+
+#: chat_commands.lua
+msgid "Achievement not found."
+msgstr "Auszeichnung nicht gefunden."
+
+#: chat_commands.lua
+msgid "<name>"
+msgstr "<Name>"
+
+#: chat_commands.lua
+msgid "Get the achievements statistics for the given player or yourself"
+msgstr "Die Statistik der Auszeichnungen eines Spielers zeigen"
