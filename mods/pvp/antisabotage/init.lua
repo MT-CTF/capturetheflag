@@ -21,7 +21,6 @@ function antisabotage.is_sabotage(pos, oldnode, digger) -- used for paxel, hence
 	end
 end
 
-
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if not digger:is_player() then return end
 	antisabotage.is_sabotage(pos, oldnode, digger)
