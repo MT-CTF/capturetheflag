@@ -47,10 +47,10 @@ local function start_healing(stack, player)
 end
 
 
--- Interrupt reason can be:
--- damage: get damage from another player
--- move: move more then 1m
--- attack: attack other player
+-- Interrupt reasons:
+-- attack: Attacked another player
+-- move: Moved 1m away from initial healing pos
+-- damage: Damaged by another player
 local function reason_handler(reason)
 	if reason == "attack" then
 		return " because you attacked other player!"
