@@ -50,7 +50,7 @@ end
 -- Interrupt reason can be:
 -- damage: get damage from another player
 -- move: move more then 1m
--- die: die because any reason
+-- attack: attack other player
 local function reason_handler(reason)
 	if reason == "attack" then
 		return " because you attacked other player!"
