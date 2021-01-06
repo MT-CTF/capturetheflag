@@ -1,7 +1,7 @@
 local full_ores = {
 	diamond = "default:diamond",
 	mese = "default:mese_crystal",
-	bronze = "default:bronze_ingot",
+	--bronze = "default:bronze_ingot",
 	steel = "default:steel_ingot",
 	stone = "default:cobble",
 }
@@ -52,11 +52,11 @@ for ore, ore_item in pairs(full_ores) do
 	})
 end
 
--- Bronze ingot x9 <== Copper x9 + Tin x9
+-- Bronze ingot <== Steel + Coal + wood
 crafting.register_recipe({
 	type   = "inv",
-	output = "default:bronze_ingot 9",
-	items  = { "default:copper_ingot 8", "default:tin_ingot"},
+	output = "default:bronze_ingot",
+	items  = { "default:steel_ingot", "default:coal_lump", "group:wood"},
 	always_known = true,
 	level  = 1,
 })
@@ -66,24 +66,6 @@ crafting.register_recipe({
 	type   = "inv",
 	output = "default:mese_crystal 9",
 	items  = { "default:mese"},
-	always_known = true,
-	level  = 1,
-})
-
---Bronze block <== Bronze Ingot x9
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:bronzeblock",
-	items  = { "default:bronze_ingot 9" },
-	always_known = true,
-	level  = 1,
-})
-
---Steel block <== Steel Ingot x9
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:steelblock",
-	items  = { "default:steel_ingot 9" },
 	always_known = true,
 	level  = 1,
 })
@@ -109,8 +91,8 @@ crafting.register_recipe({
 -- Reinforced Cobblestone
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_map:reinforced_cobble",
-	items  = { "default:cobble 4", "default:steel_ingot" },
+	output = "ctf_map:reinforced_cobble 2",
+	items  = { "default:cobble 6", "default:steel_ingot" },
 	always_known = true,
 	level  = 1,
 })
@@ -146,7 +128,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "shooter:ammo",
-	items  = { "default:tin_ingot 3", "default:coal_lump 2" },
+	items  = { "default:tin_ingot 2", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
 })
@@ -154,8 +136,8 @@ crafting.register_recipe({
 -- Ammo <== Steel ingot x3 + Coal lump x2
 crafting.register_recipe({
 	type   = "inv",
-	output = "shooter:ammo",
-	items  = { "default:steel_ingot 3", "default:coal_lump 2" },
+	output = "shooter:ammo 2",
+	items  = { "default:steel_ingot 2", "default:coal_lump 2" },
 	always_known = true,
 	level  = 1,
 })
@@ -173,7 +155,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_762",
-	items  = { "default:steelblock", "default:bronze_ingot 5", "default:mese_crystal", "default:wood" },
+	items  = { "default:steel_ingot 10", "default:mese_crystal", "default:wood 2" },
 	always_known = false,
 	level  = 1
 })
@@ -182,7 +164,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_magnum",
-	items  = { "default:steelblock", "default:bronzeblock", "default:diamond", "default:wood" },
+	items  = { "default:steel_ingot 5", "default:bronze_ingot 5", "default:diamond", "default:wood 3" },
 	always_known = false,
 	level  = 1,
 })
@@ -209,7 +191,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_traps:spike 1",
-	items  = { "default:steel_ingot 5" },
+	items  = { "default:steel_ingot 4" },
 	always_known = true,
 	level  = 1,
 })
@@ -225,7 +207,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "ctf_traps:cobble 1",
-	items  = { "default:cobble 5", "default:coal_lump" },
+	items  = { "default:cobble 4", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
 })
@@ -240,8 +222,8 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_traps:damage_cobble 1",
-	items  = { "default:cobble", "default:coal_lump 4", "default:steel_ingot 4" },
+	output = "ctf_traps:damage_cobble",
+	items  = { "ctf_traps:cobble", "ctf_traps:spike" },
 	always_known = true,
 	level  = 1,
 })
