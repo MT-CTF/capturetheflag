@@ -40,9 +40,9 @@ local function sword_special_timer_func(pname, timeleft)
 	end
 end
 
-minetest.register_tool("ctf_classes:sword_steel", {
+minetest.register_tool("ctf_classes:sword_bronze", {
 	description = "Knight's Sword\nSneak+Rightclick items/air to place marker\nRightclick enemies to place marker listing all enemies in area",
-	inventory_image = "default_tool_steelsword.png",
+	inventory_image = "default_tool_bronzesword.png",
 	tool_capabilities = {
 		full_punch_interval = 0.8,
 		max_drop_level=1,
@@ -109,7 +109,7 @@ minetest.register_tool("ctf_classes:sword_steel", {
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
 		if pointed_thing then
-			minetest.registered_tools["ctf_classes:sword_steel"].on_place(itemstack, user, pointed_thing)
+			minetest.registered_tools["ctf_classes:sword_bronze"].on_place(itemstack, user, pointed_thing)
 		end
 	end,
 })

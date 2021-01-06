@@ -175,11 +175,11 @@ local function remove_pillar(pos, pname)
 	end
 end
 
-minetest.register_tool("ctf_classes:paxel_steel", {
-	description = "Steel Paxel\n" ..
+minetest.register_tool("ctf_classes:paxel_bronze", {
+	description = "Bronze Paxel\n" ..
 		"Rightclick bottom of pillar to start destroying it, hold rightclick to stop\n"..
 		"Can't use during build time",
-	inventory_image = "default_tool_steelpick.png^default_tool_steelshovel.png",
+	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
