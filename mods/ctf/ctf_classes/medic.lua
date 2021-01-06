@@ -151,9 +151,15 @@ local function remove_pillar(pos, pname)
 	local name = minetest.get_node(pos).name
 
 	if name:find("default") and isdiggable(name) then
+		local player = minetest.get_player_by_name(pname)
+
+		if minetest.get_modpath("antisabotage") then
+			-- Fix paxel being capable of mining blocks under teammates
+			if antisabotage.is_sabotage(pos, minetest.get_node(pos), player) then return end
+		end
+
 		minetest.dig_node(pos)
 
-		local player = minetest.get_player_by_name(pname)
 		if player and diggers[pname] and type(diggers[pname]) ~= "table" then
 			if vector.distance(player:get_pos(), pos) <= DIG_DIST_LIMIT then
 				pos.y = pos.y + 1
