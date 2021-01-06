@@ -60,7 +60,7 @@ local function reason_handler(reason)
 		return " because someone damaged you!"
 	else
 		return "!"
-	end 
+	end
 end
 
 -- Called after regen is complete. Remove additional effects
