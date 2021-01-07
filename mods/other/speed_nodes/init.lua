@@ -22,7 +22,6 @@ minetest.register_node("speed_nodes:asphalt", {
 	groups = {cracky = 2},
 })
 
-local time = 0
 local quicksand_modifier = {
 	speed   = 0.5,
 	jump    = 0.9,
@@ -40,6 +39,8 @@ local asphalt_modifier = {
 	jump    = 1,
 	gravity = 1
 }
+
+local time = 0
 
 minetest.register_globalstep(function(dtime)
 
@@ -60,22 +61,34 @@ minetest.register_globalstep(function(dtime)
 		local node_feet = minetest.get_node({x = pos.x, y = pos.y, z = pos.z})
 		local node_head = minetest.get_node({x = pos.x, y = pos.y + 1, z = pos.z})
 
-		if node_below.name == "speed_nodes:quicksand" then
-			physics.set(name, "quicksand", quicksand_modifier)
-		else
-			physics.remove(name, "quicksand")
-		end
+        if node_below.name == "speed_nodes:quicksand" then
+            if not players[name].quicksand then
+                physics.set(name, "quicksand", modifier)
+            end
+        else
+            if players[name].quicksand then
+                physics.remove(name, "quicksand")
+            end
+        end
 
-		if node_below.name == "speed_nodes:asphalt" then
-			physics.set(name, "asphalt", asphalt_modifier)
+        if node_below.name == "speed_nodes:asphalt" then
+            if not players[name].asphalt then
+                physics.set(name, "asphalt", modifier)
+            end
+        else
+            if players[name].asphalt then
+                physics.remove(name, "asphalt")
+            end
+        end
+        
+		if node_feet.name == "speed_nodes:cobweb" or node_head.name == "speed_nodes:cobweb" then 
+			if not players[name].cobweb then
+				physics.set(name, "cobweb", cobweb_modifier)
+			end
 		else
-			physics.remove(name, "asphalt")
-		end
-
-		if node_feet.name == "speed_nodes:cobweb" or node_head.name == "speed_nodes:cobweb" then
-			physics.set(name, "cobweb", cobweb_modifier)
-		else
-			physics.remove(name, "cobweb")
+			if players[name].cobweb then
+				physics.remove(name, "cobweb")
+			end
 		end
 	end
 end)
