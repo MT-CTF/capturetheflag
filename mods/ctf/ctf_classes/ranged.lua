@@ -89,12 +89,8 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 	-- Remove hook if player has changed
 	-- their class after firing the hook.
 	if not ctf_classes.get(self.user).properties.allow_grapples then
-		local player = minetest.get_player_by_name(self.user)
-		if player then
-			player:get_inventory():add_item("main", "shooter_hook:grapple_hook")
-		end
 		minetest.chat_send_player(self.user,
-			"Your class can't use that weapon! Change your class at spawn")
+			"You can't fire grapples and change your class!")
 		self.object:remove()
 		return
 	end
