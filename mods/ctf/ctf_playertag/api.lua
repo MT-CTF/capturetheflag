@@ -7,6 +7,7 @@ local TYPE_ENTITY = 1
 
 local pro_color = "#00FFFFFF"
 local top_20_color = "#FF00FFFF"
+local rankings_exist = ctf_stats.get_ordered_players() not nil
 
 ctf_playertag = {
 	TYPE_BUILTIN = TYPE_BUILTIN,
@@ -26,19 +27,21 @@ local function add_entity_tag(player)
 			char = "U"..char
 		end
 		texture = texture.."^[combine:84x14:"..(x+i)..",0="..color.."_"..char..".png"
-		local players = ctf_stats.get_ordered_players()
-		local top_20 = false
-		local name = player:get_player_name()
-		for k = 1, math.min(20, #players) do
-			local pstat = players[k]
-			if pstat.name == name then
-				texture = texture.."^[colorize:"..top_20_color..":alpha"
-				top_20 = true
-				break
+		if rankings_exist then 
+			local players = ctf_stats.get_ordered_players()
+			local top_20 = false
+			local name = player:get_player_name()
+			for k = 1, math.min(20, #players) do
+				local pstat = players[k]
+				if pstat.name == name then
+					texture = texture.."^[colorize:"..top_20_color..":alpha"
+					top_20 = true
+					break
+				end
 			end
-		end
-		if not top_20 and ctf_stats.is_pro(name) then
-			texture = texture.."^[colorize:"..pro_color..":alpha"
+			if not top_20 and ctf_stats.is_pro(name) then
+				texture = texture.."^[colorize:"..pro_color..":alpha"
+			end
 		end
 		i = i + 11
 	end)
