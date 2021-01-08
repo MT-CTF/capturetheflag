@@ -7,7 +7,7 @@ local TYPE_ENTITY = 1
 
 local pro_color = "#00FFFFFF"
 local top_20_color = "#FF00FFFF"
-local rankings_exist = ctf_stats.get_ordered_players() not nil
+local rankings_exist = ctf_stats.get_ordered_players() ~= nil and #(ctf_stats.get_ordered_players()) > 0
 
 ctf_playertag = {
 	TYPE_BUILTIN = TYPE_BUILTIN,
