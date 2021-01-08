@@ -36,7 +36,7 @@ local function add_entity_tag(player)
 				break
 			end
 		end
-		if not top_20 and ctf_stats.is_pro() then
+		if not top_20 and ctf_stats.is_pro(name) then
 			texture = texture.."^[colorize:"..pro_color..":alpha"
 		end
 		i = i + 11
