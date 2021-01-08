@@ -5,7 +5,8 @@ local ATTACH_POSITION = minetest.rgba and {x=0,y=20,z=0} or {x=0,y=10,z=0}
 local TYPE_BUILTIN = 0
 local TYPE_ENTITY = 1
 
-local pro_color = "#FF00FFFF"
+local pro_color = "#00FFFFFF"
+local top_20_color = "#FF00FFFF"
 
 ctf_playertag = {
 	TYPE_BUILTIN = TYPE_BUILTIN,
@@ -26,12 +27,17 @@ local function add_entity_tag(player)
 		end
 		texture = texture.."^[combine:84x14:"..(x+i)..",0="..color.."_"..char..".png"
 		local players = ctf_stats.get_ordered_players()
+		local top_20 = false
 		for i = 1, math.min(20, #players) do
 			local pstat = players[i]
 			if pstat.name == name then
-				texture = texture.."^[colorize:"..pro_color..":alpha"
+				texture = texture.."^[colorize:"..top_20_color..":alpha"
+				top_20 = true
 				break
 			end
+		end
+		if not top_20 and ctf_stats.is_pro() then
+			texture = texture.."^[colorize:"..pro_color..":alpha"
 		end
 		i = i + 11
 	end)
