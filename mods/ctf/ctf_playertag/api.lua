@@ -28,8 +28,9 @@ local function add_entity_tag(player)
 		texture = texture.."^[combine:84x14:"..(x+i)..",0="..color.."_"..char..".png"
 		local players = ctf_stats.get_ordered_players()
 		local top_20 = false
-		for i = 1, math.min(20, #players) do
-			local pstat = players[i]
+		local name = player:get_player_name()
+		for k = 1, math.min(20, #players) do
+			local pstat = players[k]
 			if pstat.name == name then
 				texture = texture.."^[colorize:"..top_20_color..":alpha"
 				top_20 = true
