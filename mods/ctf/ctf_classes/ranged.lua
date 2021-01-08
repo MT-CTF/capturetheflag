@@ -85,5 +85,14 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 		self.object:remove()
 		return
 	end
+
+	-- Remove hook if player changes class after throwing it
+	if not ctf_classes.get(self.user).properties.allow_grapples then
+		minetest.chat_send_player(self.user,
+			"Grapples don't work if you change class!")
+		self.object:remove()
+		return
+	end
+
 	return old_grapple_step(self, dtime, ...)
 end
