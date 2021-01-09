@@ -27,7 +27,7 @@ local function add_entity_tag(player)
 			char = "U"..char
 		end
 		texture = texture.."^[combine:84x14:"..(x+i)..",0="..color.."_"..char..".png"
-		if rankings_exist then
+		if rankings_exist and ctf_stats.players[name] not nil then
 			local players = ctf_stats.get_ordered_players()
 			local top_20 = false
 			local name = player:get_player_name()
