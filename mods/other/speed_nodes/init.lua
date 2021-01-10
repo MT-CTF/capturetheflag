@@ -63,7 +63,7 @@ minetest.register_globalstep(function(dtime)
 
         if node_below.name == "speed_nodes:quicksand" then
             if not players[name].quicksand then
-                physics.set(name, "quicksand", modifier)
+                physics.set(name, "quicksand", quicksand_modifier)
             end
         else
             if players[name].quicksand then
@@ -73,7 +73,7 @@ minetest.register_globalstep(function(dtime)
 
         if node_below.name == "speed_nodes:asphalt" then
             if not players[name].asphalt then
-                physics.set(name, "asphalt", modifier)
+                physics.set(name, "asphalt", asphalt_modifier)
             end
         else
             if players[name].asphalt then
