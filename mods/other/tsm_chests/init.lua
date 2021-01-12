@@ -39,11 +39,12 @@ minetest.register_node("tsm_chests:chest", {
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
 	paramtype2 = "facedir",
-	groups = {immortal = 1},
+	groups = {oddly_breakable_by_hand = 1, choppy = 3},
 	light_source = 3,
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
+	drop = "",
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
 			minetest.chat_send_player(player:get_player_name(),
@@ -58,10 +59,19 @@ minetest.register_node("tsm_chests:chest", {
 		local inv = meta:get_inventory()
 		inv:set_size("main", 8*4)
 	end,
-	can_dig = function(pos,player)
+	on_destruct = function(pos)
 		local meta = minetest.get_meta(pos);
 		local inv = meta:get_inventory()
-		return inv:is_empty("main")
+		-- iterate over chest contents, drop all
+		for index, stack in pairs(inv:get_list("main")) do
+			if not minetest.is_yes(minetest.settings:get("remove_items")) then
+				local obj = minetest.add_item(pos, stack:take_item(stack:get_count()))
+				if obj then
+					obj:set_velocity({x = math.random(-1, 1), y = 5, z = math.random(-1, 1)})
+				end
+			end
+			inv:set_stack("main", index, nil)
+		end
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
