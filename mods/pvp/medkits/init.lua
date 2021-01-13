@@ -134,7 +134,6 @@ minetest.register_on_player_hpchange(function(player, hp, reason)
 	if hp < 0 then
 		if players[name] then
 			players[name] = nil -- Don't use stop_healing(), it uses set_hp() and won't allocate deaths or score properly
-			minetest.chat_send_player(name, minetest.colorize("#FF4444", "Your healing was interrupted"..reason_handler("damage")))
 			player:hud_remove(players[name].hud)
 		end
 		if reason and reason.type == "punch" then
