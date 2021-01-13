@@ -11,7 +11,7 @@ ctf_classes.register("knight", {
 		melee_bonus = 1,
 
 		initial_stuff = {
-			"ctf_classes:sword_steel",
+			"ctf_classes:sword_bronze",
 		},
 
 		allowed_guns = {
@@ -81,7 +81,7 @@ ctf_classes.register("medic", {
 
 		initial_stuff = {
 			"ctf_bandages:bandage",
-			"ctf_classes:paxel_steel",
+			"ctf_classes:paxel_bronze",
 			"default:cobble 99"
 		},
 

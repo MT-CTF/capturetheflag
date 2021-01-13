@@ -214,9 +214,9 @@ end
 
 if minetest.get_modpath("ctf") then
 	local old_is_protected = minetest.is_protected
-	function minetest.is_protected(pos, name)
+	function minetest.is_protected(pos, name, ...)
 		if ctf_match.build_timer <= 0 then
-			return old_is_protected(pos, name)
+			return old_is_protected(pos, name, ...)
 		end
 
 		local tname = ctf.player(name).team
@@ -225,7 +225,7 @@ if minetest.get_modpath("ctf") then
 			minetest.chat_send_player(name, "Can't dig beyond the barrier!")
 			return true
 		else
-			return old_is_protected(pos, name)
+			return old_is_protected(pos, name, ...)
 		end
 	end
 

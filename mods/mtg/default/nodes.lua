@@ -851,13 +851,14 @@ minetest.register_node("default:steelblock", {
 })
 
 
-minetest.register_node("default:stone_with_copper", {
+--[[ minetest.register_node("default:stone_with_copper", {
 	description = "Copper Ore",
 	tiles = {"default_stone.png^default_mineral_copper.png"},
 	groups = {cracky = 2},
 	drop = 'default:copper_lump',
 	sounds = default.node_sound_stone_defaults(),
-})
+}) ]]
+minetest.register_alias("default:stone_with_copper", "default:stone")
 
 minetest.register_node("default:copperblock", {
 	description = "Copper Block",
@@ -868,13 +869,14 @@ minetest.register_node("default:copperblock", {
 })
 
 
-minetest.register_node("default:stone_with_tin", {
+--[[ minetest.register_node("default:stone_with_tin", {
 	description = "Tin Ore",
 	tiles = {"default_stone.png^default_mineral_tin.png"},
 	groups = {cracky = 2},
 	drop = "default:tin_lump",
 	sounds = default.node_sound_stone_defaults(),
-})
+}) ]]
+minetest.register_alias("default:stone_with_tin", "default:stone")
 
 minetest.register_node("default:tinblock", {
 	description = "Tin Block",

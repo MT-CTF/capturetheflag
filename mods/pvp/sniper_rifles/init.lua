@@ -153,4 +153,22 @@ function sniper_rifles.register_rifle(name, def)
 	rifles[name] = table.copy(def)
 end
 
+local old_is_protected = minetest.is_protected
+local r = ctf.setting("flag.nobuild_radius") + 5
+local rs = r * r
+function minetest.is_protected(pos, name, info, ...)
+	if r <= 0 or rs == 0 or not info or not info.is_gun then
+		return old_is_protected(pos, name, info, ...)
+	end
+
+	local flag, distSQ = ctf_flag.get_nearest(pos)
+	if flag and pos.y >= flag.y - 1 and distSQ < rs then
+		minetest.chat_send_player(name,
+			"You can't shoot blocks within "..r.." nodes of a flag!")
+		return true
+	else
+		return old_is_protected(pos, name, info, ...)
+	end
+end
+
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/rifles.lua")
