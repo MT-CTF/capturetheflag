@@ -130,11 +130,12 @@ end)
 -- If player takes damage while healing,
 -- stop regen and revert back to original state
 minetest.register_on_player_hpchange(function(player, hp, reason)
+	local name = player:get_player_name()
 	if hp < 0 then
-		if players[player:get_player_name()] then
-			players[player:get_player_name()] = nil -- Don't use stop_healing(), it uses set_hp() and won't allocate deaths or score properly
+		if players[name] then
+			players[name] = nil -- Don't use stop_healing(), it uses set_hp() and won't allocate deaths or score properly
 			minetest.chat_send_player(name, minetest.colorize("#FF4444", "Your healing was interrupted"..reason_handler("damage")))
-			player:hud_remove(players[player:get_player_name()].hud)
+			player:hud_remove(players[name].hud)
 		end
 		if reason and reason.type == "punch" then
 			local hitter = reason.object
