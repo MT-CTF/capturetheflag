@@ -80,8 +80,8 @@ minetest.register_globalstep(function(dtime)
                 physics.remove(name, "asphalt")
             end
         end
-        
-		if node_feet.name == "speed_nodes:cobweb" or node_head.name == "speed_nodes:cobweb" then 
+
+		if node_feet.name == "speed_nodes:cobweb" or node_head.name == "speed_nodes:cobweb" then
 			if not players[name].cobweb then
 				physics.set(name, "cobweb", cobweb_modifier)
 			end
