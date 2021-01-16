@@ -26,6 +26,7 @@ function ctf.team(name)
 		end
 	end
 end
+--Test commit
 
 function ctf.create_team(name, data)
 	ctf.log("team", "Creating team " .. name)
