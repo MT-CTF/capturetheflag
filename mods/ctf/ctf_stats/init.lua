@@ -439,6 +439,33 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 			color = "0x00FF00",
 			value = reward
 		})
+
+		local hitters = {}
+
+		local pmeta = minetest.get_player_by_name(victim):get_meta()
+
+		for name,damage in pairs(pmeta:to_table()) do
+			if string.match(name, "hitter= ") then
+				table.insert(hitters, {name=damage})
+			end
+		end
+		if #hitters then
+			for name,damage in pairs(hitters) do
+				local percentofhelp = pmeta:get_int(name) / victim:get_properties().hp_max
+				local pname = name:sub(0,#"hitter= ")
+				local pmain, pmatch = ctf_stats.player(pname)
+
+				local newReward = math.floor(reward * percentofhelp)
+
+				match.score = match.score + newReward
+
+				hud_score.new(pname, {
+					name = "ctf_stats:kill_score",
+					color = "0x00FF00",
+					value = reward
+				})
+			end
+		end
 	end
 end)
 

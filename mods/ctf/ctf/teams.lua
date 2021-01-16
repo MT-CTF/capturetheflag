@@ -26,7 +26,6 @@ function ctf.team(name)
 		end
 	end
 end
---Test commit
 
 function ctf.create_team(name, data)
 	ctf.log("team", "Creating team " .. name)
@@ -458,6 +457,22 @@ minetest.register_on_punchplayer(function(player, hitter,
 	if player and hitter then
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
+		local pmeta = player:get_meta()
+
+		local hitters = {}
+
+		for a,b in pairs(pmeta:to_table()) do
+			if string.match(a, "hitter= ") then
+				table.insert(hitter, pmeta[a])
+			end
+		end
+
+		if #hitters then
+			local dmg = pmeta:get_int("hitter= "..hname)
+			pmeta:set_int("hitter= "..hname, dmg + damage)
+		else
+			pmeta:set_int("hitter= "..hname, damage)
+		end
 
 		local to = ctf.player(pname)
 		local from = ctf.player(hname)
