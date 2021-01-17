@@ -448,25 +448,41 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 			local subStringValue = string.sub(tostring(name), 1, #"hitter="+1)
 			if string.match(subStringValue, "hitter=") then
 				local pname = string.sub(name,#"hitter="+1, #name+1)
-				--table.insert(hitters, {pname=damage})
 				hitters[pname] = damage
+				pmeta:set_int(name, 0)
 			end
 		end
-		--print(dump(hitters))
-		if #hitters then
+		local hitLength = 0--#hitters
+		for a,b in pairs(hitters) do
+			hitLength = hitLength + 1
+		end
+		print(hitLength)
+		print(dump(hitters))
+		if hitLength > 0 then
 			for name,damage in pairs(hitters) do
-				local percentofhelp = pmeta:get_int(name) / minetest.get_player_by_name(victim):get_properties().hp_max
+				print("name: "..name)
+				--local percentofhelp = pmeta:get_int(name) / minetest.get_player_by_name(victim):get_properties().hp_max
+				local playerHP_max = minetest.get_player_by_name(victim):get_properties().hp_max
+				local percentofhelp = damage / playerHP_max
+				print("percentofhelp: "..percentofhelp)
 				local pname = name
-				print("-"..pname.."-")
 				local pmain, pmatch = ctf_stats.player(pname)
+				print("pmain: "..dump(pmain))
+				print("pmatch: "..dump(pmatch))
 				local newReward = math.floor(reward * percentofhelp)
+				print("newReward: "..newReward)
 
 				match.score = match.score + newReward
 
+				print(dump(name) .. dump(damage))
+
+				if newReward > 0 then
+					newReward = 1
+				end
 				hud_score.new(pname, {
 					name = "ctf_stats:kill_score",
 					color = "0x00FF00",
-					value = reward
+					value = newReward
 				})
 			end
 		end
