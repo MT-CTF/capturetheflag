@@ -462,16 +462,16 @@ minetest.register_on_punchplayer(function(player, hitter,
 		local hitters = {}
 
 		for a,b in pairs(pmeta:to_table()) do
-			if string.match(a, "hitter= ") then
+			if string.match(a, "hitter=") then
 				table.insert(hitter, pmeta[a])
 			end
 		end
 
 		if #hitters then
-			local dmg = pmeta:get_int("hitter= "..hname)
-			pmeta:set_int("hitter= "..hname, dmg + damage)
+			local dmg = pmeta:get_int("hitter="..hname)
+			pmeta:set_int("hitter="..hname, dmg + damage)
 		else
-			pmeta:set_int("hitter= "..hname, damage)
+			pmeta:set_int("hitter="..hname, damage)
 		end
 
 		local to = ctf.player(pname)

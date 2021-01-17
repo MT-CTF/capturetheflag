@@ -444,17 +444,21 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 
 		local pmeta = minetest.get_player_by_name(victim):get_meta()
 
-		for name,damage in pairs(pmeta:to_table()) do
-			if string.match(name, "hitter= ") then
-				table.insert(hitters, {name=damage})
+		for name,damage in pairs(pmeta:to_table().fields) do
+			local subStringValue = string.sub(tostring(name), 1, #"hitter="+1)
+			if string.match(subStringValue, "hitter=") then
+				local pname = string.sub(name,#"hitter="+1, #name+1)
+				--table.insert(hitters, {pname=damage})
+				hitters[pname] = damage
 			end
 		end
+		--print(dump(hitters))
 		if #hitters then
 			for name,damage in pairs(hitters) do
-				local percentofhelp = pmeta:get_int(name) / victim:get_properties().hp_max
-				local pname = name:sub(0,#"hitter= ")
+				local percentofhelp = pmeta:get_int(name) / minetest.get_player_by_name(victim):get_properties().hp_max
+				local pname = name
+				print("-"..pname.."-")
 				local pmain, pmatch = ctf_stats.player(pname)
-
 				local newReward = math.floor(reward * percentofhelp)
 
 				match.score = match.score + newReward
