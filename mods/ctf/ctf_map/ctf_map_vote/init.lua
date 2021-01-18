@@ -10,8 +10,14 @@ local score_requirement = 500
 local vote_delay = 172800 -- two days
 
 local function load_voter_data()
-    voted = minetest.deserialize(storage:get_string("voted"))
-    vote_cooldown = minetest.deserialize(storage:get_string("vote_cooldown"))
+    local voted_s = storage:get("voted")
+    local vote_cooldown_s = storage:get("vote_cooldown")
+    if voted_s then
+        voted = minetest.deserialize(voted_s)
+    end
+    if vote_cooldown_s then
+        vote_cooldown = minetest.deserialize(vote_cooldown_s)
+    end
 end
 
 local function save_voter_data()
