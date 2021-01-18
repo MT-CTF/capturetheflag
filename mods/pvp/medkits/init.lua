@@ -130,9 +130,11 @@ end)
 -- If player takes damage while healing,
 -- stop regen and revert back to original state
 minetest.register_on_player_hpchange(function(player, hp, reason)
+	local name = player:get_player_name()
 	if hp < 0 then
-		if players[player:get_player_name()] then
-			stop_healing(player, "damage")
+		if players[name] then
+			player:hud_remove(players[name].hud)
+			players[name] = nil -- Don't use stop_healing(), it uses set_hp() and won't allocate deaths or score properly
 		end
 		if reason and reason.type == "punch" then
 			local hitter = reason.object
