@@ -454,23 +454,18 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 			end
 		end
 
-		--there is probably a better way to get the length
 		local hitLength = 0
 		for a,b in pairs(hitters) do
 			hitLength = hitLength + 1
 		end
 
-		print(#hitters)
-		print(dump(hitters))
-
 		if hitLength > 0 then
-			local playerExists = false
 			for name,damage in pairs(hitters) do
-				playerExists = minetest.get_player_by_name(name)
+				local playerExists = minetest.get_player_by_name(name)
 				if name ~= killer and playerExists then
 					local playerHP_max = playerExists:get_properties().hp_max
 					local percentofhelp = damage / playerHP_max
-					local pmain, pmatch = ctf_stats.player(name)
+					local _, pmatch = ctf_stats.player(name)
 					local newReward = math.floor((reward * percentofhelp)*100)/100
 					pmatch.score = pmatch.score + newReward
 
