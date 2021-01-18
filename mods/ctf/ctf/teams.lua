@@ -437,6 +437,19 @@ minetest.register_on_joinplayer(function(player)
 	end
 end)
 
+function ctf.clearAssists(playerName)
+	local player = minetest.get_player_by_name(playerName)
+	local pmeta = player:get_meta()
+	local prefix = "hitter="
+	for name,damage in pairs(pmeta:to_table().fields) do
+		local subStringValue = string.sub(tostring(name), 1, #prefix+1)
+		if string.match(subStringValue, prefix) then
+			local pname = string.sub(name,#prefix+1, #name+1)
+			pmeta:set_int(name, 0)
+		end
+	end
+end
+
 -- Disable friendly fire.
 ctf.registered_on_killedplayer = {}
 function ctf.register_on_killedplayer(func)

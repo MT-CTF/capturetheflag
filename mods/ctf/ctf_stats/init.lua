@@ -441,7 +441,6 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 		})
 
 		local hitters = {}
-
 		local pmeta = minetest.get_player_by_name(victim):get_meta()
 		local prefix = "hitter="
 
@@ -464,19 +463,21 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 				local playerExists = minetest.get_player_by_name(name)
 				if name ~= killer and playerExists then
 					local playerHP_max = playerExists:get_properties().hp_max
-					local percentofhelp = damage / playerHP_max
-					local _, pmatch = ctf_stats.player(name)
-					local newReward = math.floor((reward * percentofhelp)*100)/100
-					pmatch.score = pmatch.score + newReward
+					if not (tonumber(damage) > playerHP_max*0.5) then
+						local percentofhelp = damage / playerHP_max
+						local _, pmatch = ctf_stats.player(name)
+						local newReward = math.floor((reward * percentofhelp)*100)/100
+						pmatch.score = pmatch.score + newReward
 
-					if newReward <= 1 then
-						newReward = 1
+						if newReward <= 1 then
+							newReward = 1
+						end
+						hud_score.new(name, {
+							name = "ctf_stats:kill_score",
+							color = "0x00FF00",
+							value = newReward
+						})
 					end
-					hud_score.new(name, {
-						name = "ctf_stats:kill_score",
-						color = "0x00FF00",
-						value = newReward
-					})
 				end
 			end
 		end
