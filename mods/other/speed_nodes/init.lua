@@ -62,31 +62,31 @@ minetest.register_globalstep(function(dtime)
 		local node_head = minetest.get_node({x = pos.x, y = pos.y + 1, z = pos.z})
 
         if node_below.name == "speed_nodes:quicksand" then
-            if not players[name].quicksand then
+            if not physics.layer_exists(name, "quicksand") then
                 physics.set(name, "quicksand", quicksand_modifier)
             end
         else
-            if players[name].quicksand then
+            if physics.layer_exists(name, "quicksand") then
                 physics.remove(name, "quicksand")
             end
         end
 
         if node_below.name == "speed_nodes:asphalt" then
-            if not players[name].asphalt then
+            if not physics.layer_exists(name, "asphalt") then
                 physics.set(name, "asphalt", asphalt_modifier)
             end
         else
-            if players[name].asphalt then
+            if physics.layer_exists(name, "asphalt") then
                 physics.remove(name, "asphalt")
             end
         end
 
 		if node_feet.name == "speed_nodes:cobweb" or node_head.name == "speed_nodes:cobweb" then
-			if not players[name].cobweb then
+			if physics.layer_exists(name, "cobweb") then
 				physics.set(name, "cobweb", cobweb_modifier)
 			end
 		else
-			if players[name].cobweb then
+			if physics.layer_exists(name, "cobweb") then
 				physics.remove(name, "cobweb")
 			end
 		end

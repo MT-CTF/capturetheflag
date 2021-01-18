@@ -66,3 +66,10 @@ function physics.remove(name, layer)
 	players[name][layer] = nil
 	update(name)
 end
+
+function physics.layer_exists(name, layer)
+	-- Basic sanity checks uwu
+	assert(type(name) == "string" and type(layer) == "string",
+		"physics.layer_exists: Invalid function arguments!")
+	return players[name][layer] ~= nil
+end
