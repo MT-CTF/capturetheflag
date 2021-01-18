@@ -444,7 +444,6 @@ function ctf.clearAssists(playerName)
 	for name,damage in pairs(pmeta:to_table().fields) do
 		local subStringValue = string.sub(tostring(name), 1, #prefix+1)
 		if string.match(subStringValue, prefix) then
-			local pname = string.sub(name,#prefix+1, #name+1)
 			pmeta:set_int(name, 0)
 		end
 	end
