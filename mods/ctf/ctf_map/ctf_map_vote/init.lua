@@ -41,7 +41,7 @@ end
 function ctf_map_vote.get_map_rating(map_name)
     local total = 0
     for _, type in pairs(voted[map_name]) do
-        total += type
+        total = total + type
     end
     return type
 end
