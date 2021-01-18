@@ -443,47 +443,46 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 		local hitters = {}
 
 		local pmeta = minetest.get_player_by_name(victim):get_meta()
+		local prefix = "hitter="
 
 		for name,damage in pairs(pmeta:to_table().fields) do
-			local subStringValue = string.sub(tostring(name), 1, #"hitter="+1)
-			if string.match(subStringValue, "hitter=") then
-				local pname = string.sub(name,#"hitter="+1, #name+1)
+			local subStringValue = string.sub(tostring(name), 1, #prefix+1)
+			if string.match(subStringValue, prefix) then
+				local pname = string.sub(name,#prefix+1, #name+1)
 				hitters[pname] = damage
 				pmeta:set_int(name, 0)
 			end
 		end
-		local hitLength = 0--#hitters
+
+		--there is probably a better way to get the length
+		local hitLength = 0
 		for a,b in pairs(hitters) do
 			hitLength = hitLength + 1
 		end
-		print(hitLength)
+
+		print(#hitters)
 		print(dump(hitters))
+
 		if hitLength > 0 then
+			local playerExists = false
 			for name,damage in pairs(hitters) do
-				print("name: "..name)
-				--local percentofhelp = pmeta:get_int(name) / minetest.get_player_by_name(victim):get_properties().hp_max
-				local playerHP_max = minetest.get_player_by_name(victim):get_properties().hp_max
-				local percentofhelp = damage / playerHP_max
-				print("percentofhelp: "..percentofhelp)
-				local pname = name
-				local pmain, pmatch = ctf_stats.player(pname)
-				print("pmain: "..dump(pmain))
-				print("pmatch: "..dump(pmatch))
-				local newReward = math.floor(reward * percentofhelp)
-				print("newReward: "..newReward)
+				playerExists = minetest.get_player_by_name(name)
+				if name ~= killer and playerExists then
+					local playerHP_max = playerExists:get_properties().hp_max
+					local percentofhelp = damage / playerHP_max
+					local pmain, pmatch = ctf_stats.player(name)
+					local newReward = math.floor((reward * percentofhelp)*100)/100
+					pmatch.score = pmatch.score + newReward
 
-				match.score = match.score + newReward
-
-				print(dump(name) .. dump(damage))
-
-				if newReward > 0 then
-					newReward = 1
+					if newReward <= 1 then
+						newReward = 1
+					end
+					hud_score.new(name, {
+						name = "ctf_stats:kill_score",
+						color = "0x00FF00",
+						value = newReward
+					})
 				end
-				hud_score.new(pname, {
-					name = "ctf_stats:kill_score",
-					color = "0x00FF00",
-					value = newReward
-				})
 			end
 		end
 	end
