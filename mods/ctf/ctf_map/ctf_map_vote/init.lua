@@ -48,6 +48,9 @@ end
 
 minetest.register_chatcommand("upvote", {
     func = function(name, param)
+        if minetest.get_player_by_name(name) == nil then
+            return
+        end
         local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, 1)
@@ -61,6 +64,9 @@ minetest.register_chatcommand("upvote", {
 
 minetest.register_chatcommand("downvote", {
     func = function(name, param)
+        if minetest.get_player_by_name(name) == nil then
+            return
+        end
         local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, -1)
@@ -74,6 +80,9 @@ minetest.register_chatcommand("downvote", {
 
 minetest.register_chatcommand("unvote", {
     func = function(name, param)
+        if minetest.get_player_by_name(name) == nil then
+            return
+        end
         local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, nil)
