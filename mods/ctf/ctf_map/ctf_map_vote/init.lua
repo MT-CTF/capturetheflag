@@ -33,8 +33,8 @@ end
 local function vote(name, vote_type)
     voted[ctf_map.map][name] = vote_type
     vote_cooldown[name][ctf_map.map] = true -- add cooldown
-    minetest.after(vote_delay, function(name, map)
-        vote_cooldown[name][map] = nil
+    minetest.after(vote_delay, function(mname, map)
+        vote_cooldown[mname][map] = nil
     end, name, ctf_map.map) -- get rid of cooldown after vote_delay
 end
 
@@ -48,7 +48,7 @@ end
 
 minetest.register_chatcommand("upvote", {
     func = function(name, param)
-        code = check_voter_eligibility(name)
+        local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, 1)
         elseif code == 1 then
@@ -61,7 +61,7 @@ minetest.register_chatcommand("upvote", {
 
 minetest.register_chatcommand("downvote", {
     func = function(name, param)
-        code = check_voter_eligibility(name)
+        local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, -1)
         elseif code == 1 then
@@ -74,7 +74,7 @@ minetest.register_chatcommand("downvote", {
 
 minetest.register_chatcommand("unvote", {
     func = function(name, param)
-        code = check_voter_eligibility(name)
+        local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, nil)
         elseif code == 1 then
