@@ -437,9 +437,9 @@ minetest.register_on_joinplayer(function(player)
 	end
 end)
 
-function ctf.clearAssists(playerName)
-	local player = minetest.get_player_by_name(playerName)
-	local pmeta = player:get_meta()
+function ctf.clear_assists(player)
+	local p = minetest.get_player_by_name(player)
+	local pmeta = p:get_meta()
 	local prefix = "hitter="
 	for name,damage in pairs(pmeta:to_table().fields) do
 		local subStringValue = string.sub(tostring(name), 1, #prefix+1)
