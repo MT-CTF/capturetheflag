@@ -49,7 +49,7 @@ local function rate(name, rating)
 
     rated[ctf_map.map.name][name] = rating
 
-    if not rating and rated[ctf_map.map.name] = {} then -- delete nested tables when they are empty
+    if not rating and rated[ctf_map.map.name] == {} then -- delete nested tables when they are empty
         rated[ctf_map.map.name] = nil
     end
 
@@ -60,7 +60,7 @@ local function rate(name, rating)
     rate_cooldown[name][ctf_map.map.name] = true -- add cooldown
     minetest.after(rate_delay, function(mname, map)
         rate_cooldown[mname][map] = nil
-        if rate_cooldown[mname] = {} then -- delete nested tables when they are empty
+        if rate_cooldown[mname] == {} then -- delete nested tables when they are empty
             rate_cooldown[mname] = nil
         end
     end, name, ctf_map.map.name) -- get rid of cooldown after rate_delay
