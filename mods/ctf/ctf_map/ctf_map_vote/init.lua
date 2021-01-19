@@ -21,8 +21,12 @@ local function load_voter_data()
 end
 
 local function save_voter_data()
-    storage:set_string("voted", minetest.serialize(voted))
-    storage:set_string("vote_cooldown", minetest.serialize(vote_cooldown))
+    if voted ~= {} then
+        storage:set_string("voted", minetest.serialize(voted))
+    end
+    if vote_cooldown ~= {} then
+        storage:set_string("vote_cooldown", minetest.serialize(vote_cooldown))
+    end
 end
 
 local function check_voter_eligibility(name)
@@ -52,7 +56,7 @@ function ctf_map_vote.get_map_rating(map_name)
     return type
 end
 
-minetest.register_chatcommand("upvote", {
+minetest.register_chatcommand("vote", {
     func = function(name, param)
         if minetest.get_player_by_name(name) == nil then
             return
@@ -60,38 +64,6 @@ minetest.register_chatcommand("upvote", {
         local code = check_voter_eligibility(name)
         if code == 0 then
             vote(name, 1)
-        elseif code == 1 then
-            minetest.chat_send_player(name, minetest.colorize("Your voting cooldown is still active!"))
-        else
-            minetest.chat_send_player(name, minetest.colorize("You must have at least 500 score"))
-        end
-    end,
-})
-
-minetest.register_chatcommand("downvote", {
-    func = function(name, param)
-        if minetest.get_player_by_name(name) == nil then
-            return
-        end
-        local code = check_voter_eligibility(name)
-        if code == 0 then
-            vote(name, -1)
-        elseif code == 1 then
-            minetest.chat_send_player(name, minetest.colorize("Your voting cooldown is still active!"))
-        else
-            minetest.chat_send_player(name, minetest.colorize("You must have at least 500 score"))
-        end
-    end,
-})
-
-minetest.register_chatcommand("unvote", {
-    func = function(name, param)
-        if minetest.get_player_by_name(name) == nil then
-            return
-        end
-        local code = check_voter_eligibility(name)
-        if code == 0 then
-            vote(name, nil)
         elseif code == 1 then
             minetest.chat_send_player(name, minetest.colorize("Your voting cooldown is still active!"))
         else
