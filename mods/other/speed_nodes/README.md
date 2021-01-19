@@ -1,6 +1,6 @@
 # Speed Nodes
 
-Created by oneplustwo.
+Created by [realOneplustwo](https://github.com/realOneplustwo).
 
 License: MIT.
 
