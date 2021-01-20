@@ -464,7 +464,7 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 				if name ~= killer and playerExists then
 					local playerHP_max = playerExists:get_properties().hp_max
 					if not (tonumber(damage) > playerHP_max*0.5) then
-						local percentofhelp = damage / playerHP_max
+						local percentofhelp = math.min(damage / playerHP_max, 0.75)
 						local _, pmatch = ctf_stats.player(name)
 						local newReward = math.floor((reward * percentofhelp)*100)/100
 						pmatch.score = pmatch.score + newReward
