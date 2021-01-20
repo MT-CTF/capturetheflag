@@ -440,6 +440,9 @@ end)
 function ctf.clear_assists(player)
 	local p = minetest.get_player_by_name(player)
 	local pmeta = p:get_meta()
+	if pmeta:get_int("assists") == 0 then
+		return
+	end
 	local prefix = "hitter="
 	for name,damage in pairs(pmeta:to_table().fields) do
 		local subStringValue = string.sub(tostring(name), 1, #prefix+1)
@@ -447,6 +450,7 @@ function ctf.clear_assists(player)
 			pmeta:set_int(name, 0)
 		end
 	end
+	pmeta:set_int("assists", 0)
 end
 
 -- Disable friendly fire.
@@ -474,6 +478,7 @@ minetest.register_on_punchplayer(function(player, hitter,
 		local property = "hitter="..hname
 		local dmg = pmeta:get_int(property) or 0
 		pmeta:set_int(property, dmg + damage)
+		pmeta:set_int("assists", 1)
 
 		local to = ctf.player(pname)
 		local from = ctf.player(hname)

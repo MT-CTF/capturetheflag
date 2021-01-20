@@ -16,6 +16,7 @@ local function regen_all()
 			local newhp = oldhp + hpregen.amount
 			if newhp > player:get_properties().hp_max then
 				newhp = player:get_properties().hp_max
+				ctf.clear_assists(player:get_player_name())
 			end
 			if oldhp ~= newhp then
 				player:set_hp(newhp)
