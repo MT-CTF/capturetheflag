@@ -41,7 +41,7 @@ local function return_as_chat_result(to, target)
 			kd = kd / stat.deaths
 		end
 		result = result ..
-			minetest.colorize("#63d437", "Kills: ") .. 
+			minetest.colorize("#63d437", "Kills: ") ..
                         minetest.colorize("#ffea00", stat.kills ..
 			minetest.colorize("#63d437", " | Deaths: ")) ..
                         minetest.colorize("#ffea00", stat.deaths ..
