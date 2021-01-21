@@ -54,7 +54,7 @@ local function return_as_chat_result(to, target)
 			            minetest.colorize("#63d437", " | Attempts: ") ..
                         minetest.colorize("#ffea00", stat.attempts ..
 			            minetest.colorize("#63d437", "\nScore: ") ..                         
-                        minetest.colorize("#ffea00", math.floor(stat.score))
+                        minetest.colorize("#ffea00", math.floor(stat.score)))
 	end
 	return result
 end
