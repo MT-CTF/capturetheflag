@@ -41,19 +41,19 @@ local function return_as_chat_result(to, target)
 			kd = kd / stat.deaths
 		end
 		result = result ..
-			minetest.colorize("#63d437", "Kills: ") .. 
+			            minetest.colorize("#63d437", "Kills: ") .. 
                         minetest.colorize("#ffea00", stat.kills ..
-			minetest.colorize("#63d437", " | Deaths: ") ..
+			            minetest.colorize("#63d437", " | Deaths: ") ..
                         minetest.colorize("#ffea00", stat.deaths ..
-			minetest.colorize("#63d437", " | K/D: ") ..
+			            minetest.colorize("#63d437", " | K/D: ") ..
                         minetest.colorize("#ffea00", math.floor(kd * 10) / 10 ..
-			minetest.colorize("#63d437", "\nBounty kills: ") ..
+			            minetest.colorize("#63d437", "\nBounty kills: ") ..
                         minetest.colorize("#ffea00", stat.bounty_kills ..
-			minetest.colorize("#63d437", " | Captures: ") ..
+			            minetest.colorize("#63d437", " | Captures: ") ..
                         minetest.colorize("#ffea00", stat.captures ..
-			minetest.colorize("#63d437", " | Attempts: ") ..
+			            minetest.colorize("#63d437", " | Attempts: ") ..
                         minetest.colorize("#ffea00", stat.attempts ..
-			minetest.colorize("#63d437", "\nScore: ") ..                         
+			            minetest.colorize("#63d437", "\nScore: ") ..                         
                         minetest.colorize("#ffea00", math.floor(stat.score))))))))
 	end
 	return result
