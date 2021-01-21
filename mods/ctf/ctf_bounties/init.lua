@@ -7,7 +7,8 @@ local function announce(name)
 			minetest.colorize("#fff326", "The next person to kill ") ..
 			minetest.colorize(tcolor.css, bountied_player) ..
 			minetest.colorize("#fff326", " will receive ") ..
-			minetest.colorize("#33ff00", bounty_score))
+			minetest.colorize("#33ff00", bounty_score) ..
+	        minetest.colorize("#fff326", " points!"))
 end
 
 local function announce_all()
