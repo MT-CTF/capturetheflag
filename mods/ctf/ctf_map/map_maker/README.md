@@ -48,7 +48,7 @@ There are multiple ways do this, this is the simplest in most cases.
 ### 6. Export
 
 * Click export, and wait until completion.
-* Copy the resultant folder from `worlddir/schems/` into `ctf_map/ctf_map_core/maps/`.
+* Copy the resultant folder from `worlddir/schems/` into `games/capturetheflag/mods/ctf/ctf_map/ctf_map_core/maps/`.
 * Profit!
 
 
@@ -56,7 +56,7 @@ There are multiple ways do this, this is the simplest in most cases.
 
 ### Map meta
 
-Each map's metadata is stored in an accompanying .conf file containing the following data:
+Each map's metadata is stored in an accompanying `map.conf` file containing the following data:
 
 * `name`: Name of map.
 * `author`: Author of the map.
@@ -73,7 +73,6 @@ zone `i`, relative to the center of the schem.
 * `license`: Name of the license of the map.
 * `other`: [Optional] Misc. information about the map. This is displayed in the maps catalog.
 * `base_node`: [Optional] Technical name of node to be used for the team base.
-* `schematic`: Name of the map's schematic.
 * `initial_stuff`: [Optional] Comma-separated list of itemstacks to be given to the player
  on join and on respawn.
 * `treasures`: [Optional] List of treasures to be registered for the map, in a serialized
@@ -86,16 +85,16 @@ format. Refer to the `treasures` sub-section for more details.
 
 #### `license`
 
-* Every map must have its own license. Once you've chosen your license, simply add the following line to the map's `.conf` file:
+* Every map must have its own license. Once you've chosen your license, simply add the following line to the `map.conf` file:
 
-  ```lua
+  ```properties
   license = <name>
   ```
 
 * If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
 If you want to tell more infomation, you can use:
 
-  ```lua
+  ```properties
   others = <description>
   ```
 
@@ -110,7 +109,7 @@ If you want to tell more infomation, you can use:
 
 An example `treasures` value that registers steel pick, shotgun, and grenade:
 
-```lua
+```properties
 treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
 ```
 
