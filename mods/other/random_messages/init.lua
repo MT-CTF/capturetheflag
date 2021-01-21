@@ -79,7 +79,7 @@ function random_messages.read_messages()
 		"Hitting your enemy does more damage than not hitting them.",
 		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
 		"The 'Updates' tab in your inventory will show some of the latest updates to CTF",
-		"Use /rate [rating] to rate the current map on a scale of 1 to 5. If /rate is used alone, it will remove your rating.",
+		"Use /rate [rating] to rate the current map on a scale of 1 to 5. If /rate is used without parameters, it will remove your rating.",
 	}
 end
 
