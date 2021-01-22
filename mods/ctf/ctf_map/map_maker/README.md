@@ -118,10 +118,10 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 #### `initial_stuff`
 `initial_stuff` are the items given to players at their (re)spawn. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
 
-An example `initial_stuff` value that registers a stone pickaxe, 30 cobblestones and 5 torches is given below.
+An example of `initial_stuff` value that registers a stone pickaxe, 30 cobblestones, 5 torches and a pistol is given below.
 
 ```properties
-initial_stuff = default:pick_stone,default:cobble 30,default:torch 5
+initial_stuff = default:pick_stone,default:cobble 30,default:torch 5,shooter:pistol
 ```
 
 ### `screenshot`
