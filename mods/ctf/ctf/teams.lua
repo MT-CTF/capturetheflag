@@ -510,7 +510,6 @@ minetest.register_on_punchplayer(function(player, hitter,
 	if player and hitter then
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
-		local pmeta = player:get_meta()
 
 		local to = ctf.player(pname)
 		local from = ctf.player(hname)
