@@ -437,20 +437,57 @@ minetest.register_on_joinplayer(function(player)
 	end
 end)
 
-function ctf.clear_assists(player)
-	local p = minetest.get_player_by_name(player)
-	local pmeta = p:get_meta()
-	if pmeta:get_int("assists") == 0 then
+local kill_assists = {}
+function ctf.clear_assists(victim)
+	if kill_assists[victim] and kill_assists[victim]["is_empty"] then
 		return
 	end
-	local prefix = "hitter="
-	for name,damage in pairs(pmeta:to_table().fields) do
-		local subStringValue = string.sub(tostring(name), 1, #prefix+1)
-		if string.match(subStringValue, prefix) then
-			pmeta:set_int(name, 0)
+	kill_assists[victim] = {}
+	kill_assists[victim]["is_empty"] = true
+	kill_assists[victim]["players"] = {}
+end
+
+function ctf.add_assist(victim, attacker, damage)-- player names
+	kill_assists[victim]["players"][attacker] = (kill_assists[victim]["players"][attacker] or 0) + damage
+	kill_assists[victim]["is_empty"] = false
+end
+
+function ctf.reward_assists(victim, killer, reward)
+	local hitLength = 0
+	for a,b in pairs(kill_assists[victim]["players"]) do
+		hitLength = hitLength + 1
+	end
+
+	if hitLength > 0 then
+		for name, damage in pairs(kill_assists[victim]["players"]) do
+			local playerExists = minetest.get_player_by_name(name)
+			if playerExists then
+				local playerHP_max = minetest.get_player_by_name(victim):get_properties().hp_max-8
+				local standard = 0
+				local percentofhelp = damage / playerHP_max
+				if name ~= killer then
+					standard = 0.5
+					percentofhelp = math.min(percentofhelp, 0.75)
+				else
+					percentofhelp = math.min(percentofhelp, 1)
+				end
+				if percentofhelp >= standard then
+					local _, pmatch = ctf_stats.player(name)
+					local newReward = math.floor((reward * percentofhelp)*100)/100
+					pmatch.score = pmatch.score + newReward
+					if newReward < 1 then
+						newReward = 1
+					end
+					_ = hud_score.new(name, {
+						name = "ctf_stats:kill_score",
+						color = "0x00FF00",
+						value = newReward
+					})
+				end
+			end
 		end
 	end
-	pmeta:set_int("assists", 0)
+	ctf.clear_assists(victim)
 end
 
 -- Disable friendly fire.
@@ -475,11 +512,6 @@ minetest.register_on_punchplayer(function(player, hitter,
 		local hname = hitter:get_player_name()
 		local pmeta = player:get_meta()
 
-		local property = "hitter="..hname
-		local dmg = pmeta:get_int(property) or 0
-		pmeta:set_int(property, dmg + damage)
-		pmeta:set_int("assists", 1)
-
 		local to = ctf.player(pname)
 		local from = ctf.player(hname)
 
@@ -494,6 +526,8 @@ minetest.register_on_punchplayer(function(player, hitter,
 				return true
 			end
 		end
+
+		ctf.add_assist(pname, hname, damage)
 
 		local hp = player:get_hp()
 		if hp == 0 then
