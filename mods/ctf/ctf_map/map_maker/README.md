@@ -115,6 +115,15 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
 
+### `initial_stuff`
+The `initial_stuff` are the items given to everyone when they (re)spawn. A pickaxe and a torch is promoted to be given in the maps `initial_stuff`.
+
+An example `initial_stuff` value that registers a stone pickaxe, 30 cobblestones and 5 torches is given below.
+
+```properties
+initial_stuff = default:pick_stone,default:cobble 30,default:torch 5
+```
+
 ### `screenshot`
 
 Every map must have its own screenshot in map's folder. It should have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
