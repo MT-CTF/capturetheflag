@@ -141,7 +141,7 @@ Six images which should be in map's folder.
 * `skybox_5.png` - south
 * `skybox_6.png` - north
 
-You have to include skybox license in `license` in `.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
+You have to include skybox license in `license` in `map.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`. When you include the skybox images in the map's directory, run the `update.sh` file in the `games/capturetheflag/` folder.
 
 You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
 
