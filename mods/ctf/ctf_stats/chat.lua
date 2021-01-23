@@ -31,8 +31,9 @@ local function return_as_chat_result(to, target)
 	end
 
 	-- Build return string
-	local result = (to == name and "You are in " or name .. " is in ") ..
-			place .. " place.\n"
+	local result = minetest.colorize("#63d437", (to == name and "You are in " or name .. " is in ")) ..
+			minetest.colorize("#ffea00", place ..
+                        minetest.colorize("#63d437", " place.\n"))
 
 	if stat then
 		local kd = stat.kills
@@ -40,13 +41,20 @@ local function return_as_chat_result(to, target)
 			kd = kd / stat.deaths
 		end
 		result = result ..
-			"Kills: " .. stat.kills ..
-			" | Deaths: " .. stat.deaths ..
-			" | K/D: " .. math.floor(kd * 10) / 10 ..
-			"\nBounty kills: " .. stat.bounty_kills ..
-			" | Captures: " .. stat.captures ..
-			" | Attempts: " .. stat.attempts ..
-			"\nScore: " .. math.floor(stat.score)
+			minetest.colorize("#63d437", "Kills: ") ..
+                        minetest.colorize("#ffea00", stat.kills ..
+			minetest.colorize("#63d437", " | Deaths: ")) ..
+                        minetest.colorize("#ffea00", stat.deaths ..
+			minetest.colorize("#63d437", " | K/D: ")) ..
+                        minetest.colorize("#ffea00", math.floor(kd * 10) / 10 ..
+			minetest.colorize("#63d437", "\nBounty kills: ")) ..
+                        minetest.colorize("#ffea00", stat.bounty_kills ..
+			minetest.colorize("#63d437", " | Captures: ") ..
+                        minetest.colorize("#ffea00", stat.captures ..
+			minetest.colorize("#63d437", " | Attempts: ")) ..
+                        minetest.colorize("#ffea00", stat.attempts ..
+			minetest.colorize("#63d437", "\nScore: ")) ..
+                        minetest.colorize("#ffea00", math.floor(stat.score)))
 	end
 	return result
 end
