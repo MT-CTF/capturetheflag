@@ -478,9 +478,13 @@ function ctf.reward_assists(victim, killer, reward)
 					if newReward < 1 then
 						newReward = 1
 					end
+					local colour = "0x00FFFF"
+					if name == killer then
+						colour = "0x00FF00"
+					end
 					_ = hud_score.new(name, {
 						name = "ctf_stats:kill_score",
-						color = "0x00FF00",
+						color = colour,
 						value = newReward
 					})
 				end
