@@ -5,6 +5,8 @@ function map_maker.show_gui(name)
 	local formspec = {
 		"size[9,9.5]",
 		"bgcolor[#080808BB;true]",
+		default.gui_bg,
+		default.gui_bg_img,
 
 		"label[0,0;1. Select Area]",
 		"field[0.4,1;1,1;posx;X;", context.center.x, "]",
@@ -22,6 +24,8 @@ function map_maker.show_gui(name)
 		"label[0,2.8;2. Place Barriers]",
 		"label[0.1,3.3;This may take a few minutes.]",
 		"field[0.4,4.3;1,1;barrier_r;R;", context.barrier_r, "]",
+		"dropdown[1.15,4.05;1,1;barrier_rot;Z=0;",
+		context.barrier_rot == "x" and 1 or 2, "]",
 		"button[2.3,4;2,1;place_barriers;Place Barriers]",
 
 		"box[4.4,2.8;0.05,2.2;#111111BB]",
@@ -53,7 +57,8 @@ end
 function map_maker.show_progress_formspec(name, text)
 	minetest.show_formspec(name, "ctf_map:progress",
 		"size[6,1]bgcolor[#080808BB;true]" ..
-		"label[0,0;" ..
+		default.gui_bg ..
+		default.gui_bg_img .. "label[0,0;" ..
 		minetest.formspec_escape(text) .. "]")
 end
 
@@ -77,7 +82,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			y = tonumber(fields.posy),
 			z = tonumber(fields.posz),
 			h = tonumber(fields.posh),
-			r = "z"
+			r = tonumber(fields.posr)
 		})
 	end
 
