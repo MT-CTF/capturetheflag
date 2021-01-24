@@ -132,8 +132,8 @@ ctf.register_on_killedplayer(function(victim, killer)
 		minetest.colorize("#fff326", " has killed ") ..
 		minetest.colorize(victim_color, victim) ..
 		minetest.colorize("#fff326", " and received " ) ..
-                minetest.colorize("#7efc00", bounty_score) ..
-                minetest.colorize("#fff326", " points!")
+		minetest.colorize("#7efc00", bounty_score) ..
+		minetest.colorize("#fff326", " points!")
 	minetest.log("action", minetest.strip_colors(msg))
 	minetest.chat_send_all(msg)
 end)
