@@ -45,17 +45,19 @@ minetest.register_on_punchplayer(function(player, hitter,
 	local pteam = ctf.player(pname).team
 	local hteam = ctf.player(hname).team
 
-	if player and ctf_respawn_immunity.is_immune(player) and pteam ~= hteam then
-		minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
-				" just respawned or joined," .. " and is immune to attacks!"))
-		return true
-	end
+	if pteam ~= hteam then
+		if player and ctf_respawn_immunity.is_immune(player) then
+			minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
+					" just respawned or joined," .. " and is immune to attacks!"))
+			return true
+		end
 
-	if hitter and ctf_respawn_immunity.is_immune(hitter) then
-		minetest.chat_send_player(hname, minetest.colorize("#FF8C00",
-				"Your immunity has ended because you attacked a player"))
-		immune_players[hname] = nil
-		ctf_respawn_immunity.update_effects(hitter)
+		if hitter and ctf_respawn_immunity.is_immune(hitter) then
+			minetest.chat_send_player(hname, minetest.colorize("#FF8C00",
+					"Your immunity has ended because you attacked a player"))
+			immune_players[hname] = nil
+			ctf_respawn_immunity.update_effects(hitter)
+		end
 	end
 end)
 

@@ -134,7 +134,7 @@ minetest.override_item("ctf_bandages:bandage", {
 local diggers = {}
 local DIG_COOLDOWN = 45
 local DIG_DIST_LIMIT = 30
-local DIG_SPEED = 0.5
+local DIG_SPEED = 0.1
 
 local function isdiggable(name)
 	return name:find("default:") and (
@@ -151,9 +151,15 @@ local function remove_pillar(pos, pname)
 	local name = minetest.get_node(pos).name
 
 	if name:find("default") and isdiggable(name) then
+		local player = minetest.get_player_by_name(pname)
+
+		if minetest.get_modpath("antisabotage") then
+			-- Fix paxel being capable of mining blocks under teammates
+			if antisabotage.is_sabotage(pos, minetest.get_node(pos), player) then return end
+		end
+
 		minetest.dig_node(pos)
 
-		local player = minetest.get_player_by_name(pname)
 		if player and diggers[pname] and type(diggers[pname]) ~= "table" then
 			if vector.distance(player:get_pos(), pos) <= DIG_DIST_LIMIT then
 				pos.y = pos.y + 1
@@ -169,11 +175,11 @@ local function remove_pillar(pos, pname)
 	end
 end
 
-minetest.register_tool("ctf_classes:paxel_steel", {
-	description = "Steel Paxel\n" ..
+minetest.register_tool("ctf_classes:paxel_bronze", {
+	description = "Bronze Paxel\n" ..
 		"Rightclick bottom of pillar to start destroying it, hold rightclick to stop\n"..
 		"Can't use during build time",
-	inventory_image = "default_tool_steelpick.png^default_tool_steelshovel.png",
+	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,

@@ -6,7 +6,9 @@ local function announce(name)
 	minetest.chat_send_player(name,
 			minetest.colorize("#fff326", "The next person to kill ") ..
 			minetest.colorize(tcolor.css, bountied_player) ..
-			minetest.colorize("#fff326", " will receive " .. bounty_score .. " points!"))
+			minetest.colorize("#fff326", " will receive ") ..
+	        minetest.colorize("#7efc00", bounty_score) ..
+	        minetest.colorize("#fff326", " points!"))
 end
 
 local function announce_all()
@@ -129,7 +131,9 @@ ctf.register_on_killedplayer(function(victim, killer)
 	local msg = minetest.colorize(killer_color, killer) ..
 		minetest.colorize("#fff326", " has killed ") ..
 		minetest.colorize(victim_color, victim) ..
-		minetest.colorize("#fff326", " and received " .. bounty_score .. " points!")
+		minetest.colorize("#fff326", " and received " ) ..
+		minetest.colorize("#7efc00", bounty_score) ..
+		minetest.colorize("#fff326", " points!")
 	minetest.log("action", minetest.strip_colors(msg))
 	minetest.chat_send_all(msg)
 end)
