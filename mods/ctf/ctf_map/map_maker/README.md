@@ -35,8 +35,8 @@ There are multiple ways do this, this is the simplest in most cases.
 
 ### 4. Place barriers
 
-* Set the middle barrier direction. The barrier is a plane defined by a co-ordinate = 0.
-* The barrier is Z=0. So it will placed with every node of the barrier having Z=0.
+* The barrier is a plane defined by Z=0.
+* The barrier will be placed be having the Z co-ordinate as 0.
 * Click "place barrier". Note that this command does not have an undo.
 * After placing barriers you should place 2 flags where you want bases to be. You get flags in `/gui` --> `Giveme flags`
 
