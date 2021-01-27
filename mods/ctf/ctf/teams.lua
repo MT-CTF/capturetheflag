@@ -452,7 +452,19 @@ function ctf.add_assist(victim, attacker, damage)-- player names
 	kill_assists[victim]["is_empty"] = false
 end
 
-function ctf.reward_assists(victim, killer, reward)
+function ctf.add_heal_assist(victim, healed_hp)
+	if kill_assists[victim] and kill_assists[victim]["is_empty"] then
+		return
+	end
+	if not kill_assists[victim] then
+		ctf.clear_assists(victim)
+	end
+	for name, damage in pairs(kill_assists[victim]["players"]) do
+		kill_assists[victim]["players"][name] = math.max(damage - healed_hp, 0)
+	end
+end
+
+function ctf.reward_assists(victim, killer, reward, is_suicide)
 	local hitLength = 0
 	for a,b in pairs(kill_assists[victim]["players"]) do
 		hitLength = hitLength + 1
@@ -461,8 +473,8 @@ function ctf.reward_assists(victim, killer, reward)
 	if hitLength > 0 then
 		for name, damage in pairs(kill_assists[victim]["players"]) do
 			local playerExists = minetest.get_player_by_name(name)
-			if playerExists then
-				local playerHP_max = minetest.get_player_by_name(victim):get_properties().hp_max-8
+			if playerExists and name ~= victim then
+				local playerHP_max = ctf_respawn_delay.players[victim].old_max-8
 				local standard = 0
 				local percentofhelp = damage / playerHP_max
 				if name ~= killer then
@@ -472,17 +484,21 @@ function ctf.reward_assists(victim, killer, reward)
 					percentofhelp = math.min(percentofhelp, 1)
 				end
 				if percentofhelp >= standard then
-					local _, pmatch = ctf_stats.player(name)
+					local main, match = ctf_stats.player(name)
 					local newReward = math.floor((reward * percentofhelp)*100)/100
-					pmatch.score = pmatch.score + newReward
+					match.score = match.score + newReward
+					main.score = main.score + newReward
 					if newReward < 1 then
 						newReward = 1
 					end
 					local colour = "0x00FFFF"
 					if name == killer then
 						colour = "0x00FF00"
+						main.kills = main.kills + 1
+						match.kills = match.kills + 1
+						match.kills_since_death = match.kills_since_death + 1
 					end
-					_ = hud_score.new(name, {
+					local _ = hud_score.new(name, {
 						name = "ctf_stats:kill_score",
 						color = colour,
 						value = newReward
@@ -491,6 +507,7 @@ function ctf.reward_assists(victim, killer, reward)
 			end
 		end
 	end
+	ctf_stats.request_save()
 	ctf.clear_assists(victim)
 end
 

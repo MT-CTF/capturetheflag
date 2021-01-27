@@ -19,6 +19,7 @@ local function regen_all()
 				ctf.clear_assists(player:get_player_name())
 			end
 			if oldhp ~= newhp then
+				ctf.add_heal_assist(player:get_player_name(), hpregen.amount)
 				player:set_hp(newhp)
 			end
 		end
