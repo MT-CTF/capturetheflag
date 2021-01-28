@@ -35,6 +35,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		deaths = 0,
 		attempts = 0,
 		score = 0,
+        bounty_kills = 0,
 	}
 	local blue = {
 		color = ctf.flag_colors.blue:gsub("0x", "#"),
@@ -42,6 +43,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		deaths = 0,
 		attempts = 0,
 		score = 0,
+        bounty_kills = 0,
 	}
 	for name, pstat in pairs(stats.red) do
 		pstat.name = name
@@ -51,6 +53,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		red.deaths = red.deaths + pstat.deaths
 		red.attempts = red.attempts + pstat.attempts
 		red.score = red.score + pstat.score
+                red.bounty_kills = red.bounty_kills + pstat.bounty_kills
 	end
 	for name, pstat in pairs(stats.blue) do
 		pstat.name = name
@@ -60,6 +63,7 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 		blue.deaths = blue.deaths + pstat.deaths
 		blue.attempts = blue.attempts + pstat.attempts
 		blue.score = blue.score + pstat.score
+                blue.bounty_kills = blue.bounty_kills + pstat.bounty_kills
 	end
 
 	local match_length = "-"
@@ -102,6 +106,8 @@ function ctf_stats.get_formspec_match_summary(stats, winner_team, winner_player,
 	ret = ret .. "label[3.5,0;Team K/D]"
 	ret = ret .. "label[5,0;" .. minetest.colorize(red.color, tostring(red_kd)) ..
 			" - " .. " " .. minetest.colorize(blue.color, tostring(blue_kd)) .. "]"
+	ret = ret .. "label[3.5,0.5;Bounty Kills]"
+	ret = ret .. "label[5,0.5;" .. render_team_stats(red, blue, "bounty_kills") .. "]"
 	ret = ret .. "label[6.5,0.5;Attempts]"
 	ret = ret .. "label[8,0.5;" .. render_team_stats(red, blue, "attempts") .. "]"
 	ret = ret .. "label[9.5,0;Duration]"
