@@ -470,7 +470,7 @@ doors.register("door_steel", {
 		tiles = {{name = "doors_door_steel.png", backface_culling = true}},
 		description = "Team Door",
 		inventory_image = "doors_item_steel.png",
-		protected = false,
+		protected = true,
 		groups = {cracky = 1, level = 2},
 		sounds = default.node_sound_metal_defaults(),
 		sound_open = "doors_steel_door_open",
