@@ -149,10 +149,10 @@ You can find some good skyboxes with suitable licenses at [https://opengameart.o
 
 The easiest way to edit exported maps is the following:
 * Create a world using `singlenode` mapgen. Enable `WorldEdit` and `ctf_map` mod,
-* Go in the world's folder, create a folder named `schems`, and place the `.mts` file inside,
+* Go in the world's folder, create a folder named `schems`, and place the `map.mts` file inside,
 * Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
 * Do `//1` to set the position where you will generate the map,
-* Do `//mtschemplace yourschematic` (where `yourschematic` is the name of the mts file without `.mts`).
+* Do `//mtschemplace map`.
 
 When you finish:
 
