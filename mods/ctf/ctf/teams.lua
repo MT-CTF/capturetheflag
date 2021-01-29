@@ -474,8 +474,13 @@ function ctf.reward_assists(victim, killer, reward, is_suicide)
 		for name, damage in pairs(kill_assists[victim]["players"]) do
 			local playerExists = minetest.get_player_by_name(name)
 			if playerExists and name ~= victim then
+				local hpClass = {
+					knight = 30,
+					shooter = 16,
+					medic = 20
+				}
 				local victimClass = minetest.get_player_by_name(victim):get_meta():to_table().fields["ctf_classes:class"]
-				local playerHP_max = ctf_classes.__classes[victimClass].properties.max_hp-8
+				local playerHP_max = (hpClass[victimClass] or hpClass.shooter)-8
 				local standard = 0
 				local percentofhelp = damage / playerHP_max
 				if name ~= killer then
