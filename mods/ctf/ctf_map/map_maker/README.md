@@ -143,8 +143,7 @@ Six images which should be in map's folder.
 You have to include skybox license in `license` in `map.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
 Before you test your skybox images in local CTF game, run the `update.sh` file in the `games/capturetheflag/` folder.
 
-You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
-
+You can find some good skyboxes with suitable licenses at [opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox) or [www.humus.name](https://www.humus.name/index.php?page=Textures).
 ## Editing exported map
 
 The easiest way to edit exported maps is the following:
