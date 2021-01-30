@@ -20,15 +20,12 @@ minetest.register_chatcommand("bdname_add", {
             table.insert(disallowed_names,tostring(param))
             minetest.chat_send_player(name, "added "..param.." to the list of banned words")
             local serial_table = minetest.serialize(disallowed_names)
-            storage:set_string("disallowed_names", serial_table)    
-        
-        else 
+            storage:set_string("disallowed_names", serial_table)
+        else
             minetest.chat_send_player(name, "You need to add a name\n/bdname_add <name>")
         end
-    
     end
 })
-
 
 --removes a name from disallowed names
 minetest.register_chatcommand("bdname_remove",{
@@ -36,16 +33,15 @@ minetest.register_chatcommand("bdname_remove",{
     params = "<name>",
     privs = {ban=true},
     func = function(name, param)
-        if param ~="" then    
+        if param ~="" then
             for k in pairs(disallowed_names) do
                 if param == disallowed_names[k] then
                     table.remove(disallowed_names,k)
-                end   
+                end
             end
             storage:set_string("disallowed_names", minetest.serialize(disallowed_names))
         end
     end
-
 })
 
 --list disallowed names
