@@ -49,7 +49,7 @@ minetest.register_chatcommand("bdname_list", {
     description = "lists all the disallowed",
     privs = {ban= true},
     func= function(name)
-       for k,v in pairs(disallowed_names) do
+       for k in pairs(disallowed_names) do
             minetest.chat_send_player(name, disallowed_names[k])
        end
     end
