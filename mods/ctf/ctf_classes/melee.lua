@@ -105,7 +105,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		sword_special_timer[pname] = 20
 		sword_special_timer_func(pname, 20)
 
-		minetest.registered_chatcommands["m"].func(pname, "Marked with "..pname.."'s sword")
+		minetest.registered_chatcommands["m"].func(pname, ""..pname.."'s sword marker")
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
 		if pointed_thing then
