@@ -14,7 +14,7 @@ end)
 minetest.register_chatcommand("bdname_add", {
     params = "<string>",
     privs = {ban = true},
-    description = "adds a name to disallowed names",
+    description = "Adds a name to the disallowed names list.",
     func = function(name,param)
         if param ~= "" then
             table.insert(disallowed_names,tostring(param))
