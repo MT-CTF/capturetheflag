@@ -46,7 +46,7 @@ minetest.register_chatcommand("bdname_remove",{
 
 -- List of disallowed names
 minetest.register_chatcommand("bdname_list", {
-    description = "lists all the disallowed",
+    description = "Lists all the disallowed names.",
     privs = {ban= true},
     func= function(name)
        for k in pairs(disallowed_names) do
