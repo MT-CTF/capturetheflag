@@ -12,7 +12,7 @@ end)
 
 -- Command to add a name to disallowed names
 minetest.register_chatcommand("bdname_add", {
-    params = "<string>",
+    params = "<name>",
     privs = {ban = true},
     description = "Adds a name to the disallowed names list.",
     func = function(name,param)
