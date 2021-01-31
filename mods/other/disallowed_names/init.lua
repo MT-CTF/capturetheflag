@@ -44,7 +44,7 @@ minetest.register_chatcommand("bdname_remove",{
     end
 })
 
---list disallowed names
+-- List of disallowed names
 minetest.register_chatcommand("bdname_list", {
     description = "lists all the disallowed",
     privs = {ban= true},
