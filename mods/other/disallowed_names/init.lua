@@ -5,7 +5,7 @@ disallowed_names=minetest.deserialize(storage:get_string("disallowed_names")) or
 minetest.register_on_prejoinplayer(function(name)
     for k,v in pairs(disallowed_names) do
         if string.find(string.lower(name),string.lower(v)) then
-            return "Your cannot use that username in this server, please change it and come back."
+            return "Your cannot use that username in this server. Please login with another username."
         end
     end
 end)
