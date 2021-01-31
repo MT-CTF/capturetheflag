@@ -222,7 +222,8 @@ if minetest.get_modpath("ctf") then
 		local tname = ctf.player(name).team
 		if tname and
 				(tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
-			minetest.chat_send_player(name, "Can't dig beyond the barrier!")
+			minetest.chat_send_player(name,
+minetest.colorize("#e32d2d", "Can't dig beyond the barrier!"))
 			return true
 		else
 			return old_is_protected(pos, name, ...)
@@ -238,7 +239,8 @@ if minetest.get_modpath("ctf") then
 			if ctf_map.get_team_relative_z(player) < 0 and not ctf_map.can_cross(player) then
 				local name = player:get_player_name()
 				if ctf.move_to_spawn(name) then
-					minetest.chat_send_player(name, "Match hasn't started yet!")
+					minetest.chat_send_player(name,
+minetest.colorize("#e32d2d", "Match hasn't started yet!"))
 				end
 			end
 		end
