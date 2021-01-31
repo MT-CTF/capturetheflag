@@ -10,7 +10,7 @@ minetest.register_on_prejoinplayer(function(name)
     end
 end)
 
---adds a name to disallowed names
+-- Command to add a name to disallowed names
 minetest.register_chatcommand("bdname_add", {
     params = "<string>",
     privs = {ban = true},
