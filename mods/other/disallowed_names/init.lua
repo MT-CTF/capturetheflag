@@ -18,7 +18,7 @@ minetest.register_chatcommand("bdname_add", {
     func = function(name,param)
         if param ~= "" then
             table.insert(disallowed_names,tostring(param))
-            minetest.chat_send_player(name, "added "..param.." to the list of banned words")
+            minetest.chat_send_player(name, "Added " .. param .. " to the list of banned words")
             local serial_table = minetest.serialize(disallowed_names)
             storage:set_string("disallowed_names", serial_table)
         else
