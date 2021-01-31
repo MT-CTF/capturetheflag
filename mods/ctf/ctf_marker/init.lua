@@ -54,19 +54,8 @@ function ctf_marker.add_marker(name, tname, pos, str)
 		end
 		minetest.log("action", name .. " placed a marker at " ..
 				minetest.pos_to_string(pos) .. ": '" .. str .. "'")
-
-		local marker_team = "#ffffff"
-		if tname == "red" then
-			marker_team = ctf_colors.colors["red"]
-		end
-
-		if tname == "blue" then
-			marker_team = ctf_colors.colors["blue"]
-		end
-		marker_team = "#" .. tostring(marker_team):sub(3, 8)
-
 		minetest.chat_send_player(pname,
-				msg("* " .. (minetest.colorize(marker_team, name)) .. (minetest.colorize("#ABCDEF"," placed a marker: ")) .. (minetest.colorize(marker_team, str))))
+				msg("* " .. name .. " placed a marker: " .. str))
 	end
 end
 
