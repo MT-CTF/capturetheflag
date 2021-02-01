@@ -425,7 +425,7 @@ do
 	})
 	
 	
-	minetest.register_node("default:papyrus", {
+	minetest.register_node("ctf_map:papyrus", {
 		description = "Indestructible Papyrus",
 		drawtype = "plantlike",
 		tiles = {"default_papyrus.png"},
