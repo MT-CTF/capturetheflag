@@ -52,17 +52,6 @@ for ore, ore_item in pairs(full_ores) do
 	})
 end
 
-[=====[
--- Bronze ingot <== Steel + Coal + wood
-crafting.register_recipe({
-	type   = "inv",
-	output = "default:bronze_ingot",
-	items  = { "default:steel_ingot", "default:coal_lump", "group:wood"},
-	always_known = true,
-	level  = 1,
-})
-]=====]
-
 -- Mese crystal x9 <== Mese block
 crafting.register_recipe({
 	type   = "inv",
@@ -148,7 +137,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_762",
-	items  = { "default:steel_ingot 10", "default:mese_crystal", "default:wood 2" },
+	items  = { "default:steel_ingot 10", "default:mese_crystal", "group:wood 2" },
 	always_known = false,
 	level  = 1
 })
@@ -157,7 +146,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_magnum",
-	items  = { "default:steel_ingot 10", "default:coal_lump 5", "default:diamond", "default:wood 2" },
+	items  = { "default:steel_ingot 10", "default:coal_lump 5", "default:diamond", "group:wood 2" },
 	always_known = false,
 	level  = 1,
 })
