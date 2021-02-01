@@ -240,7 +240,7 @@ if minetest.get_modpath("ctf") then
 				local name = player:get_player_name()
 				if ctf.move_to_spawn(name) then
 					minetest.chat_send_player(name,
-minetest.colorize("#e32d2d", "Match hasn't started yet!"))
+                            minetest.colorize("#e32d2d", "Match hasn't started yet!"))
 				end
 			end
 		end
