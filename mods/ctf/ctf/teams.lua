@@ -437,6 +437,86 @@ minetest.register_on_joinplayer(function(player)
 	end
 end)
 
+local kill_assists = {}
+function ctf.clear_assists(victim)
+	if kill_assists[victim] and kill_assists[victim]["is_empty"] then
+		return
+	end
+	kill_assists[victim] = {}
+	kill_assists[victim]["is_empty"] = true
+	kill_assists[victim]["players"] = {}
+end
+
+function ctf.add_assist(victim, attacker, damage)-- player names
+	kill_assists[victim]["players"][attacker] = (kill_assists[victim]["players"][attacker] or 0) + damage
+	kill_assists[victim]["is_empty"] = false
+end
+
+function ctf.add_heal_assist(victim, healed_hp)
+	if kill_assists[victim] and kill_assists[victim]["is_empty"] then
+		return
+	end
+	if not kill_assists[victim] then
+		ctf.clear_assists(victim)
+	end
+	for name, damage in pairs(kill_assists[victim]["players"]) do
+		kill_assists[victim]["players"][name] = math.max(damage - healed_hp, 0)
+	end
+end
+
+function ctf.reward_assists(victim, killer, reward, is_suicide)
+	local hitLength = 0
+	for a,b in pairs(kill_assists[victim]["players"]) do
+		hitLength = hitLength + 1
+	end
+
+	if hitLength > 0 then
+		for name, damage in pairs(kill_assists[victim]["players"]) do
+			local playerExists = minetest.get_player_by_name(name)
+			if playerExists and name ~= victim then
+				local hpClass = {
+					knight = 30,
+					shooter = 16,
+					medic = 20
+				}
+				local victimClass = minetest.get_player_by_name(victim):get_meta():to_table().fields["ctf_classes:class"]
+				local playerHP_max = (hpClass[victimClass] or hpClass.shooter)-8
+				local standard = 0
+				local percentofhelp = damage / playerHP_max
+				if name ~= killer then
+					standard = 0.5
+					percentofhelp = math.min(percentofhelp, 0.75)
+				else
+					percentofhelp = math.min(percentofhelp, 1)
+				end
+				if percentofhelp >= standard then
+					local main, match = ctf_stats.player(name)
+					local newReward = math.floor((reward * percentofhelp)*100)/100
+					match.score = match.score + newReward
+					main.score = main.score + newReward
+					if newReward < 1 then
+						newReward = 1
+					end
+					local colour = "0x00FFFF"
+					if name == killer then
+						colour = "0x00FF00"
+						main.kills = main.kills + 1
+						match.kills = match.kills + 1
+						match.kills_since_death = match.kills_since_death + 1
+					end
+					local _ = hud_score.new(name, {
+						name = "ctf_stats:kill_score",
+						color = colour,
+						value = newReward
+					})
+				end
+			end
+		end
+	end
+	ctf_stats.request_save()
+	ctf.clear_assists(victim)
+end
+
 -- Disable friendly fire.
 ctf.registered_on_killedplayer = {}
 function ctf.register_on_killedplayer(func)
@@ -472,6 +552,8 @@ minetest.register_on_punchplayer(function(player, hitter,
 				return true
 			end
 		end
+
+		ctf.add_assist(pname, hname, damage)
 
 		local hp = player:get_hp()
 		if hp == 0 then
