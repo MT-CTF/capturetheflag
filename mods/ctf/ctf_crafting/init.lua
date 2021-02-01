@@ -52,6 +52,7 @@ for ore, ore_item in pairs(full_ores) do
 	})
 end
 
+[=====[
 -- Bronze ingot <== Steel + Coal + wood
 crafting.register_recipe({
 	type   = "inv",
@@ -60,6 +61,7 @@ crafting.register_recipe({
 	always_known = true,
 	level  = 1,
 })
+]=====]
 
 -- Mese crystal x9 <== Mese block
 crafting.register_recipe({
@@ -110,7 +112,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "default:stick 4",
-	items  = { "default:wood" },
+	items  = { "group:wood" },
 	always_known = true,
 	level  = 1,
 })
@@ -142,15 +144,6 @@ crafting.register_recipe({
 	level  = 1,
 })
 
--- Arrow x5
-crafting.register_recipe({
-	type   = "inv",
-	output = "shooter:arrow_white 5",
-	items  = { "default:stick 5", "default:cobble" },
-	always_known = true,
-	level  = 1,
-})
-
 -- 7.62mm sniper rifle (unloaded)
 crafting.register_recipe({
 	type   = "inv",
@@ -164,7 +157,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_magnum",
-	items  = { "default:steel_ingot 5", "default:bronze_ingot 5", "default:diamond", "default:wood 3" },
+	items  = { "default:steel_ingot 10", "default:coal_lump 5", "default:diamond", "default:wood 3" },
 	always_known = false,
 	level  = 1,
 })
@@ -198,7 +191,7 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_traps:dirt 1",
+	output = "ctf_traps:dirt 4",
 	items  = { "default:dirt 5", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
@@ -206,7 +199,7 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_traps:cobble 1",
+	output = "ctf_traps:cobble 2",
 	items  = { "default:cobble 4", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
@@ -267,7 +260,7 @@ end
 crafting.register_recipe({
 	type   = "inv",
 	output = "grenades:frag 1",
-	items  = { "default:steel_ingot 5", "default:iron_lump" },
+	items  = { "default:steel_ingot 5", "default:iron_lump", "group:wood", "default:coal_lump",},
 	always_known = true,
 	level  = 1,
 })
@@ -283,7 +276,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "grenades:smoke 1",
-	items  = { "default:steel_ingot 5", "default:coal_lump 4" },
+	items  = { "default:steel_ingot 5", "default:coal_lump 5" },
 	always_known = true,
 	level  = 1,
 })
