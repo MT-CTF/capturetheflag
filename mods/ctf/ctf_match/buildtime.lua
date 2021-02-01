@@ -89,8 +89,7 @@ end)
 
 ctf_flag.register_on_prepick_up(function(name, flag)
 	if ctf_match.is_in_build_time() then
-		minetest.chat_send_player(name,
-                minetest.colorize("#e32d2d", "Match hasn't started yet!"))
+		minetest.chat_send_player(name, minetest.colorize("#e32d2d", "Match hasn't started yet!"))
 		ctf.move_to_spawn(name)
 		return false
 	elseif not ctf.get_spawn(ctf.player(name).team) then
