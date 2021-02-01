@@ -157,7 +157,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "sniper_rifles:rifle_magnum",
-	items  = { "default:steel_ingot 10", "default:coal_lump 5", "default:diamond", "default:wood 3" },
+	items  = { "default:steel_ingot 10", "default:coal_lump 5", "default:diamond", "default:wood 2" },
 	always_known = false,
 	level  = 1,
 })
@@ -276,7 +276,7 @@ crafting.register_recipe({
 crafting.register_recipe({
 	type   = "inv",
 	output = "grenades:smoke 1",
-	items  = { "default:steel_ingot 5", "default:coal_lump 5" },
+	items  = { "default:steel_ingot 5", "default:coal_lump 5", "group:wood" },
 	always_known = true,
 	level  = 1,
 })
