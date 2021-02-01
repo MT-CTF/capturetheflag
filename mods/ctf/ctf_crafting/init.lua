@@ -61,6 +61,15 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+-- Diamond x9 <== Diamond Block
+crafting.register_recipe({
+  type = "inv",
+  output = "default:diamond 9",
+  items = "default:diamondblock",
+  always_known = true,
+  level  = 1
+})
+
 -- Furnace <== group:stone x8
 crafting.register_recipe({
 	type   = "inv",
