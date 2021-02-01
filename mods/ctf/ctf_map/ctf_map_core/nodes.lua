@@ -423,8 +423,7 @@ do
 		groups = {immortal = 1},
 		sounds = default.node_sound_leaves_defaults()
 	})
-	
-	
+
 	minetest.register_node(":ctf_map:papyrus", {
 		description = "Indestructible Papyrus",
 		drawtype = "plantlike",
@@ -440,12 +439,10 @@ do
 		},
 		groups = {immortal = 1},
 		sounds = default.node_sound_leaves_defaults(),
-
 		after_dig_node = function(pos, node, metadata, digger)
 			default.dig_up(pos, node, digger)
 		end,
 	})
-
 
 	minetest.register_node(":ctf_map:jungletree", {
 		description = "Indestructible Jungle Tree",
