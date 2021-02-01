@@ -65,8 +65,7 @@ end)
 minetest.register_on_punchplayer(function(_, hitter)
 	if ctf_match.is_in_build_time() then
 		if hitter:is_player() then
-			minetest.chat_send_player(hitter:get_player_name(),
-                    minetest.colorize("#e32d2d", "Match hasn't started yet!"))
+			minetest.chat_send_player(hitter:get_player_name(), minetest.colorize("#e32d2d", "Match hasn't started yet!"))
 		end
 		return true
 	end
