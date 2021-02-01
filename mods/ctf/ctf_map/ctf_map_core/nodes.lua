@@ -426,7 +426,7 @@ do
 	
 	
 	minetest.register_node("default:papyrus", {
-		description = S("ndestructible Papyrus"),
+		description = "Indestructible Papyrus",
 		drawtype = "plantlike",
 		tiles = {"default_papyrus.png"},
 		inventory_image = "default_papyrus.png",
