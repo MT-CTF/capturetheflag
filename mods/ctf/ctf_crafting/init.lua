@@ -180,7 +180,7 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_traps:dirt 4",
+	output = "ctf_traps:dirt 5",
 	items  = { "default:dirt 5", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
