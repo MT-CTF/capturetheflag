@@ -10,11 +10,12 @@ ctf_events = {
 	events = {}
 }
 
-function ctf_events.post(action, one, two)
+function ctf_events.post(action, one, two, assistant)
 	table.insert(ctf_events.events, 1, {
 		action = action,
 		one = one,
-		two = two
+		two = two,
+		assist = assistant
 	})
 
 	while #ctf_events.events > NUM_EVT do
@@ -39,15 +40,16 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 	-- One
 	if evt.one then
 		local tcolor = ctf_colors.get_color(ctf.player(evt.one))
+		local txt = evt.assist or evt.one
 		if hud:exists(player, idx) then
-			hud:change(player, idx, "text", evt.one)
+			hud:change(player, idx, "text", txt)
 			hud:change(player, idx, "number", tcolor.hex)
 		else
 			local tmp = {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
-				text          = evt.one,
+				text          = txt,
 				number        = tcolor.hex,
 				offset        = {x = 145, y = -y_pos},
 				alignment     = {x = -1, y = 0}
@@ -120,7 +122,83 @@ function ctf_events.update_all()
 	end
 end
 
+local good_weapons = {
+	"default:sword_steel",
+	"default:sword_bronze",
+	"default:sword_mese",
+	"default:sword_diamond",
+	"default:pick_mese",
+	"default:pick_diamond",
+	"default:axe_mese",
+	"default:axe_diamond",
+	"default:shovel_mese",
+	"default:shovel_diamond",
+	"shooter:grenade",
+	"shooter:shotgun",
+	"shooter:rifle",
+	"shooter:machine_gun",
+	"sniper_rifles:rifle_762",
+	"sniper_rifles:rifle_magnum",
+}
+
+local function invHasGoodWeapons(inv)
+	for _, weapon in pairs(good_weapons) do
+		if inv:contains_item("main", weapon) then
+			return true
+		end
+	end
+	return false
+end
+
+local function calculateKillReward(victim, killer, toolcaps)
+	local vmain, victim_match = ctf_stats.player(victim)
+
+	if not vmain or not victim_match then return 5 end
+
+	-- +5 for every kill they've made since last death in this match.
+	local reward = victim_match.kills_since_death * 5
+	ctf.log("ctf_stats", "Player " .. victim .. " has made " .. reward ..
+			" score worth of kills since last death")
+
+	-- 30 * K/D ratio, with variable based on player's score
+	local kdreward = 30 * vmain.kills / (vmain.deaths + 1)
+	local max = vmain.score / 5
+	if kdreward > max then
+		kdreward = max
+	end
+	if kdreward > 100 then
+		kdreward = 100
+	end
+	reward = reward + kdreward
+
+	-- Limited to  5 <= X <= 250
+	if reward > 250 then
+		reward = 250
+	elseif reward < 5 then
+		reward = 5
+	end
+
+	-- Half if no good weapons, +50% if combat logger
+	local inv = minetest.get_inventory({ type = "player", name = victim })
+
+	if toolcaps.damage_groups.combat_log == 1 then
+		ctf.log("ctf_stats", "Player " .. victim .. " is a combat logger")
+		reward = reward * 1.5
+	elseif not invHasGoodWeapons(inv) then
+		ctf.log("ctf_stats", "Player " .. victim .. " has no good weapons")
+		reward = reward * 0.5
+	else
+		ctf.log("ctf_stats", "Player " .. victim .. " has good weapons")
+	end
+
+	return reward
+end
+
 ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
+	local reward = calculateKillReward(victim, killer, tool_caps)
+	reward = math.floor(reward * 100) / 100
+	ctf.reward_assists(victim, killer, reward)
+	
 	local type = "sword"
 
 	if tool_caps.damage_groups.grenade then
@@ -139,8 +217,14 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 		victim = victim .. " (Suicide?)"
 	end
 
-	ctf_events.post("kill_" .. type, killer, victim)
+	local assistant = ctf.get_last_assist(victim)
+	local assistname = nil
+	if assistant then
+		assistname = assistant.." + "..killer
+	end
+	ctf_events.post("kill_" .. type, killer, victim, assistname)
 	ctf_events.update_all()
+	ctf.clear_assists(victim)
 end)
 
 minetest.register_on_joinplayer(function(player)

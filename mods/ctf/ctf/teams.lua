@@ -447,6 +447,20 @@ function ctf.clear_assists(victim)
 	kill_assists[victim]["players"] = {}
 end
 
+function ctf.get_last_assist(victim)
+	if kill_assists[victim] then
+		return kill_assists[victim]["last_assistant_killer"]
+	else
+		return nil
+	end
+end
+
+function ctf.set_last_assist(victim, assistant)
+	if kill_assists[victim] then
+		kill_assists[victim]["last_assistant_killer"] = assistant or nil
+	end
+end
+
 function ctf.add_assist(victim, attacker, damage)-- player names
 	kill_assists[victim]["players"][attacker] = (kill_assists[victim]["players"][attacker] or 0) + damage
 	kill_assists[victim]["is_empty"] = false
@@ -464,7 +478,7 @@ function ctf.add_heal_assist(victim, healed_hp)
 	end
 end
 
-function ctf.reward_assists(victim, killer, reward, is_suicide)
+function ctf.reward_assists(victim, killer, reward)
 	local hitLength = 0
 	for a,b in pairs(kill_assists[victim]["players"]) do
 		hitLength = hitLength + 1
@@ -490,6 +504,9 @@ function ctf.reward_assists(victim, killer, reward, is_suicide)
 					percentofhelp = math.min(percentofhelp, 1)
 				end
 				if percentofhelp >= standard then
+					if name ~= killer then
+						ctf.set_last_assist(victim, name)
+					end
 					local main, match = ctf_stats.player(name)
 					local newReward = math.floor((reward * percentofhelp)*100)/100
 					match.score = match.score + newReward
@@ -514,7 +531,6 @@ function ctf.reward_assists(victim, killer, reward, is_suicide)
 		end
 	end
 	ctf_stats.request_save()
-	ctf.clear_assists(victim)
 end
 
 -- Disable friendly fire.
