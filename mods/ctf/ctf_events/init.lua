@@ -198,7 +198,6 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 	local reward = calculateKillReward(victim, killer, tool_caps)
 	reward = math.floor(reward * 100) / 100
 	ctf.reward_assists(victim, killer, reward)
-	
 	local type = "sword"
 
 	if tool_caps.damage_groups.grenade then
