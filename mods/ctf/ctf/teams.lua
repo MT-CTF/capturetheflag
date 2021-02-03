@@ -498,8 +498,8 @@ function ctf.reward_assists(victim, killer, reward)
 				local standard = 0
 				local percentofhelp = damage / playerHP_max
 				if name ~= killer then
-					standard = 0.5
-					percentofhelp = math.min(percentofhelp, 0.75)
+					standard = 0.33
+					percentofhelp = math.min(percentofhelp, 0.8)
 				else
 					percentofhelp = math.min(percentofhelp, 1)
 				end
@@ -509,6 +509,9 @@ function ctf.reward_assists(victim, killer, reward)
 					end
 					local main, match = ctf_stats.player(name)
 					local newReward = math.floor((reward * percentofhelp)*100)/100
+					if name == killer and #kill_assists[victim]["players"] == 1 then
+						newReward = reward
+					end
 					match.score = match.score + newReward
 					main.score = main.score + newReward
 					if newReward < 1 then

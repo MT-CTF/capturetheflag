@@ -125,6 +125,7 @@ end
 local good_weapons = {
 	"default:sword_steel",
 	"default:sword_bronze",
+	"ctf_classes:sword_bronze",
 	"default:sword_mese",
 	"default:sword_diamond",
 	"default:pick_mese",
