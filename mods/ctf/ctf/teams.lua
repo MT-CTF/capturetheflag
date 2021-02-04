@@ -495,53 +495,58 @@ function ctf.reward_assists(victim, killer, reward)
 		hitLength = hitLength + 1
 	end
 
+	local lReward = reward
+	local killer_name = nil
+
 	if hitLength > 0 then
 		for name, damage in pairs(kill_assists[victim]["players"]) do
 			local playerExists = minetest.get_player_by_name(name)
 			if playerExists and name ~= victim then
-				local hpClass = {
-					knight = 30,
-					shooter = 16,
-					medic = 20
-				}
-				local victimClass = minetest.get_player_by_name(victim):get_meta():to_table().fields["ctf_classes:class"]
-				local playerHP_max = (hpClass[victimClass] or hpClass.shooter)-8
-				local standard = 0
-				local percentofhelp = damage / playerHP_max
-				if name ~= killer then
-					standard = 0.33
-					percentofhelp = math.min(percentofhelp, 0.8)
+				if name == killer then
+					killer_name = name
 				else
-					percentofhelp = math.min(percentofhelp, 1)
-				end
-				if percentofhelp >= standard then
-					if name ~= killer then
+					local hpClass = {
+						knight = 30,
+						shooter = 16,
+						medic = 20
+					}
+					local victimClass = minetest.get_player_by_name(victim):get_meta():to_table().fields["ctf_classes:class"]
+					local playerHP_max = (hpClass[victimClass] or hpClass.shooter)-8
+					local standard = 0.33
+					local percentofhelp = math.min(damage / playerHP_max, 0.8)
+					if percentofhelp >= standard then
 						ctf.add_assist_count(victim, name)
+						local main, match = ctf_stats.player(name)
+						local newReward = math.floor((reward * percentofhelp)*100)/100
+						if newReward < 1 then
+							newReward = 1
+							lReward = lReward + (1-newReward)
+						end
+						match.score = match.score + newReward
+						main.score = main.score + newReward
+						local colour = "0x00FFFF"
+						local _ = hud_score.new(name, {
+							name = "ctf_stats:kill_score",
+							color = colour,
+							value = newReward
+						})
+						lReward = lReward - newReward
 					end
-					local main, match = ctf_stats.player(name)
-					local newReward = math.floor((reward * percentofhelp)*100)/100
-					if name == killer and #kill_assists[victim]["players"] == 1 then
-						newReward = reward
-					end
-					match.score = match.score + newReward
-					main.score = main.score + newReward
-					if newReward < 1 then
-						newReward = 1
-					end
-					local colour = "0x00FFFF"
-					if name == killer then
-						colour = "0x00FF00"
-						main.kills = main.kills + 1
-						match.kills = match.kills + 1
-						match.kills_since_death = match.kills_since_death + 1
-					end
-					local _ = hud_score.new(name, {
-						name = "ctf_stats:kill_score",
-						color = colour,
-						value = newReward
-					})
 				end
 			end
+		end
+		if killer_name then
+			local main, match = ctf_stats.player(killer_name)
+			match.score = match.score + lReward
+			main.score = main.score + lReward
+			main.kills = main.kills + 1
+			match.kills = match.kills + 1
+			match.kills_since_death = match.kills_since_death + 1
+			hud_score.new(killer_name, {
+				name = "ctf_stats:kill_score",
+				color = "0x00FF00",
+				value = lReward
+			})
 		end
 	end
 	ctf_stats.request_save()
