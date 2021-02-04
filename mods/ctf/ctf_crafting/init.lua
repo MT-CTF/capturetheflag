@@ -188,7 +188,7 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
-	output = "ctf_traps:cobble 2",
+	output = "ctf_traps:cobble 4",
 	items  = { "default:cobble 4", "default:coal_lump" },
 	always_known = true,
 	level  = 1,
