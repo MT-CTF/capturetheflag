@@ -449,14 +449,11 @@ end
 
 function ctf.get_assist_count(victim)
 	if kill_assists[victim] then
-		print("assist_count: "..tostring(kill_assists[victim]["assist_count"]))
 		local return_value = {}
 		if (kill_assists[victim]["assist_count"] or 0) > 1 then
-			print("returning number")
 			return_value.type = "number"
 			return_value.value = kill_assists[victim]["assist_count"]
 		else
-			print("returning name")
 			return_value.type = "string"
 			return_value.value = kill_assists[victim]["other_assistant"]
 		end

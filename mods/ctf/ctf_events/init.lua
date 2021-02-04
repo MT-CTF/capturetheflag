@@ -219,7 +219,6 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 
 	local assistant = ctf.get_assist_count(victim)
 	local assistname = nil
-	print(dump(assistant))
 	if assistant and assistant.value then
 		if assistant.type == "string" then
 			assistname = assistant.value.." + "..killer
