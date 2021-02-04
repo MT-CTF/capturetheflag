@@ -447,17 +447,31 @@ function ctf.clear_assists(victim)
 	kill_assists[victim]["players"] = {}
 end
 
-function ctf.get_last_assist(victim)
+function ctf.get_assist_count(victim)
 	if kill_assists[victim] then
-		return kill_assists[victim]["last_assistant_killer"]
+		print("assist_count: "..tostring(kill_assists[victim]["assist_count"]))
+		local return_value = {}
+		if (kill_assists[victim]["assist_count"] or 0) > 1 then
+			print("returning number")
+			return_value.type = "number"
+			return_value.value = kill_assists[victim]["assist_count"]
+		else
+			print("returning name")
+			return_value.type = "string"
+			return_value.value = kill_assists[victim]["other_assistant"]
+		end
+		return return_value
 	else
-		return nil
+		return {value=nil,type=nil}
 	end
 end
 
-function ctf.set_last_assist(victim, assistant)
+function ctf.add_assist_count(victim, assistant)
 	if kill_assists[victim] then
-		kill_assists[victim]["last_assistant_killer"] = assistant or nil
+		if not kill_assists[victim]["other_assistant"] then
+			kill_assists[victim]["other_assistant"] = assistant
+		end
+		kill_assists[victim]["assist_count"] = (kill_assists[victim]["assist_count"] or 0) + 1
 	end
 end
 
@@ -505,7 +519,7 @@ function ctf.reward_assists(victim, killer, reward)
 				end
 				if percentofhelp >= standard then
 					if name ~= killer then
-						ctf.set_last_assist(victim, name)
+						ctf.add_assist_count(victim, name)
 					end
 					local main, match = ctf_stats.player(name)
 					local newReward = math.floor((reward * percentofhelp)*100)/100
