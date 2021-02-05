@@ -418,9 +418,28 @@ local function calculateKillReward(victim, killer, toolcaps)
 end
 
 ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
-	local reward = calculateKillReward(victim, killer, toolcaps)
-	reward = math.floor(reward * 100) / 100
-	ctf.reward_assists(victim, killer, reward, (victim == killer))
+	-- Suicide is not encouraged here at CTF
+	if victim == killer then
+		return
+	end
+	local main, match = ctf_stats.player(killer)
+	if main and match then
+		local reward = calculateKillReward(victim, killer, toolcaps)
+		main.kills  = main.kills  + 1
+		main.score  = main.score  + reward
+		match.kills = match.kills + 1
+		match.score = match.score + reward
+		match.kills_since_death = match.kills_since_death + 1
+		_needs_save = true
+
+		reward = math.floor(reward * 100) / 100
+
+		hud_score.new(killer, {
+			name = "ctf_stats:kill_score",
+			color = "0x00FF00",
+			value = reward
+		})
+	end
 end)
 
 minetest.register_on_dieplayer(function(player)
