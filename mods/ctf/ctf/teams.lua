@@ -447,28 +447,17 @@ function ctf.clear_assists(victim)
 	kill_assists[victim]["players"] = {}
 end
 
-function ctf.get_assist_count(victim)
-	if kill_assists[victim] then
-		local return_value = {}
-		if (kill_assists[victim]["assist_count"] or 0) > 1 then
-			return_value.type = "number"
-			return_value.value = kill_assists[victim]["assist_count"]
-		else
-			return_value.type = "string"
-			return_value.value = kill_assists[victim]["other_assistant"]
-		end
-		return return_value
+function ctf.has_assist(victim)
+	if kill_assists[victim] and kill_assists[victim]["has_assist"] then
+		return true
 	else
-		return {value=nil,type=nil}
+		return false
 	end
 end
 
-function ctf.add_assist_count(victim, assistant)
+function ctf.add_assist_count(victim)
 	if kill_assists[victim] then
-		if not kill_assists[victim]["other_assistant"] then
-			kill_assists[victim]["other_assistant"] = assistant
-		end
-		kill_assists[victim]["assist_count"] = (kill_assists[victim]["assist_count"] or 0) + 1
+		kill_assists[victim]["has_assist"] = true
 	end
 end
 
@@ -515,7 +504,7 @@ function ctf.reward_assists(victim, killer, reward)
 					local standard = 0.33
 					local percentofhelp = math.min(damage / playerHP_max, 0.8)
 					if percentofhelp >= standard then
-						ctf.add_assist_count(victim, name)
+						ctf.add_assist_count(victim)
 						local main, match = ctf_stats.player(name)
 						local newReward = math.floor((reward * percentofhelp)*100)/100
 						if newReward < 1 then

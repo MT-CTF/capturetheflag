@@ -217,16 +217,12 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 		victim = victim .. " (Suicide?)"
 	end
 
-	local assistant = ctf.get_assist_count(victim)
-	local assistname = nil
-	if assistant and assistant.value then
-		if assistant.type == "string" then
-			assistname = assistant.value.." + "..killer
-		else
-			assistname = killer.." + " ..assistant.value.." others"
-		end
+	local assist = ctf.has_assist(victim)
+	local aname = killer
+	if assist then
+		aname = aname.." (assisted)"
 	end
-	ctf_events.post("kill_" .. type, killer, victim, assistname)
+	ctf_events.post("kill_" .. type, killer, victim, aname)
 	ctf_events.update_all()
 	ctf.clear_assists(victim)
 end)
