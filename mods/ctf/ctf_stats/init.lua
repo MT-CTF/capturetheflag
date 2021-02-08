@@ -373,7 +373,7 @@ local function invHasGoodWeapons(inv)
 	return false
 end
 
-local function calculateKillReward(victim, killer, toolcaps)
+function ctf_stats.calculateKillReward(victim, killer, toolcaps)
 	local vmain, victim_match = ctf_stats.player(victim)
 
 	if not vmain or not victim_match then return 5 end
@@ -417,15 +417,9 @@ local function calculateKillReward(victim, killer, toolcaps)
 	return reward
 end
 
-ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
-	local reward = calculateKillReward(victim, killer, toolcaps)
-	reward = math.floor(reward * 100) / 100
-
-	kill_assist.reward_assists(victim, killer, reward)
-end)
-
 minetest.register_on_dieplayer(function(player)
 	local main, match = ctf_stats.player(player:get_player_name())
+
 	if main and match then
 		main.deaths = main.deaths + 1
 		match.deaths = match.deaths + 1
