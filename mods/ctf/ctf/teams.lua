@@ -458,10 +458,10 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 function ctf.add_assist(victim, attacker, damage)
-	if not kill_assists[victim] then return end
-
-	if not kill_assists[victim].players then
-		kill_assists[victim].players = {}
+	if not kill_assists[victim] then
+		kill_assists[victim] = {
+			players = {}
+		}
 	end
 
 	kill_assists[victim].players[attacker] = (kill_assists[victim].players[attacker] or 0) + damage
