@@ -454,7 +454,7 @@ ctf.register_on_new_game(function()
 	ctf.clear_assists()
 end)
 minetest.register_on_leaveplayer(function(player)
-	ctf.clear_assists()
+	ctf.clear_assists(player)
 end)
 
 function ctf.add_assist(victim, attacker, damage)
