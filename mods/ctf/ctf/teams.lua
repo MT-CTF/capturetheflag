@@ -438,38 +438,32 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 local kill_assists = {}
-function ctf.clear_assists(victim)
-	if kill_assists[victim] and kill_assists[victim].is_empty then
-		return
-	end
 
-	kill_assists[victim] = {}
-	kill_assists[victim].is_empty = true
-	kill_assists[victim].players = {}
+function ctf.clear_assists(player)
+	kill_assists[player] = nil
 end
 
 function ctf.add_assist(victim, attacker, damage)
-	if not kill_assists[victim] then
-		ctf.clear_assists(victim)
+	if not kill_assists[victim] then return end
+
+	if not kill_assists[victim].players then
+		kill_assists[victim].players = {}
 	end
 
 	kill_assists[victim].players[attacker] = (kill_assists[victim].players[attacker] or 0) + damage
-	kill_assists[victim].is_empty = false
 end
 
 function ctf.add_heal_assist(victim, healed_hp)
-	if kill_assists[victim] and kill_assists[victim].is_empty then
-		return
-	end
-	if not kill_assists[victim] then
-		ctf.clear_assists(victim)
-	end
+	if not kill_assists[victim] then return end
+
 	for name, damage in pairs(kill_assists[victim].players) do
 		kill_assists[victim].players[name] = math.max(damage - healed_hp, 0)
 	end
 end
 
 function ctf.reward_assists(victim, killer, reward)
+	if not kill_assists[victim] then return end
+
 	if #kill_assists[victim].players > 0 then
 		for name, damage in pairs(kill_assists[victim].players) do
 			if minetest.get_player_by_name(name) and name ~= victim then
