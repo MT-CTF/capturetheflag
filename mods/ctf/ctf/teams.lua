@@ -459,27 +459,25 @@ end)
 
 function ctf.add_assist(victim, attacker, damage)
 	if not kill_assists[victim] then
-		kill_assists[victim] = {
-			players = {}
-		}
+		kill_assists[victim] = {}
 	end
 
-	kill_assists[victim].players[attacker] = (kill_assists[victim].players[attacker] or 0) + damage
+	kill_assists[victim][attacker] = (kill_assists[victim][attacker] or 0) + damage
 end
 
 function ctf.add_heal_assist(victim, healed_hp)
 	if not kill_assists[victim] then return end
 
-	for name, damage in pairs(kill_assists[victim].players) do
-		kill_assists[victim].players[name] = math.max(damage - healed_hp, 0)
+	for name, damage in pairs(kill_assists[victim]) do
+		kill_assists[victim][name] = math.max(damage - healed_hp, 0)
 	end
 end
 
 function ctf.reward_assists(victim, killer, reward)
 	if not kill_assists[victim] then return end
 
-	if #kill_assists[victim].players > 0 then
-		for name, damage in pairs(kill_assists[victim].players) do
+	if #kill_assists[victim] > 0 then
+		for name, damage in pairs(kill_assists[victim]) do
 			if minetest.get_player_by_name(name) and name ~= victim then
 				local max_hp = ctf_classes.get(victim).properties.max_hp
 				local standard = 0
