@@ -16,10 +16,10 @@ local function regen_all()
 			local newhp = oldhp + hpregen.amount
 			if newhp > player:get_properties().hp_max then
 				newhp = player:get_properties().hp_max
-				ctf.clear_assists(player:get_player_name())
+				kill_assist.clear_assists(player:get_player_name())
 			end
 			if oldhp ~= newhp then
-				ctf.add_heal_assist(player:get_player_name(), hpregen.amount)
+				kill_assist.add_heal_assist(player:get_player_name(), hpregen.amount)
 				player:set_hp(newhp)
 			end
 		end

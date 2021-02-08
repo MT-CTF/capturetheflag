@@ -156,7 +156,7 @@ minetest.register_globalstep(function(dtime)
 				end
 
 				potential_cowards[k] = nil
-				ctf.clear_assists(k)
+				kill_assist.clear_assists(k)
 			end
 		end
 

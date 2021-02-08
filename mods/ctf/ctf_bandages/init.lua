@@ -25,7 +25,7 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 			if hp > 0 and hp < limit then
 				local hp_add = math.random(3,4)
 
-				ctf.add_heal_assist(pname, hp_add)
+				kill_assist.add_heal_assist(pname, hp_add)
 				hp = hp + hp_add
 
 				if hp > limit then
