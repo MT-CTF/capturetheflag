@@ -153,10 +153,10 @@ minetest.register_globalstep(function(dtime)
 
 				if player then
 					player:hud_remove(potential_cowards[k].hud or 0)
-					ctf.clear_assists(k)
 				end
 
 				potential_cowards[k] = nil
+				ctf.clear_assists(k)
 			end
 		end
 

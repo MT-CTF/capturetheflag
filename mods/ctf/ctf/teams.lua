@@ -440,8 +440,22 @@ end)
 local kill_assists = {}
 
 function ctf.clear_assists(player)
-	kill_assists[player] = nil
+	if type(player) == "string" then
+		kill_assists[player] = nil
+	else
+		kill_assists = {}
+	end
 end
+
+ctf_match.register_on_new_match(function()
+	ctf.clear_assists()
+end)
+ctf.register_on_new_game(function()
+	ctf.clear_assists()
+end)
+minetest.register_on_leaveplayer(function(player)
+	ctf.clear_assists()
+end)
 
 function ctf.add_assist(victim, attacker, damage)
 	if not kill_assists[victim] then return end
