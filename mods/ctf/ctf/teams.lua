@@ -479,9 +479,9 @@ function ctf.reward_assists(victim, killer, reward)
 	if #kill_assists[victim] > 0 then
 		for name, damage in pairs(kill_assists[victim]) do
 			if minetest.get_player_by_name(name) and name ~= victim then
-				local max_hp = ctf_classes.get(victim).properties.max_hp
 				local standard = 0
-				local help_percent = damage / max_hp
+				local help_percent =
+						damage / ctf_classes.get(victim).properties.max_hp
 
 				if name ~= killer then
 					standard = 0.5
@@ -493,7 +493,7 @@ function ctf.reward_assists(victim, killer, reward)
 				if help_percent >= standard then
 					local main, match = ctf_stats.player(name)
 					local new_reward = math.floor((reward * help_percent)*100)/100
-					local colour = "0x00FFFF"
+					local color = "0x00FFFF"
 
 					if new_reward < 1 then
 						new_reward = 1
@@ -503,15 +503,15 @@ function ctf.reward_assists(victim, killer, reward)
 					main.score = main.score + new_reward
 
 					if name == killer then
-						colour = "0x00FF00"
+						color = "0x00FF00"
 						main.kills = main.kills + 1
 						match.kills = match.kills + 1
 						match.kills_since_death = match.kills_since_death + 1
 					end
 
 					hud_score.new(name, {
-						name = "ctf_stats:kill_score",
-						color = colour,
+						name = "ctf:kill_assist_score",
+						color = color,
 						value = new_reward
 					})
 				end
