@@ -483,11 +483,11 @@ minetest.register_on_punchplayer(function(player, hitter,
 			local wielded = hitter:get_wielded_item()
 			for i = 1, #ctf.registered_on_killedplayer do
 				ctf.registered_on_killedplayer[i](pname, hname,
-				wielded, tool_capabilities)
+						wielded, tool_capabilities)
 			end
 			return false
 		end
 
-		kill_assists.add_assist(pname, hname, damage)
+		kill_assist.add_assist(pname, hname, damage)
 	end
 end)
