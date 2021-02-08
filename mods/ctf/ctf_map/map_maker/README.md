@@ -116,7 +116,7 @@ treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grena
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
 
 #### `initial_stuff`
-`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field located in the `map.conf` file. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
+`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field is located in the `map.conf` file. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
 
 An example of `initial_stuff` value that registers a stone pickaxe, 30 cobblestones, 5 torches and a pistol is given below.
 
