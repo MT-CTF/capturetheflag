@@ -38,7 +38,7 @@ function kill_assist.reward_assists(victim, killer, reward)
 			local color = "0x00FFFF"
 
 			if name ~= killer then
-				standard = 0.5
+				standard = 0.3
 				help_percent = math.min(help_percent, 0.75)
 			else
 				help_percent = math.min(help_percent, 1)
