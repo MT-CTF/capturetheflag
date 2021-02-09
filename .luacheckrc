@@ -18,7 +18,7 @@ globals = {
 	"ctf_match", "ctf_stats", "ctf_treasure", "ctf_playertag", "chatplus", "irc",
 	"armor", "vote", "give_initial_stuff", "hud_score", "physics", "tsm_chests",
 	"armor", "shooter", "grenades", "ctf_classes", "ctf_bandages", "ctf_respawn_immunity",
-	"ctf_marker",
+	"ctf_marker", "kill_assist"
 }
 
 read_globals = {

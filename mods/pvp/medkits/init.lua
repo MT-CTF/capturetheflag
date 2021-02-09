@@ -117,6 +117,7 @@ minetest.register_globalstep(function(dtime)
 			if pstat then
 				local hp = player:get_hp()
 				if hp < pstat.regen_max then
+					kill_assist.add_heal_assist(name, regen_step)
 					player:set_hp(math.min(hp + regen_step, pstat.regen_max))
 				else
 					stop_healing(player)
