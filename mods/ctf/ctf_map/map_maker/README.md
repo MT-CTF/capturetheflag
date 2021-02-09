@@ -36,7 +36,7 @@ There are multiple ways do this, this is the simplest in most cases.
 ### 4. Place barriers
 
 * The barrier is a plane defined by co-ordinate (=0).
-* If you choose `X=0` The barrier will be placed having the X co-ordinate as 0. But from a few months, the `X=0` co-ordinate creates bugs and errors. It's better if you choose `Z=0` for creating your map.
+* If you choose `X=0` the barrier will be placed having the X co-ordinate as 0. But from a few months, the `X=0` co-ordinate creates bugs and errors. It's better if you choose `Z=0` for creating your map.
 * If you choose `Z=0` The barrier will be placed having the Z co-ordinate as 0.
 * Click "place barrier". Note that this command does not have an undo.
 * After placing barriers you should place 2 flags where you want bases to be. You get flags in `/gui` --> `Giveme flags`
