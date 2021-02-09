@@ -3,13 +3,14 @@
 potential_cowards = {}
 local TIMER_UPDATE_INTERVAL = 2
 local COMBAT_TIMEOUT_TIME = 20
+local COMBATLOG_SCORE_PENALTY = 10
 
 --
 --- Make suicides and combat logs award last puncher with kill
 --
 
 minetest.register_on_punchplayer(function(player, hitter,
-time_from_last_punch, tool_capabilities, dir, damage)
+		time_from_last_punch, tool_capabilities, dir, damage)
 	if player and hitter then
 		if ctf_respawn_immunity.is_immune(player) or ctf_match.is_in_build_time() then
 			return
@@ -134,6 +135,17 @@ minetest.register_on_leaveplayer(function(player, timeout)
 				last_attacker:get_wielded_item(),
 				potential_cowards[pname].toolcaps
 			)
+		end
+
+		local main, match = ctf_stats.player(pname)
+
+		if main and match then
+			main.deaths = main.deaths + 1
+			match.deaths = match.deaths + 1
+			main.score = main.score - COMBATLOG_SCORE_PENALTY
+			match.score = match.score - COMBATLOG_SCORE_PENALTY
+			match.kills_since_death = 0
+			ctf_stats.request_save()
 		end
 
 		potential_cowards[pname] = nil
