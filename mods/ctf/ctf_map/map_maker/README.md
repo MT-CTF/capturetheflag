@@ -152,7 +152,7 @@ The easiest way to edit exported maps is the following:
 * Go in the world's folder, create a folder named `schems`, and place the `map.mts` file inside,
 * Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
 * Do `//1` to set the position where you will generate the map,
-* Do `//mtschemplace map`.
+* Do `//mtschemplace map` (where `map` is the name of the mts file without `.mts`).
 
 When you finish:
 
