@@ -163,7 +163,6 @@ function minetest.is_protected(pos, name, info, ...)
 		return true
 	end
 
-	end
 	if r <= 0 or rs == 0 or not info or not info.is_gun then
 		return old_is_protected(pos, name, info, ...)
 	end
