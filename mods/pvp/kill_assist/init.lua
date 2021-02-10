@@ -41,7 +41,7 @@ function kill_assist.reward_assists(victim, killer, reward)
 			local color = "0x00FFFF"
 
 			if name == killer or help_percent >= 0.33 then
-				reward = math.min(math.floor((reward * help_percent)*100)/100, 1)
+				reward = math.max(math.floor((reward * help_percent)*100)/100, 0)
 			end
 
 			match.score = match.score + reward
