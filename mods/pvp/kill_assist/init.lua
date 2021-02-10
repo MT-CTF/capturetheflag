@@ -48,9 +48,6 @@ function kill_assist.reward_assists(victim, killer, reward)
 
 			if name == killer then
 				color = "0x00FF00"
-				main.kills = main.kills + 1
-				match.kills = match.kills + 1
-				match.kills_since_death = match.kills_since_death + 1
 			end
 
 			hud_score.new(name, {

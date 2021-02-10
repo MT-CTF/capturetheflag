@@ -417,6 +417,20 @@ function ctf_stats.calculateKillReward(victim, killer, toolcaps)
 	return reward
 end
 
+ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
+	-- Suicide is not encouraged here at CTF
+	if victim == killer then
+		return
+	end
+	local main, match = ctf_stats.player(killer)
+	if main and match then
+		main.kills  = main.kills  + 1
+		match.kills = match.kills + 1
+		match.kills_since_death = match.kills_since_death + 1
+		_needs_save = true
+	end
+end)
+
 minetest.register_on_dieplayer(function(player)
 	local main, match = ctf_stats.player(player:get_player_name())
 
