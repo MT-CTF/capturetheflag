@@ -11,45 +11,37 @@ function kill_assist.clear_assists(player)
 end
 
 function kill_assist.add_assist(victim, attacker, damage)
+	if victim == attacker then return end
+
 	if not kill_assists[victim] then
-		kill_assists[victim] = {}
+		kill_assists[victim] = {
+			players = {},
+			hp_offset = 0
+		}
 	end
 
-	kill_assists[victim][attacker] = (kill_assists[victim][attacker] or 0) + damage
+	kill_assists[victim].players[attacker] = (kill_assists[victim].players[attacker] or 0) + damage
 end
 
 function kill_assist.add_heal_assist(victim, healed_hp)
 	if not kill_assists[victim] then return end
 
-	for name, damage in pairs(kill_assists[victim]) do
-		kill_assists[victim][name] = math.max(damage - healed_hp, 0)
-	end
+	-- Player names can't contain '!' so it's safe to use here
+	kill_assists[victim].hp_offset = kill_assists[victim].hp_offset + healed_hp
 end
 
 function kill_assist.reward_assists(victim, killer, reward)
 	if not kill_assists[victim] then return end
 
-	for name, damage in pairs(kill_assists[victim]) do
-		if minetest.get_player_by_name(name) and name ~= victim then
-			local standard = 0
+	for name, damage in pairs(kill_assists[victim].players) do
+		if name ~= "!offset" and minetest.get_player_by_name(name) then
 			local max_hp = minetest.get_player_by_name(victim):get_properties().max_hp or 20
-			local help_percent = damage / max_hp
+			local help_percent = damage / (max_hp + kill_assists[victim].hp_offset)
 			local main, match = ctf_stats.player(name)
 			local color = "0x00FFFF"
 
-			if name ~= killer then
-				standard = 0.3
-				help_percent = math.min(help_percent, 0.75)
-			else
-				help_percent = math.min(help_percent, 1)
-			end
-
-			if help_percent >= standard then
-				reward = math.floor((reward * help_percent)*100)/100
-			end
-
-			if reward < 1 then
-				reward = 1
+			if name == killer or help_percent >= 0.33 then
+				reward = math.min(math.floor((reward * help_percent)*100)/100, 1)
 			end
 
 			match.score = match.score + reward
