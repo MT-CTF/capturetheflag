@@ -26,7 +26,6 @@ end
 function kill_assist.add_heal_assist(victim, healed_hp)
 	if not kill_assists[victim] then return end
 
-	-- Player names can't contain '!' so it's safe to use here
 	kill_assists[victim].hp_offset = kill_assists[victim].hp_offset + healed_hp
 end
 
@@ -41,7 +40,7 @@ function kill_assist.reward_assists(victim, killer, reward)
 			local color = "0x00FFFF"
 
 			if name == killer or help_percent >= 0.33 then
-				reward = math.max(math.floor((reward * help_percent)*100)/100, 0)
+				reward = math.max(math.floor((reward * help_percent)*100)/100, 1)
 			end
 
 			match.score = match.score + reward
