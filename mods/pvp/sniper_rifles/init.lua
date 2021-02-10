@@ -157,6 +157,13 @@ local old_is_protected = minetest.is_protected
 local r = ctf.setting("flag.nobuild_radius") + 5
 local rs = r * r
 function minetest.is_protected(pos, name, info, ...)
+	if antisabotage.is_sabotage(pos, minetest.get_node(pos), minetest.get_player_by_name(name)) then
+		minetest.chat_send_player(name,
+			"You can't shoot blocks under your teammates!")
+		return true
+	end
+
+	end
 	if r <= 0 or rs == 0 or not info or not info.is_gun then
 		return old_is_protected(pos, name, info, ...)
 	end
