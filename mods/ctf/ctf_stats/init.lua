@@ -417,7 +417,7 @@ function ctf_stats.calculateKillReward(victim, killer, toolcaps)
 	return reward
 end
 
-ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
+ctf.register_on_killedplayer(function(victim, killer)
 	-- Suicide is not encouraged here at CTF
 	if victim == killer then
 		return
