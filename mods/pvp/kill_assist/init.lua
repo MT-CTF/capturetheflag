@@ -30,11 +30,14 @@ function kill_assist.add_heal_assist(victim, healed_hp)
 end
 
 function kill_assist.reward_assists(victim, killer, reward)
-	if not kill_assists[victim] then return end
+	local max_hp = minetest.get_player_by_name(victim):get_properties().max_hp or 20
+
+	if not kill_assists[victim] then
+		kill_assist.add_assist(victim, killer, max_hp)
+	end
 
 	for name, damage in pairs(kill_assists[victim].players) do
-		if name ~= "!offset" and minetest.get_player_by_name(name) then
-			local max_hp = minetest.get_player_by_name(victim):get_properties().max_hp or 20
+		if minetest.get_player_by_name(name) then
 			local help_percent = damage / (max_hp + kill_assists[victim].hp_offset)
 			local main, match = ctf_stats.player(name)
 			local color = "0x00FFFF"
