@@ -75,7 +75,7 @@ ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 	kill_assist.reward_assists(victim, killer, reward)
 end)
 
-ctf.register_on_punchplayer(function(player, hitter, _, _, _, damage)
+ctf.register_on_attack(function(player, hitter, _, _, _, damage)
 	kill_assist.add_assist(player:get_player_name(), hitter:get_player_name(), damage)
 end)
 
