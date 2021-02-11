@@ -34,30 +34,26 @@ function ctf_respawn_immunity.update_effects(player)
 	-- end
 end
 
-minetest.register_on_punchplayer(function(player, hitter,
+ctf.register_can_attack(function(player, hitter,
 		time_from_last_punch, tool_capabilities, dir, damage)
 	if not player or not hitter then
-		return false
+		return
 	end
 
 	local pname = player:get_player_name()
 	local hname = hitter:get_player_name()
-	local pteam = ctf.player(pname).team
-	local hteam = ctf.player(hname).team
 
-	if pteam ~= hteam then
-		if player and ctf_respawn_immunity.is_immune(player) then
-			minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
-					" just respawned or joined," .. " and is immune to attacks!"))
-			return true
-		end
+	if ctf_respawn_immunity.is_immune(player) then
+		minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
+				" just respawned or joined," .. " and is immune to attacks!"))
+		return false
+	end
 
-		if hitter and ctf_respawn_immunity.is_immune(hitter) then
-			minetest.chat_send_player(hname, minetest.colorize("#FF8C00",
-					"Your immunity has ended because you attacked a player"))
-			immune_players[hname] = nil
-			ctf_respawn_immunity.update_effects(hitter)
-		end
+	if ctf_respawn_immunity.is_immune(hitter) then
+		minetest.chat_send_player(hname, minetest.colorize("#FF8C00",
+				"Your immunity has ended because you attacked a player"))
+		immune_players[hname] = nil
+		ctf_respawn_immunity.update_effects(hitter)
 	end
 end)
 

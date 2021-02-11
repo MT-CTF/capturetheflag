@@ -446,12 +446,20 @@ function ctf.register_on_killedplayer(func)
 	table.insert(ctf.registered_on_killedplayer, func)
 end
 
-ctf.registered_on_punchplayer = {}
-function ctf.register_on_punchplayer(func)
+ctf.registered_can_attack = {}
+function ctf.register_can_attack(func)
 	if ctf._mt_loaded then
 		error("You can't register callbacks at game time!")
 	end
-	table.insert(ctf.registered_on_punchplayer, func)
+	table.insert(ctf.registered_can_attack, func)
+end
+
+ctf.registered_on_attack = {}
+function ctf.register_on_attack(func)
+	if ctf._mt_loaded then
+		error("You can't register callbacks at game time!")
+	end
+	table.insert(ctf.registered_on_attack, func)
 end
 
 local dead_players = {}
@@ -482,6 +490,15 @@ minetest.register_on_punchplayer(function(player, hitter,
 			end
 		end
 
+		for i = 1, #ctf.register_can_attack do
+			if ctf.registered_can_attack[i](
+				player, hitter, time_from_last_punch,
+				tool_capabilities, dir, damage, ...
+			) == false then
+				return false
+			end
+		end
+
 		local hp = player:get_hp()
 		if hp == 0 then
 			return false
@@ -497,8 +514,8 @@ minetest.register_on_punchplayer(function(player, hitter,
 			return false
 		end
 
-		for i = 1, #ctf.registered_on_punchplayer do
-			ctf.registered_on_punchplayer[i](
+		for i = 1, #ctf.registered_on_attack do
+			ctf.registered_on_attack[i](
 				player, hitter, time_from_last_punch,
 				tool_capabilities, dir, damage, ...
 			)

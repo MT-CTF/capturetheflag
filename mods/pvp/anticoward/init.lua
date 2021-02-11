@@ -9,23 +9,11 @@ local COMBATLOG_SCORE_PENALTY = 10
 --- Make suicides and combat logs award last puncher with kill
 --
 
-minetest.register_on_punchplayer(function(player, hitter,
+ctf.register_on_attack(function(player, hitter,
 		time_from_last_punch, tool_capabilities, dir, damage)
 	if player and hitter then
-		if ctf_respawn_immunity.is_immune(player) or ctf_match.is_in_build_time() then
-			return
-		end
-
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
-
-		local to = ctf.player(pname)
-		local from = ctf.player(hname)
-
-		if to.team == from.team and to.team ~= "" and
-				to.team ~= nil and to.name ~= from.name then
-			return
-		end
 
 		local hp = player:get_hp() - damage
 		if hp <= 0 then
