@@ -34,8 +34,8 @@ function ctf_respawn_immunity.update_effects(player)
 	-- end
 end
 
-ctf.register_can_attack(function(player, hitter,
-		time_from_last_punch, tool_capabilities, dir, damage)
+local old_can_attack = ctf.can_attack
+function ctf.can_attack(player, hitter, ...)
 	if not player or not hitter then
 		return
 	end
@@ -55,7 +55,9 @@ ctf.register_can_attack(function(player, hitter,
 		immune_players[hname] = nil
 		ctf_respawn_immunity.update_effects(hitter)
 	end
-end)
+
+	return old_can_attack(player, hitter, ...)
+end
 
 minetest.register_on_joinplayer(ctf_respawn_immunity.set_immune)
 minetest.register_on_respawnplayer(ctf_respawn_immunity.set_immune)

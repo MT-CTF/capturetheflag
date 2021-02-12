@@ -446,12 +446,8 @@ function ctf.register_on_killedplayer(func)
 	table.insert(ctf.registered_on_killedplayer, func)
 end
 
-ctf.registered_can_attack = {}
-function ctf.register_can_attack(func)
-	if ctf._mt_loaded then
-		error("You can't register callbacks at game time!")
-	end
-	table.insert(ctf.registered_can_attack, func)
+function ctf.can_attack(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, ...)
+	return true
 end
 
 ctf.registered_on_attack = {}
@@ -490,13 +486,10 @@ minetest.register_on_punchplayer(function(player, hitter,
 			end
 		end
 
-		for i = 1, #ctf.register_can_attack do
-			if ctf.registered_can_attack[i](
-				player, hitter, time_from_last_punch,
-				tool_capabilities, dir, damage, ...
-			) == false then
-				return false
-			end
+		if ctf.can_attack(player, hitter, time_from_last_punch, tool_capabilities,
+			dir, damage, ...) == false
+		then
+			return true
 		end
 
 		local hp = player:get_hp()
