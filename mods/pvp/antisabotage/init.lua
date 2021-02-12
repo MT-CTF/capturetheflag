@@ -1,7 +1,7 @@
 -- Code by Apelta. Mutelated by Lone_Wolf. Mutelated again by Apelta.
 antisabotage = {}
 
-function antisabotage.is_sabotage(pos, oldnode, digger) -- used for paxel
+function antisabotage.is_sabotage(pos, oldnode, digger, show_msg) -- used for paxel
 	local dname = digger:get_player_name()
 
 	for _, player in pairs(minetest.get_connected_players()) do
@@ -17,8 +17,8 @@ function antisabotage.is_sabotage(pos, oldnode, digger) -- used for paxel
 				for _, item in pairs(minetest.get_node_drops(oldnode)) do
 					digger:get_inventory():remove_item("main", ItemStack(item))
 				end
-
-				minetest.chat_send_player(dname, "You can't mine blocks under your teammates!")
+				
+				if show_msg then minetest.chat_send_player(dname, "You can't mine blocks under your teammates!") end
 				return true
 			end
 		end
@@ -28,5 +28,5 @@ end
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if not digger:is_player() then return end
 
-	antisabotage.is_sabotage(pos, oldnode, digger)
+	antisabotage.is_sabotage(pos, oldnode, digger, true)
 end)

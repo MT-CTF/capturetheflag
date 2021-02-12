@@ -155,7 +155,7 @@ local function remove_pillar(pos, pname)
 
 		if minetest.get_modpath("antisabotage") then
 			-- Fix paxel being capable of mining blocks under teammates
-			if antisabotage.is_sabotage(pos, minetest.get_node(pos), player) then return end
+			if antisabotage.is_sabotage(pos, minetest.get_node(pos), player, true) then return end
 		end
 
 		minetest.dig_node(pos)
