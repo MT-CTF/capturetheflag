@@ -1,4 +1,4 @@
--- Code by Apelta. Mutelated by Lone_Wolf. Mutelated again by Apelta.
+-- Code by Apelta. Mutelated by Lone_Wolf. Mutelated again by Apelta. Slightly modified by oneplustwo.
 antisabotage = {}
 
 function antisabotage.is_sabotage(pos, oldnode, digger, show_msg) -- used for paxel

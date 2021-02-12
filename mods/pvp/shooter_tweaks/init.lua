@@ -160,6 +160,57 @@ shooter.blast = function(pos, radius, fleshy, distance, user, groups)
 	end
 end
 
+-- Override punch_node so that antisabotage can work for shooters
+shooter.punch_node = function(pos, spec)
+	if config.enable_protection and minetest.is_protected(pos, spec.user, {is_gun = true}) then
+		return
+	end
+
+	if antisabotage.is_sabotage(pos, minetest.get_node(pos), spec.user, false) then
+		minetest.chat_send_player(name,
+			"You can't shoot blocks under your teammates!")
+	end
+
+	local node = minetest.get_node(pos)
+	if not node then
+		return
+	end
+	local item = minetest.registered_items[node.name]
+	if not item then
+		return
+	end
+
+	if node.name:find("ctf_traps") and item.on_dig then
+		item.on_dig(pos, node, minetest.get_player_by_name(spec.user), {do_dig = false})
+	end
+
+	if item.groups then
+		for k, v in pairs(spec.groups) do
+			local level = item.groups[k] or 0
+			if level >= v then
+				minetest.dig_node(pos)
+				shooter.play_node_sound(node, pos)
+				if item.tiles then
+					local texture = item.tiles[1]
+					texture = (type(texture) == "table") and texture.name or texture
+					shooter.spawn_particles(pos, {texture=texture})
+				end
+				if config.node_drops then
+					local object = minetest.add_item(pos, item)
+					if object then
+						object:set_velocity({
+							x = math.random(-1, 1),
+							y = 4,
+							z = math.random(-1, 1)
+						})
+					end
+				end
+				return true
+			end
+		end
+	end
+end
+
 
 minetest.registered_entities["shooter_crossbow:arrow_entity"].collide_with_objects = false
 
