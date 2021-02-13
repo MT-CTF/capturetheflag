@@ -167,7 +167,7 @@ shooter.punch_node = function(pos, spec)
 	end
 
 	if antisabotage.is_sabotage(pos, minetest.get_node(pos), spec.user, false) then
-		minetest.chat_send_player(name,
+		minetest.chat_send_player(spec.user:get_player_name(),
 			"You can't shoot blocks under your teammates!")
 	end
 
