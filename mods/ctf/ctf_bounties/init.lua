@@ -155,3 +155,17 @@ minetest.register_chatcommand("place_bounty", {
 		return true, "Put bounty on " .. target
 	end
 })
+
+minetest.register_chatcommand("bp", {
+         description = "See bountied player and the prize",
+         func = function(name)
+                  if bountied_player then 
+                     minetest.chat_send_player(name,
+                     minetest.colorize("#fff326", "Player with bounty: ") ..
+                     minetest.colorize("#63d437", bountied_player) ..
+                     minetest.colorize("#fff326", ". Points: ") ..
+                     minetest.colorize("#7efc00", bounty_score))
+                  else return false, "No a player with bounty now."
+                 end
+        end
+})
