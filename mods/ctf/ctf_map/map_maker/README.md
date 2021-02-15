@@ -35,9 +35,9 @@ There are multiple ways do this, this is the simplest in most cases.
 
 ### 4. Place barriers
 
-* Set the middle barrier direction. The barrier is a plane defined by a co-ordinate = 0.
-  If the barrier is X=0, then it will placed with every node of the barrier having X=0.
-  If the barrier is Z=0, then it will placed with every node of the barrier having Z=0.
+* The barrier is a plane defined by co-ordinate (=0).
+* If you choose `X=0` the barrier will be placed having the X co-ordinate as 0. But from a few months, the `X=0` co-ordinate creates bugs and errors. It's better if you choose `Z=0` for creating your map.
+* If you choose `Z=0` The barrier will be placed having the Z co-ordinate as 0.
 * Click "place barrier". Note that this command does not have an undo.
 * After placing barriers you should place 2 flags where you want bases to be. You get flags in `/gui` --> `Giveme flags`
 
@@ -48,7 +48,7 @@ There are multiple ways do this, this is the simplest in most cases.
 ### 6. Export
 
 * Click export, and wait until completion.
-* Copy the resultant folder from `worlddir/schems/` into `ctf_map/ctf_map_core/maps/`.
+* Copy the resultant folder from `worlddir/schems/` into `games/capturetheflag/mods/ctf/ctf_map/ctf_map_core/maps/`.
 * Profit!
 
 
@@ -56,7 +56,7 @@ There are multiple ways do this, this is the simplest in most cases.
 
 ### Map meta
 
-Each map's metadata is stored in an accompanying .conf file containing the following data:
+Each map's metadata is stored in an accompanying `map.conf` file containing the following data:
 
 * `name`: Name of map.
 * `author`: Author of the map.
@@ -73,7 +73,6 @@ zone `i`, relative to the center of the schem.
 * `license`: Name of the license of the map.
 * `other`: [Optional] Misc. information about the map. This is displayed in the maps catalog.
 * `base_node`: [Optional] Technical name of node to be used for the team base.
-* `schematic`: Name of the map's schematic.
 * `initial_stuff`: [Optional] Comma-separated list of itemstacks to be given to the player
  on join and on respawn.
 * `treasures`: [Optional] List of treasures to be registered for the map, in a serialized
@@ -86,16 +85,16 @@ format. Refer to the `treasures` sub-section for more details.
 
 #### `license`
 
-* Every map must have its own license. Once you've chosen your license, simply add the following line to the map's `.conf` file:
+* Every map must have its own license. Once you've chosen your license, simply add the following line to the `map.conf` file:
 
-  ```lua
+  ```properties
   license = <name>
   ```
 
 * If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
 If you want to tell more infomation, you can use:
 
-  ```lua
+  ```properties
   others = <description>
   ```
 
@@ -110,11 +109,20 @@ If you want to tell more infomation, you can use:
 
 An example `treasures` value that registers steel pick, shotgun, and grenade:
 
-```lua
+```properties
 treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
 ```
 
 (See [here](../../../other/treasurer/README.md) to understand the magic numbers)
+
+#### `initial_stuff`
+`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field is located in the `map.conf` file. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
+
+An example of `initial_stuff` value that registers a stone pickaxe, 30 cobblestones, 5 torches and a pistol is given below.
+
+```properties
+initial_stuff = default:pick_stone,default:cobble 30,default:torch 5,shooter:pistol
+```
 
 ### `screenshot`
 
@@ -133,18 +141,18 @@ Six images which should be in map's folder.
 * `skybox_5.png` - south
 * `skybox_6.png` - north
 
-You have to include skybox license in `license` in `.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
+You have to include skybox license in `license` in `map.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
+Before you test your skybox images in local CTF game, run the `update.sh` file in the `games/capturetheflag/` folder.
 
-You can find some good skyboxes with suitable licenses at [https://opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox).
-
+You can find some good skyboxes with suitable licenses at [opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox) or [www.humus.name](https://www.humus.name/index.php?page=Textures).
 ## Editing exported map
 
 The easiest way to edit exported maps is the following:
 * Create a world using `singlenode` mapgen. Enable `WorldEdit` and `ctf_map` mod,
-* Go in the world's folder, create a folder named `schems`, and place the `.mts` file inside,
+* Go in the world's folder, create a folder named `schems`, and place the `map.mts` file inside,
 * Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
 * Do `//1` to set the position where you will generate the map,
-* Do `//mtschemplace yourschematic` (where `yourschematic` is the name of the mts file without `.mts`).
+* Do `//mtschemplace map` (where `map` is the name of the mts file without `.mts`).
 
 When you finish:
 

@@ -5,6 +5,8 @@ function map_maker.show_gui(name)
 	local formspec = {
 		"size[9,9.5]",
 		"bgcolor[#080808BB;true]",
+		default.gui_bg,
+		default.gui_bg_img,
 
 		"label[0,0;1. Select Area]",
 		"field[0.4,1;1,1;posx;X;", context.center.x, "]",
@@ -55,7 +57,8 @@ end
 function map_maker.show_progress_formspec(name, text)
 	minetest.show_formspec(name, "ctf_map:progress",
 		"size[6,1]bgcolor[#080808BB;true]" ..
-		"label[0,0;" ..
+		default.gui_bg ..
+		default.gui_bg_img .. "label[0,0;" ..
 		minetest.formspec_escape(text) .. "]")
 end
 
