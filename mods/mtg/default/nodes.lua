@@ -507,7 +507,7 @@ minetest.register_node("default:dry_dirt", {
 })
 
 minetest.register_node("default:dry_dirt_with_dry_grass", {
-	description = S("Savanna Dirt with Savanna Grass"),
+	description = "Savanna Dirt with Savanna Grass",
 	tiles = {"default_dry_grass.png", "default_dry_dirt.png",
 		{name = "default_dry_dirt.png^default_dry_grass_side.png",
 			tileable_vertical = false}},
