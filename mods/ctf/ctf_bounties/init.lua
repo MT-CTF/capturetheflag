@@ -159,7 +159,7 @@ minetest.register_chatcommand("place_bounty", {
 minetest.register_chatcommand("bp", {
          description = "See bountied player and the prize",
          func = function(name)
-                  if bountied_player then 
+                  if bountied_player then
                      minetest.chat_send_player(name,
                      minetest.colorize("#fff326", "Player with bounty: ") ..
                      minetest.colorize("#63d437", bountied_player) ..
