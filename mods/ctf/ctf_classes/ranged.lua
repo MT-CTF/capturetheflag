@@ -29,7 +29,7 @@ shooter.get_weapon_spec = function(user, weapon_name)
 
 	if table.indexof(class.properties.allowed_guns or {}, weapon_name) == -1 then
 		minetest.chat_send_player(user:get_player_name(),
-			"Your class can't use that weapon! Change your class at spawn")
+			"Your class can't use that weapon! Change your class at base")
 		return nil
 	end
 
