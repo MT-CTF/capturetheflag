@@ -103,9 +103,9 @@ function ctf.error(area, msg)
 end
 function ctf.log(area, msg)
 	if area and area ~= "" then
-		minetest.log("[CTF | " .. area .. "] " .. msg)
+		minetest.log("info", "[CTF | " .. area .. "] " .. msg)
 	else
-		minetest.log("[CTF]" .. msg)
+		minetest.log("info", "[CTF]" .. msg)
 	end
 end
 function ctf.action(area, msg)
