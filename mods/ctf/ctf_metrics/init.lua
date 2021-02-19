@@ -1,5 +1,4 @@
 if not minetest.create_metric then
-	error("No metrics!")
 	return
 end
 
