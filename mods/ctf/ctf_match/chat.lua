@@ -52,7 +52,7 @@ minetest.register_chatcommand("ctf_respawn", {
 
 local restart_on_next_match = false
 local restart_on_next_match_by = nil
-minetest.register_chatcommand("ctf_queue_restart", {
+minetest.register_chatcommand("restart", {
 	description = "Queue server restart",
 	privs = {
 		server = true
@@ -65,7 +65,7 @@ minetest.register_chatcommand("ctf_queue_restart", {
 	end
 })
 
-minetest.register_chatcommand("ctf_unqueue_restart", {
+minetest.register_chatcommand("unqueue_restart", {
 	description = "Unqueue server restart",
 	privs = {
 		server = true
