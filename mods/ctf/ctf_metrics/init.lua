@@ -2,23 +2,12 @@ if not minetest.create_metric then
 	return
 end
 
-local storage = minetest.get_mod_storage()
-local function counter(name, help)
-	local metric = minetest.create_metric("counter", name, help)
-	metric:increment(tonumber(storage:get(name) or 0))
-	return {
-		get = function()
-			return metric:get()
-		end,
 
-		increment = function(_, value)
-			metric:increment(value)
-			storage:set_string(name, tostring(metric:get()))
-		end,
-	}
+local function counter(...)
+	return minetest.create_metric("counter", ...)
 end
-local function gauge(name, help)
-	return minetest.create_metric("gauge", name, help)
+local function gauge(...)
+	return minetest.create_metric("gauge", ...)
 end
 
 
@@ -54,15 +43,35 @@ minetest.register_on_placenode(function()
 end)
 
 
+--
+-- Gauges
+--
+
+local class_gauges = {}
+for _, class in ipairs(ctf_classes.__classes_ordered) do
+	class_gauges[class.name] = gauge("ctf_class_players", "Player count for class", {
+		class = class.name
+	})
+end
+
 local online_score = gauge("ctf_online_score", "Total score of online players")
 local match_time = gauge("ctf_match_play_time", "Current time in match")
+
 minetest.register_globalstep(function()
 	local sum = 0
+	local class_counts = {}
 	for _, player in pairs(minetest.get_connected_players()) do
 		local total, _ = ctf_stats.player(player:get_player_name())
 		sum = sum + total.score
-	end
-	online_score:set(sum)
 
+		local class = ctf_classes.get(player)
+		class_counts[class.name] = (class_counts[class.name] or 0) + 1
+	end
+
+	online_score:set(sum)
 	match_time:set(ctf_match.get_match_duration() or 0)
+
+	for _, class in ipairs(ctf_classes.__classes_ordered) do
+		class_gauges[class.name]:set(class_counts[class.name] or 0)
+	end
 end)
