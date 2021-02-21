@@ -99,6 +99,7 @@ minetest.override_item("ctf_bandages:bandage", {
 		if ctf.player(pname).team == ctf.player(name).team then
 			local nodename = minetest.get_node(object:get_pos()).name
 			if ctf_classes.dont_heal[pname] or nodename:find("lava") or nodename:find("water") or nodename:find("trap") then
+                                minetest.chat_send_player(name, "You can't heal player in lava, water or spikes!")
 				return -- Can't heal players in lava/water/spikes
 			end
 
