@@ -207,7 +207,7 @@ end
 function ctf_stats.is_pro(name)
 	local stats = ctf_stats.player(name)
 	local kd = stats.kills / (stats.deaths == 0 and 1 or stats.deaths)
-	return stats.score >= 10000 and kd >= 1.5
+	return stats.score >= 10000 and kd >= 1.5 and stats.captures >= 10
 end
 
 ctf.register_on_join_team(function(name, tname, oldteam)
