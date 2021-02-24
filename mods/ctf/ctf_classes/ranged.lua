@@ -49,7 +49,7 @@ local function check_grapple(itemname)
 		on_use = function(itemstack, user, ...)
 			if not ctf_classes.get(user).properties.allow_grapples then
 				minetest.chat_send_player(user:get_player_name(),
-					"Your class can't use that weapon! Change your class at spawn")
+					"Your class can't use that weapon! Change your class at base")
 
 				return itemstack
 			end
