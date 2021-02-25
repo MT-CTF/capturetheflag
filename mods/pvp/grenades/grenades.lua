@@ -20,7 +20,7 @@ local fragdef = {
         if ctf_match.is_in_build_time() then
            			minetest.get_player_by_name(name):get_inventory():add_item("main", "grenades:frag")
                                       return
-            minetest.chat_send_player(pname, "Match hasn't started yet!")
+            minetest.chat_send_player(name, "Match hasn't started yet!")
         end
     end
 
