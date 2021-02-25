@@ -1,4 +1,4 @@
-local color = "#66A0FF"
+ color = "#66A0FF"
 local items = {
 	"",
 	color .. "Game Play",
@@ -10,8 +10,8 @@ local items = {
 	"*  Use medkits to replenish health gradually.",
 	"*  Gain more score by killing more than you die, or by capturing the flag.",
 	"*  Players are immune for 5 seconds after they respawn.",
-	"*  Access the pro section of the chest by achieving a 2k+ score and",
-	"   killing 2 people for every death.",
+	"*  Access the pro section of the chest by achieving 2k+ score,",
+	"   killing 3 people for every 2 deaths, and capturing the flag at least 10 times",
 	"",
 
 	color .. "Team Co-op",
@@ -30,7 +30,11 @@ local items = {
 
 	color .. "Contact Moderators",
 	"",
-	"*  Report people who sabotage using /report."
+	"*  Report people using /report or the #reports channel in Discord",
+
+	color .. "Other",
+	"",
+	"* CaptureTheFlag Discord: https://discord.gg/vcZTRPX",
 }
 for i = 1, #items do
 	items[i] = minetest.formspec_escape(items[i])
