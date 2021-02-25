@@ -60,7 +60,7 @@ function random_messages.read_messages()
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Craft 6 cobbles and 1 steel ingot together to make reinforced cobble.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
-		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
+		"Like CTF? Give feedback using /report, and consider joining the Discord",
 		"Want to submit your own map? Visit ctf.rubenwardy.com to get involved.",
 		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
 		"To report misbehaving players to moderators, please use /report <name> <action>",
@@ -78,7 +78,6 @@ function random_messages.read_messages()
 		"Medics cause troops within 10 metres to regenerate health faster.",
 		"Hitting your enemy does more damage than not hitting them.",
 		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
-		"The 'Updates' tab in your inventory will show some of the latest updates to CTF",
 	}
 end
 
