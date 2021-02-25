@@ -31,10 +31,11 @@ local items = {
 	color .. "Contact Moderators",
 	"",
 	"*  Report people using /report or the #reports channel in Discord",
+	"",
 
 	color .. "Other",
 	"",
-	"* CaptureTheFlag Discord: https://discord.gg/vcZTRPX",
+	"* Capture The Flag Discord: https://discord.gg/vcZTRPX",
 }
 for i = 1, #items do
 	items[i] = minetest.formspec_escape(items[i])
