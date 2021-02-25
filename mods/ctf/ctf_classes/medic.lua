@@ -99,6 +99,7 @@ minetest.override_item("ctf_bandages:bandage", {
 		if ctf.player(pname).team == ctf.player(name).team then
 			local nodename = minetest.get_node(object:get_pos()).name
 			if ctf_classes.dont_heal[pname] or nodename:find("lava") or nodename:find("water") or nodename:find("trap") then
+                                minetest.chat_send_player(name, "You can't heal player in lava, water or spikes!")
 				return -- Can't heal players in lava/water/spikes
 			end
 
@@ -152,11 +153,6 @@ local function remove_pillar(pos, pname)
 
 	if name:find("default") and isdiggable(name) then
 		local player = minetest.get_player_by_name(pname)
-
-		if minetest.get_modpath("antisabotage") then
-			-- Fix paxel being capable of mining blocks under teammates
-			if antisabotage.is_sabotage(pos, minetest.get_node(pos), player) then return end
-		end
 
 		minetest.dig_node(pos)
 
