@@ -240,6 +240,12 @@ minetest.register_chatcommand("makepro", {
 			modified = true
 		end
 
+        if stats.captures < 10 then
+            stats.captures = 10
+            modified = true
+        end
+
+
 		if modified then
 			ctf_stats.request_save()
 			return true, "Made " .. param .. " a pro!"
