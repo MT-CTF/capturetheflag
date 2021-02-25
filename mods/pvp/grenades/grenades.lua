@@ -22,7 +22,6 @@ local fragdef = {
                                       return
             minetest.chat_send_player(name, "Match hasn't started yet!")
         end
-    end
 
 		local player = minetest.get_player_by_name(name)
 
