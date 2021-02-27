@@ -841,7 +841,7 @@ minetest.register_node("default:aspen_leaves", {
 minetest.register_node("default:stone_with_coal", {
 	description = "Coal Ore",
 	tiles = {"default_stone.png^default_mineral_coal.png"},
-	groups = {cracky = 3},
+	groups = {cracky = 3,ores = 1},
 	drop = 'default:coal_lump',
 	sounds = default.node_sound_stone_defaults(),
 })
@@ -858,7 +858,7 @@ minetest.register_node("default:coalblock", {
 minetest.register_node("default:stone_with_iron", {
 	description = "Iron Ore",
 	tiles = {"default_stone.png^default_mineral_iron.png"},
-	groups = {cracky = 2},
+	groups = {cracky = 2,ores = 2},
 	drop = 'default:iron_lump',
 	sounds = default.node_sound_stone_defaults(),
 })
@@ -920,7 +920,7 @@ minetest.register_node("default:bronzeblock", {
 minetest.register_node("default:stone_with_mese", {
 	description = "Mese Ore",
 	tiles = {"default_stone.png^default_mineral_mese.png"},
-	groups = {cracky = 1},
+	groups = {cracky = 1,ores = 3},
 	drop = "default:mese_crystal",
 	sounds = default.node_sound_stone_defaults(),
 })
@@ -938,7 +938,7 @@ minetest.register_node("default:mese", {
 minetest.register_node("default:stone_with_gold", {
 	description = "Gold Ore",
 	tiles = {"default_stone.png^default_mineral_gold.png"},
-	groups = {cracky = 2},
+	groups = {cracky = 2,ores = 2},
 	drop = "default:gold_lump",
 	sounds = default.node_sound_stone_defaults(),
 })
@@ -955,7 +955,7 @@ minetest.register_node("default:goldblock", {
 minetest.register_node("default:stone_with_diamond", {
 	description = "Diamond Ore",
 	tiles = {"default_stone.png^default_mineral_diamond.png"},
-	groups = {cracky = 1},
+	groups = {cracky = 1,ores = 3},
 	drop = "default:diamond",
 	sounds = default.node_sound_stone_defaults(),
 })
