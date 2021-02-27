@@ -191,8 +191,11 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 		if pointed_thing.type == "node" then
 			local pname = placer:get_player_name()
 
-			if not isdiggable(minetest.get_node(pointed_thing.under).name) or ctf_match.is_in_build_time() then
-				minetest.chat_send_player(pname, "Can't dig node or build time active")
+			if not isdiggable(minetest.get_node(pointed_thing.under).name) then
+				minetest.chat_send_player(pname, "Can't dig node!")
+				return minetest.item_place(itemstack, placer, pointed_thing)
+			elseif ctf_match.is_in_build_time() then
+				minetest.chat_send_player(pname, "Build time active!")
 				return minetest.item_place(itemstack, placer, pointed_thing)
 			end
 
