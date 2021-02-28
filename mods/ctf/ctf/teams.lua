@@ -498,6 +498,10 @@ minetest.register_on_punchplayer(function(player, hitter,
 		end
 
 		if hp - damage <= 0 then
+			if pname == hname then
+				tool_capabilities.damage_groups = tool_capabilities.damage_groups or {}
+				tool_capabilities.damage_groups.suicide = true
+			end
 			dead_players[pname] = true
 			local wielded = hitter:get_wielded_item()
 			for i = 1, #ctf.registered_on_killedplayer do
