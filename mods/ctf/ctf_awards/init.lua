@@ -1,4 +1,3 @@
-local AMS = minetest.get_mod_storage()
 awards.register_award("ctf",{
   title = "Capture The Flag!",
   description = "Capture The Flag",
@@ -22,7 +21,7 @@ awards.register_award("ctf_king",{
 
 ctf_flag.register_on_capture(function(attname,flag)
   minetest.after(0,function()
-  CAPS = ctf_stats.player(attname).captures
+  local CAPS = ctf_stats.player(attname).captures
   if CAPS >= 100 then
     awards.unlock(attname, "ctf_king")
   elseif CAPS >= 10 then
