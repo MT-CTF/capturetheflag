@@ -7,3 +7,6 @@
 [submodule "mods/pvp/shooter"]
 	path = mods/pvp/shooter
 	url = https://github.com/MT-CTF/shooter
+[submodule "mods/other/awards"]
+	path = mods/other/awards
+	url = https://gitlab.com/rubenwardy/awards
