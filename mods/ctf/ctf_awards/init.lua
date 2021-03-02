@@ -1,18 +1,18 @@
-awards.register_award("ctf",{
+awards.register_award("ctf", {
   title = "Capture The Flag!",
   description = "Capture The Flag",
   icon = "awards_ctf_icon.png",
   difficulty = 1,
 })
 
-awards.register_award("ctf_ten",{
+awards.register_award("ctf_ten", {
   title = "The Master of Capturing!",
   description = "Capture The Flag ten times",
   icon = "awards_ctf_icon.png",
   difficulty = 5,
 })
 
-awards.register_award("ctf_king",{
+awards.register_award("ctf_king", {
   title = "The King of Capturing!",
   description = "Capture The Flag 100 times!",
   icon = "awards_ctf_icon.png",
@@ -20,7 +20,7 @@ awards.register_award("ctf_king",{
 })
 
 ctf_flag.register_on_capture(function(attname,flag)
-  minetest.after(0,function()
+  minetest.after(0, function()
   local CAPS = ctf_stats.player(attname).captures
   if CAPS >= 100 then
     awards.unlock(attname, "ctf_king")
@@ -32,7 +32,7 @@ ctf_flag.register_on_capture(function(attname,flag)
 end)
 
 
-awards.register_award("gravitation",{
+awards.register_award("gravitation", {
   title = "Wow! Gravitation!",
   description = "You forgot Newton's law of universal gravitation.",
   icon = "default_sand.png",
