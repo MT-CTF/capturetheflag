@@ -66,9 +66,7 @@ minetest.register_node("tsm_chests:chest", {
 		for index, stack in pairs(inv:get_list("main")) do
 			if not minetest.is_yes(minetest.settings:get("remove_items")) then
 				local obj = minetest.add_item(pos, stack:take_item(stack:get_count()))
-				if obj then
-					obj:set_velocity({x = math.random(-1, 1), y = 5, z = math.random(-1, 1)})
-				end
+				_ = obj and obj:set_velocity({x = math.random(-1, 1), y = 5, z = math.random(-1, 1)})
 			end
 			inv:set_stack("main", index, nil)
 		end
