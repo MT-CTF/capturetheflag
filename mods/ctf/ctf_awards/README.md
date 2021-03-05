@@ -1,5 +1,7 @@
 ## ctf_awards
-A mod that add awards to Minetest Capture The Flag
+
+A mod that adds awards to Minetest Capture The Flag
+
 ## License
 
     Copyright © 2020-2021 Cato Yiu
@@ -15,4 +17,3 @@ A mod that add awards to Minetest Capture The Flag
 
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
