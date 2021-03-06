@@ -48,7 +48,7 @@ awards.register_award("canary", {
 
 local canary = ""
 minetest.register_on_dieplayer(function(ObjectRef, reason)
-  name = ObjectRef:get_player_name()
+  local name = ObjectRef:get_player_name()
   if canary == "" then
     canary = name
     awards.unlock(name, "canary")
