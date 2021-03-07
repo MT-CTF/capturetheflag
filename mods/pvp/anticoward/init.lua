@@ -165,9 +165,15 @@ minetest.register_globalstep(function(dtime)
 end)
 
 ctf_match.register_on_new_match(function()
+        for _, coward in ipairs(potential_cowards) do
+		coward:hud_remove(potential_cowards[coward].hud or 0)
+        end
 	potential_cowards = {}
 end)
 
 ctf.register_on_new_game(function()
+        for _, coward in ipairs(potential_cowards) do
+		coward:hud_remove(potential_cowards[coward].hud or 0)
+        end
 	potential_cowards = {}
 end)
