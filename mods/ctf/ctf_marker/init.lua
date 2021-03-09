@@ -47,7 +47,7 @@ function ctf_marker.add_marker(name, tname, pos, str)
 		if tplayer then
 			teams[tname].players[pname] = tplayer:hud_add({
 				hud_elem_type = "waypoint",
-				name          = str,
+				name          = "[" .. name .. "'s marker" .. str,
 				number        = tonumber(ctf.flag_colors[team.data.color]),
 				world_pos     = pos
 			})
@@ -99,7 +99,7 @@ minetest.register_chatcommand("m", {
 		local tname = ctf.player(name).team
 
 		-- Handle waypoint string
-		local str = (param and param:trim() ~= "") and param or name .. "'s marker"
+		local str = (param and param:trim() ~= "") and ": " .. param or ""
 		if pointed.type == "object" then
 			local concat
 			local obj = pointed.ref
@@ -126,11 +126,54 @@ minetest.register_chatcommand("m", {
 			end
 			str = concat and str .. " <" .. concat .. ">"
 		end
-		str = "[" .. str .. "]"
+		str = str .. "]"
 
 		-- Remove existing marker if it exists
 		ctf_marker.remove_marker(tname)
 
 		ctf_marker.add_marker(name, tname, minetest.get_pointed_thing_position(pointed), str)
 	end
+})
+
+
+local function mr_command(name)
+	local tname = ctf.player(name).team
+	local player = minetest.get_player_by_name(name)
+	local mmsg = ""
+	local args = ""
+
+	local function hud_check()
+		if teams[tname].players[name] then
+			mmsg = player:hud_get(teams[tname].players[name]).name
+			args = mmsg:split("'")
+		end
+	end
+
+	if pcall(hud_check) then
+		if args[1] == "[" .. name then
+			ctf_marker.remove_marker(tname)
+			local team = ctf.team(tname)
+			for pname, _ in pairs(team.players) do
+				minetest.chat_send_player(pname, msg("* " .. name .. " removed their marker!"))
+			end
+		elseif args[1] == "" or nil then
+			minetest.chat_send_player(name, msg("No marker to remove"))
+		else
+			minetest.chat_send_player(name, msg("Not your marker!"))
+		end
+	else
+		minetest.chat_send_player(name, msg("No marker to remove"))
+	end
+end
+
+minetest.register_chatcommand("m_remove", {
+	description = "Remove your own marker (/mr)",
+	privs = {interact = true},
+	func = mr_command
+})
+
+minetest.register_chatcommand("mr", {
+	description = "Remove your own marker",
+	privs = {interact = true},
+	func = mr_command
 })
