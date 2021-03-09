@@ -89,7 +89,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 
 			if #enemies > 0 then
 				ctf_marker.remove_marker(pteam)
-				ctf_marker.add_marker(pname, pteam, pos, ("[Enemies Found!: <%s>]"):format(table.concat(enemies, ", ")))
+				ctf_marker.add_marker(pname, pteam, pos, (" found enemies: <%s>]"):format(table.concat(enemies, ", ")))
 			end
 
 			return
@@ -105,7 +105,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		sword_special_timer[pname] = 20
 		sword_special_timer_func(pname, 20)
 
-		minetest.registered_chatcommands["m"].func(pname, "Marked with "..pname.."'s sword")
+		minetest.registered_chatcommands["m"].func(pname, "placed with sword")
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
 		if pointed_thing then
