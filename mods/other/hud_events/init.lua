@@ -26,6 +26,7 @@ local function update(name)
 	end
 
 	for i, def in ipairs(temp) do
+		local text = tostring(def.value)
 		if hud:exists(player, def.name) then
 			hud:change(player, def.name, "text", text)
 			hud:change(player, def.name, "offset", {x = 0, y = i * 20})
