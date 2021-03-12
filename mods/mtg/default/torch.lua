@@ -13,105 +13,85 @@ local function on_flood(pos, oldnode, newnode)
 	return false
 end
 
-minetest.register_node("default:torch", {
-	description = "Torch",
-	drawtype = "mesh",
-	mesh = "torch_floor.obj",
-	inventory_image = "default_torch_on_floor.png",
-	wield_image = "default_torch_on_floor.png",
-	tiles = {{
-		    name = "default_torch_on_floor_animated.png",
-		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
-	}},
-	paramtype = "light",
-	paramtype2 = "wallmounted",
-	sunlight_propagates = true,
-	walkable = false,
-	liquids_pointable = false,
-	light_source = 12,
-	groups = {choppy=2, dig_immediate=3, flammable=1, attached_node=1, torch=1},
-	drop = "default:torch",
-	selection_box = {
-		type = "wallmounted",
-		wall_bottom = {-1/8, -1/2, -1/8, 1/8, 2/16, 1/8},
-	},
-	sounds = default.node_sound_wood_defaults(),
-	on_place = function(itemstack, placer, pointed_thing)
+function default.register_torch(name, defs)
+	local def = defs.floor
+	local ceiling = name .. "_ceiling"
+	local wall = name .. "_wall"
+	local lookup = {[0] = ceiling, name, wall, wall, wall, wall}
+	def.on_place = function(itemstack, placer, pointed_thing)
 		local under = pointed_thing.under
 		local node = minetest.get_node(under)
-		local def = minetest.registered_nodes[node.name]
-		if def and def.on_rightclick and
+		local nodedef = minetest.registered_nodes[node.name]
+		if nodedef and nodedef.on_rightclick and
 			not (placer and placer:is_player() and
 			placer:get_player_control().sneak) then
-			return def.on_rightclick(under, node, placer, itemstack,
+			return nodedef.on_rightclick(under, node, placer, itemstack,
 				pointed_thing) or itemstack
 		end
 
 		local above = pointed_thing.above
 		local wdir = minetest.dir_to_wallmounted(vector.subtract(under, above))
-		local fakestack = itemstack
-		if wdir == 0 then
-			fakestack:set_name("default:torch_ceiling")
-		elseif wdir == 1 then
-			fakestack:set_name("default:torch")
-		else
-			fakestack:set_name("default:torch_wall")
-		end
-
-		itemstack = minetest.item_place(fakestack, placer, pointed_thing, wdir)
-		itemstack:set_name("default:torch")
-
+		itemstack:set_name(lookup[wdir])
+		itemstack = minetest.item_place(itemstack, placer, pointed_thing, wdir)
+		itemstack:set_name(name)
 		return itemstack
-	end,
-	floodable = true,
-	on_flood = on_flood,
-})
+	end
+	minetest.register_node(":" .. name, def)
+	local def_ceiling = table.copy(def)
+	for key, value in pairs(defs.ceiling) do
+		def_ceiling[key] = value
+	end
+	minetest.register_node(":" .. ceiling, def_ceiling)
+	local def_wall = table.copy(def)
+	for key, value in pairs(defs.wall) do
+		def_wall[key] = value
+	end
+	minetest.register_node(":" .. wall, def_wall)
+end
 
-minetest.register_node("default:torch_wall", {
-	drawtype = "mesh",
-	mesh = "torch_wall.obj",
-	tiles = {{
-		    name = "default_torch_on_floor_animated.png",
-		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
-	}},
-	paramtype = "light",
-	paramtype2 = "wallmounted",
-	sunlight_propagates = true,
-	walkable = false,
-	light_source = 12,
-	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1},
-	drop = "default:torch",
-	selection_box = {
-		type = "wallmounted",
-		wall_side = {-1/2, -1/2, -1/8, -1/8, 1/8, 1/8},
+default.torch = {
+	floor = {
+		description = "Torch",
+		drawtype = "mesh",
+		mesh = "torch_floor.obj",
+		inventory_image = "default_torch_on_floor.png",
+		wield_image = "default_torch_on_floor.png",
+		tiles = {{
+				name = "default_torch_on_floor_animated.png",
+				animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
+		}},
+		paramtype = "light",
+		paramtype2 = "wallmounted",
+		sunlight_propagates = true,
+		walkable = false,
+		liquids_pointable = false,
+		light_source = 12,
+		groups = {choppy=2, dig_immediate=3, flammable=1, attached_node=1, torch=1},
+		drop = "default:torch",
+		selection_box = {
+			type = "wallmounted",
+			wall_bottom = {-1/8, -1/2, -1/8, 1/8, 2/16, 1/8},
+		},
+		sounds = default.node_sound_wood_defaults(),
+		floodable = true,
+		on_flood = on_flood,
 	},
-	sounds = default.node_sound_wood_defaults(),
-	floodable = true,
-	on_flood = on_flood,
-})
-
-minetest.register_node("default:torch_ceiling", {
-	drawtype = "mesh",
-	mesh = "torch_ceiling.obj",
-	tiles = {{
-		    name = "default_torch_on_floor_animated.png",
-		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
-	}},
-	paramtype = "light",
-	paramtype2 = "wallmounted",
-	sunlight_propagates = true,
-	walkable = false,
-	light_source = 12,
-	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1},
-	drop = "default:torch",
-	selection_box = {
-		type = "wallmounted",
-		wall_top = {-1/8, -1/16, -5/16, 1/8, 1/2, 1/8},
+	ceiling = {
+		mesh = "torch_ceiling.obj",
+		selection_box = {
+			type = "wallmounted",
+			wall_top = {-1/8, -1/16, -5/16, 1/8, 1/2, 1/8},
+		},
 	},
-	sounds = default.node_sound_wood_defaults(),
-	floodable = true,
-	on_flood = on_flood,
-})
+	wall = {
+		mesh = "torch_wall.obj",
+		selection_box = {
+			type = "wallmounted",
+			wall_side = {-1/2, -1/2, -1/8, -1/8, 1/8, 1/8},
+		},
+	},
+}
+default.register_torch("default:torch", default.torch)
 
 minetest.register_lbm({
 	name = "default:3dtorch",
