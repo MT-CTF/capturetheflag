@@ -62,23 +62,28 @@ minetest.register_globalstep(function(delta)
 	end
 end)
 
-minetest.register_on_punchplayer(function(_, hitter)
+local old_can_attack = ctf.can_attack
+function ctf.can_attack(player, hitter, ...)
 	if ctf_match.is_in_build_time() then
-		minetest.chat_send_player(hitter:get_player_name(), "Match hasn't started yet!")
-		return true
+		if hitter:is_player() then
+			minetest.chat_send_player(hitter:get_player_name(), "Match hasn't started yet!")
+		end
+		return false
 	end
-end)
+
+	return old_can_attack(player, hitter, ...)
+end
 
 ctf_match.register_on_build_time_start(function()
-	minetest.chat_send_all("Prepare your base! Match starts in " ..
-		ctf.setting("match.build_time") .. " seconds.")
+	minetest.chat_send_all(minetest.colorize("#fcca05", ("Prepare your base! Match starts in " ..
+		ctf.setting("match.build_time") .. " seconds.")))
 end)
 
 ctf_match.register_on_build_time_end(function()
 	if minetest.global_exists("chatplus") then
 		chatplus.log("Build time over!")
 	end
-	minetest.chat_send_all("Build time over! Attack and defend!")
+	minetest.chat_send_all(minetest.colorize("#dd5f04", "Build time over! Attack and defend!"))
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf.hud:remove(player, "ctf_match:countdown")
 	end
@@ -88,6 +93,8 @@ ctf_flag.register_on_prepick_up(function(name, flag)
 	if ctf_match.is_in_build_time() then
 		minetest.chat_send_player(name, "Match hasn't started yet!")
 		ctf.move_to_spawn(name)
+		return false
+	elseif not ctf.get_spawn(ctf.player(name).team) then
 		return false
 	else
 		return true

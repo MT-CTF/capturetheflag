@@ -23,11 +23,15 @@ function give_initial_stuff.give_item(inv, item)
 
 	-- Don't duplicate stacks
 	if inv:contains_item("main", item:get_name()) then
-		local safeguard = 1
-		-- Do a fast refill of stack if needed
-		while not inv:contains_item("main", item:get_name().." "..item:get_stack_max()-5) do
+		local safeguard = 0
+		local itemcount = item:get_count()-5
+		if itemcount < 0 then itemcount = 0 end
+
+		-- Replace stack if it's smaller than what we want to add
+		while not inv:contains_item("main", ("%s %d"):format(item:get_name(), itemcount)) do
 			safeguard = safeguard + 1
-			inv:add_item("main", item:get_name().." 5")
+
+			inv:add_item("main", item:get_name() .. " 5")
 
 			if safeguard >= 500 then
 				minetest.log("error", "[give_initial_stuff] Something went wrong when filling stack "..dump(item:get_name()))

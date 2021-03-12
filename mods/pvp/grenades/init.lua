@@ -1,5 +1,5 @@
 grenades = {
-	grenade_deaccel = 9
+	grenade_deaccel = 8
 }
 
 function grenades.throw_grenade(name, startspeed, player)
@@ -135,12 +135,12 @@ function grenades.register_grenade(name, def)
 	local newdef = {}
 
 	newdef.description = def.description
-	newdef.stack_max = 1
+	newdef.stack_max = def.stack_max or 1
 	newdef.range = 0
 	newdef.inventory_image = def.image
 	newdef.on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
-			grenades.throw_grenade(name, 20, user)
+			grenades.throw_grenade(name, 17, user)
 
 			if not minetest.settings:get_bool("creative_mode") then
 				itemstack:take_item(1)

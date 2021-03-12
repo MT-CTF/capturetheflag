@@ -153,9 +153,12 @@ function _doors.door_toggle(pos, node, clicker)
 	-- If team door, check clicker's team
 	if node.name:find("doors:door_steel") then
 		local tname = ctf.player(clicker:get_player_name()).team
-		local owner_team = meta:get_string("owner_team")
-		if clicker and tname ~= owner_team then
-			return false
+
+		if tname == "red" or tname == "blue" then
+			local owner_team = meta:get_string("owner_team")
+			if clicker and tname ~= owner_team then
+				return false
+			end
 		end
 	end
 
@@ -302,6 +305,11 @@ function doors.register(name, def)
 
 			-- Get placer's team
 			local tname = ctf.player(pn).team or ""
+
+			if tname ~= "red" and tname ~= "blue" then
+				minetest.chat_send_player(pn, "Your team can't place doors!")
+				return itemstack
+			end
 
 			-- Prevent door placement if within 40 nodes of enemy base
 			local enemy_team = tname == "red" and "blue" or "red"
@@ -701,7 +709,7 @@ doors.register_trapdoor("doors:trapdoor_steel", {
 	wield_image = "doors_trapdoor_steel.png",
 	tile_front = "doors_trapdoor_steel.png",
 	tile_side = "doors_trapdoor_steel_side.png",
-	protected = true,
+	protected = false,
 	sounds = default.node_sound_metal_defaults(),
 	sound_open = "doors_steel_door_open",
 	sound_close = "doors_steel_door_close",

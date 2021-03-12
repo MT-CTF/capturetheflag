@@ -44,7 +44,9 @@ minetest.register_node("ctf_traps:damage_cobble", {
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3, stone=2},
-	on_dig = function(pos, node, digger)
+	on_dig = function(pos, node, digger, extra)
+		if not digger:is_player() then return end
+
 		local name = digger:get_player_name()
 		if not digger then
 			return
@@ -52,20 +54,34 @@ minetest.register_node("ctf_traps:damage_cobble", {
 
 		local digger_team = ctf.player(name).team
 		local meta = minetest.get_meta(pos)
-		local placer_team = meta:get_string("placer") or "missing"
+		local placer = minetest.deserialize(meta:get_string("placer"))
+
+		local placer_team = placer and placer.team or "missing"
 		if digger_team ~= placer_team then
-			local hp = digger:get_hp()
-			digger:set_hp(hp - 7)
+			local placerobj = placer and minetest.get_player_by_name(placer.name)
+
+			if placerobj then
+				digger:punch(placerobj, 10, {damage_groups = {fleshy = 7}}, vector.new(0, 1, 0))
+			else
+				digger:set_hp(digger:get_hp() - 7)
+			end
+
 			minetest.remove_node(pos)
 			return
 		end
 
-		meta:set_string("placer", "")
-		return minetest.node_dig(pos, node, digger)
+		if not extra or extra.do_dig then
+			meta:set_string("placer", "")
+			return minetest.node_dig(pos, node, digger)
+		end
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
 		local name = placer:get_player_name()
-		meta:set_string("placer", ctf.player(name).team)
+
+		meta:set_string("placer", minetest.serialize({
+			team = ctf.player(name).team,
+			name = name,
+		}))
 	end
 })

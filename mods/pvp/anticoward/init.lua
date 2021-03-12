@@ -1,30 +1,19 @@
 -- Capture The Flag mod: anticoward
 
-local potential_cowards = {}
+potential_cowards = {}
 local TIMER_UPDATE_INTERVAL = 2
 local COMBAT_TIMEOUT_TIME = 20
+local COMBATLOG_SCORE_PENALTY = 10
 
 --
 --- Make suicides and combat logs award last puncher with kill
 --
 
-minetest.register_on_punchplayer(function(player, hitter,
-time_from_last_punch, tool_capabilities, dir, damage)
+ctf.register_on_attack(function(player, hitter,
+		time_from_last_punch, tool_capabilities, dir, damage)
 	if player and hitter then
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
-
-		local to = ctf.player(pname)
-		local from = ctf.player(hname)
-
-		if to.team == from.team and to.team ~= "" and
-				to.team ~= nil and to.name ~= from.name then
-			return
-		end
-
-		if ctf_respawn_immunity.is_immune(player) then
-			return
-		end
 
 		local hp = player:get_hp() - damage
 		if hp <= 0 then
@@ -38,7 +27,7 @@ time_from_last_punch, tool_capabilities, dir, damage)
 				potential_cowards[hname] = nil
 			end
 
-			return false
+			return
 		end
 
 		if not potential_cowards[pname] then
@@ -94,11 +83,6 @@ minetest.register_on_dieplayer(function(player, reason)
 				last_attacker:hud_remove(potential_cowards[hname].hud or 0)
 				potential_cowards[hname] = nil
 			end
-
-			if potential_cowards[pname] then
-				player:hud_remove(potential_cowards[pname].hud or 0)
-				potential_cowards[pname] = nil
-			end
 		else
 			for victim in pairs(potential_cowards) do
 				if potential_cowards[victim].puncher == pname then
@@ -113,6 +97,11 @@ minetest.register_on_dieplayer(function(player, reason)
 				end
 			end
 		end
+	end
+
+	if potential_cowards[pname] then
+		player:hud_remove(potential_cowards[pname].hud or 0)
+		potential_cowards[pname] = nil
 	end
 end)
 
@@ -136,6 +125,17 @@ minetest.register_on_leaveplayer(function(player, timeout)
 			)
 		end
 
+		local main, match = ctf_stats.player(pname)
+
+		if main and match then
+			main.deaths = main.deaths + 1
+			match.deaths = match.deaths + 1
+			main.score = main.score - COMBATLOG_SCORE_PENALTY
+			match.score = match.score - COMBATLOG_SCORE_PENALTY
+			match.kills_since_death = 0
+			ctf_stats.request_save()
+		end
+
 		potential_cowards[pname] = nil
 	end
 end)
@@ -156,9 +156,32 @@ minetest.register_globalstep(function(dtime)
 				end
 
 				potential_cowards[k] = nil
+				kill_assist.clear_assists(k)
 			end
 		end
 
 		globtimer = 0
 	end
+end)
+
+ctf_match.register_on_new_match(function()
+	for coward, info in pairs(potential_cowards) do
+		coward = minetest.get_player_by_name(coward)
+
+		if coward and info.hud then
+			coward:hud_remove(info.hud)
+		end
+	end
+	potential_cowards = {}
+end)
+
+ctf.register_on_new_game(function()
+	for coward, info in pairs(potential_cowards) do
+		coward = minetest.get_player_by_name(coward)
+
+		if coward and info.hud then
+			coward:hud_remove(info.hud)
+		end
+	end
+	potential_cowards = {}
 end)

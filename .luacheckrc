@@ -7,6 +7,7 @@ exclude_files = {
 	"mods/pvp/shooter",
 	"mods/other/wield3d",
 	"mods/other/treasurer",
+	"mods/other/hudbars",
 }
 
 ignore = {"631"}
@@ -16,7 +17,8 @@ globals = {
 	"ctf_colors", "hudkit", "default", "treasurer", "ChatCmdBuilder", "ctf_map",
 	"ctf_match", "ctf_stats", "ctf_treasure", "ctf_playertag", "chatplus", "irc",
 	"armor", "vote", "give_initial_stuff", "hud_score", "physics", "tsm_chests",
-	"armor", "shooter", "grenades", "ctf_classes", "ctf_bandages"
+	"armor", "shooter", "grenades", "ctf_classes", "ctf_bandages", "ctf_respawn_immunity",
+	"ctf_marker", "kill_assist"
 }
 
 read_globals = {
@@ -29,6 +31,7 @@ read_globals = {
 	"Settings",
 	"prometheus", "hb",
 	"awards",
+	"potential_cowards",
 
 	"VoxelArea",
 	"VoxelManip",

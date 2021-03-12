@@ -55,11 +55,11 @@ function ctf_colors.update(player, name, tplayer)
 	local tcolor = ctf_colors.get_color(tplayer)
 
 	if ctf.setting("colors.hudtint") then
-		if tcolor.text == "red" or tcolor.text == "blue" then
-			player:hud_set_hotbar_image("ctf_colors_hotbar_" .. tcolor.text .. ".png")
-			player:hud_set_hotbar_selected_image("ctf_colors_hotbar_selected_" .. tcolor.text .. ".png")
+		if tcolor.css then
+			player:hud_set_hotbar_image("gui_hotbar.png^[colorize:"..tcolor.css..":180")
+			player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[colorize:"..tcolor.css..":180")
 		else
-			ctf.error("ctf_colors", "Hint color not supported for " .. tcolor.text)
+			ctf.error("ctf_colors", "css color not found!")
 		end
 	end
 

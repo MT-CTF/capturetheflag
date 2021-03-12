@@ -82,5 +82,5 @@ ctf_match.register_on_build_time_end(function()
 	can_skip = true
 	matchskip_timer = 0
 	-- Set to initial vote time
-	matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_delay")) or 90 * 60
+	matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_delay")) or 50 * 60
 end)

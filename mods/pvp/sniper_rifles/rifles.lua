@@ -11,7 +11,8 @@ sniper_rifles.register_rifle("sniper_rifles:rifle_762", {
 		sounds    = { shot = "sniper_rifles_shot" },
 		particle  = "shooter_bullet.png",
 		groups    = {
-			snappy = 2, fleshy = 1, oddly_breakable_by_hand = 1
+			cracky = 3, snappy = 2, crumbly = 2, choppy = 2,
+			fleshy = 1, oddly_breakable_by_hand = 1,
 		}
 	}
 })
@@ -29,7 +30,8 @@ sniper_rifles.register_rifle("sniper_rifles:rifle_magnum", {
 		sounds    = { shot = "sniper_rifles_shot" },
 		particle  = "shooter_bullet.png",
 		groups    = {
-			snappy = 1, fleshy = 1, oddly_breakable_by_hand = 1
+			cracky = 2, snappy = 1, crumbly = 1, choppy = 1,
+			fleshy = 1, oddly_breakable_by_hand = 1,
 		}
 	}
 })

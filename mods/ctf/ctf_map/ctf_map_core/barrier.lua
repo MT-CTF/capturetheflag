@@ -214,9 +214,9 @@ end
 
 if minetest.get_modpath("ctf") then
 	local old_is_protected = minetest.is_protected
-	function minetest.is_protected(pos, name)
+	function minetest.is_protected(pos, name, ...)
 		if ctf_match.build_timer <= 0 then
-			return old_is_protected(pos, name)
+			return old_is_protected(pos, name, ...)
 		end
 
 		local tname = ctf.player(name).team
@@ -225,7 +225,7 @@ if minetest.get_modpath("ctf") then
 			minetest.chat_send_player(name, "Can't dig beyond the barrier!")
 			return true
 		else
-			return old_is_protected(pos, name)
+			return old_is_protected(pos, name, ...)
 		end
 	end
 
@@ -237,8 +237,9 @@ if minetest.get_modpath("ctf") then
 		for _, player in pairs(minetest.get_connected_players()) do
 			if ctf_map.get_team_relative_z(player) < 0 and not ctf_map.can_cross(player) then
 				local name = player:get_player_name()
-				minetest.chat_send_player(name, "Match hasn't started yet!")
-				ctf.move_to_spawn(name)
+				if ctf.move_to_spawn(name) then
+					minetest.chat_send_player(name, "Match hasn't started yet!")
+				end
 			end
 		end
 

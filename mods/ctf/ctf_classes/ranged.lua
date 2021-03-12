@@ -29,7 +29,7 @@ shooter.get_weapon_spec = function(user, weapon_name)
 
 	if table.indexof(class.properties.allowed_guns or {}, weapon_name) == -1 then
 		minetest.chat_send_player(user:get_player_name(),
-			"Your class can't use that weapon! Change your class at spawn")
+			"Your class can't use that weapon! Change your class at base")
 		return nil
 	end
 
@@ -49,7 +49,7 @@ local function check_grapple(itemname)
 		on_use = function(itemstack, user, ...)
 			if not ctf_classes.get(user).properties.allow_grapples then
 				minetest.chat_send_player(user:get_player_name(),
-					"Your class can't use that weapon! Change your class at spawn")
+					"Your class can't use that weapon! Change your class at base")
 
 				return itemstack
 			end
@@ -85,5 +85,14 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 		self.object:remove()
 		return
 	end
+
+	-- Remove hook if player changes class after throwing it
+	if not ctf_classes.get(self.user).properties.allow_grapples then
+		minetest.chat_send_player(self.user,
+			"Grapples don't work if you change class!")
+		self.object:remove()
+		return
+	end
+
 	return old_grapple_step(self, dtime, ...)
 end

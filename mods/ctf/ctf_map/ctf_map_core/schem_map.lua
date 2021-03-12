@@ -42,13 +42,13 @@ function minetest.get_server_status(name, joined)
 
 	local str = map_str
 	if name and minetest.get_player_by_name(name) then
-		str = minetest.colorize("#44FF44", str)
+		str = str
 	end
 	status = status .. "\n" .. str
 
 	-- If player just joined, also display map hint
 	if joined and ctf_map.map.hint then
-		status = status .. "\n" .. minetest.colorize("#22FF22", ctf_map.map.hint)
+		status = status .. "\n" .. minetest.colorize("#f49200", ctf_map.map.hint)
 	end
 
 	return status
@@ -335,7 +335,7 @@ local function place_map(map)
 		local res = minetest.place_schematic(map.pos1, schempath,
 				map.rotation == "z" and "0" or "90")
 
-		assert(res)
+		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 
 		for _, value in pairs(ctf_map.map.teams) do
 			ctf_map.place_base(value.color, value.pos)
@@ -349,9 +349,10 @@ local function place_map(map)
 		end
 
 		minetest.after(2, function()
-			local msg = "Map: " .. map.name .. " by " .. map.author
+			local msg = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", map.name) ..
+				minetest.colorize("#fcdb05", " by ") .. minetest.colorize("#f49200", map.author))
 			if map.hint then
-				msg = msg .. "\n" .. map.hint
+				msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 			end
 			minetest.chat_send_all(msg)
 			if minetest.global_exists("irc") and irc.connected then
@@ -378,7 +379,8 @@ ctf_match.register_on_new_match(function()
 	ctf_map.map = ctf_map.available_maps[idx]
 	ctf_map.map.idx = idx
 
-	map_str = "Map: " .. ctf_map.map.name .. " by " .. ctf_map.map.author
+	map_str = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", ctf_map.map.name) ..
+		minetest.colorize("#fcdb05", " by ") .. minetest.colorize ("#f49200", ctf_map.map.author))
 
 	-- Register per-map treasures, or the default set of treasures
 	-- if treasures field hasn't been defined in map meta

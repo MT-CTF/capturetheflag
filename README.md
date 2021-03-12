@@ -1,5 +1,6 @@
 # Capture The Flag
-[![Build Status](https://travis-ci.org/MT-CTF/capturetheflag.svg?branch=master)](https://travis-ci.org/MT-CTF/capturetheflag)
+
+[![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
 
 * Fast rounds of CTF games.
 * Removed nodes for focus.
@@ -34,6 +35,7 @@ Textures: CC-BY-SA 3.0
 
 * ctf_classes_skin_* created by GreenDimond/GreenXenith
     * ctf_classes_skin_rocketeer with help from Lone_Wolf
+* [Header](menu/header.png): CC BY-SA 4.0 by xenonca
 
 ### Mods
 

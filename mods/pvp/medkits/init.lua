@@ -46,6 +46,23 @@ local function start_healing(stack, player)
 	return stack
 end
 
+
+-- Interrupt reasons:
+-- attack: Attacked another player
+-- move: Moved 1m away from initial healing pos
+-- damage: Damaged by another player
+local function reason_handler(reason)
+	if reason == "attack" then
+		return " because you attacked other player!"
+	elseif reason == "move" then
+		return " because you moved!"
+	elseif reason == "damage" then
+		return " because someone damaged you!"
+	else
+		return "!"
+	end
+end
+
 -- Called after regen is complete. Remove additional effects
 -- If interrupted == true, revert to original HP and give back one medkit.
 local function stop_healing(player, interrupted)
@@ -55,7 +72,7 @@ local function stop_healing(player, interrupted)
 	players[name] = nil
 	if interrupted then
 		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-			"Your healing was interrupted!"))
+			"Your healing was interrupted"..reason_handler(interrupted)))
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end
@@ -92,7 +109,7 @@ minetest.register_globalstep(function(dtime)
 			-- allow players to manually interrupt healing if necessary
 			local pos = player:get_pos()
 			if vector.distance(pos, info.pos) >= 1 then
-				stop_healing(player, true)
+				stop_healing(player, "move")
 			end
 
 			-- Stop healing if target reached
@@ -100,6 +117,7 @@ minetest.register_globalstep(function(dtime)
 			if pstat then
 				local hp = player:get_hp()
 				if hp < pstat.regen_max then
+					kill_assist.add_heal_assist(name, regen_step)
 					player:set_hp(math.min(hp + regen_step, pstat.regen_max))
 				else
 					stop_healing(player)
@@ -113,14 +131,16 @@ end)
 -- If player takes damage while healing,
 -- stop regen and revert back to original state
 minetest.register_on_player_hpchange(function(player, hp, reason)
+	local name = player:get_player_name()
 	if hp < 0 then
-		if players[player:get_player_name()] then
-			stop_healing(player, true)
+		if players[name] then
+			player:hud_remove(players[name].hud)
+			players[name] = nil -- Don't use stop_healing(), it uses set_hp() and won't allocate deaths or score properly
 		end
 		if reason and reason.type == "punch" then
 			local hitter = reason.object
 			if hitter and players[hitter:get_player_name()] then
-				stop_healing(hitter, true)
+				stop_healing(hitter, "attack")
 			end
 		end
 	end
