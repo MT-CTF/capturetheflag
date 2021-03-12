@@ -29,7 +29,7 @@ end, true)
 
 
 local sword_special_timer = {}
-local SWORD_SPECIAL_COOLDOWN = 40
+local SWORD_SPECIAL_COOLDOWN = 10
 local function sword_special_timer_func(pname, timeleft)
 	sword_special_timer[pname] = timeleft
 
@@ -57,7 +57,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		local pname = placer:get_player_name()
 		if not pointed_thing then return end
 
-		if sword_special_timer[pname] then
+		if (sword_special_timer[pname] and placer:get_player_control().sneak) then
 			minetest.chat_send_player(pname, "You can't place a marker yet (>"..sword_special_timer[pname].."s left)")
 
 			if pointed_thing.type == "node" then
@@ -102,8 +102,8 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		-- Check if player is sneaking before placing marker
 		if not placer:get_player_control().sneak then return end
 
-		sword_special_timer[pname] = 20
-		sword_special_timer_func(pname, 20)
+		sword_special_timer[pname] = 5
+		sword_special_timer_func(pname, 5)
 
 		minetest.registered_chatcommands["m"].func(pname, "Marked with "..pname.."'s sword")
 	end,
