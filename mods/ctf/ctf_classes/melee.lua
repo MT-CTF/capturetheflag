@@ -58,7 +58,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		if not pointed_thing then return end
 
 		if (sword_special_timer[pname] and placer:get_player_control().sneak) then
-			minetest.chat_send_player(pname, "You can't place a marker yet ("..sword_special_timer[pname].."s left)")
+			minetest.chat_send_player(pname, "You have to wait "..sword_special_timer[pname].."s to place marker again")
 
 			if pointed_thing.type == "node" then
 				return minetest.item_place(itemstack, placer, pointed_thing)
@@ -102,8 +102,8 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		-- Check if player is sneaking before placing marker
 		if not placer:get_player_control().sneak then return end
 
-		sword_special_timer[pname] = 3
-		sword_special_timer_func(pname, 3)
+		sword_special_timer[pname] = 4
+		sword_special_timer_func(pname, 4)
 
 		minetest.registered_chatcommands["m"].func(pname, "Marked with "..pname.."'s sword")
 	end,
