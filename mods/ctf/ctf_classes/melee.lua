@@ -33,8 +33,8 @@ local SWORD_SPECIAL_COOLDOWN = 10
 local function sword_special_timer_func(pname, timeleft)
 	sword_special_timer[pname] = timeleft
 
-	if timeleft - 1 >= 0 then
-		minetest.after(1, sword_special_timer_func, pname, timeleft - 1)
+	if timeleft - 2 >= 0 then
+		minetest.after(2, sword_special_timer_func, pname, timeleft - 2)
 	else
 		sword_special_timer[pname] = nil
 	end
