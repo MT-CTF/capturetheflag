@@ -156,7 +156,7 @@ local function mr_command(name)
 			local team = ctf.team(tname)
 			for pname, _ in pairs(team.players) do
 				minetest.chat_send_player(pname,
-				minetest.colorize("#00d0ff", "[Team Chat] ")
+				minetest.colorize("#00d0ff", "[Team Chat] ") ..
 				msg(name .. " removed their marker!"))
 			end
 		elseif args[1] == "" or nil then
