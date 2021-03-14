@@ -256,9 +256,13 @@ minetest.register_chatcommand("t", {
 				chatplus.log("<" .. name .. "> ** ".. param .. " **")
 			end
 
+			if param == "" then return false, minetest.colorize("#00d0ff", name .. ", see /help t")
+			end
+
 			local tcolor = ctf_colors.get_color(ctf.player(name))
 			for username, to in pairs(team.players) do
 				minetest.chat_send_player(username,
+						minetest.colorize("#00d0ff", "[Team Chat] ") ..
 						minetest.colorize(tcolor.css, "<" .. name .. "> ** " .. param .. " **"))
 			end
 			if minetest.global_exists("irc") and irc.feature_mod_channel then
