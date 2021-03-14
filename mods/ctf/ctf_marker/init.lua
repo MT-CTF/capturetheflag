@@ -55,7 +55,8 @@ function ctf_marker.add_marker(name, tname, pos, str)
 		minetest.log("action", name .. " placed a marker at " ..
 				minetest.pos_to_string(pos) .. ": '" .. str .. "'")
 		minetest.chat_send_player(pname,
-				msg("* " .. name .. " placed a marker!"))
+				minetest.colorize("#00d0ff", "[Team Chat] ") ..
+				msg(name .. " placed a marker!"))
 	end
 end
 
@@ -154,7 +155,9 @@ local function mr_command(name)
 			ctf_marker.remove_marker(tname)
 			local team = ctf.team(tname)
 			for pname, _ in pairs(team.players) do
-				minetest.chat_send_player(pname, msg("* " .. name .. " removed their marker!"))
+				minetest.chat_send_player(pname,
+				minetest.colorize("#00d0ff", "[Team Chat] ")
+				msg(name .. " removed their marker!"))
 			end
 		elseif args[1] == "" or nil then
 			minetest.chat_send_player(name, msg("No marker to remove"))
