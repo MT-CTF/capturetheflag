@@ -73,6 +73,11 @@ check_grapple("shooter_hook:grapple_hook")
 -- Override grappling hook entity to check if player has flag before teleporting
 local old_grapple_step = minetest.registered_entities["shooter_hook:hook"].on_step
 minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime, ...)
+	-- User left the game. Life is no longer worth living for this poor hook
+	if not self.user then
+		self.object:remove()
+	end
+
 	-- Remove entity if player has flag
 	-- This is to prevent players from firing the hook, and then punching the flag
 	if ctf_flag.has_flag(self.user) then
