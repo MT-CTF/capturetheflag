@@ -183,6 +183,7 @@ minetest.register_chatcommand("team", {
 minetest.register_chatcommand("join", {
 	params = "team name",
 	description = "Add to team",
+	privs = {ctf_team_mgr = true},
 	func = function(name, param)
 		if ctf.join(name, param, false, name) then
 			return true, "Joined team " .. param .. "!"
