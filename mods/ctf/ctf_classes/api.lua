@@ -72,16 +72,17 @@ function ctf_classes.set(player, new_name)
 
 	local meta = player:get_meta()
 	local old_name = meta:get("ctf_classes:class")
+	
+	if old_name == new_name then
+		return
+	end
 
 	meta:set_string("ctf_classes:class", new_name)
 	ctf_classes.update(player)
 
-	if old_name == new_name then
-		return
-	end
 	ctf_classes.set_cooldown(player:get_player_name())
 
-	if old_name == nil or old_name ~= new_name then
+	if old_name == nil then
 		local old = old_name and ctf_classes.__classes[old_name]
 		for i=1, #registered_on_changed do
 			registered_on_changed[i](player, old, new)
