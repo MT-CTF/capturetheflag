@@ -258,6 +258,7 @@ minetest.register_chatcommand("t", {
 
 			if param == "" then
 			minetest.chat_send_player(name, "You did not write anything, see /help t"
+			end
 
 			local tcolor = ctf_colors.get_color(ctf.player(name))
 			for username, to in pairs(team.players) do
