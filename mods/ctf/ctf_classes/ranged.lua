@@ -76,6 +76,7 @@ minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime
 	-- User left the game. Life is no longer worth living for this poor hook
 	if not self.user then
 		self.object:remove()
+		return
 	end
 
 	-- Remove entity if player has flag
