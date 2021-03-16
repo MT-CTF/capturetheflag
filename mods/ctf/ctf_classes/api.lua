@@ -82,11 +82,9 @@ function ctf_classes.set(player, new_name)
 
 	ctf_classes.set_cooldown(player:get_player_name())
 
-	if old_name == nil then
-		local old = old_name and ctf_classes.__classes[old_name]
-		for i=1, #registered_on_changed do
-			registered_on_changed[i](player, old, new)
-		end
+	local old = old_name and ctf_classes.__classes[old_name]
+	for i=1, #registered_on_changed do
+		registered_on_changed[i](player, old, new)
 	end
 end
 
