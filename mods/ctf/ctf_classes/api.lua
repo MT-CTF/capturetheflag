@@ -72,7 +72,7 @@ function ctf_classes.set(player, new_name)
 
 	local meta = player:get_meta()
 	local old_name = meta:get("ctf_classes:class")
-	
+
 	if old_name == new_name then
 		return
 	end
