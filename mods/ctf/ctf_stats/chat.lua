@@ -31,7 +31,9 @@ local function return_as_chat_result(to, target)
 	end
 
 	-- Build return string
-	local result = minetest.colorize("#63d437", (to == name and "You are in " or name .. " is in ")) ..
+		local tcolor = ctf_colors.get_color(ctf.player(name))
+	local result = minetest.colorize(tcolor.css, (to == name and "You " or name)) ..
+						minetest.colorize("#63d437", (to == name and "are in " or " is in ")) ..
 			minetest.colorize("#ffea00", place ..
                         minetest.colorize("#63d437", " place.\n"))
 
