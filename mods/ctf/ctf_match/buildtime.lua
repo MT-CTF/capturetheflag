@@ -64,9 +64,14 @@ end)
 
 local old_can_attack = ctf.can_attack
 function ctf.can_attack(player, hitter, ...)
+	local hitter_name = hitter:get_player_name()
 	if ctf_match.is_in_build_time() then
 		if hitter:is_player() then
-			minetest.chat_send_player(hitter:get_player_name(), "Match hasn't started yet!")
+			hud_event.new(hitter_name, {
+			name = "ctf_match:buildtime",
+			color = "0xFFFFFF",
+			value = "Match hasn't started yet!"
+			})
 		end
 		return false
 	end
@@ -91,7 +96,11 @@ end)
 
 ctf_flag.register_on_prepick_up(function(name, flag)
 	if ctf_match.is_in_build_time() then
-		minetest.chat_send_player(name, "Match hasn't started yet!")
+			hud_event.new(name, {
+			name = "ctf_match:buildtime",
+			color = "0xFFFFFF",
+			value = "Match hasn't started yet!"
+			})
 		ctf.move_to_spawn(name)
 		return false
 	elseif not ctf.get_spawn(ctf.player(name).team) then
