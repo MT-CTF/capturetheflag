@@ -6,19 +6,16 @@ function ctf_match.register_on_skip_map(func)
 	table.insert(ctf_match.registered_on_skip_map, func)
 end
 
-local voted_skip = false
-local flags_hold = 0
-function check_skip()
-	if not voted_skip or flags_hold > 0 then
-		return
-	end
-
+function skip()
 	for i = 1, #ctf_match.registered_on_skip_map do
 		ctf_match.registered_on_skip_map[i]()
 	end
 	ctf_match.next()
 end
 
+local can_vote_skip = false
+local voted_skip = false
+local flags_hold = 0
 function ctf_match.vote_next(name)
 	local tcolor = ctf_colors.get_color(ctf.player(name)).css or "#FFFFFFFF"
 	minetest.chat_send_all(minetest.colorize("#FFAA11", "Vote started by ") ..
@@ -36,8 +33,11 @@ function ctf_match.vote_next(name)
 				minetest.chat_send_all("Vote to skip match passed, " ..
 						#results.yes .. " to " .. #results.no)
 
+				can_vote_skip = false
 				voted_skip = true
-				check_skip()
+				if flags_hold <= 0 then
+					skip()
+				end
 			else
 				minetest.chat_send_all("Vote to skip match failed, " ..
 						#results.no .. " to " .. #results.yes)
@@ -65,9 +65,8 @@ minetest.register_chatcommand("vote", {
 
 local matchskip_time
 local matchskip_timer = 0
-local can_skip = false
 minetest.register_globalstep(function(dtime)
-	if not can_skip then return end
+	if not can_vote_skip then return end
 
 	matchskip_timer = matchskip_timer + dtime
 
@@ -81,20 +80,24 @@ minetest.register_globalstep(function(dtime)
 end)
 
 ctf.register_on_new_game(function()
-	can_skip = false
-	flags_hold = 0
+	can_vote_skip = false
 	voted_skip = false
+	flags_hold = 0
 end)
 ctf_flag.register_on_pick_up(function()
 	flags_hold = flags_hold + 1
 end)
 ctf_flag.register_on_drop(function()
 	flags_hold = flags_hold - 1
-	check_skip()
+	if voted_skip and flags_hold <= 0 then
+		minetest.after(5, function()
+			skip()
+		end)
+	end
 end)
 
 ctf_match.register_on_build_time_end(function()
-	can_skip = true
+	can_vote_skip = true
 	matchskip_timer = 0
 	-- Set to initial vote time
 	matchskip_time = tonumber(minetest.settings:get("ctf_match.auto_skip_delay")) or 50 * 60
