@@ -6,6 +6,19 @@ function ctf_match.register_on_skip_map(func)
 	table.insert(ctf_match.registered_on_skip_map, func)
 end
 
+local voted_skip = false
+local flags_hold = 0
+function check_skip()
+	if not voted_skip or flags_hold > 0 then
+		return
+	end
+
+	for i = 1, #ctf_match.registered_on_skip_map do
+		ctf_match.registered_on_skip_map[i]()
+	end
+	ctf_match.next()
+end
+
 function ctf_match.vote_next(name)
 	local tcolor = ctf_colors.get_color(ctf.player(name)).css or "#FFFFFFFF"
 	minetest.chat_send_all(minetest.colorize("#FFAA11", "Vote started by ") ..
@@ -22,10 +35,9 @@ function ctf_match.vote_next(name)
 			if result == "yes" then
 				minetest.chat_send_all("Vote to skip match passed, " ..
 						#results.yes .. " to " .. #results.no)
-				for i = 1, #ctf_match.registered_on_skip_map do
-					ctf_match.registered_on_skip_map[i]()
-				end
-				ctf_match.next()
+
+				voted_skip = true
+				check_skip()
 			else
 				minetest.chat_send_all("Vote to skip match failed, " ..
 						#results.no .. " to " .. #results.yes)
@@ -68,14 +80,17 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-local function prevent_autoskip()
+ctf.register_on_new_game(function()
 	can_skip = false
-end
-
-ctf.register_on_new_game(prevent_autoskip)
-ctf_flag.register_on_pick_up(prevent_autoskip)
+	flags_hold = 0
+	voted_skip = false
+end)
+ctf_flag.register_on_pick_up(function()
+	flags_hold = flags_hold + 1
+end)
 ctf_flag.register_on_drop(function()
-	can_skip = true
+	flags_hold = flags_hold - 1
+	check_skip()
 end)
 
 ctf_match.register_on_build_time_end(function()
