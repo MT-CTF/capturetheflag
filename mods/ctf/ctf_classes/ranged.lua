@@ -74,7 +74,7 @@ check_grapple("shooter_hook:grapple_hook")
 local old_grapple_step = minetest.registered_entities["shooter_hook:hook"].on_step
 minetest.registered_entities["shooter_hook:hook"].on_step = function(self, dtime, ...)
 	-- User left the game. Life is no longer worth living for this poor hook
-	if not self.user then
+	if not self.user or not minetest.get_player_by_name(self.user) then
 		self.object:remove()
 		return
 	end
