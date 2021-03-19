@@ -288,12 +288,12 @@ if minetest.global_exists("irc") then
 		local bbrace = color .. ">" .. clear
 		return ("%s%s%s %s"):format(abrace, name, bbrace, message)
 	end
-	
+
 	me_func = function(...)
 		local message = irc.playerMessage(...)
-		
+
 		message = "*" .. message:sub(message:find(" "))
-		
+
 		irc.say(message)
 	end
 end
@@ -329,7 +329,7 @@ minetest.registered_chatcommands["me"].func = function(name, param)
 	else
 		name = "* ".. name
 	end
-	
+
 	me_func(name, param)
 	minetest.chat_send_all(name .. " " .. param)
 end
