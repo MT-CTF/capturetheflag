@@ -257,7 +257,7 @@ minetest.register_chatcommand("t", {
 			end
 
 			if param == "" then
-		return false, "-!- Empty team message, see /help t"
+		        return false, "-!- Empty team message, see /help t"
 			end
 
 			local tcolor = ctf_colors.get_color(ctf.player(name))
