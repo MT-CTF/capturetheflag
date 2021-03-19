@@ -323,6 +323,8 @@ end
 table.insert(minetest.registered_on_chat_messages, 1, handler)
 
 minetest.registered_chatcommands["me"].func = function(name, param)
+	me_func(name, param)
+
 	if ctf.player(name).team then
 		local tcolor = ctf_colors.get_color(ctf.player(name))
 		name = minetest.colorize(tcolor.css, "* " .. name)
@@ -330,6 +332,7 @@ minetest.registered_chatcommands["me"].func = function(name, param)
 		name = "* ".. name
 	end
 
-	me_func(name, param)
+	minetest.log("action", "[CHAT] "..name.." "..param)
+
 	minetest.chat_send_all(name .. " " .. param)
 end
