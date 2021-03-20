@@ -230,6 +230,31 @@ do
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
+	
+	minetest.register_node(":ctf_map:obsidian", {
+		description = "Indestructible Obsidian",
+		tiles = {"default_obsidian.png"},
+		groups = {immortal = 1},
+		sounds = default.node_sound_stone_defaults(),
+	})
+	
+	minetest.register_node(":ctf_map:obsidian_brick", {
+		description = "Indestructible Obsidian Brick",
+		paramtype2 = "facedir",
+		place_param2 = 0,
+		tiles = {"default_obsidian_brick.png"},
+		is_ground_content = false,
+		groups = {immortal = 1},
+		sounds = default.node_sound_stone_defaults(),
+	})
+	
+	minetest.register_node(":ctf_map:obsidian_block", {
+		description = "Indestructible Obsidian Block",
+		tiles = {"default_obsidian_block.png"},
+		is_ground_content = false,
+		groups = {immortal = 1},
+		sounds = default.node_sound_stone_defaults(),
+	})
 
 	-- Soft / Non-Stone
 
