@@ -230,7 +230,6 @@ do
 		groups = {immortal = 1},
 		sounds = default.node_sound_stone_defaults(),
 	})
-	
 	minetest.register_node(":ctf_map:obsidian", {
 		description = "Indestructible Obsidian",
 		tiles = {"default_obsidian.png"},
