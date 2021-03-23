@@ -126,7 +126,7 @@ end)
 ctf_match.register_on_new_match(function()
 	local connected_players = minetest.get_connected_players()
 	for _, player in ipairs(connected_players) do
-		players[player:get_player_name()].stamina = STAMINA_MAX
+		player[player:get_player_name()].stamina = STAMINA_MAX
 	end
 end)
 
