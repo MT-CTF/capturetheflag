@@ -124,15 +124,15 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 ctf_match.register_on_new_match(function()
-	local players = minetest.get_connected_players()
-	for _, player in ipairs(players) do
+	local connected_players = minetest.get_connected_players()
+	for _, player in ipairs(connected_players) do
 		players[player:get_player_name()].stamina = STAMINA_MAX
 	end
 end)
 
 ctf.register_on_new_game(function()
-	local players = minetest.get_connected_players()
-	for _, player in ipairs(players) do
+	local connected_players = minetest.get_connected_players()
+	for _, player in ipairs(connected_players) do
 		players[player:get_player_name()].stamina = STAMINA_MAX
 	end
 end)
