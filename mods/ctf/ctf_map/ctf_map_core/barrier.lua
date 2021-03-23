@@ -225,7 +225,7 @@ if minetest.get_modpath("ctf") then
 			hud_event.new(name, {
 			name = "ctf_map:barrier",
 			color = "0xFFFFFF",
-			value = "Can't dig beyond barrier!"
+			value = "Can't dig or place node beyond barrier!"
 			})
 			return true
 		else
