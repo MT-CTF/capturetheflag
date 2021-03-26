@@ -102,7 +102,7 @@ for _, chest_color in pairs(colors) do
 		else
 			formspec = formspec .. "label[4.75,3;" ..
 				minetest.formspec_escape("You need at least 10000" ..
-				"\nscore, 1.5+ KD, and 10+\ncaptures to access the\npro section") .. "]"
+				"\nscore, 1.5+ KD, and 10+\ncaptures \n or 0.25+ Captures/Apttempts\nto access the\npro section") .. "]"
 		end
 
 		formspec = formspec ..
