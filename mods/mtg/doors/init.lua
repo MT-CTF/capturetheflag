@@ -362,14 +362,20 @@ function doors.register(name, def)
 				meta:set_string("owner_team", tname)
 			end
 
+			local copy = table.copy
+			local newnode = minetest.get_node(pos)
+			for _, on_placenode in pairs(minetest.registered_on_placenodes) do
+				if on_placenode(copy(pos), copy(newnode), placer, copy(node), ItemStack(itemstack), copy(pointed_thing)) then
+					return itemstack
+				end
+			end
 			if not (creative and creative.is_enabled_for and creative.is_enabled_for(pn)) then
 				itemstack:take_item()
 			end
 
 			minetest.sound_play(def.sounds.place, {pos = pos})
 
-			on_place_node(pos, minetest.get_node(pos),
-				placer, node, itemstack, pointed_thing)
+			on_place_node(pos, newnode, placer, node, itemstack, pointed_thing)
 
 			return itemstack
 		end
