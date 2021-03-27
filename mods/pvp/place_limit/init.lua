@@ -8,7 +8,6 @@ local warning_color = 0xFFC107
 minetest.register_on_joinplayer(function(player)
 	-- player has to wait after join before they can place a node
 	players[player:get_player_name()] = {
-		last_placement = minetest.get_us_time(),
 		last_notification_sent = -math.huge
 	}
 end)
@@ -29,19 +28,24 @@ minetest.register_on_placenode(function(pos, _newnode, placer, oldnode, _itemsta
 		minetest.set_node(pos, oldnode)
 		return true
 	end
-	local playerdata = players[name]
 	local time = minetest.get_us_time()
-	if (time - playerdata.last_placement) / 1e6 < 1 / blocks_per_second then
-		if (time - playerdata.last_notification_sent) / 1e6 >= resend_notification_seconds then
+	local placements = players[name]
+	for i = #placements, 1, -1 do
+		if time - placements[i] > 1e6 then
+			placements[i] = nil
+		end
+	end
+	if #placements >= blocks_per_second then
+		if (time - placements.last_notification_sent) / 1e6 >= resend_notification_seconds then
 			hud_event.new(name, {
-				name  = "place_limit",
+				name  = "place_limit:speed",
 				color = warning_color,
 				value = "Placing too fast!",
 			})
-			playerdata.last_notification_sent = time
+			placements.last_notification_sent = time
 		end
 		minetest.set_node(pos, oldnode)
 		return true
 	end
-	playerdata.last_placement = time
+	table.insert(placements, 1, time)
 end)
