@@ -2,7 +2,8 @@
 local players = {}
 local blocks_per_second = 5
 local resend_notification_seconds = 10
-local warning_color = 0xB8C990
+-- Bootstrap 4 "warning" color
+local warning_color = 0xFFC107
 
 minetest.register_on_joinplayer(function(player)
 	-- player has to wait after join before they can place a node
