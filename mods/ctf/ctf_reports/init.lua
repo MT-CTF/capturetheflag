@@ -112,7 +112,7 @@ function ctf_reports.send_report(report)
 end
 
 local report_reasons = {
-	"chat abuse",
+	"abusing chat",
 	"swearing",
 	"asking for personal info",
 	"spawn killing",
@@ -124,12 +124,10 @@ local report_reasons = {
 minetest.register_chatcommand("report", {
 	func = function(name, param)
 		local connected_players = {}
-		for _,player in pairs(minetest.get_connected_players()) do
-			if player:is_player() and player:get_player_name() then
-				table.insert(connected_players, player:get_player_name())
-			end
+		for index, player in ipairs(minetest.get_connected_players()) do
+			connected_players[index] = player:get_player_name()
 		end
-		local report_formspec = ""..
+		local report_formspec =
 		"size[6,0.5,false]"..
 		"label[0,-0.35;Username]"..
 		"dropdown[0,0;2,2;username_dropdown;"..table.concat(connected_players,",")..";0]"..
