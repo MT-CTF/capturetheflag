@@ -243,7 +243,7 @@ if minetest.get_modpath("ctf") then
 				local name = player:get_player_name()
 				if ctf.move_to_spawn(name) then
 					hud_event.new(name, {
-					name = "ctf_map:barrier",
+					name = "ctf_map:barrier_buildtime",
 					color = "0xFFFFFF",
 					value = "Match hasn't started yet!"
 					})
