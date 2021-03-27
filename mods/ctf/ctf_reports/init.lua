@@ -111,29 +111,47 @@ function ctf_reports.send_report(report)
 	end
 end
 
+local report_reasons = {
+	"chat abuse",
+	"swearing",
+	"asking for personal info",
+	"spawn killing",
+	"hacking",
+	"cross teaming",
+	"base griefing"
+}
+
 minetest.register_chatcommand("report", {
 	func = function(name, param)
-		param = param:trim()
-		if param == "" then
-			return false, "Please add a message to your report. " ..
-				"If it's about (a) particular player(s), please also include their name(s)."
+		local connected_players = {}
+		for _,player in pairs(minetest.get_connected_players()) do
+			if player:is_player() and player:get_player_name() then
+				table.insert(connected_players, player:get_player_name())
+			end
 		end
+		local report_formspec = ""..
+		"size[6,0.5,false]"..
+		"label[0,-0.35;Username]"..
+		"dropdown[0,0;2,2;username_dropdown;"..table.concat(connected_players,",")..";0]"..
 
-		-- Count the number of words, by counting for replaced spaces
-		-- Number of spaces = Number of words - 1
-		local _, count = string.gsub(param, " ", "")
-		if count == 0 then
-			return false, "If you're reporting a player, you should" ..
-				" also include a reason why (e.g. swearing, griefing, spawnkilling, etc.)."
-		end
-
-		param = name .. " reported: " .. param
-
-		ctf_reports.send_report(param)
-
-		return true, "Report has been sent."
+		"label[2,-0.35;Reason]"..
+		"dropdown[2,0;2,2;reason_dropdown;"..table.concat(report_reasons,",")..";0]"..
+		"button_exit[4,-0.06;2,1;report_btn;Report]"
+		minetest.show_formspec(name, "ctf_report", report_formspec)
+		return true
 	end
 })
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if formname == "ctf_report" and fields.quit then
+		if fields.username_dropdown and fields.reason_dropdown then
+			ctf_reports.send_report(fields.username_dropdown .." was "..fields.reason_dropdown)
+			minetest.chat_send_player(player:get_player_name(),"Report has been sent." )
+		else
+			minetest.chat_send_player(player:get_player_name(),"Missing argument!" )
+		end
+	end
+end)
 
 minetest.register_chatcommand("report_sub", {
 	privs = { kick = true },
