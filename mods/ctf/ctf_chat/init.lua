@@ -113,8 +113,8 @@ minetest.register_chatcommand("team", {
 				test = param
 			end
 			if ctf.player(test).team then
-				return true, test ..
-						" is in team " .. ctf.player(test).team
+				return true, minetest.colorize(tcolor.css, test) ..
+						" is in team " .. minetest.colorize(tcolor.css, ctf.player(test).team)
 			else
 				return true, test.." is not in a team"
 			end
