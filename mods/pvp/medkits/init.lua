@@ -71,8 +71,11 @@ local function stop_healing(player, interrupted)
 
 	players[name] = nil
 	if interrupted then
-		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-			"Your healing was interrupted"..reason_handler(interrupted)))
+		hud_event.new(name, {
+			name  = "medkits:interrupt",
+			color = 0xFF4444,
+			value = "Your healing was interrupted" .. reason_handler(interrupted),
+		})
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end

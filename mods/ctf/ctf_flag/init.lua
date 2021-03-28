@@ -84,8 +84,11 @@ function minetest.is_protected(pos, name, ...)
 
 	local flag, distSQ = ctf_flag.get_nearest(pos)
 	if flag and pos.y >= flag.y - 1 and distSQ < rs then
-		minetest.chat_send_player(name,
-			"Too close to the flag to build! Leave at least " .. r .. " blocks around the flag.")
+		hud_event.new(name, {
+			name  = "ctf_bandages:team",
+			color = "warning",
+			value = "Too close to the flag to build (< " .. r .. " nodes) !",
+		})
 		return true
 	else
 		return old_is_protected(pos, name, ...)
