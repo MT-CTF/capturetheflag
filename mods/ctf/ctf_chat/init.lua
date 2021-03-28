@@ -112,6 +112,7 @@ minetest.register_chatcommand("team", {
 			if not test then
 				test = param
 			end
+			local tcolor = ctf_colors.get_color(ctf.player(test))
 			if ctf.player(test).team then
 				return true, minetest.colorize(tcolor.css, test) ..
 						" is in team " .. minetest.colorize(tcolor.css, ctf.player(test).team)
