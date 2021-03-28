@@ -478,6 +478,7 @@ minetest.register_on_punchplayer(function(player, hitter,
 			return
 		end
 
+		local tcolor = ctf_colors.get_color(ctf.player(pname))
 		if to.team == from.team and to.team ~= "" and
 				to.team ~= nil and to.name ~= from.name then
 			minetest.chat_send_player(hname,
