@@ -148,6 +148,15 @@ local function isdiggable(name)
 	)
 end
 
+local function paxel_stop(pname, reason)
+	hud_event.new(pname, {
+		name  = "ctf_classes:paxel_stop",
+		color = "success",
+		value = table.concat({"Pillar digging stopped", reason, "- wait " .. DIG_COOLDOWN .. "s"}, " "),
+	})
+	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+end
+
 local function remove_pillar(pos, pname)
 	local name = minetest.get_node(pos).name
 
@@ -167,15 +176,6 @@ local function remove_pillar(pos, pname)
 	else
 		paxel_stop(pname, "at undiggable node")
 	end
-end
-
-local function paxel_stop(pname, reason)
-	hud_event.new(pname, {
-		name  = "ctf_classes:paxel_stop",
-		color = "success",
-		value = table.concat({"Pillar digging stopped", reason, "- wait " .. DIG_COOLDOWN .. "s"}, " "),
-	})
-	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 end
 
 minetest.register_tool("ctf_classes:paxel_bronze", {
