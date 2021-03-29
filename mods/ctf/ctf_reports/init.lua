@@ -119,7 +119,7 @@ local report_reasons = {
 	"hacking",
 	"cross teaming",
 	"base griefing",
-	"inappropriate"
+	"being inappropriate"
 }
 
 minetest.register_chatcommand("report", {
