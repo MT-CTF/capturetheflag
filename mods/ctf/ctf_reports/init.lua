@@ -118,7 +118,8 @@ local report_reasons = {
 	"spawn killing",
 	"hacking",
 	"cross teaming",
-	"base griefing"
+	"base griefing",
+	"inappropriate"
 }
 
 minetest.register_chatcommand("report", {
