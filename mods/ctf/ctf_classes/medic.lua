@@ -148,6 +148,15 @@ local function isdiggable(name)
 	)
 end
 
+local function paxel_stop(pname, reason)
+	hud_event.new(pname, {
+		name  = "ctf_classes:paxel_stop",
+		color = "success",
+		value = table.concat({"Pillar digging stopped", reason, "- wait " .. DIG_COOLDOWN .. "s"}, " "),
+	})
+	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+end
+
 local function remove_pillar(pos, pname)
 	local name = minetest.get_node(pos).name
 
@@ -161,13 +170,11 @@ local function remove_pillar(pos, pname)
 				pos.y = pos.y + 1
 				minetest.after(DIG_SPEED, remove_pillar, pos, pname)
 			else
-				minetest.chat_send_player(pname, "Pillar digging stopped, too far away from digging pos. Can activate again in "..DIG_COOLDOWN.." seconds")
-				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+				paxel_stop(pname, "at too far away node")
 			end
 		end
 	else
-		minetest.chat_send_player(pname, "Pillar digging stopped at undiggable node. Can activate again in "..DIG_COOLDOWN.." seconds")
-		diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+		paxel_stop(pname, "at undiggable node")
 	end
 end
 
@@ -191,20 +198,39 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 		if pointed_thing.type == "node" then
 			local pname = placer:get_player_name()
 
-			if not isdiggable(minetest.get_node(pointed_thing.under).name) or ctf_match.is_in_build_time() then
-				minetest.chat_send_player(pname, "Can't dig node or build time active")
+			if not isdiggable(minetest.get_node(pointed_thing.under).name) then
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_undiggable",
+					color = "warning",
+					value = "Can't paxel node!",
+				})
+				return minetest.item_place(itemstack, placer, pointed_thing)
+			end
+			if ctf_match.is_in_build_time() then
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_build_time",
+					color = "warning",
+					value = "Build time active!",
+				})
 				return minetest.item_place(itemstack, placer, pointed_thing)
 			end
 
 			if not diggers[pname] then
-				minetest.chat_send_player(pname, "Pillar digging started")
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_start",
+					color = "primary",
+					value = "Pillar digging started",
+				})
 				diggers[pname] = true
 				remove_pillar(pointed_thing.under, pname)
 			elseif type(diggers[pname]) ~= "table" then
-				minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in "..DIG_COOLDOWN.." seconds")
-				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+				paxel_stop(pname)
 			else
-				minetest.chat_send_player(pname, "You can't activate yet")
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_timer",
+					color = "warning",
+					value = "You can't activate yet!",
+				})
 			end
 		end
 	end,
@@ -216,8 +242,7 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 			minetest.after(2, function()
 				if user and user:get_player_control().RMB then
 					if diggers[pname] and type(diggers[pname]) ~= "table" then
-						minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in "..DIG_COOLDOWN.." seconds")
-						diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+						paxel_stop(pname)
 					end
 				end
 			end)

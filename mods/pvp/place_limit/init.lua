@@ -2,8 +2,6 @@
 local players = {}
 local blocks_per_second = 5
 local resend_notification_seconds = 10
--- Bootstrap 4 "warning" color
-local warning_color = 0xFFC107
 
 minetest.register_on_joinplayer(function(player)
 	-- player has to wait after join before they can place a node
@@ -22,7 +20,7 @@ minetest.register_on_placenode(function(pos, _newnode, placer, oldnode, _itemsta
 		-- This should happen rarely
 		hud_event.new(name, {
 			name  = "place_limit:unpointable",
-			color = warning_color,
+			color = "warning",
 			value = "Block not pointable (dug/replaced)!",
 		})
 		minetest.set_node(pos, oldnode)
@@ -39,7 +37,7 @@ minetest.register_on_placenode(function(pos, _newnode, placer, oldnode, _itemsta
 		if (time - placements.last_notification_sent) / 1e6 >= resend_notification_seconds then
 			hud_event.new(name, {
 				name  = "place_limit:speed",
-				color = warning_color,
+				color = "warning",
 				value = "Placing too fast!",
 			})
 			placements.last_notification_sent = time

@@ -163,8 +163,11 @@ function minetest.is_protected(pos, name, info, ...)
 
 	local flag, distSQ = ctf_flag.get_nearest(pos)
 	if flag and pos.y >= flag.y - 1 and distSQ < rs then
-		minetest.chat_send_player(name,
-			"You can't shoot blocks within "..r.." nodes of a flag!")
+		hud_event.new(name, {
+			name  = "sniper_rifles:hit_base",
+			color = "warning",
+			value = "You can't shoot blocks within " .. r .. " nodes of a flag!",
+		})
 		return true
 	else
 		return old_is_protected(pos, name, info, ...)
