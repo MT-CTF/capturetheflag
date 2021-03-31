@@ -32,7 +32,7 @@ function map_maker.show_gui(name)
 
 		"label[4.8,2.8;3. Place Flags]",
 		"label[4.8,3.3;", minetest.formspec_escape(map_maker.get_flag_status()), "]",
-		"button[4.8,4;3.5,1;giveme;Get Flags]",
+		"button[4.8,4;3.5,1;giveme;Get flags]",
 
 		"box[0,5.06;8.85,0.05;#111111BB]",
 
