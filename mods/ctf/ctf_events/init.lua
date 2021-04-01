@@ -131,6 +131,8 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 		type = "bullet"
 	elseif tool_caps.damage_groups.sniper then
 		type = "sniper"
+	elseif tool_caps.damage_groups.tnt then
+		type = "tnt"
 	end
 
 	if tool_caps.damage_groups.combat_log then

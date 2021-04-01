@@ -277,3 +277,22 @@ crafting.register_recipe({
 -- 	always_known = true,
 -- 	level  = 1,
 -- })
+
+--
+-- TNT Crafts
+--
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "tnt:tnt 1",
+	items  = {"tnt:gunpowder 8"},
+	always_known = true,
+	level  = 1,
+})
+crafting.register_recipe({
+	type   = "inv",
+	output = "tnt:gunpowder 4",
+	items  = {"default:coal_lump 2", "default:gravel 2"},
+	always_known = true,
+	level  = 1,
+})

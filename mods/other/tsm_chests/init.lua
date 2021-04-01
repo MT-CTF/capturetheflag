@@ -89,6 +89,7 @@ minetest.register_node("tsm_chests:chest", {
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
 		end
 	end,
+	on_blast = function() end,
 })
 
 --[[ here are some configuration variables ]]
