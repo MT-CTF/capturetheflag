@@ -234,7 +234,6 @@ local function tnt_explode(pos, radius, owner)
 		elseif z_limit < 0 and blocked_axis["-z"] then
 			z_limit = blocked_axis["-z"]
 		end
-		
 		for x = 0, x_limit, 1 * i[1] do
 			for y = 0, y_limit, 1 * i[2] do
 				for z = 0, z_limit, 1 * i[3] do
