@@ -99,7 +99,11 @@ minetest.override_item("ctf_bandages:bandage", {
 		if ctf.player(pname).team == ctf.player(name).team then
 			local nodename = minetest.get_node(object:get_pos()).name
 			if ctf_classes.dont_heal[pname] or nodename:find("lava") or nodename:find("water") or nodename:find("trap") then
-                                minetest.chat_send_player(name, "You can't heal player in lava, water or spikes!")
+				hud_event.new(name, {
+					name  = "ctf_classes:environment",
+					color = "warning",
+					value = "Can't heal " .. pname .. " in lava, water or spikes!",
+				})
 				return -- Can't heal players in lava/water/spikes
 			end
 
@@ -149,10 +153,15 @@ local function isdiggable(name)
 end
 
 local function paxel_stop(pname, reason)
+	local message = "Pillar digging stopped "
+	if reason then
+		message = message .. reason .. " "
+	end
+	message = message .. "- wait " .. DIG_COOLDOWN .. "s"
 	hud_event.new(pname, {
 		name  = "ctf_classes:paxel_stop",
 		color = "success",
-		value = table.concat({"Pillar digging stopped", reason or "unknown", "- wait " .. DIG_COOLDOWN .. "s"}, " "),
+		value = message,
 	})
 	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 end

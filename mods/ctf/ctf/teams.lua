@@ -480,7 +480,11 @@ minetest.register_on_punchplayer(function(player, hitter,
 
 		if to.team == from.team and to.team ~= "" and
 				to.team ~= nil and to.name ~= from.name then
-			minetest.chat_send_player(hname, pname .. " is on your team!")
+			hud_event.new(hname, {
+				name  = "ctf:friendly_fire",
+				color = "warning",
+				value = pname .. " is on your team!",
+			})
 			if not ctf.setting("friendly_fire") then
 				return true
 			end
