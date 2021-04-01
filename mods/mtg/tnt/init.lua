@@ -83,32 +83,6 @@ local function destroy(drops, npos, cid, c_air, on_blast_queue, owner)
 	end
 end
 
-local function calc_velocity(pos1, pos2, old_vel, power)
-	-- Avoid errors caused by a vector of zero length
-	if vector.equals(pos1, pos2) then
-		return old_vel
-	end
-
-	local vel = vector.direction(pos1, pos2)
-	vel = vector.normalize(vel)
-	vel = vector.multiply(vel, power)
-
-	-- Divide by distance
-	local dist = vector.distance(pos1, pos2)
-	dist = math.max(dist, 1)
-	vel = vector.divide(vel, dist)
-
-	-- Add old velocity
-	vel = vector.add(vel, old_vel)
-
-	-- Limit to terminal velocity
-	dist = vector.length(vel)
-	if dist > 250 then
-		vel = vector.divide(vel, dist / 250)
-	end
-	return vel
-end
-
 local function entity_physics(pos, radius, drops, owner)
 	local objs = minetest.get_objects_inside_radius(pos, radius)
 	for _, obj in pairs(objs) do
@@ -163,7 +137,6 @@ local function tnt_explode(pos, radius, owner)
 	local minp, maxp = vm1:read_from_map(p1, p2)
 	local a = VoxelArea:new({MinEdge = minp, MaxEdge = maxp})
 	local data = vm1:get_data()
-	local count = 0
 	local c_tnt = minetest.get_content_id("tnt:tnt")
 	local c_tnt_burning = minetest.get_content_id("tnt:tnt_burning")
 	local c_air = minetest.get_content_id("air")
@@ -288,7 +261,6 @@ local function tnt_explode(pos, radius, owner)
 			end
 		end
 	end
-
 	vm:set_data(data)
 	vm:write_to_map()
 	vm:update_map()
