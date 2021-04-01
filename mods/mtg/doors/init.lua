@@ -188,27 +188,6 @@ function _doors.door_toggle(pos, node, clicker)
 end
 
 
-local function on_place_node(place_to, newnode,
-	placer, oldnode, itemstack, pointed_thing)
-	-- Run script hook
-	for _, callback in ipairs(minetest.registered_on_placenodes) do
-		-- Deepcopy pos, node and pointed_thing because callback can modify them
-		local place_to_copy = {x = place_to.x, y = place_to.y, z = place_to.z}
-		local newnode_copy =
-			{name = newnode.name, param1 = newnode.param1, param2 = newnode.param2}
-		local oldnode_copy =
-			{name = oldnode.name, param1 = oldnode.param1, param2 = oldnode.param2}
-		local pointed_thing_copy = {
-			type  = pointed_thing.type,
-			above = vector.new(pointed_thing.above),
-			under = vector.new(pointed_thing.under),
-			ref   = pointed_thing.ref,
-		}
-		callback(place_to_copy, newnode_copy, placer,
-			oldnode_copy, itemstack, pointed_thing_copy)
-	end
-end
-
 local function can_dig_door(pos, digger)
 	replace_old_owner_information(pos)
 	if default.can_interact_with_node(digger, pos) then
@@ -362,14 +341,18 @@ function doors.register(name, def)
 				meta:set_string("owner_team", tname)
 			end
 
+			local copy = table.copy
+			local newnode = minetest.get_node(pos)
+			for _, on_placenode in ipairs(minetest.registered_on_placenodes) do
+				if on_placenode(copy(pos), copy(newnode), placer, copy(node), ItemStack(itemstack), copy(pointed_thing)) then
+					return itemstack
+				end
+			end
 			if not (creative and creative.is_enabled_for and creative.is_enabled_for(pn)) then
 				itemstack:take_item()
 			end
 
 			minetest.sound_play(def.sounds.place, {pos = pos})
-
-			on_place_node(pos, minetest.get_node(pos),
-				placer, node, itemstack, pointed_thing)
 
 			return itemstack
 		end

@@ -71,8 +71,11 @@ local function stop_healing(player, interrupted)
 
 	players[name] = nil
 	if interrupted then
-		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-			"Your healing was interrupted"..reason_handler(interrupted)))
+		hud_event.new(name, {
+			name  = "medkits:interrupt",
+			color = 0xFF4444,
+			value = "Your healing was interrupted" .. reason_handler(interrupted),
+		})
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end
@@ -117,6 +120,7 @@ minetest.register_globalstep(function(dtime)
 			if pstat then
 				local hp = player:get_hp()
 				if hp < pstat.regen_max then
+					kill_assist.add_heal_assist(name, regen_step)
 					player:set_hp(math.min(hp + regen_step, pstat.regen_max))
 				else
 					stop_healing(player)

@@ -34,12 +34,13 @@ function ctf_map.place_base(color, pos)
 	minetest.set_node(pos3, chest)
 	local inv = minetest.get_meta(pos3):get_inventory()
 	inv:add_item("main", ItemStack("default:cobble 99"))
-	inv:add_item("main", ItemStack("default:cobble 99"))
-	inv:add_item("main", ItemStack("default:cobble 99"))
+	inv:add_item("main", ItemStack("ctf_map:reinforced_cobble 50"))
+	inv:add_item("main", ItemStack("ctf_traps:damage_cobble 40"))
 	inv:add_item("main", ItemStack("default:wood 99"))
 	inv:add_item("main", ItemStack("default:stick 30"))
 	inv:add_item("main", ItemStack("default:glass 5"))
 	inv:add_item("main", ItemStack("default:torch 10"))
+	inv:add_item("main", ItemStack("doors:door_steel 2"))
 end
 
 -- Override ctf.get_spawn to implement random spawns

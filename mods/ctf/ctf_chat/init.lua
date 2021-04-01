@@ -183,6 +183,7 @@ minetest.register_chatcommand("team", {
 minetest.register_chatcommand("join", {
 	params = "team name",
 	description = "Add to team",
+	privs = {ctf_team_mgr = true},
 	func = function(name, param)
 		if ctf.join(name, param, false, name) then
 			return true, "Joined team " .. param .. "!"
@@ -271,6 +272,8 @@ minetest.register_chatcommand("t", {
 	end
 })
 
+local function me_func() end
+
 if minetest.global_exists("irc") then
 	function irc.playerMessage(name, message)
 		local color = ctf_colors.get_irc_color(ctf.player(name))
@@ -284,6 +287,14 @@ if minetest.global_exists("irc") then
 		local abrace = color .. "<" .. clear
 		local bbrace = color .. ">" .. clear
 		return ("%s%s%s %s"):format(abrace, name, bbrace, message)
+	end
+
+	me_func = function(...)
+		local message = irc.playerMessage(...)
+
+		message = "*" .. message:sub(message:find(" "))
+
+		irc.say(message)
 	end
 end
 
@@ -312,12 +323,16 @@ end
 table.insert(minetest.registered_on_chat_messages, 1, handler)
 
 minetest.registered_chatcommands["me"].func = function(name, param)
+	me_func(name, param)
+
 	if ctf.player(name).team then
 		local tcolor = ctf_colors.get_color(ctf.player(name))
 		name = minetest.colorize(tcolor.css, "* " .. name)
 	else
 		name = "* ".. name
 	end
+
+	minetest.log("action", "[CHAT] "..name.." "..param)
 
 	minetest.chat_send_all(name .. " " .. param)
 end

@@ -424,6 +424,25 @@ do
 		sounds = default.node_sound_leaves_defaults()
 	})
 
+	minetest.register_node(":ctf_map:papyrus", {
+		description = "Indestructible Papyrus",
+		drawtype = "plantlike",
+		tiles = {"default_papyrus.png"},
+		inventory_image = "default_papyrus.png",
+		wield_image = "default_papyrus.png",
+		paramtype = "light",
+		sunlight_propagates = true,
+		walkable = false,
+		selection_box = {
+			type = "fixed",
+			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
+		},
+		groups = {immortal = 1},
+		sounds = default.node_sound_leaves_defaults(),
+		after_dig_node = function(pos, node, metadata, digger)
+			default.dig_up(pos, node, digger)
+		end,
+	})
 
 	minetest.register_node(":ctf_map:jungletree", {
 		description = "Indestructible Jungle Tree",

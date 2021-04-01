@@ -29,12 +29,12 @@ end, true)
 
 
 local sword_special_timer = {}
-local SWORD_SPECIAL_COOLDOWN = 40
+local SWORD_SPECIAL_COOLDOWN = 20
 local function sword_special_timer_func(pname, timeleft)
 	sword_special_timer[pname] = timeleft
 
-	if timeleft - 10 >= 0 then
-		minetest.after(10, sword_special_timer_func, pname, timeleft - 10)
+	if timeleft - 2 >= 0 then
+		minetest.after(2, sword_special_timer_func, pname, timeleft - 2)
 	else
 		sword_special_timer[pname] = nil
 	end
@@ -57,8 +57,8 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		local pname = placer:get_player_name()
 		if not pointed_thing then return end
 
-		if sword_special_timer[pname] then
-			minetest.chat_send_player(pname, "You can't place a marker yet (>"..sword_special_timer[pname].."s left)")
+		if sword_special_timer[pname] and placer:get_player_control().sneak then
+			minetest.chat_send_player(pname, "You have to wait "..sword_special_timer[pname].."s to place marker again")
 
 			if pointed_thing.type == "node" then
 				return minetest.item_place(itemstack, placer, pointed_thing)
@@ -89,7 +89,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 
 			if #enemies > 0 then
 				ctf_marker.remove_marker(pteam)
-				ctf_marker.add_marker(pname, pteam, pos, ("[Enemies Found!: <%s>]"):format(table.concat(enemies, ", ")))
+				ctf_marker.add_marker(pname, pteam, pos, (" found enemies: <%s>]"):format(table.concat(enemies, ", ")))
 			end
 
 			return
@@ -102,10 +102,10 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		-- Check if player is sneaking before placing marker
 		if not placer:get_player_control().sneak then return end
 
-		sword_special_timer[pname] = 20
-		sword_special_timer_func(pname, 20)
+		sword_special_timer[pname] = 4
+		sword_special_timer_func(pname, 4)
 
-		minetest.registered_chatcommands["m"].func(pname, "Marked with "..pname.."'s sword")
+		minetest.registered_chatcommands["m"].func(pname, "placed with sword")
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
 		if pointed_thing then

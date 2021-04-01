@@ -207,7 +207,7 @@ end
 function ctf_stats.is_pro(name)
 	local stats = ctf_stats.player(name)
 	local kd = stats.kills / (stats.deaths == 0 and 1 or stats.deaths)
-	return stats.score >= 10000 and kd >= 1.5
+	return stats.score >= 10000 and kd >= 1.5 and stats.captures >= 10
 end
 
 ctf.register_on_join_team(function(name, tname, oldteam)
@@ -373,7 +373,7 @@ local function invHasGoodWeapons(inv)
 	return false
 end
 
-local function calculateKillReward(victim, killer, toolcaps)
+function ctf_stats.calculateKillReward(victim, killer, toolcaps)
 	local vmain, victim_match = ctf_stats.player(victim)
 
 	if not vmain or not victim_match then return 5 end
@@ -417,33 +417,23 @@ local function calculateKillReward(victim, killer, toolcaps)
 	return reward
 end
 
-ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
+ctf.register_on_killedplayer(function(victim, killer)
 	-- Suicide is not encouraged here at CTF
 	if victim == killer then
 		return
 	end
 	local main, match = ctf_stats.player(killer)
 	if main and match then
-		local reward = calculateKillReward(victim, killer, toolcaps)
 		main.kills  = main.kills  + 1
-		main.score  = main.score  + reward
 		match.kills = match.kills + 1
-		match.score = match.score + reward
 		match.kills_since_death = match.kills_since_death + 1
 		_needs_save = true
-
-		reward = math.floor(reward * 100) / 100
-
-		hud_score.new(killer, {
-			name = "ctf_stats:kill_score",
-			color = "0x00FF00",
-			value = reward
-		})
 	end
 end)
 
 minetest.register_on_dieplayer(function(player)
 	local main, match = ctf_stats.player(player:get_player_name())
+
 	if main and match then
 		main.deaths = main.deaths + 1
 		match.deaths = match.deaths + 1
