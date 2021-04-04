@@ -153,16 +153,12 @@ local function isdiggable(name)
 end
 
 local function paxel_stop(pname, reason)
-	local message = "Pillar digging stopped "
-	if reason then
-		message = message .. reason .. " "
-	end
-	message = message .. "- wait " .. DIG_COOLDOWN .. "s"
 	hud_event.new(pname, {
 		name  = "ctf_classes:paxel_stop",
 		color = "success",
-		value = message,
+		value = string.format("Pillar digging stopped. Reason: %s. You can use again in %ds", reason or "unknown", DIG_COOLDOWN), 
 	})
+
 	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 end
 
@@ -248,10 +244,10 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 
 		if diggers[pname] and diggers[pname] == true and type(diggers[pname]) ~= "table" then
 			diggers[pname] = 1
-			minetest.after(2, function()
+			minetest.after(1, function()
 				if user and user:get_player_control().RMB then
 					if diggers[pname] and type(diggers[pname]) ~= "table" then
-						paxel_stop(pname)
+						paxel_stop(pname, "Stop requested")
 					end
 				end
 			end)
