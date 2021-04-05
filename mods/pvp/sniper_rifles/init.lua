@@ -11,6 +11,12 @@ local scoped = {}
 -- Timer for scope-check globalstep
 local timer = 0.2
 
+-- List of IDs for players scoped, for use in hide_scope(). NOTE: for HUD overlay
+local scoped_hud_id = {}
+
+-- Scale constant, for crosshair. This is to ensure the crosshair will be centered.
+local scale_const = 6
+
 local default_physics_overrides = {
 	speed = 0.1,
 	jump = 0
@@ -27,10 +33,19 @@ local function show_scope(name, item_name, fov_mult)
 	end
 
 	scoped[name] = item_name
+	scoped_hud_id[name] = player:hud_add({
+		hud_elem_type = "image",
+		position = {x = 0.5, y = 0.5},
+		offset = {x = (-65*scale_const)/2, y = (-65*scale_const)/2},
+		text = "rifle_crosshair.png",
+		scale = {x = scale_const, y = scale_const},
+		alignment = {x = 1, y = 1},
+	})
 	-- e.g. if fov_mult == 8, then FOV = 1/8 * current_FOV, a.k.a 8x zoom
 	player:set_fov(1 / fov_mult, true)
 	physics.set(name, "sniper_rifles:scoping", rifles[item_name].physics_overrides)
 	player:hud_set_flags({ wielditem = false })
+
 end
 
 local function hide_scope(name)
@@ -40,10 +55,20 @@ local function hide_scope(name)
 	end
 
 	scoped[name] = nil
+	player:hud_remove(scoped_hud_id[name])
+	scoped_hud_id[name] = nil
 	player:set_fov(0)
 	physics.remove(name, "sniper_rifles:scoping")
 	player:hud_set_flags({ wielditem = true })
+
 end
+
+-- Be absolutely certain crosshair HUD gets removed on death
+minetest.register_on_dieplayer(function(player)
+	if scoped_hud_id[player:get_player_name()] then
+		hide_scope(player:get_player_name())
+	end
+end)
 
 local function on_use(stack, user, pointed)
 	if scoped[user:get_player_name()] then
@@ -72,7 +97,7 @@ local function on_rclick(item, placer, pointed_thing)
 end
 
 ------------------
--- Sccope-check --
+-- Scope-check --
 ------------------
 
 -- Hide scope if currently wielded item is not the same item
@@ -126,6 +151,27 @@ function sniper_rifles.register_rifle(name, def)
 	def.physics_overrides = def.physics_overrides or default_physics_overrides
 
 	rifles[name] = table.copy(def)
+end
+
+local old_is_protected = minetest.is_protected
+local r = ctf.setting("flag.nobuild_radius") + 5
+local rs = r * r
+function minetest.is_protected(pos, name, info, ...)
+	if r <= 0 or rs == 0 or not info or not info.is_gun then
+		return old_is_protected(pos, name, info, ...)
+	end
+
+	local flag, distSQ = ctf_flag.get_nearest(pos)
+	if flag and pos.y >= flag.y - 1 and distSQ < rs then
+		hud_event.new(name, {
+			name  = "sniper_rifles:hit_base",
+			color = "warning",
+			value = "You can't shoot blocks within " .. r .. " nodes of a flag!",
+		})
+		return true
+	else
+		return old_is_protected(pos, name, info, ...)
+	end
 end
 
 dofile(minetest.get_modpath(minetest.get_current_modname()) .. "/rifles.lua")

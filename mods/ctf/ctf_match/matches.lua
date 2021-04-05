@@ -41,7 +41,7 @@ function ctf_match.next()
 
 	ctf_alloc.set_all()
 
-	minetest.chat_send_all("Next round!")
+	minetest.chat_send_all(minetest.colorize("#4aaf01", "Next round!"))
 	if minetest.global_exists("chatplus") then
 		chatplus.log("Next round!")
 	end
@@ -51,7 +51,7 @@ end
 local game_won = false
 function ctf_match.check_for_winner()
 	local winner
-	for name, team in pairs(ctf.teams) do
+	for name, team in pairs({red = ctf.teams.red, blue = ctf.teams.blue}) do
 		if winner then
 			return
 		end
@@ -62,7 +62,18 @@ function ctf_match.check_for_winner()
 	if not game_won then
 		game_won = true
 		ctf.action("match", winner .. " won!")
-		minetest.chat_send_all("Team " .. winner .. " won!")
+
+		local winner_color = "#ffffff"
+		if winner == "red" then
+			winner_color = ctf_colors.colors["red"]
+		end
+		if winner == "blue" then
+			winner_color = ctf_colors.colors["blue"]
+		end
+		winner_color = "#" .. tostring(winner_color):sub(3, 8)
+
+		minetest.chat_send_all(minetest.colorize(winner_color, ("Team " .. winner .. " won!")))
+
 		for i = 1, #ctf_match.registered_on_winner do
 			ctf_match.registered_on_winner[i](winner)
 		end
@@ -99,7 +110,7 @@ ctf_flag.register_on_capture(function(attname, flag)
 	if fl_team and #fl_team.flags == 0 then
 		ctf.action("match", flag.team .. " was defeated.")
 		ctf.remove_team(flag.team)
-		minetest.chat_send_all(flag.team .. " has been defeated!")
+		minetest.chat_send_all(minetest.colorize("#808080", (flag.team .. " has been defeated!")))
 	end
 
 	ctf_match.check_for_winner()

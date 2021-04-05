@@ -153,9 +153,12 @@ function _doors.door_toggle(pos, node, clicker)
 	-- If team door, check clicker's team
 	if node.name:find("doors:door_steel") then
 		local tname = ctf.player(clicker:get_player_name()).team
-		local owner_team = meta:get_string("owner_team")
-		if clicker and tname ~= owner_team then
-			return false
+
+		if tname == "red" or tname == "blue" then
+			local owner_team = meta:get_string("owner_team")
+			if clicker and tname ~= owner_team then
+				return false
+			end
 		end
 	end
 
@@ -184,27 +187,6 @@ function _doors.door_toggle(pos, node, clicker)
 	return true
 end
 
-
-local function on_place_node(place_to, newnode,
-	placer, oldnode, itemstack, pointed_thing)
-	-- Run script hook
-	for _, callback in ipairs(minetest.registered_on_placenodes) do
-		-- Deepcopy pos, node and pointed_thing because callback can modify them
-		local place_to_copy = {x = place_to.x, y = place_to.y, z = place_to.z}
-		local newnode_copy =
-			{name = newnode.name, param1 = newnode.param1, param2 = newnode.param2}
-		local oldnode_copy =
-			{name = oldnode.name, param1 = oldnode.param1, param2 = oldnode.param2}
-		local pointed_thing_copy = {
-			type  = pointed_thing.type,
-			above = vector.new(pointed_thing.above),
-			under = vector.new(pointed_thing.under),
-			ref   = pointed_thing.ref,
-		}
-		callback(place_to_copy, newnode_copy, placer,
-			oldnode_copy, itemstack, pointed_thing_copy)
-	end
-end
 
 local function can_dig_door(pos, digger)
 	replace_old_owner_information(pos)
@@ -303,6 +285,11 @@ function doors.register(name, def)
 			-- Get placer's team
 			local tname = ctf.player(pn).team or ""
 
+			if tname ~= "red" and tname ~= "blue" then
+				minetest.chat_send_player(pn, "Your team can't place doors!")
+				return itemstack
+			end
+
 			-- Prevent door placement if within 40 nodes of enemy base
 			local enemy_team = tname == "red" and "blue" or "red"
 			local enemy_base = ctf_map.map.teams[enemy_team].pos
@@ -354,14 +341,18 @@ function doors.register(name, def)
 				meta:set_string("owner_team", tname)
 			end
 
+			local copy = table.copy
+			local newnode = minetest.get_node(pos)
+			for _, on_placenode in ipairs(minetest.registered_on_placenodes) do
+				if on_placenode(copy(pos), copy(newnode), placer, copy(node), ItemStack(itemstack), copy(pointed_thing)) then
+					return itemstack
+				end
+			end
 			if not (creative and creative.is_enabled_for and creative.is_enabled_for(pn)) then
 				itemstack:take_item()
 			end
 
 			minetest.sound_play(def.sounds.place, {pos = pos})
-
-			on_place_node(pos, minetest.get_node(pos),
-				placer, node, itemstack, pointed_thing)
 
 			return itemstack
 		end
@@ -701,7 +692,7 @@ doors.register_trapdoor("doors:trapdoor_steel", {
 	wield_image = "doors_trapdoor_steel.png",
 	tile_front = "doors_trapdoor_steel.png",
 	tile_side = "doors_trapdoor_steel_side.png",
-	protected = true,
+	protected = false,
 	sounds = default.node_sound_metal_defaults(),
 	sound_open = "doors_steel_door_open",
 	sound_close = "doors_steel_door_close",

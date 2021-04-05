@@ -236,6 +236,7 @@ local furnaces = {}
 
 local function on_destruct(pos)
 	local inv = minetest.get_inventory({ type = "node", pos = pos })
+	if not inv then return end
 	for _, list in pairs(inv:get_lists()) do
 		for _, item in pairs(list) do
 			minetest.add_item(pos, item)

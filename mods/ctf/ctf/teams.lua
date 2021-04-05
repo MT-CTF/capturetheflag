@@ -116,6 +116,8 @@ function ctf.chat_send_team(team, msg)
 		team = ctf.team(team)
 	end
 
+	if not team then return end
+
 	for pname, _ in pairs(team.players) do
 		minetest.chat_send_player(pname, msg)
 	end
@@ -199,6 +201,7 @@ function ctf.join(name, team, force, by)
 		end
 	end
 
+	local prevteam = player.team
 	player.team = team
 	team_data.players[player.name] = player
 	ctf.player_last_team[name] = team
@@ -219,7 +222,7 @@ function ctf.join(name, team, force, by)
 	minetest.log("action", name .. " joined team " .. team)
 
 	for i = 1, #ctf.registered_on_join_team do
-		ctf.registered_on_join_team[i](name, team)
+		ctf.registered_on_join_team[i](name, team, prevteam)
 	end
 	return true
 end
@@ -421,6 +424,7 @@ minetest.register_on_joinplayer(function(player)
 
 	local name = player:get_player_name()
 	if ctf.team(ctf.player(name).team) then
+		minetest.log("action", name.." already in team so not allocating")
 		return
 	end
 
@@ -441,6 +445,19 @@ function ctf.register_on_killedplayer(func)
 	end
 	table.insert(ctf.registered_on_killedplayer, func)
 end
+
+function ctf.can_attack(player, hitter, time_from_last_punch, tool_capabilities, dir, damage, ...)
+	return true
+end
+
+ctf.registered_on_attack = {}
+function ctf.register_on_attack(func)
+	if ctf._mt_loaded then
+		error("You can't register callbacks at game time!")
+	end
+	table.insert(ctf.registered_on_attack, func)
+end
+
 local dead_players = {}
 minetest.register_on_respawnplayer(function(player)
 	dead_players[player:get_player_name()] = nil
@@ -449,7 +466,7 @@ minetest.register_on_joinplayer(function(player)
 	dead_players[player:get_player_name()] = nil
 end)
 minetest.register_on_punchplayer(function(player, hitter,
-		time_from_last_punch, tool_capabilities, dir, damage)
+		time_from_last_punch, tool_capabilities, dir, damage, ...)
 	if player and hitter then
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
@@ -463,10 +480,20 @@ minetest.register_on_punchplayer(function(player, hitter,
 
 		if to.team == from.team and to.team ~= "" and
 				to.team ~= nil and to.name ~= from.name then
-			minetest.chat_send_player(hname, pname .. " is on your team!")
+			hud_event.new(hname, {
+				name  = "ctf:friendly_fire",
+				color = "warning",
+				value = pname .. " is on your team!",
+			})
 			if not ctf.setting("friendly_fire") then
 				return true
 			end
+		end
+
+		if ctf.can_attack(player, hitter, time_from_last_punch, tool_capabilities,
+			dir, damage, ...) == false
+		then
+			return true
 		end
 
 		local hp = player:get_hp()
@@ -482,6 +509,13 @@ minetest.register_on_punchplayer(function(player, hitter,
 						wielded, tool_capabilities)
 			end
 			return false
+		end
+
+		for i = 1, #ctf.registered_on_attack do
+			ctf.registered_on_attack[i](
+				player, hitter, time_from_last_punch,
+				tool_capabilities, dir, damage, ...
+			)
 		end
 	end
 end)

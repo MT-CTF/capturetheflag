@@ -11,7 +11,7 @@ ctf_classes.register("knight", {
 		melee_bonus = 1,
 
 		initial_stuff = {
-			"default:sword_steel",
+			"ctf_classes:sword_bronze",
 		},
 
 		allowed_guns = {
@@ -28,9 +28,15 @@ ctf_classes.register("shooter", {
 	color = "#c60",
 	properties = {
 		allow_grapples = true,
-		max_hp = 15,
+		max_hp = 16,
 
 		initial_stuff = {
+			"shooter_guns:rifle_loaded",
+			"shooter_hook:grapple_gun_loaded",
+			"shooter:ammo 2"
+		},
+
+		item_blacklist = {
 			"shooter_guns:rifle_loaded",
 			"shooter_hook:grapple_gun_loaded",
 		},
@@ -66,7 +72,7 @@ ctf_classes.register("shooter", {
 
 ctf_classes.register("medic", {
 	description = "Medic",
-	pros = { "x2 regen for nearby friendlies", "Building supplies", "+10% speed" },
+	pros = { "x2 regen for nearby friendlies", "Building supplies + Paxel", "+10% speed" },
 	cons = {},
 	color = "#0af",
 	properties = {
@@ -74,9 +80,8 @@ ctf_classes.register("medic", {
 		speed = 1.1,
 
 		initial_stuff = {
-			"ctf_bandages:bandage 50",
-			"default:pick_steel",
-			"default:shovel_steel",
+			"ctf_bandages:bandage",
+			"ctf_classes:paxel_bronze",
 			"default:cobble 99"
 		},
 

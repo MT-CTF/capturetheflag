@@ -50,12 +50,12 @@ local function team_console_help(name)
 	local privs = minetest.get_player_privs(name)
 	if privs and privs.ctf_admin == true then
 		minetest.chat_send_player(name, "/team add <team> - add a team called name (ctf_admin only)")
-		minetest.chat_send_player(name, "/team remove <team> - add a team called name (ctf_admin only)")
+		minetest.chat_send_player(name, "/team remove <team> - remove a team called name (ctf_admin only)")
 	end
 	if privs and privs.ctf_team_mgr == true then
 		minetest.chat_send_player(name, "/team bjoin <team> <commands> - Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)")
 		minetest.chat_send_player(name, "/team join <name> <team> - add 'player' to team 'team' (ctf_team_mgr only)")
-		minetest.chat_send_player(name, "/team removeply <name> - add 'player' to team 'team' (ctf_team_mgr only)")
+		minetest.chat_send_player(name, "/team removeplayer <name> - remove 'player' from 'team' (ctf_team_mgr only)")
 	end
 end
 
@@ -67,7 +67,7 @@ minetest.register_chatcommand("team", {
 		local remove = string.match(param, "^remove ([%a%d_-]+)")
 		local j_name, j_tname = string.match(param, "^join ([%a%d_-]+) ([%a%d_]+)")
 		local b_tname, b_pattern = string.match(param, "^bjoin ([%a%d_-]+) ([%a%d_-%*%! ]+)")
-		local l_name = string.match(param, "^removeplr ([%a%d_-]+)")
+		local l_name = string.match(param, "^removeplayer ([%a%d_-]+)")
 		if create then
 			local privs = minetest.get_player_privs(name)
 			if privs and privs.ctf_admin then
@@ -75,7 +75,7 @@ minetest.register_chatcommand("team", {
 					string.match(create, "([%a%b_]-)")
 					and create ~= ""
 					and create ~= nil
-					and ctf.team({name=create, add_team=true})
+					and ctf.team({name=create, add_team=true, color=create, allow_joins=false})
 				) then
 					return true, "Added team '"..create.."'"
 				else
@@ -183,6 +183,7 @@ minetest.register_chatcommand("team", {
 minetest.register_chatcommand("join", {
 	params = "team name",
 	description = "Add to team",
+	privs = {ctf_team_mgr = true},
 	func = function(name, param)
 		if ctf.join(name, param, false, name) then
 			return true, "Joined team " .. param .. "!"
@@ -271,6 +272,8 @@ minetest.register_chatcommand("t", {
 	end
 })
 
+local function me_func() end
+
 if minetest.global_exists("irc") then
 	function irc.playerMessage(name, message)
 		local color = ctf_colors.get_irc_color(ctf.player(name))
@@ -284,6 +287,14 @@ if minetest.global_exists("irc") then
 		local abrace = color .. "<" .. clear
 		local bbrace = color .. ">" .. clear
 		return ("%s%s%s %s"):format(abrace, name, bbrace, message)
+	end
+
+	me_func = function(...)
+		local message = irc.playerMessage(...)
+
+		message = "*" .. message:sub(message:find(" "))
+
+		irc.say(message)
 	end
 end
 
@@ -312,12 +323,16 @@ end
 table.insert(minetest.registered_on_chat_messages, 1, handler)
 
 minetest.registered_chatcommands["me"].func = function(name, param)
+	me_func(name, param)
+
 	if ctf.player(name).team then
 		local tcolor = ctf_colors.get_color(ctf.player(name))
 		name = minetest.colorize(tcolor.css, "* " .. name)
 	else
 		name = "* ".. name
 	end
+
+	minetest.log("action", "[CHAT] "..name.." "..param)
 
 	minetest.chat_send_all(name .. " " .. param)
 end

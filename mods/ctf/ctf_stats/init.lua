@@ -211,10 +211,18 @@ end
 function ctf_stats.is_pro(name)
 	local stats = ctf_stats.player(name)
 	local kd = stats.kills / (stats.deaths == 0 and 1 or stats.deaths)
-	return stats.score >= 10000 and kd >= 1.5
+	return stats.score >= 10000 and kd >= 1.5 and stats.captures >= 10
 end
 
-ctf.register_on_join_team(function(name, tname)
+ctf.register_on_join_team(function(name, tname, oldteam)
+	if not ctf_stats.current[tname] then
+		ctf_stats.current[tname] = {}
+	end
+
+	if oldteam and ctf_stats.current[oldteam] then
+		ctf_stats.current[oldteam][name] = nil
+	end
+
 	ctf_stats.current[tname][name] = ctf_stats.current[tname][name] or {
 		kills = 0,
 		kills_since_death = 0,
@@ -230,12 +238,23 @@ ctf_stats.winner_team = "-"
 ctf_stats.winner_player = "-"
 
 table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
+	local score = 0
+	for i, pstat in pairs(ctf_stats.current.red) do
+		score = score + pstat.score
+	end
+	for i, pstat in pairs(ctf_stats.current.blue) do
+		score = score + pstat.score
+	end
+	local capturereward = math.floor(score * 10) / 100
+	if capturereward < 50 then capturereward = 50 end
+	if capturereward > 750 then capturereward = 750 end
+
 	local main, match = ctf_stats.player(name)
 	if main and match then
 		main.captures  = main.captures  + 1
-		main.score     = main.score     + 50
+		main.score     = main.score     + capturereward
 		match.captures = match.captures + 1
-		match.score    = match.score    + 50
+		match.score    = match.score    + capturereward
 		_needs_save = true
 	end
 	ctf_stats.winner_player = name
@@ -243,7 +262,7 @@ table.insert(ctf_flag.registered_on_capture, 1, function(name, flag)
 	hud_score.new(name, {
 		name  = "ctf_stats:flag_capture",
 		color = "0xFF00FF",
-		value = 50
+		value = capturereward
 	})
 end)
 
@@ -358,8 +377,10 @@ local function invHasGoodWeapons(inv)
 	return false
 end
 
-local function calculateKillReward(victim, killer)
+function ctf_stats.calculateKillReward(victim, killer, toolcaps)
 	local vmain, victim_match = ctf_stats.player(victim)
+
+	if not vmain or not victim_match then return 5 end
 
 	-- +5 for every kill they've made since last death in this match.
 	local reward = victim_match.kills_since_death * 5
@@ -384,9 +405,13 @@ local function calculateKillReward(victim, killer)
 		reward = 5
 	end
 
-	-- Half if no good weapons
+	-- Half if no good weapons, +50% if combat logger
 	local inv = minetest.get_inventory({ type = "player", name = victim })
-	if not invHasGoodWeapons(inv) then
+
+	if toolcaps.damage_groups.combat_log == 1 then
+		ctf.log("ctf_stats", "Player " .. victim .. " is a combat logger")
+		reward = reward * 1.5
+	elseif not invHasGoodWeapons(inv) then
 		ctf.log("ctf_stats", "Player " .. victim .. " has no good weapons")
 		reward = reward * 0.5
 	else
@@ -403,26 +428,16 @@ ctf.register_on_killedplayer(function(victim, killer)
 	end
 	local main, match = ctf_stats.player(killer)
 	if main and match then
-		local reward = calculateKillReward(victim, killer)
 		main.kills  = main.kills  + 1
-		main.score  = main.score  + reward
 		match.kills = match.kills + 1
-		match.score = match.score + reward
 		match.kills_since_death = match.kills_since_death + 1
 		_needs_save = true
-
-		reward = math.floor(reward * 100) / 100
-
-		hud_score.new(killer, {
-			name = "ctf_stats:kill_score",
-			color = "0x00FF00",
-			value = reward
-		})
 	end
 end)
 
 minetest.register_on_dieplayer(function(player)
 	local main, match = ctf_stats.player(player:get_player_name())
+
 	if main and match then
 		main.deaths = main.deaths + 1
 		match.deaths = match.deaths + 1

@@ -40,6 +40,7 @@ minetest.register_node("tsm_chests:chest", {
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
 	paramtype2 = "facedir",
 	groups = {immortal = 1},
+	light_source = 3,
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),

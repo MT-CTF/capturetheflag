@@ -16,7 +16,7 @@ end
 wrap_callback("shooter_hook:grapple_hook", "on_use", function(old, itemstack, user, pointed_thing, ...)
 	if pointed_thing.type == "nothing" then
 		local before = itemstack:get_wear()
-		itemstack:add_wear(65536 / 16)
+		itemstack:add_wear(65536 / 32)
 
 		if itemstack:get_wear() < before then
 			itemstack:set_wear(65535)
@@ -29,7 +29,7 @@ end)
 wrap_callback("shooter_hook:grapple_gun_loaded", "on_use", function(old, itemstack, user, pointed_thing, ...)
 	if pointed_thing.type == "nothing" then
 		local before = itemstack:get_wear()
-		itemstack:add_wear(65536 / 8)
+		itemstack:add_wear(65536 / 16)
 
 		if itemstack:get_wear() < before then
 			itemstack:set_wear(65535)

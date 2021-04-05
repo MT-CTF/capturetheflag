@@ -52,6 +52,8 @@ default:dirt_with_dry_grass
 default:dirt_with_snow
 default:dirt_with_rainforest_litter
 default:dirt_with_coniferous_litter
+default:dry_dirt
+default:dry_dirt_with_dry_grass
 
 default:permafrost
 default:permafrost_with_stones
@@ -497,10 +499,29 @@ minetest.register_node("default:dirt_with_coniferous_litter", {
 	}),
 })
 
+minetest.register_node("default:dry_dirt", {
+	description = "Savanna Dirt",
+	tiles = {"default_dry_dirt.png"},
+	groups = {crumbly = 3, soil = 1},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dry_dirt_with_dry_grass", {
+	description = "Savanna Dirt with Savanna Grass",
+	tiles = {"default_dry_grass.png", "default_dry_dirt.png",
+		{name = "default_dry_dirt.png^default_dry_grass_side.png",
+			tileable_vertical = false}},
+	groups = {crumbly = 3, soil = 1},
+	drop = "default:dry_dirt",
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name = "default_grass_footstep", gain = 0.4},
+	}),
+})
+
 minetest.register_node("default:permafrost", {
 	description = "Permafrost",
 	tiles = {"default_permafrost.png"},
-	groups = {cracky = 3},
+	groups = {cracky = 3, crumbly = 2},
 	sounds = default.node_sound_dirt_defaults(),
 })
 
@@ -508,7 +529,7 @@ minetest.register_node("default:permafrost_with_stones", {
 	description = "Permafrost with Stones",
 	tiles = {"default_permafrost.png^default_stones.png",
 		"default_permafrost.png"},
-	groups = {cracky = 3},
+	groups = {cracky = 3, crumbly = 2},
 	drop = "default:permafrost",
 	sounds = default.node_sound_gravel_defaults(),
 })
@@ -518,7 +539,7 @@ minetest.register_node("default:permafrost_with_moss", {
 	tiles = {"default_moss.png", "default_permafrost.png",
 		{name = "default_permafrost.png^default_moss_side.png",
 			tileable_vertical = false}},
-	groups = {cracky = 3},
+	groups = {cracky = 3, crumbly = 2},
 	drop = "default:permafrost",
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name = "default_grass_footstep", gain = 0.25},
@@ -851,13 +872,14 @@ minetest.register_node("default:steelblock", {
 })
 
 
-minetest.register_node("default:stone_with_copper", {
+--[[ minetest.register_node("default:stone_with_copper", {
 	description = "Copper Ore",
 	tiles = {"default_stone.png^default_mineral_copper.png"},
 	groups = {cracky = 2},
 	drop = 'default:copper_lump',
 	sounds = default.node_sound_stone_defaults(),
-})
+}) ]]
+minetest.register_alias("default:stone_with_copper", "default:stone")
 
 minetest.register_node("default:copperblock", {
 	description = "Copper Block",
@@ -868,13 +890,14 @@ minetest.register_node("default:copperblock", {
 })
 
 
-minetest.register_node("default:stone_with_tin", {
+--[[ minetest.register_node("default:stone_with_tin", {
 	description = "Tin Ore",
 	tiles = {"default_stone.png^default_mineral_tin.png"},
 	groups = {cracky = 2},
 	drop = "default:tin_lump",
 	sounds = default.node_sound_stone_defaults(),
-})
+}) ]]
+minetest.register_alias("default:stone_with_tin", "default:stone")
 
 minetest.register_node("default:tinblock", {
 	description = "Tin Block",
@@ -1284,14 +1307,9 @@ minetest.register_node("default:blueberry_bush_leaves_with_berries", {
 	waving = 1,
 	tiles = {"default_blueberry_bush_leaves.png^default_blueberry_overlay.png"},
 	paramtype = "light",
-	groups = {snappy = 3, flammable = 2, leaves = 1, dig_immediate = 3},
-	drop = "default:blueberries",
+	groups = {snappy = 3, flammable = 2, leaves = 1},
+	drop = "default:blueberry_bush_leaves",
 	sounds = default.node_sound_leaves_defaults(),
-	node_dig_prediction = "default:blueberry_bush_leaves",
-
-	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		minetest.set_node(pos, {name = "default:blueberry_bush_leaves"})
-	end,
 })
 
 minetest.register_node("default:blueberry_bush_leaves", {

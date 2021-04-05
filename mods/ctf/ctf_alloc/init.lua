@@ -52,9 +52,11 @@ local function update_lowest()
 	-- Update lowest.score and lowest.team
 	lowest = {}
 	for tname, score in pairs(scores) do
-		if not lowest.score or score <= lowest.score then
-			lowest.score = score
-			lowest.team  = tname
+		if tname == "red" or tname == "blue" then
+			if not lowest.score or score <= lowest.score then
+				lowest.score = score
+				lowest.team  = tname
+			end
 		end
 	end
 end
