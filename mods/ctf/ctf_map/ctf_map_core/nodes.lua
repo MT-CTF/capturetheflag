@@ -104,7 +104,7 @@ end
 for name, def in pairs(minetest.registered_nodes) do
 	local mod, nodename = name:match"(..-):(.+)"
 	local prefix = mod_prefixes[mod]
-	if nodename and prefix and name ~= "default:torch" and not (def.groups and (def.groups.immortal or def.groups.not_in_creative_inventory)) then
+	if nodename and prefix and not (def.buildable_to or (def.groups and (def.groups.immortal or def.groups.mortal))) then
 		-- HACK to preserve backwards compatibility
 		local new_name = ":ctf_map:" .. prefix .. nodename
 		local new_def = table.copy(def)
@@ -115,8 +115,3 @@ for name, def in pairs(minetest.registered_nodes) do
 		minetest.register_node(new_name, new_def)
 	end
 end
-
-local torch_defs = table.copy(default.torch)
-make_immortal(torch_defs.floor)
-torch_defs.floor.drop = "ctf_map:torch"
-default.register_torch("ctf_map:torch", torch_defs)

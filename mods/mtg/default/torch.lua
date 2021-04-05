@@ -13,40 +13,44 @@ local function on_flood(pos, oldnode, newnode)
 	return false
 end
 
+local torch_suffix = {[0] = "_ceiling", "", "_wall", "_wall", "_wall", "_wall"}
+function default.torch_on_place(itemstack, placer, pointed_thing)
+	local under = pointed_thing.under
+	local node = minetest.get_node(under)
+	local nodedef = minetest.registered_nodes[node.name]
+	if nodedef and nodedef.on_rightclick and
+		not (placer and placer:is_player() and
+		placer:get_player_control().sneak) then
+		return nodedef.on_rightclick(under, node, placer, itemstack,
+			pointed_thing) or itemstack
+	end
+
+	local above = pointed_thing.above
+	local wdir = minetest.dir_to_wallmounted(vector.subtract(under, above))
+	local name = itemstack:get_name()
+	itemstack:set_name(name .. torch_suffix[wdir])
+	itemstack = minetest.item_place(itemstack, placer, pointed_thing, wdir)
+	itemstack:set_name(name)
+	return itemstack
+end
+
 function default.register_torch(name, defs)
 	local def = defs.floor
-	local ceiling = name .. "_ceiling"
-	local wall = name .. "_wall"
-	local lookup = {[0] = ceiling, name, wall, wall, wall, wall}
-	def.on_place = function(itemstack, placer, pointed_thing)
-		local under = pointed_thing.under
-		local node = minetest.get_node(under)
-		local nodedef = minetest.registered_nodes[node.name]
-		if nodedef and nodedef.on_rightclick and
-			not (placer and placer:is_player() and
-			placer:get_player_control().sneak) then
-			return nodedef.on_rightclick(under, node, placer, itemstack,
-				pointed_thing) or itemstack
-		end
-
-		local above = pointed_thing.above
-		local wdir = minetest.dir_to_wallmounted(vector.subtract(under, above))
-		itemstack:set_name(lookup[wdir])
-		itemstack = minetest.item_place(itemstack, placer, pointed_thing, wdir)
-		itemstack:set_name(name)
-		return itemstack
-	end
+	def.drop = def.drop or name
+	def.on_place = def.on_place or default.torch_on_place
 	minetest.register_node(":" .. name, def)
 	local def_ceiling = table.copy(def)
 	for key, value in pairs(defs.ceiling) do
 		def_ceiling[key] = value
 	end
-	minetest.register_node(":" .. ceiling, def_ceiling)
+	def_ceiling.groups.not_in_creative_inventory = 1
+	minetest.register_node(":" .. name .. "_ceiling", def_ceiling)
 	local def_wall = table.copy(def)
 	for key, value in pairs(defs.wall) do
 		def_wall[key] = value
 	end
-	minetest.register_node(":" .. wall, def_wall)
+	def_wall.groups.not_in_creative_inventory = 1
+	minetest.register_node(":" .. name .. "_wall", def_wall)
 end
 
 default.torch = {
@@ -67,7 +71,6 @@ default.torch = {
 		liquids_pointable = false,
 		light_source = 12,
 		groups = {choppy=2, dig_immediate=3, flammable=1, attached_node=1, torch=1},
-		drop = "default:torch",
 		selection_box = {
 			type = "wallmounted",
 			wall_bottom = {-1/8, -1/2, -1/8, 1/8, 2/16, 1/8},
