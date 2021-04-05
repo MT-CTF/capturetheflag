@@ -14,8 +14,9 @@ end
 local function announce_all()
 	if bountied_player then
 		for _, player in pairs(minetest.get_connected_players()) do
-			if bountied_player ~= player:get_player_name() then
-				announce(player:get_player_name())
+			local pname = player:get_player_name()
+			if ctf.player(pname).team ~= ctf.player(bountied_player).team then
+				announce(pname)
 			end
 		end
 	end
