@@ -142,11 +142,6 @@ function ctf_stats.player(name)
 
 	local match_player_stats =
 			ctf_stats.current.red[name] or ctf_stats.current.blue[name]
-	if name == "singleplayer" then
-		player_stats.score = 200000
-		player_stats.kills = 20000
-		player_stats.deaths = 1
-	end
 	return player_stats, match_player_stats
 end
 
