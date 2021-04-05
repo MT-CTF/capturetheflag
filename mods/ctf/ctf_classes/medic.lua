@@ -156,7 +156,7 @@ local function paxel_stop(pname, reason)
 	hud_event.new(pname, {
 		name  = "ctf_classes:paxel_stop",
 		color = "success",
-		value = string.format("Pillar digging stopped. Reason: %s. You can use again in %ds", reason or "unknown", DIG_COOLDOWN), 
+		value = string.format("Pillar digging stopped. Reason: %s. You can use again in %ds", reason or "unknown", DIG_COOLDOWN),
 	})
 
 	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
