@@ -113,5 +113,8 @@ for name, def in pairs(minetest.registered_nodes) do
 		end
 		make_immortal(new_def)
 		minetest.register_node(new_name, new_def)
+		if mod == "wool" then
+			minetest.register_alias("ctf_map:" .. nodename, new_name)
+		end
 	end
 end
