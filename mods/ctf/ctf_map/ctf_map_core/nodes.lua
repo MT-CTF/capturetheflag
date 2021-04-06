@@ -82,37 +82,53 @@ local mod_prefixes = {
 	wool = "wool_";
 }
 
--- See Lua API, section "Node-only groups"
-local preserved_groups = {
-	bouncy = true;
-	connect_to_raillike = true;
-	disable_jump = true;
-	fall_damage_add_percent = true;
-	slippery = true;
+local tool_groups = {
+	dig_immediate = true
 }
 
-local function make_immortal(def)
-	local groups = {immortal = 1}
-	for group in pairs(preserved_groups) do
-		groups[group] = def.groups[group]
+local function add_tool_groups(def)
+	local caps = def.tool_capabilities
+	if not caps then
+		return
 	end
-	def.groups = groups
+	local groups = caps.groupcaps
+	if not groups then
+		return
+	end
+	for group in pairs(groups) do
+		tool_groups[group] = true
+	end
+end
+
+for _, def in pairs(minetest.registered_tools) do
+	add_tool_groups(def)
+end
+
+-- Add hand groups
+add_tool_groups(minetest.registered_items[""])
+
+local function make_immortal(def)
+	for group in pairs(tool_groups) do
+		def.groups[group] = nil
+	end
+	def.groups.immortal = 1
 	def.floodable = false
+	def.buildable_to = false
 	def.description = def.description and ("Indestructible " .. def.description)
 end
 
-for name, def in pairs(minetest.registered_nodes) do
+local registered_nodes = table.copy(minetest.registered_nodes)
+for name, def in pairs(registered_nodes) do
 	local mod, nodename = name:match"(..-):(.+)"
 	local prefix = mod_prefixes[mod]
-	if nodename and prefix and not (def.buildable_to or (def.groups and (def.groups.immortal or def.groups.mortal))) then
+	if nodename and prefix and not (def.groups and def.groups.mortal) then
 		-- HACK to preserve backwards compatibility
 		local new_name = ":ctf_map:" .. prefix .. nodename
-		local new_def = table.copy(def)
 		if def.drop == name then
-			new_def.drop = new_name
+			def.drop = new_name
 		end
-		make_immortal(new_def)
-		minetest.register_node(new_name, new_def)
+		make_immortal(def)
+		minetest.register_node(new_name, def)
 		if mod == "wool" then
 			minetest.register_alias("ctf_map:" .. nodename, new_name)
 		end
