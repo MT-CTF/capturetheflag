@@ -97,22 +97,23 @@ local function make_immortal(def)
 		groups[group] = def.groups[group]
 	end
 	def.groups = groups
+	def.buildable_to = false
 	def.floodable = false
 	def.description = def.description and ("Indestructible " .. def.description)
 end
 
-for name, def in pairs(minetest.registered_nodes) do
+local registered_nodes = table.copy(minetest.registered_nodes)
+for name, def in pairs(registered_nodes) do
 	local mod, nodename = name:match"(..-):(.+)"
 	local prefix = mod_prefixes[mod]
-	if nodename and prefix and not (def.buildable_to or (def.groups and (def.groups.immortal or def.groups.mortal))) then
+	if nodename and prefix and not (def.groups and def.groups.mortal) then
 		-- HACK to preserve backwards compatibility
 		local new_name = ":ctf_map:" .. prefix .. nodename
-		local new_def = table.copy(def)
 		if def.drop == name then
-			new_def.drop = new_name
+			def.drop = new_name
 		end
-		make_immortal(new_def)
-		minetest.register_node(new_name, new_def)
+		make_immortal(def)
+		minetest.register_node(new_name, def)
 		if mod == "wool" then
 			minetest.register_alias("ctf_map:" .. nodename, new_name)
 		end
