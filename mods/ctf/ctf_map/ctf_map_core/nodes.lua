@@ -113,6 +113,7 @@ local function make_immortal(def)
 	end
 	def.groups.immortal = 1
 	def.floodable = false
+	def.buildable_to = false
 	def.description = def.description and ("Indestructible " .. def.description)
 end
 
