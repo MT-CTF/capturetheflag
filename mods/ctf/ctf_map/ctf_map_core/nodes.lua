@@ -123,12 +123,12 @@ for name, def in pairs(registered_nodes) do
 	local prefix = mod_prefixes[mod]
 	if nodename and prefix and not (def.groups and def.groups.mortal) then
 		-- HACK to preserve backwards compatibility
-		local new_name = ":ctf_map:" .. prefix .. nodename
+		local new_name = "ctf_map:" .. prefix .. nodename
 		if def.drop == name then
 			def.drop = new_name
 		end
 		make_immortal(def)
-		minetest.register_node(new_name, def)
+		minetest.register_node(":" .. new_name, def)
 		if mod == "wool" then
 			minetest.register_alias("ctf_map:" .. nodename, new_name)
 		end
