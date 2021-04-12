@@ -33,10 +33,12 @@ function ctf_match.vote_next(name)
 				minetest.chat_send_all("Vote to skip match passed, " ..
 						#results.yes .. " to " .. #results.no)
 
-				can_vote_skip = false
-				voted_skip = true
-				if flags_hold <= 0 then
-					skip()
+				if can_vote_skip then
+					can_vote_skip = false
+					voted_skip = true
+					if flags_hold <= 0 then
+						skip()
+					end
 				end
 			else
 				minetest.chat_send_all("Vote to skip match failed, " ..
