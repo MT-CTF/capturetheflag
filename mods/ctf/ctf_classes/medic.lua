@@ -99,7 +99,11 @@ minetest.override_item("ctf_bandages:bandage", {
 		if ctf.player(pname).team == ctf.player(name).team then
 			local nodename = minetest.get_node(object:get_pos()).name
 			if ctf_classes.dont_heal[pname] or nodename:find("lava") or nodename:find("water") or nodename:find("trap") then
-                                minetest.chat_send_player(name, "You can't heal player in lava, water or spikes!")
+				hud_event.new(name, {
+					name  = "ctf_classes:environment",
+					color = "warning",
+					value = "Can't heal " .. pname .. " in lava, water or spikes!",
+				})
 				return -- Can't heal players in lava/water/spikes
 			end
 
@@ -152,8 +156,9 @@ local function paxel_stop(pname, reason)
 	hud_event.new(pname, {
 		name  = "ctf_classes:paxel_stop",
 		color = "success",
-		value = table.concat({"Pillar digging stopped", reason, "- wait " .. DIG_COOLDOWN .. "s"}, " "),
+		value = string.format("Pillar digging stopped. Reason: %s. You can use again in %ds", reason or "unknown", DIG_COOLDOWN),
 	})
+
 	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 end
 
@@ -239,10 +244,10 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 
 		if diggers[pname] and diggers[pname] == true and type(diggers[pname]) ~= "table" then
 			diggers[pname] = 1
-			minetest.after(2, function()
+			minetest.after(1, function()
 				if user and user:get_player_control().RMB then
 					if diggers[pname] and type(diggers[pname]) ~= "table" then
-						paxel_stop(pname)
+						paxel_stop(pname, "Stop requested")
 					end
 				end
 			end)
