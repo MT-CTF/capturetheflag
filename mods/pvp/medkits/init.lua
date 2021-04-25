@@ -83,10 +83,10 @@ local function stop_healing(player, interrupted)
 	player:hud_remove(info.hud)
 end
 
-ctf_flag.register_on_precapture(function()
+ctf_match.register_on_new_match(function()
 	-- Reset all player states at the end of the match
 	for name, info in pairs(players) do
-		players[name]=nil
+		players[name] = nil
 		local player = minetest.get_player_by_name(name)
 		if player then
 			player:hud_remove(info.hud)
