@@ -24,6 +24,7 @@ local function announce_all()
 end
 
 local function bounty_player(target)
+	local bountied = ctf.player(bountied_player)
 	local prev = bountied_player
 	bountied_player = target
 
@@ -69,6 +70,10 @@ local function bounty_player(target)
 	if prev then
 		for _, player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
+			if ctf.player(name).team == bountied.team then
+				return -- Prevent teammates from knowing who no longer has the bounty
+				       -- when the bountied player is disconnected and isn't in a team
+			end
 			if bountied_player ~= name then
 				local prev_color = ctf_colors.get_color(ctf.player(prev)).css
 				minetest.chat_send_player(player:get_player_name(),
