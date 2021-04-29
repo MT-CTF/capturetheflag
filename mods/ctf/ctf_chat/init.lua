@@ -103,8 +103,10 @@ minetest.register_chatcommand("team", {
 			local team = ctf.team(param)
 			local tcolor = "#" .. ctf.flag_colors[team.data.color]:sub(3, 8)
 			for pname, tplayer in pairs(team.players) do
-				i = i + 1
-				str = str .. "  " .. i .. ") " .. minetest.colorize(tcolor, pname) .. "\n"
+				if not minetest.check_player_privs(pname, {spectate=true}) then
+					i = i + 1
+					str = str .. "  " .. i .. ") " .. minetest.colorize(tcolor, pname) .. "\n"
+				end
 			end
 			str = "Team " .. minetest.colorize(tcolor, param) .. " (" .. i .. ") :\n" .. str
 			minetest.chat_send_player(name, str)
@@ -113,8 +115,12 @@ minetest.register_chatcommand("team", {
 				test = param
 			end
 			if ctf.player(test).team then
-				return true, test ..
+				if minetest.check_player_privs(test, {spectate=true}) then
+					return true, "Player " .. test .. " not found!"
+				else
+					return true, test ..
 						" is in team " .. ctf.player(test).team
+				end
 			else
 				return true, test.." is not in a team"
 			end
