@@ -218,8 +218,12 @@ function ctf.join(name, team, force, by)
 			" has joined team " .. minetest.colorize(tcolor, team)
 	end
 
-	minetest.chat_send_all("*** " .. join_msg)
-	minetest.log("action", name .. " joined team " .. team)
+	if minetest.check_player_privs(name, {spectate = true}) then
+		minetest.log("action", name .. " joined team " .. team .. " unannounced (spectator)")
+	else
+		minetest.chat_send_all("*** " .. join_msg)
+		minetest.log("action", name .. " joined team " .. team)
+	end
 
 	for i = 1, #ctf.registered_on_join_team do
 		ctf.registered_on_join_team[i](name, team, prevteam)
