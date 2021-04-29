@@ -66,9 +66,29 @@ local function check_grapple(itemname)
 	})
 end
 
+local function check_rocket(itemname)
+	local def = minetest.registered_items[itemname]
+	local old_func = def.on_use
+	minetest.override_item(itemname, {
+		on_use = function(itemstack, user, ...)
+			if not ctf_classes.get(user).properties.allow_rockets then
+				minetest.chat_send_player(user:get_player_name(),
+					"You can't use that weapon! Change your class at base")
+				return itemstack
+			end
+
+			return old_func(itemstack, user, ...)
+		end,
+
+	})
+end
+
 check_grapple("shooter_hook:grapple_gun_loaded")
 check_grapple("shooter_hook:grapple_gun")
 check_grapple("shooter_hook:grapple_hook")
+
+check_rocket("shooter_rocket:rocket_gun_loaded")
+check_rocket("shooter_rocket:rocket_gun")
 
 -- Override grappling hook entity to check if player has flag before teleporting
 local old_grapple_step = minetest.registered_entities["shooter_hook:hook"].on_step
