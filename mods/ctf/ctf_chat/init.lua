@@ -248,6 +248,9 @@ minetest.register_chatcommand("t", {
 			minetest.chat_send_player(name, "The team channel is disabled.")
 			return
 		end
+		if param == "" then
+			return false, "-!- Empty team message, see /help t"
+		end
 
 		local tname = ctf.player(name).team
 		local team = ctf.team(tname)
