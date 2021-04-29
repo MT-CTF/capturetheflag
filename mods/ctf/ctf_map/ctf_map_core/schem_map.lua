@@ -214,28 +214,44 @@ local shuffled_idx
 
 math.randomseed(os.time())
 
--- Fisher-Yates shuffling algorithm, used for shuffling map selection order
+-- Fisher-Yates-Savilli shuffling algorithm, used for shuffling map selection order
 -- Adapted from snippet provided in https://stackoverflow.com/a/35574006
-local function shuffle_maps(idx_to_avoid)
+-- Improved to ensure that the first maps from current shuffled order differ
+-- from the last maps from previous shuffled order
+-- You can set the minimum distance between the same map using map_recurrence_threshold param
+local function shuffle_maps(previous_order, map_recurrence_threshold)
+	local maps_count = #ctf_map.available_maps
+
+	map_recurrence_threshold = math.min(map_recurrence_threshold or 0, maps_count - 1)
+
+	if previous_order == nil then
+		map_recurrence_threshold = 0
+		previous_order = {}
+		for i = 1, maps_count do
+			previous_order[i] = i
+		end
+	end
+
 	-- Reset shuffled_idx
 	shuffled_idx = 1
 
 	-- Create table of ordered indices
 	shuffled_order = {}
-	for i = 1, #ctf_map.available_maps, 1 do
-		shuffled_order[i] = i
+
+	-- At first select maps that don't intersect with the last maps from previous order
+	for i = 1, map_recurrence_threshold do
+		local j = math.random(1, maps_count - map_recurrence_threshold)
+		local k = maps_count - map_recurrence_threshold + i
+		shuffled_order[i] = previous_order[j]
+		previous_order[j] = previous_order[k]
 	end
 
-	-- Shuffle table
-	for i = #ctf_map.available_maps, 1, -1 do
-		local j = math.random(i)
-		shuffled_order[i], shuffled_order[j] = shuffled_order[j], shuffled_order[i]
-	end
-
-	-- Prevent the last map of the previous cycle from becoming the first in the next cycle
-	if shuffled_order[1] == idx_to_avoid then
-		local k = math.random(#ctf_map.available_maps - 1)
-		shuffled_order[1], shuffled_order[k + 1] = shuffled_order[k + 1], shuffled_order[1]
+	-- Select remaining maps
+	for i = map_recurrence_threshold + 1, maps_count do
+		local j = math.random(1, maps_count - i + 1)
+		local k = maps_count - i + 1
+		shuffled_order[i] = previous_order[j]
+		previous_order[j] = previous_order[k]
 	end
 end
 
@@ -257,7 +273,7 @@ local function select_map()
 
 		-- If shuffled_idx overflows, re-shuffle map selection order
 		if shuffled_idx > #ctf_map.available_maps then
-			shuffle_maps(shuffled_order[#ctf_map.available_maps])
+			shuffle_maps(shuffled_order, tonumber(minetest.settings:get("ctf_map.map_recurrence_threshold")) or 3)
 		end
 	else
 		-- Choose next map index, but don't select the same one again
