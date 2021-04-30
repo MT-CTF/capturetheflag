@@ -32,9 +32,26 @@ ctf_map.mapdir = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/
 
 -- Modify server status message to include map info
 local map_str
-local old_server_status = minetest.get_server_status
+local mtversion = minetest.get_version().string
+
+local function get_nonspectators()
+	mtplayers = ""
+	local players_tbl = {}
+	local players = minetest.get_connected_players()
+	for _, p in pairs(players) do
+		local name = p:get_player_name()
+		if not minetest.check_player_privs(name, {spectate=true}) then
+			table.insert(players_tbl, name)
+		end
+	end
+	mtplayers = tostring(table.concat(players_tbl, ", "))
+	return mtplayers
+end
+
 function minetest.get_server_status(name, joined)
-	local status = old_server_status(name, joined)
+	local status = "# Server: version=" .. mtversion .. ", uptime=" ..
+	math.floor(minetest.get_server_uptime()) .. ", clients={" .. get_nonspectators() ..
+	"}\n# Server: Welcome to CTF!"
 
 	if not ctf_map.map or not map_str then
 		return status
