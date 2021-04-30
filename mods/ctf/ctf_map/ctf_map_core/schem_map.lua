@@ -33,9 +33,9 @@ ctf_map.mapdir = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/
 -- Modify server status message to include map info
 local map_str
 local mtversion = minetest.get_version().string
+local mtplayers = ""
 
 local function get_nonspectators()
-	mtplayers = ""
 	local players_tbl = {}
 	local players = minetest.get_connected_players()
 	for _, p in pairs(players) do
