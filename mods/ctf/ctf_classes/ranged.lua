@@ -73,7 +73,7 @@ local function check_rocket(itemname)
 		on_use = function(itemstack, user, ...)
 			if not ctf_classes.get(user).properties.allow_rockets then
 				minetest.chat_send_player(user:get_player_name(),
-					"You can't use that weapon! Change your class at base")
+					"You can't use that weapon! Change your class at base.")
 				return itemstack
 			end
 
