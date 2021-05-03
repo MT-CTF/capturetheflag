@@ -294,8 +294,10 @@ if minetest.global_exists("irc") then
 
 	me_func = function(...)
 		local message = irc.playerMessage(...)
+		local start_escape = message:sub(1, message:find("<")-1)
 
-		message = "*" .. message:sub(message:find(" "))
+		-- format is: \startescape < \endescape playername \startescape > \endescape
+		message = message:gsub("\15(.-)"..start_escape, "* %1"):gsub("[<>]", "")
 
 		irc.say(message)
 	end
