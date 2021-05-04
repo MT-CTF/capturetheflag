@@ -137,7 +137,7 @@ grenades.register_grenade("grenades:smoke", {
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,
-				texture = "grenades_smoke.png^[noalpha^[colorize:#" .. math.random(7, 9)*111 ..":255",
+				texture = "grenades_smoke.png^[noalpha^[colorize:#" .. math.random(7, 9)*111 ..":255^grenades_smoke.png",
 			})
 		end
 	end,
