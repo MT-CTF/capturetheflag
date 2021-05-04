@@ -120,24 +120,24 @@ grenades.register_grenade("grenades:smoke", {
 
 		minetest.after(SMOKE_GRENADE_TIME, minetest.sound_stop, hiss)
 
-		for i = 0, 5, 1 do
+		for i = 0, 4, 1 do
 			minetest.add_particlespawner({
 				amount = 40,
 				time = SMOKE_GRENADE_TIME + 3,
-				minpos = vector.subtract(pos, 2),
-				maxpos = vector.add(pos, 2),
-				minvel = {x = 0, y = 2, z = 0},
-				maxvel = {x = 0, y = 3, z = 0},
-				minacc = {x = 1, y = 0.2, z = 1},
-				maxacc = {x = 1, y = 0.2, z = 1},
+				minpos = vector.new(pos.x-4, pos.y+1, pos.z-4),
+				maxpos = vector.new(pos.x+4, pos.y+2, pos.z+4),
+				minvel = vector.new(-1, 0, -1),
+				maxvel = vector.new(1, 0.3, 1),
+				minacc = vector.new(-1, 0, -1),
+				maxacc = vector.new(1, 1, 1),
 				minexptime = 1,
-				maxexptime = 1,
-				minsize = 125,
-				maxsize = 140,
+				maxexptime = 2,
+				minsize = 50,
+				maxsize = 40,
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,
-				texture = "grenades_smoke.png",
+				texture = "grenades_smoke.png^[noalpha^[colorize:#" .. math.random(7, 9)*111 ..":255",
 			})
 		end
 	end,
