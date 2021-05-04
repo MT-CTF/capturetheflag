@@ -37,12 +37,16 @@ function ctf_marker.add_marker(name, tname, pos, str)
 
 	local team = ctf.team(tname)
 
+	if not tname then
+		minetest.log("error", "Team name not provided to ctf_marker.add_marker()")
+	end
+
 	teams[tname] = {
 		players = {},
 		time = 0
 	}
 
-	for pname, _ in pairs(team.players) do
+	for pname in pairs(team.players) do
 		local tplayer = minetest.get_player_by_name(pname)
 		if tplayer then
 			teams[tname].players[pname] = tplayer:hud_add({
