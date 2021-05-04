@@ -69,6 +69,10 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 
 		local pteam = ctf.player(pname).team
 
+		if not pteam then -- can be nil during map change
+			return
+		end
+
 		if pointed_thing.type == "object" and pointed_thing.ref:is_player() then
 			if ctf_match.is_in_build_time() then return end
 
