@@ -69,3 +69,16 @@ ctf_classes.register_on_changed(function(player, old, new)
 	ctf.chat_send_team(ctf.player(pname).team,
 			minetest.colorize("#ABCDEF", pname .. " is now a " .. new.description))
 end)
+
+local old_get_damage_modifier = ctf.get_damage_modifier
+function ctf.get_damage_modifier(player, tool_capabilities)
+	local modifier = 0
+	if tool_capabilities.damage_groups.sword then
+		local class = ctf_classes.get(player)
+		if class.properties.sword_modifier then
+			modifier = class.properties.sword_modifier
+		end
+	end
+
+	return modifier + old_get_damage_modifier(player, tool_capabilities)
+end

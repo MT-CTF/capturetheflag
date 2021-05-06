@@ -69,7 +69,7 @@ function kill_assist.reward_assists(victim, killer, reward)
 	kill_assist.clear_assists(victim)
 end
 
-ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
+ctf.register_on_killedplayer(function(victim, killer, toolcaps)
 	local reward = ctf_stats.calculateKillReward(victim, killer, toolcaps)
 	reward = math.floor(reward * 100) / 100
 	kill_assist.reward_assists(victim, killer, reward)

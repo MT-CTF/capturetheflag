@@ -120,7 +120,7 @@ function ctf_events.update_all()
 	end
 end
 
-ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
+ctf.register_on_killedplayer(function(victim, killer, tool_caps)
 	local victim_color = ctf_colors.get_color(ctf.player(victim))
 	local killer_color = ctf_colors.get_color(ctf.player(killer))
 

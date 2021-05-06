@@ -8,7 +8,7 @@ ctf_classes.register("knight", {
 	properties = {
 		max_hp = 30,
 		speed = 0.90,
-		melee_bonus = 1,
+		sword_modifier = 1,
 
 		initial_stuff = {
 			"ctf_classes:sword_bronze",
