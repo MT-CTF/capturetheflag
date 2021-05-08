@@ -124,11 +124,9 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 	local victim_color = ctf_colors.get_color(ctf.player(victim))
 	local killer_color = ctf_colors.get_color(ctf.player(killer))
 
-	local type = "unknown"
+	local type = "sword" -- Also used for unknown attacks
 
-	if tool_caps.damage_groups.sword then
-		type = "sword"
-	elseif tool_caps.damage_groups.grenade then
+	if tool_caps.damage_groups.grenade then
 		type = "grenade"
 	elseif tool_caps.damage_groups.rocket then
 		type = "rocket"
