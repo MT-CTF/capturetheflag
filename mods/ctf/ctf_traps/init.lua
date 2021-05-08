@@ -63,7 +63,10 @@ minetest.register_node("ctf_traps:damage_cobble", {
 			if placerobj then
 				digger:punch(placerobj, 10, {damage_groups = {fleshy = 7}}, vector.new(0, 1, 0))
 			else
-				digger:set_hp(digger:get_hp() - 7)
+				local hp = digger:get_hp()
+				if hp > 0 then
+					digger:set_hp(hp - 7)
+				end
 			end
 
 			minetest.remove_node(pos)
