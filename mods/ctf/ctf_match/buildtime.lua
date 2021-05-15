@@ -66,7 +66,11 @@ local old_can_attack = ctf.can_attack
 function ctf.can_attack(player, hitter, ...)
 	if ctf_match.is_in_build_time() then
 		if hitter:is_player() then
-			minetest.chat_send_player(hitter:get_player_name(), "Match hasn't started yet!")
+			hud_event.new(hitter:get_player_name(), {
+				name  = "ctf_match:buildtime_hit",
+				color = "warning",
+				value = "Match hasn't started yet!",
+			})
 		end
 		return false
 	end

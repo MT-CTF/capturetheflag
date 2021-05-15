@@ -71,8 +71,11 @@ local function stop_healing(player, interrupted)
 
 	players[name] = nil
 	if interrupted then
-		minetest.chat_send_player(name, minetest.colorize("#FF4444",
-			"Your healing was interrupted"..reason_handler(interrupted)))
+		hud_event.new(name, {
+			name  = "medkits:interrupt",
+			color = 0xFF4444,
+			value = "Your healing was interrupted" .. reason_handler(interrupted),
+		})
 		player:set_hp(info.hp)
 		player:get_inventory():add_item("main", ItemStack("medkits:medkit 1"))
 	end
@@ -80,10 +83,10 @@ local function stop_healing(player, interrupted)
 	player:hud_remove(info.hud)
 end
 
-ctf_flag.register_on_precapture(function()
+ctf_match.register_on_new_match(function()
 	-- Reset all player states at the end of the match
 	for name, info in pairs(players) do
-		players[name]=nil
+		players[name] = nil
 		local player = minetest.get_player_by_name(name)
 		if player then
 			player:hud_remove(info.hud)

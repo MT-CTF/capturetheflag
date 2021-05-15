@@ -44,14 +44,20 @@ function ctf.can_attack(player, hitter, ...)
 	local hname = hitter:get_player_name()
 
 	if ctf_respawn_immunity.is_immune(player) then
-		minetest.chat_send_player(hname, minetest.colorize("#EE8822", pname ..
-				" just respawned or joined," .. " and is immune to attacks!"))
+		hud_event.new(hname, {
+			name  = "ctf_respawn_immunity:hit",
+			color = 0xEE8822,
+			value = pname .. " has respawn immunity!",
+		})
 		return false
 	end
 
 	if ctf_respawn_immunity.is_immune(hitter) then
-		minetest.chat_send_player(hname, minetest.colorize("#FF8C00",
-				"Your immunity has ended because you attacked a player"))
+		hud_event.new(hname, {
+			name  = "ctf_respawn_immunity:end",
+			color = 0xFF8C00,
+			value = "Your immunity has ended!",
+		})
 		immune_players[hname] = nil
 		ctf_respawn_immunity.update_effects(hitter)
 	end

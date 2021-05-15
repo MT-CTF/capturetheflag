@@ -257,7 +257,7 @@ minetest.register_tool("default:sword_stone", {
 		groupcaps={
 			snappy={times={[2]=1.4, [3]=0.40}, uses=20, maxlevel=1},
 		},
-		damage_groups = {fleshy=4},
+		damage_groups = {fleshy=4, sword=1},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -271,7 +271,7 @@ minetest.register_tool("default:sword_bronze", {
 		groupcaps={
 			snappy={times={[1]=2.75, [2]=1.30, [3]=0.375}, uses=25, maxlevel=2},
 		},
-		damage_groups = {fleshy=6},
+		damage_groups = {fleshy=6, sword=1},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -285,7 +285,7 @@ minetest.register_tool("default:sword_steel", {
 		groupcaps={
 			snappy={times={[1]=2.5, [2]=1.20, [3]=0.35}, uses=30, maxlevel=2},
 		},
-		damage_groups = {fleshy=6},
+		damage_groups = {fleshy=6, sword=1},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -299,7 +299,7 @@ minetest.register_tool("default:sword_mese", {
 		groupcaps={
 			snappy={times={[1]=2.0, [2]=1.00, [3]=0.35}, uses=30, maxlevel=3},
 		},
-		damage_groups = {fleshy=7},
+		damage_groups = {fleshy=7, sword=1},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
@@ -313,7 +313,7 @@ minetest.register_tool("default:sword_diamond", {
 		groupcaps={
 			snappy={times={[1]=1.90, [2]=0.90, [3]=0.30}, uses=40, maxlevel=3},
 		},
-		damage_groups = {fleshy=8},
+		damage_groups = {fleshy=8, sword=1},
 	},
 	sound = {breaks = "default_tool_breaks"},
 })

@@ -5,6 +5,18 @@ local players = {}
 local duration = 7
 local max = 3
 local next_check = 10000000
+-- Bootstrap 5 palette
+local colors = {
+	primary = 0x0D6EFD,
+	secondary = 0x6C757D,
+	success = 0x198754,
+	info = 0x0DCAF0,
+	warning = 0xFFC107,
+	danger = 0xDC3545,
+	light = 0xF8F9FA,
+	dark = 0x212529,
+}
+hud_event.colors = colors
 
 local function update(name)
 	local player = minetest.get_player_by_name(name)
@@ -51,6 +63,8 @@ function hud_event.new(name, def)
 			not def.name or not def.value or not def.color then
 		error("hud_event: Invalid HUD event element definition", 2)
 	end
+
+	def.color = colors[def.color] or def.color
 
 	local player = minetest.get_player_by_name(name)
 	if not player then

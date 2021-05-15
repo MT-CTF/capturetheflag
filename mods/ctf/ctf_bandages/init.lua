@@ -22,7 +22,19 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 			local hp = object:get_hp()
 			local limit = ctf_bandages.heal_percent * object:get_properties().hp_max
 
-			if hp > 0 and hp < limit then
+			if hp <= 0 then
+				hud_event.new(name, {
+					name  = "ctf_bandages:dead",
+					color = "warning",
+					value = pname .. " is dead!",
+				})
+			elseif hp >= limit then
+				hud_event.new(name, {
+					name  = "ctf_bandages:limit",
+					color = "warning",
+					value = pname .. " already has " .. limit .. " HP!",
+				})
+			else
 				local hp_add = math.random(3,4)
 
 				kill_assist.add_heal_assist(pname, hp_add)
@@ -33,14 +45,18 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 				end
 
 				object:set_hp(hp)
-				minetest.chat_send_player(pname, minetest.colorize("#C1FF44", name .. " has healed you!"))
-
-				return itemstack
-			else
-				minetest.chat_send_player(name, pname .. " has " .. hp .. " HP. You can't heal them.")
+				hud_event.new(pname, {
+					name  = "ctf_bandages:heal",
+					color = 0xC1FF44,
+					value = name .. " healed you!",
+				})
 			end
 		else
-			minetest.chat_send_player(name, pname.." isn't in your team!")
+			hud_event.new(name, {
+				name  = "ctf_bandages:team",
+				color = "warning",
+				value = pname .. " isn't in your team!",
+			})
 		end
 	end,
 })

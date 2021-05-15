@@ -10,11 +10,13 @@ ctf_events = {
 	events = {}
 }
 
-function ctf_events.post(action, one, two)
+function ctf_events.post(action, one, one_color, two, two_color)
 	table.insert(ctf_events.events, 1, {
 		action = action,
 		one = one,
-		two = two
+		one_color = one_color,
+		two = two,
+		two_color = two_color
 	})
 
 	while #ctf_events.events > NUM_EVT do
@@ -38,17 +40,16 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 
 	-- One
 	if evt.one then
-		local tcolor = ctf_colors.get_color(ctf.player(evt.one))
 		if hud:exists(player, idx) then
 			hud:change(player, idx, "text", evt.one)
-			hud:change(player, idx, "number", tcolor.hex)
+			hud:change(player, idx, "number", evt.one_color.hex)
 		else
 			local tmp = {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
 				text          = evt.one,
-				number        = tcolor.hex,
+				number        = evt.one_color.hex,
 				offset        = {x = 145, y = -y_pos},
 				alignment     = {x = -1, y = 0}
 			}
@@ -60,17 +61,16 @@ function ctf_events.update_row(i, player, name, tplayer, evt)
 
 	-- Two
 	if evt.two then
-		local tcolor = ctf_colors.get_color(ctf.player(evt.two))
 		if hud:exists(player, idx2) then
 			hud:change(player, idx2, "text", evt.two)
-			hud:change(player, idx2, "number", tcolor.hex)
+			hud:change(player, idx2, "number", evt.two_color.hex)
 		else
 			local tmp = {
 				hud_elem_type = "text",
 				position      = {x = 0, y = 0.8},
 				scale         = {x = 200, y = 100},
 				text          = evt.two,
-				number        = tcolor.hex,
+				number        = evt.two_color.hex,
 				offset        = {x = 175, y = -y_pos},
 				alignment     = {x = 1, y = 0}
 			}
@@ -121,7 +121,10 @@ function ctf_events.update_all()
 end
 
 ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
-	local type = "sword"
+	local victim_color = ctf_colors.get_color(ctf.player(victim))
+	local killer_color = ctf_colors.get_color(ctf.player(killer))
+
+	local type = "sword" -- Also used for unknown attacks
 
 	if tool_caps.damage_groups.grenade then
 		type = "grenade"
@@ -139,7 +142,7 @@ ctf.register_on_killedplayer(function(victim, killer, stack, tool_caps)
 		victim = victim .. " (Suicide?)"
 	end
 
-	ctf_events.post("kill_" .. type, killer, victim)
+	ctf_events.post("kill_" .. type, killer, killer_color, victim, victim_color)
 	ctf_events.update_all()
 end)
 

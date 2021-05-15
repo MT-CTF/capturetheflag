@@ -248,6 +248,9 @@ minetest.register_chatcommand("t", {
 			minetest.chat_send_player(name, "The team channel is disabled.")
 			return
 		end
+		if param == "" then
+			return false, "-!- Empty team message, see /help t"
+		end
 
 		local tname = ctf.player(name).team
 		local team = ctf.team(tname)
@@ -272,6 +275,8 @@ minetest.register_chatcommand("t", {
 	end
 })
 
+local function me_func() end
+
 if minetest.global_exists("irc") then
 	function irc.playerMessage(name, message)
 		local color = ctf_colors.get_irc_color(ctf.player(name))
@@ -285,6 +290,16 @@ if minetest.global_exists("irc") then
 		local abrace = color .. "<" .. clear
 		local bbrace = color .. ">" .. clear
 		return ("%s%s%s %s"):format(abrace, name, bbrace, message)
+	end
+
+	me_func = function(...)
+		local message = irc.playerMessage(...)
+		local start_escape = message:sub(1, message:find("<")-1)
+
+		-- format is: \startescape < \endescape playername \startescape > \endescape
+		message = message:gsub("\15(.-)"..start_escape, "* %1"):gsub("[<>]", "")
+
+		irc.say(message)
 	end
 end
 
@@ -313,12 +328,16 @@ end
 table.insert(minetest.registered_on_chat_messages, 1, handler)
 
 minetest.registered_chatcommands["me"].func = function(name, param)
+	me_func(name, param)
+
 	if ctf.player(name).team then
 		local tcolor = ctf_colors.get_color(ctf.player(name))
 		name = minetest.colorize(tcolor.css, "* " .. name)
 	else
 		name = "* ".. name
 	end
+
+	minetest.log("action", "[CHAT] "..name.." "..param)
 
 	minetest.chat_send_all(name .. " " .. param)
 end

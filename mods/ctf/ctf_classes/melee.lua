@@ -49,7 +49,7 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		groupcaps={
 			snappy={times={[1]=2.5, [2]=1.20, [3]=0.35}, uses=0, maxlevel=2},
 		},
-		damage_groups = {fleshy=6},
+		damage_groups = {fleshy=6, sword=1},
 		punch_attack_uses = 0,
 	},
 	sound = {breaks = "default_tool_breaks"},
@@ -68,6 +68,10 @@ minetest.register_tool("ctf_classes:sword_bronze", {
 		end
 
 		local pteam = ctf.player(pname).team
+
+		if not pteam then -- can be nil during map change
+			return
+		end
 
 		if pointed_thing.type == "object" and pointed_thing.ref:is_player() then
 			if ctf_match.is_in_build_time() then return end

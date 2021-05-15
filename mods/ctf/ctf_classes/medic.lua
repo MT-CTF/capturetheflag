@@ -99,7 +99,11 @@ minetest.override_item("ctf_bandages:bandage", {
 		if ctf.player(pname).team == ctf.player(name).team then
 			local nodename = minetest.get_node(object:get_pos()).name
 			if ctf_classes.dont_heal[pname] or nodename:find("lava") or nodename:find("water") or nodename:find("trap") then
-                                minetest.chat_send_player(name, "You can't heal player in lava, water or spikes!")
+				hud_event.new(name, {
+					name  = "ctf_classes:environment",
+					color = "warning",
+					value = "Can't heal " .. pname .. " in lava, water or spikes!",
+				})
 				return -- Can't heal players in lava/water/spikes
 			end
 
@@ -133,7 +137,7 @@ minetest.override_item("ctf_bandages:bandage", {
 })
 
 local diggers = {}
-local DIG_COOLDOWN = 45
+local DIG_COOLDOWN = 30
 local DIG_DIST_LIMIT = 50
 local DIG_SPEED = 0.1
 
@@ -146,6 +150,16 @@ local function isdiggable(name)
 		name:find("glass" ) or name:find("ice"  ) or
 		name:find("snow"  )
 	)
+end
+
+local function paxel_stop(pname, reason)
+	hud_event.new(pname, {
+		name  = "ctf_classes:paxel_stop",
+		color = "success",
+		value = string.format("Pillar digging stopped. Reason: %s. You can use again in %ds", reason or "unknown", DIG_COOLDOWN),
+	})
+
+	diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
 end
 
 local function remove_pillar(pos, pname)
@@ -161,13 +175,11 @@ local function remove_pillar(pos, pname)
 				pos.y = pos.y + 1
 				minetest.after(DIG_SPEED, remove_pillar, pos, pname)
 			else
-				minetest.chat_send_player(pname, "Pillar digging stopped, too far away from digging pos. Can activate again in "..DIG_COOLDOWN.." seconds")
-				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+				paxel_stop(pname, "at too far away node")
 			end
 		end
 	else
-		minetest.chat_send_player(pname, "Pillar digging stopped at undiggable node. Can activate again in "..DIG_COOLDOWN.." seconds")
-		diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+		paxel_stop(pname, "at undiggable node")
 	end
 end
 
@@ -191,20 +203,39 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 		if pointed_thing.type == "node" then
 			local pname = placer:get_player_name()
 
-			if not isdiggable(minetest.get_node(pointed_thing.under).name) or ctf_match.is_in_build_time() then
-				minetest.chat_send_player(pname, "Can't dig node or build time active")
+			if not isdiggable(minetest.get_node(pointed_thing.under).name) then
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_undiggable",
+					color = "warning",
+					value = "Can't paxel node!",
+				})
+				return minetest.item_place(itemstack, placer, pointed_thing)
+			end
+			if ctf_match.is_in_build_time() then
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_build_time",
+					color = "warning",
+					value = "Build time active!",
+				})
 				return minetest.item_place(itemstack, placer, pointed_thing)
 			end
 
 			if not diggers[pname] then
-				minetest.chat_send_player(pname, "Pillar digging started")
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_start",
+					color = "primary",
+					value = "Pillar digging started",
+				})
 				diggers[pname] = true
 				remove_pillar(pointed_thing.under, pname)
 			elseif type(diggers[pname]) ~= "table" then
-				minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in "..DIG_COOLDOWN.." seconds")
-				diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+				paxel_stop(pname)
 			else
-				minetest.chat_send_player(pname, "You can't activate yet")
+				hud_event.new(pname, {
+					name  = "ctf_classes:paxel_timer",
+					color = "warning",
+					value = "You can't activate yet!",
+				})
 			end
 		end
 	end,
@@ -213,11 +244,10 @@ minetest.register_tool("ctf_classes:paxel_bronze", {
 
 		if diggers[pname] and diggers[pname] == true and type(diggers[pname]) ~= "table" then
 			diggers[pname] = 1
-			minetest.after(2, function()
+			minetest.after(1, function()
 				if user and user:get_player_control().RMB then
 					if diggers[pname] and type(diggers[pname]) ~= "table" then
-						minetest.chat_send_player(pname, "Pillar digging stopped. Can activate again in "..DIG_COOLDOWN.." seconds")
-						diggers[pname] = minetest.after(DIG_COOLDOWN, function() diggers[pname] = nil end)
+						paxel_stop(pname, "Stop requested")
 					end
 				end
 			end)

@@ -8,8 +8,7 @@ local RESPAWN_MESSAGE = "Respawning in "
 
 minetest.register_on_dieplayer(function(player, reason)
 	local pname = player:get_player_name()
-	if ctf_match.is_in_build_time() or (reason.type == "punch" and reason.object and
-	reason.object:is_player() and reason.object:get_player_name() == pname) then
+	if ctf_match.is_in_build_time() or ctf_respawn_delay.players[pname] then -- what is dead may never die
 		return
 	end
 

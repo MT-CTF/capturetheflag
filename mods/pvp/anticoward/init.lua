@@ -15,18 +15,7 @@ ctf.register_on_attack(function(player, hitter,
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
 
-		local hp = player:get_hp() - damage
-		if hp <= 0 then
-			if potential_cowards[pname] then
-				player:hud_remove(potential_cowards[pname].hud or 0)
-				potential_cowards[pname] = nil
-			end
-
-			if potential_cowards[hname] and potential_cowards[hname].puncher == pname then
-				hitter:hud_remove(potential_cowards[hname].hud or 0)
-				potential_cowards[hname] = nil
-			end
-
+		if pname == hname then
 			return
 		end
 
@@ -49,55 +38,63 @@ ctf.register_on_attack(function(player, hitter,
 
 		potential_cowards[pname].timer = 0
 		potential_cowards[pname].puncher = hname
+		potential_cowards[pname].wielded_item = hitter:get_wielded_item()
 		potential_cowards[pname].toolcaps = tool_capabilities
 	end
 end)
 
+ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
+	if toolcaps.damage_groups.combat_log or toolcaps.damage_groups.suicide then
+		return
+	end
+
+	if victim ~= killer and potential_cowards[victim] then -- if player is killed then killer is already awarded
+		local player = minetest.get_player_by_name(victim)
+		if player then
+			player:hud_remove(potential_cowards[victim].hud or 0)
+		end
+
+		potential_cowards[victim] = nil
+	end
+end)
+
+function handle_leave_or_die(pname, leave)
+	if potential_cowards[pname] then
+		local hname = potential_cowards[pname].puncher
+
+		if leave then
+			potential_cowards[pname].toolcaps.damage_groups.combat_log = 1
+		else
+			potential_cowards[pname].toolcaps.damage_groups.suicide = 1
+		end
+
+		for i = 1, #ctf.registered_on_killedplayer do
+			ctf.registered_on_killedplayer[i](
+				pname,
+				hname,
+				potential_cowards[pname].wielded_item,
+				potential_cowards[pname].toolcaps
+			)
+		end
+	end
+
+	for victim in pairs(potential_cowards) do
+		if potential_cowards[victim].puncher == pname then
+			local victimobj = minetest.get_player_by_name(victim)
+
+			if victimobj then
+				victimobj:hud_remove(potential_cowards[victim].hud or 0)
+			end
+
+			potential_cowards[victim] = nil
+		end
+	end
+end
+
 minetest.register_on_dieplayer(function(player, reason)
 	local pname = player:get_player_name()
 
-	if reason.type == "node_damage" or reason.type == "drown" or reason.type == "fall" then
-		if potential_cowards[pname] then
-			local hname = potential_cowards[pname].puncher
-			local last_attacker = minetest.get_player_by_name(hname)
-
-			if not last_attacker then
-				player:hud_remove(potential_cowards[pname].hud or 0)
-				potential_cowards[pname] = nil
-
-				return
-			end
-
-			potential_cowards[pname].toolcaps.damage_groups.suicide = 1
-
-			for i = 1, #ctf.registered_on_killedplayer do
-				ctf.registered_on_killedplayer[i](
-					pname,
-					hname,
-					last_attacker:get_wielded_item(),
-					potential_cowards[pname].toolcaps
-				)
-			end
-
-			if potential_cowards[hname] and potential_cowards[hname].puncher == pname then
-				last_attacker:hud_remove(potential_cowards[hname].hud or 0)
-				potential_cowards[hname] = nil
-			end
-		else
-			for victim in pairs(potential_cowards) do
-				if potential_cowards[victim].puncher == pname then
-					local victimobj = minetest.get_player_by_name(victim)
-
-					if victimobj then
-						victimobj:hud_remove(potential_cowards[victim].hud or 0)
-					end
-
-					potential_cowards[victim] = nil
-					break
-				end
-			end
-		end
-	end
+	handle_leave_or_die(pname, false)
 
 	if potential_cowards[pname] then
 		player:hud_remove(potential_cowards[pname].hud or 0)
@@ -109,22 +106,9 @@ minetest.register_on_leaveplayer(function(player, timeout)
 	if timeout == true then return end
 	local pname = player:get_player_name()
 
+	handle_leave_or_die(pname, true)
+
 	if potential_cowards[pname] then
-		local last_attacker = minetest.get_player_by_name(potential_cowards[pname].puncher)
-
-		if not last_attacker then return end
-
-		potential_cowards[pname].toolcaps.damage_groups.combat_log = 1
-
-		for i = 1, #ctf.registered_on_killedplayer do
-			ctf.registered_on_killedplayer[i](
-				pname,
-				potential_cowards[pname].puncher,
-				last_attacker:get_wielded_item(),
-				potential_cowards[pname].toolcaps
-			)
-		end
-
 		local main, match = ctf_stats.player(pname)
 
 		if main and match then

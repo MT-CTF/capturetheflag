@@ -30,11 +30,6 @@ end
 
 -- Add waypoint element to all players in the same team as name
 function ctf_marker.add_marker(name, tname, pos, str)
-	local player = minetest.get_player_by_name(name)
-	if not player then
-		return
-	end
-
 	local team = ctf.team(tname)
 
 	teams[tname] = {
@@ -42,7 +37,7 @@ function ctf_marker.add_marker(name, tname, pos, str)
 		time = 0
 	}
 
-	for pname, _ in pairs(team.players) do
+	for pname in pairs(team.players) do
 		local tplayer = minetest.get_player_by_name(pname)
 		if tplayer then
 			teams[tname].players[pname] = tplayer:hud_add({
@@ -97,6 +92,9 @@ minetest.register_chatcommand("m", {
 		end
 
 		local tname = ctf.player(name).team
+		if not tname then -- can be nil during map change
+			return
+		end
 
 		-- Handle waypoint string
 		local str = (param and param:trim() ~= "") and ": " .. param or ""
