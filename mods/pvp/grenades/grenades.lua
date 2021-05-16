@@ -84,6 +84,29 @@ grenades.register_grenade("grenades:frag", table.copy(fragdef))
 
 -- Smoke Grenade
 
+-- HACK to ensure all players use the same texture
+local modpath = minetest.get_modpath(minetest.get_current_modname())
+local dynamic_textures = modpath .. "/dynamic_textures"
+minetest.mkdir(dynamic_textures)
+local files = minetest.get_dir_list(dynamic_textures, false)
+for _, file in ipairs(files) do
+	os.remove(dynamic_textures .. "/" .. file)
+end
+
+local source = io.open(modpath .. "/textures/grenades_smoke.png", "r")
+-- Generate a random name for the texture so that texture packs can't override it
+local name = {}
+for i = 1, 16 do
+	name[i] = string.char(("a"):byte() + math.random(0, 25))
+end
+local copyname = "grenades_smoke_" .. table.concat(name) .. ".png"
+local copy = dynamic_textures .. "/" .. copyname
+minetest.safe_file_write(copy, source:read"*a")
+source:close()
+minetest.after(0, function()
+	minetest.dynamic_add_media(copy, function() end)
+end)
+
 local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
@@ -137,7 +160,7 @@ grenades.register_grenade("grenades:smoke", {
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,
-				texture = "grenades_smoke.png^[noalpha^[opacity:200",
+				texture = copyname,
 			})
 		end
 	end,
