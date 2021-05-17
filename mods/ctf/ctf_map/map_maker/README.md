@@ -35,13 +35,13 @@ There are many ways of placing the barrier:
 
 - Go to the center of the map and click on `Player Pos` and then on `To WE`
   - set a radius and a height for the map
-- **Or** elect the area of the map via WE
+- **Or** select the area of the map via WE
   - Go to one corner of the map and type `//pos 1` in the chat
   - Then go to the opposite corner of the cube and type `//pos 2` in the chat
   - Click on `From WE` to import the positions
   - **If `h` is negative change it to the positive number** (`-130 -> 130`)
 - **Both radii must be the same!**
-- The rotation of the map has to be `z=0` (x=0 creates bugs and errors)
+- The rotation of the map has to be `z=0` (currently x=0 creates bugs and errors)
 - Click on `Place Barriers` (Note that this has no undo)
 - After the barriers are placed, click on `Givme Flags` to get 2 flags and place them at the bases.
 
@@ -78,66 +78,79 @@ The metadata of each map are stored in the `map.conf` file and includes all impo
 - `phys_jump` [Optional]: Player jump multiplier. Accepts any valid number. Defaults to 1.
 - `phys_gravity` [Optional]: Player gravity multiplier. Accepts any valid number. Defaults to 1.
 
-#### license
 
-- Every map must have a license. Simply add your chosen one in the `map.conf`:
+#### `license`
 
-    - license = \<name>
+* Every map must have its own license. Once you've chosen your license, simply add the following line to the `map.conf` file:
 
-- If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field. If you want to tell more infomation, you can use:
-  - others = \<description>
-- If you don't know which license to use, this list of CC licenses can help you.
-- We can only accept Free Software licenses, e.g.`CC BY-SA 4.0`.
-- Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
+  ```properties
+  license = <name>
+  ```
 
-#### treasures
+* If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
+If you want to tell more infomation, you can use:
+
+  ```properties
+  others = <description>
+  ```
+
+* If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
+* We can only accept Free Software licenses, e.g.`CC BY-SA 4.0`.
+* Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
+
+
+#### `treasures`
 
 `treasures` is a list of treasures to be registered for this map in serialized format.
 
 An example `treasures` value that registers steel pick, shotgun, and grenade:
-  - treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
 
-(See [here](https://github.com/MT-CTF/capturetheflag/blob/master/mods/other/treasurer/README.md) to understand the magic numbers)
+```properties
+treasures = default:pick_steel,0.5,5,1,10;shooter:shotgun,0.04,2,1;shooter:grenade,0.08,2,1
+```
 
-#### initial_stuff
+(See [here](../../../other/treasurer/README.md) to understand the magic numbers)
 
-`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field is located in the `map.conf file`. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
+#### `initial_stuff`
+`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field is located in the `map.conf` file. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
 
 An example of `initial_stuff` value that registers a stone pickaxe, 30 cobblestones, 5 torches and a pistol is given below.
-  - initial_stuff = default:pick_stone,default:cobble 30,default:torch 5,shooter:pistol
 
-## Screenshot
+```properties
+initial_stuff = default:pick_stone,default:cobble 30,default:torch 5,shooter:pistol
+```
 
-Every map needs an own screenshot aspect ratio of 3:2 (600x400px is suggested) in map's folder.
+### `screenshot`
+
+Every map must have its own screenshot in map's folder. It should have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
 
 It should be named `screenshot.png`.
 
-## skybox [Optional]
+### `skybox` [Optional]
 
-Six images which should be in map's folder:
-- `skybox_1.png` - up
-- `skybox_2.png` - down
-- `skybox_3.png` - east
-- `skybox_4.png` - west
-- `skybox_5.png` - south
-- `skybox_6.png` - north
+Six images which should be in map's folder.
 
-You have to include skybox license in `license` in `map.conf file`. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`. Before you test your skybox images in local CTF game, run the `update.sh` file in the `games/capturetheflag/` folder.
+* `skybox_1.png` - up
+* `skybox_2.png` - down
+* `skybox_3.png` - east
+* `skybox_4.png` - west
+* `skybox_5.png` - south
+* `skybox_6.png` - north
+
+You have to include skybox license in `license` in `map.conf` file. We can only accept Free Software licenses, e.g. `CC0`, `CC BY 3.0`, `CC BY 4.0`, `CC BY-SA 3.0`, `CC BY-SA 4.0`.
+Before you test your skybox images in local CTF game, run the `update.sh` file in the `games/capturetheflag/` folder.
 
 You can find some good skyboxes with suitable licenses at [opengameart.org](https://opengameart.org/art-search-advanced?field_art_tags_tid=skybox) or [www.humus.name](https://www.humus.name/index.php?page=Textures).
-
-## Editing the exported map
+## Editing exported map
 
 The easiest way to edit exported maps is the following:
+* Create a world using `singlenode` mapgen. Enable `WorldEdit` and `ctf_map` mod,
+* Go in the world's folder, create a folder named `schems`, and place the `map.mts` file inside,
+* Start the game, `/grantme all` and enable `fly` (there is no ground in singlenode mapgen),
+* Do `//1` to set the position where you will generate the map,
+* Do `//mtschemplace map` (where `map` is the name of the mts file without `.mts`).
 
-- Create a new world with `singlenode`-mapgen and enable `WorldEdit` and `ctf_map` mod,
-- Go into the world's folder, create a new folder `schems`, and place your `map.mts` in it,
-- Start the game, `grantme all` and enable `fly`, because `singlenode` has no ground,
-- Do `//pos1` to set the position where the map should be placed,
-- Do `//mtschemplace map` to place it (`map` is the name of your schem without the `.mts`),
-- Change the things you want.
+When you finish:
 
-#### Export it again
-
-- Place `//pos1` and `//pos2` at the opposite corners of your map (cube),
-- Do `//mtschemcreats <new-name>` to create the edited `.mts`. It's saved in the `schems`-folder of the world.
+* Place `//1` and `//2` exactly in opposite corners of map (cube),
+* Do `//mtschemcreate <new_name>` to create new edited `.mts` file. It will be saved in `schems` folder.
