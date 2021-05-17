@@ -23,7 +23,7 @@ ctf_classes.register("knight", {
 
 ctf_classes.register("shooter", {
 	description = "Sharp Shooter",
-	pros = { "Skilled with ranged weapons", "Can craft/use sniper rifles"},
+	pros = { "Skilled with ranged weapons", "Can craft and use sniper rifles"},
 	cons = {"-25% health points"},
 	color = "#c60",
 	properties = {
@@ -72,7 +72,7 @@ ctf_classes.register("shooter", {
 
 ctf_classes.register("medic", {
 	description = "Medic",
-	pros = { "x2 regen for nearby friendlies", "Building supplies + Paxel", "+10% speed" },
+	pros = { "Building supplies + Paxel", "x2 regen for nearby teammates", "+10% speed" },
 	cons = {},
 	color = "#0af",
 	properties = {
@@ -94,10 +94,8 @@ ctf_classes.register("medic", {
 		},
 
 		crafting = {
-			"default:axe_bronze",
 			"default:axe_mese",
 			"default:axe_diamond",
-			"default:shovel_bronze",
 			"default:shovel_mese",
 			"default:shovel_diamond",
 		}
