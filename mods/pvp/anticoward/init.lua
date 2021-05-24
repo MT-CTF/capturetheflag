@@ -169,3 +169,19 @@ ctf.register_on_new_game(function()
 	end
 	potential_cowards = {}
 end)
+
+--disable towering while fighting
+local no_towering = {}
+
+minetest.register_on_punchplayer(function (player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
+	no_towering[player:get_player_name()] = true
+	minetest.after(5, function ()
+		no_towering[player:get_player_name()] = false
+	end)
+end)
+
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+	if no_towering[placer:get_player_name()] then
+		minetest.remove_node(pos)
+	end
+end)
