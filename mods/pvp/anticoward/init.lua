@@ -182,6 +182,6 @@ end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
 	if no_towering[placer:get_player_name()] then
-		minetest.remove_node(pos)
+		minetest.set_node(pos, oldnode)
 	end
 end)
