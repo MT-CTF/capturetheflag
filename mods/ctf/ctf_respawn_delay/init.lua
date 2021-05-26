@@ -37,13 +37,18 @@ minetest.register_on_mods_loaded(function()
 	table.insert(minetest.registered_on_respawnplayers, 1, function(player)
 		local pname = player:get_player_name()
 
-		if ctf_respawn_delay.players[pname] and ctf_respawn_delay.players[pname].timeleft == "waiting" then
-			ctf_respawn_delay.players[pname].timeleft = RESPAWN_DELAY
-			local pos = player:get_pos()
-			pos.y = ctf_map.map.h/2 + 10
+		if ctf_respawn_delay.players[pname] then
+			-- Since the player is still dead the client can send respawn actions
+			-- https://github.com/minetest/minetest/blob/4152227f17315a9cf9038266d9f9bb06e21e3424/src/network/serverpackethandler.cpp#L895
+			-- We should ignore those
+			if ctf_respawn_delay.players[pname].timeleft == "waiting" then
+				ctf_respawn_delay.players[pname].timeleft = RESPAWN_DELAY
+				local pos = player:get_pos()
+				pos.y = ctf_map.map.h/2 + 10
 
-			player:set_pos(pos) -- Player will be stuck there because CTF 'air' is walkable
-			minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
+				player:set_pos(pos) -- Player will be stuck there because CTF 'air' is walkable
+				minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
+			end
 
 			return true
 		end
@@ -56,15 +61,10 @@ minetest.register_on_mods_loaded(function()
 	end)
 end)
 
-function ctf_respawn_delay.respawnplayer(name)
-	local player = minetest.get_player_by_name(name)
-
-	if not player then return end
-
-	player:hud_remove(ctf_respawn_delay.players[name].hudid)
-	player:set_properties({hp_max = ctf_respawn_delay.players[name].old_max})
-	player:set_hp(ctf_respawn_delay.players[name].old_max)
-	ctf_respawn_delay.players[name] = nil
+function respawnplayer(player, pname)
+	player:hud_remove(ctf_respawn_delay.players[pname].hudid)
+	player:set_properties({hp_max = ctf_respawn_delay.players[pname].old_max})
+	player:set_hp(ctf_respawn_delay.players[pname].old_max)
 
 	for k, func in ipairs(ctf_respawn_delay.registered_on_respawnplayers) do
 		func(player)
@@ -72,16 +72,13 @@ function ctf_respawn_delay.respawnplayer(name)
 end
 
 function respawnfunc(pname)
-	local player = minetest.get_player_by_name(pname)
-
-	if not player or not ctf_respawn_delay.players[pname] then
-		ctf_respawn_delay.players[pname] = nil
+	if not ctf_respawn_delay.players[pname] then
 		return
 	end
 
-	if type(ctf_respawn_delay.players[pname].timeleft) == "string" then
-		minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
-
+	local player = minetest.get_player_by_name(pname)
+	if not player then
+		ctf_respawn_delay.players[pname] = nil
 		return
 	end
 
@@ -93,12 +90,26 @@ function respawnfunc(pname)
 
 		minetest.after(RESPAWN_INTERVAL, respawnfunc, pname)
 	else
-		ctf_respawn_delay.respawnplayer(pname)
+		respawnplayer(player, pname)
+		ctf_respawn_delay.players[pname] = nil
 	end
 end
 
 ctf_match.register_on_new_match(function()
-	for name in pairs(ctf_respawn_delay.players) do
-		ctf_respawn_delay.respawnplayer(name)
+	for pname in pairs(ctf_respawn_delay.players) do
+		local player = minetest.get_player_by_name(pname)
+		if player then
+			respawnplayer(player, pname)
+		end
+	end
+
+	ctf_respawn_delay.players = {}
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	local pname = player:get_player_name()
+	if ctf_respawn_delay.players[pname] then
+		player:set_properties({hp_max = ctf_respawn_delay.players[pname].old_max})
+		ctf_respawn_delay.players[pname] = nil
 	end
 end)

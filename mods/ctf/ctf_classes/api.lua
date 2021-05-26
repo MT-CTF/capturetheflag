@@ -91,11 +91,14 @@ end
 local function set_max_hp(player, max_hp)
 	local cur_hp = player:get_hp()
 	local old_max = player:get_properties().hp_max
-	local new_hp = cur_hp + max_hp - old_max
-	player:set_properties({
-		hp_max = max_hp
-	})
 
+	if old_max == 0 then
+		minetest.log("error", "[ctf_classes] Reviving dead player " .. player:get_player_name())
+	end
+
+	player:set_properties({hp_max = max_hp})
+
+	local new_hp = cur_hp + max_hp - old_max
 	if new_hp > max_hp then
 		minetest.log("error", string.format("New hp %d is larger than new max %d, old max is %d", new_hp, max_hp, old_max))
 		new_hp = max_hp
