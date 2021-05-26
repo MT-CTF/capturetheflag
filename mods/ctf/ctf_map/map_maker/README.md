@@ -1,87 +1,83 @@
-# CTF Map - Map maker
+# CTF map-maker mod
 
-## Creating a new map
+## Making a new map
 
-### Youtube tutorial
+### Youtube Tutorial
 https://youtu.be/orBsC9wViUw
 
+### Dependencies
+- Minetest 5.0.0 or later (https://minetest.net/)
+- Minetest Game (https://github.com/minetest/minetest_game/) (CTF supports most MTG nodes)
+- `ctf_map` modpack (copy this folder to `minetest/mods`)
+- `worldedit` modpack (WE) (https://content.minetest.net/packages/sfan5/worldedit/)
 
-### 1. Dependencies
+### Find an area
 
-* Minetest 5.0.0 or later.
-* `ctf_map` modpack (by copying the folder from this game to `minetest/mods`)
-* `worldedit` and `worldedit_commands`.
+- The area can be maximum 230x230 blocks in surface area, but it can be lesser.
+- Modify the area to *your* unique ctf_map
+  - you could add
+    - buildings
+    - lakes
+    - hills
+    - etc.
+- If you haven't modified the map at all, do the following to speed up barrier placement:
 
-### 2. Find an area
+    - Stop Minetest.
+    - Open up the world's world.mt
+    - Set backend to "dummy".
+    - Save.
 
-* Can use Minetest Game and any mapgen.
-* It must be a cube, and the barrier will be in the exact center.
-* It should be around 230x230 in surface area, but this can be lesser.
-* Feel free to modify the area to your needs.
+### The `gui`window
 
-### 3. Select the area
+  ![gui-window](./gui.png)
 
-There are multiple ways do this, this is the simplest in most cases.
+There are many ways of placing the barrier:
 
-* If you haven't modified the map at all, do the following to speed up barrier placement:
-  * Stop Minetest.
-  * Open up the world's world.mt
-  * Set backend to "dummy".
-  * Save.
-* Using worldedit, select the area.
-* Type `/gui`, and click `Player pos` then `From WE` and then `To WE`.
-* Check that the center location is the right place for the barrier to go.
-* Check that the bounds extend far enough.
+- Go to the center of the map and click on `Player Pos` and then on `To WE`
+  - set a radius and a height for the map
+- **Or** select the area of the map via WE
+  - Go to one corner of the map and type `//pos 1` in the chat
+  - Then go to the opposite corner of the cube and type `//pos 2` in the chat
+  - Click on `From WE` to import the positions
+  - **If `h` is negative change it to the positive number** (`-130 -> 130`)
+- **Both radii must be the same!**
+- The rotation of the map has to be `z=0` (currently x=0 creates bugs and errors)
+- Click on `Place Barriers` (Note that this has no undo)
+- After the barriers are placed, click on `Givme Flags` to get 2 flags and place them at the bases.
 
-### 4. Place barriers
+### Meta Data
 
-* The barrier is a plane defined by co-ordinate (=0).
-* If you choose `X=0` the barrier will be placed having the X co-ordinate as 0. But from a few months, the `X=0` co-ordinate creates bugs and errors. It's better if you choose `Z=0` for creating your map.
-* If you choose `Z=0` The barrier will be placed having the Z co-ordinate as 0.
-* Click "place barrier". Note that this command does not have an undo.
-* After placing barriers you should place 2 flags where you want bases to be. You get flags in `/gui` --> `Giveme flags`
+The `gui`window only shows the most important things. You have to add the missing in the `map.conf` later.
 
-### 5. Meta data
+### Exporting
 
-* Set the meta data
+- Click on `Export` to export the map-files. This may takes some time
 
-### 6. Export
+## Map Meta
 
-* Click export, and wait until completion.
-* Copy the resultant folder from `worlddir/schems/` into `games/capturetheflag/mods/ctf/ctf_map/ctf_map_core/maps/`.
-* Profit!
+The metadata of each map are stored in the `map.conf` file and includes all important information about them:
+- `name`: Name of the map.
+- `author`: Author of the map.
+- `hint` [Optional]: A helpful tip for players to understand unique maps.
+- `roation`: The rotation of the map. [x|y]
+- `r`: Radius of the map.
+- `h`: Heigt of the map (**If it's an odd numer, make h=h+1 `107->108`**).
+- `team.i`: Name of the team.
+- `team.i.color`: Color of the team.
+- `team.i.pos`: Position of team `i`'s flag, relative ot the center of schem. **The y-positions of the flags must be an integer!** `30,-32.5,60 -> 30,-33,60`
+- `chest.i.from` and `chests.i.to` [Optional]: Positions of diagonal corners of custom chest zone `i`, relative to the center of the schem.
+- `chests.i.n` [Optional]: Number if chests in zone `i`
+- `license`: Name of license of the map.
+- `other` [Optional]: Additional information about the map. This is displayed in the maps catalog.
+- `base_node` [Optional]: String of the node around the flags.
+- `initial_stuff` [Optional]: Comma-separated list of itemstacks to be given to the player on join and on respawn.
+- `treasures` [Optional]: List of treasures to be registered for the map, in a serialized format. Refer to the `treasures` sub-section for more details.
+- `start_time` [Optional]: Time of day when the match starts. Default to `0.4` [`0 - 1`].
+- `time_speed` [Optional]: Time speed multiplier. Accepts any valid number. Defaults to 1.
+- `phys_speed` [Optional]: Player speed multiplier. Accepts any valid number. Defaults to 1.
+- `phys_jump` [Optional]: Player jump multiplier. Accepts any valid number. Defaults to 1.
+- `phys_gravity` [Optional]: Player gravity multiplier. Accepts any valid number. Defaults to 1.
 
-
-## Documentation
-
-### Map meta
-
-Each map's metadata is stored in an accompanying `map.conf` file containing the following data:
-
-* `name`: Name of map.
-* `author`: Author of the map.
-* `hint`: [Optional] Helpful hint or tip for unique maps, to help players understand the map.
-* `rotation`: Rotation of the schem. [`x`|`z`]
-* `r`: Radius of the map.
-* `h`: Height of the map.
-* `team.i`: Name of team `i`.
-* `team.i.color`: Color of team `i`.
-* `team.i.pos`: Position of team `i`'s flag, relative to center of schem.
-* `chests.i.from`, `chests.i.to`: [Optional] Positions of diagonal corners of custom chest
-zone `i`, relative to the center of the schem.
-* `chests.i.n`: [Optional] Number of chests to place in custom chest zone `i`.
-* `license`: Name of the license of the map.
-* `other`: [Optional] Misc. information about the map. This is displayed in the maps catalog.
-* `base_node`: [Optional] Technical name of node to be used for the team base.
-* `initial_stuff`: [Optional] Comma-separated list of itemstacks to be given to the player
- on join and on respawn.
-* `treasures`: [Optional] List of treasures to be registered for the map, in a serialized
-format. Refer to the `treasures` sub-section for more details.
-* `start_time`: [Optional] Time at start of match. Defaults to `0.4` [`0` - `1`].
-* `time_speed`: [Optional] Time speed multiplier. Accepts any valid number. Defaults to 1.
-* `phys_speed`: [Optional] Player speed multiplier. Accepts any valid number. Defaults to 1.
-* `phys_jump`: [Optional] Player jump multiplier. Accepts any valid number. Defaults to 1.
-* `phys_gravity`: [Optional] Player gravity multiplier. Accepts any valid number. Defaults to 1.
 
 #### `license`
 
