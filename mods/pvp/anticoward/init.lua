@@ -181,7 +181,7 @@ minetest.register_on_punchplayer(function (player, hitter, time_from_last_punch,
 end)
 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-	if no_towering[placer:get_player_name()] then
+	if no_towering[placer:get_player_name()] and (placer:get_pos().y = (pos.y + 1)) then
 		minetest.set_node(pos, oldnode)
 	end
 end)
