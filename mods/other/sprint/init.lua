@@ -35,6 +35,13 @@ local function setSprinting(player, info, sprinting)
 	end
 end
 
+ctf_match.register_on_new_match(function()
+	for pname in pairs(players) do
+		local player = minetest.get_player_by_name(pname)
+		players[player:get_player_name()].stamina = STAMINA_MAX
+	end
+end)
+
 minetest.register_globalstep(function(dtime)
 	for name, info in pairs(players) do
 		local player = minetest.get_player_by_name(name)
