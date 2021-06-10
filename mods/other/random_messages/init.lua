@@ -52,7 +52,7 @@ function random_messages.read_messages()
 		"Use medkits to gradually restore your health.",
 		"Moving or fighting while using medkits will interrupt the healing process.",
 		"Knights have a slight damage bonus (up to 1.5 hp) when attacking with swords.",
-		"Gain more score by killing, by healing teammates as a medic, or by capturing the flag.",
+		"Gain more score by killing enemies, healing teammates as a medic, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
 		"Players are immune to attack for 5 seconds after they respawn.",
@@ -80,7 +80,7 @@ function random_messages.read_messages()
 		"Hitting your enemy does more damage than not hitting them.",
 		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
 		"Medics can dig pillars by right clicking the base of one with their paxel.",
-		"Use /help to see all available commands.",
+		"Use `/help all` to see all available commands.",
 	}
 end
 
