@@ -48,7 +48,7 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 				hud_event.new(pname, {
 					name  = "ctf_bandages:heal",
 					color = 0xC1FF44,
-					value = name .. " healed you!",
+					value = name .. " healed you!\nYour HP:"..object:get_hp(),
 				})
 			end
 		else
