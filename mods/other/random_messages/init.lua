@@ -77,7 +77,6 @@ function random_messages.read_messages()
 		"Use /maps to view the maps catalog. It also contains license info and attribution details.",
 		"Change your class in your base by right clicking the home flag or typing /class.",
 		"Medics cause troops within 10 metres to regenerate health faster.",
-		"Hitting your enemy does more damage than not hitting them.",
 		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
 		"Medics can dig pillars by right clicking the base of one with their paxel.",
 		"Use `/help all` to see all available commands.",
