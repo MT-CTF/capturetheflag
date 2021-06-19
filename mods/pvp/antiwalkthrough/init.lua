@@ -4,13 +4,27 @@ local collisionbox = {
     fixed = {}
 }
 local boxes = collisionbox.fixed
+local bias = 1e-3
 for i = 1, 3 do
     boxes[i] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
-    boxes[i][i] = 0.49
+    boxes[i][i] = 0.5 - bias
     boxes[i+3] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
-    boxes[i+3][i+3] = -0.49
+    boxes[i+3][i+3] = -0.5 + bias
 end
-boxes[7] = {-0.49, -0.49, -0.49, 0.49, 0.49, 0.49}
+-- Remove bottom box
+table.remove(boxes, 5)
+-- Generate 4^2 = 16 points inside the node to prevent players from entering
+local points = 4
+local step = 1 / (points + 2)
+for xn = 1, points do
+    for zn = 1, points do
+        -- Fixed y - player collisionbox is usually higher than a single node
+        -- Lower y might trigger stepheight
+        local x, z = -0.5 + xn * step, -0.5 + zn * step
+        table.insert(boxes, {x, 0.5, z, x + bias, 0.5 - bias, z + bias})
+    end
+end
+
 
 -- Determines whether a node def has a regular collision box
 local function regular_collision_box(def)
