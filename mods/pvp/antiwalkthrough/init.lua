@@ -3,14 +3,14 @@ local collisionbox = {
     type = "fixed",
     fixed = {}
 }
-local fixed = collisionbox.fixed
+local boxes = collisionbox.fixed
 for i = 1, 3 do
-    fixed[i] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
-    fixed[i][i] = 0.49
-    fixed[i+3] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
-    fixed[i+3][i+3] = -0.49
+    boxes[i] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
+    boxes[i][i] = 0.49
+    boxes[i+3] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
+    boxes[i+3][i+3] = -0.49
 end
-fixed[7] = {-0.49, -0.49, -0.49, 0.49, 0.49, 0.49}
+boxes[7] = {-0.49, -0.49, -0.49, 0.49, 0.49, 0.49}
 
 -- Determines whether a node def has a regular collision box
 local function regular_collision_box(def)
@@ -64,6 +64,7 @@ end
 local def = minetest.registered_entities["__builtin:item"]
 local on_step = def.on_step
 function def.on_step(...)
+    -- HACK temporarily replace the registered_nodes table
     minetest.registered_nodes = original_nodes
     on_step(...)
     minetest.registered_nodes = registered_nodes
