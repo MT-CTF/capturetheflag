@@ -138,7 +138,7 @@ minetest.override_item("ctf_bandages:bandage", {
 
 local diggers = {}
 local DIG_COOLDOWN = 30
-local DIG_DIST_LIMIT = 50
+local DIG_DIST_LIMIT = 20
 local DIG_SPEED = 0.1
 
 local function isdiggable(name)
@@ -171,7 +171,10 @@ local function remove_pillar(pos, pname)
 		minetest.dig_node(pos)
 
 		if player and diggers[pname] and type(diggers[pname]) ~= "table" then
-			if vector.distance(player:get_pos(), pos) <= DIG_DIST_LIMIT then
+			local distance = vector.subtract(player:get_pos(), pos)
+			-- Ignore vertical distance
+			distance.y = 0
+			if vector.length(distance) <= DIG_DIST_LIMIT then
 				pos.y = pos.y + 1
 				minetest.after(DIG_SPEED, remove_pillar, pos, pname)
 			else
