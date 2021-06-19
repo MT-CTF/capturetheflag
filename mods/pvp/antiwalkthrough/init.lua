@@ -11,8 +11,8 @@ for i = 1, 3 do
     boxes[i+3] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
     boxes[i+3][i+3] = -0.5 + bias
 end
--- Remove bottom box
-table.remove(boxes, 5)
+-- Replace bottom box with enclosing box
+boxes[5] = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5}
 -- Generate 4^2 = 16 points inside the node to prevent players from entering
 local points = 4
 local step = 1 / (points + 2)
