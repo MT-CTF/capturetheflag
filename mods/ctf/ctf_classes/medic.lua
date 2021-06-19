@@ -138,7 +138,7 @@ minetest.override_item("ctf_bandages:bandage", {
 
 local diggers = {}
 local DIG_COOLDOWN = 30
-local DIG_DIST_LIMIT = 20
+local DIG_DIST_LIMIT = 10
 local DIG_SPEED = 0.1
 
 local function isdiggable(name)
