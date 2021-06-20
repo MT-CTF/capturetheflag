@@ -277,15 +277,14 @@ local function select_map()
 		end
 	else
 		-- Choose next map index, but don't select the same one again
-		if ctf_map.map then
-			idx = math.random(#ctf_map.available_maps - 1)
+		if ctf_map.map and #ctf_map.available_maps > 1 then
+			idx = math.random(1, #ctf_map.available_maps - 1)
 			if idx >= ctf_map.map.idx then
 				idx = idx + 1
 			end
 		else
-			idx = math.random(#ctf_map.available_maps)
+			idx = math.random(1, #ctf_map.available_maps)
 		end
-		ctf_map.next_idx = (idx % #ctf_map.available_maps) + 1
 	end
 	return idx
 end
