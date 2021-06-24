@@ -150,9 +150,7 @@ local function isdiggable(name)
 		name:find("glass" ) or name:find("ice"  ) or
 		name:find("snow"  )
 	)
-	or name:find("stairs:") and (
-		name:find("stair_cobble") or name:find("stair_desert_cobble")
-	)
+	or name:find("stairs:")
 end
 
 local function paxel_stop(pname, reason)
