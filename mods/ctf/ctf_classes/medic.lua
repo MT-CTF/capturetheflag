@@ -150,6 +150,9 @@ local function isdiggable(name)
 		name:find("glass" ) or name:find("ice"  ) or
 		name:find("snow"  )
 	)
+	or name:find("stairs:") and (
+		name:find("stair_cobble") or name:find("stair_desert_cobble")
+	)
 end
 
 local function paxel_stop(pname, reason)
@@ -165,7 +168,7 @@ end
 local function remove_pillar(pos, pname)
 	local name = minetest.get_node(pos).name
 
-	if name:find("default") and isdiggable(name) then
+	if name:find("default") or name:find("stairs") and isdiggable(name) then
 		local player = minetest.get_player_by_name(pname)
 
 		minetest.dig_node(pos)
