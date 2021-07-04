@@ -8,8 +8,3 @@ function core.send_leave_message(player_name, timed_out)
 	end
 	minetest.chat_send_all(announcement)
 end
-
-minetest.register_on_leaveplayer(function(player, timed_out)
-	local player_name = player:get_player_name()
-	core.send_leave_message(player_name, timed_out)
-end)
