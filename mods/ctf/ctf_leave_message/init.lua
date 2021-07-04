@@ -9,7 +9,7 @@ function core.send_leave_message(player_name, timed_out)
 	minetest.chat_send_all(announcement)
 end
 
-core.register_on_leaveplayer(function(player, timed_out)
+minetest.register_on_leaveplayer(function(player, timed_out)
 	local player_name = player:get_player_name()
 	ctf.send_leave_message(player_name, timed_out)
 end)
