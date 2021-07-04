@@ -11,5 +11,5 @@ end
 
 minetest.register_on_leaveplayer(function(player, timed_out)
 	local player_name = player:get_player_name()
-	ctf.send_leave_message(player_name, timed_out)
+	core.send_leave_message(player_name, timed_out)
 end)
