@@ -1,4 +1,4 @@
-function core.send_leave_message(player_name, timed_out)
+function minetest.send_leave_message(player_name, timed_out)
 	local player = ctf.player(player_name)
 	local tcolor = ctf_colors.get_color(player).css
 
