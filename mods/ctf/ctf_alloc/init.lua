@@ -1,5 +1,6 @@
 local storage = minetest.get_mod_storage()
 local data = minetest.parse_json(storage:get_string("locktoteam")) or {}
+local S = minetest.get_translator()
 
 -- Override autoalloc function to implement team-locking
 local ctf_autoalloc = ctf.autoalloc
@@ -16,15 +17,15 @@ ChatCmdBuilder.new("ctf_lock_to_team", function(cmd)
 		if team == "!" then
 			data[pname] = nil
 			storage:set_string("locktoteam", minetest.write_json(data))
-			return true, "Unlocked " .. pname
+			return true, S("Unlocked @1")
 		else
 			data[pname] = team
 			storage:set_string("locktoteam", minetest.write_json(data))
-			return true, "Locked " .. pname .. " to " .. team
+			return true, S("Locked @1 to @2")
 		end
 	end)
 end, {
-	description = "Lock a player to a team",
+	description = S("Lock a player to a team"),
 	privs = {
 		ctf_admin = true,
 	}

@@ -1,0 +1,11 @@
+# textdomain:ctf
+## init.lua
+Team manager=隊伍管理員
+Can create teams, manage players, assign team owners.=可以建立隊伍，管理玩家和指定隊伍擁有者。
+## teams.lua
+### List Teams
+Teams:=隊伍：
+members=成員
+flags=旗幟
+### On Punch
+@1 is on your team!=@1 在你的隊伍中！

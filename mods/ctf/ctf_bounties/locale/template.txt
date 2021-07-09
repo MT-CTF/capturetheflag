@@ -1,0 +1,8 @@
+# textdomain:ctf_bounties
+The next person to kill @1 will receive @2 points!=
+Player @1 no longer has a bounty on their head!=
+@1 has killed @2 ans received @2 points!=
+Place a bounty on a player=
+<player name>=
+@1 is not online=
+Put bounty on @1=

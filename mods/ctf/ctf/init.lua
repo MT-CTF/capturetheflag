@@ -3,14 +3,15 @@
 -----------------------------------------
 
 ctf = {}
+local S = minetest.get_translator()
 
 -- Privs
 minetest.register_privilege("ctf_team_mgr", {
-	description = "Team manager",
+	description = S("Team manager"),
 })
 
 minetest.register_privilege("ctf_admin", {
-	description = "Can create teams, manage players, assign team owners.",
+	description = S("Can create teams, manage players, assign team owners."),
 })
 
 -- Modules

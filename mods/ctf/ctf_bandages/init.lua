@@ -2,11 +2,12 @@
 
 ctf_bandages = {}
 ctf_bandages.heal_percent = 0.75 -- Percentage of total HP to be healed
+local S = minetest.get_translator()
 
 minetest.register_craftitem("ctf_bandages:bandage", {
-	description = "Bandage\n\n" ..
-		"Heals teammates for 3-4 HP until target's HP is equal to " ..
-		ctf_bandages.heal_percent * 100 .. "% of their maximum HP",
+	description = S("Bandage") .. "\n\n" ..
+		S("Heals teammates for 3-4 HP until target's HP is equal to") ..
+		S("@1% of their maximum HP",tostring(ctf_bandages.heal_percent * 100),
 	inventory_image = "ctf_bandages_bandage.png",
 	stack_max = 1,
 	on_use = function(itemstack, player, pointed_thing)
@@ -26,13 +27,13 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 				hud_event.new(name, {
 					name  = "ctf_bandages:dead",
 					color = "warning",
-					value = pname .. " is dead!",
+					value = S("@1 is dead!", pname),
 				})
 			elseif hp >= limit then
 				hud_event.new(name, {
 					name  = "ctf_bandages:limit",
 					color = "warning",
-					value = pname .. " already has " .. limit .. " HP!",
+					value = S("@1 already has @2 HP!", pname, limit),
 				})
 			else
 				local hp_add = math.random(3,4)
@@ -48,14 +49,14 @@ minetest.register_craftitem("ctf_bandages:bandage", {
 				hud_event.new(pname, {
 					name  = "ctf_bandages:heal",
 					color = 0xC1FF44,
-					value = name .. " healed you!",
+					value = S("@1 healed you!", name),
 				})
 			end
 		else
 			hud_event.new(name, {
 				name  = "ctf_bandages:team",
 				color = "warning",
-				value = pname .. " isn't in your team!",
+				value = S("@1 isn't in your team!", pname),
 			})
 		end
 	end,

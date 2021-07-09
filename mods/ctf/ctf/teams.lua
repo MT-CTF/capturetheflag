@@ -60,17 +60,17 @@ function ctf.remove_team(name)
 end
 
 function ctf.list_teams(name)
-	minetest.chat_send_player(name, "Teams:")
+	minetest.chat_send_player(name, S("Teams:"))
 	for tname, team in pairs(ctf.teams) do
 		if team and team.players then
 			local numPlayers = ctf.count_players_in_team(tname)
-			local details = numPlayers .. " members"
+			local details = numPlayers .. " " .. S("members")
 			if team.flags then
 				local numFlags = 0
 				for flagid, flag in pairs(team.flags) do
 					numFlags = numFlags + 1
 				end
-				details = details .. ", " .. numFlags .. " flags"
+				details = details .. ", " .. numFlags .. " " .. S("flags")
 			end
 
 			minetest.chat_send_player(name, ">> " .. tname ..
@@ -483,7 +483,7 @@ minetest.register_on_punchplayer(function(player, hitter,
 			hud_event.new(hname, {
 				name  = "ctf:friendly_fire",
 				color = "warning",
-				value = pname .. " is on your team!",
+				value =  S("is on your team!",pname),
 			})
 			if not ctf.setting("friendly_fire") then
 				return true

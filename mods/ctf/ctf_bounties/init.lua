@@ -1,3 +1,4 @@
+local S = minetest.get_translator()
 local bountied_player = nil
 local bounty_score = 0
 
@@ -8,11 +9,19 @@ local function announce(name)
 	end
 	local tcolor = ctf_colors.get_color(bountied)
 	minetest.chat_send_player(name,
+		minetest.get_color_escape_sequence("#fff326") ..
+		S("The next person to kill @1 will receive @2 points!",
+			minetest.colorize(tcolor.css, bountied_player) .. minetest.get_color_escape_sequence("#fff326"),
+			minetest.colorize("#7efc00", bounty_score) .. minetest.get_color_escape_sequence("#fff326")
+		)
+	)
+	--[[minetest.chat_send_player(name,
 			minetest.colorize("#fff326", "The next person to kill ") ..
 			minetest.colorize(tcolor.css, bountied_player) ..
 			minetest.colorize("#fff326", " will receive ") ..
 	        minetest.colorize("#7efc00", bounty_score) ..
 	        minetest.colorize("#fff326", " points!"))
+	]]
 end
 
 local function announce_all()
@@ -72,9 +81,11 @@ local function bounty_player(target)
 			if bountied_player ~= name then
 				local prev_color = ctf_colors.get_color(ctf.player(prev)).css
 				minetest.chat_send_player(player:get_player_name(),
-					minetest.colorize("#fff326", "Player ") ..
-					minetest.colorize(prev_color, prev) ..
-					minetest.colorize("#fff326", " no longer has a bounty on their head!"))
+					minetest.get_color_escape_sequence("#fff326") ..
+					S("Player @1 no longer has a bounty on their head!",
+						minetest.colorize(prev_color, prev) .. minetest.get_color_escape_sequence("#fff326")
+					)
+				)
 			end
 		end
 	end
@@ -130,12 +141,19 @@ ctf.register_on_killedplayer(function(victim, killer)
 
 	local killer_color = ctf_colors.get_color(ctf.player(killer)).css
 	local victim_color = ctf_colors.get_color(ctf.player(victim)).css
-	local msg = minetest.colorize(killer_color, killer) ..
+	-- minetest.get_color_escape_sequence("#fff326")
+	local msg = S("@1 has killed @2 ans received @2 points!",
+		minetest.colorize(killer_color, killer) .. minetest.get_color_escape_sequence("#fff326"),
+		minetest.colorize(victim_color, victim) .. minetest.get_color_escape_sequence("#fff326"),
+		minetest.colorize("#7efc00", bounty_score) .. minetest.get_color_escape_sequence("#fff326")
+	)
+	--[[local msg = minetest.colorize(killer_color, killer) ..
 		minetest.colorize("#fff326", " has killed ") ..
 		minetest.colorize(victim_color, victim) ..
 		minetest.colorize("#fff326", " and received " ) ..
 		minetest.colorize("#7efc00", bounty_score) ..
 		minetest.colorize("#fff326", " points!")
+	]]
 	minetest.log("action", minetest.strip_colors(msg))
 	minetest.chat_send_all(msg)
 end)
@@ -143,17 +161,17 @@ end)
 minetest.register_privilege("bounty_admin")
 
 minetest.register_chatcommand("place_bounty", {
-	description = "Place a bounty on a player",
-	params = "<player name>",
+	description = S("Place a bounty on a player"),
+	params = S("<player name>"),
 	privs = { bounty_admin = true },
 	func = function(name, target)
 		target = target:trim()
 		if not minetest.get_player_by_name(target) then
-			return false, target .. " is not online"
+			return false, S("@1 is not online", target)
 		end
 
 		bounty_player(target)
 		minetest.log("action", name .. " places bounty on " .. target)
-		return true, "Put bounty on " .. target
+		return true, S("Put bounty on @1", target)
 	end
 })

@@ -1,0 +1,5 @@
+# textdomain:ctf_alloc
+## lock_to_team
+Unlocked @1=
+Locked @1 to @2=
+Lock a player to a team=

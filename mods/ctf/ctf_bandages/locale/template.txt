@@ -1,0 +1,9 @@
+# textdomain:ctf_bandages
+Bandage=
+Heals teammates for 3-4 HP until target's HP is equal to=
+@1% of their maximum HP=
+
+@1 is dead!=
+@1 already has @2 HP!=
+@1 healed you!=
+@1 isn't in your team!=

@@ -1,0 +1,11 @@
+# textdomain:ctf
+## init.lua
+Team manager=
+Can create teams, manage players, assign team owners.=
+## teams.lua
+### List Teams
+Teams:=
+members=
+flags=
+### On Punch
+@1 is on your team!=

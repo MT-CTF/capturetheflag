@@ -1,0 +1,9 @@
+# textdomain:ctf_bandages
+Bandage=繃帶
+Heals teammates for 3-4 HP until target's HP is equal to=治療隊友3-4HP，除非他的
+@1% of their maximum HP=HP已達總和的@1%
+
+@1 is dead!=@1 死了！
+@1 already has @2 HP!=@1 已有 @2HP！
+@1 healed you!=@1 治療了你！
+@1 isn't in your team!=@1 不和你在同一個隊伍！
