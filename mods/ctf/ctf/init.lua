@@ -3,7 +3,7 @@
 -----------------------------------------
 
 ctf = {}
-local S = minetest.get_translator()
+local S = minetest.get_translator(minetest.get_current_modname())
 
 -- Privs
 minetest.register_privilege("ctf_team_mgr", {

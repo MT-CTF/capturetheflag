@@ -1,0 +1,54 @@
+# textdomain:ctf_chat
+Invalid usage, see /help msg.=
+The player @1 is not online.=
+## team_console_help
+show team panel=
+list all teams=
+show details about team 'name'=
+get which team 'player' is in=
+add a team called name (ctf_admin only)=
+remove a team called name (ctf_admin only)=
+Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)=
+add 'player' to team 'team' (ctf_team_mgr only)=
+remove 'player' from 'team' (ctf_team_mgr only)=
+## team command
+Open the team console, or run team command (see /team help)=
+Added team '@1'=
+Error adding team '@1'=
+You are not a ctf_admin!=
+Removed team '@1'=
+Error removing team '@1'=
+@1 is in team @2=
+@1 is not in a team=
+Successfully added @1 to @2=
+Failed to add @1 to @2=
+You are not a ctf_team_mgr!=
+Invalid token: @1=
+Expecting *, playername, or !playername.=
+Success!=
+Removed player @1=
+Failed to remove player.=
+'@1' is an invalid parameter to /team=
+Nothing could be done=
+## join command
+Add to team=
+Joined team @1!=
+Failed to join team!=
+## ctf_clean command
+Do admin cleaning stuff=
+CTF cleaned!=
+## ctf_reset command
+Delete all CTF saved states and start again.=
+The CTF core was reset by the admin. All team memberships, flags, land ownerships etc have been deleted.=
+Reset CTF core.=
+## ctf_reload command
+reload the ctf main frame and get settings=
+CTF core reloaded!=
+## Team messages
+msg=
+Send a message on the team channel=
+The team channel is disabled.=
+Empty team message, see /help t=
+You're not in a team, so you have no team to talk to.=
+## on chat message handler
+You don't have permission to shout.=

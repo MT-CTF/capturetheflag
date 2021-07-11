@@ -1,3 +1,4 @@
+local S = minetest.get_translator(minetest.get_current_modname())
 ctf.register_on_init(function()
 	ctf.log("chat", "Initialising...")
 
@@ -19,16 +20,17 @@ minetest.override_chatcommand("msg", {
 	func = function(name, param)
 		local sendto, message = param:match("^(%S+)%s(.+)$")
 		if not sendto then
-			return false, "Invalid usage, see /help msg."
+			return false, S("Invalid usage, see /help msg.")
 		end
 		if not minetest.get_player_by_name(sendto) then
-			return false, "The player " .. sendto .. " is not online."
+			return false, S("The player @1 is not online.",sendto)
 		end
 
 		-- Message color
 		local color = minetest.settings:get("ctf_chat.message_color") or "#E043FF"
 
 		-- Colorized sender name and message
+		-- TODO: after translate supports color, translate these too
 		local str =  minetest.colorize(color, "PM from ")
 		str = str .. minetest.colorize(ctf_colors.get_color(ctf.player(name)).css, name)
 		str = str .. minetest.colorize(color, ": " .. message)
@@ -41,26 +43,26 @@ minetest.override_chatcommand("msg", {
 
 local function team_console_help(name)
 	minetest.chat_send_player(name, "Try:")
-	minetest.chat_send_player(name, "/team - show team panel")
-	minetest.chat_send_player(name, "/team all - list all teams")
-	minetest.chat_send_player(name, "/team <team> - show details about team 'name'")
-	minetest.chat_send_player(name, "/team <name> - get which team 'player' is in")
-	minetest.chat_send_player(name, "/team player <name> - get which team 'player' is in")
+	minetest.chat_send_player(name, "/team - " .. S("show team panel"))
+	minetest.chat_send_player(name, "/team all - " .. S("list all teams"))
+	minetest.chat_send_player(name, "/team <team> - " .. S("show details about team 'name'"))
+	minetest.chat_send_player(name, "/team <name> - " .. S("get which team 'player' is in"))
+	minetest.chat_send_player(name, "/team player <name> - " .. S("get which team 'player' is in"))
 
 	local privs = minetest.get_player_privs(name)
 	if privs and privs.ctf_admin == true then
-		minetest.chat_send_player(name, "/team add <team> - add a team called name (ctf_admin only)")
-		minetest.chat_send_player(name, "/team remove <team> - remove a team called name (ctf_admin only)")
+		minetest.chat_send_player(name, "/team add <team> - " .. S("add a team called name (ctf_admin only)"))
+		minetest.chat_send_player(name, "/team remove <team> - " .. S("remove a team called name (ctf_admin only)"))
 	end
 	if privs and privs.ctf_team_mgr == true then
-		minetest.chat_send_player(name, "/team bjoin <team> <commands> - Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)")
-		minetest.chat_send_player(name, "/team join <name> <team> - add 'player' to team 'team' (ctf_team_mgr only)")
-		minetest.chat_send_player(name, "/team removeplayer <name> - remove 'player' from 'team' (ctf_team_mgr only)")
+		minetest.chat_send_player(name, "/team bjoin <team> <commands> - " .. S("Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)"))
+		minetest.chat_send_player(name, "/team join <name> <team> - " .. S("add 'player' to team 'team' (ctf_team_mgr only)"))
+		minetest.chat_send_player(name, "/team removeplayer <name> - " .. S("remove 'player' from 'team' (ctf_team_mgr only)"))
 	end
 end
 
 minetest.register_chatcommand("team", {
-	description = "Open the team console, or run team command (see /team help)",
+	description = S("Open the team console, or run team command (see /team help)"),
 	func = function(name, param)
 		local test   = string.match(param, "^player ([%a%d_-]+)")
 		local create = string.match(param, "^add ([%a%d_-]+)")
@@ -77,23 +79,23 @@ minetest.register_chatcommand("team", {
 					and create ~= nil
 					and ctf.team({name=create, add_team=true, color=create, allow_joins=false})
 				) then
-					return true, "Added team '"..create.."'"
+					return true, S("Added team '@1'",create)
 				else
-					return false, "Error adding team '"..create.."'"
+					return false, S("Error adding team '@1'",create)
 				end
 			else
-				return false, "You are not a ctf_admin!"
+				return false, S("You are not a ctf_admin!")
 			end
 		elseif remove then
 			local privs = minetest.get_player_privs(name)
 			if privs and privs.ctf_admin then
 				if ctf.remove_team(remove) then
-					return true, "Removed team '" .. remove .. "'"
+					return true, S("Removed team '@1'",remove)
 				else
-					return false, "Error removing team '" .. remove .. "'"
+					return false, S("Error removing team '@1'",remove)
 				end
 			else
-				return false, "You are not a ctf_admin!"
+				return false, S("You are not a ctf_admin!")
 			end
 		elseif param == "all" then
 			ctf.list_teams(name)
@@ -113,21 +115,20 @@ minetest.register_chatcommand("team", {
 				test = param
 			end
 			if ctf.player(test).team then
-				return true, test ..
-						" is in team " .. ctf.player(test).team
+				return true, S("@1 is in team @2",test,ctf.player(test).team)
 			else
-				return true, test.." is not in a team"
+				return true, S("@1 is not in a team",test)
 			end
 		elseif j_name and j_tname then
 			local privs = minetest.get_player_privs(name)
 			if privs and privs.ctf_team_mgr then
 				if ctf.join(j_name, j_tname, true, name) then
-					return true, "Successfully added " .. j_name .. " to " .. j_tname
+					return true, S("Successfully added @1 to @2",j_name,j_tname)
 				else
-					return false, "Failed to add " .. j_name .. " to " .. j_tname
+					return false, S("Failed to add @1 to @2",j_name,j_tname)
 				end
 			else
-				return true, "You are not a ctf_team_mgr!"
+				return true, S("You are not a ctf_team_mgr!")
 			end
 		elseif b_pattern and b_tname then
 			local privs = minetest.get_player_privs(name)
@@ -146,55 +147,55 @@ minetest.register_chatcommand("team", {
 					elseif minetest.is_player_name_valid(token) then
 						players[token] = true
 					else
-						return false, "Invalid token: " .. token .. "\nExpecting *, playername, or !playername."
+						return false,S("Invalid token: @1",token) .. "\n" .. S("Expecting *, playername, or !playername.")
 					end
 				end
 
 				for pname, _ in pairs(players) do
 					ctf.join(pname, b_tname, true, name)
 				end
-				return true, "Success!"
+				return true, S("Success!")
 			else
-				return false, "You are not a ctf_team_mgr!"
+				return false, S("You are not a ctf_team_mgr!")
 			end
 		elseif l_name then
 			local privs = minetest.get_player_privs(name)
 			if privs and privs.ctf_team_mgr then
 				if ctf.remove_player(l_name) then
-					return true, "Removed player " .. l_name
+					return true, S("Removed player @1",l_name)
 				else
-					return false, "Failed to remove player."
+					return false, S("Failed to remove player.")
 				end
 			else
-				return false, "You are not a ctf_team_mgr!"
+				return false, S("You are not a ctf_team_mgr!")
 			end
 		elseif param=="help" then
 			team_console_help(name)
 		else
 			if param ~= "" and param ~= nil then
-				minetest.chat_send_player(name, "'"..param.."' is an invalid parameter to /team")
+				minetest.chat_send_player(name, S("'@1' is an invalid parameter to /team",param))
 				team_console_help(name)
 			end
 		end
-		return false, "Nothing could be done"
+		return false, S("Nothing could be done")
 	end
 })
 
 minetest.register_chatcommand("join", {
 	params = "team name",
-	description = "Add to team",
+	description = S("Add to team"),
 	privs = {ctf_team_mgr = true},
 	func = function(name, param)
 		if ctf.join(name, param, false, name) then
-			return true, "Joined team " .. param .. "!"
+			return true, S("Joined team @1!",param)
 		else
-			return false, "Failed to join team!"
+			return false, S("Failed to join team!")
 		end
 	end
 })
 
 minetest.register_chatcommand("ctf_clean", {
-	description = "Do admin cleaning stuff",
+	description = S("Do admin cleaning stuff"),
 	privs = {ctf_admin=true},
 	func = function(name, param)
 		ctf.log("chat", "Cleaning CTF...")
@@ -202,27 +203,27 @@ minetest.register_chatcommand("ctf_clean", {
 		if ctf_flag and ctf_flag.assert_flags then
 			ctf_flag.assert_flags()
 		end
-		return true, "CTF cleaned!"
+		return true, S("CTF cleaned!")
 	end
 })
 
 minetest.register_chatcommand("ctf_reset", {
-	description = "Delete all CTF saved states and start again.",
+	description = S("Delete all CTF saved states and start again."),
 	privs = {ctf_admin=true},
 	func = function(name, param)
-		minetest.chat_send_all("The CTF core was reset by the admin. All team memberships," ..
-				"flags, land ownerships etc have been deleted.")
+		minetest.chat_send_all(S("The CTF core was reset by the admin." ..
+			"All team memberships, flags, land ownerships etc have been deleted."))
 		ctf.reset()
-		return true, "Reset CTF core."
+		return true, S("Reset CTF core.")
 	end,
 })
 
 minetest.register_chatcommand("ctf_reload", {
-	description = "reload the ctf main frame and get settings",
+	description = S("reload the ctf main frame and get settings"),
 	privs = {ctf_admin=true},
 	func = function(name, param)
 		ctf.init()
-		return true, "CTF core reloaded!"
+		return true, S("CTF core reloaded!")
 	end
 })
 
@@ -240,16 +241,16 @@ minetest.register_chatcommand("ctf_ls", {
 })
 
 minetest.register_chatcommand("t", {
-	params = "msg",
-	description = "Send a message on the team channel",
+	params = S("msg"),
+	description = S("Send a message on the team channel"),
 	privs = { interact = true, shout = true },
 	func = function(name, param)
 		if not ctf.setting("chat.team_channel") then
-			minetest.chat_send_player(name, "The team channel is disabled.")
+			minetest.chat_send_player(name, S("The team channel is disabled."))
 			return
 		end
 		if param == "" then
-			return false, "-!- Empty team message, see /help t"
+			return false, "-!- " .. S("Empty team message, see /help t")
 		end
 
 		local tname = ctf.player(name).team
@@ -270,7 +271,7 @@ minetest.register_chatcommand("t", {
 			end
 		else
 			minetest.chat_send_player(name,
-					"You're not in a team, so you have no team to talk to.")
+					S("You're not in a team, so you have no team to talk to."))
 		end
 	end
 })
@@ -314,7 +315,7 @@ handler = function(name, message)
 		end
 
 		if not minetest.check_player_privs(name, {shout = true}) then
-			minetest.chat_send_player(name, "-!- You don't have permission to shout.")
+			minetest.chat_send_player(name, "-!- " .. S("You don't have permission to shout."))
 			return true
 		end
 		local tcolor = ctf_colors.get_color(ctf.player(name))

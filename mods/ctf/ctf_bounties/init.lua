@@ -1,4 +1,4 @@
-local S = minetest.get_translator()
+local S = minetest.get_translator(minetest.get_current_modname())
 local bountied_player = nil
 local bounty_score = 0
 

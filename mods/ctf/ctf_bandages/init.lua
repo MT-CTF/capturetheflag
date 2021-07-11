@@ -2,7 +2,7 @@
 
 ctf_bandages = {}
 ctf_bandages.heal_percent = 0.75 -- Percentage of total HP to be healed
-local S = minetest.get_translator()
+local S = minetest.get_translator(minetest.get_current_modname())
 
 minetest.register_craftitem("ctf_bandages:bandage", {
 	description = S("Bandage") .. "\n\n" ..

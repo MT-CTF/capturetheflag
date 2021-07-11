@@ -1,0 +1,54 @@
+# textdomain:ctf_chat
+Invalid usage, see /help msg.=無效用法，見/help msg。
+The player @1 is not online.=玩家 @1 不在線。
+## team_console_help
+show team panel=顯示隊伍控制版
+list all teams=列出所有隊伍
+show details about team 'name'=顯示「名稱」隊伍的資料
+get which team 'player' is in=顯示「玩家」所在的隊伍
+add a team called name (ctf_admin only)=建立名爲「名稱」的隊伍（只可由 ctf_admin 操作）
+remove a team called name (ctf_admin only)=移除名爲「名稱」的隊伍（只可由 ctf_admin 操作）
+Command is * for all players, playername for one, !playername to remove (ctf_team_mgr only)=
+add 'player' to team 'team' (ctf_team_mgr only)=把「玩家」加入「隊伍」（只可由 ctf_team_mgr 操作）
+remove 'player' from 'team' (ctf_team_mgr only)=把「玩家」從「隊伍」中移除（只可由 ctf_team_mgr 操作）
+## team command
+Open the team console, or run team command (see /team help)=打開隊伍控制版，或執行隊伍指令（見 /team help ）
+Added team '@1'=已建立隊伍「@1」
+Error adding team '@1'=因錯誤而無法建立隊伍「@1」
+You are not a ctf_admin!=你不是 ctf_admin ！
+Removed team '@1'=已移除隊伍「@1」
+Error removing team '@1'=因錯誤而無法移除隊伍「@1」
+@1 is in team @2=@1 在隊伍 @2 裏
+@1 is not in a team=@1 不在任何隊伍裏
+Successfully added @1 to @2=已把 @1 加進 @2
+Failed to add @1 to @2=無法把 @1 加進 @2
+You are not a ctf_team_mgr!=你不是 ctf_team_mgr ！
+Invalid token: @1=無效參數：@1
+Expecting *, playername, or !playername.=應爲 *， 玩家名稱 ，或 !玩家名稱 。
+Success!=成功！
+Removed player @1=已移除玩家「@1」。
+Failed to remove player.=無法移除玩家。
+'@1' is an invalid parameter to /team=「@1」不是 /team 的有效參數
+Nothing could be done=沒事可做
+## join command
+Add to team=進入隊伍
+Joined team @1!=已進入隊伍「@1」！
+Failed to join team!=無法進入隊伍！
+## ctf_clean command
+Do admin cleaning stuff=進行管理清理
+CTF cleaned!=CTF 已被清理！
+## ctf_reset command
+Delete all CTF saved states and start again.=移除所有CTF狀態
+The CTF core was reset by the admin. All team memberships, flags, land ownerships etc have been deleted.=
+Reset CTF core.=CTF核心已被管理員重置。隊伍成員資料、旗幟、地區擁有者資料等已被移除。
+## ctf_reload command
+reload the ctf main frame and get settings=重新載入CTF主架構並重新獲取設定
+CTF core reloaded!=CTF核心已重新載入！
+## Team messages
+msg=信息
+Send a message on the team channel=在隊伍頻道發送信息
+The team channel is disabled.=隊伍頻道已被禁用。
+Empty team message, see /help t=空隊伍信息，見 /help t
+You're not in a team, so you have no team to talk to.=你不在任何隊伍中，也因此沒有可聊天的隊伍。
+## on chat message handler
+You don't have permission to shout.=

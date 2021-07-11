@@ -1,6 +1,6 @@
 local storage = minetest.get_mod_storage()
 local data = minetest.parse_json(storage:get_string("locktoteam")) or {}
-local S = minetest.get_translator()
+local S = minetest.get_translator(minetest.get_current_modname())
 
 -- Override autoalloc function to implement team-locking
 local ctf_autoalloc = ctf.autoalloc
