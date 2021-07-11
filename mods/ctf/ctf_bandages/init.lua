@@ -7,7 +7,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 minetest.register_craftitem("ctf_bandages:bandage", {
 	description = S("Bandage") .. "\n\n" ..
 		S("Heals teammates for 3-4 HP until target's HP is equal to") ..
-		S("@1% of their maximum HP",tostring(ctf_bandages.heal_percent * 100),
+		S("@1% of their maximum HP",tostring(ctf_bandages.heal_percent * 100)),
 	inventory_image = "ctf_bandages_bandage.png",
 	stack_max = 1,
 	on_use = function(itemstack, player, pointed_thing)
