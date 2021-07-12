@@ -1,4 +1,5 @@
 -- Get or add a team
+local S = ctf.S
 function ctf.team(name)
 	if name == nil then
 		return nil
