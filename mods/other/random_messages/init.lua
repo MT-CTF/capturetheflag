@@ -81,6 +81,7 @@ function random_messages.read_messages()
 		"Press right mouse button or double-tap the screen to activate scope while wielding a sniper rifle.",
 		"Medics can dig pillars by right clicking the base of one with their paxel.",
 		"Use `/help all` to see all available commands.",
+		"Use /rules to see the server rules."
 	}
 end
 
