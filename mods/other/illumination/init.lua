@@ -57,7 +57,7 @@ minetest.register_on_leaveplayer(function(player, _)
 	local remainingPlayers = {}
 	for _, online in pairs(minetest.get_connected_players()) do
 		if online:get_player_name() ~= player_name then
-			remainingPlayers[online:get_player_name()] = illumination.playerLights[online:get_player_name()]	
+			remainingPlayers[online:get_player_name()] = illumination.playerLights[online:get_player_name()]
 		end
 	end
 	illumination.playerLights = remainingPlayers
