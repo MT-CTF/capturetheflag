@@ -57,7 +57,7 @@ minetest.register_on_leaveplayer(function(player, _)
 	local remainingPlayers = {}
 	for _, online in pairs(minetest.get_connected_players()) do
 		if online:get_player_name() ~= player_name then
-			remainingPlayers[online:get_player_name()] = illumination.playerLights[online:get_player_name()]		
+			remainingPlayers[online:get_player_name()] = illumination.playerLights[online:get_player_name()]	
 		end
 	end
 	illumination.playerLights = remainingPlayers
@@ -104,7 +104,7 @@ minetest.register_globalstep(function(dtime)
 				end
 			end
 			local pos1 = illumination.playerLights[player:get_player_name()].pos
-			-- local lightLast = illumination.playerLights[player:get_player_name()].bright			
+			-- local lightLast = illumination.playerLights[player:get_player_name()].bright
 			illumination.playerLights[player:get_player_name()] = {}
 			if canLight(minetest.get_node(pos).name) then
 				illumination.playerLights[player:get_player_name()].bright = light
@@ -125,7 +125,7 @@ minetest.register_globalstep(function(dtime)
 				if nodeName then
 					minetest.set_node(pos, {name=nodeName})
 				end
-			end			
+			end
 			if pos1 then
 				if canLight(minetest.get_node(pos1).name) then
 					if not vector.equals(pos, pos1) then
