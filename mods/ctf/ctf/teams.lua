@@ -218,7 +218,12 @@ function ctf.join(name, team, force, by)
 			" has joined team " .. minetest.colorize(tcolor, team)
 	end
 
-	minetest.chat_send_all("*** " .. join_msg)
+	if minetest.get_modpath("helloip") then
+		minetest.chat_send_all("*** " .. join_msg .. " from " .. minetest.colorize("#f49200", helloip.get_player_country(name)))
+	else
+		minetest.chat_send_all("*** " .. join_msg)
+	end
+
 	minetest.log("action", name .. " joined team " .. team)
 
 	for i = 1, #ctf.registered_on_join_team do
