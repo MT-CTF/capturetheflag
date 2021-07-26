@@ -228,6 +228,318 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:steelblock",
+	items  = { "default:steel_ingot 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:bronzeblock",
+	items  = { "default:bronze_ingot 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:copperblock",
+	items  = { "default:copper_ingot 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:sandstone",
+	items  = { "default:sand 4"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:desert_sandstone",
+	items  = { "default:desert_sand 4"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:stone_block 9",
+	items  = { "default:stone 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:desert_stone_block 9",
+	items  = { "default:desert_stone 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:sandstone_block 9",
+	items  = { "default:sandstone 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:desert_sandstone_block 9",
+	items  = { "default:desert_sandstone 9"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:stonebrick 4",
+	items  = { "default:stone 4"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:desert_stonebrick 4",
+	items  = { "default:desert_stone 4"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:sandstonebrick 4",
+	items  = { "default:sandstone 4"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "default:desert_sandstone_brick 4",
+	items  = { "default:desert_sandstone 4"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_stone 8",
+	items  = { "default:stone 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_stone 8",
+	items  = { "default:desert_stone 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_sandstone 8",
+	items  = { "default:sandstone 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_sandstone 8",
+	items  = { "default:desert_sandstone 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_stone_block 8",
+	items  = { "default:stone_block 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_stone_block 8",
+	items  = { "default:desert_stone_block 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_sandstone_block 8",
+	items  = { "default:sandstone_block 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_sandstone_block 8",
+	items  = { "default:desert_sandstone_block 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_stonebrick 8",
+	items  = { "default:stonebrick 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_stonebrick 8",
+	items  = { "default:desert_stonebrick 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_sandstonebrick 8",
+	items  = { "default:sandstonebrick 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_sandstone_brick 8",
+	items  = { "default:desert_sandstone_brick 6"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_cobble 6",
+	items  = { "default:cobble 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_cobble 6",
+	items  = { "default:desert_cobble 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_stone 6",
+	items  = { "default:stone 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_stone 6",
+	items  = { "default:desert_stone 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_sandstone 6",
+	items  = { "default:sandstone 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_sandstone 6",
+	items  = { "default:desert_sandstone 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_stone_block 6",
+	items  = { "default:stone_block 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_stone_block 6",
+	items  = { "default:desert_stone_block 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_sandstone_block 6",
+	items  = { "default:sandstone_block 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_sandstone_block 6",
+	items  = { "default:desert_sandstone_block 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_stonebrick 6",
+	items  = { "default:stonebrick 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_stonebrick 6",
+	items  = { "default:desert_stonebrick 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_sandstonebrick 6",
+	items  = { "default:sandstonebrick 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:slab_desert_sandstone_brick 6",
+	items  = { "default:desert_sandstone_brick 3"},
+	always_known = true,
+	level  = 1,
+})
+
 -- Shovels
 for ore, ore_item in pairs(full_ores) do
 	local show = true
