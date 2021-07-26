@@ -398,6 +398,14 @@ crafting.register_recipe({
 
 crafting.register_recipe({
 	type   = "inv",
+	output = "stairs:slab_desert_cobble 6",
+	items  = { "default:desert_cobble 3"},
+	always_known = true,
+	level  = 1,
+})
+
+crafting.register_recipe({
+	type   = "inv",
 	output = "stairs:slab_stone 6",
 	items  = { "default:stone 3"},
 	always_known = true,
