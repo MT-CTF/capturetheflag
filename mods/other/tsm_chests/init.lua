@@ -89,6 +89,19 @@ minetest.register_node("tsm_chests:chest", {
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
 		end
 	end,
+	allow_metadata_inventory_take = function(pos, listname, index, stack, player)
+        local tname = ctf.player(player:get_player_name()).team
+        if ctf_match.build_timer <= 0 then
+            return 1
+        end
+        
+        if tname and (tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
+            minetest.chat_send_player(player:get_player_name(), "Match hasn't started yet, cannot take things from treasure chest!")
+            return 0
+        else
+            return 1
+        end
+    end,
 })
 
 --[[ here are some configuration variables ]]
