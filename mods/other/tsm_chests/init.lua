@@ -94,7 +94,7 @@ minetest.register_node("tsm_chests:chest", {
         if ctf_match.build_timer <= 0 then
             return 1
         end
-        
+
         if tname and (tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
             minetest.chat_send_player(player:get_player_name(), "Match hasn't started yet, cannot take things from treasure chest!")
             return 0
