@@ -7,3 +7,6 @@
 [submodule "mods/pvp/shooter"]
 	path = mods/pvp/shooter
 	url = https://github.com/MT-CTF/shooter
+[submodule "mods/other/playtime"]
+	path = mods/other/playtime
+	url = https://github.com/Lejo1/playtime
