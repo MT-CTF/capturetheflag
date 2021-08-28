@@ -76,7 +76,7 @@ local fragdef = {
 		remove_flora(pos, radius/2)
 
 		for _, v in pairs(minetest.get_objects_inside_radius(pos, radius)) do
-			if v:is_player() and v:get_hp() > 0 then
+			if v:is_player() and v:get_hp() > 0 and v:get_properties().pointable then
 				local footpos = vector.offset(v:get_pos(), 0, 0.1, 0)
 				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
 				local footdist = vector.distance(pos, footpos)
@@ -95,7 +95,7 @@ local fragdef = {
 						punch_interval = 1,
 						damage_groups = {
 							grenade = 1,
-							fleshy = 30 - ( (radius/3) * (target_head and headdist or footdist) )
+							fleshy = 26 - ( (radius/3) * (target_head and headdist or footdist) )
 						}
 					}, nil)
 				end

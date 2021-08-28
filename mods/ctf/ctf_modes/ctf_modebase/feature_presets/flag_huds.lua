@@ -1,19 +1,11 @@
 local hud = mhud.init()
 
-local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flag! Protect your flag!"           }
-local FLAG_STOLEN           = {color = 0xFF0000, text = "Kill %s, they've got your flag!"                    }
-local FLAG_STOLEN_YOU       = {color = 0xFF0000, text = "You've got the flag! Run back and punch your flag!" }
-local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect %s! They have the enemy flag!"              }
-local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow %s to capture the flag!"           }
-local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture the flag until %s is killed!"     }
-
-local function other(team)
-	if team == "red" then
-		return "blue"
-	else
-		return "red"
-	end
-end
+local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flag(s)! Protect your flag!"         }
+local FLAG_STOLEN           = {color = 0xFF0000, text = "Kill %s, they've got your flag!"                     }
+local FLAG_STOLEN_YOU       = {color = 0xFF0000, text = "You've got a flag! Run back and punch your flag!"    }
+local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammate(s) %s! They have the enemy flag!"   }
+local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammate(s) %s to capture the flag!"}
+local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"     }
 
 local function get_status(you)
 	local teamname = ctf_teams.get(you)
@@ -21,30 +13,40 @@ local function get_status(you)
 	if not teamname then return end
 
 	local enemy_thief = ctf_modebase.flag_taken[teamname]
-	local your_thief = ctf_modebase.flag_taken[other(teamname)]
+	local your_thieves = {}
+
+	for pname in pairs(ctf_modebase.team_flag_takers[teamname]) do
+		table.insert(your_thieves, pname)
+	end
+
+	if #your_thieves > 0 then
+		your_thieves = table.concat(your_thieves, ", ")
+	else
+		your_thieves = false
+	end
 
 	local status
 
 	if enemy_thief then
-		if your_thief then
-			if your_thief == you then
+		if your_thieves then
+			if ctf_modebase.taken_flags[you] then
 				status = table.copy(BOTH_FLAGS_STOLEN_YOU)
 				status.text = status.text:format(enemy_thief)
 			else
 				status = table.copy(BOTH_FLAGS_STOLEN)
-				status.text = status.text:format(enemy_thief, your_thief)
+				status.text = status.text:format(enemy_thief, your_thieves)
 			end
 		else
 			status = table.copy(FLAG_STOLEN)
 			status.text = status.text:format(enemy_thief)
 		end
 	else
-		if your_thief then
-			if your_thief == you then
+		if your_thieves then
+			if ctf_modebase.taken_flags[you] then
 				status = FLAG_STOLEN_YOU
 			else
 				status = table.copy(FLAG_STOLEN_TEAMMATE)
-				status.text = status.text:format(your_thief)
+				status.text = status.text:format(your_thieves)
 			end
 		else
 			status = FLAG_SAFE
@@ -160,5 +162,8 @@ return {
 		for _, player in pairs(minetest.get_connected_players()) do
 			hud:change(player, "flag_status", get_status(player:get_player_name()))
 		end
+	end,
+	clear_huds = function()
+		hud:clear_all()
 	end,
 }

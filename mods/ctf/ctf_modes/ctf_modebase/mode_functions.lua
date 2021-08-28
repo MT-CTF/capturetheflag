@@ -29,11 +29,12 @@ add_mode_func(minetest.register_on_leaveplayer, "on_leaveplayer")
 
 add_mode_func(ctf_modebase.register_on_new_match, "on_new_match", true)
 add_mode_func(ctf_modebase.register_on_new_mode, "on_mode_start", true)
+-- on_mode_end is called in match.lua's ctf_modebase.start_new_match()
 
-add_mode_func(ctf_modebase.register_on_flag_take    , "on_flag_take"    )
-add_mode_func(ctf_modebase.register_on_flag_drop    , "on_flag_drop"    )
-add_mode_func(ctf_modebase.register_on_flag_rightclick, "on_flag_rightclick")
-add_mode_func(ctf_modebase.register_on_flag_capture , "on_flag_capture" )
+add_mode_func(ctf_modebase.register_on_flag_take       , "on_flag_take"       )
+add_mode_func(ctf_modebase.register_on_flag_drop       , "on_flag_drop"       )
+add_mode_func(ctf_modebase.register_on_flag_rightclick , "on_flag_rightclick" )
+add_mode_func(ctf_modebase.register_on_flag_capture    , "on_flag_capture"    )
 
 add_mode_func(ctf_modebase.register_on_treasurefy_node, "on_treasurefy_node")
 
@@ -61,3 +62,41 @@ minetest.calculate_knockback = function(...)
 		return default_calc_knockback(...)
 	end
 end
+
+--
+--- can_drop_item()
+
+local default_item_drop = minetest.item_drop
+minetest.item_drop = function(itemstack, dropper, ...)
+	local current_mode = ctf_modebase:get_current_mode()
+
+	if current_mode and current_mode.is_bound_item then
+		if current_mode.is_bound_item(dropper, itemstack) then
+			return itemstack
+		end
+	end
+
+	return default_item_drop(itemstack, dropper, ...)
+end
+
+dropondie.register_drop_filter(function(player, itemname)
+	local current_mode = ctf_modebase:get_current_mode()
+
+	if current_mode and current_mode.is_bound_item then
+		return not current_mode.is_bound_item(player, ItemStack(itemname))
+	end
+
+	return true
+end)
+
+minetest.register_allow_player_inventory_action(function(player, action, inventory, info)
+	local current_mode = ctf_modebase:get_current_mode()
+
+	if current_mode and current_mode.is_bound_item and
+	action == "take" and current_mode.is_bound_item(player, info.stack) then
+		return 0
+	end
+end)
+
+--- end
+--

@@ -14,13 +14,6 @@ ctf_modebase.register_on_new_mode(function()
 	end
 end)
 
-local full_ores = {
-	diamond = "default:diamond",
-	mese = "default:mese_crystal",
-	steel = "default:steel_ingot",
-	stone = "default:cobble",
-}
-
 local sword_materials = {
 	steel   = "default:steel_ingot",
 	mese    = "default:mese_crystal",
@@ -33,10 +26,17 @@ for material, craft_material in pairs(sword_materials) do
 		type   = "inv",
 		output = "ctf_melee:sword_" .. material,
 		items  = { "default:stick", craft_material .. " 2" },
-		always_known = true,
+		always_known = false,
 		level  = 1,
 	})
 end
+
+local full_ores = {
+	diamond = "default:diamond",
+	mese = "default:mese_crystal",
+	steel = "default:steel_ingot",
+	stone = "default:cobble",
+}
 
 -- Pickaxes
 for ore, ore_item in pairs(full_ores) do

@@ -40,6 +40,8 @@ return {
 		pname = PlayerName(pname)
 		local pteam = ctf_teams.get(pname)
 
+		minetest.chat_send_all(minetest.colorize(CHAT_COLOR, string.format("[Bounty] %s is no longer bountied", pname)))
+
 		if pteam and self.bounties[pteam] and self.bounties[pteam].name == pname then
 			self.bounties[pteam] = nil
 		end

@@ -44,7 +44,7 @@ local function drop_list(player, pos, inv, list)
 	end
 end
 
-local function drop_all(player)
+function dropondie.drop_all(player)
 	local pos = player:get_pos()
 	pos.y = math.floor(pos.y + 0.5)
 
@@ -57,6 +57,6 @@ local function drop_all(player)
 end
 
 if ctf_core.settings.server_mode ~= "mapedit" then
-	minetest.register_on_dieplayer(drop_all)
-	minetest.register_on_leaveplayer(drop_all)
+	minetest.register_on_dieplayer(dropondie.drop_all)
+	minetest.register_on_leaveplayer(dropondie.drop_all)
 end

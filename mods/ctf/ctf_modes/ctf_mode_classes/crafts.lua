@@ -8,7 +8,8 @@ crafting.register_recipe({
 
 return {
 	"ctf_ranged:ammo",
-	"ctf_melee:sword_steel",
-	"ctf_melee:sword_mese",
-	"ctf_melee:sword_diamond",
+	"default:axe_mese",
+	"default:axe_diamond",
+	"default:shovel_mese",
+	"default:shovel_diamond",
 }

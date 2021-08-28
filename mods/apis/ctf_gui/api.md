@@ -6,7 +6,7 @@ A tool for easily creating basic CTF-themed GUIs
 
 ```lua
 ctf_gui.show_formspec(player, "modname:formname", {
-	size = (x = <x size>, y = <y size>),
+	size = {x = <x size>, y = <y size>},
 	title = "Formspec Title",
 	description = "Text below the title",
 	privs = {server = true},

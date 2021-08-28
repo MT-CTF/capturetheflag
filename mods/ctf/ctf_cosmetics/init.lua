@@ -4,11 +4,13 @@ function ctf_cosmetics.get_colored_skin(player, color)
 	local extras = ""
 
 	for clothing, clothcolor in pairs(ctf_cosmetics.get_extra_clothing(player)) do
-		extras = string.format(
-			"%s^(%s^[multiply:%s)", extras,
-			ctf_cosmetics.get_clothing_texture(player, clothing),
-			clothcolor
-		)
+		if clothing:sub(1, 1) ~= "_" then
+			extras = string.format(
+				"%s^(%s^[multiply:%s)", extras,
+				ctf_cosmetics.get_clothing_texture(player, clothing),
+				clothcolor
+			)
+		end
 	end
 
 	return string.format(
@@ -35,6 +37,8 @@ end
 function ctf_cosmetics.set_extra_clothing(player, extra_clothing)
 	local current = ctf_cosmetics.get_extra_clothing(player)
 
+	current._unset = nil
+
 	if extra_clothing._remove then
 		for _, clothing in pairs(extra_clothing._remove) do
 			current[clothing] = nil
@@ -51,5 +55,11 @@ function ctf_cosmetics.set_extra_clothing(player, extra_clothing)
 end
 
 function ctf_cosmetics.get_extra_clothing(player)
-	return minetest.deserialize(PlayerObj(player):get_meta():get_string("ctf_cosmetics:extra_clothing")) or {}
+	local meta = PlayerObj(player):get_meta():get_string("ctf_cosmetics:extra_clothing")
+
+	if meta == "" then
+		return {_unset = true}
+	else
+		return minetest.deserialize(meta)
+	end
 end

@@ -31,10 +31,10 @@ minetest.register_chatcommand("ctf_next", {
 	params = "[<technical modename> | <technical mapname>]",
 	func = function(name, param)
 		if param then
-			if ctf_modebase.modes[param] then
+			if ctf_modebase.modes[param] then -- New mode given
 				ctf_modebase.start_new_match(nil, param)
 				return true
-			elseif table.indexof(minetest.get_dir_list(ctf_map.maps_dir, true), param) ~= -1 then
+			elseif table.indexof(minetest.get_dir_list(ctf_map.maps_dir, true), param) ~= -1 then -- New map given
 				ctf_modebase.start_new_match(nil, nil, param)
 				return true
 			end

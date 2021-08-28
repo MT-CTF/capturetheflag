@@ -9,20 +9,6 @@ minetest.register_entity("ctf_modebase:respawn_movement_freezer", {
 		backface_culling = false,
 		static_save = false,
 	},
-	on_attach_child = function(self)
-		if self.handled_children then return end
-
-		self.handled_children = true
-
-		minetest.after(0.9, function()
-			if self.object and self.object:get_luaentity() then
-				for _, child in pairs(self.object:get_children()) do
-					child:set_detach()
-				end
-				self.object:remove()
-			end
-		end)
-	end
 })
 
 local function run_respawn_timer(pname)
@@ -62,6 +48,9 @@ local function run_respawn_timer(pname)
 			end)
 		end
 
+		player:set_detach()
+		respawn_delay[pname].obj:remove()
+
 		respawn_delay[pname].state = "done"
 		RunCallbacks(minetest.registered_on_respawnplayers, player)
 	end
@@ -84,6 +73,8 @@ function ctf_modebase.prep_delayed_respawn(player)
 
 		physics.set(pname, "ctf_modebase:respawn_freeze", {speed = 0, jump = 0, gravity = 0})
 		player:set_attach(obj)
+
+		respawn_delay[pname].obj = obj
 
 		return true
 	end

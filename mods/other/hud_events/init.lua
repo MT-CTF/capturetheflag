@@ -110,6 +110,8 @@ end
 
 function hud_events.new(player, def)
 	player = PlayerObj(player)
+
+	if not player then return end
 	local pname = player:get_player_name()
 
 	if not hud_queues[pname] then

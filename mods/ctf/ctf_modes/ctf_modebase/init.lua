@@ -1,6 +1,6 @@
 ctf_modebase = {
 	-- Time until voting ends
-	VOTING_TIME          = 20,    ---@type integer
+	VOTING_TIME          = 30,    ---@type integer
 
 	-- Amount of maps that need to be played before a mode vote starts
 	MAPS_PER_MODE        = 5,     ---@type integer
@@ -25,11 +25,17 @@ ctf_modebase = {
 	-- taken_flags[Player Name] = list of team names
 	taken_flags          = {},
 
+	-- team_flag_takers[Team name][Player Name] = list of team names
+	team_flag_takers     = {},
+
 	-- flag_taken[Team Name] = Name of thief
 	flag_taken           = {},
 
 	--flag_captured[Team name] = true if captured, otherwise nil
 	flag_captured        = {},
+
+	-- mode feature presets
+	feature_presets     = {},
 }
 
 ctf_gui.init()
@@ -51,6 +57,10 @@ ctf_core.include_files(
 )
 
 ctf_modebase.bounties = ctf_core.include_files("bounties.lua")
+ctf_modebase.build_timer = ctf_core.include_files("build_timer.lua")
+
+ctf_modebase.feature_presets.rankings = ctf_core.include_files("feature_presets/rankings.lua")
+ctf_modebase.feature_presets.flag_huds = ctf_core.include_files("feature_presets/flag_huds.lua")
 
 if ctf_core.settings.server_mode == "play" then
 	local match_started = false

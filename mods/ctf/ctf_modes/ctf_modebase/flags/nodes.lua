@@ -77,10 +77,13 @@ minetest.register_node("ctf_modebase:flag", {
 		minetest.node_punch(pos, node, puncher, pointed_thing, ...)
 	end,
 	on_rightclick = function(pos, node, clicker)
+		local pos_above = vector.offset(pos, 0, 1, 0)
+		local node_above = minetest.get_node(pos_above)
+
 		if ctf_core.settings.server_mode == "mapedit" then
-			show_flag_color_form(clicker, vector.offset(pos, 0, 1, 0), node.param2)
+			show_flag_color_form(clicker, pos_above, node.param2)
 		else
-			ctf_modebase.on_flag_rightclick(pos, node, clicker)
+			ctf_modebase.on_flag_rightclick(clicker, pos_above, node_above)
 		end
 	end,
 })
@@ -102,8 +105,8 @@ for name, def in pairs(ctf_teams.team) do
 			"default_wood.png",
 			"default_wood.png",
 			"default_wood.png",
-			"default_wood.png^(wool_white.png^[colorize:"..color..":200^[mask:ctf_modebase_flag_mask.png)",
-			"default_wood.png^(wool_white.png^[colorize:"..color..":200^[mask:ctf_modebase_flag_mask2.png)"
+			"default_wood.png^([combine:16x16:4,0=wool_white.png^[colorize:"..color..":200)",
+			"default_wood.png^([combine:12x16:0,0=wool_white.png^[colorize:"..color..":200)"
 		},
 		node_box = {
 			type = "fixed",
@@ -112,9 +115,8 @@ for name, def in pairs(ctf_teams.team) do
 				{-0.5,0,0.000000,0.250000,0.500000,0.062500}
 			}
 		},
-		groups = {immortal=1,is_flag=1,flag_top=1,not_in_creative_inventory=1},
+		groups = {immortal=1,is_flag=1,flag_top=1,not_in_creative_inventory=1,[name]=1},
 		on_punch = function(pos, node, puncher, pointed_thing, ...)
-
 			if node.name ~= "ctf_modebase:flag_captured_top" then
 				ctf_modebase.flag_on_punch(puncher, pos, node)
 			end
@@ -125,7 +127,7 @@ for name, def in pairs(ctf_teams.team) do
 			if ctf_core.settings.server_mode == "mapedit" then
 				show_flag_color_form(clicker, pos, node.param2)
 			else
-				ctf_modebase.on_flag_rightclick(pos, node, clicker)
+				ctf_modebase.on_flag_rightclick(clicker, pos, node)
 			end
 		end,
 	})

@@ -73,7 +73,7 @@ local function process_ray(ray, user, look_dir, def)
 end
 
 
-function ctf_ranged.register_simple_weapon(name, def)
+function ctf_ranged.simple_register_gun(name, def)
 	minetest.register_tool(rawf.also_register_loaded_tool(name, {
 		description = def.description,
 		inventory_image = def.texture.."^[colorize:#F44:42",
@@ -106,7 +106,7 @@ function ctf_ranged.register_simple_weapon(name, def)
 					return
 				end
 			else
-				shoot_cooldown:start(user, def.fire_interval)
+				shoot_cooldown:set(user, def.fire_interval)
 			end
 
 			local spawnpos, look_dir = rawf.get_bullet_start_data(user)
@@ -134,12 +134,24 @@ function ctf_ranged.register_simple_weapon(name, def)
 				process_ray(ray, user, look_dir, def)
 			end
 
-			return rawf.unload_weapon(itemstack)
+			if def.rounds > 0 then
+				return rawf.unload_weapon(itemstack)
+			end
+		end
+
+		if def.rightclick_func then
+			loaded_def.on_place = def.rightclick_func
+
+			loaded_def.on_secondary_use = function(itemstack, user, pointed_thing, ...)
+				if pointed_thing then
+					def.rightclick_func(itemstack, user, pointed_thing, ...)
+				end
+			end
 		end
 	end))
 end
 
-ctf_ranged.register_simple_weapon("ctf_ranged:pistol", {
+ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	type = "pistol",
 	description = "Pistol",
 	texture = "ctf_ranged_pistol.png",
@@ -152,7 +164,7 @@ ctf_ranged.register_simple_weapon("ctf_ranged:pistol", {
 	liquid_travel_dist = 2
 })
 
-ctf_ranged.register_simple_weapon("ctf_ranged:rifle", {
+ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	type = "rifle",
 	description = "Rifle",
 	texture = "ctf_ranged_rifle.png",
@@ -164,7 +176,7 @@ ctf_ranged.register_simple_weapon("ctf_ranged:rifle", {
 	liquid_travel_dist = 4,
 })
 
-ctf_ranged.register_simple_weapon("ctf_ranged:shotgun", {
+ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	type = "shotgun",
 	description = "Shotgun",
 	texture = "ctf_ranged_shotgun.png",
@@ -179,7 +191,7 @@ ctf_ranged.register_simple_weapon("ctf_ranged:shotgun", {
 	fire_interval = 2,
 })
 
-ctf_ranged.register_simple_weapon("ctf_ranged:smg", {
+ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	type = "smg",
 	description = "Submachinegun",
 	texture = "ctf_ranged_smgun.png",

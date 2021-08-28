@@ -1,4 +1,6 @@
-mode_classic = {
+ctf_gui.init()
+
+mode_classes = {
 	SUMMARY_RANKS = {
 		_sort = "score",
 		"score",
@@ -9,18 +11,19 @@ mode_classic = {
 	}
 }
 
-local rankings = ctf_modebase.feature_presets.rankings("classic", mode_classic)
+local rankings = ctf_modebase.feature_presets.rankings("classes", mode_classes)
 local flag_huds = ctf_modebase.feature_presets.flag_huds
 
-local crafts = ctf_core.include_files(
-	"crafts.lua"
+local crafts, classes = ctf_core.include_files(
+	"crafts.lua",
+	"classes.lua"
 )
 
 local function BOUNTY_REWARD_FUNC(pname, pteam)
 	local match_rank = rankings.recent()[pname] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
 
-	return {bounty_kills = 1, score = math.max(0, math.min(500, kd * 40))}
+	return {bounty_kills = 1, score = math.max(0, math.min(500, kd * 30))}
 end
 
 local FLAG_CAPTURE_TIMER = 60 * 3
@@ -34,7 +37,7 @@ local function calculate_killscore(player)
 	return math.round(kd * 5) + (bounty_reward and bounty_reward.score or 0)
 end
 
-function mode_classic.tp_player_near_flag(player)
+function mode_classes.tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
 
 	if not tname then return end
@@ -50,7 +53,15 @@ function mode_classic.tp_player_near_flag(player)
 	return true
 end
 
-function mode_classic.celebrate_team(teamname)
+function mode_classes.dist_from_flag(player)
+	local tname = ctf_teams.get(player)
+
+	if not tname then return 0 end
+
+	return vector.distance(ctf_map.current_map.teams[tname].flag_pos, PlayerObj(player):get_pos())
+end
+
+function mode_classes.celebrate_team(teamname)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.player_team[pname].name
@@ -154,7 +165,8 @@ end
 local flag_captured = false
 local next_team = "red"
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
-ctf_modebase.register_mode("classic", {
+local old_get_colored_skin = ctf_cosmetics.get_colored_skin
+ctf_modebase.register_mode("classes", {
 	map_whitelist = {
 		"bridge", "caverns", "coast", "iceage", "two_hills", "plains", "desert_spikes",
 		"river_valley",
@@ -171,18 +183,12 @@ ctf_modebase.register_mode("classic", {
 		["default:shovel_steel"] = {rarity = 0.4, max_stacks = 2},
 		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
 
-		["ctf_melee:sword_steel"  ] = {rarity = 0.2  , max_stacks = 2},
-		["ctf_melee:sword_mese"   ] = {rarity = 0.01 , max_stacks = 1},
-		["ctf_melee:sword_diamond"] = {rarity = 0.001, max_stacks = 1},
-
 		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
 		["ctf_ranged:rifle_loaded"  ] = {rarity = 0.2                 },
 		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
-		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
 
 		["ctf_ranged:ammo"     ] = {min_count = 3, max_count = 10, rarity = 0.3 , max_stacks = 2},
 		["default:apple"       ] = {min_count = 5, max_count = 20, rarity = 0.1 , max_stacks = 2},
-		["ctf_healing:bandage" ] = {                               rarity = 0.2 , max_stacks = 1},
 
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
@@ -190,6 +196,15 @@ ctf_modebase.register_mode("classic", {
 	crafts = crafts,
 	physics = {sneak_glitch = true, new_move = false},
 	commands = {"ctf_start", "rank", "r"},
+	is_bound_item = function(_, itemstack)
+		local iname = itemstack:get_name()
+
+		if itemstack:get_definition().groups.sword or
+		iname:match("ctf_mode_classes:") or
+		iname == "ctf_healing:bandage" then
+			return true
+		end
+	end,
 	on_mode_start = function()
 		ctf_modebase.bounties.get_next_bounty = function(team_members)
 			local best_kd = {amount = 0}
@@ -206,11 +221,21 @@ ctf_modebase.register_mode("classic", {
 
 			return best_kd.name
 		end
+
+		ctf_cosmetics.get_colored_skin = function(player, color)
+			local classname = classes.get_name(player)
+
+			return old_get_colored_skin(player, color) .. (classname and "^ctf_mode_classes_"..classname.."_overlay.png" or "")
+		end
 	end,
 	on_mode_end = function()
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 
+		ctf_cosmetics.get_colored_skin = old_get_colored_skin
+
 		flag_huds.clear_huds()
+
+		classes.finish()
 	end,
 	on_new_match = function(mapdef)
 		rankings.next_match()
@@ -219,10 +244,14 @@ ctf_modebase.register_mode("classic", {
 
 		flag_captured = false
 
-		ctf_modebase.build_timer.start(mapdef)
+		ctf_modebase.build_timer.start(mapdef, 60 * 1.5)
 
-		give_initial_stuff.register_stuff_provider(function()
-			return {"default:sword_stone", "default:pick_stone", "default:torch 15", "default:stick 5"}
+		give_initial_stuff.register_stuff_provider(function(player)
+			local initial_stuff = classes.get(player).items or {}
+
+			table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
+
+			return(initial_stuff)
 		end)
 
 		ctf_map.place_chests(mapdef)
@@ -259,11 +288,6 @@ ctf_modebase.register_mode("classic", {
 	end,
 	on_allocplayer = function(player, teamname)
 		local tcolor = ctf_teams.team[teamname].color
-
-		player:set_properties({
-			textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}
-		})
-
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
 
@@ -271,11 +295,11 @@ ctf_modebase.register_mode("classic", {
 
 		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
 
+		classes.set(player)
+
 		player:set_hp(player:get_properties().hp_max)
 
-		mode_classic.tp_player_near_flag(player)
-
-		give_initial_stuff(player)
+		mode_classes.tp_player_near_flag(player)
 
 		flag_huds.on_allocplayer(player)
 
@@ -335,11 +359,14 @@ ctf_modebase.register_mode("classic", {
 
 		give_initial_stuff(player)
 
-		return mode_classic.tp_player_near_flag(player)
+		return mode_classes.tp_player_near_flag(player)
+	end,
+	on_flag_rightclick = function(clicker, pos, node)
+		classes:show_class_formspec(clicker)
 	end,
 	on_flag_take = function(player, teamname)
 		if ctf_modebase.build_timer.in_progress() then
-			mode_classic.tp_player_near_flag(player)
+			mode_classes.tp_player_near_flag(player)
 
 			return "You can't take the enemy flag during build time!"
 		end
@@ -348,7 +375,7 @@ ctf_modebase.register_mode("classic", {
 		local tcolor = pteam and ctf_teams.team[pteam].color or "#FFF"
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_BUILTIN, tcolor)
 
-		mode_classic.celebrate_team(ctf_teams.get(player))
+		mode_classes.celebrate_team(ctf_teams.get(player))
 
 		rankings.add(player, {score = 20, flag_attempts = 1})
 
@@ -365,7 +392,7 @@ ctf_modebase.register_mode("classic", {
 	end,
 	on_flag_capture = function(player, captured_team)
 		local pteam = ctf_teams.get(player)
-		mode_classic.celebrate_team(pteam)
+		mode_classes.celebrate_team(pteam)
 
 		flag_captured = true
 
@@ -381,7 +408,7 @@ ctf_modebase.register_mode("classic", {
 			ctf_modebase.show_summary_gui(
 				pname,
 				insert_team_totals(rankings.recent(), rankings.total()),
-				mode_classic.SUMMARY_RANKS,
+				mode_classes.SUMMARY_RANKS,
 				{
 					title = HumanReadable(pteam).." Team Wins!",
 					special_row_title = "Total Team Score",
@@ -415,7 +442,7 @@ ctf_modebase.register_mode("classic", {
 			return true, insert_team_totals(
 				rankings.recent(),
 				rankings.total()
-			), mode_classic.SUMMARY_RANKS, {
+			), mode_classes.SUMMARY_RANKS, {
 				title = "Match Summary",
 				special_row_title = "Total Team Stats",
 				buttons = {previous = true}
@@ -424,7 +451,7 @@ ctf_modebase.register_mode("classic", {
 			return true, insert_team_totals(
 				rankings.previous_recent(),
 				rankings.previous_total()
-			), mode_classic.SUMMARY_RANKS, {
+			), mode_classes.SUMMARY_RANKS, {
 				title = "Previous Match Summary",
 				special_row_title = "Total Team Stats",
 				buttons = {next = true}
@@ -470,7 +497,7 @@ ctf_modebase.register_mode("classic", {
 		if ctf_combat_mode.get(patient) then
 			ctf_combat_mode.set(patient, 15, {[player:get_player_name()] = "healer"})
 		else
-			stats.score = math.ceil(amount/2)
+			stats.score = amount/2
 		end
 
 		rankings.add(player, stats, true)

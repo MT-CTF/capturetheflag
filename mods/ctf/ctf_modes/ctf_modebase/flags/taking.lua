@@ -1,14 +1,20 @@
 ctf_modebase.register_on_new_match(function(mapdef, old_mapdef)
 	ctf_modebase.taken_flags = {}
+	ctf_modebase.team_flag_takers = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}
 
 	for tname in pairs(mapdef.teams) do
+		ctf_modebase.team_flag_takers[tname] = {}
 		ctf_modebase.flag_taken[tname] = false
 	end
 end)
 
 function ctf_modebase.drop_flags(pname, capture)
+	local pteam = ctf_teams.get(pname)
+
+	if not pteam then return end
+
 	local flagteams = ctf_modebase.taken_flags[pname]
 
 	if flagteams then
@@ -32,6 +38,7 @@ function ctf_modebase.drop_flags(pname, capture)
 		end
 
 		ctf_modebase.taken_flags[pname] = nil
+		ctf_modebase.team_flag_takers[pteam][pname] = nil
 
 		if not capture then
 			RunCallbacks(ctf_modebase.registered_on_flag_drop, pname, flagteams)
@@ -41,13 +48,13 @@ end
 
 function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 	local pname = PlayerName(puncher)
+	local pteam = ctf_teams.get(pname)
 
-	if not ctf_teams.player_team[pname] then
+	if not pteam then
 		minetest.chat_send_player(pname, "You're not in a team, you can't take that flag!")
 		return
 	end
 
-	local pteam = ctf_teams.player_team[pname].name
 	local target_team = node.name:sub(node.name:find("top_") + 4)
 
 	if pteam ~= target_team then
@@ -58,6 +65,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 
 		if not ctf_modebase.taken_flags[pname] then
 			ctf_modebase.taken_flags[pname] = {}
+			ctf_modebase.team_flag_takers[pteam][pname] = ctf_modebase.taken_flags[pname]
 		end
 
 		table.insert(ctf_modebase.taken_flags[pname], target_team)
