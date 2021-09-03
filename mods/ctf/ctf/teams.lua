@@ -450,6 +450,10 @@ function ctf.can_attack(player, hitter, time_from_last_punch, tool_capabilities,
 	return true
 end
 
+function ctf.get_damage_modifier(player, tool_capabilities)
+	return 0
+end
+
 ctf.registered_on_attack = {}
 function ctf.register_on_attack(func)
 	if ctf._mt_loaded then
@@ -458,25 +462,14 @@ function ctf.register_on_attack(func)
 	table.insert(ctf.registered_on_attack, func)
 end
 
-local dead_players = {}
-minetest.register_on_respawnplayer(function(player)
-	dead_players[player:get_player_name()] = nil
-end)
-minetest.register_on_joinplayer(function(player)
-	dead_players[player:get_player_name()] = nil
-end)
 minetest.register_on_punchplayer(function(player, hitter,
-		time_from_last_punch, tool_capabilities, dir, damage, ...)
+		time_from_last_punch, tool_capabilities, dir, orig_damage, ...)
 	if player and hitter then
 		local pname = player:get_player_name()
 		local hname = hitter:get_player_name()
 
 		local to = ctf.player(pname)
 		local from = ctf.player(hname)
-
-		if dead_players[pname] then
-			return
-		end
 
 		if to.team == from.team and to.team ~= "" and
 				to.team ~= nil and to.name ~= from.name then
@@ -491,25 +484,23 @@ minetest.register_on_punchplayer(function(player, hitter,
 		end
 
 		if ctf.can_attack(player, hitter, time_from_last_punch, tool_capabilities,
-			dir, damage, ...) == false
+			dir, orig_damage, ...) == false
 		then
 			return true
 		end
 
 		local hp = player:get_hp()
-		if hp == 0 then
-			return false
+		if hp <= 0 then
+			return true
 		end
 
-		if hp - damage <= 0 then
-			dead_players[pname] = true
-			local wielded = hitter:get_wielded_item()
-			for i = 1, #ctf.registered_on_killedplayer do
-				ctf.registered_on_killedplayer[i](pname, hname,
-						wielded, tool_capabilities)
-			end
-			return false
+		if tool_capabilities and tool_capabilities.damage_groups and tool_capabilities.damage_groups.fleshy then
+			local modifier = ctf.get_damage_modifier(hitter, tool_capabilities)
+			tool_capabilities.damage_groups.fleshy = math.max(1, tool_capabilities.damage_groups.fleshy + modifier)
 		end
+
+		local damage = minetest.get_hit_params(player:get_armor_groups(), tool_capabilities, time_from_last_punch).hp
+		damage = math.min(damage, hp)
 
 		for i = 1, #ctf.registered_on_attack do
 			ctf.registered_on_attack[i](
@@ -517,5 +508,14 @@ minetest.register_on_punchplayer(function(player, hitter,
 				tool_capabilities, dir, damage, ...
 			)
 		end
+
+		if hp <= damage then
+			for i = 1, #ctf.registered_on_killedplayer do
+				ctf.registered_on_killedplayer[i](pname, hname,	tool_capabilities)
+			end
+		end
+
+		player:set_hp(hp - damage)
+		return true
 	end
 end)
