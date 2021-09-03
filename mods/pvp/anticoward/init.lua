@@ -38,11 +38,12 @@ ctf.register_on_attack(function(player, hitter,
 
 		potential_cowards[pname].timer = 0
 		potential_cowards[pname].puncher = hname
+		potential_cowards[pname].wielded_item = hitter:get_wielded_item()
 		potential_cowards[pname].toolcaps = tool_capabilities
 	end
 end)
 
-ctf.register_on_killedplayer(function(victim, killer, toolcaps)
+ctf.register_on_killedplayer(function(victim, killer, _, toolcaps)
 	if toolcaps.damage_groups.combat_log or toolcaps.damage_groups.suicide then
 		return
 	end
@@ -71,6 +72,7 @@ function handle_leave_or_die(pname, leave)
 			ctf.registered_on_killedplayer[i](
 				pname,
 				hname,
+				potential_cowards[pname].wielded_item,
 				potential_cowards[pname].toolcaps
 			)
 		end

@@ -15,7 +15,7 @@ end
 -- Kills
 --
 local kill_counter = counter("ctf_kills", "Total kills")
-ctf.register_on_killedplayer(function(victim, killer)
+ctf.register_on_killedplayer(function(victim, killer, type)
 	kill_counter:increment()
 end)
 
