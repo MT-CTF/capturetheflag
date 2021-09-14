@@ -222,7 +222,7 @@ if minetest.get_modpath("ctf") then
 		local tname = ctf.player(name).team
 		if tname and
 				(tname == "blue" and pos.z >= 0) or (tname == "red" and pos.z <= 0) then
-			minetest.chat_send_player(name, "Can't dig beyond the barrier!")
+			minetest.chat_send_player(name, "Can't dig/place beyond the barrier!")
 			return true
 		else
 			return old_is_protected(pos, name, ...)
