@@ -1,7 +1,7 @@
 ctf_gui = {
 	ELEM_SIZE = {x = 3, y = 0.7},
 	SCROLLBAR_WIDTH = 0.6,
-	FORM_SIZE = {x = 18, y = 12},
+	FORM_SIZE = {x = 18, y = 13},
 }
 
 local context = {}
@@ -58,7 +58,7 @@ function ctf_gui.show_formspec(player, formname, formdef)
 				"hypertext[0,0.2;"..formdef.size.x..
 					",1.6;title;<center><big>"..formdef.title.."</big>\n" ..
 					(formdef.description or "\b") .."</center>]" ..
-				"scroll_container[0.1,1.8;"..formdef.size.x..
+				"scroll_container[0.1,1;"..formdef.size.x..
 				","..formdef.size.y..";formcontent;vertical]"
 
 	local using_scrollbar = false
@@ -74,7 +74,7 @@ function ctf_gui.show_formspec(player, formname, formdef)
 			end
 		end
 
-		using_scrollbar = maxyscroll > 9
+		using_scrollbar = maxyscroll > 10
 
 		for id, def in pairs(formdef.elements) do
 			id = minetest.formspec_escape(id)
@@ -158,10 +158,43 @@ function ctf_gui.show_formspec(player, formname, formdef)
 					minetest.formspec_escape(def.label),
 					def.default or false
 				)
+			elseif def.type == "textarea" then
+				formspec = formspec .. string.format(
+					"textarea[%f,%f;%f,%f;;;%s]",
+					def.pos.x,
+					def.pos.y,
+					def.size.x,
+					def.size.y,
+					minetest.formspec_escape(def.text)
+				)
+			elseif def.type == "image" then
+				formspec = formspec .. string.format(
+					"image[%f,%f;%f,%f;%s]",
+					def.pos.x,
+					def.pos.y,
+					def.size.x,
+					def.size.y,
+					def.texture
+				)
 			elseif def.type == "table" then
-				local tablecolumns = {}
-				local tableoptions = {}
+				if def.options then
+					local tableoptions = {}
+					for name, option in pairs(def.options) do
+						if type(tonumber(name)) ~= "number" then
+							table.insert(tableoptions, string.format("%s=%s", name, option))
+						else
+							table.insert(tableoptions, option)
+						end
+					end
 
+					formspec = formspec ..
+						string.format(
+							"tableoptions[%s]",
+							table.concat(tableoptions, ";")
+						)
+				end
+
+				local tablecolumns = {}
 				for _, column in ipairs(def.columns) do
 					if type(column) == "table" then
 						local tc_out = column.type
@@ -178,33 +211,22 @@ function ctf_gui.show_formspec(player, formname, formdef)
 					end
 				end
 
-				for name, option in pairs(def.options) do
-					if type(tonumber(name)) ~= "number" then
-						table.insert(tableoptions, string.format("%s=%s", name, option))
-					else
-						table.insert(tableoptions, option)
-					end
-				end
 
 				formspec = formspec ..
-						string.format(
-							"tableoptions[%s]",
-							table.concat(tableoptions, ";")
-						) ..
-						string.format(
-							"tablecolumns[%s]",
-							table.concat(tablecolumns, ";")
-						) ..
-						string.format(
-							"table[%f,%f;%f,%f;%s;%s;%d]",
-							def.pos.x,
-							def.pos.y,
-							def.size.x,
-							def.size.y,
-							id,
-							table.concat(def.rows, ","),
-							def.default_idx or 1
-						)
+					string.format(
+						"tablecolumns[%s]",
+						table.concat(tablecolumns, ";")
+					) ..
+					string.format(
+						"table[%f,%f;%f,%f;%s;%s;%d]",
+						def.pos.x,
+						def.pos.y,
+						def.size.x,
+						def.size.y,
+						id,
+						table.concat(def.rows, ","),
+						def.default_idx or 1
+					)
 			end
 		end
 	end

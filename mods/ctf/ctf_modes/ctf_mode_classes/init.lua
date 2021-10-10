@@ -12,19 +12,14 @@ mode_classes = {
 }
 
 local rankings = ctf_modebase.feature_presets.rankings("classes", mode_classes)
+local summary = ctf_modebase.feature_presets.summary(mode_classes, rankings)
 local flag_huds = ctf_modebase.feature_presets.flag_huds
+local bounties = ctf_modebase.feature_presets.bounties(rankings)
 
 local crafts, classes = ctf_core.include_files(
 	"crafts.lua",
 	"classes.lua"
 )
-
-local function BOUNTY_REWARD_FUNC(pname, pteam)
-	local match_rank = rankings.recent()[pname] or {}
-	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
-
-	return {bounty_kills = 1, score = math.max(0, math.min(500, kd * 30))}
-end
 
 local FLAG_CAPTURE_TIMER = 60 * 3
 
@@ -32,9 +27,8 @@ local function calculate_killscore(player)
 	local pname = PlayerName(player)
 	local match_rank = rankings.recent()[pname] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
-	local bounty_reward = ctf_modebase.bounties:player_has(pname)
 
-	return math.round(kd * 5) + (bounty_reward and bounty_reward.score or 0)
+	return math.round(kd * 5)
 end
 
 function mode_classes.tp_player_near_flag(player)
@@ -82,22 +76,6 @@ function mode_classes.celebrate_team(teamname)
 	end
 end
 
-local function insert_team_totals(match_rankings, total)
-	if not match_rankings then return {} end
-
-	local ranks = table.copy(match_rankings)
-
-	for team, rank_values in pairs(total) do
-		rank_values._special_row = true
-		rank_values._row_color = ctf_teams.team[team].color
-
-		-- There will be problems with this if player names can contain spaces
-		ranks[HumanReadable("team "..team)] = rank_values
-	end
-
-	return ranks
-end
-
 -- Returns true if player was in combat mode
 local function end_combat_mode(player, killer)
 	local victim_combat_mode = ctf_combat_mode.get(player)
@@ -122,10 +100,8 @@ local function end_combat_mode(player, killer)
 			local bounty = ctf_modebase.bounties:player_has(player)
 
 			if bounty then
-				bounty.score = nil
-
 				for name, amount in pairs(bounty) do
-					rewards[name] = amount
+					rewards[name] = (rewards[name] or 0) + amount
 				end
 
 				ctf_modebase.bounties:remove(player)
@@ -136,7 +112,7 @@ local function end_combat_mode(player, killer)
 			-- share kill score with healers
 			ctf_combat_mode.manage_extra(killer, function(pname, type)
 				if type == "healer" then
-					rankings.add(pname, {score = killscore})
+					rankings.add(pname, {score = rewards.score})
 				end
 
 				return type
@@ -162,14 +138,15 @@ local function end_combat_mode(player, killer)
 	return true
 end
 
-local flag_captured = false
+local flag_captured = true
 local next_team = "red"
+local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 local old_get_colored_skin = ctf_cosmetics.get_colored_skin
 ctf_modebase.register_mode("classes", {
 	map_whitelist = {
 		"bridge", "caverns", "coast", "iceage", "two_hills", "plains", "desert_spikes",
-		"river_valley",
+		"river_valley", "plain_battle", --"moon",
 	},
 	treasures = {
 		["default:ladder_wood"] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -206,21 +183,8 @@ ctf_modebase.register_mode("classes", {
 		end
 	end,
 	on_mode_start = function()
-		ctf_modebase.bounties.get_next_bounty = function(team_members)
-			local best_kd = {amount = 0}
-			local recent = rankings.recent()
-
-			for _, pname in pairs(team_members) do
-				local kd = recent[pname] and (recent[pname].kills or 1) / (recent[pname].deaths or 1) or 1
-
-				if kd > best_kd.amount then
-					best_kd.amount = kd
-					best_kd.name = pname
-				end
-			end
-
-			return best_kd.name
-		end
+		ctf_modebase.bounties.bounty_reward_func = bounties.bounty_reward_func
+		ctf_modebase.bounties.get_next_bounty = bounties.get_next_bounty
 
 		ctf_cosmetics.get_colored_skin = function(player, color)
 			local classname = classes.get_name(player)
@@ -229,6 +193,7 @@ ctf_modebase.register_mode("classes", {
 		end
 	end,
 	on_mode_end = function()
+		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 
 		ctf_cosmetics.get_colored_skin = old_get_colored_skin
@@ -238,13 +203,14 @@ ctf_modebase.register_mode("classes", {
 		classes.finish()
 	end,
 	on_new_match = function(mapdef)
-		rankings.next_match()
-
-		flag_huds.clear_capturers()
-
 		flag_captured = false
 
-		ctf_modebase.build_timer.start(mapdef, 60 * 1.5)
+		classes.on_new_match()
+
+		ctf_modebase.build_timer.start(mapdef, 60 * 1.5, function()
+			summary.on_match_start()
+			ctf_modebase.bounties:on_match_start()
+		end)
 
 		give_initial_stuff.register_stuff_provider(function(player)
 			local initial_stuff = classes.get(player).items or {}
@@ -256,12 +222,20 @@ ctf_modebase.register_mode("classes", {
 
 		ctf_map.place_chests(mapdef)
 	end,
+	on_match_end = function()
+		summary.on_match_end()
+		rankings.on_match_end()
+
+		ctf_modebase.bounties:on_match_end()
+
+		flag_huds.clear_capturers()
+	end,
 	allocate_player = function(player)
 		player = player:get_player_name()
 
-		local total = rankings.total()
-		local bscore = (total.blue and total.blue.score) or 0
-		local rscore = (total.red and total.red.score) or 0
+		local teams = rankings.teams()
+		local bscore = (teams.blue and teams.blue.score) or 0
+		local rscore = (teams.red and teams.red.score) or 0
 
 		if math.abs(bscore - rscore) <= 100 then
 			if not ctf_teams.remembered_player[player] then
@@ -303,33 +277,18 @@ ctf_modebase.register_mode("classes", {
 
 		flag_huds.on_allocplayer(player)
 
-		ctf_modebase.bounties:update_team_bounties(teamname, BOUNTY_REWARD_FUNC)
+		ctf_modebase.bounties:on_player_join(player)
 	end,
 	on_leaveplayer = function(player)
 		local pname = player:get_player_name()
-		local pteam = ctf_teams.get(pname)
-		local recent = rankings.recent()[pname]
-		local count = 0
 
-		for _ in pairs(recent or {}) do
-			count = count + 1
-		end
-
-		if not recent or count <= 1 then
-			rankings.reset_recent(pname)
-		end
+		rankings.on_leaveplayer(pname)
 
 		if end_combat_mode(player) then
 			rankings.add(player, {deaths = 1})
 		end
 
 		flag_huds.untrack_capturer(pname)
-
-		ctf_modebase.bounties:remove(pname)
-
-		if pteam then
-			ctf_modebase.bounties:update_team_bounties(pteam, BOUNTY_REWARD_FUNC, pname)
-		end
 	end,
 	on_dieplayer = function(player, reason)
 		if reason.type == "punch" and reason.object and reason.object:is_player() then
@@ -392,6 +351,8 @@ ctf_modebase.register_mode("classes", {
 	end,
 	on_flag_capture = function(player, captured_team)
 		local pteam = ctf_teams.get(player)
+		local tcolor = ctf_teams.team[pteam].color
+
 		mode_classes.celebrate_team(pteam)
 
 		flag_captured = true
@@ -402,19 +363,12 @@ ctf_modebase.register_mode("classes", {
 
 		rankings.add(player, {score = 30, flag_captures = 1})
 
-		for _, pname in pairs(minetest.get_connected_players()) do
-			pname = pname:get_player_name()
+		summary.set_winner(string.format("Player %s captured",  minetest.colorize(tcolor, player)))
 
-			ctf_modebase.show_summary_gui(
-				pname,
-				insert_team_totals(rankings.recent(), rankings.total()),
-				mode_classes.SUMMARY_RANKS,
-				{
-					title = HumanReadable(pteam).." Team Wins!",
-					special_row_title = "Total Team Score",
-					buttons = {previous = true}
-				}
-			)
+		for _, pname in pairs(minetest.get_connected_players()) do
+			local match_rankings, special_rankings, rank_values, formdef = summary.summary_func()
+			formdef.title = HumanReadable(pteam) .." Team Wins!"
+			ctf_modebase.show_summary_gui(pname:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
 		end
 
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
@@ -437,29 +391,7 @@ ctf_modebase.register_mode("classes", {
 
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
-	summary_func = function(name, param)
-		if not param or param == "" then
-			return true, insert_team_totals(
-				rankings.recent(),
-				rankings.total()
-			), mode_classes.SUMMARY_RANKS, {
-				title = "Match Summary",
-				special_row_title = "Total Team Stats",
-				buttons = {previous = true}
-			}
-		elseif param:match("p") then
-			return true, insert_team_totals(
-				rankings.previous_recent(),
-				rankings.previous_total()
-			), mode_classes.SUMMARY_RANKS, {
-				title = "Previous Match Summary",
-				special_row_title = "Total Team Stats",
-				buttons = {next = true}
-			}
-		else
-			return false, "Don't understand param "..dump(param)
-		end
-	end,
+	summary_func = function(prev) return summary.summary_func(prev) end,
 	on_punchplayer = function(player, hitter, ...)
 		if flag_captured then return true end
 

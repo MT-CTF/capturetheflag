@@ -7,6 +7,43 @@ local timer = 0
 local maps_placed = {}
 
 local check_interval = 0
+
+local new_specific_map = nil
+local function start_new_match(new_mode)
+	for _, pos in pairs(ctf_teams.team_chests) do
+		minetest.remove_node(pos)
+	end
+	ctf_teams.team_chests = {}
+
+	local old_map = ctf_map.current_map
+	local old_mode = ctf_modebase.current_mode
+
+	if new_mode ~= old_mode then
+		maps_placed = {}
+		if old_mode and ctf_modebase.modes[old_mode].on_mode_end then
+			ctf_modebase.modes[old_mode].on_mode_end()
+		end
+		ctf_modebase.current_mode = new_mode
+		RunCallbacks(ctf_modebase.registered_on_new_mode, new_mode, old_mode)
+	end
+
+	ctf_modebase.place_map(new_mode, new_specific_map, function(map)
+		give_initial_stuff.reset_stuff_providers()
+
+		RunCallbacks(ctf_modebase.registered_on_new_match, map, old_map)
+
+		if map.initial_stuff then
+			give_initial_stuff.register_stuff_provider(function()
+				return map.initial_stuff
+			end)
+		end
+
+		ctf_teams.allocate_teams(map.teams)
+
+		ctf_modebase.current_mode_matches = ctf_modebase.current_mode_matches + 1
+	end)
+end
+
 minetest.register_globalstep(function(dtime)
 	if not voting then return end
 
@@ -49,7 +86,7 @@ minetest.register_globalstep(function(dtime)
 			votes._most.c or 0
 		))
 
-		ctf_modebase.start_new_match(nil, new_mode)
+		start_new_match(new_mode)
 	end
 end)
 
@@ -105,54 +142,22 @@ function ctf_modebase.start_mode_vote()
 	voter_count = 0
 end
 
-
 function ctf_modebase.start_new_match(show_form, new_mode, specific_map)
-	local old_map = ctf_map.current_map
-	local old_mode = ctf_modebase.current_mode
+	new_specific_map = specific_map
 
-	local function start_new_match()
-		for _, pos in pairs(ctf_teams.team_chests) do
-			minetest.remove_node(pos)
-		end
-		ctf_teams.team_chests = {}
-
-		if new_mode and new_mode ~= old_mode then
-			maps_placed = {}
-		end
-
-		if new_mode then
-			if old_mode and ctf_modebase.modes[old_mode].on_mode_end then
-				ctf_modebase.modes[old_mode].on_mode_end()
-			end
-
-			ctf_modebase.current_mode = new_mode
-			RunCallbacks(ctf_modebase.registered_on_new_mode, new_mode, old_mode)
-		end
-
-		ctf_modebase.place_map(new_mode or ctf_modebase.current_mode, specific_map, function(map)
-			give_initial_stuff.reset_stuff_providers()
-
-			RunCallbacks(ctf_modebase.registered_on_new_match, map, old_map)
-
-			if map.initial_stuff then
-				give_initial_stuff.register_stuff_provider(function()
-					return map.initial_stuff
-				end)
-			end
-
-			ctf_teams.allocate_teams(map.teams)
-
-			ctf_modebase.current_mode_matches = ctf_modebase.current_mode_matches + 1
-		end)
+	if ctf_modebase.current_mode then
+		ctf_modebase.modes[ctf_modebase.current_mode].on_match_end()
 	end
 
+	if new_mode then
+		start_new_match(new_mode)
 	-- Show mode selection form every 'ctf_modebase.MAPS_PER_MODE'-th match
-	if ctf_modebase.current_mode_matches >= ctf_modebase.MAPS_PER_MODE or show_form then
+	elseif ctf_modebase.current_mode_matches >= ctf_modebase.MAPS_PER_MODE or show_form then
 		ctf_modebase.current_mode_matches = 0
 
 		ctf_modebase.start_mode_vote()
 	else
-		start_new_match()
+		start_new_match(ctf_modebase.current_mode)
 	end
 end
 
@@ -165,7 +170,7 @@ function ctf_modebase.show_modechoose_form(player)
 			type = "button",
 			label = HumanReadable(modename),
 			exit = true,
-			pos = {"center", idx},
+			pos = {"center", idx + 0.5},
 			func = function(playername, fields, field_name)
 				if voting then
 					if ctf_modebase.modes[modename] then

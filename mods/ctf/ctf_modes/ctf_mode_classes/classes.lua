@@ -36,41 +36,66 @@ local classes = {
 }
 
 local UPDATE_STEP = 2
+local wear_timers = {}
 local function update_wear(pname, item, cooldown_time, time_passed, down)
-	minetest.after(UPDATE_STEP, function()
-		time_passed = time_passed + UPDATE_STEP
+	if not wear_timers[pname] then wear_timers[pname] = {} end
 
-		local player = minetest.get_player_by_name(pname)
+	table.insert(wear_timers[pname],
+		minetest.after(UPDATE_STEP, function()
+			table.remove(wear_timers[pname], 1)
 
-		if player then
-			local pinv = player:get_inventory()
-			local found = false
+			time_passed = time_passed + UPDATE_STEP
 
-			for pos, stack in pairs(pinv:get_list("main")) do
-				if stack:get_name() == item then
-					if down then
-						stack:set_wear((65534 / cooldown_time) * time_passed)
-					else
-						stack:set_wear((65535 / cooldown_time) * (cooldown_time - time_passed))
-					end
+			local player = minetest.get_player_by_name(pname)
 
-					pinv:set_stack("main", pos, stack)
+			if player then
+				local pinv = player:get_inventory()
+				local found = false
 
-					if time_passed == cooldown_time then
-						return
-					else
-						found = true
-						break
+				for pos, stack in pairs(pinv:get_list("main")) do
+					if stack:get_name() == item then
+						if down then
+							stack:set_wear((65534 / cooldown_time) * time_passed)
+						else
+							stack:set_wear((65535 / cooldown_time) * (cooldown_time - time_passed))
+						end
+
+						pinv:set_stack("main", pos, stack)
+
+						if time_passed == cooldown_time then
+							return
+						else
+							found = true
+							break
+						end
 					end
 				end
-			end
 
-			if found then
-				update_wear(pname, item, cooldown_time, time_passed, down)
+				if found then
+					update_wear(pname, item, cooldown_time, time_passed, down)
+				end
 			end
-		end
-	end)
+		end)
+	)
 end
+
+local function stop_wear_updates()
+	for _, wear_updates in pairs(wear_timers) do
+		for _, timer_job in pairs(wear_updates) do
+			timer_job:cancel()
+		end
+	end
+end
+
+minetest.register_on_dieplayer(function(player)
+	local pname = player:get_player_name()
+
+	if wear_timers[pname] then
+		for _, timer_job in pairs(wear_timers[pname]) do
+			timer_job:cancel()
+		end
+	end
+end)
 
 --
 --- Knight Sword
@@ -250,7 +275,7 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		if (not pointed or not pointed_nodedef.on_rightclick) and itemstack:get_wear() == 0 then
 			local old_textures = user:get_properties().textures
 
-			user:set_properties({pointable = false, textures = {old_textures[1].."^[brighten"}})
+			user:set_properties({pointable = false, textures = {old_textures[1].."^[brighten^[multiply:#7ba5ff"}})
 
 			minetest.after(IMMUNITY_TIME, function()
 				user = minetest.get_player_by_name(uname)
@@ -272,7 +297,12 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 })
 
 return {
+	on_new_match = function()
+		stop_wear_updates()
+	end,
 	finish = function()
+		stop_wear_updates()
+
 		for _, player in pairs(minetest.get_connected_players()) do
 			player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
 			physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")

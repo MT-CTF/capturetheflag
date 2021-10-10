@@ -58,6 +58,27 @@ function ctf_teams.get_team(teamname)
 	return out
 end
 
+---@return table
+--- Returns a table where a key is team name and a value is a list of all players in the team
+function ctf_teams.get_teams()
+	local out = {}
+
+	for _, player in pairs(minetest.get_connected_players()) do
+		local pname = player:get_player_name()
+		local team = ctf_teams.get(pname)
+
+		if team then
+			if not out[team] then
+				out[team] = {}
+			end
+
+			table.insert(out[team], pname)
+		end
+	end
+
+	return out
+end
+
 --
 --- Allocation
 --

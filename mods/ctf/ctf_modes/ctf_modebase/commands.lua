@@ -1,5 +1,5 @@
 local mode_chatcommands = {}
-function ctf_modebase.register_chatcommand(modename, name, def)
+function ctf_modebase.register_chatcommand_alias(modename, name, alias, def)
 	if not mode_chatcommands[modename] then
 		mode_chatcommands[modename] = {}
 	end
@@ -22,7 +22,11 @@ function ctf_modebase.register_chatcommand(modename, name, def)
 		end
 	end
 
-	minetest.register_chatcommand(name, def)
+	ctf_core.register_chatcommand_alias(name, alias, def)
+end
+
+function ctf_modebase.register_chatcommand(modename, name, def)
+	ctf_modebase.register_chatcommand_alias(modename, name, nil, def)
 end
 
 minetest.register_chatcommand("ctf_next", {
@@ -49,7 +53,7 @@ minetest.register_chatcommand("ctf_next", {
 	end,
 })
 
-minetest.register_chatcommand("list_bounties", {
+ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 	description = "List current bounties",
 	func = function(name)
 		local pteam = ctf_teams.get(name)

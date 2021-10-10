@@ -2,20 +2,24 @@ local hud = mhud.init()
 
 local DEFAULT_BUILD_TIME = 60 * 3
 
-local target_map
 local timer
+local target_map
+local finish_callback
 local second_timer = 0
 
 local build_timer = {
-	start = function(mapdef, time)
+	start = function(mapdef, time, callback)
 		timer = time or DEFAULT_BUILD_TIME
 		target_map = mapdef
+		finish_callback = callback
 	end,
 	in_progress = function()
 		return timer ~= nil
 	end,
 	finish = function(ignore_barrier)
-		timer = nil
+		if timer == nil then return end
+
+		finish_callback()
 
 		if target_map then
 			if not ignore_barrier then
@@ -28,11 +32,12 @@ local build_timer = {
 			end
 
 			hud:remove_all()
-
-			target_map = nil
-			timer = nil
-			second_timer = 0
 		end
+
+		timer = nil
+		target_map = nil
+		finish_callback = nil
+		second_timer = 0
 	end
 }
 
@@ -54,7 +59,7 @@ minetest.is_protected = function(pos, pname, ...)
 end
 
 minetest.register_globalstep(function(dtime)
-	if not timer then return end
+	if timer == nil then return end
 
 	timer = timer - dtime
 	second_timer = second_timer + dtime
@@ -68,7 +73,6 @@ minetest.register_globalstep(function(dtime)
 
 		for _, player in pairs(minetest.get_connected_players()) do
 			local time_str = string.format("%dm %ds until match begins!", math.floor(timer / 60), math.floor(timer % 60))
-			local pteam = ctf_teams.get(player)
 
 			if not hud:exists(player, "build_timer") then
 				hud:add(player, "build_timer", {
@@ -85,7 +89,8 @@ minetest.register_globalstep(function(dtime)
 				})
 			end
 
-			if not ctf_core.pos_inside(player:get_pos(), ctf_teams.get_team_territory(pteam)) then
+			local pteam = ctf_teams.get(player)
+			if pteam and not ctf_core.pos_inside(player:get_pos(), ctf_teams.get_team_territory(pteam)) then
 				minetest.chat_send_player(player:get_player_name(), "You can't cross the barrier until build time is over!")
 				player:set_pos(ctf_map.current_map.teams[pteam].flag_pos)
 			end

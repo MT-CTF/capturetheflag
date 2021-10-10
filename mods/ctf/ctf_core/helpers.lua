@@ -101,6 +101,30 @@ if not math.round then
 end
 
 --
+--- MISC
+--
+
+function ctf_core.register_chatcommand_alias(name, alias, def)
+	minetest.register_chatcommand(name, def)
+	if alias then
+		minetest.register_chatcommand(alias, {
+			description = "An alias for /" .. name,
+			func = def.func,
+		})
+	end
+end
+
+function ctf_core.file_exists(path)
+	local file = io.open(path, "r")
+	if file then
+		file:close()
+		return true
+	end
+
+	return false
+end
+
+--
 ---Debug helpers
 --
 

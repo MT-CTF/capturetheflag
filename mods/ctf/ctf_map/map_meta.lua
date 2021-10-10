@@ -15,10 +15,6 @@ function ctf_map.load_map_meta(idx, dirname)
 			error("Map was not properly configured: " .. ctf_map.maps_dir .. dirname .. "/map.conf")
 		end
 
-		if meta:get("rotation") and meta:get("rotation") == "x" then
-			minetest.chat_send_all(minetest.colorize("red", "Map must be rotated 90 degress along the y axis"))
-		end
-
 		local mapr = meta:get("r")
 		local maph = meta:get("h")
 		local start_time = meta:get("start_time")
@@ -186,8 +182,15 @@ function ctf_map.save_map(mapmeta)
 		if not def.enabled then
 			mapmeta.teams[id] = nil
 		else
+			local flagpos = minetest.find_node_near(def.flag_pos, 3, {"group:flag_bottom"}, true)
+
+			if not flagpos then
+				flagpos = def.flag_pos
+				minetest.chat_send_all(minetest.colorize("red", "Failed to find flag for team "..id))
+			end
+
 			mapmeta.teams[id].flag_pos = vector.subtract(
-				assert(minetest.find_node_near(def.flag_pos, 3, {"group:flag_bottom"}, true), "Failed to find flag for team "..id),
+				flagpos,
 				mapmeta.offset
 			)
 
