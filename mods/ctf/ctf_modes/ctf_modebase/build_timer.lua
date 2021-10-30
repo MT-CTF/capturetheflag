@@ -7,7 +7,7 @@ local target_map
 local finish_callback
 local second_timer = 0
 
-local build_timer = {
+ctf_modebase.build_timer = {
 	start = function(mapdef, time, callback)
 		timer = time or DEFAULT_BUILD_TIME
 		target_map = mapdef
@@ -65,7 +65,7 @@ minetest.register_globalstep(function(dtime)
 	second_timer = second_timer + dtime
 
 	if timer <= 0 then
-		return build_timer.finish()
+		return ctf_modebase.build_timer.finish()
 	end
 
 	if second_timer >= 1 then
@@ -102,10 +102,8 @@ minetest.register_chatcommand("ctf_start", {
 	description = "Skip build time",
 	privs = {ctf_admin = true},
 	func = function(name, param)
-		build_timer.finish()
+		ctf_modebase.build_timer.finish()
 
 		return true, "Build time ended"
 	end,
 })
-
-return build_timer

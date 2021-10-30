@@ -97,7 +97,11 @@ local function make_immortal(def)
 	def.description = def.description and ("Indestructible " .. def.description)
 end
 
+local queue = {}
 for name, def in pairs(minetest.registered_nodes) do
+	if name:find("stair_junglewood") then
+		minetest.log(dump(name))
+	end
 	local mod, nodename = name:match"(..-):(.+)"
 	local prefix = mod_prefixes[mod]
 	if nodename and prefix and name ~= "default:torch" and
@@ -108,8 +112,12 @@ for name, def in pairs(minetest.registered_nodes) do
 			new_def.drop = new_name
 		end
 		make_immortal(new_def)
-		minetest.register_node(new_name, new_def)
+		table.insert(queue, {name = new_name, def = new_def})
 	end
+end
+
+for _, node in pairs(queue) do
+	minetest.register_node(node.name, node.def)
 end
 
 minetest.register_alias("ctf_map:torch", "default:torch")

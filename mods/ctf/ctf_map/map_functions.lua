@@ -23,7 +23,8 @@ function ctf_map.place_map(idx, dirname, mapmeta)
 
 	local schempath = ctf_map.maps_dir .. dirname .. "/map.mts"
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
-		local res = minetest.place_schematic(mapmeta.pos1, schempath)
+		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
+		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
 
 		minetest.log("action", string.format("Placed map %s in %.2fms", dirname, (os.clock() - ctx.start_time) * 1000))
 

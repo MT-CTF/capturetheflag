@@ -18,8 +18,18 @@ local function add_recent(storage, key, amounts)
 end
 
 local function clear_recent(storage, key)
-	if storage[key] and #storage[key] then
-		storage[key] = nil
+	if storage[key] then
+		local count = 0
+
+		for k in pairs(storage[key]) do
+			if k:sub(1, 1) ~= "_" then
+				count = count + 1
+			end
+		end
+
+		if count == 0 then
+			storage[key] = nil
+		end
 	end
 end
 
@@ -149,7 +159,8 @@ ctf_modebase.register_chatcommand(mode_tech_name, "top50", {
 
 		ctf_modebase.show_summary_gui_sorted(name, top50, {}, mode_data.SUMMARY_RANKS, {
 			title = "Top 50 Players",
-			disable_nonuser_colors = true
+			gamemode = ctf_modebase.current_mode,
+			disable_nonuser_colors = true,
 		})
 	end,
 })

@@ -1,49 +1,31 @@
 ctf_modebase.register_on_new_match(function(mapdef, old_mapdef)
 	ctf_modebase.taken_flags = {}
-	ctf_modebase.team_flag_takers = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}
-
-	for tname in pairs(mapdef.teams) do
-		ctf_modebase.team_flag_takers[tname] = {}
-		ctf_modebase.flag_taken[tname] = false
-	end
 end)
 
-function ctf_modebase.drop_flags(pname, capture)
-	local pteam = ctf_teams.get(pname)
-
-	if not pteam then return end
-
+function ctf_modebase.drop_flags(pname)
 	local flagteams = ctf_modebase.taken_flags[pname]
+	if not flagteams then return end
 
-	if flagteams then
-		for _, flagteam in pairs(flagteams) do
-			ctf_modebase.flag_taken[flagteam] = false
+	for _, flagteam in pairs(flagteams) do
+		ctf_modebase.flag_taken[flagteam] = nil
 
-			if capture then
-				ctf_modebase.flag_captured[flagteam] = true
-			else
-				local fpos = vector.offset(ctf_map.current_map.teams[flagteam].flag_pos, 0, 1, 0)
+		local fpos = vector.offset(ctf_map.current_map.teams[flagteam].flag_pos, 0, 1, 0)
 
-				local node = minetest.get_node(fpos)
+		local node = minetest.get_node(fpos)
 
-				if node.name == "ctf_modebase:flag_captured_top" or node.name == "ignore" then
-					node.name = "ctf_modebase:flag_top_" .. flagteam
-					minetest.set_node(fpos, node)
-				else
-					ctf_core.error("ctf_modebase:flag_taking", "Failed to return flag to its base!")
-				end
-			end
-		end
-
-		ctf_modebase.taken_flags[pname] = nil
-		ctf_modebase.team_flag_takers[pteam][pname] = nil
-
-		if not capture then
-			RunCallbacks(ctf_modebase.registered_on_flag_drop, pname, flagteams)
+		if node.name == "ctf_modebase:flag_captured_top" or node.name == "ignore" then
+			node.name = "ctf_modebase:flag_top_" .. flagteam
+			minetest.set_node(fpos, node)
+		else
+			ctf_core.error("ctf_modebase:flag_taking", "Failed to return flag to its base!")
 		end
 	end
+
+	ctf_modebase.taken_flags[pname] = nil
+
+	ctf_modebase:get_current_mode().on_flag_drop(pname, flagteams)
 end
 
 function ctf_modebase.flag_on_punch(puncher, nodepos, node)
@@ -63,40 +45,42 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			return
 		end
 
+		local result = ctf_modebase:get_current_mode().can_take_flag(pname, target_team)
+		if result then
+			minetest.chat_send_player(pname, "You can't take that flag. Reason: " .. result)
+			return
+		end
+
 		if not ctf_modebase.taken_flags[pname] then
 			ctf_modebase.taken_flags[pname] = {}
-			ctf_modebase.team_flag_takers[pteam][pname] = ctf_modebase.taken_flags[pname]
 		end
-
 		table.insert(ctf_modebase.taken_flags[pname], target_team)
-		ctf_modebase.flag_taken[target_team] = pname
+		ctf_modebase.flag_taken[target_team] = {p=pname, t=pteam}
 
-		local result = RunCallbacks(ctf_modebase.registered_on_flag_take, pname, target_team)
+		ctf_modebase:get_current_mode().on_flag_take(pname, target_team)
 
-		if not result then
-			minetest.set_node(nodepos, {name = "ctf_modebase:flag_captured_top", param2 = node.param2})
-		elseif type(result) == "string" then
-			table.remove(ctf_modebase.taken_flags[pname])
-			ctf_modebase.flag_taken[target_team] = nil
-			minetest.chat_send_player(pname, "You can't take that flag. Reason: "..result)
-		end
+		minetest.set_node(nodepos, {name = "ctf_modebase:flag_captured_top", param2 = node.param2})
 	else
+		local flagteams = ctf_modebase.taken_flags[pname]
 		if not ctf_modebase.taken_flags[pname] then
 			minetest.chat_send_player(pname, "That's your flag!")
 		else
-			local result = RunCallbacks(ctf_modebase.registered_on_flag_capture, pname, ctf_modebase.taken_flags[pname])
+			ctf_modebase.taken_flags[pname] = nil
 
-			if type(result) == "string" then
-				minetest.chat_send_player(pname, "You can't capture. Reason: "..result)
-			else
-				ctf_modebase.drop_flags(pname, true)
+			for _, flagteam in pairs(flagteams) do
+				ctf_modebase.flag_taken[flagteam] = nil
+				ctf_modebase.flag_captured[flagteam] = true
 			end
+
+			ctf_modebase:get_current_mode().on_flag_capture(pname, flagteams)
 		end
 	end
 end
 
 function ctf_modebase.on_flag_rightclick(...)
-	RunCallbacks(ctf_modebase.registered_on_flag_rightclick, ...)
+	if ctf_modebase.current_mode then
+		ctf_modebase:get_current_mode().on_flag_rightclick(...)
+	end
 end
 
 minetest.register_on_dieplayer(function(player)

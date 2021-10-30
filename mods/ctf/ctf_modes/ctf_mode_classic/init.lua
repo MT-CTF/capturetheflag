@@ -13,12 +13,11 @@ local rankings = ctf_modebase.feature_presets.rankings("classic", mode_classic)
 local summary = ctf_modebase.feature_presets.summary(mode_classic, rankings)
 local flag_huds = ctf_modebase.feature_presets.flag_huds
 local bounties = ctf_modebase.feature_presets.bounties(rankings)
+local teams = ctf_modebase.feature_presets.teams(rankings, summary, flag_huds)
 
 local crafts = ctf_core.include_files(
 	"crafts.lua"
 )
-
-local FLAG_CAPTURE_TIMER = 60 * 3
 
 local function calculate_killscore(player)
 	local pname = PlayerName(player)
@@ -86,14 +85,14 @@ local function end_combat_mode(player, killer)
 
 		if killer then
 			local rewards = {kills = 1, score = killscore}
-			local bounty = ctf_modebase.bounties:player_has(player)
+			local bounty = ctf_modebase.bounties.player_has(player)
 
 			if bounty then
 				for name, amount in pairs(bounty) do
 					rewards[name] = (rewards[name] or 0) + amount
 				end
 
-				ctf_modebase.bounties:remove(player)
+				ctf_modebase.bounties.remove(player)
 			end
 
 			rankings.add(killer, rewards)
@@ -127,14 +126,13 @@ local function end_combat_mode(player, killer)
 	return true
 end
 
-local flag_captured = true
-local next_team = "red"
+local match_over = true
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 ctf_modebase.register_mode("classic", {
 	map_whitelist = {
-		"bridge", "caverns", "coast", "iceage", "two_hills", "plains", "desert_spikes",
-		"river_valley",
+		"bridge", "caverns", "coast", "iceage", "two_hills", "plains", "desert_spikes", "river_valley", "plain_battle",
+		"karsthafen", "abandoned_isles", "ahkmenrah_pyramids", "capture_legend", "moon",
 	},
 	treasures = {
 		["default:ladder_wood"] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -167,6 +165,7 @@ ctf_modebase.register_mode("classic", {
 	crafts = crafts,
 	physics = {sneak_glitch = true, new_move = false},
 	commands = {"ctf_start", "rank", "r"},
+
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = bounties.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = bounties.get_next_bounty
@@ -174,15 +173,14 @@ ctf_modebase.register_mode("classic", {
 	on_mode_end = function()
 		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
-
-		flag_huds.clear_huds()
 	end,
 	on_new_match = function(mapdef)
-		flag_captured = false
+		match_over = false
+		teams.on_new_match()
 
 		ctf_modebase.build_timer.start(mapdef, nil, function()
 			summary.on_match_start()
-			ctf_modebase.bounties:on_match_start()
+			ctf_modebase.bounties.on_match_start()
 		end)
 
 		give_initial_stuff.register_stuff_provider(function()
@@ -192,43 +190,17 @@ ctf_modebase.register_mode("classic", {
 		ctf_map.place_chests(mapdef)
 	end,
 	on_match_end = function()
+		match_over = true
+
 		summary.on_match_end()
 		rankings.on_match_end()
 
-		ctf_modebase.bounties:on_match_end()
+		ctf_modebase.bounties.on_match_end()
 
-		flag_huds.clear_capturers()
+		flag_huds.on_match_end()
 	end,
-	allocate_player = function(player)
-		player = player:get_player_name()
-
-		local teams = rankings.teams()
-		local bscore = (teams.blue and teams.blue.score) or 0
-		local rscore = (teams.red and teams.red.score) or 0
-
-		if math.abs(bscore - rscore) <= 100 then
-			if not ctf_teams.remembered_player[player] then
-				ctf_teams.set(player, next_team)
-				next_team = next_team == "red" and "blue" or "red"
-			else
-				ctf_teams.set(player, ctf_teams.remembered_player[player])
-			end
-		elseif bscore > rscore then
-			-- Only allocate player to remembered team if they aren't desperately needed in the other
-			if ctf_teams.remembered_player[player] and bscore - rscore < 500 then
-				ctf_teams.set(player, ctf_teams.remembered_player[player])
-			else
-				ctf_teams.set(player, "red")
-			end
-		else
-			-- Only allocate player to remembered team if they aren't desperately needed in the other
-			if ctf_teams.remembered_player[player] and rscore - bscore < 500 then
-				ctf_teams.set(player, ctf_teams.remembered_player[player])
-			else
-				ctf_teams.set(player, "blue")
-			end
-		end
-	end,
+	summary_func = summary.summary_func,
+	allocate_player = teams.allocate_player,
 	on_allocplayer = function(player, teamname)
 		local tcolor = ctf_teams.team[teamname].color
 
@@ -251,7 +223,7 @@ ctf_modebase.register_mode("classic", {
 
 		flag_huds.on_allocplayer(player)
 
-		ctf_modebase.bounties:on_player_join(player)
+		ctf_modebase.bounties.on_player_join(player)
 	end,
 	on_leaveplayer = function(player)
 		local pname = player:get_player_name()
@@ -261,8 +233,6 @@ ctf_modebase.register_mode("classic", {
 		if end_combat_mode(player) then
 			rankings.add(player, {deaths = 1})
 		end
-
-		flag_huds.untrack_capturer(pname)
 	end,
 	on_dieplayer = function(player, reason)
 		if reason.type == "punch" and reason.object and reason.object:is_player() then
@@ -294,57 +264,15 @@ ctf_modebase.register_mode("classic", {
 
 		return mode_classic.tp_player_near_flag(player)
 	end,
-	on_flag_take = function(player, teamname)
-		if ctf_modebase.build_timer.in_progress() then
-			mode_classic.tp_player_near_flag(player)
-
-			return "You can't take the enemy flag during build time!"
+	on_flag_rightclick = function() end,
+	can_take_flag = teams.can_take_flag,
+	on_flag_take = teams.on_flag_take,
+	on_flag_drop = teams.on_flag_drop,
+	on_flag_capture = function(...)
+		if teams.on_flag_capture(...) then
+			match_over = true
+			minetest.after(3, ctf_modebase.start_new_match)
 		end
-
-		local pteam = ctf_teams.get(player)
-		local tcolor = pteam and ctf_teams.team[pteam].color or "#FFF"
-		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_BUILTIN, tcolor)
-
-		mode_classic.celebrate_team(ctf_teams.get(player))
-
-		rankings.add(player, {score = 20, flag_attempts = 1})
-
-		flag_huds.update()
-
-		flag_huds.track_capturer(player, FLAG_CAPTURE_TIMER)
-	end,
-	on_flag_drop = function(player, teamname)
-		flag_huds.update()
-
-		flag_huds.untrack_capturer(player)
-
-		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
-	end,
-	on_flag_capture = function(player, captured_team)
-		local pteam = ctf_teams.get(player)
-		local tcolor = ctf_teams.team[pteam].color
-
-		mode_classic.celebrate_team(pteam)
-
-		flag_captured = true
-
-		flag_huds.update()
-
-		flag_huds.clear_capturers()
-
-		rankings.add(player, {score = 30, flag_captures = 1})
-
-		summary.set_winner(string.format("Player %s captured",  minetest.colorize(tcolor, player)))
-
-		for _, pname in pairs(minetest.get_connected_players()) do
-			local match_rankings, special_rankings, rank_values, formdef = summary.summary_func()
-			formdef.title = HumanReadable(pteam) .." Team Wins!"
-			ctf_modebase.show_summary_gui(pname:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
-		end
-
-		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
-
-		minetest.after(3, ctf_modebase.start_new_match)
 	end,
 	get_chest_access = function(pname)
 		local rank = rankings.get(pname)
@@ -362,9 +290,8 @@ ctf_modebase.register_mode("classic", {
 
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
-	summary_func = function(prev) return summary.summary_func(prev) end,
 	on_punchplayer = function(player, hitter, ...)
-		if flag_captured then return true end
+		if match_over then return true end
 
 		if not hitter:is_player() or player:get_hp() <= 0 then return end
 

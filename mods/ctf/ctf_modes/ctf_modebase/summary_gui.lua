@@ -129,19 +129,27 @@ function ctf_modebase.show_summary_gui_sorted(name, rankings, special_rankings, 
 		}
 	end
 
-	if formdef.duration then
-		formspec.elements.duration = {
+	if formdef.gamemode then
+		formspec.elements.gamemode = {
 			type = "label",
-			pos = {"center", 0.5},
-			label = "Duration: " .. formdef.duration,
+			pos = {1, 0.5},
+			label = HumanReadable(formdef.gamemode) .. " mode",
 		}
 	end
 
 	if formdef.winner then
 		formspec.elements.winner = {
 			type = "label",
-			pos = {1, 0.5},
+			pos = {4, 0.5},
 			label = formdef.winner,
+		}
+	end
+
+	if formdef.duration then
+		formspec.elements.duration = {
+			type = "label",
+			pos = {"center", 0.5},
+			label = "Duration: " .. formdef.duration,
 		}
 	end
 

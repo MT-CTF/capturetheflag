@@ -10,7 +10,7 @@ for _, key in ipairs(client:keys(prefix .. '*')) do
 	local value = client:get(key)
 	local pname = string.sub(key, #prefix + 1)
 	local rank = minetest.parse_json(value)
-	if rank.score then
+	if rank ~= nil and rank.score then
 		top:set(pname, rank.score)
 	end
 end

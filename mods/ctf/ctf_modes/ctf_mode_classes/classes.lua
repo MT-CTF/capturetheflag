@@ -79,14 +79,6 @@ local function update_wear(pname, item, cooldown_time, time_passed, down)
 	)
 end
 
-local function stop_wear_updates()
-	for _, wear_updates in pairs(wear_timers) do
-		for _, timer_job in pairs(wear_updates) do
-			timer_job:cancel()
-		end
-	end
-end
-
 minetest.register_on_dieplayer(function(player)
 	local pname = player:get_player_name()
 
@@ -297,12 +289,14 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 })
 
 return {
-	on_new_match = function()
-		stop_wear_updates()
+	on_match_end = function()
+		for _, wear_updates in pairs(wear_timers) do
+			for _, timer_job in pairs(wear_updates) do
+				timer_job:cancel()
+			end
+		end
 	end,
 	finish = function()
-		stop_wear_updates()
-
 		for _, player in pairs(minetest.get_connected_players()) do
 			player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
 			physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")

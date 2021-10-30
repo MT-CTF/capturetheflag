@@ -18,6 +18,6 @@ end
 
 ctf_rankings = {
 	init = function()
-		return rankings(top())
+		return rankings(top:new())
 	end,
 }

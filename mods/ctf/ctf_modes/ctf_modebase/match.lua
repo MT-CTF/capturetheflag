@@ -146,7 +146,7 @@ function ctf_modebase.start_new_match(show_form, new_mode, specific_map)
 	new_specific_map = specific_map
 
 	if ctf_modebase.current_mode then
-		ctf_modebase.modes[ctf_modebase.current_mode].on_match_end()
+		ctf_modebase:get_current_mode().on_match_end()
 	end
 
 	if new_mode then
@@ -279,3 +279,27 @@ function ctf_modebase.place_map(mode_def, mapidx, callback)
 		callback(map)
 	end)
 end
+
+minetest.register_chatcommand("ctf_next", {
+	description = "Skip to a new match.",
+	privs = {ctf_admin = true},
+	params = "[<technical modename> | <technical mapname>]",
+	func = function(name, param)
+		if param then
+			if ctf_modebase.modes[param] then -- New mode given
+				ctf_modebase.start_new_match(nil, param)
+				return true
+			elseif table.indexof(minetest.get_dir_list(ctf_map.maps_dir, true), param) ~= -1 then -- New map given
+				ctf_modebase.start_new_match(nil, nil, param)
+				return true
+			end
+		end
+
+		if ctf_modebase.current_mode then
+			ctf_modebase.start_new_match()
+			return true
+		else
+			return false, "You need to provide a mode to go to when running this command at server start"
+		end
+	end,
+})

@@ -4,7 +4,7 @@ local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at
 
 for k, v in pairs(modstorage:to_table()["fields"]) do
 	local rank = minetest.parse_json(v)
-	if rank.score then
+	if rank ~= nil and rank.score then
 		top:set(k, rank.score)
 	end
 end

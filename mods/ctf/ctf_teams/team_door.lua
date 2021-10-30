@@ -24,7 +24,8 @@ minetest.override_item("ctf_teams:door_steel", {
 			local newitemstack = ItemStack("ctf_teams:door_steel_"..pteam)
 			newitemstack:set_count(itemstack:get_count())
 
-			local result = old_on_place(newitemstack, placer, pointed_thing)
+			local item = minetest.registered_craftitems["ctf_teams:door_steel_" .. pteam]
+			local result = item.on_place(newitemstack, placer, pointed_thing)
 
 			if result then
 				itemstack:set_count(result:get_count())
@@ -39,8 +40,10 @@ minetest.override_item("ctf_teams:door_steel", {
 
 local old_handle = minetest.handle_node_drops
 minetest.handle_node_drops = function(pos, drops, digger)
-	if drops and drops[1]:match("ctf_teams:door_steel_") then
-		return old_handle(pos, {"ctf_teams:door_steel"}, digger)
+	for i, item in ipairs(drops) do
+		if item:match("ctf_teams:door_steel_") then
+			drops[i] = "ctf_teams:door_steel"
+		end
 	end
 
 	return old_handle(pos, drops, digger)

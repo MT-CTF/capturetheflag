@@ -36,8 +36,9 @@ return {
 				rankings.recent(), team_rankings(rankings.teams()), mode_data.SUMMARY_RANKS, {
 					title = "Match Summary",
 					special_row_title = "Total Team Stats",
-					duration = get_duration(),
+					gamemode = ctf_modebase.current_mode,
 					winner = winner,
+					duration = get_duration(),
 					buttons = {previous = previous ~= nil},
 				}
 		elseif previous ~= nil then
@@ -45,8 +46,9 @@ return {
 				previous.players, team_rankings(previous.teams), previous.mode_data.SUMMARY_RANKS, {
 					title = "Previous Match Summary",
 					special_row_title = "Total Team Stats",
-					duration = previous.duration,
+					gamemode = previous.gamemode,
 					winner = previous.winner,
+					duration = previous.duration,
 					buttons = {next = true},
 				}
 		end
@@ -55,8 +57,9 @@ return {
 		previous = {
 			players = rankings.recent(),
 			teams = rankings.teams(),
-			duration = get_duration(),
+			gamemode = ctf_modebase.current_mode,
 			winner = winner or "NO WINNER",
+			duration = get_duration(),
 			mode_data = mode_data,
 		}
 		start_time = nil

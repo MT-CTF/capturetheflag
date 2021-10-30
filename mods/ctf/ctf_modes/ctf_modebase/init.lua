@@ -45,7 +45,6 @@ ctf_core.include_files(
 	"give_initial_stuff.lua",
 	"treasure.lua",
 	"register.lua",
-	"commands.lua",
 	"flags/nodes.lua",
 	"flags/taking.lua",
 	"match.lua",
@@ -53,16 +52,16 @@ ctf_core.include_files(
 	"crafting.lua",
 	"hpregen.lua",
 	"respawn_delay.lua",
-	"markers.lua"
+	"markers.lua",
+	"bounties.lua",
+	"build_timer.lua"
 )
-
-ctf_modebase.bounties = ctf_core.include_files("bounties.lua")
-ctf_modebase.build_timer = ctf_core.include_files("build_timer.lua")
 
 ctf_modebase.feature_presets.rankings = ctf_core.include_files("feature_presets/rankings.lua")
 ctf_modebase.feature_presets.summary = ctf_core.include_files("feature_presets/summary.lua")
 ctf_modebase.feature_presets.flag_huds = ctf_core.include_files("feature_presets/flag_huds.lua")
 ctf_modebase.feature_presets.bounties = ctf_core.include_files("feature_presets/bounties.lua")
+ctf_modebase.feature_presets.teams = ctf_core.include_files("feature_presets/teams.lua")
 
 if ctf_core.settings.server_mode == "play" then
 	local match_started = false

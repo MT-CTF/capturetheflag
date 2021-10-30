@@ -31,13 +31,6 @@ add_mode_func(ctf_modebase.register_on_new_match, "on_new_match", true)
 add_mode_func(ctf_modebase.register_on_new_mode, "on_mode_start", true)
 -- on_mode_end is called in match.lua's ctf_modebase.start_new_match()
 
-add_mode_func(ctf_modebase.register_on_flag_take       , "on_flag_take"       )
-add_mode_func(ctf_modebase.register_on_flag_drop       , "on_flag_drop"       )
-add_mode_func(ctf_modebase.register_on_flag_rightclick , "on_flag_rightclick" )
-add_mode_func(ctf_modebase.register_on_flag_capture    , "on_flag_capture"    )
-
-add_mode_func(ctf_modebase.register_on_treasurefy_node, "on_treasurefy_node")
-
 add_mode_func(ctf_healing.register_on_heal, "on_healplayer")
 
 ctf_teams.allocate_player = function(...)
@@ -97,6 +90,37 @@ minetest.register_allow_player_inventory_action(function(player, action, invento
 		return 0
 	end
 end)
+
+local mode_chatcommands = {}
+function ctf_modebase.register_chatcommand_alias(modename, name, alias, def)
+	if not mode_chatcommands[modename] then
+		mode_chatcommands[modename] = {}
+	end
+
+	mode_chatcommands[modename][name] = def.func
+
+	def.func = function(...)
+		local current_mode = ctf_modebase.current_mode
+
+		if current_mode then
+			local cmd_func = mode_chatcommands[current_mode][name]
+
+			if cmd_func then
+				return cmd_func(...)
+			else
+				return false, "The current mode hasn't implemented that command!"
+			end
+		else
+			return false, "Can't run mode-specific commands when no mode is running!"
+		end
+	end
+
+	ctf_core.register_chatcommand_alias(name, alias, def)
+end
+
+function ctf_modebase.register_chatcommand(modename, name, def)
+	ctf_modebase.register_chatcommand_alias(modename, name, nil, def)
+end
 
 --- end
 --

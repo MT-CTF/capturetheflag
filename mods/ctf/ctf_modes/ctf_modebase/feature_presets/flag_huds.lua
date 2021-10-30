@@ -6,24 +6,44 @@ local FLAG_STOLEN_YOU       = {color = 0xFF0000, text = "You've got a flag! Run 
 local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammate(s) %s! They have the enemy flag!"   }
 local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammate(s) %s to capture the flag!"}
 local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"     }
+local OTHER_FLAG_STOLEN     = {color = 0xAA00FF, text = "Kill %s, they've got some flags!"                    }
 
-local function get_status(you)
+local function concat_players(players)
+	local list = {}
+	for pname in pairs(players) do
+		table.insert(list, pname)
+	end
+
+	if #list > 0 then
+		return table.concat(list, ", ")
+	end
+
+	return false
+end
+
+local function get_flag_status(you)
 	local teamname = ctf_teams.get(you)
 
 	if not teamname then return end
 
 	local enemy_thief = ctf_modebase.flag_taken[teamname]
 	local your_thieves = {}
+	local other_thieves = {}
 
-	for pname in pairs(ctf_modebase.team_flag_takers[teamname]) do
-		table.insert(your_thieves, pname)
+	for tname, player in pairs(ctf_modebase.flag_taken) do
+		if player.t == teamname then
+			your_thieves[player.p] = true
+		else
+			other_thieves[player.p] = true
+		end
 	end
 
-	if #your_thieves > 0 then
-		your_thieves = table.concat(your_thieves, ", ")
-	else
-		your_thieves = false
+	if enemy_thief then
+		enemy_thief = enemy_thief.p
 	end
+
+	your_thieves = concat_players(your_thieves)
+	other_thieves = concat_players(other_thieves)
 
 	local status
 
@@ -48,6 +68,9 @@ local function get_status(you)
 				status = table.copy(FLAG_STOLEN_TEAMMATE)
 				status.text = status.text:format(your_thieves)
 			end
+		elseif other_thieves then
+			status = table.copy(OTHER_FLAG_STOLEN)
+			status.text = status.text:format(other_thieves)
 		else
 			status = FLAG_SAFE
 		end
@@ -56,22 +79,54 @@ local function get_status(you)
 	return status
 end
 
-local player_timers
-local player_timer_count = 0
-local function untrack_capturer(player)
-	player = PlayerName(player)
+local player_timers = nil
 
-	if hud:get(player, "flag_timer") then
-		hud:remove(player, "flag_timer")
+local function update_player(player)
+	local status = get_flag_status(player:get_player_name())
+
+	if hud:exists(player, "flag_status") then
+		hud:change(player, "flag_status", get_flag_status(player:get_player_name()))
+	else
+		hud:add(player, "flag_status", {
+			hud_elem_type = "text",
+			position = {x = 1, y = 0},
+			offset = {x = -6, y = 6},
+			alignment = {x = "left", y = "down"},
+			text = status.text,
+			color = status.color,
+		})
 	end
 
-	if player_timers and player_timers[player] then
-		player_timers[player] = nil
-		player_timer_count = player_timer_count - 1
-	end
+	for tname, def in pairs(ctf_map.current_map.teams) do
+		local hud_label = "flag_pos:" .. tname
 
-	if player_timer_count == 0 then
-		player_timers = nil
+		local base_label = HumanReadable(tname) .. "'s flag"
+		if ctf_modebase.flag_taken[tname] then
+			base_label = base_label .. " (taken)"
+		end
+
+		if hud:exists(player, hud_label) then
+			if not ctf_modebase.flag_captured[tname] then
+				hud:change(player, hud_label, {waypoint_text = base_label})
+			else
+				hud:remove(player, hud_label)
+			end
+		else
+			if not ctf_modebase.flag_captured[tname] then
+				hud:add(player, hud_label, {
+					hud_elem_type = "waypoint",
+					waypoint_text = base_label,
+					color = ctf_teams.team[tname].color_hex,
+					world_pos = def.flag_pos,
+				})
+			end
+		end
+	end
+end
+
+local function update()
+	for _, player in pairs(minetest.get_connected_players()) do
+		update_player(player)
 	end
 end
 
@@ -104,66 +159,41 @@ return {
 
 		if not player_timers then player_timers = {} end
 
-		player_timers[player] = time
-		player_timer_count = player_timer_count + 1
+		if not player_timers[player] then
+			player_timers[player] = time
 
-		hud:add(player, "flag_timer", {
-			hud_elem_type = "text",
-			position = {x = 0.5, y = 0},
-			alignment = {x = "center", y = "down"},
-			color = 0xFF0000,
-			text_scale = 2
-		})
-	end,
-	untrack_capturer = untrack_capturer,
-	clear_capturers = function()
-		if not player_timers then return end
-
-		for pname in pairs(player_timers) do
-			untrack_capturer(pname)
+			hud:add(player, "flag_timer", {
+				hud_elem_type = "text",
+				position = {x = 0.5, y = 0},
+				alignment = {x = "center", y = "down"},
+				color = 0xFF0000,
+				text_scale = 2
+			})
+		else
+			player_timers[player] = time -- Player already has a flag, just reset their capture timer
 		end
+
+		update()
+	end,
+	untrack_capturer = function(player)
+		player = PlayerName(player)
+
+		if hud:get(player, "flag_timer") then
+			hud:remove(player, "flag_timer")
+		end
+
+		if player_timers and player_timers[player] then
+			player_timers[player] = nil
+		end
+
+		update()
+	end,
+	on_match_end = function()
+		hud:clear_all()
 
 		player_timers = nil
 	end,
 	on_allocplayer = function(player)
-		local status = get_status(player:get_player_name())
-
-		if not hud:exists(player, "flag_status") then
-			hud:add(player, "flag_status", {
-				hud_elem_type = "text",
-				position = {x = 1, y = 0},
-				offset = {x = -6, y = 6},
-				alignment = {x = "left", y = "down"},
-				text = status.text,
-				color = status.color,
-			})
-		else
-			hud:change(player, "flag_status", status)
-		end
-
-		for tname, def in pairs(ctf_map.current_map.teams) do
-			local flag_pos = table.copy(def.flag_pos)
-
-			if not hud:exists(player, "flag_pos:"..tname) then
-				hud:add(player, "flag_pos:"..tname, {
-					hud_elem_type = "waypoint",
-					waypoint_text = HumanReadable(tname).."'s base",
-					color = ctf_teams.team[tname].color_hex,
-					world_pos = flag_pos,
-				})
-			else
-				hud:change(player, "flag_pos:"..tname, {
-					world_pos = flag_pos,
-				})
-			end
-		end
-	end,
-	update = function()
-		for _, player in pairs(minetest.get_connected_players()) do
-			hud:change(player, "flag_status", get_status(player:get_player_name()))
-		end
-	end,
-	clear_huds = function()
-		hud:clear_all()
+		update_player(player)
 	end,
 }

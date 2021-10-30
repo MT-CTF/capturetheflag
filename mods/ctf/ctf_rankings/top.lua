@@ -130,102 +130,108 @@ local function remove(self, node)
 	end
 end
 
-return function()
-return {
-	players = {},
-	root = nil,
+local top = {}
 
-	set = function(self, player, score)
-		if score == 0 then
-			local node = self.players[player]
-			if node then
-				remove(self, node)
-				self.players[player] = nil
-			end
-			return
-		end
-
-		local node = self.players[player]
-		if not node then
-			add(self, player, score)
-			return
-		end
-
-		local need_move = false
-		if score > node.x then
-			local next_node = node.r
-			if not next_node then
-				local tmp_node = node
-				while tmp_node do
-					if tmp_node.p and tmp_node.p.l == tmp_node then
-						next_node = tmp_node.p
-						break
-					end
-					tmp_node = tmp_node.p
-				end
-			end
-			if next_node and next_node.x < score then
-				need_move = true
-			end
-		elseif score < node.x then
-			local next_node = node.l
-			if not next_node then
-				local tmp_node = node
-				while tmp_node do
-					if tmp_node.p and tmp_node.p.r == tmp_node then
-						next_node = tmp_node.p
-						break
-					end
-					tmp_node = tmp_node.p
-				end
-			end
-			if next_node and next_node.x > score then
-				need_move = true
-			end
-		end
-
-		if not need_move then
-			node.x = score
-			return
-		end
-
-		remove(self, node)
-		node.x = score
-		insert(self, node)
-	end,
-
-	get_place = function(self, player)
-		local node = self.players[player]
-		if not node then
-			if self.root then
-				return self.root.s + 1
-			end
-			return 1
-		end
-
-		local s = 1
-		if node and node.r then
-			s = s + node.r.s
-		end
-
-		while node do
-			if node.p and node.p.r ~= node then
-				s = s + 1
-				if node.p.r then
-					s = s + node.p.r.s
-				end
-			end
-			node = node.p
-		end
-		return s
-	end,
-
-	get_top = function(self, count)
-		local ret = {}
-		if count > 0 then
-			get_top_rec(self.root, count, ret)
-		end
-		return ret
-	end,
-}
+function top:new()
+	local o = {
+		players = {},
+		root = nil,
+	}
+	setmetatable(o, {__index=self})
+	return o
 end
+
+function top:set(player, score)
+	if score == 0 then
+		local node = self.players[player]
+		if node then
+			remove(self, node)
+			self.players[player] = nil
+		end
+		return
+	end
+
+	local node = self.players[player]
+	if not node then
+		add(self, player, score)
+		return
+	end
+
+	local need_move = false
+	if score > node.x then
+		local next_node = node.r
+		if not next_node then
+			local tmp_node = node
+			while tmp_node do
+				if tmp_node.p and tmp_node.p.l == tmp_node then
+					next_node = tmp_node.p
+					break
+				end
+				tmp_node = tmp_node.p
+			end
+		end
+		if next_node and next_node.x < score then
+			need_move = true
+		end
+	elseif score < node.x then
+		local next_node = node.l
+		if not next_node then
+			local tmp_node = node
+			while tmp_node do
+				if tmp_node.p and tmp_node.p.r == tmp_node then
+					next_node = tmp_node.p
+					break
+				end
+				tmp_node = tmp_node.p
+			end
+		end
+		if next_node and next_node.x > score then
+			need_move = true
+		end
+	end
+
+	if not need_move then
+		node.x = score
+		return
+	end
+
+	remove(self, node)
+	node.x = score
+	insert(self, node)
+end
+
+function top:get_place(player)
+	local node = self.players[player]
+	if not node then
+		if self.root then
+			return self.root.s + 1
+		end
+		return 1
+	end
+
+	local s = 1
+	if node and node.r then
+		s = s + node.r.s
+	end
+
+	while node do
+		if node.p and node.p.r ~= node then
+			s = s + 1
+			if node.p.r then
+				s = s + node.p.r.s
+			end
+		end
+		node = node.p
+	end
+	return s
+end
+
+function top:get_top(count)
+	local ret = {}
+	if count > 0 then
+		get_top_rec(self.root, count, ret)
+	end
+	return ret
+end
+
+return top

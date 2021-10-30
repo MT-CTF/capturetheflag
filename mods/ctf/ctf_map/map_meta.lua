@@ -32,6 +32,7 @@ function ctf_map.load_map_meta(idx, dirname)
 		map = {
 			pos1          = pos1,
 			pos2          = pos2,
+			rotation      = meta:get("rotation"),
 			offset        = offset,
 			size          = vector.subtract(pos2, pos1),
 			enabled       = not meta:get("disabled", false),
@@ -186,7 +187,10 @@ function ctf_map.save_map(mapmeta)
 
 			if not flagpos then
 				flagpos = def.flag_pos
-				minetest.chat_send_all(minetest.colorize("red", "Failed to find flag for team "..id))
+				minetest.chat_send_all(minetest.colorize("red",
+					"Failed to find flag for team " .. id ..
+					". Node at given position: " .. dump(minetest.get_node(flagpos).name)
+				))
 			end
 
 			mapmeta.teams[id].flag_pos = vector.subtract(
