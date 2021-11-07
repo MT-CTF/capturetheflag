@@ -25,14 +25,19 @@ end
 local fragdef = {
 	description = "Frag grenade (Kills anyone near blast)",
 	image = "grenades_frag.png",
-	on_explode = function(pos, name)
+	explode_radius = 10,
+	explode_damage = 26,
+	on_collide = function(def, obj)
+		return true
+	end,
+	on_explode = function(def, pos, name)
 		if not name or not pos then
 			return
 		end
 
 		local player = minetest.get_player_by_name(name)
 
-		local radius = 10
+		local radius = def.explode_radius
 
 		minetest.add_particlespawner({
 			amount = 20,
@@ -95,7 +100,7 @@ local fragdef = {
 						punch_interval = 1,
 						damage_groups = {
 							grenade = 1,
-							fleshy = 26 - ( (radius/3) * (target_head and headdist or footdist) )
+							fleshy = def.explode_damage - ( (radius/3) * (target_head and headdist or footdist) )
 						}
 					}, nil)
 				end
@@ -104,14 +109,16 @@ local fragdef = {
 	end,
 }
 
-
--- fragdef.description = "Sticky Frag grenade (Sticks to surfaces)"
--- fragdef.image = "grenades_frag_sticky.png"
-fragdef.on_collide = function(obj)
-	return true
-end
-grenades.register_grenade("grenades:frag", table.copy(fragdef))
---grenades.register_grenade("grenades:frag_sticky", fragdef)
+grenades.register_grenade("grenades:frag", fragdef)
+local fragdef_small = table.copy(fragdef)
+fragdef_small.explode_radius = 4
+fragdef_small.explode_damage = 10
+grenades.register_grenade("grenades:frag_small", fragdef_small)
+local fragdef_sticky = table.copy(fragdef)
+fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
+fragdef_sticky.image = "grenades_frag_sticky.png"
+fragdef_sticky.on_collide = function(def, obj) return false end
+grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 
 -- Smoke Grenade
 
@@ -119,10 +126,10 @@ local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
-	on_collide = function(obj)
+	on_collide = function(def, obj)
 		return true
 	end,
-	on_explode = function(pos, pname)
+	on_explode = function(def, pos, pname)
 		local player = minetest.get_player_by_name(pname)
 		if not player or not pos then return end
 
@@ -193,7 +200,7 @@ grenades.register_grenade("grenades:flashbang", {
 	description = "Flashbang grenade (Blinds all who look at blast)",
 	image = "grenades_flashbang.png",
 	clock = 4,
-	on_explode = function(pos)
+	on_explode = function(def, pos)
 		for _, v in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
 			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
 

@@ -4,42 +4,35 @@ local flag_huds = ctf_modebase.feature_presets.flag_huds
 local bounties = ctf_modebase.feature_presets.bounties(recent_rankings)
 local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings, flag_huds)
 
-local crafts = ctf_core.include_files(
-	"crafts.lua"
-)
+ctf_core.include_files("tool.lua")
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
-ctf_modebase.register_mode("classic", {
+ctf_modebase.register_mode("nade_fight", {
 	treasures = {
-		["default:ladder_wood"] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
+		["default:ladder_wood"] = {           max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:torch" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:cobble"] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 5},
 		["default:wood"  ] = {min_count = 10, max_count = 60, rarity = 0.5, max_stacks = 4},
 
 		["ctf_teams:door_steel"] = {rarity = 0.2, max_stacks = 3},
 
-		["default:pick_steel"  ] = {rarity = 0.4, max_stacks = 3},
-		["default:shovel_steel"] = {rarity = 0.4, max_stacks = 2},
-		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
+		["default:pick_mese"  ] = {rarity = 0.4, max_stacks = 3},
+		["default:shovel_mese"] = {rarity = 0.4, max_stacks = 2},
+		["default:axe_mese"   ] = {rarity = 0.4, max_stacks = 2},
 
-		["ctf_melee:sword_steel"  ] = {rarity = 0.2  , max_stacks = 2},
-		["ctf_melee:sword_mese"   ] = {rarity = 0.01 , max_stacks = 1},
-		["ctf_melee:sword_diamond"] = {rarity = 0.001, max_stacks = 1},
+		["default:pick_diamond"  ] = {rarity = 0.01, max_stacks = 3},
+		["default:shovel_diamond"] = {rarity = 0.01, max_stacks = 2},
+		["default:axe_diamond"   ] = {rarity = 0.01, max_stacks = 2},
 
-		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
-		["ctf_ranged:rifle_loaded"  ] = {rarity = 0.2                 },
-		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
-		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
+		["ctf_melee:sword_mese"   ] = {rarity = 0.4 , max_stacks = 1},
+		["ctf_melee:sword_diamond"] = {rarity = 0.01, max_stacks = 1},
 
-		["ctf_ranged:ammo"     ] = {min_count = 3, max_count = 10, rarity = 0.3 , max_stacks = 2},
-		["default:apple"       ] = {min_count = 5, max_count = 20, rarity = 0.1 , max_stacks = 2},
-		["ctf_healing:bandage" ] = {                               rarity = 0.2 , max_stacks = 1},
+		["default:apple"] = {min_count = 5, max_count = 20, rarity = 0.1, max_stacks = 2},
 
-		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
 	},
-	crafts = crafts,
+	crafts = {},
 	physics = {sneak_glitch = true, new_move = false},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
@@ -52,6 +45,11 @@ ctf_modebase.register_mode("classic", {
 		"hp_healed"
 	},
 
+	is_bound_item = function(_, itemstack)
+		if itemstack:get_name() == "ctf_mode_nade_fight:grenade" then
+			return true
+		end
+	end,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = bounties.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = bounties.get_next_bounty
@@ -63,13 +61,13 @@ ctf_modebase.register_mode("classic", {
 	on_new_match = function(mapdef)
 		teams.on_new_match()
 
-		ctf_modebase.build_timer.start(mapdef, nil, function()
+		ctf_modebase.build_timer.start(mapdef, 60, function()
 			ctf_modebase.summary.on_match_start()
 			ctf_modebase.bounties.on_match_start()
 		end)
 
 		give_initial_stuff.register_stuff_provider(function()
-			return {"default:sword_stone", "default:pick_stone", "default:torch 15", "default:stick 5"}
+			return {"ctf_mode_nade_fight:grenade", "default:pick_steel", "default:shovel_steel", "default:axe_steel"}
 		end)
 
 		ctf_map.place_chests(mapdef)
@@ -79,6 +77,8 @@ ctf_modebase.register_mode("classic", {
 
 		ctf_modebase.summary.on_match_end()
 		recent_rankings.on_match_end()
+
+		ctf_modebase.update_wear.cancel_updates()
 
 		ctf_modebase.bounties.on_match_end()
 

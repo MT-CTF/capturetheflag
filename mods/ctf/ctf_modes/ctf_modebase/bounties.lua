@@ -60,7 +60,11 @@ ctf_modebase.bounties = {
 		end
 	end,
 	on_match_start = function()
-		timer = math.random(180, 360)
+		timer = minetest.after(math.random(180, 360), function()
+			timer = nil
+			ctf_modebase.bounties.reassign()
+			ctf_modebase.bounties.on_match_start()
+		end)
 	end,
 	reassign = function()
 		local teams = ctf_teams.get_teams()
@@ -94,7 +98,10 @@ ctf_modebase.bounties = {
 	end,
 	on_match_end = function()
 		bounties = {}
-		timer = nil
+		if timer then
+			timer:cancel()
+			timer = nil
+		end
 	end,
 	bounty_reward_func = function()
 		return {bounty_kills = 1, score = 500}
@@ -103,20 +110,6 @@ ctf_modebase.bounties = {
 		return team_members[math.random(1, #team_members)]
 	end,
 }
-
-minetest.register_globalstep(function(dtime)
-	if timer == nil then
-		return
-	end
-
-	timer = timer - dtime
-
-	if timer <= 0 then
-		timer = nil
-		ctf_modebase.bounties.reassign()
-		ctf_modebase.bounties.on_match_start()
-	end
-end)
 
 ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 	description = "List current bounties",

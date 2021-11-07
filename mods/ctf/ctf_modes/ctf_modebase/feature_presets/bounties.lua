@@ -1,10 +1,10 @@
-return function(rankings)
+return function(recent_rankings)
 
 return {
 	get_next_bounty = function(team_members)
 		local sum = 0
 		local kd_list = {}
-		local recent = rankings.recent()
+		local recent = recent_rankings.players()
 
 		for _, pname in ipairs(team_members) do
 			local kd = recent[pname] and (recent[pname].kills or 1) / (recent[pname].deaths or 1) or 1
@@ -25,7 +25,7 @@ return {
 	end,
 
 	bounty_reward_func = function(pname)
-		local recent = rankings.recent()[pname] or {}
+		local recent = recent_rankings.players()[pname] or {}
 		local kd = (recent.kills or 1) / (recent.deaths or 1)
 
 		return {bounty_kills = 1, score = math.max(0, math.min(500, kd * 30))}

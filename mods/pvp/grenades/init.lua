@@ -50,13 +50,13 @@ function grenades.register_grenade(name, def)
 
 			if moveresult.collides and moveresult.collisions then
 				if def.on_collide then
-					local c_result = def.on_collide(obj, self.thrower_name)
+					local c_result = def:on_collide(obj, self.thrower_name)
 
 					if c_result == true then
 						if self.thrower_name then
 							minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 									" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-							def.on_explode(pos, self.thrower_name)
+							def:on_explode(pos, self.thrower_name)
 						end
 						obj:remove()
 					elseif c_result == "stop" then
@@ -123,7 +123,7 @@ function grenades.register_grenade(name, def)
 				if self.thrower_name then
 					minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 					" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-					def.on_explode(pos, self.thrower_name)
+					def:on_explode(pos, self.thrower_name)
 				end
 
 				obj:remove()

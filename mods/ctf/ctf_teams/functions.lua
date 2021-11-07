@@ -112,11 +112,13 @@ end
 -- Should be called at match start
 function ctf_teams.allocate_teams(teams)
 	local players = minetest.get_connected_players()
+	ctf_teams.current_teams = {}
 	ctf_teams.current_team_list = {}
 	ctf_teams.remembered_player = {}
 	tpos = 1
 
 	for teamname, def in pairs(teams) do
+		ctf_teams.current_teams[teamname] = true
 		table.insert(ctf_teams.current_team_list, teamname)
 	end
 

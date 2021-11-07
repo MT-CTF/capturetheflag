@@ -17,7 +17,7 @@ return {
 	get = function(self, pname)
 		pname = PlayerName(pname)
 
-		local rank_str = self.modstorage:get_string(PlayerName(pname))
+		local rank_str = self.modstorage:get_string(pname)
 
 		if not rank_str or rank_str == "" then
 			return false

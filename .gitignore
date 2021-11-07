@@ -6,3 +6,11 @@ tags
 *.vim
 debug.txt
 .vscode/
+
+/mods/ctf/ctf_map/textures/*Up.*
+/mods/ctf/ctf_map/textures/*Down.*
+/mods/ctf/ctf_map/textures/*Front.*
+/mods/ctf/ctf_map/textures/*Back.*
+/mods/ctf/ctf_map/textures/*Left.*
+/mods/ctf/ctf_map/textures/*Right.*
+/mods/ctf/ctf_map/textures/*_screenshot.png

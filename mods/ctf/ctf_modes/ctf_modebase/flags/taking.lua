@@ -83,6 +83,10 @@ function ctf_modebase.on_flag_rightclick(...)
 	end
 end
 
+ctf_teams.register_on_allocplayer(function(player)
+	ctf_modebase.drop_flags(player:get_player_name())
+end)
+
 minetest.register_on_dieplayer(function(player)
 	ctf_modebase.drop_flags(player:get_player_name())
 end)

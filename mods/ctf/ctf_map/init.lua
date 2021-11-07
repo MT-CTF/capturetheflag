@@ -18,13 +18,15 @@ ctf_map = {
 	treasurefy_node = function(pos) end, -- See ctf_modebase for function
 }
 
-minetest.register_on_mods_loaded(function()
-	local skyboxlist = skybox.get_skies()
+for _, s in ipairs(skybox.get_skies()) do
+	table.insert(ctf_map.skyboxes, s[1])
+end
 
-	for _, s in ipairs(skyboxlist) do
-		table.insert(ctf_map.skyboxes, s[1])
-	end
-end)
+local old_add_skies = skybox.add
+skybox.add = function(def, ...)
+	table.insert(ctf_map.skyboxes, def[1])
+	old_add_skies(def, ...)
+end
 
 minetest.register_tool("ctf_map:adminpick", {
 	description = "Admin pickaxe used to break indestructible nodes.\nRightclick to remove non-indestructible nodes",
@@ -64,8 +66,7 @@ ctf_core.include_files(
 	"map_meta.lua",
 	"map_functions.lua",
 	"editor_functions.lua",
-	"mapedit_gui.lua",
-	"map_catalog.lua"
+	"mapedit_gui.lua"
 )
 
 minetest.register_chatcommand("ctf_map", {

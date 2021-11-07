@@ -3,11 +3,9 @@ local voters = {}
 local voter_count = 0
 local timer = 0
 
--- List of all maps placed during the current mode
-local maps_placed = {}
-
 local check_interval = 0
 
+local maps_placed = {}
 local new_specific_map = nil
 local function start_new_match(new_mode)
 	for _, pos in pairs(ctf_teams.team_chests) do
@@ -19,7 +17,6 @@ local function start_new_match(new_mode)
 	local old_mode = ctf_modebase.current_mode
 
 	if new_mode ~= old_mode then
-		maps_placed = {}
 		if old_mode and ctf_modebase.modes[old_mode].on_mode_end then
 			ctf_modebase.modes[old_mode].on_mode_end()
 		end
@@ -142,17 +139,19 @@ function ctf_modebase.start_mode_vote()
 	voter_count = 0
 end
 
-function ctf_modebase.start_new_match(show_form, new_mode, specific_map)
-	new_specific_map = specific_map
+function ctf_modebase.start_new_match(new_mode, new_map)
+	new_specific_map = new_map
 
 	if ctf_modebase.current_mode then
 		ctf_modebase:get_current_mode().on_match_end()
 	end
 
 	if new_mode then
+		ctf_modebase.current_mode_matches = 0
+
 		start_new_match(new_mode)
 	-- Show mode selection form every 'ctf_modebase.MAPS_PER_MODE'-th match
-	elseif ctf_modebase.current_mode_matches >= ctf_modebase.MAPS_PER_MODE or show_form then
+	elseif ctf_modebase.current_mode_matches >= ctf_modebase.MAPS_PER_MODE or not ctf_modebase.current_mode then
 		ctf_modebase.current_mode_matches = 0
 
 		ctf_modebase.start_mode_vote()
@@ -162,10 +161,16 @@ function ctf_modebase.start_new_match(show_form, new_mode, specific_map)
 end
 
 function ctf_modebase.show_modechoose_form(player)
+	local modenames = {}
+
+	for modename in pairs(ctf_modebase.modes) do
+		table.insert(modenames, modename)
+	end
+	table.sort(modenames)
+
 	local elements = {}
 	local idx = 0
-
-	for modename, def in pairs(ctf_modebase.modes) do
+	for _, modename in ipairs(modenames) do
 		elements[modename] = {
 			type = "button",
 			label = HumanReadable(modename),
@@ -218,37 +223,29 @@ function ctf_modebase.show_modechoose_form(player)
 	return "ctf_modebase:mode_select"
 end
 
---- @param mode_def table | string
-function ctf_modebase.place_map(mode_def, mapidx, callback)
-	-- Convert name of mode into it's def
-	if type(mode_def) == "string" then
-		mode_def = ctf_modebase.modes[mode_def]
-	end
-
-	local dirlist = minetest.get_dir_list(ctf_map.maps_dir, true)
-
+--- @param mode string
+--- @param mapidx integer
+function ctf_modebase.place_map(mode, mapidx, callback)
 	if not mapidx then
-		local map_pool = mode_def.map_whitelist or dirlist
 		local new_pool = {}
 
-		if #maps_placed >= #map_pool then
+		if #maps_placed >= #ctf_modebase.map_catalog.maps then
 			maps_placed = {}
 		end
 
-		for _, name in pairs(map_pool) do
-			if table.indexof(maps_placed, name) == -1 then
-				table.insert(new_pool, name)
+		for idx = 1, #ctf_modebase.map_catalog.maps do
+			if table.indexof(maps_placed, idx) == -1 then
+				table.insert(new_pool, idx)
 			end
 		end
 
-		mapidx = table.indexof(dirlist, new_pool[math.random(1, #new_pool)])
-	elseif type(mapidx) ~= "number" then
-		mapidx = table.indexof(dirlist, mapidx)
+		mapidx = new_pool[math.random(1, #new_pool)]
 	end
 
-	ctf_map.place_map(mapidx, dirlist[mapidx], function(map)
-		table.insert(maps_placed, dirlist[mapidx])
-
+	table.insert(maps_placed, mapidx)
+	ctf_modebase.map_catalog.current_map = mapidx
+	local map = ctf_modebase.map_catalog.maps[mapidx]
+	ctf_map.place_map(map, function()
 		-- Set time, time_speed, skyboxes, and physics
 
 		minetest.set_timeofday(map.start_time/24000)
@@ -263,6 +260,9 @@ function ctf_modebase.place_map(mode_def, mapidx, callback)
 				jump = map.phys_jump,
 				gravity = map.phys_gravity,
 			})
+
+			-- Convert name of mode into it's def
+			local mode_def = ctf_modebase.modes[mode]
 
 			if mode_def.physics then
 				player:set_physics_override({
@@ -283,23 +283,24 @@ end
 minetest.register_chatcommand("ctf_next", {
 	description = "Skip to a new match.",
 	privs = {ctf_admin = true},
-	params = "[<technical modename> | <technical mapname>]",
+	params = "<mode:technical modename> <technical mapname>",
 	func = function(name, param)
-		if param then
-			if ctf_modebase.modes[param] then -- New mode given
-				ctf_modebase.start_new_match(nil, param)
-				return true
-			elseif table.indexof(minetest.get_dir_list(ctf_map.maps_dir, true), param) ~= -1 then -- New map given
-				ctf_modebase.start_new_match(nil, nil, param)
-				return true
+		local map = nil
+		local map_name, mode = ctf_modebase.match_mode(param)
+
+		if mode then
+			if not ctf_modebase.modes[mode] then
+				return false, "No such game mode: " .. mode
 			end
 		end
 
-		if ctf_modebase.current_mode then
-			ctf_modebase.start_new_match()
-			return true
-		else
-			return false, "You need to provide a mode to go to when running this command at server start"
+		if map_name then
+			map = ctf_modebase.map_catalog.map_dirnames[map_name]
+			if not map then
+				return false, "No such map: " .. map_name
+			end
 		end
+
+		ctf_modebase.start_new_match(mode, map)
 	end,
 })

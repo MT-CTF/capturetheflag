@@ -10,18 +10,10 @@ function ctf_map.announce_map(map)
 	end
 end
 
-function ctf_map.place_map(idx, dirname, mapmeta)
-	local callback
-
-	if type(mapmeta) == "function" then
-		callback, mapmeta = mapmeta, nil
-	end
-
-	if not mapmeta then
-		mapmeta = ctf_map.load_map_meta(idx, dirname)
-	end
-
+function ctf_map.place_map(mapmeta, callback)
+	local dirname = mapmeta.dirname
 	local schempath = ctf_map.maps_dir .. dirname .. "/map.mts"
+
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
 		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
@@ -69,16 +61,13 @@ function ctf_map.place_map(idx, dirname, mapmeta)
 
 		ctf_map.current_map = mapmeta
 
-		callback(mapmeta)
+		callback()
 	end)
 end
 
 --
 --- VOXELMANIP FUNCTIONS
 --
-
-local BARRIER_NODES
-minetest.after(0, function() BARRIER_NODES = ctf_map.barrier_nodes end)
 
 -- Takes [mapmeta] or [pos1, pos2] arguments
 function ctf_map.remove_barrier(mapmeta, pos2)
@@ -100,7 +89,7 @@ function ctf_map.remove_barrier(mapmeta, pos2)
 			for x = pos1.x, pos2.x do
 				local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
 
-				for barriernode_id, replacement_id in pairs(BARRIER_NODES) do
+				for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
 					if data[vi] == barriernode_id then
 						data[vi] = replacement_id
 						break

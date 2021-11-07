@@ -12,13 +12,13 @@ for f in *; do
 		fi
 
 		# Skybox textures
-		if [ -f ${f}/skybox_1.png ]; then
-			cp ${f}/skybox_1.png ../textures/${f}_skybox_1.png
-			cp ${f}/skybox_2.png ../textures/${f}_skybox_2.png
-			cp ${f}/skybox_3.png ../textures/${f}_skybox_3.png
-			cp ${f}/skybox_4.png ../textures/${f}_skybox_4.png
-			cp ${f}/skybox_5.png ../textures/${f}_skybox_5.png
-			cp ${f}/skybox_6.png ../textures/${f}_skybox_6.png
+		if [ -d ${f}/skybox/ ]; then
+			cp ${f}/skybox/Up.png    ../textures/${f}Up.png
+			cp ${f}/skybox/Down.png  ../textures/${f}Down.png
+			cp ${f}/skybox/Front.png ../textures/${f}Front.png
+			cp ${f}/skybox/Back.png  ../textures/${f}Back.png
+			cp ${f}/skybox/Left.png  ../textures/${f}Left.png
+			cp ${f}/skybox/Right.png ../textures/${f}Right.png
 		fi
 	fi
 done

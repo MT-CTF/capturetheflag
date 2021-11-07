@@ -91,35 +91,25 @@ minetest.register_allow_player_inventory_action(function(player, action, invento
 	end
 end)
 
-local mode_chatcommands = {}
-function ctf_modebase.register_chatcommand_alias(modename, name, alias, def)
-	if not mode_chatcommands[modename] then
-		mode_chatcommands[modename] = {}
+function ctf_modebase.match_mode(param)
+	local _, _, opt_param, mode_param = string.find(param, "^(.*) +mode:([^ ]*)$")
+
+	if not mode_param then
+		_, _, mode_param, opt_param = string.find(param, "^mode:([^ ]*) *(.*)$")
 	end
 
-	mode_chatcommands[modename][name] = def.func
-
-	def.func = function(...)
-		local current_mode = ctf_modebase.current_mode
-
-		if current_mode then
-			local cmd_func = mode_chatcommands[current_mode][name]
-
-			if cmd_func then
-				return cmd_func(...)
-			else
-				return false, "The current mode hasn't implemented that command!"
-			end
-		else
-			return false, "Can't run mode-specific commands when no mode is running!"
-		end
+	if not mode_param then
+		opt_param = param
 	end
 
-	ctf_core.register_chatcommand_alias(name, alias, def)
-end
+	if not mode_param or mode_param == "" then
+		mode_param = nil
+	end
+	if not opt_param or opt_param == "" then
+		opt_param = nil
+	end
 
-function ctf_modebase.register_chatcommand(modename, name, def)
-	ctf_modebase.register_chatcommand_alias(modename, name, nil, def)
+	return opt_param, mode_param
 end
 
 --- end

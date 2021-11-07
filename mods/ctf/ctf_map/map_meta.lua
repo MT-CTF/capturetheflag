@@ -1,5 +1,11 @@
 local CURRENT_MAP_VERSION = "2"
 
+function ctf_map.skybox_exists(subdir)
+	local list = minetest.get_dir_list(subdir, true)
+
+	return not (table.indexof(list, "skybox") == -1)
+end
+
 function ctf_map.load_map_meta(idx, dirname)
 	local meta = Settings(ctf_map.maps_dir .. dirname .. "/map.conf")
 
@@ -151,6 +157,13 @@ function ctf_map.load_map_meta(idx, dirname)
 		else
 			map.barrier_area = {pos1 = map.pos1, pos2 = map.pos2}
 		end
+	end
+
+	if ctf_map.skybox_exists(ctf_map.maps_dir .. dirname) then
+		skybox.add({dirname, "#ffffff", [5] = "png"})
+
+		map.skybox = dirname
+		map.skybox_forced = true
 	end
 
 	return map

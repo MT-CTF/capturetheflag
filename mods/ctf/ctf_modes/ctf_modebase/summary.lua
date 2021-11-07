@@ -1,8 +1,92 @@
+local previous = nil
+local start_time = nil
+local winner = nil
+
+local function team_rankings(total)
+	local ranks = {}
+
+	for team, rank_values in pairs(total) do
+		rank_values._row_color = ctf_teams.team[team].color
+
+		ranks[HumanReadable("team " .. team)] = rank_values
+	end
+
+	return ranks
+end
+
+local function get_duration()
+	if not start_time then
+		return "-"
+	end
+
+	local time = os.time() - start_time
+	return string.format("%02d:%02d:%02d",
+		math.floor(time / 3600),        -- hours
+		math.floor((time % 3600) / 60), -- minutes
+		math.floor(time % 60))          -- seconds
+end
+
+ctf_modebase.summary = {}
+
+function ctf_modebase.summary.get(prev)
+	if not prev then
+		local current_mode = ctf_modebase:get_current_mode()
+		if not current_mode then return end
+		local rankings = current_mode.recent_rankings
+
+		return
+			rankings.players(), team_rankings(rankings.teams()), current_mode.summary_ranks, {
+				title = "Match Summary",
+				special_row_title = "Total Team Stats",
+				gamemode = ctf_modebase.current_mode,
+				winner = winner,
+				duration = get_duration(),
+				buttons = {previous = previous ~= nil},
+			}
+	elseif previous ~= nil then
+		return
+			previous.players, team_rankings(previous.teams), previous.summary_ranks, {
+				title = "Previous Match Summary",
+				special_row_title = "Total Team Stats",
+				gamemode = previous.gamemode,
+				winner = previous.winner,
+				duration = previous.duration,
+				buttons = {next = true},
+			}
+	end
+end
+
+function ctf_modebase.summary.on_match_end()
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	local rankings = current_mode.recent_rankings
+
+	previous = {
+		players = rankings.players(),
+		teams = rankings.teams(),
+		gamemode = ctf_modebase.current_mode,
+		winner = winner or "NO WINNER",
+		duration = get_duration(),
+		summary_ranks = current_mode.summary_ranks,
+	}
+
+	start_time = nil
+	winner = nil
+end
+
+function ctf_modebase.summary.set_winner(i)
+	winner = i
+end
+
+function ctf_modebase.summary.on_match_start()
+	start_time = os.time()
+end
+
 ---@param name string Player name
 ---@param rankings table Recent rankings to show in the gui
 ---@param rank_values table Example: `{_sort = "score", "captures" "kills"}`
 ---@param formdef table table for customizing the formspec
-function ctf_modebase.show_summary_gui(name, rankings, special_rankings, rank_values, formdef)
+function ctf_modebase.summary.show_gui(name, rankings, special_rankings, rank_values, formdef)
 	local sort_by = rank_values._sort or rank_values[1]
 
 	local sort = function(unsorted)
@@ -20,14 +104,24 @@ function ctf_modebase.show_summary_gui(name, rankings, special_rankings, rank_va
 		return sorted
 	end
 
-	ctf_modebase.show_summary_gui_sorted(name, sort(rankings), sort(special_rankings), rank_values, formdef)
+	ctf_modebase.summary.show_gui_sorted(name, sort(rankings), sort(special_rankings), rank_values, formdef)
+end
+
+local function show_for_player(name, prev)
+	local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get(prev)
+	if not match_rankings then
+		return false
+	end
+
+	ctf_modebase.summary.show_gui(name, match_rankings, special_rankings, rank_values, formdef)
+	return true
 end
 
 ---@param name string Player name
 ---@param rankings table Sorted recent rankings Example: `{{pname=a, score=2}, {pname=b, score=1}}`
 ---@param rank_values table Example: `{_sort = "score", "captures" "kills"}`
 ---@param formdef table table for customizing the formspec
-function ctf_modebase.show_summary_gui_sorted(name, rankings, special_rankings, rank_values, formdef)
+function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, rank_values, formdef)
 	if not formdef then formdef = {} end
 	if not formdef.buttons then formdef.buttons = {} end
 
@@ -52,7 +146,7 @@ function ctf_modebase.show_summary_gui_sorted(name, rankings, special_rankings, 
 			local row = string.format("%d,%s,%s", ranks.number or i, color, ranks.pname)
 
 			for idx, rank in ipairs(rank_values) do
-				row = string.format("%s,%s", row, ranks[rank] or 0)
+				row = string.format("%s,%s", row, math.round(ranks[rank] or 0))
 			end
 
 			sorted[i] = row
@@ -103,12 +197,7 @@ function ctf_modebase.show_summary_gui_sorted(name, rankings, special_rankings, 
 			label = "See Current",
 			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
 			func = function()
-				local current_mode = ctf_modebase:get_current_mode()
-
-				if not current_mode then return end
-
-				local nrankings, nspecial_rankings, nrank_values, nformdef = current_mode.summary_func()
-				ctf_modebase.show_summary_gui(name, nrankings, nspecial_rankings, nrank_values, nformdef)
+				show_for_player(name, false)
 			end,
 		}
 	end
@@ -119,12 +208,7 @@ function ctf_modebase.show_summary_gui_sorted(name, rankings, special_rankings, 
 			label = "See Previous",
 			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
 			func = function()
-				local current_mode = ctf_modebase:get_current_mode()
-
-				if not current_mode then return end
-
-				local nrankings, nspecial_rankings, nrank_values, nformdef = current_mode.summary_func(true)
-				ctf_modebase.show_summary_gui(name, nrankings, nspecial_rankings, nrank_values, nformdef)
+				show_for_player(name, true)
 			end,
 		}
 	end
@@ -159,16 +243,6 @@ end
 ctf_core.register_chatcommand_alias("summary", "s", {
 	description = "Show a summary for the current match",
 	func = function(name, param)
-		local current_mode = ctf_modebase:get_current_mode()
-
-		if not current_mode then
-			return false, "No match has started yet!"
-		end
-
-		if not current_mode.summary_func then
-			return false, "This mode doesn't have a summary command!"
-		end
-
 		local prev
 		if not param or param == "" then
 			prev = false
@@ -178,13 +252,10 @@ ctf_core.register_chatcommand_alias("summary", "s", {
 			return false, "Can't understand param " .. dump(param)
 		end
 
-		local rankings, special_rankings, rank_values, formdef = current_mode.summary_func(prev)
-
-		if not rankings then
+		if not show_for_player(name, prev) then
 			return false, "No match summary!"
 		end
 
-		ctf_modebase.show_summary_gui(name, rankings, special_rankings, rank_values, formdef)
 		return true
 	end
 })

@@ -28,6 +28,7 @@ ctf_teams = {
 	},
 	teamlist = {},
 	player_team = {},
+	current_teams = {},
 	current_team_list = {},
 	remembered_player = {}, -- Holds players that have been set to a team previously. Format: ["player_name"] = teamname
 

@@ -1,3 +1,4 @@
+ctf_gui.init()
 local cooldowns = ctf_core.init_cooldowns()
 local CLASS_SWITCH_COOLDOWN = 30
 
@@ -35,59 +36,13 @@ local classes = {
 	}
 }
 
-local UPDATE_STEP = 2
-local wear_timers = {}
-local function update_wear(pname, item, cooldown_time, time_passed, down)
-	if not wear_timers[pname] then wear_timers[pname] = {} end
+local function dist_from_flag(player)
+	local tname = ctf_teams.get(player)
 
-	table.insert(wear_timers[pname],
-		minetest.after(UPDATE_STEP, function()
-			table.remove(wear_timers[pname], 1)
+	if not tname then return 0 end
 
-			time_passed = time_passed + UPDATE_STEP
-
-			local player = minetest.get_player_by_name(pname)
-
-			if player then
-				local pinv = player:get_inventory()
-				local found = false
-
-				for pos, stack in pairs(pinv:get_list("main")) do
-					if stack:get_name() == item then
-						if down then
-							stack:set_wear((65534 / cooldown_time) * time_passed)
-						else
-							stack:set_wear((65535 / cooldown_time) * (cooldown_time - time_passed))
-						end
-
-						pinv:set_stack("main", pos, stack)
-
-						if time_passed == cooldown_time then
-							return
-						else
-							found = true
-							break
-						end
-					end
-				end
-
-				if found then
-					update_wear(pname, item, cooldown_time, time_passed, down)
-				end
-			end
-		end)
-	)
+	return vector.distance(ctf_map.current_map.teams[tname].flag_pos, player:get_pos())
 end
-
-minetest.register_on_dieplayer(function(player)
-	local pname = player:get_player_name()
-
-	if wear_timers[pname] then
-		for _, timer_job in pairs(wear_timers[pname]) do
-			timer_job:cancel()
-		end
-	end
-end)
 
 --
 --- Knight Sword
@@ -111,28 +66,26 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 		end
 
 		if (not pointed or not pointed_nodedef.on_rightclick) and itemstack:get_wear() == 0 then
-			minetest.after(KNIGHT_USAGE_TIME, function()
+			user:set_wielded_item("ctf_melee:sword_diamond")
+
+			local step = math.floor(65534 / KNIGHT_USAGE_TIME)
+			ctf_modebase.update_wear.start_update(pname, "ctf_melee:sword_diamond", step, false, function()
 				local player = minetest.get_player_by_name(pname)
 
 				if player then
 					local pinv = player:get_inventory()
+					local pos = ctf_modebase.update_wear.find_item(pinv, "ctf_melee:sword_diamond")
 
-					for pos, stack in pairs(pinv:get_list("main")) do
-						if stack:get_name() == "ctf_melee:sword_diamond" then
-							local newstack = ItemStack("ctf_mode_classes:knight_sword")
+					if pos then
+						local newstack = ItemStack("ctf_mode_classes:knight_sword")
+						newstack:set_wear(65534)
+						player:get_inventory():set_stack("main", pos, newstack)
 
-							newstack:set_wear(65534)
-							pinv:set_stack("main", pos, newstack)
-
-							update_wear(pname, "ctf_mode_classes:knight_sword", KNIGHT_COOLDOWN_TIME, 0)
-							break
-						end
+						local dstep = math.floor(65534 / KNIGHT_COOLDOWN_TIME)
+						ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:knight_sword", dstep, true)
 					end
 				end
 			end)
-
-			minetest.after(0, user.set_wielded_item, user, "ctf_melee:sword_diamond")
-			update_wear(pname, "ctf_melee:sword_diamond", KNIGHT_USAGE_TIME, 0, true)
 		end
 
 		minetest.item_place(itemstack, user, pointed)
@@ -164,11 +117,11 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 
 		if (not pointed or not pointed_nodedef.on_rightclick) and itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
-
 			itemstack:set_wear(65534)
-			minetest.after(0, user.set_wielded_item, user, itemstack)
+			user:set_wielded_item(itemstack)
 
-			update_wear(user:get_player_name(), "ctf_mode_classes:ranged_rifle_loaded", RANGED_COOLDOWN_TIME, 0)
+			local step = math.floor(65534 / RANGED_COOLDOWN_TIME)
+			ctf_modebase.update_wear.start_update(user:get_player_name(), "ctf_mode_classes:ranged_rifle_loaded", step, true)
 		end
 
 		minetest.item_place(itemstack, user, pointed)
@@ -258,7 +211,7 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	heal_max = 5,
 	rightclick_func = function(itemstack, user, pointed)
 		local pointed_nodedef = {}
-		local uname = user:get_player_name()
+		local pname = user:get_player_name()
 
 		if pointed and pointed.type == "node" then
 			pointed_nodedef = minetest.registered_nodes[minetest.get_node(pointed.under).name]
@@ -269,19 +222,20 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 
 			user:set_properties({pointable = false, textures = {old_textures[1].."^[brighten^[multiply:#7ba5ff"}})
 
-			minetest.after(IMMUNITY_TIME, function()
-				user = minetest.get_player_by_name(uname)
+			itemstack:set_wear(1)
+			user:set_wielded_item(itemstack)
 
-				if user then
-					user:set_properties({pointable = true, textures = old_textures})
-					update_wear(uname, "ctf_mode_classes:support_bandage", IMMUNITY_COOLDOWN, 0)
+			local step = math.floor(65534 / IMMUNITY_TIME)
+			ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", step, false, function()
+				local player = minetest.get_player_by_name(pname)
+
+				if player then
+					player:set_properties({pointable = true, textures = old_textures})
+
+					local dstep = math.floor(65534 / IMMUNITY_COOLDOWN)
+					ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", dstep, true)
 				end
 			end)
-
-			itemstack:set_wear(1)
-			minetest.after(0, user.set_wielded_item, user, itemstack)
-
-			update_wear(uname, "ctf_mode_classes:support_bandage", IMMUNITY_TIME, 0, true)
 		end
 
 		minetest.item_place(itemstack, user, pointed)
@@ -289,13 +243,6 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 })
 
 return {
-	on_match_end = function()
-		for _, wear_updates in pairs(wear_timers) do
-			for _, timer_job in pairs(wear_updates) do
-				timer_job:cancel()
-			end
-		end
-	end,
 	finish = function()
 		for _, player in pairs(minetest.get_connected_players()) do
 			player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
@@ -303,12 +250,16 @@ return {
 		end
 	end,
 	set = function(player, classname)
-		player = PlayerObj(player)
 		local meta = player:get_meta()
 		local pteam = ctf_teams.get(player)
+		local oldclassname = meta:get_string("class")
+
+		if classname == oldclassname then
+			return
+		end
 
 		if not classname then
-			classname = meta:get_string("class")
+			classname = oldclassname
 		end
 
 		if not classes[classname] then
@@ -316,6 +267,8 @@ return {
 		end
 
 		meta:set_string("class", classname)
+
+		ctf_modebase.update_wear.cancel_player_updates(player)
 
 		player:set_properties({
 			textures = {ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color or "white")},
@@ -346,17 +299,30 @@ return {
 	get_name = function(player)
 		return player:get_meta():get_string("class") or false
 	end,
+	select_class = function(self, player, classname)
+		player = PlayerObj(player)
+		if not player then return end
+
+		if dist_from_flag(player) <= 5 then
+			cooldowns:set(player, CLASS_SWITCH_COOLDOWN)
+			self.set(player, classname)
+		end
+	end,
 	show_class_formspec = function(self, player, selected)
 		player = PlayerObj(player)
+		if not player then return end
 
 		if not selected then
-			selected = self.get_name(player)
-
-			selected = selected and table.indexof(class_list, selected) or 1
+			local name = self.get_name(player)
+			if name then
+				selected = table.indexof(class_list, name)
+			end
 		end
 
+		selected = selected or 1
+
 		if not cooldowns:get(player) then
-			if mode_classes.dist_from_flag(player) > 5 then
+			if dist_from_flag(player) > 5 then
 				minetest.chat_send_player(player:get_player_name(), "You can only change class at your flag!")
 				return
 			end
@@ -372,20 +338,18 @@ return {
 					local new_idx = table.indexof(readable_class_list, fields[field_name])
 
 					if new_idx ~= selected then
-						self.show_class_formspec(self, playername, new_idx)
+						self:show_class_formspec(playername, new_idx)
 					end
 				end,
 			}
+
 			elements.select_class = {
 				type = "button",
 				exit = true,
 				label = "Choose Class",
 				pos = {x = ctf_gui.ELEM_SIZE.x + 0.5, y = 0.5},
 				func = function(playername, fields, field_name)
-					if mode_classes.dist_from_flag(player) <= 5 then
-						cooldowns:set(player, CLASS_SWITCH_COOLDOWN)
-						self.set(player, class_list[selected])
-					end
+					self:select_class(playername, class_list[selected])
 				end,
 			}
 

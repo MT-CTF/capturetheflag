@@ -8,7 +8,7 @@ local cmd = chatcmdbuilder.register("ctf_teams", {
 
 cmd:sub("set :player:username :team", function(name, player, team)
 	if minetest.get_player_by_name(player) then
-		if not ctf_teams.team[team] then
+		if not ctf_teams.current_teams[team] then
 			return false, "Unable to find team " .. dump(team)
 		end
 

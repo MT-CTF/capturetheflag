@@ -72,7 +72,10 @@ function ctf_map.show_map_editor(player)
 					end)
 
 					minetest.after(0.5, function()
-						ctf_map.place_map(table.indexof(dirlist, fields.currentmaps), fields.currentmaps, function(map)
+						local idx = table.indexof(dirlist, fields.currentmaps)
+						local map = ctf_map.load_map_meta(idx, fields.currentmaps)
+
+						ctf_map.place_map(map, function()
 							minetest.after(2, function()
 								ctf_map.announce_map(map)
 
@@ -195,23 +198,26 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.skybox_label = {
 		type = "label",
 		pos = {0, 15.4},
-		label = "Skybox",
+		label = (context[player].skybox_forced and "Skybox: Using the one provided in map folder") or "Skybox",
 	}
-	elements.skybox = {
-		type = "dropdown",
-		pos = {0, 15.6},
-		size = {6, ctf_gui.ELEM_SIZE.y},
-		items = ctf_map.skyboxes,
-		default_idx = table.indexof(ctf_map.skyboxes, context[player].skybox),
-		func = function(pname, fields, name)
-			local oldval = context[pname].skybox
-			context[pname].skybox = fields[name]
 
-			if context[pname].skybox ~= oldval then
-				skybox.set(PlayerObj(pname), table.indexof(ctf_map.skyboxes, fields[name])-1)
-			end
-		end,
-	}
+	if not context[player].skybox_forced then
+		elements.skybox = {
+			type = "dropdown",
+			pos = {0, 15.6},
+			size = {6, ctf_gui.ELEM_SIZE.y},
+			items = ctf_map.skyboxes,
+			default_idx = table.indexof(ctf_map.skyboxes, context[player].skybox),
+			func = function(pname, fields, name)
+				local oldval = context[pname].skybox
+				context[pname].skybox = fields[name]
+
+				if context[pname].skybox ~= oldval then
+					skybox.set(PlayerObj(pname), table.indexof(ctf_map.skyboxes, fields[name])-1)
+				end
+			end,
+		}
+	end
 
 	-- MAP PHYSICS
 	ypos = 17

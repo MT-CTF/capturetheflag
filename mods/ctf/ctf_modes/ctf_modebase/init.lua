@@ -41,24 +41,26 @@ ctf_modebase = {
 ctf_gui.init()
 
 ctf_core.include_files(
-	"summary_gui.lua",
+	"register.lua",
+	"mode_functions.lua",
+	"map_catalog.lua",
+	"ranking_commands.lua",
+	"summary.lua",
 	"give_initial_stuff.lua",
 	"treasure.lua",
-	"register.lua",
 	"flags/nodes.lua",
 	"flags/taking.lua",
 	"match.lua",
-	"mode_functions.lua",
 	"crafting.lua",
 	"hpregen.lua",
 	"respawn_delay.lua",
 	"markers.lua",
 	"bounties.lua",
-	"build_timer.lua"
+	"build_timer.lua",
+	"update_wear.lua"
 )
 
-ctf_modebase.feature_presets.rankings = ctf_core.include_files("feature_presets/rankings.lua")
-ctf_modebase.feature_presets.summary = ctf_core.include_files("feature_presets/summary.lua")
+ctf_modebase.feature_presets.recent_rankings = ctf_core.include_files("feature_presets/recent_rankings.lua")
 ctf_modebase.feature_presets.flag_huds = ctf_core.include_files("feature_presets/flag_huds.lua")
 ctf_modebase.feature_presets.bounties = ctf_core.include_files("feature_presets/bounties.lua")
 ctf_modebase.feature_presets.teams = ctf_core.include_files("feature_presets/teams.lua")
@@ -69,7 +71,7 @@ if ctf_core.settings.server_mode == "play" then
 	minetest.register_on_joinplayer(function(player)
 		if not match_started then
 			ctf_modebase.current_mode_matches = ctf_modebase.MAPS_PER_MODE
-			ctf_modebase.start_new_match(true)
+			ctf_modebase.start_new_match()
 			match_started = true
 		end
 
