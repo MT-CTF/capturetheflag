@@ -3,9 +3,7 @@ local voters = {}
 local voter_count = 0
 local timer = 0
 
-local check_interval = 0
-
-local maps_placed = {}
+local map_pools = {}
 local new_specific_map = nil
 local function start_new_match(new_mode)
 	for _, pos in pairs(ctf_teams.team_chests) do
@@ -41,51 +39,36 @@ local function start_new_match(new_mode)
 	end)
 end
 
-minetest.register_globalstep(function(dtime)
-	if not voting then return end
+local function vote_finish()
+	local votes = {_most = {c = 0}}
 
-	check_interval = check_interval + dtime
-
-	if check_interval >= 3 then
-		timer = timer - check_interval
-		check_interval = 0
-	else
-		return
+	for _, mode in pairs(ctf_modebase.modelist) do
+		votes[mode] = 0
 	end
 
-	if timer <= 0 then
-		local votes = {_most = {c = 0}}
+	for pname, info in pairs(voters) do
+		if info.choice then
+			votes[info.choice] = (votes[info.choice] or 0) + 1
 
-		for _, mode in pairs(ctf_modebase.modelist) do
-			votes[mode] = 0
-		end
-
-		for pname, info in pairs(voters) do
-			if not info.choice and timer > 0 then
-				ctf_modebase.show_modechoose_form(pname)
-			else
-				votes[info.choice] = (votes[info.choice] or 0) + 1
-
-				if votes[info.choice] >= votes._most.c then
-					votes._most.c = votes[info.choice]
-					votes._most.n = info.choice
-				end
+			if votes[info.choice] >= votes._most.c then
+				votes._most.c = votes[info.choice]
+				votes._most.n = info.choice
 			end
 		end
-
-		voting = false
-		voters = {}
-
-		local new_mode = votes._most.n or ctf_modebase.modelist[math.random(1, #ctf_modebase.modelist)]
-
-		minetest.chat_send_all(string.format("Voting is over, '%s' won with %d votes!",
-			HumanReadable(new_mode),
-			votes._most.c or 0
-		))
-
-		start_new_match(new_mode)
 	end
-end)
+
+	voting = false
+	voters = {}
+
+	local new_mode = votes._most.n or ctf_modebase.modelist[math.random(1, #ctf_modebase.modelist)]
+
+	minetest.chat_send_all(string.format("Voting is over, '%s' won with %d votes!",
+		HumanReadable(new_mode),
+		votes._most.c or 0
+	))
+
+	start_new_match(new_mode)
+end
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
@@ -134,7 +117,10 @@ function ctf_modebase.start_mode_vote()
 		}
 	end
 
-	timer = ctf_modebase.VOTING_TIME
+	timer = minetest.after(ctf_modebase.VOTING_TIME, function()
+		timer = nil
+		vote_finish()
+	end)
 	voting = true
 	voter_count = 0
 end
@@ -187,11 +173,16 @@ function ctf_modebase.show_modechoose_form(player)
 
 						voter.choice = modename
 
-						if voter_count >= table.count(voters) then
-							timer = 0
-						end
-
 						minetest.chat_send_all(string.format("%s voted for the mode '%s'", playername, HumanReadable(modename)))
+
+						if voter_count >= table.count(voters) then
+							if timer then
+								timer:cancel()
+								timer = nil
+							end
+
+							vote_finish()
+						end
 					else
 						ctf_modebase.show_modechoose_form(player)
 					end
@@ -227,22 +218,20 @@ end
 --- @param mapidx integer
 function ctf_modebase.place_map(mode, mapidx, callback)
 	if not mapidx then
-		local new_pool = {}
+		if not map_pools[mode] or #map_pools[mode] == 0 then
+			map_pools[mode] = {}
 
-		if #maps_placed >= #ctf_modebase.map_catalog.maps then
-			maps_placed = {}
-		end
-
-		for idx = 1, #ctf_modebase.map_catalog.maps do
-			if table.indexof(maps_placed, idx) == -1 then
-				table.insert(new_pool, idx)
+			for idx, map in ipairs(ctf_modebase.map_catalog.maps) do
+				if not map.game_modes or table.indexof(map.game_modes, mode) ~= -1 then
+					table.insert(map_pools[mode], idx)
+				end
 			end
 		end
 
-		mapidx = new_pool[math.random(1, #new_pool)]
+		local idx = math.random(1, #map_pools[mode])
+		mapidx = table.remove(map_pools[mode], idx)
 	end
 
-	table.insert(maps_placed, mapidx)
 	ctf_modebase.map_catalog.current_map = mapidx
 	local map = ctf_modebase.map_catalog.maps[mapidx]
 	ctf_map.place_map(map, function()

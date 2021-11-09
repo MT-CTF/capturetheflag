@@ -74,15 +74,6 @@ ctf_modebase.register_mode("nade_fight", {
 	end,
 	on_match_end = function()
 		teams.on_match_end()
-
-		ctf_modebase.summary.on_match_end()
-		recent_rankings.on_match_end()
-
-		ctf_modebase.update_wear.cancel_updates()
-
-		ctf_modebase.bounties.on_match_end()
-
-		flag_huds.on_match_end()
 	end,
 	allocate_player = teams.allocate_player,
 	on_allocplayer = function(player, teamname)

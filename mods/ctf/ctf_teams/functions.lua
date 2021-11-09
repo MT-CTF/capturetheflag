@@ -46,7 +46,7 @@ end
 function ctf_teams.get_team(teamname)
 	local out = {}
 
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local team = ctf_teams.get(pname)
 
@@ -63,7 +63,7 @@ end
 function ctf_teams.get_teams()
 	local out = {}
 
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local team = ctf_teams.get(pname)
 
@@ -102,18 +102,12 @@ function ctf_teams.default_allocate_player(player)
 end
 ctf_teams.allocate_player = ctf_teams.default_allocate_player
 
-function ctf_teams.dealloc_player(player)
-	RunCallbacks(ctf_teams.registered_on_deallocplayer, PlayerObj(player), ctf_teams.get(player))
-
-	ctf_teams.set(player, nil)
-end
-
 ---@param teams table
 -- Should be called at match start
 function ctf_teams.allocate_teams(teams)
-	local players = minetest.get_connected_players()
 	ctf_teams.current_teams = {}
 	ctf_teams.current_team_list = {}
+	ctf_teams.player_team = {}
 	ctf_teams.remembered_player = {}
 	tpos = 1
 
@@ -122,6 +116,7 @@ function ctf_teams.allocate_teams(teams)
 		table.insert(ctf_teams.current_team_list, teamname)
 	end
 
+	local players = minetest.get_connected_players()
 	table.shuffle(players)
 	for _, player in ipairs(players) do
 		ctf_teams.allocate_player(player)

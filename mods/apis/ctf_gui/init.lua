@@ -176,6 +176,24 @@ function ctf_gui.show_formspec(player, formname, formdef)
 					def.size.y,
 					def.texture
 				)
+			elseif def.type == "textlist" then
+				if def.items then
+					for k, v in pairs(def.items) do
+						def.items[k] = minetest.formspec_escape(v)
+					end
+				end
+
+				formspec = formspec .. string.format(
+					"textlist[%f,%f;%f,%f;%s;%s;%d;%s]",
+					def.pos.x,
+					def.pos.y,
+					def.size.x,
+					def.size.y,
+					id,
+					def.items and table.concat(def.items, ",") or "",
+					def.default_idx or 1,
+					def.transparent and "true" or "false"
+				)
 			elseif def.type == "table" then
 				if def.options then
 					local tableoptions = {}

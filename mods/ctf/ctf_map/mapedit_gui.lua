@@ -13,14 +13,14 @@ function ctf_map.show_map_editor(player)
 	table.sort(dirlist_sorted)
 
 	ctf_gui.show_formspec(player, "ctf_map:start", {
-		size = {x = 8, y = 8},
+		size = {x = 8, y = 10},
 		title = "Capture The Flag Map Editor",
 		description = "Would you like to edit an existing map or create a new one?",
 		privs = {ctf_map_editor = true},
 		elements = {
 			newmap = {
 				type = "button", exit = true, label = "Create New Map",
-				pos = {"center", 0},
+				pos = {"center", 0.5},
 				func = function(pname)
 					minetest.chat_send_player(pname,
 							"Please decide what the size of your map will be and punch nodes on two opposite corners of it")
@@ -51,6 +51,8 @@ function ctf_map.show_map_editor(player)
 							chests        = {},
 							teams         = {},
 							barrier_area  = {pos1 = pos1, pos2 = pos2},
+							--
+							game_modes    = {},
 						}
 
 						minetest.chat_send_player(pname, "Build away!")
@@ -105,9 +107,9 @@ function ctf_map.show_map_editor(player)
 				end,
 			},
 			currentmaps = {
-				type = "dropdown",
+				type = "textlist",
 				pos = {"center", 1.9 + ctf_gui.ELEM_SIZE.y},
-				size = {5, ctf_gui.ELEM_SIZE.y},
+				size = {6, 6},
 				items = dirlist_sorted,
 			},
 		}
@@ -178,33 +180,35 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP INITIAL STUFF
 	elements.initial_stuff = {
-		type = "field", label = "Map Initial Stuff", pos = {0, 12.8}, size = {6, 0.7},
+		type = "field", label = "Map Initial Stuff", pos = {0, ypos}, size = {6, 0.7},
 		default = table.concat(context[player].initial_stuff or {"none"}, ","),
 		func = function(pname, fields, name)
 			context[pname].initial_stuff = string.split(fields[name]:gsub("%s?,%s?", ","), ",")
 		end,
 	}
+	ypos = ypos + 1.4
 
 	-- MAP TREASURES
 	elements.treasures = {
-		type = "field", label = "Map Treasures", pos = {0, 14.2}, size = {6, 0.7},
+		type = "field", label = "Map Treasures", pos = {0, ypos}, size = {6, 0.7},
 		default = table.concat(context[player].treasures or {"none"}, ","),
 		func = function(pname, fields, name)
 			context[pname].treasures = string.split(fields[name], ",")
 		end,
 	}
+	ypos = ypos + 1.7
 
 	-- SKYBOX SELECTOR
 	elements.skybox_label = {
 		type = "label",
-		pos = {0, 15.4},
-		label = (context[player].skybox_forced and "Skybox: Using the one provided in map folder") or "Skybox",
+		pos = {0, ypos},
+		label = (context[player].skybox_forced and "Skybox: Using the one provided in map folder") or "Skybox:",
 	}
 
 	if not context[player].skybox_forced then
 		elements.skybox = {
 			type = "dropdown",
-			pos = {0, 15.6},
+			pos = {1.1, ypos-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {6, ctf_gui.ELEM_SIZE.y},
 			items = ctf_map.skyboxes,
 			default_idx = table.indexof(ctf_map.skyboxes, context[player].skybox),
@@ -218,9 +222,60 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end,
 		}
 	end
+	ypos = ypos + 1.5
+
+	-- MODE SELECTOR
+	context[player].game_modes = context[player].game_modes or {}
+	local available_game_modes = table.copy(ctf_modebase.modelist)
+
+	for _, v in pairs(context[player].game_modes) do
+		table.remove(available_game_modes, table.indexof(available_game_modes, v))
+	end
+
+	elements.game_modeslabel = {
+		type = "label",
+		pos = {0, ypos},
+		label = "Map Modes"
+	}
+	elements.available_game_modeslabel = {
+		type = "label",
+		pos = {ctf_gui.FORM_SIZE.x/2 + 0.2, ypos},
+		label = "Available Modes"
+	}
+	ypos = ypos + 0.3
+	elements["game_modes"] = {
+		type = "textlist",
+		pos = {0, ypos},
+		size = {ctf_gui.FORM_SIZE.x/2 - 0.2, 2},
+		items = context[player].game_modes,
+		func = function(pname, fields, fname)
+			local event = minetest.explode_textlist_event(fields.game_modes)
+
+			if event.type == "DCL" then
+				table.remove(context[pname].game_modes, event.index)
+
+				ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+			end
+		end
+	}
+	elements["available_game_modes"] = {
+		type = "textlist",
+		pos = {ctf_gui.FORM_SIZE.x/2 + 0.2, ypos},
+		size = {ctf_gui.FORM_SIZE.x/2 - 0.2, 2},
+		items = available_game_modes,
+		func = function(pname, fields, fname)
+			local event = minetest.explode_textlist_event(fields.available_game_modes)
+
+			if event.type == "DCL" then
+				table.insert(context[pname].game_modes, available_game_modes[event.index])
+
+				ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+			end
+		end
+	}
+	ypos = ypos + 3
 
 	-- MAP PHYSICS
-	ypos = 17
 	for name, label in pairs({speed = "Map Movement Speed", jump = "Map Jump Height", gravity = "Map Gravity"}) do
 		elements[name] = {
 			type = "field", label = label,
@@ -241,7 +296,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP START TIME
 	elements.start_time = {
-		type = "field", label = "Map start_time", pos = {0, 21.2}, size = {4, 0.7},
+		type = "field", label = "Map start_time", pos = {0, ypos}, size = {4, 0.7},
 		default = context[player].start_time or ctf_map.DEFAULT_START_TIME,
 		func = function(pname, fields, name)
 			local oldval = context[pname].start_time
@@ -252,10 +307,11 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end
 		end,
 	}
+	ypos = ypos + 1.4
 
 	-- MAP time_speed
 	elements.time_speed = {
-		type = "field", label = "Map time_speed (Multiplier)", pos = {0, 22.6},
+		type = "field", label = "Map time_speed (Multiplier)", pos = {0, ypos},
 		size = {4, 0.7}, default = context[player].time_speed or "1",
 		func = function(pname, fields, name)
 			local oldval = context[pname].time_speed
@@ -266,9 +322,10 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end
 		end,
 	}
+	ypos = ypos + 1.4
 
 	-- TEAMS
-	local idx = 24.2
+	local idx = ypos
 	for teamname, def in pairs(context[player].teams) do
 		elements[teamname.."_checkbox"] = {
 			type = "checkbox",

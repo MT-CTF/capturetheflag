@@ -3,7 +3,6 @@ return function(rankings, recent_rankings, flag_huds)
 local FLAG_MESSAGE_COLOR = "#d9b72a"
 local FLAG_CAPTURE_TIMER = 60 * 3
 local match_over = true
-local next_team
 local team_list
 local teams_left
 
@@ -32,7 +31,7 @@ local function tp_player_near_flag(player)
 end
 
 local function celebrate_team(teamname)
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.player_team[pname].name
 
@@ -118,7 +117,6 @@ return {
 	on_new_match = function()
 		match_over = false
 
-		next_team = 1
 		team_list = {}
 		for tname in pairs(ctf_map.current_map.teams) do
 			table.insert(team_list, tname)
@@ -127,16 +125,33 @@ return {
 	end,
 	on_match_end = function()
 		match_over = true
+
+		ctf_modebase.bounties.on_match_end()
+		ctf_modebase.respawn_delay.on_match_end()
+		ctf_modebase.update_wear.cancel_updates()
+		flag_huds.on_match_end()
+
+		ctf_modebase.summary.on_match_end()
+		recent_rankings.on_match_end()
 	end,
 	allocate_player = function(player)
 		player = PlayerName(player)
 
-		local teams = recent_rankings.teams()
+		local team_players = ctf_teams.get_teams()
+		local team_scores = recent_rankings.teams()
+
 		local best_score = nil
 		local worst_score = nil
+		local best_players = nil
+		local worst_players = nil
+		local sum_score = 0
 
-		for _, team in pairs(team_list) do
-			local score = (teams[team] and teams[team].score) or 0
+		for _, team in ipairs(team_list) do
+			local score = (team_scores[team] and team_scores[team].score) or 0
+			local players_count = (team_players[team] and #team_players[team]) or 0
+
+			sum_score = sum_score + score
+
 			if not best_score or score > best_score.s then
 				best_score = {s = score, t = team}
 			end
@@ -144,28 +159,27 @@ return {
 			if not worst_score or score < worst_score.s then
 				worst_score = {s = score, t = team}
 			end
+
+			if not best_players or players_count > best_players.s then
+				best_players = {s = players_count, t = team}
+			end
+
+			if not worst_players or players_count < worst_players.s then
+				worst_players = {s = players_count, t = team}
+			end
 		end
 
+		local score_diff = (sum_score > 0 and (best_score.s - worst_score.s) / sum_score) or 0
+		local players_diff = best_players.s - worst_players.s
+
+		-- Allocate player to remembered team unless they're desperately needed in the other
 		local remembered_team = ctf_teams.remembered_player[player]
-		if not best_score or best_score.s - worst_score.s <= 100 then
-			if not remembered_team or ctf_modebase.flag_captured[remembered_team] then
-				if next_team > #team_list then
-					next_team = 1
-				end
-
-				ctf_teams.set(player, team_list[next_team])
-
-				next_team = next_team + 1
-			else
-				ctf_teams.set(player, remembered_team)
-			end
+		if score_diff <= 0.4 and players_diff < 2 and remembered_team and not ctf_modebase.flag_captured[remembered_team] then
+			ctf_teams.set(player, remembered_team)
+		elseif players_diff == 0 or score_diff > 0.2 and players_diff < 2 then
+			ctf_teams.set(player, worst_score.t)
 		else
-			-- Allocate player to remembered team unless they're desperately needed in the other
-			if remembered_team and not ctf_modebase.flag_captured[remembered_team] and best_score.s - worst_score.s <= 400 then
-				ctf_teams.set(player, remembered_team)
-			else
-				ctf_teams.set(player, worst_score.t)
-			end
+			ctf_teams.set(player, worst_players.t)
 		end
 	end,
 	can_take_flag = function(player, teamname)
@@ -225,7 +239,7 @@ return {
 			local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get()
 			formdef.title = HumanReadable(pteam) .." Team Wins!"
 
-			for _, pname in pairs(minetest.get_connected_players()) do
+			for _, pname in ipairs(minetest.get_connected_players()) do
 				ctf_modebase.summary.show_gui(pname:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
 			end
 
@@ -284,7 +298,7 @@ return {
 			end
 		end
 
-		if ctf_modebase.prep_delayed_respawn(player) then
+		if ctf_modebase.respawn_delay.prepare(player) then
 			if not ctf_modebase.build_timer.in_progress() then
 				recent_rankings.add(player, {deaths = 1})
 			end
@@ -292,11 +306,11 @@ return {
 	end,
 	on_respawnplayer = function(player)
 		if not ctf_modebase.build_timer.in_progress() then
-			if ctf_modebase.delay_respawn(player, 7, 4) then
+			if ctf_modebase.respawn_delay.respawn(player, 7, 4) then
 				return true
 			end
 		else
-			if ctf_modebase.delay_respawn(player, 3) then
+			if ctf_modebase.respawn_delay.respawn(player, 3) then
 				return true
 			end
 		end

@@ -17,7 +17,7 @@ for i, dirname in ipairs(maps) do
 	end
 end
 
-assert(#ctf_modebase.map_catalog.maps > 0)
+assert(#ctf_modebase.map_catalog.maps > 0 or ctf_core.settings.server_mode == "mapedit")
 
 local function show_catalog(pname, current_map)
 	local map_names = {}
