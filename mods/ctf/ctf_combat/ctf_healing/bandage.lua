@@ -69,13 +69,23 @@ function ctf_healing.register_bandage(name, def)
 	}
 
 	if def.rightclick_func then
-		tooldef.on_place = def.rightclick_func
+		tooldef.on_place = function(itemstack, user, pointed, ...)
+			local pointed_def = false
+			local node
 
-		tooldef.on_secondary_use = function(itemstack, user, pointed_thing, ...)
-			if pointed_thing then
-				def.rightclick_func(itemstack, user, pointed_thing, ...)
+			if pointed and pointed.under then
+				node = minetest.get_node(pointed.under)
+				pointed_def = minetest.registered_nodes[node.name]
+			end
+
+			if pointed_def and pointed_def.on_rightclick then
+				pointed_def.on_rightclick(pointed.under, node, user, itemstack, pointed)
+			else
+				def.rightclick_func(itemstack, user, pointed, ...)
 			end
 		end
+
+		tooldef.on_secondary_use = def.rightclick_func
 	end
 
 	minetest.register_tool(name, tooldef)

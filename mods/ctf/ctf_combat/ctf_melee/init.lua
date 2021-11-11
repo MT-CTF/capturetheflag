@@ -33,6 +33,8 @@ function ctf_melee.simple_register_sword(name, def)
 	local base_def = {
 		description = def.description,
 		inventory_image = def.inventory_image,
+		inventory_overlay = def.inventory_overlay,
+		wield_image = def.wield_image,
 		tool_capabilities = {
 			full_punch_interval = def.full_punch_interval,
 			max_drop_level=1,
@@ -49,13 +51,23 @@ function ctf_melee.simple_register_sword(name, def)
 	base_def.groups.sword = 1
 
 	if def.rightclick_func then
-		base_def.on_place = def.rightclick_func
+		base_def.on_place = function(itemstack, user, pointed, ...)
+			local pointed_def = false
+			local node
 
-		base_def.on_secondary_use = function(itemstack, user, pointed_thing, ...)
-			if pointed_thing then
-				def.rightclick_func(itemstack, user, pointed_thing, ...)
+			if pointed and pointed.under then
+				node = minetest.get_node(pointed.under)
+				pointed_def = minetest.registered_nodes[node.name]
+			end
+
+			if pointed_def and pointed_def.on_rightclick then
+				return pointed_def.on_rightclick(pointed.under, node, user, itemstack, pointed)
+			else
+				return def.rightclick_func(itemstack, user, pointed, ...)
 			end
 		end
+
+		base_def.on_secondary_use = def.rightclick_func
 	end
 
 	minetest.register_tool(name, base_def)

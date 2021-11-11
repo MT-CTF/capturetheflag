@@ -7,7 +7,7 @@ function grenades.throw_grenade(name, startspeed, player)
 	local pos = player:get_pos()
 	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5 + dir.y, z = pos.z + dir.z}, name)
 
-	obj:set_velocity(vector.multiply(dir, startspeed))
+	obj:set_velocity(vector.add(vector.multiply(dir, startspeed), player:get_velocity()))
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
 	obj:get_luaentity().thrower_name = player:get_player_name()

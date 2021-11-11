@@ -111,8 +111,8 @@ local fragdef = {
 
 grenades.register_grenade("grenades:frag", fragdef)
 local fragdef_small = table.copy(fragdef)
-fragdef_small.explode_radius = 4
-fragdef_small.explode_damage = 10
+fragdef_small.explode_radius = 3
+fragdef_small.explode_damage = 12
 grenades.register_grenade("grenades:frag_small", fragdef_small)
 local fragdef_sticky = table.copy(fragdef)
 fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"

@@ -17,10 +17,6 @@ function ctf_gui.init()
 	ctf_core.register_on_formspec_input(modname..":", function(pname, formname, fields)
 		if not context[pname] then return end
 
-		if fields.quit and context[pname].on_quit then
-			context[pname].on_quit(pname, fields)
-		end
-
 		if context[pname].formname == formname and context[pname].elements then
 			for name, info in pairs(fields) do
 				if context[pname].elements[name] and context[pname].elements[name].func then
@@ -40,6 +36,10 @@ function ctf_gui.init()
 				end
 			end
 		end
+
+		if fields.quit and context[pname].on_quit then
+			context[pname].on_quit(pname, fields)
+		end
 	end)
 end
 
@@ -58,7 +58,7 @@ function ctf_gui.show_formspec(player, formname, formdef)
 				"hypertext[0,0.2;"..formdef.size.x..
 					",1.6;title;<center><big>"..formdef.title.."</big>\n" ..
 					(formdef.description or "\b") .."</center>]" ..
-				"scroll_container[0.1,1;"..formdef.size.x..
+				"scroll_container[0.1,1.5;"..formdef.size.x..
 				","..formdef.size.y..";formcontent;vertical]"
 
 	local using_scrollbar = false
@@ -156,16 +156,18 @@ function ctf_gui.show_formspec(player, formname, formdef)
 					def.pos.y,
 					id,
 					minetest.formspec_escape(def.label),
-					def.default or false
+					def.default and "true" or "false"
 				)
 			elseif def.type == "textarea" then
 				formspec = formspec .. string.format(
-					"textarea[%f,%f;%f,%f;;;%s]",
+					"textarea[%f,%f;%f,%f;%s;%s;%s]",
 					def.pos.x,
 					def.pos.y,
 					def.size.x,
 					def.size.y,
-					minetest.formspec_escape(def.text)
+					def.read_only and "" or id,
+					minetest.formspec_escape(def.label or ""),
+					minetest.formspec_escape(def.default or "")
 				)
 			elseif def.type == "image" then
 				formspec = formspec .. string.format(
@@ -174,7 +176,7 @@ function ctf_gui.show_formspec(player, formname, formdef)
 					def.pos.y,
 					def.size.x,
 					def.size.y,
-					def.texture
+					minetest.formspec_escape(def.texture or "")
 				)
 			elseif def.type == "textlist" then
 				if def.items then

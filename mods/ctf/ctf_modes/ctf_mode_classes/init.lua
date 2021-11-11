@@ -1,8 +1,7 @@
 local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.feature_presets.recent_rankings(rankings)
-local flag_huds = ctf_modebase.feature_presets.flag_huds
 local bounties = ctf_modebase.feature_presets.bounties(recent_rankings)
-local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings, flag_huds)
+local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings)
 
 local crafts, classes = ctf_core.include_files(
 	"crafts.lua",
@@ -28,6 +27,7 @@ ctf_modebase.register_mode("classes", {
 		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
 		["ctf_ranged:rifle_loaded"  ] = {rarity = 0.2                 },
 		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
+		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
 
 		["ctf_ranged:ammo"     ] = {min_count = 3, max_count = 10, rarity = 0.3 , max_stacks = 2},
 		["default:apple"       ] = {min_count = 5, max_count = 20, rarity = 0.1 , max_stacks = 2},
@@ -75,13 +75,10 @@ ctf_modebase.register_mode("classes", {
 
 		classes.finish()
 	end,
-	on_new_match = function(mapdef)
+	on_new_match = function()
 		teams.on_new_match()
 
-		ctf_modebase.build_timer.start(mapdef, 60 * 1.5, function()
-			ctf_modebase.summary.on_match_start()
-			ctf_modebase.bounties.on_match_start()
-		end)
+		ctf_modebase.build_timer.start(60 * 1.5)
 
 		give_initial_stuff.register_stuff_provider(function(player)
 			local initial_stuff = classes.get(player).items or {}
@@ -90,13 +87,9 @@ ctf_modebase.register_mode("classes", {
 
 			return(initial_stuff)
 		end)
-
-		ctf_map.place_chests(mapdef)
 	end,
-	on_match_end = function()
-		teams.on_match_end()
-	end,
-	allocate_player = teams.allocate_player,
+	on_match_end = teams.on_match_end,
+	team_allocator = teams.team_allocator,
 	on_allocplayer = function(player, teamname)
 		classes.set(player)
 

@@ -2,6 +2,33 @@ ctf_gui.init()
 
 local context = {}
 
+local function edit_map(pname, map)
+	local p = minetest.get_player_by_name(pname)
+
+	minetest.close_formspec(pname, "ctf_map:loading")
+
+	ctf_map.announce_map(map)
+
+	p:set_pos(vector.add(map.pos1, vector.divide(map.size, 2)))
+
+	skybox.set(p, table.indexof(ctf_map.skyboxes, map.skybox)-1)
+
+	physics.set(pname, "ctf_map_editor_speed", {
+		speed = map.phys_speed,
+		jump = map.phys_jump,
+		gravity = map.phys_gravity,
+	})
+
+	minetest.settings:set("time_speed", map.time_speed * 72)
+	minetest.registered_chatcommands["time"].func(pname, tostring(map.start_time))
+
+	minetest.after(8, function()
+		minetest.fix_light(map.pos1, map.pos2)
+	end)
+
+	context[pname] = map
+end
+
 function ctf_map.show_map_editor(player)
 	if context[player] then
 		ctf_map.show_map_save_form(player)
@@ -12,15 +39,16 @@ function ctf_map.show_map_editor(player)
 	local dirlist_sorted = dirlist
 	table.sort(dirlist_sorted)
 
+	local selected_map = 1
 	ctf_gui.show_formspec(player, "ctf_map:start", {
-		size = {x = 8, y = 10},
+		size = {x = 8, y = 10.2},
 		title = "Capture The Flag Map Editor",
 		description = "Would you like to edit an existing map or create a new one?",
 		privs = {ctf_map_editor = true},
 		elements = {
 			newmap = {
 				type = "button", exit = true, label = "Create New Map",
-				pos = {"center", 0.5},
+				pos = {"center", 0},
 				func = function(pname)
 					minetest.chat_send_player(pname,
 							"Please decide what the size of your map will be and punch nodes on two opposite corners of it")
@@ -39,7 +67,7 @@ function ctf_map.show_map_editor(player)
 							others        = "Other info",
 							base_node     = "ctf_map:cobble",
 							initial_stuff = {},
-							treasures     = {},
+							treasures     = "none",
 							skybox        = "none",
 							-- Also see the save form for defaults
 							start_time    = ctf_map.DEFAULT_START_TIME,
@@ -60,49 +88,45 @@ function ctf_map.show_map_editor(player)
 				end,
 			},
 			editexisting = {
-				type = "button", exit = true, label = "Edit Existing map",
-				pos = {"center", 1.8},
+				type = "button", exit = true, label = "Edit Existing Map",
+				pos = {0.1, 1.8},
 				func = function(pname, fields)
-					local p = PlayerObj(pname)
-
 					minetest.after(0.1, function()
 						ctf_gui.show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = "Capture The Flag Map Editor",
-							description = "Placing map '"..fields.currentmaps.."'. This will take a few seconds..."
+							description = "Placing map '"..dirlist_sorted[selected_map].."'. This will take a few seconds..."
 						})
 					end)
 
 					minetest.after(0.5, function()
-						local idx = table.indexof(dirlist, fields.currentmaps)
-						local map = ctf_map.load_map_meta(idx, fields.currentmaps)
+						local idx = table.indexof(dirlist, dirlist_sorted[selected_map])
+						local map = ctf_map.load_map_meta(idx, dirlist_sorted[selected_map])
 
 						ctf_map.place_map(map, function()
-							minetest.after(2, function()
-								ctf_map.announce_map(map)
-
-								minetest.close_formspec(pname, "ctf_map:loading")
-
-								p:set_pos(vector.add(map.pos1, vector.divide(map.size, 2)))
-
-								skybox.set(p, table.indexof(ctf_map.skyboxes, map.skybox)-1)
-
-								physics.set(pname, "ctf_map_editor_speed", {
-									speed = map.phys_speed,
-									jump = map.phys_jump,
-									gravity = map.phys_gravity,
-								})
-
-								minetest.settings:set("time_speed", map.time_speed * 72)
-								minetest.registered_chatcommands["time"].func(pname, tostring(map.start_time))
-							end)
-
-							minetest.after(10, function()
-								minetest.fix_light(map.pos1, map.pos2)
-							end)
-
-							context[pname] = map
+								minetest.after(2, edit_map, pname, map)
 						end)
+					end)
+				end,
+			},
+			resume_edit = {
+				type = "button", exit = true, label = "Resume Editing Map",
+				pos = {(8-ctf_gui.ELEM_SIZE.x) - 0.3, 1.8},
+				func = function(pname, fields)
+					minetest.after(0.1, function()
+						ctf_gui.show_formspec(pname, "ctf_map:loading", {
+							size = {x = 6, y = 4},
+							title = "Capture The Flag Map Editor",
+							description = "Resuming map '"..dirlist_sorted[selected_map]..
+									"'.\n(Remember that this doesn't recall setting changes)"
+						})
+					end)
+
+					minetest.after(0.5, function()
+						local idx = table.indexof(dirlist, dirlist_sorted[selected_map])
+						local map = ctf_map.load_map_meta(idx, dirlist_sorted[selected_map])
+
+						minetest.after(2, edit_map, pname, map)
 					end)
 				end,
 			},
@@ -111,6 +135,13 @@ function ctf_map.show_map_editor(player)
 				pos = {"center", 1.9 + ctf_gui.ELEM_SIZE.y},
 				size = {6, 6},
 				items = dirlist_sorted,
+				func = function(pname, fields)
+					local event = minetest.explode_textlist_event(fields.currentmaps)
+
+					if event.type ~= "INV" then
+						selected_map = event.index
+					end
+				end,
 			},
 		}
 	})
@@ -190,13 +221,13 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP TREASURES
 	elements.treasures = {
-		type = "field", label = "Map Treasures", pos = {0, ypos}, size = {6, 0.7},
-		default = table.concat(context[player].treasures or {"none"}, ","),
+		type = "textarea", label = "Map Treasures", pos = {0, ypos}, size = {ctf_gui.FORM_SIZE.x-3.6, 2.1},
+		default = context[player].treasures,
 		func = function(pname, fields, name)
-			context[pname].treasures = string.split(fields[name], ",")
+			context[pname].treasures = fields[name]
 		end,
 	}
-	ypos = ypos + 1.7
+	ypos = ypos + 3.1
 
 	-- SKYBOX SELECTOR
 	elements.skybox_label = {
@@ -485,6 +516,10 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			minetest.after(0.1, function()
 				if context[pname].initial_stuff[1] == "none" then
 					table.remove(context[player].initial_stuff, 1)
+				end
+
+				if context[pname].treasures == "none" then
+					context[pname].treasures = nil
 				end
 
 				ctf_map.save_map(context[pname])

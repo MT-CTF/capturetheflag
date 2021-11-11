@@ -160,7 +160,11 @@ function top:set(player, score)
 	local need_move = false
 	if score > node.x then
 		local next_node = node.r
-		if not next_node then
+		if next_node then
+			while next_node.l do
+				next_node = next_node.l
+			end
+		else
 			local tmp_node = node
 			while tmp_node do
 				if tmp_node.p and tmp_node.p.l == tmp_node then
@@ -175,7 +179,11 @@ function top:set(player, score)
 		end
 	elseif score < node.x then
 		local next_node = node.l
-		if not next_node then
+		if next_node then
+			while next_node.r do
+				next_node = next_node.r
+			end
+		else
 			local tmp_node = node
 			while tmp_node do
 				if tmp_node.p and tmp_node.p.r == tmp_node then

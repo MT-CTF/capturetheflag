@@ -1,8 +1,7 @@
 local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.feature_presets.recent_rankings(rankings)
-local flag_huds = ctf_modebase.feature_presets.flag_huds
 local bounties = ctf_modebase.feature_presets.bounties(recent_rankings)
-local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings, flag_huds)
+local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings)
 
 local crafts = ctf_core.include_files(
 	"crafts.lua"
@@ -60,24 +59,17 @@ ctf_modebase.register_mode("classic", {
 		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 	end,
-	on_new_match = function(mapdef)
+	on_new_match = function()
 		teams.on_new_match()
 
-		ctf_modebase.build_timer.start(mapdef, nil, function()
-			ctf_modebase.summary.on_match_start()
-			ctf_modebase.bounties.on_match_start()
-		end)
+		ctf_modebase.build_timer.start()
 
 		give_initial_stuff.register_stuff_provider(function()
 			return {"default:sword_stone", "default:pick_stone", "default:torch 15", "default:stick 5"}
 		end)
-
-		ctf_map.place_chests(mapdef)
 	end,
-	on_match_end = function()
-		teams.on_match_end()
-	end,
-	allocate_player = teams.allocate_player,
+	on_match_end = teams.on_match_end,
+	team_allocator = teams.team_allocator,
 	on_allocplayer = function(player, teamname)
 		local tcolor = ctf_teams.team[teamname].color
 

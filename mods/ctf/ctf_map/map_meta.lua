@@ -26,7 +26,6 @@ function ctf_map.load_map_meta(idx, dirname)
 		local start_time = meta:get("start_time")
 		local time_speed = meta:get("time_speed")
 		local initial_stuff = meta:get("initial_stuff")
-		local treasures = meta:get("treasures")
 
 		offset.y = -maph / 2
 
@@ -50,7 +49,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			others        = meta:get("others"),
 			base_node     = meta:get("base_node"),
 			initial_stuff = initial_stuff and initial_stuff:split(","),
-			treasures     = treasures and treasures:split(";"),
+			treasures     = meta:get("treasures"),
 			skybox        = "none",
 			start_time    = start_time and tonumber(start_time) or ctf_map.DEFAULT_START_TIME,
 			time_speed    = time_speed and tonumber(time_speed) or 1,
@@ -90,8 +89,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			from, to = vector.sort(from, to)
 
 			map.chests[i] = {
-				pos1   = vector.add(from, offset_to_new),
-				pos2   = vector.add(to,   offset_to_new),
+				pos1   = vector.add(offset, vector.add(from, offset_to_new)),
+				pos2   = vector.add(offset, vector.add(to,   offset_to_new)),
 				amount = tonumber(meta:get("chests." .. i .. ".n") or "20"),
 			}
 
@@ -127,7 +126,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			license       = meta:get("license"),
 			others        = meta:get("others"),
 			initial_stuff = minetest.deserialize(meta:get("initial_stuff")),
-			treasures     = minetest.deserialize(meta:get("treasures")),
+			treasures     = meta:get("treasures"),
 			skybox        = meta:get("skybox"),
 			start_time    = tonumber(meta:get("start_time")),
 			time_speed    = tonumber(meta:get("time_speed")),
@@ -229,7 +228,7 @@ function ctf_map.save_map(mapmeta)
 	meta:set("license"      , mapmeta.license)
 	meta:set("others"       , mapmeta.others)
 	meta:set("initial_stuff", minetest.serialize(mapmeta.initial_stuff))
-	meta:set("treasures"    , minetest.serialize(mapmeta.treasures))
+	meta:set("treasures"    , mapmeta.treasures)
 	meta:set("skybox"       , mapmeta.skybox)
 	meta:set("start_time"   , mapmeta.start_time)
 	meta:set("time_speed"   , mapmeta.time_speed)

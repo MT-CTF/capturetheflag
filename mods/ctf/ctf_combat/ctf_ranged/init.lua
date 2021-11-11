@@ -95,6 +95,8 @@ function ctf_ranged.simple_register_gun(name, def)
 	function(loaded_def)
 		loaded_def.description = def.description.." (Loaded)"
 		loaded_def.inventory_image = def.texture
+		loaded_def.inventory_overlay = def.texture_overlay
+		loaded_def.wield_image = def.wield_texture or def.texture
 		loaded_def.groups.not_in_creative_inventory = nil
 		loaded_def.on_use = function(itemstack, user)
 			if shoot_cooldown:get(user) then
@@ -140,13 +142,23 @@ function ctf_ranged.simple_register_gun(name, def)
 		end
 
 		if def.rightclick_func then
-			loaded_def.on_place = def.rightclick_func
+			loaded_def.on_place = function(itemstack, user, pointed, ...)
+				local pointed_def = false
+				local node
 
-			loaded_def.on_secondary_use = function(itemstack, user, pointed_thing, ...)
-				if pointed_thing then
-					def.rightclick_func(itemstack, user, pointed_thing, ...)
+				if pointed and pointed.under then
+					node = minetest.get_node(pointed.under)
+					pointed_def = minetest.registered_nodes[node.name]
+				end
+
+				if pointed_def and pointed_def.on_rightclick then
+					return pointed_def.on_rightclick(pointed.under, node, user, itemstack, pointed)
+				else
+					return def.rightclick_func(itemstack, user, pointed, ...)
 				end
 			end
+
+			loaded_def.on_secondary_use = def.rightclick_func
 		end
 	end))
 end

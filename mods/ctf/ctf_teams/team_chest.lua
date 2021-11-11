@@ -3,6 +3,13 @@ local blacklist = {
 	".*leaves$",
 }
 
+local function get_chest_access(name)
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return false, false end
+
+	return current_mode.get_chest_access(name)
+end
+
 function ctf_teams.is_allowed_in_team_chest(listname, stack, player)
 	if listname == "helper" then
 		return false
@@ -63,13 +70,8 @@ for _, chest_color in pairs(colors) do
 	end
 
 	function def.on_rightclick(pos, node, player)
-		local current_mode = ctf_modebase:get_current_mode()
-
-		if not current_mode then return end
-
 		local meta = minetest.get_meta(pos)
 		local name = player:get_player_name()
-		local pteam = ctf_teams.get(name)
 
 		if meta:get_string("infotext") == "" then
 			table.insert(ctf_teams.team_chests, pos)
@@ -77,7 +79,8 @@ for _, chest_color in pairs(colors) do
 			def.on_construct(pos)
 		end
 
-		if chest_color ~= pteam then
+		local flag_captured = ctf_modebase.flag_captured[chest_color]
+		if not flag_captured and chest_color ~= ctf_teams.get(name) then
 			minetest.chat_send_player(name, string.format("You're not on team %s", chest_color))
 			return
 		end
@@ -88,9 +91,15 @@ for _, chest_color in pairs(colors) do
 			"list[current_player;main;0,7.85;8,1;]",
 			"list[current_player;main;0,9.08;8,3;8]",
 		}, "")
-		local reg_access, pro_access = ctf_modebase:get_current_mode().get_chest_access(name)
 
-		if type(reg_access) == "string" then
+		local reg_access, pro_access
+		if not flag_captured then
+			reg_access, pro_access = get_chest_access(name)
+		else
+			reg_access, pro_access = true, true
+		end
+
+		if reg_access ~= true then
 			formspec = formspec .. "label[0.75,3;" ..
 				minetest.formspec_escape(minetest.wrap_text(
 					reg_access or "You aren't allowed to access the team chest",
@@ -132,16 +141,15 @@ for _, chest_color in pairs(colors) do
 	function def.allow_metadata_inventory_move(pos, from_list, from_index,
 			to_list, to_index, count, player)
 		local name = player:get_player_name()
+
 		if chest_color ~= ctf_teams.get(name) then
 			minetest.chat_send_player(name, "You're not on team " .. chest_color)
 			return 0
 		end
 
-		if ctf_modebase:get_current_mode().get_chest_access(name) == nil then
-			return 0
-		end
+		local reg_access, pro_access = get_chest_access(name)
 
-		if (from_list ~= "pro" and to_list ~= "pro") or ctf_modebase:get_current_mode().get_chest_access(name) == "pro" then
+		if reg_access == true and (pro_access == true or from_list ~= "pro" and to_list ~= "pro") then
 			if to_list == "helper" then
 				-- handle move & overflow
 				local chestinv = minetest.get_inventory({type = "node", pos = pos})
@@ -165,12 +173,9 @@ for _, chest_color in pairs(colors) do
 
 	function def.allow_metadata_inventory_put(pos, listname, index, stack, player)
 		local name = player:get_player_name()
+
 		if chest_color ~= ctf_teams.get(name) then
 			minetest.chat_send_player(name, "You're not on team " .. chest_color)
-			return 0
-		end
-
-		if not ctf_modebase:get_current_mode().get_chest_access(name) == true then
 			return 0
 		end
 
@@ -178,7 +183,9 @@ for _, chest_color in pairs(colors) do
 			return 0
 		end
 
-		if listname ~= "pro" or ctf_modebase:get_current_mode().get_chest_access(name) == "pro" then
+		local reg_access, pro_access = get_chest_access(name)
+
+		if reg_access == true and (pro_access == true or listname ~= "pro") then
 			local chestinv = minetest.get_inventory({type = "node", pos = pos})
 			if chestinv:room_for_item("pro", stack) then
 				return stack:get_count()
@@ -202,17 +209,20 @@ for _, chest_color in pairs(colors) do
 			return 0
 		end
 
+		if ctf_modebase.flag_captured[chest_color] then
+			return stack:get_count()
+		end
+
 		local name = player:get_player_name()
+
 		if chest_color ~= ctf_teams.get(name) then
 			minetest.chat_send_player(name, "You're not on team " .. chest_color)
 			return 0
 		end
 
-		if not ctf_modebase:get_current_mode().get_chest_access(name) == true then
-			return 0
-		end
+		local reg_access, pro_access = get_chest_access(name)
 
-		if listname ~= "pro" or ctf_modebase:get_current_mode().get_chest_access(name) == "pro" then
+		if reg_access == true and (pro_access == true or listname ~= "pro") then
 			return stack:get_count()
 		else
 			return 0

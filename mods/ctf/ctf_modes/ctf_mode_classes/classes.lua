@@ -55,6 +55,8 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	description = "Knight Sword\nRightclick to use Rage ability (Lasts "..
 			KNIGHT_USAGE_TIME.."s, "..KNIGHT_COOLDOWN_TIME.."s cooldown)",
 	inventory_image = "default_tool_bronzesword.png",
+	inventory_overlay = "ctf_modebase_special_item.png",
+	wield_image = "default_tool_bronzesword.png",
 	damage_groups = {fleshy = 7},
 	full_punch_interval = 0.7,
 	rightclick_func = function(itemstack, user, pointed)
@@ -102,6 +104,8 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "rifle",
 	description = "Rifle\nRightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)",
 	texture = "ctf_mode_classes_ranged_rifle.png",
+	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
+	wield_texture = "ctf_mode_classes_ranged_rifle.png",
 	fire_sound = "ctf_ranged_rifle",
 	rounds = 0,
 	range = 150,
@@ -140,6 +144,7 @@ local scaling_def = {
 	tiles = {"default_ladder_steel.png"},
 	drawtype = "signlike",
 	inventory_image = "default_ladder_steel.png",
+	inventory_overlay = "ctf_modebase_special_item.png",
 	wield_image = "default_ladder_steel.png",
 	paramtype = "light",
 	paramtype2 = "wallmounted",
@@ -175,6 +180,8 @@ minetest.register_node("ctf_mode_classes:scaling_ladder", scaling_def)
 minetest.register_tool("ctf_mode_classes:support_paxel", {
 	description = "Paxel",
 	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
+	inventory_overlay = "ctf_modebase_special_item.png",
+	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -206,6 +213,8 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		IMMUNITY_TIME, IMMUNITY_COOLDOWN
 	),
 	inventory_image = "ctf_healing_bandage.png",
+	inventory_overlay = "ctf_modebase_special_item.png",
+	wield_image = "ctf_healing_bandage.png",
 	heal_percent = HEAL_PERCENT,
 	heal_min = 4,
 	heal_max = 5,
@@ -234,6 +243,12 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 
 					local dstep = math.floor(65534 / IMMUNITY_COOLDOWN)
 					ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", dstep, true)
+				end
+			end, function()
+				local player = minetest.get_player_by_name(pname)
+
+				if player then
+					player:set_properties({pointable = true, textures = old_textures})
 				end
 			end)
 		end
@@ -288,7 +303,6 @@ return {
 			physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
 		end
 
-		dropondie.drop_all(player)
 		give_initial_stuff(player)
 	end,
 	get = function(player)

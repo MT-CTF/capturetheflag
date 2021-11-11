@@ -27,10 +27,10 @@ ctf_teams = {
 		},
 	},
 	teamlist = {},
+
 	player_team = {},
-	current_teams = {},
+	online_players = {},
 	current_team_list = {},
-	remembered_player = {}, -- Holds players that have been set to a team previously. Format: ["player_name"] = teamname
 
 	team_chests = {}, -- Whenever a team chest is initialized it'll be put in this table
 }
@@ -64,7 +64,7 @@ minetest.send_join_message = empty_func
 minetest.send_leave_message = empty_func
 
 minetest.register_on_joinplayer(function(player, ...)
-	ctf_teams.allocate_player(player)
+	ctf_teams.allocate_player(player, true)
 
 	local pteam = ctf_teams.get(player)
 
@@ -85,6 +85,8 @@ minetest.register_on_leaveplayer(function(player, timed_out, ...)
 	if not pteam then
 		old_leave_func(player:get_player_name(), timed_out, ...)
 	else
+		ctf_teams.remove_online_player(player)
+
 		local tcolor = ctf_teams.team[pteam].color
 
 		minetest.chat_send_all(string.format("*** %s left the game%s.",
