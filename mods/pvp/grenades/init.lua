@@ -5,7 +5,7 @@ grenades = {
 function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
-	local obj = minetest.add_entity({x = pos.x + dir.x, y = pos.y + 1.5 + dir.y, z = pos.z + dir.z}, name)
+	local obj = minetest.add_entity(vector.new(pos.x, pos.y + player:get_properties().eye_height, pos.z), name)
 
 	obj:set_velocity(vector.add(vector.multiply(dir, startspeed), player:get_velocity()))
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
@@ -133,7 +133,7 @@ function grenades.register_grenade(name, def)
 
 	minetest.register_entity(name, grenade_entity)
 
-	local newdef = {}
+	local newdef = {grenade = def}
 
 	newdef.description = def.description
 	newdef.stack_max = def.stack_max or 1

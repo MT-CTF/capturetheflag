@@ -52,8 +52,9 @@ local KNIGHT_COOLDOWN_TIME = 42
 local KNIGHT_USAGE_TIME = 12
 
 ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
-	description = "Knight Sword\nRightclick to use Rage ability (Lasts "..
-			KNIGHT_USAGE_TIME.."s, "..KNIGHT_COOLDOWN_TIME.."s cooldown)",
+	description = "Knight Sword\n" .. minetest.colorize("gold",
+			"Rightclick to use Rage ability (Lasts "..
+			KNIGHT_USAGE_TIME.."s, "..KNIGHT_COOLDOWN_TIME.."s cooldown)"),
 	inventory_image = "default_tool_bronzesword.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
 	wield_image = "default_tool_bronzesword.png",
@@ -61,15 +62,8 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	full_punch_interval = 0.7,
 	rightclick_func = function(itemstack, user, pointed)
 		local pname = user:get_player_name()
-		local pointed_nodedef = {}
 
-		if pointed and pointed.type == "node" then
-			pointed_nodedef = minetest.registered_nodes[minetest.get_node(pointed.under).name]
-		end
-
-		if (not pointed or not pointed_nodedef.on_rightclick) and itemstack:get_wear() == 0 then
-			user:set_wielded_item("ctf_melee:sword_diamond")
-
+		if itemstack:get_wear() == 0 then
 			local step = math.floor(65534 / KNIGHT_USAGE_TIME)
 			ctf_modebase.update_wear.start_update(pname, "ctf_melee:sword_diamond", step, false, function()
 				local player = minetest.get_player_by_name(pname)
@@ -88,9 +82,9 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 					end
 				end
 			end)
-		end
 
-		minetest.item_place(itemstack, user, pointed)
+			return "ctf_melee:sword_diamond"
+		end
 	end,
 })
 
@@ -102,7 +96,8 @@ local RANGED_COOLDOWN_TIME = 36
 
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "rifle",
-	description = "Rifle\nRightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)",
+	description = "Rifle\n" .. minetest.colorize("gold",
+			"Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)"),
 	texture = "ctf_mode_classes_ranged_rifle.png",
 	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
 	wield_texture = "ctf_mode_classes_ranged_rifle.png",
@@ -113,22 +108,15 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	fire_interval = 0.8,
 	liquid_travel_dist = 4,
 	rightclick_func = function(itemstack, user, pointed)
-		local pointed_nodedef = {}
-
-		if pointed and pointed.type == "node" then
-			pointed_nodedef = minetest.registered_nodes[minetest.get_node(pointed.under).name]
-		end
-
-		if (not pointed or not pointed_nodedef.on_rightclick) and itemstack:get_wear() == 0 then
+		if itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
 			itemstack:set_wear(65534)
-			user:set_wielded_item(itemstack)
 
 			local step = math.floor(65534 / RANGED_COOLDOWN_TIME)
 			ctf_modebase.update_wear.start_update(user:get_player_name(), "ctf_mode_classes:ranged_rifle_loaded", step, true)
-		end
 
-		minetest.item_place(itemstack, user, pointed)
+			return itemstack
+		end
 	end
 })
 
@@ -140,7 +128,8 @@ local SCALING_TIMEOUT = 4
 
 -- Code borrowed from minetest_game default/nodes.lua -> default:ladder_steel
 local scaling_def = {
-	description = "Scaling Ladder (Infinite, self-removes after "..SCALING_TIMEOUT.."s)",
+	description = "Scaling Ladder\n"..
+			minetest.colorize("gold", "(Infinite usage, self-removes after "..SCALING_TIMEOUT.."s)"),
 	tiles = {"default_ladder_steel.png"},
 	drawtype = "signlike",
 	inventory_image = "default_ladder_steel.png",
@@ -180,8 +169,6 @@ minetest.register_node("ctf_mode_classes:scaling_ladder", scaling_def)
 minetest.register_tool("ctf_mode_classes:support_paxel", {
 	description = "Paxel",
 	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
-	inventory_overlay = "ctf_modebase_special_item.png",
-	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level=1,
@@ -208,7 +195,7 @@ local HEAL_PERCENT = 0.8
 ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	description = string.format(
 		"Bandage\nHeals teammates for 4-5 HP until target's HP is equal to %d%% of their maximum HP\n" ..
-		"Rightclick to become immune to damage for %ds (%ds cooldown)",
+		minetest.colorize("gold", "Rightclick to become immune to damage for %ds (%ds cooldown)"),
 		HEAL_PERCENT * 100,
 		IMMUNITY_TIME, IMMUNITY_COOLDOWN
 	),
@@ -219,23 +206,18 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	heal_min = 4,
 	heal_max = 5,
 	rightclick_func = function(itemstack, user, pointed)
-		local pointed_nodedef = {}
 		local pname = user:get_player_name()
 
-		if pointed and pointed.type == "node" then
-			pointed_nodedef = minetest.registered_nodes[minetest.get_node(pointed.under).name]
-		end
-
-		if (not pointed or not pointed_nodedef.on_rightclick) and itemstack:get_wear() == 0 then
+		if itemstack:get_wear() == 0 then
 			local old_textures = user:get_properties().textures
 
 			user:set_properties({pointable = false, textures = {old_textures[1].."^[brighten^[multiply:#7ba5ff"}})
 
 			itemstack:set_wear(1)
-			user:set_wielded_item(itemstack)
 
 			local step = math.floor(65534 / IMMUNITY_TIME)
-			ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", step, false, function()
+			ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", step, false,
+			function()
 				local player = minetest.get_player_by_name(pname)
 
 				if player then
@@ -244,16 +226,16 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 					local dstep = math.floor(65534 / IMMUNITY_COOLDOWN)
 					ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", dstep, true)
 				end
-			end, function()
+			end,
+			function()
 				local player = minetest.get_player_by_name(pname)
-
 				if player then
 					player:set_properties({pointable = true, textures = old_textures})
 				end
 			end)
-		end
 
-		minetest.item_place(itemstack, user, pointed)
+			return itemstack
+		end
 	end
 })
 

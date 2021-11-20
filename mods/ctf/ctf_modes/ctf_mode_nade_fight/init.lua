@@ -3,11 +3,12 @@ local recent_rankings = ctf_modebase.feature_presets.recent_rankings(rankings)
 local bounties = ctf_modebase.feature_presets.bounties(recent_rankings)
 local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings)
 
-ctf_core.include_files("tool.lua")
+local tool = ctf_core.include_files("tool.lua")
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 ctf_modebase.register_mode("nade_fight", {
+	hp_regen = 2,
 	treasures = {
 		["default:ladder_wood"] = {           max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:torch" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -70,7 +71,7 @@ ctf_modebase.register_mode("nade_fight", {
 
 		give_initial_stuff.register_stuff_provider(function(player)
 			return {
-				"ctf_mode_nade_fight:grenade_tool_1",
+				tool.get_grenade_tool(player),
 				"default:pick_steel",
 				"default:shovel_steel",
 				"default:axe_steel"

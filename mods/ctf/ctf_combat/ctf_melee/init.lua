@@ -61,7 +61,7 @@ function ctf_melee.simple_register_sword(name, def)
 			end
 
 			if pointed_def and pointed_def.on_rightclick then
-				return pointed_def.on_rightclick(pointed.under, node, user, itemstack, pointed)
+				return minetest.item_place(itemstack, user, pointed)
 			else
 				return def.rightclick_func(itemstack, user, pointed, ...)
 			end

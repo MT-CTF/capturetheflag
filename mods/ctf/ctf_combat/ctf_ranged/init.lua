@@ -152,7 +152,7 @@ function ctf_ranged.simple_register_gun(name, def)
 				end
 
 				if pointed_def and pointed_def.on_rightclick then
-					return pointed_def.on_rightclick(pointed.under, node, user, itemstack, pointed)
+					return minetest.item_place(itemstack, user, pointed)
 				else
 					return def.rightclick_func(itemstack, user, pointed, ...)
 				end
@@ -168,9 +168,9 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	description = "Pistol",
 	texture = "ctf_ranged_pistol.png",
 	fire_sound = "ctf_ranged_pistol",
-	rounds = 50,
+	rounds = 54,
 	range = 75,
-	damage = 1,
+	damage = 2,
 	automatic = true,
 	fire_interval = 0.6,
 	liquid_travel_dist = 2
@@ -194,8 +194,8 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	texture = "ctf_ranged_shotgun.png",
 	fire_sound = "ctf_ranged_shotgun",
 	bullet = {
-		amount = 30,
-		spread = 3,
+		amount = 32,
+		spread = 3.6,
 	},
 	rounds = 10,
 	range = 25,
@@ -212,7 +212,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 		spread = 1,
 	},
 	automatic = true,
-	rounds = 30,
+	rounds = 36,
 	range = 75,
 	damage = 2,
 	fire_interval = 0.1,

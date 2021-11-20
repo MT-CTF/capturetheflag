@@ -31,11 +31,11 @@ local fragdef = {
 		return true
 	end,
 	on_explode = function(def, pos, name)
-		if not name or not pos then
-			return
-		end
+		if not name or not pos then return end
 
 		local player = minetest.get_player_by_name(name)
+		if not player then return end
+
 
 		local radius = def.explode_radius
 
@@ -110,10 +110,7 @@ local fragdef = {
 }
 
 grenades.register_grenade("grenades:frag", fragdef)
-local fragdef_small = table.copy(fragdef)
-fragdef_small.explode_radius = 3
-fragdef_small.explode_damage = 12
-grenades.register_grenade("grenades:frag_small", fragdef_small)
+
 local fragdef_sticky = table.copy(fragdef)
 fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
 fragdef_sticky.image = "grenades_frag_sticky.png"

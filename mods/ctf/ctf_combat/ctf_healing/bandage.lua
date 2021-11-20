@@ -6,6 +6,8 @@ function ctf_healing.register_bandage(name, def)
 	local tooldef = {
 		description = def.description,
 		inventory_image = def.inventory_image,
+		inventory_overlay = def.inventory_overlay,
+		wield_image = def.wield_image,
 		on_use = function(itemstack, player, pointed_thing)
 			if pointed_thing.type ~= "object" then return end
 
@@ -79,9 +81,9 @@ function ctf_healing.register_bandage(name, def)
 			end
 
 			if pointed_def and pointed_def.on_rightclick then
-				pointed_def.on_rightclick(pointed.under, node, user, itemstack, pointed)
+				return minetest.item_place(itemstack, user, pointed)
 			else
-				def.rightclick_func(itemstack, user, pointed, ...)
+				return def.rightclick_func(itemstack, user, pointed, ...)
 			end
 		end
 

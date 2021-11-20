@@ -33,6 +33,7 @@ exclude_files = {
 	"mods/other/real_suffocation",
 	"mods/other/lib_chatcmdbuilder",
 	"mods/other/email",
+	"mods/other/select_item",
 }
 
 read_globals = {
