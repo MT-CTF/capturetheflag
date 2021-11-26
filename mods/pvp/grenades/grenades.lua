@@ -9,17 +9,35 @@ local function remove_flora(pos, radius)
 	end
 end
 
+local function check_hit(pos1, pos2, obj)
+	local ray = minetest.raycast(pos1, pos2, true, false)
+	local hit = ray:next()
+
+	while hit and hit.type == "node" and vector.distance(pos1, hit.under) <= 1.6 do
+		hit = ray:next()
+	end
+
+	if hit and hit.type == "object" and hit.ref == obj then
+		return true
+	end
+end
+
 local fragdef = {
 	description = "Frag grenade (Kills anyone near blast)",
 	image = "grenades_frag.png",
-	on_explode = function(pos, name)
-		if not name or not pos then
-			return
-		end
+	explode_radius = 10,
+	explode_damage = 26,
+	on_collide = function(def, obj)
+		return true
+	end,
+	on_explode = function(def, pos, name)
+		if not name or not pos then return end
 
 		local player = minetest.get_player_by_name(name)
+		if not player then return end
 
-		local radius = 10
+
+		local radius = def.explode_radius
 
 		minetest.add_particlespawner({
 			amount = 20,
@@ -62,25 +80,42 @@ local fragdef = {
 
 		remove_flora(pos, radius/2)
 
-		for _, v in ipairs(minetest.get_objects_inside_radius(pos, radius)) do
-			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
+		for _, v in pairs(minetest.get_objects_inside_radius(pos, radius)) do
+			if v:is_player() and v:get_hp() > 0 and v:get_properties().pointable then
+				local footpos = vector.offset(v:get_pos(), 0, 0.1, 0)
+				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
+				local footdist = vector.distance(pos, footpos)
+				local headdist = vector.distance(pos, headpos)
+				local target_head = false
 
-			if hit and player and v:is_player() and v:get_hp() > 0 and hit.type == "object" and hit.ref:is_player() and
-			hit.ref:get_player_name() == v:get_player_name() then
-				v:punch(player, 2, {damage_groups = {grenade = 1, fleshy = 30 - ((radius/3) * vector.distance(pos, v:get_pos()))}}, nil)
+				if footdist >= headdist then
+					target_head = true
+				end
+
+				local hit_pos1 = check_hit(pos, target_head and headpos or footpos, v)
+
+				-- Check the closest distance, but if that fails try targeting the farther one
+				if hit_pos1 or check_hit(pos, target_head and footpos or headpos, v) then
+					v:punch(player, 1, {
+						punch_interval = 1,
+						damage_groups = {
+							grenade = 1,
+							fleshy = def.explode_damage - ( (radius/3) * (target_head and headdist or footdist) )
+						}
+					}, nil)
+				end
 			end
 		end
 	end,
 }
 
+grenades.register_grenade("grenades:frag", fragdef)
 
--- fragdef.description = "Sticky Frag grenade (Sticks to surfaces)"
--- fragdef.image = "grenades_frag_sticky.png"
-fragdef.on_collide = function(obj)
-	return true
-end
-grenades.register_grenade("grenades:frag", table.copy(fragdef))
---grenades.register_grenade("grenades:frag_sticky", fragdef)
+local fragdef_sticky = table.copy(fragdef)
+fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
+fragdef_sticky.image = "grenades_frag_sticky.png"
+fragdef_sticky.on_collide = function(def, obj) return false end
+grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 
 -- Smoke Grenade
 
@@ -88,21 +123,25 @@ local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
-	on_collide = function(obj)
+	on_collide = function(def, obj)
 		return true
 	end,
-	on_explode = function(pos, pname)
+	on_explode = function(def, pos, pname)
 		local player = minetest.get_player_by_name(pname)
 		if not player or not pos then return end
 
-		local fpos = ctf_classes.get_flag_pos(player)
+		local pteam = ctf_teams.get(pname)
 
-		if not fpos then return end
+		if pteam then
+			local fpos = ctf_map.current_map.teams[pteam].flag_pos
 
-		if vector.distance(pos, fpos) <= 15 then
-			minetest.chat_send_player(pname, "You can't explode smoke grenades so close to your flag!")
-			player:get_inventory():add_item("main", "grenades:smoke")
-			return
+			if not fpos then return end
+
+			if vector.distance(pos, fpos) <= 15 then
+				minetest.chat_send_player(pname, "You can't explode smoke grenades so close to your flag!")
+				player:get_inventory():add_item("main", "grenades:smoke")
+				return
+			end
 		end
 
 		minetest.sound_play("grenades_glasslike_break", {
@@ -120,24 +159,24 @@ grenades.register_grenade("grenades:smoke", {
 
 		minetest.after(SMOKE_GRENADE_TIME, minetest.sound_stop, hiss)
 
-		for i = 0, 4, 1 do
+		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
 				amount = 40,
 				time = SMOKE_GRENADE_TIME + 3,
-				minpos = vector.new(pos.x-4, pos.y+1, pos.z-4),
-				maxpos = vector.new(pos.x+4, pos.y+2, pos.z+4),
-				minvel = vector.new(-1, 0, -1),
-				maxvel = vector.new(1, 0.3, 1),
-				minacc = vector.new(-1, 0, -1),
-				maxacc = vector.new(1, 1, 1),
+				minpos = vector.subtract(pos, 2),
+				maxpos = vector.add(pos, 2),
+				minvel = {x = 0, y = 2, z = 0},
+				maxvel = {x = 0, y = 3, z = 0},
+				minacc = {x = 1, y = 0.2, z = 1},
+				maxacc = {x = 1, y = 0.2, z = 1},
 				minexptime = 1,
-				maxexptime = 2,
-				minsize = 50,
-				maxsize = 40,
+				maxexptime = 1,
+				minsize = 125,
+				maxsize = 140,
 				collisiondetection = false,
 				collision_removal = false,
 				vertical = false,
-				texture = "grenades_smoke.png^[noalpha^[colorize:#" .. math.random(7, 9)*111 ..":255^grenades_smoke.png",
+				texture = "grenades_smoke.png",
 			})
 		end
 	end,
@@ -158,7 +197,7 @@ grenades.register_grenade("grenades:flashbang", {
 	description = "Flashbang grenade (Blinds all who look at blast)",
 	image = "grenades_flashbang.png",
 	clock = 4,
-	on_explode = function(pos)
+	on_explode = function(def, pos)
 		for _, v in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
 			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
 

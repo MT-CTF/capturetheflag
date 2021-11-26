@@ -1,9 +1,18 @@
 [submodule "mods/other/crafting"]
 	path = mods/other/crafting
 	url = https://github.com/rubenwardy/crafting
-[submodule "mods/ctf/ctf_map/ctf_map_core/maps"]
-	path = mods/ctf/ctf_map/ctf_map_core/maps
-	url = https://github.com/MT-CTF/maps
-[submodule "mods/pvp/shooter"]
-	path = mods/pvp/shooter
-	url = https://github.com/MT-CTF/shooter
+[submodule "mods/ctf/ctf_map/maps"]
+	path = mods/ctf/ctf_map/maps
+	url = git@github.com:MT-CTF/maps.git
+[submodule "mods/other/lib_chatcmdbuilder"]
+	path = mods/other/lib_chatcmdbuilder
+	url = git@github.com:rubenwardy/ChatCmdBuilder.git
+[submodule "mods/other/skybox"]
+	path = mods/other/skybox
+	url = git@github.com:MT-CTF/skybox.git
+[submodule "mods/apis/rawf"]
+	path = mods/apis/rawf
+	url = https://github.com/LoneWolfHT/rawf.git
+[submodule "mods/apis/mhud"]
+	path = mods/apis/mhud
+	url = git@github.com:LoneWolfHT/mhud.git

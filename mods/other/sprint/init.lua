@@ -7,6 +7,7 @@ local MOD_JUMP    = tonumber(minetest.settings:get("sprint_jump")      or 1.1)
 local STAMINA_MAX = tonumber(minetest.settings:get("sprint_stamina")   or 20)
 local HEAL_RATE   = tonumber(minetest.settings:get("sprint_heal_rate") or 0.5)
 local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
+local SPRINT_HUDBARS_USED
 
 if minetest.get_modpath("hudbars") ~= nil then
 	hb.register_hudbar("sprint", 0xFFFFFF, "Stamina",
@@ -35,13 +36,6 @@ local function setSprinting(player, info, sprinting)
 	end
 end
 
-ctf_match.register_on_new_match(function()
-	for pname in pairs(players) do
-		local player = minetest.get_player_by_name(pname)
-		players[player:get_player_name()].stamina = STAMINA_MAX
-	end
-end)
-
 minetest.register_globalstep(function(dtime)
 	for name, info in pairs(players) do
 		local player = minetest.get_player_by_name(name)
@@ -56,8 +50,7 @@ minetest.register_globalstep(function(dtime)
 			local sprintRequested = controls.aux1 and controls.up
 			-- ##1## replace info.sprintRequested with info.sprinting
 			if sprintRequested ~= info.sprintRequested then
-				if sprintRequested and info.stamina > MIN_SPRINT
-						and not medkits.is_healing(player:get_player_name()) then
+				if sprintRequested and info.stamina > MIN_SPRINT then
 					setSprinting(player, info, true)
 				elseif not sprintRequested then
 					setSprinting(player, info, false)

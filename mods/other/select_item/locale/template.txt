@@ -1,0 +1,5 @@
+# textdomain:select_item
+Cancel=
+Page @1/@2=
+Select an item:=
+There are no items to choose from.=

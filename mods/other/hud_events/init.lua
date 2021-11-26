@@ -1,12 +1,12 @@
-hud_event = {}
-local hud = hudkit()
+hud_events = {}
 
-local players = {}
-local duration = 7
-local max = 3
-local next_check = 10000000
--- Bootstrap 5 palette
-local colors = {
+local hud = mhud.init()
+
+local HUD_SHOW_TIME = 4
+local HUD_SHOW_QUICK_TIME = 2
+local HUD_SHOW_NEXT_TIME = 1
+
+local HUD_COLORS = {
 	primary = 0x0D6EFD,
 	secondary = 0x6C757D,
 	success = 0x198754,
@@ -16,124 +16,128 @@ local colors = {
 	light = 0xF8F9FA,
 	dark = 0x212529,
 }
-hud_event.colors = colors
 
-local function update(name)
-	local player = minetest.get_player_by_name(name)
-	if not player then
-		return
-	end
-
-	-- Handle all elements marked for deletion
-	-- and rebuild table
-	local temp = {}
-	for _, def in ipairs(players[name]) do
-		if def.delete then
-			if hud:exists(player, def.name) then
-				hud:remove(player, def.name)
-			end
-		else
-			table.insert(temp, def)
-		end
-	end
-
-	for i, def in ipairs(temp) do
-		local text = tostring(def.value)
-		if hud:exists(player, def.name) then
-			hud:change(player, def.name, "text", text)
-			hud:change(player, def.name, "offset", {x = 0, y = i * 20})
-		else
-			hud:add(player, def.name, {
-				hud_elem_type = "text",
-				alignment = {x = 0, y = 0},
-				position = {x = 0.5, y = 0.7},
-				offset = {x = 0, y = i * 20},
-				number = tonumber(def.color),
-				text = text,
-				z_index = -200
-			})
-		end
-	end
-	players[name] = temp
-end
-
-function hud_event.new(name, def)
-	-- Verify HUD event element def
-	if not name or not def or type(def) ~= "table" or
-			not def.name or not def.value or not def.color then
-		error("hud_event: Invalid HUD event element definition", 2)
-	end
-
-	def.color = colors[def.color] or def.color
-
-	local player = minetest.get_player_by_name(name)
-	if not player then
-		return
-	end
-
-	-- Store element expiration time in def.time
-	-- and append event element def to players[name]
-	def.time = os.time() + duration
-	if next_check > duration then
-		next_check = duration
-	end
-
-	-- If a HUD event element with the same name exists already,
-	-- reuse it instead of creating a new element
-	local is_new = true
-	for i, hud_event_spec in ipairs(players[name]) do
-		if hud_event_spec.name == def.name then
-			is_new = false
-			players[name][i] = def
-			break
-		end
-	end
-
-	if is_new then
-		table.insert(players[name], def)
-	end
-
-	-- If more than `max` active elements, mark oldest element for deletion
-	if #players[name] > max then
-		players[name][1].delete = true
-	end
-
-	update(name)
-end
-
-minetest.register_globalstep(function(dtime)
-	next_check = next_check - dtime
-	if next_check > 0 then
-		return
-	end
-
-	next_check = 10000000
-
-	-- Loop through HUD score elements of all players
-	-- and remove them if they've expired
-	for name, hudset in pairs(players) do
-		local modified = false
-		for i, def in pairs(hudset) do
-			local rem = def.time - os.time()
-			if rem <= 0 then
-				def.delete = true
-				modified = true
-			elseif rem < next_check then
-				next_check = rem
-			end
-		end
-
-		-- If a player's hudset was modified, update player's HUD
-		if modified then
-			update(name)
-		end
-	end
-end)
-
-minetest.register_on_joinplayer(function(player)
-	players[player:get_player_name()] = {}
-end)
-
+local hud_queues = {}
 minetest.register_on_leaveplayer(function(player)
-	players[player:get_player_name()] = nil
+	hud:clear(player)
+	hud_queues[player] = nil
 end)
+
+local function show_hud_event(player, huddef)
+	local pname = player:get_player_name()
+
+	if not hud:exists(player, "hud_event") then
+		hud:add(player, "hud_event", {
+			hud_elem_type = "text",
+			position = {x = 0.5, y = 0.5},
+			offset = {x = 0, y = 20},
+			alignment = {x = "center", y = "down"},
+			text = huddef.text,
+			color = huddef.color,
+		})
+	else
+		hud:change(player, "hud_event", {text = ""})
+
+		minetest.after(HUD_SHOW_NEXT_TIME, function()
+			player = minetest.get_player_by_name(pname)
+			if not player then return end
+
+			hud:change(player, "hud_event", {
+				text = huddef.text,
+				color = huddef.color
+			})
+		end)
+	end
+end
+
+local quick_event_timer = {}
+local function show_quick_hud_event(player, huddef)
+
+	if not hud:exists(player, "hud_event_quick") then
+		hud:add(player, "hud_event_quick", {
+			hud_elem_type = "text",
+			position = {x = 0.5, y = 0.5},
+			offset = {x = 0, y = 45},
+			alignment = {x = "center", y = "down"},
+			text = huddef.text,
+			color = huddef.color,
+		})
+	else
+		hud:change(player, "hud_event_quick", {text = huddef.text, color = huddef.color})
+	end
+
+	quick_event_timer[player] = 0
+end
+
+local timer = 0
+minetest.register_globalstep(function(dtime)
+	timer = timer + dtime
+
+	if timer >= 1 then
+		for player, time in pairs(quick_event_timer) do
+			time = time + timer
+
+			if time >= HUD_SHOW_QUICK_TIME then
+				hud:remove(player, "hud_event_quick")
+				quick_event_timer[player] = nil
+			else
+				quick_event_timer[player] = time
+			end
+		end
+
+		timer = 0
+	end
+end)
+
+local function handle_hud_events(pname)
+	local player = minetest.get_player_by_name(pname)
+	if not player or not hud_queues[pname] then return end
+
+	show_hud_event(player, table.remove(hud_queues[pname], 1))
+
+	minetest.after(HUD_SHOW_TIME, function()
+		player = minetest.get_player_by_name(pname)
+		if not player or not hud_queues[pname] then return end
+
+		if #hud_queues[pname] >= 1 then
+			handle_hud_events(pname)
+		else
+			hud:remove(player, "hud_event")
+			hud_queues[pname]._started = false
+		end
+	end)
+end
+
+function hud_events.new(player, def)
+	player = PlayerObj(player)
+
+	if not player then return end
+	local pname = player:get_player_name()
+
+	if not hud_queues[pname] then
+		hud_queues[pname] = {_started = false}
+	end
+
+	if type(def) == "string" then
+		def = {text = def}
+	end
+
+	if def.color then
+		if type(def.color) == "string" then
+			def.color = HUD_COLORS[def.color]
+		end
+	else
+		def.color = 0x00D1FF
+	end
+
+	if not def.quick then
+		table.insert(hud_queues[pname], {text = def.text, color = def.color})
+
+		if not hud_queues[pname]._started then
+			hud_queues[pname]._started = true
+			handle_hud_events(pname)
+		end
+	else
+		show_quick_hud_event(pname, def)
+	end
+end
