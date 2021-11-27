@@ -26,7 +26,9 @@ local function show_modechoose_form(player)
 	local modenames = {}
 
 	for modename in pairs(ctf_modebase.modes) do
-		table.insert(modenames, modename)
+		if modename ~= ctf_modebase.current_mode then
+			table.insert(modenames, modename)
+		end
 	end
 	table.sort(modenames)
 
@@ -90,7 +92,9 @@ function ctf_modebase.mode_vote.end_vote()
 
 	local modes = {}
 	for _, mode in ipairs(ctf_modebase.modelist) do
-		modes[mode] = 0
+		if ctf_modebase.current_mode ~= mode then
+			modes[mode] = 0
+		end
 	end
 
 	for _, mode in pairs(votes) do
