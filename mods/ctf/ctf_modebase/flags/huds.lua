@@ -63,7 +63,7 @@ local function get_flag_status(you)
 	else
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = FLAG_STOLEN_YOU
+				status = table.copy(FLAG_STOLEN_YOU)
 			else
 				status = table.copy(FLAG_STOLEN_TEAMMATE)
 				status.text = status.text:format(your_thieves)
@@ -72,7 +72,7 @@ local function get_flag_status(you)
 			status = table.copy(OTHER_FLAG_STOLEN)
 			status.text = status.text:format(other_thieves)
 		else
-			status = FLAG_SAFE
+			status = table.copy(FLAG_SAFE)
 		end
 	end
 
