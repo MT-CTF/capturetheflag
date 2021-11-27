@@ -94,7 +94,7 @@ end
 --
 
 -- Borrowed from random_messages mod
-function table.count( t ) -- luacheck: ignore
+function table.count( t )
 	local i = 0
 	for k in pairs( t ) do i = i + 1 end
 	return i
@@ -116,10 +116,6 @@ end
 --
 
 do
-	function vector.sign(a)
-		return vector.new(math.sign(a.x), math.sign(a.y), math.sign(a.z))
-	end
-
 	local vsort = vector.sort
 	function ctf_core.pos_inside(pos, pos1, pos2)
 		pos1, pos2 = vsort(pos1, pos2)

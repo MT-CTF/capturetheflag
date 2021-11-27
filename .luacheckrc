@@ -24,6 +24,12 @@ globals = {
 		}
 	},
 
+	table = {
+		fields = {
+			"count",
+		}
+	}
+
 	"minetest", "core",
 }
 
