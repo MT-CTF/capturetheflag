@@ -32,7 +32,10 @@ local function update_hud(player, time)
 		local playerobj = minetest.get_player_by_name(player)
 
 		if playerobj and in_combat[player] then
-			if minetest.registered_nodes[minetest.get_node(playerobj:get_pos()).name].walkable == false then
+			local pos = vector.offset(playerobj:get_pos(), 0, 1, 0)
+			local node = minetest.registered_nodes[minetest.get_node(pos).name]
+
+			if node.walkable == false then
 				in_combat[player].time = in_combat[player].time - 1
 			else
 				in_combat[player].time = in_combat[player].time + 0.5

@@ -263,9 +263,14 @@ return {
 			classname = "knight"
 		end
 
-		meta:set_string("class", classname)
-
 		ctf_modebase.update_wear.cancel_player_updates(player)
+
+		local inv = player:get_inventory()
+		for _, item in pairs(give_initial_stuff.get_stuff(player)) do
+			inv:remove_item("main", ItemStack(item))
+		end
+		-- should be after inv cleaning
+		meta:set_string("class", classname)
 
 		player:set_properties({
 			textures = {ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color or "white")},
@@ -285,7 +290,7 @@ return {
 			physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
 		end
 
-		give_initial_stuff(player)
+		give_initial_stuff(player, true)
 	end,
 	get = function(player)
 		local cname = player:get_meta():get_string("class")
