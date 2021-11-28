@@ -84,7 +84,7 @@ ctf_modebase.register_mode("classes", {
 		give_initial_stuff.register_stuff_provider(function(player)
 			local initial_stuff = classes.get(player).items or {}
 
-			table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
+			table.insert_all(initial_stuff, {"default:torch 15", "default:stick 5"})
 
 			return(initial_stuff)
 		end)
