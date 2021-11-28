@@ -10,7 +10,7 @@ return {
 		if not no_hud then
 			local hud_text = ""
 			for name, val in pairs(amounts) do
-				hud_text = string.format("%s+%d %s | ", hud_text, math.round(val), HumanReadable(name))
+				hud_text = string.format("%s%s%d %s | ", hud_text, val >= 0 and "+" or "", math.round(val), HumanReadable(name))
 			end
 
 			hud_events.new(player, {text = hud_text:sub(1, -4)})
