@@ -56,6 +56,9 @@ function dropondie.drop_all(player)
 			end
 		end
 	end
+	for _, item in pairs(give_initial_stuff.get_stuff(player)) do
+		pinv:remove_item("main", ItemStack(item))
+	end
 
 	drop_list(player, ppos, pinv, "main")
 	drop_list(player, ppos, pinv, "craft")

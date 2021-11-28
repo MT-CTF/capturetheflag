@@ -17,7 +17,8 @@ fragdef_small.explode_damage = 16
 fragdef_small.clock = 1.7
 grenades.register_grenade("ctf_mode_nade_fight:small_frag", fragdef_small)
 
-local holed = {}
+local tool = {holed = {}}
+
 local black_hole_radius = 4.5
 grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 	description = "Void Grenade, sucks players in and holds them for a few seconds."..
@@ -82,7 +83,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 
 			if
 				v:is_player() and v:get_hp() > 0 and v:get_properties().pointable and
-				(vname == name or ctf_teams.get(vname) ~= ctf_teams.get(name)) and holed[vname] == nil
+				(vname == name or ctf_teams.get(vname) ~= ctf_teams.get(name)) and tool.holed[vname] == nil
 			then
 				local footpos = vector.offset(v:get_pos(), 0, 0.1, 0)
 				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
@@ -110,7 +111,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 
 					v:add_velocity(vector.multiply(vector.direction(footpos, pos), vector.distance(footpos, pos) * 8))
 
-					holed[vname] = false
+					tool.holed[vname] = false
 					table.insert(victims, vname)
 				end
 			end
@@ -118,7 +119,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 
 		minetest.after(0.2, function()
 			for _, vname in ipairs(victims) do
-				holed[vname] = true
+				tool.holed[vname] = true
 				local v = minetest.get_player_by_name(vname)
 				if v then
 					v:set_attach(black_hole)
@@ -128,21 +129,13 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 
 		minetest.after(2.2, function()
 			for _, vname in ipairs(victims) do
-				holed[vname] = nil
+				tool.holed[vname] = nil
 			end
 			black_hole:remove()
 			minetest.sound_stop(hiss)
 		end)
 	end,
 })
-
-minetest.register_on_player_hpchange(function(player, hp_change, reason)
-	if holed[player:get_player_name()] then
-		return hp_change * 2
-	else
-		return hp_change
-	end
-end, true)
 
 minetest.register_entity("ctf_mode_nade_fight:black_hole", {
 	is_visible = true,
@@ -279,7 +272,7 @@ for idx, info in ipairs(grenade_list) do
 			if itemstack:get_wear() > 1 then return end
 			local uname = user:get_player_name()
 
-			if not holed[uname] then
+			if not tool.holed[uname] then
 				if itemstack:get_wear() <= 1 then
 					grenades.throw_grenade(info.name, 17, user)
 				end
@@ -316,8 +309,8 @@ for idx, info in ipairs(grenade_list) do
 	})
 end
 
-return {
-	get_grenade_tool = function(player)
-		return "ctf_mode_nade_fight:grenade_tool_" .. (held_grenade[PlayerName(player)] or 1)
-	end
-}
+function tool.get_grenade_tool(player)
+	return "ctf_mode_nade_fight:grenade_tool_" .. (held_grenade[PlayerName(player)] or 1)
+end
+
+return tool

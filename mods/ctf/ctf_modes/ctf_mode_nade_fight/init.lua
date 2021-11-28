@@ -98,7 +98,13 @@ ctf_modebase.register_mode("nade_fight", {
 	on_flag_capture = teams.on_flag_capture,
 	on_flag_rightclick = function() end,
 	get_chest_access = teams.get_chest_access,
-	on_punchplayer = teams.on_punchplayer,
+	on_punchplayer = function(player, hitter, damage, ...)
+		if tool.holed[player:get_player_name()] then
+			damage = damage * 2
+		end
+
+		return teams.on_punchplayer(player, hitter, damage, ...)
+	end,
 	on_healplayer = teams.on_healplayer,
 	calculate_knockback = function()
 		return 0

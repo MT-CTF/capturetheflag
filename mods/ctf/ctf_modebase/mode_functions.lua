@@ -29,13 +29,18 @@ add_mode_func(ctf_modebase.register_on_new_match, "on_new_match", true)
 add_mode_func(ctf_modebase.register_on_new_mode, "on_mode_start", true)
 -- on_mode_end is called in match.lua's ctf_modebase.start_new_match()
 
-minetest.register_on_punchplayer(function(...)
+minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
 	if not ctf_modebase.match_started then return true end
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
 
-	return current_mode.on_punchplayer(...)
+	local real_damage = current_mode.on_punchplayer(player, hitter, damage, time_from_last_punch, tool_capabilities, dir)
+	if real_damage > 0 then
+		player:set_hp(player:get_hp() - real_damage, {type="punch"})
+	end
+
+	return true
 end)
 
 ctf_healing.register_on_heal(function(...)

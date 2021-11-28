@@ -110,34 +110,29 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 local damage_group_textures = {grenade = "grenades_frag.png"}
-function ctf_kill_list.on_punchplayer(player, hitter, time_from_last_punch, tool_capabilities, _, damage)
-	local hp = player:get_hp()
+function ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+	local killwep_invimage
 
-	if hp > 0 and hitter and hitter:is_player() and hp - damage <= 0 then
-		local killwep_invimage
-
-		for group, texture in pairs(damage_group_textures) do
-			if tool_capabilities.damage_groups[group] then
-				killwep_invimage = texture
-
-				break
-			end
+	for group, texture in pairs(damage_group_textures) do
+		if tool_capabilities.damage_groups[group] then
+			killwep_invimage = texture
+			break
 		end
-
-		if not killwep_invimage then
-			killwep_invimage = hitter:get_wielded_item():get_definition().inventory_image
-		end
-
-		if killwep_invimage == "" then
-			killwep_invimage = "ctf_kill_list_punch.png"
-		end
-
-		if tool_capabilities.damage_groups.ranged then
-			killwep_invimage = killwep_invimage .. "^[transformFX"
-		end
-
-		ctf_kill_list.add_kill(hitter, killwep_invimage, player)
 	end
+
+	if not killwep_invimage then
+		killwep_invimage = hitter:get_wielded_item():get_definition().inventory_image
+	end
+
+	if killwep_invimage == "" then
+		killwep_invimage = "ctf_kill_list_punch.png"
+	end
+
+	if tool_capabilities.damage_groups.ranged then
+		killwep_invimage = killwep_invimage .. "^[transformFX"
+	end
+
+	ctf_kill_list.add_kill(hitter, killwep_invimage, player)
 end
 
 function ctf_kill_list.add_kill(hitter, weapon_image, player)

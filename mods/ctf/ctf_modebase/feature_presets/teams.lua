@@ -57,52 +57,50 @@ local function end_combat_mode(player, killer)
 
 	if not victim_combat_mode then return end
 
-	if killer ~= player then
-		local killscore = calculate_killscore(player)
-		local attackers = {}
+	local killscore = calculate_killscore(player)
+	local attackers = {}
 
-		-- populate attackers table
-		ctf_combat_mode.manage_extra(player, function(pname, type)
-			if type == "hitter" then
-				table.insert(attackers, pname)
-			else
-				return type
-			end
-		end)
-
-		if killer then
-			local rewards = {kills = 1, score = killscore}
-			local bounty = ctf_modebase.bounties.claim(player, killer)
-
-			if bounty then
-				for name, amount in pairs(bounty) do
-					rewards[name] = (rewards[name] or 0) + amount
-				end
-			end
-
-			recent_rankings.add(killer, rewards)
-
-			-- share kill score with healers
-			ctf_combat_mode.manage_extra(killer, function(pname, type)
-				if type == "healer" then
-					recent_rankings.add(pname, {score = rewards.score})
-				end
-
-				return type
-			end)
+	-- populate attackers table
+	ctf_combat_mode.manage_extra(player, function(pname, type)
+		if type == "hitter" then
+			table.insert(attackers, pname)
 		else
-			-- Only take score for suicide if they're in combat for being healed
-			if victim_combat_mode and #attackers >= 1 then
-				recent_rankings.add(player, {score = -math.ceil(killscore/2)})
-			end
+			return type
+		end
+	end)
 
-			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player) -- suicide
+	if killer then
+		local rewards = {kills = 1, score = killscore}
+		local bounty = ctf_modebase.bounties.claim(player, killer)
+
+		if bounty then
+			for name, amount in pairs(bounty) do
+				rewards[name] = (rewards[name] or 0) + amount
+			end
 		end
 
-		for _, pname in pairs(attackers) do
-			if not killer or pname ~= killer:get_player_name() then
-				recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #attackers)})
+		recent_rankings.add(killer, rewards)
+
+		-- share kill score with healers
+		ctf_combat_mode.manage_extra(killer, function(pname, type)
+			if type == "healer" then
+				recent_rankings.add(pname, {score = rewards.score})
 			end
+
+			return type
+		end)
+	else
+		-- Only take score for suicide if they're in combat for being healed
+		if victim_combat_mode and #attackers >= 1 then
+			recent_rankings.add(player, {score = -math.ceil(killscore/2)})
+		end
+
+		ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player) -- suicide
+	end
+
+	for _, pname in pairs(attackers) do
+		if not killer or pname ~= killer:get_player_name() then
+			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #attackers)})
 		end
 	end
 
@@ -303,12 +301,10 @@ return {
 		recent_rankings.on_leaveplayer(pname)
 	end,
 	on_dieplayer = function(player, reason)
-		if reason.type == "punch" and reason.object and reason.object:is_player() then
-			end_combat_mode(player, reason.object)
-		else
-			if not end_combat_mode(player) then
-				ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
-			end
+		-- punch is handled in on_punchplayer
+		if reason.type ~= "punch" then
+			end_combat_mode(player)
+			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
 		end
 
 		if ctf_modebase.respawn_delay.prepare(player) then
@@ -348,7 +344,7 @@ return {
 
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
-	on_punchplayer = function(player, hitter, ...)
+	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
 		if not hitter:is_player() or player:get_hp() <= 0 then return end
 
 		local pname, hname = player:get_player_name(), hitter:get_player_name()
@@ -356,26 +352,36 @@ return {
 
 		if not pteam then
 			minetest.chat_send_player(hname, pname .. " is not in a team!")
-			return true
+			return 0
 		elseif not hteam then
 			minetest.chat_send_player(hname, "You are not in a team!")
-			return true
+			return 0
 		end
 
 		if pteam == hteam and pname ~= hname then
 			minetest.chat_send_player(hname, pname .. " is on your team!")
 
-			return true
+			return 0
 		elseif ctf_modebase.build_timer.in_progress() then
 			minetest.chat_send_player(hname, "The match hasn't started yet!")
-			return true
+			return 0
 		end
 
-		if player ~= hitter then
-			ctf_combat_mode.set(player, 15, {[hitter:get_player_name()] = "hitter"})
+		if hitter and hitter:is_player() then
+			if player ~= hitter then
+				ctf_combat_mode.set(player, 15, {[hitter:get_player_name()] = "hitter"})
+
+				if player:get_hp() <= damage then
+					end_combat_mode(player, hitter)
+				end
+			end
+
+			if player:get_hp() <= damage then
+				ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+			end
 		end
 
-		ctf_kill_list.on_punchplayer(player, hitter, ...)
+		return damage
 	end,
 	on_healplayer = function(player, patient, amount)
 		local stats = {hp_healed = amount}
