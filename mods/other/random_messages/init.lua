@@ -11,15 +11,6 @@ math.randomseed(os.time())
 random_messages = {}
 random_messages.messages = {} --This table contains all messages.
 
-function table.random( t ) -- luacheck: ignore
-	local rk = math.random( 1, table.count( t ) )
-	local i = 1
-	for k, v in pairs( t ) do
-		if ( i == rk ) then return v, k end
-		i = i + 1
-	end
-end
-
 function random_messages.initialize() --Set the interval in minetest.conf.
 	minetest.settings:set("random_messages_interval", 60)
 	minetest.settings:write();
@@ -77,7 +68,8 @@ function random_messages.display_message(message_number)
 end
 
 function random_messages.show_message()
-	random_messages.display_message(table.random(random_messages.messages))
+	local message = random_messages.messages[math.random(1, #random_messages.messages)]
+	random_messages.display_message(message)
 end
 
 function random_messages.list_messages()

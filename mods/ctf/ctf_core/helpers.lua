@@ -93,13 +93,6 @@ end
 --- TABLES
 --
 
--- Borrowed from random_messages mod
-function table.count( t )
-	local i = 0
-	for k in pairs( t ) do i = i + 1 end
-	return i
-end
-
 ---@param funclist table
 function RunCallbacks(funclist, ...)
 	for _, func in ipairs(funclist) do

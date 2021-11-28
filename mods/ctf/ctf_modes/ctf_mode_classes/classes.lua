@@ -263,14 +263,16 @@ return {
 			classname = "knight"
 		end
 
+		meta:set_string("class", classname)
+
 		ctf_modebase.update_wear.cancel_player_updates(player)
 
-		local inv = player:get_inventory()
-		for _, item in pairs(give_initial_stuff.get_stuff(player)) do
-			inv:remove_item("main", ItemStack(item))
+		local pinv = player:get_inventory()
+		for pos, stack in pairs(pinv:get_list("main")) do
+			if ctf_modebase.modes.classes.is_bound_item(player, stack) then
+				pinv:set_stack("main", pos, "")
+			end
 		end
-		-- should be after inv cleaning
-		meta:set_string("class", classname)
 
 		player:set_properties({
 			textures = {ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color or "white")},

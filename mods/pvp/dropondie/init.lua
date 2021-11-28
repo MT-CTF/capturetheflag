@@ -45,15 +45,20 @@ local function drop_list(player, pos, inv, list)
 end
 
 function dropondie.drop_all(player)
-	local pos = player:get_pos()
-	pos.y = math.floor(pos.y + 0.5)
+	local ppos = vector.offset(player:get_pos(), 0, 1, 0)
 
-	local inv = player:get_inventory()
-	for _, item in pairs(give_initial_stuff.get_stuff(player)) do
-		inv:remove_item("main", ItemStack(item))
+	local pinv = player:get_inventory()
+	local mode = ctf_modebase:get_current_mode()
+	if mode then
+		for pos, stack in pairs(pinv:get_list("main")) do
+			if ctf_modebase.modes.classes.is_bound_item(player, stack) then
+				pinv:set_stack("main", pos, "")
+			end
+		end
 	end
-	drop_list(player, pos, inv, "main")
-	drop_list(player, pos, inv, "craft")
+
+	drop_list(player, ppos, pinv, "main")
+	drop_list(player, ppos, pinv, "craft")
 end
 
 if ctf_core.settings.server_mode ~= "mapedit" then
