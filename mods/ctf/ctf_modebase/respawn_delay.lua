@@ -71,8 +71,10 @@ function ctf_modebase.respawn_delay.prepare(player)
 		physics.set(pname, "ctf_modebase:respawn_freeze", {speed = 0, jump = 0, gravity = 0})
 
 		local obj = minetest.add_entity(player:get_pos(), "ctf_modebase:respawn_movement_freezer")
-		player:set_attach(obj)
-		respawn_delay[pname].obj = obj
+		if obj then
+			player:set_attach(obj)
+			respawn_delay[pname].obj = obj
+		end
 
 		return true
 	end

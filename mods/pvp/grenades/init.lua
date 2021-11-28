@@ -6,6 +6,9 @@ function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()
 	local pos = player:get_pos()
 	local obj = minetest.add_entity(vector.new(pos.x, pos.y + player:get_properties().eye_height, pos.z), name)
+	if not obj then
+		return
+	end
 
 	obj:set_velocity(vector.add(vector.multiply(dir, startspeed), player:get_velocity()))
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
