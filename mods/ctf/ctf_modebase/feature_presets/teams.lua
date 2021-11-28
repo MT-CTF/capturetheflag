@@ -352,19 +352,19 @@ return {
 
 		if not pteam then
 			minetest.chat_send_player(hname, pname .. " is not in a team!")
-			return 0
+			return
 		elseif not hteam then
 			minetest.chat_send_player(hname, "You are not in a team!")
-			return 0
+			return
 		end
 
 		if pteam == hteam and pname ~= hname then
 			minetest.chat_send_player(hname, pname .. " is on your team!")
 
-			return 0
+			return
 		elseif ctf_modebase.build_timer.in_progress() then
 			minetest.chat_send_player(hname, "The match hasn't started yet!")
-			return 0
+			return
 		end
 
 		if hitter and hitter:is_player() then

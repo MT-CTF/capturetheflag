@@ -82,12 +82,6 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 	end
 end
 
-function ctf_modebase.on_flag_rightclick(...)
-	if ctf_modebase.current_mode then
-		ctf_modebase:get_current_mode().on_flag_rightclick(...)
-	end
-end
-
 ctf_teams.register_on_allocplayer(function(player)
 	ctf_modebase.drop_flags(player:get_player_name())
 end)

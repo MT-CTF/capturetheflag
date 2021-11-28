@@ -84,7 +84,7 @@ minetest.register_node("ctf_modebase:flag", {
 		if ctf_core.settings.server_mode == "mapedit" then
 			show_flag_color_form(clicker, pos_above, node.param2)
 		else
-			ctf_modebase.on_flag_rightclick(clicker, pos_above, node_above)
+			ctf_modebase.on_flag_rightclick(clicker, pos, node)
 		end
 	end,
 })
@@ -158,5 +158,8 @@ minetest.register_node("ctf_modebase:flag_captured_top",{
 	groups = {immortal=1,is_flag=1,flag_top=1,not_in_creative_inventory=1},
 	on_punch = function(pos, node, puncher, pointed_thing)
 		flag_taken(puncher)
+	end,
+	on_rightclick = function(pos, node, clicker)
+		ctf_modebase.on_flag_rightclick(clicker, pos, node)
 	end,
 })

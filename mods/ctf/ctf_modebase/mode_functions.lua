@@ -36,7 +36,7 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	if not current_mode then return true end
 
 	local real_damage = current_mode.on_punchplayer(player, hitter, damage, time_from_last_punch, tool_capabilities, dir)
-	if real_damage > 0 then
+	if real_damage then
 		player:set_hp(player:get_hp() - real_damage, {type="punch"})
 	end
 
@@ -51,6 +51,12 @@ ctf_healing.register_on_heal(function(...)
 
 	return current_mode.on_healplayer(...)
 end)
+
+function ctf_modebase.on_flag_rightclick(...)
+	if ctf_modebase.current_mode then
+		ctf_modebase:get_current_mode().on_flag_rightclick(...)
+	end
+end
 
 ctf_teams.team_allocator = function(...)
 	local current_mode = ctf_modebase:get_current_mode()
