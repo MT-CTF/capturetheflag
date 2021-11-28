@@ -322,8 +322,10 @@ return {
 
 		local inv = player:get_inventory()
 
-		for _, item in pairs(classes[oldclassname].items) do
-			inv:remove_item("main", ItemStack(item))
+		if classes[oldclassname] then
+			for _, item in pairs(classes[oldclassname].items) do
+				inv:remove_item("main", ItemStack(item))
+			end
 		end
 
 		player:set_properties({
