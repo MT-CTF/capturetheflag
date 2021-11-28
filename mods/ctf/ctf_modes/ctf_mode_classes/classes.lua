@@ -9,10 +9,14 @@ local classes = {
 		name = "Knight",
 		description = "High HP class with a sword capable of strong damage bursts",
 		hp_max = 28,
-		visual_size = vector.new(1.1, 1.1, 1.1),
+		visual_size = vector.new(1.1, 1.05, 1.1),
 		items = {
 			"ctf_mode_classes:knight_sword",
-		}
+		},
+		disallowed_items = {
+			"ctf_ranged:rifle",
+			"ctf_ranged:smg",
+		},
 	},
 	support = {
 		name = "Support",
@@ -21,18 +25,27 @@ local classes = {
 			"ctf_mode_classes:support_bandage",
 			"ctf_mode_classes:support_paxel",
 			"default:cobble 99",
-		}
+		},
+		disallowed_items = {
+			"ctf_ranged:rifle",
+			"ctf_ranged:smg",
+			"ctf_ranged:shotgun",
+			"ctf_melee:",
+		},
 	},
 	ranged = {
 		name = "Ranged",
 		description = "Low HP ranged class with a rifle/grenade launcher gun, and a scaling ladder for reaching high places",
 		hp_max = 10,
 		physics = {speed = 1.1},
-		visual_size = vector.new(0.95, 0.95, 0.95),
+		visual_size = vector.new(0.9, 0.95, 0.9),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
 			"ctf_mode_classes:scaling_ladder"
-		}
+		},
+		disallowed_items = {
+			"ctf_melee:",
+		},
 	}
 }
 
@@ -81,7 +94,14 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 						ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:knight_sword", dstep, true)
 					end
 				end
-			end)
+			end,
+		function()
+			local player = minetest.get_player_by_name(pname)
+
+			if player then
+				player:get_inventory():remove_item("main", "ctf_melee:sword_diamond")
+			end
+		end)
 
 			return "ctf_melee:sword_diamond"
 		end
@@ -95,7 +115,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 local RANGED_COOLDOWN_TIME = 36
 
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
-	type = "rifle",
+	type = "classes_rifle",
 	description = "Rifle\n" .. minetest.colorize("gold",
 			"Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)"),
 	texture = "ctf_mode_classes_ranged_rifle.png",
@@ -180,7 +200,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 		damage_groups = {fleshy=4},
 		punch_attack_uses = 0,
 	},
-	groups = {pickaxe = 1, tier = 3},
+	groups = {pickaxe = 1, tier = 10},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -239,6 +259,39 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	end
 })
 
+local function is_restricted(player, item)
+	local class = PlayerObj(player):get_meta():get_string("class")
+
+	if type(item) ~= "string" then
+		item = item:get_name()
+	end
+
+	if class and classes[class] then
+		for _, disallowed in pairs(classes[class].disallowed_items) do
+			if item:find(disallowed) then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+local old_func = ctf_ranged.can_use_gun
+
+function ctf_ranged.can_use_gun(player, gun, ...)
+	if is_restricted(player, gun) then
+		hud_events.new(player, {
+			quick = true,
+			text = "Your class can't use that item!",
+			color = "warning",
+		})
+		return false
+	end
+
+	return old_func(player, gun, ...)
+end
+
 return {
 	finish = function()
 		for _, player in pairs(minetest.get_connected_players()) do
@@ -267,11 +320,10 @@ return {
 
 		ctf_modebase.update_wear.cancel_player_updates(player)
 
-		local pinv = player:get_inventory()
-		for pos, stack in pairs(pinv:get_list("main")) do
-			if ctf_modebase.modes.classes.is_bound_item(player, stack) then
-				pinv:set_stack("main", pos, "")
-			end
+		local inv = player:get_inventory()
+
+		for _, item in pairs(classes[oldclassname].items) do
+			inv:remove_item("main", ItemStack(item))
 		end
 
 		player:set_properties({
@@ -326,7 +378,11 @@ return {
 
 		if not cooldowns:get(player) then
 			if dist_from_flag(player) > 5 then
-				minetest.chat_send_player(player:get_player_name(), "You can only change class at your flag!")
+				hud_events.new(player, {
+					quick = true,
+					text = "You can only change class at your flag!",
+					color = "warning",
+				})
 				return
 			end
 
@@ -364,10 +420,11 @@ return {
 				elements = elements,
 			})
 		else
-			minetest.chat_send_player(
-				player:get_player_name(),
-				"You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds"
-			)
+			hud_events.new(player, {
+				quick = true,
+				text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
+				color = "warning",
+			})
 		end
 	end,
 }

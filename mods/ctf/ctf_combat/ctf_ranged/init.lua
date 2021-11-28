@@ -72,6 +72,10 @@ local function process_ray(ray, user, look_dir, def)
 	end
 end
 
+-- Can be overridden for custom behaviour
+function ctf_ranged.can_use_gun(player, gun)
+	return true
+end
 
 function ctf_ranged.simple_register_gun(name, def)
 	minetest.register_tool(rawf.also_register_loaded_tool(name, {
@@ -79,8 +83,14 @@ function ctf_ranged.simple_register_gun(name, def)
 		inventory_image = def.texture.."^[colorize:#F44:42",
 		ammo = def.ammo or "ctf_ranged:ammo",
 		rounds = def.rounds,
-		groups = {ranged = 1, [def.type] = 1, not_in_creative_inventory = 1},
+		_g_category = def.type,
+		groups = {ranged = 1, [def.type] = 1, tier = def.tier or 1, not_in_creative_inventory = 1},
 		on_use = function(itemstack, user)
+			if not ctf_ranged.can_use_gun(user, name) then
+				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				return
+			end
+
 			local result = rawf.load_weapon(itemstack, user:get_inventory())
 
 			if result:get_name() == itemstack:get_name() then
@@ -99,6 +109,11 @@ function ctf_ranged.simple_register_gun(name, def)
 		loaded_def.wield_image = def.wield_texture or def.texture
 		loaded_def.groups.not_in_creative_inventory = nil
 		loaded_def.on_use = function(itemstack, user)
+			if not ctf_ranged.can_use_gun(user, name) then
+				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				return
+			end
+
 			if shoot_cooldown:get(user) then
 				return
 			end
@@ -168,7 +183,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	description = "Pistol",
 	texture = "ctf_ranged_pistol.png",
 	fire_sound = "ctf_ranged_pistol",
-	rounds = 54,
+	rounds = 75,
 	range = 75,
 	damage = 2,
 	automatic = true,

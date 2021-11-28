@@ -47,7 +47,7 @@ minetest.register_on_mods_loaded(function()
 	-- Set item type and tiers for give_initial_stuff
 	local tiers = {"wood", "stone", "steel", "mese", "diamond"}
 	local tool_categories = {"pickaxe", "shovel", "axe"}
-	local other_categories = {sword = "melee", ranged = "ranged", healing = "healing"}
+	local other_categories = {sword = "melee"}
 	for name, def in pairs(minetest.registered_tools) do
 		local new_category = nil
 

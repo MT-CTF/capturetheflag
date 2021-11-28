@@ -92,7 +92,7 @@ minetest.register_alias("ctf_map:flag", "ctf_modebase:flag")
 
 for name, def in pairs(ctf_teams.team) do
 	local color = def.color
-	minetest.register_node("ctf_modebase:flag_top_"..name,{
+	minetest.register_node("ctf_modebase:flag_top_"..name, {
 		description = "You are not meant to have this! - flag top",
 		drawtype = "nodebox",
 		paramtype = "light",

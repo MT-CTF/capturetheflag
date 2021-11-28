@@ -12,7 +12,6 @@ local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 local old_get_colored_skin = ctf_cosmetics.get_colored_skin
 ctf_modebase.register_mode("classes", {
-	hp_regen = 0.3,
 	treasures = {
 		["default:ladder_wood"] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:torch" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -48,7 +47,6 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
-
 	is_bound_item = function(_, itemstack)
 		local iname = itemstack:get_name()
 

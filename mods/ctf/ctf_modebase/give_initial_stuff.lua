@@ -1,38 +1,47 @@
 give_initial_stuff = {}
 
--- Add item to inv. Split item if count > stack_max using recursion
-function give_initial_stuff.give_item(inv, item)
-	-- Don't duplicate stacks
-	if inv:contains_item("main", item:get_name()) then
-		local safeguard = 0
-		local itemcount = item:get_count()-5
-		if itemcount < 0 then itemcount = 0 end
+-- Add item to inv.
+function give_initial_stuff.give_item(inv, new_item)
+	local list = inv:get_list("main")
+	local new_count = new_item:get_count()
+	local new_def = new_item:get_definition()
 
-		-- Replace stack if it's smaller than what we want to add
-		while not inv:contains_item("main", ("%s %d"):format(item:get_name(), itemcount)) do
-			safeguard = safeguard + 1
+	for idx, item in ipairs(list) do
+		local item_def = item:get_definition()
 
-			inv:add_item("main", item:get_name() .. " 5")
+		if item:get_name() == new_item:get_name() then
+			local item_count = item:get_count()
+			local space = item:get_free_space()
 
-			if safeguard >= 500 then
-				minetest.log("error", "[give_initial_stuff] Something went wrong when filling stack "..dump(item:get_name()))
-				break
+			new_count = new_count - item_count -- <item_count> of the new item was already added
+
+			if space >= new_count then -- We can fully add the item
+				item:set_count(item_count + new_count)
+
+				inv:set_stack("main", idx, item)
+				return
+			else -- We can't fully add to it, but we can fill this stack up to max and move on
+				item:set_count(item:get_stack_max())
+				new_item:set_count(new_count - space)
+				new_count = new_count - space
+
+				inv:set_stack("main", idx, item)
+			end
+		elseif new_def._g_category and new_def._g_category == item_def._g_category then
+			if (new_def.groups.tier or 0) >= (item_def.groups.tier or 0) then -- Replace the lower tier item
+				inv:set_stack("main", idx, new_item)
+				return
+			else -- A higher tier item already exists
+				return
 			end
 		end
-
-		return
 	end
 
-	inv:add_item("main", item:take_item(item:get_stack_max()))
-
-	-- If item isn't empty, add the leftovers again
-	if not item:is_empty() then
-		give_initial_stuff.give_item(inv, item)
-	end
+	inv:add_item("main", new_item:take_item(new_item:get_stack_max()))
 end
 
 setmetatable(give_initial_stuff, {
-	__call = function(self, player, replace)
+	__call = function(self, player, dont_replace)
 		if ctf_core.settings.server_mode == "mapedit" then
 			return
 		end
@@ -41,7 +50,7 @@ setmetatable(give_initial_stuff, {
 				.. player:get_player_name())
 		local inv = player:get_inventory()
 
-		if not replace then
+		if not dont_replace then
 			inv:set_list("main",  {})
 			inv:set_list("craft", {})
 

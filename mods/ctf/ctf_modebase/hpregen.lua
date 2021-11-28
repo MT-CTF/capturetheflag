@@ -1,7 +1,7 @@
 local timer = 0
 minetest.register_globalstep(function(dtime)
 if ctf_modebase.current_mode then
-	local health_per_sec = ctf_modebase:get_current_mode().hp_regen or 0.2
+	local health_per_sec = ctf_modebase:get_current_mode().hp_regen or 0.3
 
 	if health_per_sec <= 0 then return end
 

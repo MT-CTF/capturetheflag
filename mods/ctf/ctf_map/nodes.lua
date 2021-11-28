@@ -99,9 +99,6 @@ end
 
 local queue = {}
 for name, def in pairs(minetest.registered_nodes) do
-	if name:find("stair_junglewood") then
-		minetest.log(dump(name))
-	end
 	local mod, nodename = name:match"(..-):(.+)"
 	local prefix = mod_prefixes[mod]
 	if nodename and prefix and name ~= "default:torch" and
