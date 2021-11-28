@@ -79,12 +79,11 @@ minetest.register_node("ctf_modebase:flag", {
 	end,
 	on_rightclick = function(pos, node, clicker)
 		local pos_above = vector.offset(pos, 0, 1, 0)
-		local node_above = minetest.get_node(pos_above)
 
 		if ctf_core.settings.server_mode == "mapedit" then
 			show_flag_color_form(clicker, pos_above, node.param2)
 		else
-			ctf_modebase.on_flag_rightclick(clicker, pos, node)
+			ctf_modebase.on_flag_rightclick(clicker)
 		end
 	end,
 })
@@ -128,7 +127,7 @@ for name, def in pairs(ctf_teams.team) do
 			if ctf_core.settings.server_mode == "mapedit" then
 				show_flag_color_form(clicker, pos, node.param2)
 			else
-				ctf_modebase.on_flag_rightclick(clicker, pos, node)
+				ctf_modebase.on_flag_rightclick(clicker)
 			end
 		end,
 	})
@@ -159,7 +158,7 @@ minetest.register_node("ctf_modebase:flag_captured_top",{
 	on_punch = function(pos, node, puncher, pointed_thing)
 		flag_taken(puncher)
 	end,
-	on_rightclick = function(pos, node, clicker)
-		ctf_modebase.on_flag_rightclick(clicker, pos, node)
+	on_rightclick = function(_, _, clicker)
+		ctf_modebase.on_flag_rightclick(clicker)
 	end,
 })

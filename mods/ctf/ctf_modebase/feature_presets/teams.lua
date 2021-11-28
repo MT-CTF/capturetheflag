@@ -303,8 +303,9 @@ return {
 	on_dieplayer = function(player, reason)
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			end_combat_mode(player)
-			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
+			if not end_combat_mode(player) then
+				ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
+			end
 		end
 
 		if ctf_modebase.respawn_delay.prepare(player) then

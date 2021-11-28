@@ -103,7 +103,7 @@ ctf_modebase.register_mode("classes", {
 	on_flag_take = teams.on_flag_take,
 	on_flag_drop = teams.on_flag_drop,
 	on_flag_capture = teams.on_flag_capture,
-	on_flag_rightclick = function(clicker, pos, node)
+	on_flag_rightclick = function(clicker)
 		classes:show_class_formspec(clicker)
 	end,
 	get_chest_access = teams.get_chest_access,
