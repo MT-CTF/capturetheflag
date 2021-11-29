@@ -37,16 +37,14 @@ minetest.register_chatcommand("report", {
 			return pname
 		end)
 
-		-- Append list of moderators in-game
+		-- Append list of staff in-game
 		local staff = ""
 		for pname in pairs(ctf_report.staff) do
 			staff = staff .. pname .. ", "
 		end
 
-		if staff == "" then
-			msg = msg .. " (no moderators online)"
-		else
-			msg = msg .. " (moderators online: " .. staff:sub(0, -3) .. ")"
+		if staff ~= "" then
+			msg = msg .. " (staff online: " .. staff:sub(0, -3) .. ")"
 		end
 
 		ctf_report.send_report(msg)
