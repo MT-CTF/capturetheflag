@@ -15,8 +15,6 @@ local function player_vote(name, modename)
 	voted[name] = true
 	votes[minetest.get_player_information(name).address] = modename
 
-	minetest.chat_send_all(string.format("%s voted for the mode '%s'", name, HumanReadable(modename)))
-
 	if voters_count == 0 then
 		ctf_modebase.mode_vote.end_vote()
 	end
@@ -109,8 +107,10 @@ function ctf_modebase.mode_vote.end_vote()
 		max_votes = math.max(max_votes, count)
 	end
 
+	local votes_result = ""
 	local best_modes = {}
 	for mode, count in pairs(modes) do
+		votes_result = votes_result .. string.format("%s got %d votes, ", HumanReadable(mode), count)
 		if count == max_votes then
 			table.insert(best_modes, mode)
 		end
@@ -118,9 +118,8 @@ function ctf_modebase.mode_vote.end_vote()
 
 	local new_mode = best_modes[math.random(1, #best_modes)]
 
-	minetest.chat_send_all(string.format("Voting is over, '%s' won with %d votes!",
-		HumanReadable(new_mode),
-		max_votes
+	minetest.chat_send_all(string.format("Voting is over, %s won with %d votes!\n%s",
+		HumanReadable(new_mode), max_votes, votes_result:sub(0, -3)
 	))
 
 	ctf_modebase.mode_on_next_match = new_mode

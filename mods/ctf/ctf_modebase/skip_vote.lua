@@ -161,8 +161,6 @@ local function player_vote(name, vote)
 		hud:remove(player, "skip_vote:vote")
 	end
 
-	minetest.chat_send_all(string.format("%s voted %s", name, vote))
-
 	if voters_count == 0 then
 		ctf_modebase.skip_vote.end_vote()
 	end

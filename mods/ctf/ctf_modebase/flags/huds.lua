@@ -1,10 +1,10 @@
 local hud = mhud.init()
 
-local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flag(s)! Protect your flag!"         }
+local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flags! Protect your flag!"           }
 local FLAG_STOLEN           = {color = 0xFF0000, text = "Kill %s, they've got your flag!"                     }
 local FLAG_STOLEN_YOU       = {color = 0xFF0000, text = "You've got a flag! Run back and punch your flag!"    }
-local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammate(s) %s! They have the enemy flag!"   }
-local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammate(s) %s to capture the flag!"}
+local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammates %s! They have the enemy flag!"     }
+local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammates %s to capture the flag!"  }
 local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"     }
 local OTHER_FLAG_STOLEN     = {color = 0xAA00FF, text = "Kill %s, they've got some flags!"                    }
 
@@ -50,29 +50,29 @@ local function get_flag_status(you)
 	if enemy_thief then
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = table.copy(BOTH_FLAGS_STOLEN_YOU)
+				status = BOTH_FLAGS_STOLEN_YOU
 				status.text = status.text:format(enemy_thief)
 			else
-				status = table.copy(BOTH_FLAGS_STOLEN)
+				status = BOTH_FLAGS_STOLEN
 				status.text = status.text:format(enemy_thief, your_thieves)
 			end
 		else
-			status = table.copy(FLAG_STOLEN)
+			status = FLAG_STOLEN
 			status.text = status.text:format(enemy_thief)
 		end
 	else
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = table.copy(FLAG_STOLEN_YOU)
+				status = FLAG_STOLEN_YOU
 			else
-				status = table.copy(FLAG_STOLEN_TEAMMATE)
+				status = FLAG_STOLEN_TEAMMATE
 				status.text = status.text:format(your_thieves)
 			end
 		elseif other_thieves then
-			status = table.copy(OTHER_FLAG_STOLEN)
+			status = OTHER_FLAG_STOLEN
 			status.text = status.text:format(other_thieves)
 		else
-			status = table.copy(FLAG_SAFE)
+			status = FLAG_SAFE
 		end
 	end
 
