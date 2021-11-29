@@ -24,7 +24,7 @@ end
 local function get_flag_status(you)
 	local teamname = ctf_teams.get(you)
 
-	if not teamname then return end
+	if not teamname then return FLAG_SAFE end
 
 	local enemy_thief = ctf_modebase.flag_taken[teamname]
 	local your_thieves = {}
@@ -45,38 +45,33 @@ local function get_flag_status(you)
 	your_thieves = concat_players(your_thieves)
 	other_thieves = concat_players(other_thieves)
 
-	local status
+	local format = function(template, ...)
+		return {color = template.color, text=string.format(template.text, ...)}
+	end
 
 	if enemy_thief then
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = BOTH_FLAGS_STOLEN_YOU
-				status.text = status.text:format(enemy_thief)
+				return format(BOTH_FLAGS_STOLEN_YOU, enemy_thief)
 			else
-				status = BOTH_FLAGS_STOLEN
-				status.text = status.text:format(enemy_thief, your_thieves)
+				return format(BOTH_FLAGS_STOLEN, enemy_thief, your_thieves)
 			end
 		else
-			status = FLAG_STOLEN
-			status.text = status.text:format(enemy_thief)
+			return format(FLAG_STOLEN, enemy_thief)
 		end
 	else
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = FLAG_STOLEN_YOU
+				return format(FLAG_STOLEN_YOU)
 			else
-				status = FLAG_STOLEN_TEAMMATE
-				status.text = status.text:format(your_thieves)
+				return format(FLAG_STOLEN_TEAMMATE, your_thieves)
 			end
 		elseif other_thieves then
-			status = OTHER_FLAG_STOLEN
-			status.text = status.text:format(other_thieves)
+			return format(OTHER_FLAG_STOLEN, other_thieves)
 		else
-			status = FLAG_SAFE
+			return FLAG_SAFE
 		end
 	end
-
-	return status
 end
 
 local function update_player(player)
