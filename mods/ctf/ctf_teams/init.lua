@@ -55,43 +55,45 @@ ctf_core.include_files(
 	"team_door.lua"
 )
 
-local old_join_func = minetest.send_join_message
-local old_leave_func = minetest.send_leave_message
+minetest.register_on_mods_loaded(function()
+	local old_join_func = minetest.send_join_message
+	local old_leave_func = minetest.send_leave_message
 
-local function empty_func() end
+	local function empty_func() end
 
-minetest.send_join_message = empty_func
-minetest.send_leave_message = empty_func
+	minetest.send_join_message = empty_func
+	minetest.send_leave_message = empty_func
 
-minetest.register_on_joinplayer(function(player, ...)
-	ctf_teams.allocate_player(player, true)
+	minetest.register_on_joinplayer(function(player, ...)
+		ctf_teams.allocate_player(player, true)
 
-	local pteam = ctf_teams.get(player)
+		local pteam = ctf_teams.get(player)
 
-	if not pteam then
-		old_join_func(player:get_player_name(), ...)
-	else
-		local tcolor = ctf_teams.team[pteam].color
+		if not pteam then
+			old_join_func(player:get_player_name(), ...)
+		else
+			local tcolor = ctf_teams.team[pteam].color
 
-		minetest.chat_send_all(string.format("*** %s joined the game.",
-			minetest.colorize(tcolor, player:get_player_name())
-		))
-	end
-end)
+			minetest.chat_send_all(string.format("*** %s joined the game.",
+				minetest.colorize(tcolor, player:get_player_name())
+			))
+		end
+	end)
 
-minetest.register_on_leaveplayer(function(player, timed_out, ...)
-	local pteam = ctf_teams.get(player)
+	minetest.register_on_leaveplayer(function(player, timed_out, ...)
+		local pteam = ctf_teams.get(player)
 
-	if not pteam then
-		old_leave_func(player:get_player_name(), timed_out, ...)
-	else
-		ctf_teams.remove_online_player(player)
+		if not pteam then
+			old_leave_func(player:get_player_name(), timed_out, ...)
+		else
+			ctf_teams.remove_online_player(player)
 
-		local tcolor = ctf_teams.team[pteam].color
+			local tcolor = ctf_teams.team[pteam].color
 
-		minetest.chat_send_all(string.format("*** %s left the game%s.",
-			minetest.colorize(tcolor, player:get_player_name()),
-			timed_out and " (timed out)" or ""
-		))
-	end
+			minetest.chat_send_all(string.format("*** %s left the game%s.",
+				minetest.colorize(tcolor, player:get_player_name()),
+				timed_out and " (timed out)" or ""
+			))
+		end
+	end)
 end)
