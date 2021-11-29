@@ -76,6 +76,11 @@ end
 
 -- Automatically start a skip vote after 50m, and subsequent votes every 15m
 function ctf_modebase.skip_vote.on_match_start()
+	if timer then
+		timer:cancel()
+		timer = nil
+	end
+
 	timer = minetest.after(SKIP_DELAY, ctf_modebase.skip_vote.start_vote)
 end
 
