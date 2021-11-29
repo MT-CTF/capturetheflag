@@ -76,28 +76,6 @@ function ctf_modebase.start_new_match(delay)
 	end
 end
 
-function ctf_modebase.on_match_start()
-	ctf_modebase.summary.on_match_start()
-	ctf_modebase.bounties.on_match_start()
-	ctf_modebase.skip_vote.on_match_start()
-
-	ctf_modebase.match_started = true
-end
-
-function ctf_modebase.on_match_end()
-	ctf_modebase.bounties.on_match_end()
-	ctf_modebase.build_timer.on_match_end()
-	ctf_modebase.flag_huds.on_match_end()
-	ctf_modebase.respawn_delay.on_match_end()
-	ctf_modebase.skip_vote.on_match_end()
-	ctf_modebase.summary.on_match_end()
-	ctf_modebase.update_wear.cancel_updates()
-
-	if ctf_modebase.current_mode then
-		ctf_modebase:get_current_mode().on_match_end()
-	end
-end
-
 --- @param mode string
 --- @param mapidx integer
 function ctf_modebase.place_map(mode, mapidx, callback)

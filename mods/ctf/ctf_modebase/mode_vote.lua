@@ -119,7 +119,7 @@ function ctf_modebase.mode_vote.end_vote()
 	local new_mode = best_modes[math.random(1, #best_modes)]
 
 	minetest.chat_send_all(string.format("Voting is over, %s won with %d votes!\n%s",
-		HumanReadable(new_mode), max_votes, votes_result:sub(0, -3)
+		HumanReadable(new_mode), max_votes, votes_result:sub(1, -3)
 	))
 
 	ctf_modebase.mode_on_next_match = new_mode

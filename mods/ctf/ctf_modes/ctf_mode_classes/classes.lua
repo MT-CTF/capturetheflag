@@ -259,37 +259,18 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	end
 })
 
-local function is_restricted(player, item)
+local function is_restricted(player, name)
 	local class = PlayerObj(player):get_meta():get_string("class")
-
-	if type(item) ~= "string" then
-		item = item:get_name()
-	end
 
 	if class and classes[class] then
 		for _, disallowed in pairs(classes[class].disallowed_items) do
-			if item:find(disallowed) then
+			if name:match(disallowed) then
 				return true
 			end
 		end
 	end
 
 	return false
-end
-
-local old_func = ctf_ranged.can_use_gun
-
-function ctf_ranged.can_use_gun(player, gun, ...)
-	if is_restricted(player, gun) then
-		hud_events.new(player, {
-			quick = true,
-			text = "Your class can't use that item!",
-			color = "warning",
-		})
-		return false
-	end
-
-	return old_func(player, gun, ...)
 end
 
 return {
@@ -427,6 +408,16 @@ return {
 				text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
 				color = "warning",
 			})
+		end
+	end,
+	is_restricted_item = function(player, name)
+		if is_restricted(player, name) then
+			hud_events.new(player, {
+				quick = true,
+				text = "Your class can't use that item!",
+				color = "warning",
+			})
+			return true
 		end
 	end,
 }

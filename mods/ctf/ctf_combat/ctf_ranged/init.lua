@@ -73,7 +73,7 @@ local function process_ray(ray, user, look_dir, def)
 end
 
 -- Can be overridden for custom behaviour
-function ctf_ranged.can_use_gun(player, gun)
+function ctf_ranged.can_use_gun(player, name)
 	return true
 end
 

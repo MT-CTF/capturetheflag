@@ -51,8 +51,8 @@ ctf_modebase.register_mode("nade_fight", {
 		"hp_healed"
 	},
 
-	is_bound_item = function(_, itemstack)
-		if itemstack:get_name():sub(1, -2) == "ctf_mode_nade_fight:grenade_tool_" then
+	is_bound_item = function(_, name)
+		if name:match("ctf_mode_nade_fight:") then
 			return true
 		end
 	end,

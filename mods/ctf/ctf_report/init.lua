@@ -44,7 +44,7 @@ minetest.register_chatcommand("report", {
 		end
 
 		if staff ~= "" then
-			msg = msg .. " (staff online: " .. staff:sub(0, -3) .. ")"
+			msg = msg .. " (staff online: " .. staff:sub(1, -3) .. ")"
 		end
 
 		ctf_report.send_report(msg)

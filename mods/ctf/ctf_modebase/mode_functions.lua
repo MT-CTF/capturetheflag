@@ -89,7 +89,7 @@ minetest.item_drop = function(itemstack, dropper, ...)
 	local current_mode = ctf_modebase:get_current_mode()
 
 	if current_mode and current_mode.is_bound_item then
-		if current_mode.is_bound_item(dropper, itemstack) then
+		if current_mode.is_bound_item(dropper, itemstack:get_name()) then
 			return itemstack
 		end
 	end
@@ -97,11 +97,11 @@ minetest.item_drop = function(itemstack, dropper, ...)
 	return default_item_drop(itemstack, dropper, ...)
 end
 
-dropondie.register_drop_filter(function(player, itemname)
+dropondie.register_drop_filter(function(player, name)
 	local current_mode = ctf_modebase:get_current_mode()
 
 	if current_mode and current_mode.is_bound_item then
-		return not current_mode.is_bound_item(player, ItemStack(itemname))
+		return not current_mode.is_bound_item(player, name)
 	end
 
 	return true
@@ -111,10 +111,20 @@ minetest.register_allow_player_inventory_action(function(player, action, invento
 	local current_mode = ctf_modebase:get_current_mode()
 
 	if current_mode and current_mode.is_bound_item and
-	action == "take" and current_mode.is_bound_item(player, info.stack) then
+	action == "take" and current_mode.is_bound_item(player, info.stack:get_name()) then
 		return 0
 	end
 end)
+
+ctf_ranged.can_use_gun = function(player, name)
+	local current_mode = ctf_modebase:get_current_mode()
+
+	if current_mode and current_mode.is_restricted_item then
+		return not current_mode.is_restricted_item(player, name)
+	end
+
+	return true
+end
 
 function ctf_modebase.match_mode(param)
 	local _, _, opt_param, mode_param = string.find(param, "^(.*) +mode:([^ ]*)$")
@@ -135,6 +145,28 @@ function ctf_modebase.match_mode(param)
 	end
 
 	return opt_param, mode_param
+end
+
+function ctf_modebase.on_match_start()
+	ctf_modebase.summary.on_match_start()
+	ctf_modebase.bounties.on_match_start()
+	ctf_modebase.skip_vote.on_match_start()
+
+	ctf_modebase.match_started = true
+end
+
+function ctf_modebase.on_match_end()
+	ctf_modebase.bounties.on_match_end()
+	ctf_modebase.build_timer.on_match_end()
+	ctf_modebase.flag_huds.on_match_end()
+	ctf_modebase.respawn_delay.on_match_end()
+	ctf_modebase.skip_vote.on_match_end()
+	ctf_modebase.summary.on_match_end()
+	ctf_modebase.update_wear.cancel_updates()
+
+	if ctf_modebase.current_mode then
+		ctf_modebase:get_current_mode().on_match_end()
+	end
 end
 
 --- end

@@ -47,15 +47,12 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
-	is_bound_item = function(_, itemstack)
-		local iname = itemstack:get_name()
-
-		if itemstack:get_definition().groups.sword or
-		iname:match("ctf_mode_classes:") or
-		iname == "ctf_healing:bandage" then
+	is_bound_item = function(_, name)
+		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
 			return true
 		end
 	end,
+	is_restricted_item = classes.is_restricted_item,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = bounties.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = bounties.get_next_bounty
