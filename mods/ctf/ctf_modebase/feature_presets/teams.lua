@@ -237,7 +237,16 @@ return {
 
 		ctf_modebase.flag_huds.untrack_capturer(player)
 
-		recent_rankings.add(player, {score = 30 * #teamnames, flag_captures = #teamnames})
+		local team_scores = recent_rankings.teams()
+		local capture_reward = 0
+		for _, lost_team in ipairs(teamnames) do
+			capture_reward = capture_reward + (team_scores[teamnames].score or 0)
+		end
+		capture_reward = capture_reward / 10
+		if capture_reward < 50 then capture_reward = 50 end
+		if capture_reward > 750 then capture_reward = 750 end
+
+		recent_rankings.add(player, {score = capture_reward, flag_captures = #teamnames})
 
 		teams_left = teams_left - #teamnames
 
