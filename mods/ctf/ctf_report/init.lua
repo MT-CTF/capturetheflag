@@ -37,7 +37,7 @@ minetest.register_chatcommand("report", {
 			return pname
 		end)
 
-		-- Append list of moderators in-game
+		-- Append list of staff in-game
 		local staff = ""
 		for pname in pairs(ctf_report.staff) do
 			staff = staff .. pname .. ", "
