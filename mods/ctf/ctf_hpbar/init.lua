@@ -1,3 +1,4 @@
+ctf_hpbar = {}
 local max = {hp = 20}
 local players = {}
 
@@ -50,12 +51,18 @@ minetest.register_playerevent(function(player, eventname)
 	end
 end)
 
-minetest.register_on_joinplayer(function(player)
-	local entity = minetest.add_entity(player:get_pos(), "ctf_hpbar:entity")
-	entity:set_attach(player, "", {x=0, y=19, z=0}, {x=0, y=0, z=0})
-	players[player:get_player_name()] = {entity=entity}
+function ctf_hpbar.can_show(player)
+    return true
+end
 
-	update_entity(player)
+minetest.register_on_joinplayer(function(player)
+    if not ctf_hpbar.can_show(player) then return end
+
+    local entity = minetest.add_entity(player:get_pos(), "ctf_hpbar:entity")
+    entity:set_attach(player, "", {x=0, y=19, z=0}, {x=0, y=0, z=0})
+    players[player:get_player_name()] = {entity=entity}
+
+    update_entity(player)
 end)
 
 minetest.register_on_leaveplayer(function(player)
