@@ -14,6 +14,9 @@ ctf_modebase = {
 	-- Players can hit, heal, etc
 	match_started         = false, ---@type boolean
 
+	-- For team allocator
+	in_game               = false, ---@type boolean
+
 	-- Get the mode def of the current mode. On server start this will return false
 	get_current_mode = function(self)
 		return self.current_mode and self.modes[self.current_mode]

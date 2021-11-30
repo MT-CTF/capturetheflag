@@ -59,6 +59,8 @@ function ctf_modebase.on_flag_rightclick(...)
 end
 
 ctf_teams.team_allocator = function(...)
+	if not ctf_modebase.in_game then return end
+
 	local current_mode = ctf_modebase:get_current_mode()
 
 	if not current_mode or #ctf_teams.current_team_list <= 0 then return end
