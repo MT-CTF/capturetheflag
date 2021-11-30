@@ -62,7 +62,7 @@ minetest.register_on_joinplayer(function(player)
     entity:set_attach(player, "", {x=0, y=19, z=0}, {x=0, y=0, z=0})
     players[player:get_player_name()] = {entity=entity}
 
-		update_entity(player)
+	update_entity(player)
 end)
 
 minetest.register_on_leaveplayer(function(player)
