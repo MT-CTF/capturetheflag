@@ -70,12 +70,22 @@ minetest.register_on_mods_loaded(function()
 			for tier, needle in pairs(tiers) do
 				if name:match(needle) then
 					def.groups.tier = tier
+
+					if tier <= 2 then
+						def.tool_capabilities.full_punch_interval = 1
+						def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy + 1
+					end
+
 					break
 				end
 			end
 		end
 
-		minetest.override_item(name, {groups = def.groups, _g_category = new_category})
+		minetest.override_item(name, {
+			groups = def.groups,
+			_g_category = new_category,
+			tool_capabilities = def.tool_capabilities,
+		})
 	end
 
 	local drop_self = {
