@@ -11,7 +11,7 @@ globals = {
 
 	"physics", "give_initial_stuff", "medkits", "grenades", "dropondie",
 	"vote", "random_messages", "sfinv", "email", "hb", "wield3d", "irc",
-	"default", "skybox", "crafting", "doors", "hud_events",
+	"default", "skybox", "crafting", "doors", "hud_events", "throwable_snow",
 
 	"vector",
 	math = {

@@ -114,7 +114,7 @@ grenades.register_grenade("grenades:frag", fragdef)
 local fragdef_sticky = table.copy(fragdef)
 fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
 fragdef_sticky.image = "grenades_frag_sticky.png"
-fragdef_sticky.on_collide = function(def, obj) return false end
+fragdef_sticky.on_collide = function() return false end
 grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 
 -- Smoke Grenade
@@ -123,7 +123,7 @@ local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
-	on_collide = function(def, obj)
+	on_collide = function()
 		return true
 	end,
 	on_explode = function(def, pos, pname)

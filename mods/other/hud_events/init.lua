@@ -9,7 +9,7 @@ local HUD_SHOW_NEXT_TIME = 1
 local HUD_COLORS = {
 	primary = 0x0D6EFD,
 	secondary = 0x6C757D,
-	success = 0x198754,
+	success = 0x20bf5c,
 	info = 0x0DCAF0,
 	warning = 0xFFC107,
 	danger = 0xDC3545,
@@ -74,7 +74,6 @@ local function handle_hud_events(player)
 			text = huddef.text,
 			color = huddef.color,
 		})
-
 	else
 		hud:change(player, "hud_event", {text = ""})
 	end
@@ -100,6 +99,13 @@ local function handle_hud_events(player)
 	end)
 end
 
+--[[
+	hud_events.new(player, {
+		text = "This is a hud event",
+		color = "info",
+		quick = true,
+	})
+]]
 function hud_events.new(player, def)
 	player = PlayerObj(player)
 	if not player then return end
