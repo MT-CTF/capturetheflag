@@ -66,7 +66,7 @@ local KNIGHT_USAGE_TIME = 12
 
 ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	description = "Knight Sword\n" .. minetest.colorize("gold",
-			"Rightclick to use Rage ability (Lasts "..
+			"(Sneak/Run) + Rightclick to use Rage ability (Lasts "..
 			KNIGHT_USAGE_TIME.."s, "..KNIGHT_COOLDOWN_TIME.."s cooldown)"),
 	inventory_image = "default_tool_bronzesword.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
@@ -74,6 +74,9 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	damage_groups = {fleshy = 7},
 	full_punch_interval = 0.7,
 	rightclick_func = function(itemstack, user, pointed)
+		local ctl = user:get_player_control()
+		if not ctl.sneak and not ctl.aux1 then return end
+
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
@@ -117,7 +120,7 @@ local RANGED_COOLDOWN_TIME = 36
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "classes_rifle",
 	description = "Rifle\n" .. minetest.colorize("gold",
-			"Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)"),
+			"(Sneak/Run) + Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)"),
 	texture = "ctf_mode_classes_ranged_rifle.png",
 	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
 	wield_texture = "ctf_mode_classes_ranged_rifle.png",
@@ -128,6 +131,9 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	fire_interval = 0.8,
 	liquid_travel_dist = 4,
 	rightclick_func = function(itemstack, user, pointed)
+		local ctl = user:get_player_control()
+		if not ctl.sneak and not ctl.aux1 then return end
+
 		if itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
 			itemstack:set_wear(65534)
@@ -215,7 +221,7 @@ local HEAL_PERCENT = 0.8
 ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	description = string.format(
 		"Bandage\nHeals teammates for 4-5 HP until target's HP is equal to %d%% of their maximum HP\n" ..
-		minetest.colorize("gold", "Rightclick to become immune to damage for %ds (%ds cooldown)"),
+		minetest.colorize("gold", "(Sneak/Run) + Rightclick to become immune to damage for %ds (%ds cooldown)"),
 		HEAL_PERCENT * 100,
 		IMMUNITY_TIME, IMMUNITY_COOLDOWN
 	),
@@ -226,6 +232,9 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	heal_min = 4,
 	heal_max = 5,
 	rightclick_func = function(itemstack, user, pointed)
+		local ctl = user:get_player_control()
+		if not ctl.sneak and not ctl.aux1 then return end
+
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
