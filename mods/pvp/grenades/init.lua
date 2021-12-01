@@ -167,7 +167,7 @@ function grenades.register_grenade(name, def)
 				cooldown:set(user, def.throw_cooldown)
 			end
 
-			on_use(itemstack, user, ...)
+			return on_use(itemstack, user, ...)
 		end
 	else
 		newdef.on_use = on_use
