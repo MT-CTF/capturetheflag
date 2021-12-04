@@ -125,7 +125,12 @@ minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
 	if respawn_delay[pname] then
-		finish_respawn(player, nil)
+		if respawn_delay[pname].obj then
+			respawn_delay[pname].obj:remove()
+		end
+		if respawn_delay[pname].timer then
+			respawn_delay[pname].timer:cancel()
+		end
+		respawn_delay[pname] = nil
 	end
-	respawn_delay[pname] = nil
 end)
