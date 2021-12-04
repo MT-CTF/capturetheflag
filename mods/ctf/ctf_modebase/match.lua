@@ -133,64 +133,65 @@ function ctf_modebase.place_map(mode, mapidx, callback)
 	end)
 end
 
-local function set_next(param)
-	local map = nil
-	local map_name, mode = ctf_modebase.match_mode(param)
-
-	if mode then
-		if not ctf_modebase.modes[mode] then
-			return "No such game mode: " .. mode
-		end
-	end
-
-	if map_name then
-		map = ctf_modebase.map_catalog.map_dirnames[map_name]
-		if not map then
-			return "No such map: " .. map_name
-		end
-	end
-
-	ctf_modebase.map_on_next_match = map
-	ctf_modebase.mode_on_next_match = mode
-end
-
 minetest.register_chatcommand("ctf_next", {
-	description = "Set a new map and mode after the match ends",
+	description = "Set a new map and mode",
 	privs = {ctf_admin = true},
 	params = "[-f] <mode:technical modename> <technical mapname>",
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_next %s", name, param))
-		local force, pos2 = param:find("-f ")
 
-		if pos2 then
-			param = param:sub(pos2+1)
+		local force = param == "-f"
+		if force then
+			param = ""
+		else
+			local _, pos = param:find("^-f +")
+			if pos then
+				param = param:sub(pos + 1)
+				force = true
+			end
 		end
 
-		local error = set_next(param)
-		if error then
-			return false, error
+		if force and not ctf_modebase.in_game then
+			return false, "Map switching is in progress"
 		end
+
+		local map = nil
+		local map_name, mode = ctf_modebase.match_mode(param)
+
+		if mode then
+			if not ctf_modebase.modes[mode] then
+				return false, "No such game mode: " .. mode
+			end
+		end
+
+		if map_name then
+			map = ctf_modebase.map_catalog.map_dirnames[map_name]
+			if not map then
+				return false, "No such map: " .. map_name
+			end
+		end
+
+		ctf_modebase.map_on_next_match = map
+		ctf_modebase.mode_on_next_match = mode
 
 		if force then
 			ctf_modebase.start_new_match()
-		end
 
-		return true, "The next map and mode are queued"
+			return true, "Skipping match..."
+		else
+			return true, "The next map and mode are queued"
+		end
 	end,
 })
 
 minetest.register_chatcommand("ctf_skip", {
-	description = "Skip to a new match now",
+	description = "Skip to a new match",
 	privs = {ctf_admin = true},
-	params = "[<mode:technical modename> <technical mapname>]",
 	func = function(name, param)
-		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_skip %s", name, param))
+		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_skip", name))
 
-		if param and param ~= "" then
-			local error = set_next(param)
-			if error then
-				return false, error
-			end
+		if not ctf_modebase.in_game then
+			return false, "Map switching is in progress"
 		end
 
 		ctf_modebase.start_new_match()

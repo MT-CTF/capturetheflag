@@ -140,6 +140,10 @@ minetest.register_chatcommand("vote_skip", {
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /vote_skip", name))
 
+		if not ctf_modebase.in_game then
+			return false, "Map switching is in progress"
+		end
+
 		if votes then
 			return false, "Vote is already in progress"
 		end
