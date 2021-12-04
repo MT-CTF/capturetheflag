@@ -125,14 +125,14 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 					v:set_attach(black_hole)
 				end
 			end
-		end)
 
-		minetest.after(2.2, function()
-			for _, vname in ipairs(victims) do
-				tool.holed[vname] = nil
-			end
-			black_hole:remove()
-			minetest.sound_stop(hiss)
+			minetest.after(2, function()
+				for _, vname in ipairs(victims) do
+					tool.holed[vname] = nil
+				end
+				black_hole:remove()
+				minetest.sound_stop(hiss)
+			end)
 		end)
 	end,
 })
