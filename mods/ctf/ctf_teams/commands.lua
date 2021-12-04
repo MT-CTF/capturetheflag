@@ -42,3 +42,47 @@ cmd:sub("rset :pattern :team", function(name, pattern, team)
 		return false, "No player names matched the given regex, or all players that matched were locked to a team"
 	end
 end)
+
+local function get_team_players(team)
+	local tcolor = ctf_teams.team[team].color
+	local count = 0
+	local str = ""
+
+	for player in pairs(ctf_teams.online_players[team].players) do
+		count = count + 1
+		str = str .. player .. ", "
+	end
+
+	return string.format("Team %s has %d players: %s", minetest.colorize(tcolor, team), count, str:sub(1, -3))
+end
+
+minetest.register_chatcommand("team", {
+	description = "Get team members for 'team' or on which team is 'player' in",
+	params = "<team> | player <player>",
+	func = function(name, param)
+		local _, pos = param:find("^player +")
+		if pos then
+			local player = param:sub(pos + 1)
+			local pteam = ctf_teams.get(player)
+
+			if not pteam then
+				return false, "No such player: " .. player
+			end
+
+			local tcolor = ctf_teams.team[pteam].color
+			return true, string.format("Player %s is in team %s", player, minetest.colorize(tcolor, pteam))
+		elseif param == "" then
+			local str = ""
+			for _, team in ipairs(ctf_teams.current_team_list) do
+				str = str .. get_team_players(team) .. "\n"
+			end
+			return true, str:sub(1, -2)
+		else
+			if not ctf_teams.team[param] then
+				return false, "No such team: " .. param
+			end
+
+			return true, get_team_players(param)
+		end
+	end,
+})
