@@ -57,10 +57,6 @@ function random_messages.read_messages()
 		"Use /summary (Or /s) to check scores of the current match and the previous match.",
 		"Strengthen your team by capturing enemy flags.",
 		"Hitting your enemy does more damage than not hitting them.",
-		"Use /top50 command to see the leaderboard.",
-		"Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.",
-		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
-		.. "For example: /r mode:nade_fight randomplayer.",
 	}
 end
 
