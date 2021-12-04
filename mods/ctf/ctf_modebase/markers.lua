@@ -25,7 +25,7 @@ end
 
 function ctf_modebase.markers.remove(pname)
 	if markers[pname] then
-		markers[pname].timer.cancel()
+		markers[pname].timer:cancel()
 
 		for teammate in pairs(ctf_teams.online_players[markers[pname].team].players) do
 			hud:remove(teammate, "marker_" .. pname)
@@ -40,7 +40,7 @@ function ctf_modebase.markers.add(pname, msg, pos)
 	if not pteam then return end
 
 	if markers[pname] then
-		markers[pname].timer.cancel()
+		markers[pname].timer:cancel()
 	end
 
 	markers[pname] = {
@@ -68,7 +68,7 @@ end)
 
 function ctf_modebase.markers.on_match_end()
 	for _, marker in pairs(markers) do
-		marker.timer():cancel()
+		marker.timer:cancel()
 	end
 	markers = {}
 	hud:remove_all()
