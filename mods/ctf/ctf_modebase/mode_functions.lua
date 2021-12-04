@@ -165,6 +165,7 @@ function ctf_modebase.on_match_end()
 	ctf_modebase.skip_vote.on_match_end()
 	ctf_modebase.summary.on_match_end()
 	ctf_modebase.update_wear.cancel_updates()
+	ctf_modebase.markers.on_match_end()
 
 	if ctf_modebase.current_mode then
 		ctf_modebase:get_current_mode().on_match_end()

@@ -1,19 +1,14 @@
+local hud = mhud.init()
 local markers = {}
 
 local MARKER_LIFETIME = 20
 local MARKER_RANGE = 150
 
-for _, team in pairs(ctf_teams.teamlist) do
-	markers[team] = {timer = nil, hud = mhud.init()}
-end
+ctf_modebase.markers = {}
 
-local function add_marker(player, message, pos)
-	local pteam = ctf_teams.get(player)
-
-	if not pteam then return false end
-
-	if not markers[pteam].hud:get(player, "team_waypoint") then
-		markers[pteam].hud:add(player, "team_waypoint", {
+local function add_marker(pname, pteam, message, pos, owner)
+	if not hud:get(pname, "marker_" .. owner) then
+		hud:add(pname, "marker_" .. owner, {
 			hud_elem_type = "waypoint",
 			world_pos = pos,
 			precision = 1,
@@ -21,33 +16,63 @@ local function add_marker(player, message, pos)
 			text = message
 		})
 	else
-		markers[pteam].hud:change(player, "team_waypoint", {
+		hud:change(pname, "marker_" .. owner, {
 			world_pos = pos,
 			text = message
 		})
 	end
 end
 
-function ctf_modebase.remove_marker(team)
-	markers[team].timer = nil
-	markers[team].hud:clear_all()
-	markers[team].content = nil
+function ctf_modebase.markers.remove(pname)
+	if markers[pname] then
+		markers[pname].timer.cancel()
+
+		for teammate in pairs(ctf_teams.online_players[markers[pname].team].players) do
+			hud:remove(teammate, "marker_" .. pname)
+		end
+
+		markers[pname] = nil
+	end
 end
 
-function ctf_modebase.add_marker(team, message, pos)
-	markers[team].content = {msg = message, pos = pos}
-	markers[team].timer = minetest.after(MARKER_LIFETIME, ctf_modebase.remove_marker, team)
+function ctf_modebase.markers.add(pname, msg, pos)
+	local pteam = ctf_teams.get(pname)
+	if not pteam then return end
 
-	for player in pairs(ctf_teams.online_players[team].players) do
-		add_marker(player, message, pos)
+	if markers[pname] then
+		markers[pname].timer.cancel()
+	end
+
+	markers[pname] = {
+		msg = msg, pos = pos, team = pteam,
+		timer = minetest.after(MARKER_LIFETIME, ctf_modebase.markers.remove, pname),
+	}
+
+	for teammate in pairs(ctf_teams.online_players[pteam].players) do
+		add_marker(teammate, pteam, msg, pos, pname)
 	end
 end
 
 ctf_teams.register_on_allocplayer(function(player, team)
-	if markers[team].content then
-		add_marker(player, markers[team].content.msg, markers[team].content.pos)
+	local pname = player:get_player_name()
+
+	ctf_modebase.markers.remove(pname)
+	hud:remove(pname)
+
+	for teammate, marker in pairs(markers) do
+		if marker.team == team then
+			add_marker(pname, team, marker.msg, marker.pos, teammate)
+		end
 	end
 end)
+
+function ctf_modebase.markers.on_match_end()
+	for _, marker in pairs(markers) do
+		marker.timer():cancel()
+	end
+	markers = {}
+	hud:remove_all()
+end
 
 minetest.register_chatcommand("m", {
 	description = "Place a marker in your look direction",
@@ -111,8 +136,16 @@ minetest.register_chatcommand("m", {
 			pos = pointed.under
 		end
 
-		ctf_modebase.add_marker(pteam, message, pos)
+		ctf_modebase.markers.add(name, message, pos)
 
-		return true, "Marker placed!"
+		return true, "Marker is placed!"
+	end
+})
+
+minetest.register_chatcommand("mr", {
+	description = "Remove your own marker",
+	func = function(name, param)
+		ctf_modebase.markers.remove(name)
+		return true, "Marker is removed!"
 	end
 })
