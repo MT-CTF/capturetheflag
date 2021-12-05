@@ -75,20 +75,16 @@ local function handle_hud_events(player)
 			color = huddef.color,
 		})
 	else
-		hud:change(player, "hud_event", {text = ""})
-	end
-
-	hud_queues[pname].t = minetest.after(HUD_SHOW_NEXT_TIME, function()
-		if not player:is_player() then return end
-
 		hud:change(player, "hud_event", {
 			text = huddef.text,
 			color = huddef.color
 		})
+	end
 
-		hud_queues[pname].t = minetest.after(HUD_SHOW_TIME, function()
-			if not player:is_player() then return end
+	hud_queues[pname].t = minetest.after(HUD_SHOW_TIME, function()
+		hud:change(player, "hud_event", {text = ""})
 
+		hud_queues[pname].t = minetest.after(HUD_SHOW_NEXT_TIME, function()
 			if #hud_queues[pname].e >= 1 then
 				handle_hud_events(player)
 			else

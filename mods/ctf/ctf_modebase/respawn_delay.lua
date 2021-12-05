@@ -68,21 +68,18 @@ ctf_modebase.respawn_delay = {}
 -- Returns true unless player has already been prepped
 function ctf_modebase.respawn_delay.prepare(player)
 	local pname = player:get_player_name()
+	if respawn_delay[pname] then return end
 
-	if not respawn_delay[pname] then
-		respawn_delay[pname] = {state = false, hp_max = player:get_properties().hp_max}
+	respawn_delay[pname] = {state = false, hp_max = player:get_properties().hp_max}
 
-		player:set_properties({hp_max = 0, pointable = false})
+	player:set_properties({hp_max = 0, pointable = false})
 
-		physics.set(pname, "ctf_modebase:respawn_freeze", {speed = 0, jump = 0, gravity = 0})
+	physics.set(pname, "ctf_modebase:respawn_freeze", {speed = 0, jump = 0, gravity = 0})
 
-		local obj = minetest.add_entity(player:get_pos(), "ctf_modebase:respawn_movement_freezer")
-		if obj then
-			player:set_attach(obj)
-			respawn_delay[pname].obj = obj
-		end
-
-		return true
+	local obj = minetest.add_entity(player:get_pos(), "ctf_modebase:respawn_movement_freezer")
+	if obj then
+		player:set_attach(obj)
+		respawn_delay[pname].obj = obj
 	end
 end
 

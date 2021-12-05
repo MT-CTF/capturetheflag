@@ -51,23 +51,9 @@ local function celebrate_team(teamname)
 	end
 end
 
--- Returns true if player was in combat mode
-local function end_combat_mode(player, killer)
-	local victim_combat_mode = ctf_combat_mode.get(player)
-
-	if not victim_combat_mode then return end
-
+local function end_combat_mode(player, killer, leaving)
 	local killscore = calculate_killscore(player)
-	local attackers = {}
-
-	-- populate attackers table
-	ctf_combat_mode.manage_extra(player, function(pname, type)
-		if type == "hitter" then
-			table.insert(attackers, pname)
-		else
-			return type
-		end
-	end)
+	local attackers = ctf_combat_mode.get_extra(player, "hitter")
 
 	if killer then
 		local rewards = {kills = 1, score = killscore}
@@ -82,31 +68,31 @@ local function end_combat_mode(player, killer)
 		recent_rankings.add(killer, rewards)
 
 		-- share kill score with healers
-		ctf_combat_mode.manage_extra(killer, function(pname, type)
-			if type == "healer" then
-				recent_rankings.add(pname, {score = rewards.score})
-			end
-
-			return type
-		end)
-	else
-		-- Only take score for suicide if they're in combat for being healed
-		if victim_combat_mode and #attackers >= 1 then
-			recent_rankings.add(player, {score = -math.ceil(killscore/2)})
+		for _, pname in ipairs(ctf_combat_mode.get_extra(killer, "healer")) do
+			recent_rankings.add(pname, {score = rewards.score})
 		end
 
-		ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player) -- suicide
+		recent_rankings.add(player, {deaths = 1}, true)
+	else
+		print(leaving, dump(attackers))
+		-- Only take score if they're in combat for being hitted
+		if #attackers > 0 then
+			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
+		end
+
+		if #attackers > 0 or not leaving then
+			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
+			recent_rankings.add(player, {deaths = 1}, true)
+		end
 	end
 
-	for _, pname in pairs(attackers) do
+	for _, pname in ipairs(attackers) do
 		if not killer or pname ~= killer:get_player_name() then
 			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #attackers)})
 		end
 	end
 
 	ctf_combat_mode.remove(player)
-
-	return true
 end
 
 return {
@@ -301,27 +287,20 @@ return {
 		ctf_modebase.bounties.on_player_join(player)
 	end,
 	on_leaveplayer = function(player)
-		local pname = player:get_player_name()
+		-- should be no_hud to avoid a race
+		end_combat_mode(player, nil, true)
 
-		if end_combat_mode(player) then
-			recent_rankings.add(player, {deaths = 1})
-		end
-
-		recent_rankings.on_leaveplayer(pname)
+		recent_rankings.on_leaveplayer(player:get_player_name())
 	end,
 	on_dieplayer = function(player, reason)
+		if ctf_modebase.build_timer.in_progress() then return end
+
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			if not end_combat_mode(player) then
-				ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
-			end
+			end_combat_mode(player)
 		end
 
-		if ctf_modebase.respawn_delay.prepare(player) then
-			if not ctf_modebase.build_timer.in_progress() then
-				recent_rankings.add(player, {deaths = 1})
-			end
-		end
+		ctf_modebase.respawn_delay.prepare(player)
 	end,
 	on_respawnplayer = function(player)
 		if not ctf_modebase.build_timer.in_progress() then

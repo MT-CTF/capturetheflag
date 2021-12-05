@@ -50,18 +50,14 @@ function ctf_combat_mode.set(player, time, extra)
 	player = PlayerName(player)
 
 	if not in_combat[player] then
-		in_combat[player] = {time = time, extra = extra}
+		in_combat[player] = {time = time, extra = {}}
 		update_hud(player, time)
 	else
 		in_combat[player].time = time
+	end
 
-		if extra._set then
-			in_combat[player].extra = extra
-		else
-			for k, v in pairs(extra) do
-				in_combat[player].extra[k] = v
-			end
-		end
+	for k, v in pairs(extra) do
+		in_combat[player].extra[k] = v
 	end
 end
 
@@ -73,14 +69,19 @@ function ctf_combat_mode.get_all()
 	return in_combat
 end
 
-function ctf_combat_mode.manage_extra(player, func)
+function ctf_combat_mode.get_extra(player, name)
 	local pname = PlayerName(player)
+	local ret = {}
 
-	if in_combat[pname] and in_combat[pname].extra then
+	if in_combat[pname] then
 		for k, v in pairs(in_combat[pname].extra) do
-			in_combat[pname].extra[k] = func(k, v)
+			if v == name then
+				table.insert(ret, k)
+			end
 		end
 	end
+
+	return ret
 end
 
 function ctf_combat_mode.remove(player)
@@ -98,7 +99,3 @@ function ctf_combat_mode.remove_all()
 		end
 	end
 end
-
-minetest.register_on_leaveplayer(function(player)
-	minetest.after(0, function() in_combat[player:get_player_name()] = nil end)
-end)
