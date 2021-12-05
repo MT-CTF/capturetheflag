@@ -83,7 +83,12 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 end
 
 ctf_teams.register_on_allocplayer(function(player)
-	ctf_modebase.drop_flags(player:get_player_name())
+	local pname = player:get_player_name()
+	if ctf_modebase.taken_flags[pname] then
+		ctf_modebase.drop_flags(pname)
+	else
+		ctf_modebase.flag_huds.update_player(player)
+	end
 end)
 
 minetest.register_on_dieplayer(function(player)

@@ -74,7 +74,6 @@ local function end_combat_mode(player, killer, leaving)
 
 		recent_rankings.add(player, {deaths = 1}, true)
 	else
-		print(leaving, dump(attackers))
 		-- Only take score if they're in combat for being hitted
 		if #attackers > 0 then
 			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
@@ -262,8 +261,8 @@ return {
 			end
 		end
 	end,
-	on_allocplayer = function(player, teamname)
-		local tcolor = ctf_teams.team[teamname].color
+	on_allocplayer = function(player, new_team)
+		local tcolor = ctf_teams.team[new_team].color
 
 		player:set_properties({
 			textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}
@@ -272,7 +271,7 @@ return {
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
 
-		recent_rankings.set_team(player, teamname)
+		recent_rankings.set_team(player, new_team)
 
 		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
 
@@ -281,10 +280,6 @@ return {
 		tp_player_near_flag(player)
 
 		give_initial_stuff(player)
-
-		ctf_modebase.flag_huds.on_allocplayer(player)
-
-		ctf_modebase.bounties.on_player_join(player)
 	end,
 	on_leaveplayer = function(player)
 		-- should be no_hud to avoid a race
@@ -313,9 +308,9 @@ return {
 			end
 		end
 
-		give_initial_stuff(player)
+		tp_player_near_flag(player)
 
-		return tp_player_near_flag(player)
+		give_initial_stuff(player)
 	end,
 	get_chest_access = function(pname)
 		local rank = rankings:get(pname)

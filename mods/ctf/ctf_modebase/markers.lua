@@ -53,15 +53,17 @@ function ctf_modebase.markers.add(pname, msg, pos)
 	end
 end
 
-ctf_teams.register_on_allocplayer(function(player, team)
+ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 	local pname = player:get_player_name()
 
-	ctf_modebase.markers.remove(pname)
-	hud:remove(pname)
+	if old_team and old_team ~= new_team then
+		ctf_modebase.markers.remove(pname)
+		hud:remove(pname)
+	end
 
-	for teammate, marker in pairs(markers) do
-		if marker.team == team then
-			add_marker(pname, team, marker.msg, marker.pos, teammate)
+	for owner, marker in pairs(markers) do
+		if marker.team == new_team then
+			add_marker(pname, new_team, marker.msg, marker.pos, owner)
 		end
 	end
 end)
