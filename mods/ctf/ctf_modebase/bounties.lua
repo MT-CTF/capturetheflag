@@ -52,14 +52,6 @@ function ctf_modebase.bounties.claim(pname, killer)
 	return rewards
 end
 
-function ctf_modebase.bounties.on_match_start()
-	timer = minetest.after(math.random(180, 360), function()
-		timer = nil
-		ctf_modebase.bounties.reassign()
-		ctf_modebase.bounties.on_match_start()
-	end)
-end
-
 function ctf_modebase.bounties.reassign()
 	local teams = {}
 
@@ -99,13 +91,22 @@ function ctf_modebase.bounties.reassign()
 	end
 end
 
-function ctf_modebase.bounties.on_match_end()
+function ctf_modebase.bounties.reassign_timer()
+	timer = minetest.after(math.random(180, 360), function()
+		ctf_modebase.bounties.reassign()
+		ctf_modebase.bounties.reassign_timer()
+	end)
+end
+
+ctf_modebase.register_on_match_start(ctf_modebase.bounties.reassign_timer)
+
+ctf_modebase.register_on_match_end(function()
 	bounties = {}
 	if timer then
 		timer:cancel()
 		timer = nil
 	end
-end
+end)
 
 function ctf_modebase.bounties.bounty_reward_func()
 	return {bounty_kills = 1, score = 500}

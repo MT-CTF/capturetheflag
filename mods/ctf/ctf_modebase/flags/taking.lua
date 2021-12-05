@@ -1,9 +1,3 @@
-ctf_modebase.register_on_new_match(function()
-	ctf_modebase.taken_flags = {}
-	ctf_modebase.flag_taken = {}
-	ctf_modebase.flag_captured = {}
-end)
-
 function ctf_modebase.drop_flags(pname)
 	local flagteams = ctf_modebase.taken_flags[pname]
 	if not flagteams then return end
@@ -81,6 +75,12 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		end
 	end
 end
+
+ctf_modebase.register_on_match_end(function()
+	ctf_modebase.taken_flags = {}
+	ctf_modebase.flag_taken = {}
+	ctf_modebase.flag_captured = {}
+end)
 
 ctf_teams.register_on_allocplayer(function(player)
 	local pname = player:get_player_name()

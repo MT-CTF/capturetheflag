@@ -1,33 +1,84 @@
--- add_mode_func(minetest.register_on_dieplayer, "on_dieplayer", true) is the same as calling
---[[
-	minetest.register_on_dieplayer(function(...)
-		if current_mode.on_dieplayer then
-			return current_mode.on_dieplayer(...)
-		end
-	end, true)
-]]--
-local function add_mode_func(minetest_func, mode_func_name, ...)
-	minetest_func(function(...)
-		local current_mode = ctf_modebase:get_current_mode()
-
-		if not current_mode then return end
-
-		if current_mode[mode_func_name] then
-			return current_mode[mode_func_name](...)
-		end
-	end, ...)
+function ctf_modebase.register_mode(name, func)
+	ctf_modebase.modes[name] = func
+	table.insert(ctf_modebase.modelist, name)
 end
 
-add_mode_func(ctf_teams.register_on_allocplayer  , "on_allocplayer"  )
-add_mode_func(minetest .register_on_dieplayer    , "on_dieplayer"    )
-add_mode_func(minetest .register_on_respawnplayer, "on_respawnplayer")
+ctf_modebase.registered_on_mode_start = {}
+ctf_modebase.registered_on_match_start = {}
+ctf_modebase.registered_on_match_end = {}
 
-add_mode_func(minetest.register_on_joinplayer , "on_joinplayer" )
-add_mode_func(minetest.register_on_leaveplayer, "on_leaveplayer")
+---@param func function
+function ctf_modebase.register_on_mode_start(func)
+	table.insert(ctf_modebase.registered_on_mode_start, func)
+end
 
-add_mode_func(ctf_modebase.register_on_new_match, "on_new_match", true)
-add_mode_func(ctf_modebase.register_on_new_mode, "on_mode_start", true)
--- on_mode_end is called in match.lua's ctf_modebase.start_new_match()
+---@param func function
+function ctf_modebase.register_on_match_start(func)
+	table.insert(ctf_modebase.registered_on_match_start, func)
+end
+
+---@param func function
+function ctf_modebase.register_on_match_end(func)
+	table.insert(ctf_modebase.registered_on_match_end, func)
+end
+
+function ctf_modebase.on_mode_end()
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	current_mode.on_mode_end()
+end
+
+function ctf_modebase.on_mode_start()
+	RunCallbacks(ctf_modebase.registered_on_mode_start)
+
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	current_mode.on_mode_start()
+end
+
+function ctf_modebase.on_new_match()
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	current_mode.on_new_match()
+end
+
+function ctf_modebase.on_match_start()
+	RunCallbacks(ctf_modebase.registered_on_match_start)
+
+	ctf_modebase.match_started = true
+end
+
+function ctf_modebase.on_match_end()
+	RunCallbacks(ctf_modebase.registered_on_match_end)
+
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	current_mode.on_match_end()
+end
+
+minetest.register_on_leaveplayer(function(...)
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	return current_mode.on_leaveplayer(...)
+end)
+
+minetest.register_on_dieplayer(function(...)
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	return current_mode.on_dieplayer(...)
+end)
+
+minetest.register_on_respawnplayer(function(...)
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	return current_mode.on_respawnplayer(...)
+end)
+
+ctf_teams.register_on_allocplayer(function(...)
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return true end
+	return current_mode.on_allocplayer(...)
+end)
 
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
 	if not ctf_modebase.match_started then return true end
@@ -48,7 +99,6 @@ ctf_healing.register_on_heal(function(...)
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
-
 	return current_mode.on_healplayer(...)
 end)
 
@@ -147,29 +197,6 @@ function ctf_modebase.match_mode(param)
 	end
 
 	return opt_param, mode_param
-end
-
-function ctf_modebase.on_match_start()
-	ctf_modebase.summary.on_match_start()
-	ctf_modebase.bounties.on_match_start()
-	ctf_modebase.skip_vote.on_match_start()
-
-	ctf_modebase.match_started = true
-end
-
-function ctf_modebase.on_match_end()
-	ctf_modebase.bounties.on_match_end()
-	ctf_modebase.build_timer.on_match_end()
-	ctf_modebase.flag_huds.on_match_end()
-	ctf_modebase.respawn_delay.on_match_end()
-	ctf_modebase.skip_vote.on_match_end()
-	ctf_modebase.summary.on_match_end()
-	ctf_modebase.update_wear.cancel_updates()
-	ctf_modebase.markers.on_match_end()
-
-	if ctf_modebase.current_mode then
-		ctf_modebase:get_current_mode().on_match_end()
-	end
 end
 
 --- end

@@ -111,12 +111,12 @@ function ctf_modebase.respawn_delay.respawn(player, time, immunity_after)
 	return true
 end
 
-function ctf_modebase.respawn_delay.on_match_end()
+ctf_modebase.register_on_match_end(function()
 	for pname in pairs(respawn_delay) do
 		finish_respawn(minetest.get_player_by_name(pname), nil)
 	end
 	respawn_delay = {}
-end
+end)
 
 minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()

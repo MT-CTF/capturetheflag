@@ -44,7 +44,6 @@ ctf_modebase = {
 ctf_gui.init()
 
 ctf_core.include_files(
-	"register.lua",
 	"mode_functions.lua",
 	"map_catalog.lua",
 	"ranking_commands.lua",

@@ -13,17 +13,15 @@ function ctf_modebase.start_match_after_vote()
 	local old_mode = ctf_modebase.current_mode
 
 	if ctf_modebase.mode_on_next_match ~= old_mode then
-		if old_mode and ctf_modebase.modes[old_mode].on_mode_end then
-			ctf_modebase.modes[old_mode].on_mode_end()
-		end
+		ctf_modebase.on_mode_end()
 		ctf_modebase.current_mode = ctf_modebase.mode_on_next_match
-		RunCallbacks(ctf_modebase.registered_on_new_mode, ctf_modebase.mode_on_next_match, old_mode)
+		ctf_modebase.on_mode_start()
 	end
 
 	ctf_modebase.place_map(ctf_modebase.mode_on_next_match, ctf_modebase.map_on_next_match, function()
 		give_initial_stuff.reset_stuff_providers()
 
-		RunCallbacks(ctf_modebase.registered_on_new_match)
+		ctf_modebase.on_new_match()
 
 		if ctf_map.current_map.initial_stuff then
 			give_initial_stuff.register_stuff_provider(function()

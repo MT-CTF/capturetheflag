@@ -68,13 +68,13 @@ ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 	end
 end)
 
-function ctf_modebase.markers.on_match_end()
+ctf_modebase.register_on_match_end(function()
 	for _, marker in pairs(markers) do
 		marker.timer:cancel()
 	end
 	markers = {}
 	hud:remove_all()
-end
+end)
 
 minetest.register_chatcommand("m", {
 	description = "Place a marker in your look direction",

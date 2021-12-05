@@ -68,12 +68,12 @@ function ctf_modebase.build_timer.finish()
 	ctf_modebase.on_match_start()
 end
 
-function ctf_modebase.build_timer.on_match_end()
+ctf_modebase.register_on_match_end(function()
 	if timer == nil then return end
 	timer:cancel()
 	timer = nil
 	hud:remove_all()
-end
+end)
 
 local old_protected = minetest.is_protected
 minetest.is_protected = function(pos, pname, ...)
