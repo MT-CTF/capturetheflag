@@ -25,7 +25,6 @@ ctf_modebase.register_mode("classes", {
 		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
 
 		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
-		["ctf_ranged:rifle_loaded"  ] = {rarity = 0.2                 },
 		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
 		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
 
