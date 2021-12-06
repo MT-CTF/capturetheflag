@@ -81,6 +81,24 @@ crafting.register_recipe({
 	level  = 1,
 })
 
+-- Cobble Stairs
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_cobble 8",
+	items  = { "default:cobble 6"},
+	always_known = true,
+	level  = 1,
+})
+
+-- Desert Cobble Stairs
+crafting.register_recipe({
+	type   = "inv",
+	output = "stairs:stair_desert_cobble 8",
+	items  = { "default:desert_cobble 6"},
+	always_known = true,
+	level  = 1,
+})
+
 -- Wood x4
 crafting.register_recipe({
 	type   = "inv",
