@@ -112,7 +112,7 @@ local function show_catalog(pname, current_map)
 			size = {10, 3},
 			label = minetest.colorize("#ffff00", "GAME MODES"),
 			read_only = true,
-			default = table.concat(current_map_meta.game_modes, ", "),
+			default = HumanReadable(table.concat(current_map_meta.game_modes, ", ")),
 		}
 		y = y + 1.5
 	end
