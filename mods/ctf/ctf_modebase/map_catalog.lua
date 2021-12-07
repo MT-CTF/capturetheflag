@@ -104,7 +104,7 @@ local function show_catalog(pname, current_map)
 		y = y + 1.5
 	end
 
-	if current_map_meta.game_modes and next(current_map_meta.game_modes) then
+	if current_map_meta.game_modes and #current_map_meta.game_modes > 0 then
 		table.sort(current_map_meta.game_modes)
 		formspec.elements.game_modes = {
 			type = "textarea",
