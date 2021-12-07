@@ -116,7 +116,7 @@ local function show_catalog(pname, current_map)
 		}
 		y = y + 1.5
 	end
-	
+
 	if current_map_meta.others and current_map_meta.others ~= "" then
 		formspec.elements.others = {
 			type = "textarea",
