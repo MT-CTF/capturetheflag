@@ -105,14 +105,13 @@ local function show_catalog(pname, current_map)
 	end
 
 	if current_map_meta.game_modes and #current_map_meta.game_modes > 0 then
-		table.sort(current_map_meta.game_modes)
 		formspec.elements.game_modes = {
 			type = "textarea",
 			pos = {7, y},
 			size = {10, 3},
 			label = minetest.colorize("#ffff00", "GAME MODES"),
 			read_only = true,
-			default = HumanReadable(table.concat(current_map_meta.game_modes, ", ")),
+			default = HumanReadable(current_map_meta.game_modes, ", "),
 		}
 		y = y + 1.5
 	end
