@@ -63,6 +63,10 @@ for _, chest_color in pairs(colors) do
 		inv:set_size("main", 4 * 7)
 		inv:set_size("pro", 4 * 7)
 		inv:set_size("helper", 1 * 1)
+		inv:add_item("main", ItemStack("default:cobble 99"))
+       	inv:add_item("main", ItemStack("default:wood 99"))
+       	inv:add_item("main", ItemStack("default:torch 30"))
+       	inv:add_item("main", ItemStack("ctf_teams:door_steel 3"))
 	end
 
 	function def.can_dig(pos, player)
