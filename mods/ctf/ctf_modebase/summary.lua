@@ -224,7 +224,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.winner then
 		formspec.elements.winner = {
 			type = "label",
-			pos = {4, 0.5},
+			pos = {"center", 0.5},
 			label = formdef.winner,
 		}
 	end
@@ -232,7 +232,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.duration then
 		formspec.elements.duration = {
 			type = "label",
-			pos = {"center", 0.5},
+			pos = {14.5, 0.5},
 			label = "Duration: " .. formdef.duration,
 		}
 	end
