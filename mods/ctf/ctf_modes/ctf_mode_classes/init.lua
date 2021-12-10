@@ -13,10 +13,10 @@ local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 local old_get_colored_skin = ctf_cosmetics.get_colored_skin
 ctf_modebase.register_mode("classes", {
 	treasures = {
-		["default:ladder_wood"] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
-		["default:torch" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
-		["default:cobble"] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 5},
-		["default:wood"  ] = {min_count = 10, max_count = 60, rarity = 0.5, max_stacks = 4},
+		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
+		["default:torch"       ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
+		["default:cobble"      ] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 5},
+		["default:wood"        ] = {min_count = 10, max_count = 60, rarity = 0.5, max_stacks = 4},
 
 		["ctf_teams:door_steel"] = {rarity = 0.2, max_stacks = 3},
 
@@ -28,8 +28,8 @@ ctf_modebase.register_mode("classes", {
 		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
 		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
 
-		["ctf_ranged:ammo"     ] = {min_count = 3, max_count = 10, rarity = 0.3 , max_stacks = 2},
-		["default:apple"       ] = {min_count = 5, max_count = 20, rarity = 0.1 , max_stacks = 2},
+		["ctf_ranged:ammo"    ] = {min_count = 3, max_count = 10, rarity = 0.3  , max_stacks = 2},
+		["ctf_healing:medkit" ] = {                               rarity = 0.08 , max_stacks = 2},
 
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
