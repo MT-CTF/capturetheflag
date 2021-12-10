@@ -9,10 +9,6 @@ local MAX_WEAR = 65535
 local MEDKIT_CAPACITY = 50 -- Amount of HP a medkit can heal
 local WEAR_PER_SEC = math.floor(MAX_WEAR / (MEDKIT_CAPACITY / REGEN_PER_SEC))
 
-minetest.register_on_leaveplayer(function(player)
-	healing_players[player:get_player_name()] = nil
-end)
-
 local function stop_medkit_heal(playername, interrupt_reason)
 	local player = minetest.get_player_by_name(playername)
 
