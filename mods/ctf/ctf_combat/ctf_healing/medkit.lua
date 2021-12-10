@@ -1,6 +1,6 @@
 local hud = mhud.init()
 
--- healing_players[pname] = hp_at_healing_start
+-- healing_players[pname] = {hp = hp_at_healing_start, after = minetest.after id}
 local healing_players = {}
 
 local REGEN_PER_SEC = 3 -- Amount of HP healed per second
@@ -16,11 +16,12 @@ local function stop_medkit_heal(playername, interrupt_reason)
 		if interrupt_reason then
 			local php = player:get_hp()
 
-			player:set_hp((php + healing_players[playername])/2) -- set hp halfway from the original to the current
+			player:set_hp((php + healing_players[playername].hp)/2) -- set hp halfway from the original to the current
 
 			hud_events.new(playername, {
 				text = "Your healing was interrupted: " .. interrupt_reason,
 				color = "danger",
+				quick = true,
 			})
 		end
 
@@ -28,11 +29,15 @@ local function stop_medkit_heal(playername, interrupt_reason)
 		physics.remove(playername, "ctf_healing:medkit_slow")
 	end
 
+	if healing_players[playername].after then
+		healing_players[playername].after:cancel()
+	end
+
 	healing_players[playername] = nil
 end
 
 local function medkit_heal(playername)
-	minetest.after(1, function()
+	healing_players[playername].after = minetest.after(1, function()
 		local player = minetest.get_player_by_name(playername)
 
 		if not player then
@@ -89,7 +94,7 @@ local function start_medkit_heal(playername)
 		return
 	end
 
-	healing_players[playername] = php
+	healing_players[playername] = {hp = php}
 
 	hud:add(player, "healing_overlay", {
 		hud_elem_type = "image",
@@ -121,7 +126,15 @@ minetest.register_on_punchplayer(function(player, hitter, _, _, _, damage)
 end)
 
 minetest.register_on_leaveplayer(function(player)
-	healing_players[player:get_player_name()] = nil
+	local pname = player:get_player_name()
+
+	if not healing_players[pname] then return end
+
+	if healing_players[pname].after then
+		healing_players[pname].after:cancel()
+	end
+
+	healing_players[pname] = nil
 end)
 
 minetest.register_tool("ctf_healing:medkit", {
