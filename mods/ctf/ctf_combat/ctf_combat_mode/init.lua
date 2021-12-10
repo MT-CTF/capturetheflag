@@ -99,3 +99,7 @@ function ctf_combat_mode.remove_all()
 		end
 	end
 end
+
+ctf_modebase.register_on_match_end(function()
+	ctf_combat_mode.remove_all()
+end)
