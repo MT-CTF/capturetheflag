@@ -31,7 +31,6 @@ end
 
 local function remove(pname, pteam)
 	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, string.format("[Bounty] %s is no longer bountied", pname)))
-
 	bounties[pteam] = nil
 end
 
@@ -79,14 +78,12 @@ function ctf_modebase.bounties.reassign()
 			new = ctf_modebase.bounties.get_next_bounty(team_members)
 		end
 
-		if old ~= new then
-			if old then
-				remove(old, tname)
-			end
+		if old and old ~= new then
+			remove(old, tname)
+		end
 
-			if new then
-				set(new, tname, ctf_modebase.bounties.bounty_reward_func(new))
-			end
+		if new then
+			set(new, tname, ctf_modebase.bounties.bounty_reward_func(new))
 		end
 	end
 end

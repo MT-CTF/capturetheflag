@@ -59,6 +59,9 @@ local function run_respawn_timer(pname)
 			end)
 		end
 
+		ctf_modebase.player.empty_inv(player)
+		ctf_modebase.player.give_initial_stuff(player)
+
 		RunCallbacks(minetest.registered_on_respawnplayers, player)
 	end
 end

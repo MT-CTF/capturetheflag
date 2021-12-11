@@ -19,15 +19,7 @@ function ctf_modebase.start_match_after_vote()
 	end
 
 	ctf_modebase.place_map(ctf_modebase.mode_on_next_match, ctf_modebase.map_on_next_match, function()
-		give_initial_stuff.reset_stuff_providers()
-
 		ctf_modebase.on_new_match()
-
-		if ctf_map.current_map.initial_stuff then
-			give_initial_stuff.register_stuff_provider(function()
-				return ctf_map.current_map.initial_stuff
-			end)
-		end
 
 		ctf_modebase.in_game = true
 		ctf_teams.allocate_teams(ctf_map.current_map.teams)
@@ -97,33 +89,9 @@ function ctf_modebase.place_map(mode, mapidx, callback)
 	ctf_modebase.map_catalog.current_map = mapidx
 	local map = ctf_modebase.map_catalog.maps[mapidx]
 	ctf_map.place_map(map, function()
-		-- Set time, time_speed, skyboxes, and physics
-
+		-- Set time and time_speed
 		minetest.set_timeofday(map.start_time/24000)
-
-		for _, player in pairs(minetest.get_connected_players()) do
-			local name = PlayerName(player)
-
-			skybox.set(player, table.indexof(ctf_map.skyboxes, map.skybox)-1)
-
-			physics.set(name, "ctf_modebase:map_physics", {
-				speed = map.phys_speed,
-				jump = map.phys_jump,
-				gravity = map.phys_gravity,
-			})
-
-			-- Convert name of mode into it's def
-			local mode_def = ctf_modebase.modes[mode]
-
-			if mode_def.physics then
-				player:set_physics_override({
-					sneak_glitch = mode_def.physics.sneak_glitch or false,
-					new_move = mode_def.physics.new_move or true
-				})
-			end
-
-			minetest.settings:set("time_speed", map.time_speed * 72)
-		end
+		minetest.settings:set("time_speed", map.time_speed * 72)
 
 		ctf_map.announce_map(map)
 
@@ -217,26 +185,3 @@ minetest.register_chatcommand("unqueue_restart", {
 				return true, "Restart is cancelled."
 		end
 })
-
-minetest.register_on_joinplayer(function(player)
-	player:set_hp(player:get_properties().hp_max)
-
-	if ctf_modebase.current_mode and ctf_map.current_map then
-		local map = ctf_map.current_map
-		local mode_def = ctf_modebase:get_current_mode()
-		skybox.set(player, table.indexof(ctf_map.skyboxes, map.skybox)-1)
-
-		physics.set(player:get_player_name(), "ctf_modebase:map_physics", {
-			speed = map.phys_speed,
-			jump = map.phys_jump,
-			gravity = map.phys_gravity,
-		})
-
-		if mode_def.physics then
-			player:set_physics_override({
-				sneak_glitch = mode_def.physics.sneak_glitch or false,
-				new_move = mode_def.physics.new_move or true
-			})
-		end
-	end
-end)

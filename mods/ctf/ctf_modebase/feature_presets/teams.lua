@@ -278,8 +278,6 @@ return {
 		player:set_hp(player:get_properties().hp_max)
 
 		tp_player_near_flag(player)
-
-		give_initial_stuff(player)
 	end,
 	on_leaveplayer = function(player)
 		-- should be no_hud to avoid a race
@@ -309,8 +307,6 @@ return {
 		end
 
 		tp_player_near_flag(player)
-
-		give_initial_stuff(player)
 	end,
 	get_chest_access = function(pname)
 		local rank = rankings:get(pname)

@@ -44,11 +44,11 @@ ctf_modebase = {
 ctf_gui.init()
 
 ctf_core.include_files(
-	"mode_functions.lua",
+	"register.lua",
 	"map_catalog.lua",
 	"ranking_commands.lua",
 	"summary.lua",
-	"give_initial_stuff.lua",
+	"player.lua",
 	"treasure.lua",
 	"flags/nodes.lua",
 	"flags/taking.lua",

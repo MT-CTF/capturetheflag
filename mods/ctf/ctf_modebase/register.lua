@@ -4,12 +4,18 @@ function ctf_modebase.register_mode(name, func)
 end
 
 ctf_modebase.registered_on_mode_start = {}
+ctf_modebase.registered_on_new_match = {}
 ctf_modebase.registered_on_match_start = {}
 ctf_modebase.registered_on_match_end = {}
 
 ---@param func function
 function ctf_modebase.register_on_mode_start(func)
 	table.insert(ctf_modebase.registered_on_mode_start, func)
+end
+
+---@param func function
+function ctf_modebase.register_on_new_match(func)
+	table.insert(ctf_modebase.registered_on_new_match, func)
 end
 
 ---@param func function
@@ -37,6 +43,8 @@ function ctf_modebase.on_mode_start()
 end
 
 function ctf_modebase.on_new_match()
+	RunCallbacks(ctf_modebase.registered_on_new_match)
+
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
 	current_mode.on_new_match()
@@ -148,16 +156,6 @@ minetest.item_drop = function(itemstack, dropper, ...)
 
 	return default_item_drop(itemstack, dropper, ...)
 end
-
-dropondie.register_drop_filter(function(player, name)
-	local current_mode = ctf_modebase:get_current_mode()
-
-	if current_mode and current_mode.is_bound_item then
-		return not current_mode.is_bound_item(player, name)
-	end
-
-	return true
-end)
 
 minetest.register_allow_player_inventory_action(function(player, action, inventory, info)
 	local current_mode = ctf_modebase:get_current_mode()

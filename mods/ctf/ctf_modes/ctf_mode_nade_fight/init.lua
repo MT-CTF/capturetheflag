@@ -51,11 +51,20 @@ ctf_modebase.register_mode("nade_fight", {
 		"deaths",
 		"hp_healed"
 	},
+	build_timer = 60,
 
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_nade_fight:") then
 			return true
 		end
+	end,
+	stuff_provider = function(player)
+		return {
+			tool.get_grenade_tool(player),
+			"default:pick_steel",
+			"default:shovel_steel",
+			"default:axe_steel"
+		}
 	end,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = bounties.bounty_reward_func
@@ -65,20 +74,7 @@ ctf_modebase.register_mode("nade_fight", {
 		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 	end,
-	on_new_match = function()
-		teams.on_new_match()
-
-		ctf_modebase.build_timer.start(60)
-
-		give_initial_stuff.register_stuff_provider(function(player)
-			return {
-				tool.get_grenade_tool(player),
-				"default:pick_steel",
-				"default:shovel_steel",
-				"default:axe_steel"
-			}
-		end)
-	end,
+	on_new_match = teams.on_new_match,
 	on_match_end = teams.on_match_end,
 	team_allocator = teams.team_allocator,
 	on_allocplayer = function(player, teamname)

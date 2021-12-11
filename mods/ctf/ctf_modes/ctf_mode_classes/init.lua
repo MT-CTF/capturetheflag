@@ -46,10 +46,17 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
+	build_timer = 60 * 1.5,
+
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
 			return true
 		end
+	end,
+	stuff_provider = function(player)
+		local initial_stuff = table.copy(classes.get(player).items or {})
+		table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
+		return initial_stuff
 	end,
 	is_restricted_item = classes.is_restricted_item,
 	on_mode_start = function()
@@ -70,19 +77,7 @@ ctf_modebase.register_mode("classes", {
 
 		classes.finish()
 	end,
-	on_new_match = function()
-		teams.on_new_match()
-
-		ctf_modebase.build_timer.start(60 * 1.5)
-
-		give_initial_stuff.register_stuff_provider(function(player)
-			local initial_stuff = classes.get(player).items or {}
-
-			table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
-
-			return(initial_stuff)
-		end)
-	end,
+	on_new_match = teams.on_new_match,
 	on_match_end = teams.on_match_end,
 	team_allocator = teams.team_allocator,
 	on_allocplayer = function(player, teamname)
