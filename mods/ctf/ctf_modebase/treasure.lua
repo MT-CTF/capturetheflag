@@ -5,7 +5,7 @@ ctf_map.treasurefy_node = function(pos, node, clicker)
 
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
-	local treasures = table.copy(ctf_modebase:get_current_mode().treasures) or {}
+	local treasures = table.copy(ctf_modebase:get_current_mode().treasures or {})
 	if ctf_map.current_map then
 		local map_treasures = ctf_map.treasure_from_string(ctf_map.current_map.treasures)
 

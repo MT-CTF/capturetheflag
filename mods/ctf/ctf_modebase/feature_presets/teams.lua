@@ -275,8 +275,6 @@ return {
 
 		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
 
-		player:set_hp(player:get_properties().hp_max)
-
 		tp_player_near_flag(player)
 	end,
 	on_leaveplayer = function(player)
@@ -296,16 +294,6 @@ return {
 		ctf_modebase.respawn_delay.prepare(player)
 	end,
 	on_respawnplayer = function(player)
-		if not ctf_modebase.build_timer.in_progress() then
-			if ctf_modebase.respawn_delay.respawn(player, 7, 4) then
-				return true
-			end
-		else
-			if ctf_modebase.respawn_delay.respawn(player, 3) then
-				return true
-			end
-		end
-
 		tp_player_near_flag(player)
 	end,
 	get_chest_access = function(pname)

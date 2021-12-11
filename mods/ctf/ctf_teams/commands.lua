@@ -9,20 +9,20 @@ local cmd = chatcmdbuilder.register("ctf_teams", {
 cmd:sub("set :player:username :team", function(name, player, team)
 	if minetest.get_player_by_name(player) then
 		if table.indexof(ctf_teams.current_team_list, team) == -1 then
-			return false, "Unable to find team " .. dump(team)
+			return false, "No such team: " .. team
 		end
 
 		ctf_teams.set(player, team)
 
 		return true, string.format("Allocated %s to team %s", player, team)
 	else
-		return false, "Unable to find player " .. dump(player)
+		return false, "No such player: " .. player
 	end
 end)
 
 cmd:sub("rset :pattern :team", function(name, pattern, team)
 	if table.indexof(ctf_teams.current_team_list, team) == -1 then
-		return false, "Unable to find team " .. dump(team)
+		return false, "No such team: " .. team
 	end
 
 	local added = {}
@@ -78,7 +78,7 @@ minetest.register_chatcommand("team", {
 			end
 			return true, str:sub(1, -2)
 		else
-			if not ctf_teams.team[param] or table.indexof(ctf_teams.current_team_list, param) == -1 then
+			if table.indexof(ctf_teams.current_team_list, param) == -1 then
 				return false, "No such team: " .. param
 			end
 

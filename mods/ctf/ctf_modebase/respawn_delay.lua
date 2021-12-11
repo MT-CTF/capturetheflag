@@ -59,16 +59,12 @@ local function run_respawn_timer(pname)
 			end)
 		end
 
-		ctf_modebase.player.empty_inv(player)
-		ctf_modebase.player.give_initial_stuff(player)
-
-		RunCallbacks(minetest.registered_on_respawnplayers, player)
+		ctf_modebase.on_respawnplayer(player)
 	end
 end
 
 ctf_modebase.respawn_delay = {}
 
--- Returns true unless player has already been prepped
 function ctf_modebase.respawn_delay.prepare(player)
 	local pname = player:get_player_name()
 	if respawn_delay[pname] then return end
@@ -86,14 +82,9 @@ function ctf_modebase.respawn_delay.prepare(player)
 	end
 end
 
--- Returns false if timer is up, true if timer is ongoing
 function ctf_modebase.respawn_delay.respawn(player, time, immunity_after)
 	local pname = player:get_player_name()
-	if not respawn_delay[pname] then return false end
-
-	if respawn_delay[pname].state == true then
-		return true
-	end
+	if not respawn_delay[pname] or respawn_delay[pname].state == true then return end
 
 	assert(time >= 1, "Delay time must be >= 1!")
 
@@ -110,8 +101,6 @@ function ctf_modebase.respawn_delay.respawn(player, time, immunity_after)
 	})
 
 	run_respawn_timer(pname)
-
-	return true
 end
 
 ctf_modebase.register_on_match_end(function()
@@ -133,4 +122,14 @@ minetest.register_on_leaveplayer(function(player)
 		end
 		respawn_delay[pname] = nil
 	end
+end)
+
+minetest.register_on_respawnplayer(function(player)
+	if respawn_delay[player:get_player_name()] then
+		ctf_modebase.respawn_delay.respawn(player, 7, 4)
+	else
+		ctf_modebase.on_respawnplayer(player)
+	end
+
+	return true
 end)

@@ -7,6 +7,7 @@ ctf_modebase.registered_on_mode_start = {}
 ctf_modebase.registered_on_new_match = {}
 ctf_modebase.registered_on_match_start = {}
 ctf_modebase.registered_on_match_end = {}
+ctf_modebase.registered_on_respawnplayer = {}
 
 ---@param func function
 function ctf_modebase.register_on_mode_start(func)
@@ -26,6 +27,11 @@ end
 ---@param func function
 function ctf_modebase.register_on_match_end(func)
 	table.insert(ctf_modebase.registered_on_match_end, func)
+end
+
+---@param func function
+function ctf_modebase.register_on_respawnplayer(func)
+	table.insert(ctf_modebase.registered_on_respawnplayer, func)
 end
 
 function ctf_modebase.on_mode_end()
@@ -64,28 +70,30 @@ function ctf_modebase.on_match_end()
 	current_mode.on_match_end()
 end
 
+function ctf_modebase.on_respawnplayer(player)
+	RunCallbacks(ctf_modebase.registered_on_respawnplayer, player)
+
+	local current_mode = ctf_modebase:get_current_mode()
+	if not current_mode then return end
+	current_mode.on_respawnplayer(player)
+end
+
 minetest.register_on_leaveplayer(function(...)
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
-	return current_mode.on_leaveplayer(...)
+	current_mode.on_leaveplayer(...)
 end)
 
 minetest.register_on_dieplayer(function(...)
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
-	return current_mode.on_dieplayer(...)
-end)
-
-minetest.register_on_respawnplayer(function(...)
-	local current_mode = ctf_modebase:get_current_mode()
-	if not current_mode then return end
-	return current_mode.on_respawnplayer(...)
+	current_mode.on_dieplayer(...)
 end)
 
 ctf_teams.register_on_allocplayer(function(...)
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
-	return current_mode.on_allocplayer(...)
+	current_mode.on_allocplayer(...)
 end)
 
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
