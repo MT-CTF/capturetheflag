@@ -53,7 +53,7 @@ end
 
 local function end_combat_mode(player, killer, leaving)
 	local killscore = calculate_killscore(player)
-	local attackers = ctf_combat_mode.get_extra(player, "hitter")
+	local hitters = ctf_combat_mode.get(player, "hitter")
 
 	if killer then
 		local rewards = {kills = 1, score = killscore}
@@ -68,26 +68,31 @@ local function end_combat_mode(player, killer, leaving)
 		recent_rankings.add(killer, rewards)
 
 		-- share kill score with healers
-		for _, pname in ipairs(ctf_combat_mode.get_extra(killer, "healer")) do
+		for _, pname in ipairs(ctf_combat_mode.get(killer, "healer")) do
 			recent_rankings.add(pname, {score = rewards.score})
 		end
 
 		recent_rankings.add(player, {deaths = 1}, true)
+
+		local killer_hitters = ctf_combat_mode.get(killer, "hitter")
+		if #killer_hitters == 1 and killer_hitters[1] == PlayerName(player) then
+			ctf_combat_mode.set_time(killer, 5)
+		end
 	else
 		-- Only take score if they're in combat for being hitted
-		if #attackers > 0 then
+		if #hitters > 0 then
 			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
 		end
 
-		if #attackers > 0 or not leaving then
+		if #hitters > 0 or not leaving then
 			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
 			recent_rankings.add(player, {deaths = 1}, true)
 		end
 	end
 
-	for _, pname in ipairs(attackers) do
+	for _, pname in ipairs(hitters) do
 		if not killer or pname ~= killer:get_player_name() then
-			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #attackers)})
+			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
 		end
 	end
 
@@ -337,7 +342,7 @@ return {
 
 		if hitter and hitter:is_player() then
 			if player ~= hitter then
-				ctf_combat_mode.set(player, 15, {[hitter:get_player_name()] = "hitter"})
+				ctf_combat_mode.set(player, hitter, "hitter", 15, true)
 
 				if player:get_hp() <= damage then
 					end_combat_mode(player, hitter)
@@ -352,15 +357,8 @@ return {
 		return damage
 	end,
 	on_healplayer = function(player, patient, amount)
-		local stats = {hp_healed = amount}
-
-		if ctf_combat_mode.get(patient) then
-			ctf_combat_mode.set(patient, 15, {[player:get_player_name()] = "healer"})
-		else
-			stats.score = math.ceil(amount/2)
-		end
-
-		recent_rankings.add(player, stats, true)
+		ctf_combat_mode.set(patient, player, "healer", 60, false)
+		recent_rankings.add(player, {hp_healed = amount}, true)
 	end,
 }
 

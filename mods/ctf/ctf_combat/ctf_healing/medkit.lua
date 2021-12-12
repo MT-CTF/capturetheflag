@@ -85,7 +85,7 @@ local function start_medkit_heal(playername)
 		return
 	end
 
-	if ctf_combat_mode.get(player) then
+	if ctf_combat_mode.in_combat(playername) then
 		hud_events.new(playername, {
 			text = "You can't heal while in combat",
 			color = "warning",
