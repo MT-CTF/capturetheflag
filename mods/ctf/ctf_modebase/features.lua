@@ -188,6 +188,7 @@ return {
 			minetest.colorize(tcolor, player) ..
 			minetest.colorize(FLAG_MESSAGE_COLOR, text)
 		)
+		ctf_modebase.announce(player .. text)
 
 		celebrate_team(ctf_teams.get(player))
 
@@ -207,6 +208,8 @@ return {
 			minetest.colorize(tcolor, player) ..
 			minetest.colorize(FLAG_MESSAGE_COLOR, text)
 		)
+		ctf_modebase.announce(player .. text)
+
 		ctf_modebase.flag_huds.untrack_capturer(player)
 
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
@@ -223,6 +226,9 @@ return {
 				minetest.colorize(tcolor, player) ..
 				minetest.colorize(FLAG_MESSAGE_COLOR, " has captured the flag of team(s) " .. HumanReadable(teamnames))
 			)
+			ctf_modebase.announce(player .. " has captured the flag of team(s) " .. HumanReadable(teamnames))
+		else
+			ctf_modebase.announce(player .. " has captured the flag")
 		end
 
 		ctf_modebase.flag_huds.untrack_capturer(player)
@@ -253,6 +259,8 @@ return {
 			for _, p in ipairs(minetest.get_connected_players()) do
 				ctf_modebase.summary.show_gui(p:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
 			end
+
+			ctf_modebase.announce(HumanReadable(pteam) .. " Team Wins!")
 
 			ctf_modebase.start_new_match(5)
 		else

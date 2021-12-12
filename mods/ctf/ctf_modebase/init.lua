@@ -43,6 +43,9 @@ ctf_modebase = {
 
 ctf_gui.init()
 
+function ctf_modebase.announce(msg)
+end
+
 ctf_core.include_files(
 	"register.lua",
 	"map_catalog.lua",
