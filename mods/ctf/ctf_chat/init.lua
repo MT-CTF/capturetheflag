@@ -1,3 +1,5 @@
+ctf_chat = {}
+
 minetest.override_chatcommand("msg", {
 	func = function(name, param)
 		local sendto, message = param:match("^(%S+)%s(.+)$")
@@ -88,7 +90,7 @@ minetest.register_on_mods_loaded(function()
 			end
 		end
 
-		for i = 1, old_handlers do
+		for i = 1, #old_handlers do
 			if old_handlers[i](name, message) then
 				return true
 			end

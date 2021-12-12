@@ -172,8 +172,8 @@ function email.send_mail(aname, ato, msg)
 	local name = send_as[aname]  or aname
 	local to   = forward_to[ato] or ato
 
-	minetest.log("action", "Email - To: "..to..", From: "..name..", MSG: "..msg)
-	email.log("Email - To: "..to..", From: "..name..", MSG: "..msg)
+	minetest.log("action", string.format("[EMAIL] from %s to %s: %s", name, to, msg))
+	email.log(string.format("Email from %s to %s: %s", name, to, msg))
 	if not minetest.player_exists(to) then
 		return false, "Player '" .. to .. "' does not exist"
 	end
