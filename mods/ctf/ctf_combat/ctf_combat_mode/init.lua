@@ -6,6 +6,12 @@ ctf_combat_mode = {}
 local function update(player)
 	local combat = combats[player]
 
+	if combat.time <= 0 then
+		hud:remove(player, "combat_indicator")
+		combats[player] = nil
+		return
+	end
+
 	local hud_message = "You are in combat [%ds left]"
 	hud_message = hud_message:format(combat.time)
 
@@ -33,12 +39,7 @@ local function update(player)
 		combat.time = combat.time + 0.5
 	end
 
-	if combat.time <= 0 then
-		hud:remove(player, "combat_indicator")
-		combats[player] = nil
-	else
-		combat.timer = minetest.after(1, update, player)
-	end
+	combat.timer = minetest.after(1, update, player)
 end
 
 function ctf_combat_mode.set(player, combatant, type, time, in_combat)
