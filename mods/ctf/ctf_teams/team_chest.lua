@@ -81,7 +81,11 @@ for _, chest_color in pairs(colors) do
 
 		local flag_captured = ctf_modebase.flag_captured[chest_color]
 		if not flag_captured and chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, string.format("You're not on team %s", chest_color))
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. chest_color,
+				color = "warning",
+			})
 			return
 		end
 
@@ -143,7 +147,11 @@ for _, chest_color in pairs(colors) do
 		local name = player:get_player_name()
 
 		if chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, "You're not on team " .. chest_color)
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. chest_color,
+				color = "warning",
+			})
 			return 0
 		end
 
@@ -175,7 +183,11 @@ for _, chest_color in pairs(colors) do
 		local name = player:get_player_name()
 
 		if chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, "You're not on team " .. chest_color)
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. chest_color,
+				color = "warning",
+			})
 			return 0
 		end
 
@@ -216,7 +228,11 @@ for _, chest_color in pairs(colors) do
 		local name = player:get_player_name()
 
 		if chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, "You're not on team " .. chest_color)
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. chest_color,
+				color = "warning",
+			})
 			return 0
 		end
 

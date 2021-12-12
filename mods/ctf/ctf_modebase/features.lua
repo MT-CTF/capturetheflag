@@ -319,19 +319,38 @@ return {
 		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
 
 		if not pteam then
-			minetest.chat_send_player(hname, pname .. " is not in a team!")
+			hud_events.new(hname, {
+				quick = true,
+				text = pname .. " is not in a team!",
+				color = "warning",
+			})
 			return
-		elseif not hteam then
-			minetest.chat_send_player(hname, "You are not in a team!")
+		end
+
+		if not hteam then
+			hud_events.new(hname, {
+				quick = true,
+				text = "You are not in a team!",
+				color = "warning",
+			})
 			return
 		end
 
 		if pteam == hteam and pname ~= hname then
-			minetest.chat_send_player(hname, pname .. " is on your team!")
-
+			hud_events.new(hname, {
+				quick = true,
+				text = pname .. " is on your team!",
+				color = "warning",
+			})
 			return
-		elseif ctf_modebase.build_timer.in_progress() then
-			minetest.chat_send_player(hname, "The match hasn't started yet!")
+		end
+
+		if ctf_modebase.build_timer.in_progress() then
+			hud_events.new(hname, {
+				quick = true,
+				text = "The match hasn't started yet!",
+				color = "warning",
+			})
 			return
 		end
 

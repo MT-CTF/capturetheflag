@@ -28,7 +28,11 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 	local pteam = ctf_teams.get(pname)
 
 	if not pteam then
-		minetest.chat_send_player(pname, "You're not in a team, you can't take that flag!")
+		hud_events.new(puncher, {
+			quick = true,
+			text = "You're not in a team, you can't take that flag!",
+			color = "warning",
+		})
 		return
 	end
 
@@ -36,13 +40,21 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 
 	if pteam ~= target_team then
 		if ctf_modebase.flag_captured[pteam] then
-			minetest.chat_send_player(pname, "You can't take that flag. Your team's flag was captured!")
+			hud_events.new(puncher, {
+				quick = true,
+				text = "You can't take that flag. Your team's flag was captured!",
+				color = "warning",
+			})
 			return
 		end
 
 		local result = ctf_modebase:get_current_mode().can_take_flag(pname, target_team)
 		if result then
-			minetest.chat_send_player(pname, result)
+			hud_events.new(puncher, {
+				quick = true,
+				text = result,
+				color = "warning",
+			})
 			return
 		end
 
@@ -61,7 +73,11 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 	else
 		local flagteams = ctf_modebase.taken_flags[pname]
 		if not ctf_modebase.taken_flags[pname] then
-			minetest.chat_send_player(pname, "That's your flag!")
+			hud_events.new(puncher, {
+				quick = true,
+				text = "That's your flag!",
+				color = "warning",
+			})
 		else
 			ctf_modebase.taken_flags[pname] = nil
 

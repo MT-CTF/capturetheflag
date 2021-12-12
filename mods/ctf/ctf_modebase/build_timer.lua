@@ -31,7 +31,11 @@ local function timer_func(time_left)
 
 		local pteam = ctf_teams.get(player)
 		if pteam and not ctf_core.pos_inside(player:get_pos(), ctf_teams.get_team_territory(pteam)) then
-			minetest.chat_send_player(player:get_player_name(), "You can't cross the barrier until build time is over!")
+			hud_events.new(player, {
+				quick = true,
+				text = "You can't cross the barrier until build time is over!",
+				color = "warning",
+			})
 			player:set_pos(ctf_map.current_map.teams[pteam].flag_pos)
 		end
 	end
@@ -82,7 +86,11 @@ minetest.is_protected = function(pos, pname, ...)
 	local pteam = ctf_teams.get(pname)
 
 	if pteam and not ctf_core.pos_inside(pos, ctf_teams.get_team_territory(pteam)) then
-		minetest.chat_send_player(pname, "You can't interact outside of your team territory during build time!")
+		hud_events.new(pname, {
+			quick = true,
+			text = "You can't interact outside of your team territory during build time!",
+			color = "warning",
+		})
 
 		return true
 	else
