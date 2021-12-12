@@ -23,6 +23,9 @@ local function select_map(mode, mapidx, callback)
 	ctf_modebase.map_catalog.current_map = mapidx
 end
 
+function ctf_modebase.announce_new_match(msg)
+end
+
 function ctf_modebase.start_match_after_vote()
 	for _, pos in pairs(ctf_teams.team_chests) do
 		minetest.remove_node(pos)
@@ -46,9 +49,7 @@ function ctf_modebase.start_match_after_vote()
 		minetest.settings:set("time_speed", map.time_speed * 72)
 
 		ctf_map.announce_map(map)
-		if minetest.global_exists("irc") and irc.connected then
-			irc:say(string.format("%s mode, map: %s", HumanReadable(ctf_modebase.current_mode), map.name))
-		end
+		ctf_modebase.announce_new_match(string.format("%s mode, map: %s", HumanReadable(ctf_modebase.current_mode), map.name))
 
 		ctf_modebase.on_new_match()
 
