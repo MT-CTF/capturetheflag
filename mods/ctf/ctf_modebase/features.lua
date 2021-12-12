@@ -1,4 +1,4 @@
-return function(rankings, recent_rankings)
+ctf_modebase.features = function(rankings, recent_rankings)
 
 local FLAG_MESSAGE_COLOR = "#d9b72a"
 local FLAG_CAPTURE_TIMER = 60 * 3
@@ -268,10 +268,6 @@ return {
 	end,
 	on_allocplayer = function(player, new_team)
 		local tcolor = ctf_teams.team[new_team].color
-
-		player:set_properties({
-			textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}
-		})
 
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)

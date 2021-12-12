@@ -1,7 +1,6 @@
 local rankings = ctf_rankings.init()
-local recent_rankings = ctf_modebase.feature_presets.recent_rankings(rankings)
-local bounties = ctf_modebase.feature_presets.bounties(recent_rankings)
-local teams = ctf_modebase.feature_presets.teams(rankings, recent_rankings)
+local recent_rankings = ctf_modebase.recent_rankings(rankings)
+local features = ctf_modebase.features(rankings, recent_rankings)
 
 local crafts = ctf_core.include_files(
 	"crafts.lua"
@@ -54,36 +53,33 @@ ctf_modebase.register_mode("classic", {
 		return {"default:sword_stone", "default:pick_stone", "default:torch 15", "default:stick 5"}
 	end,
 	on_mode_start = function()
-		ctf_modebase.bounties.bounty_reward_func = bounties.bounty_reward_func
-		ctf_modebase.bounties.get_next_bounty = bounties.get_next_bounty
+		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
+		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 	end,
 	on_mode_end = function()
 		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 	end,
-	on_new_match = teams.on_new_match,
-	on_match_end = teams.on_match_end,
-	team_allocator = teams.team_allocator,
-	on_allocplayer = function(player, teamname)
-		local tcolor = ctf_teams.team[teamname].color
+	on_new_match = features.on_new_match,
+	on_match_end = features.on_match_end,
+	team_allocator = features.team_allocator,
+	on_allocplayer = function(player, new_team)
+		local tcolor = ctf_teams.team[new_team].color
+		player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
 
-		player:set_properties({
-			textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}
-		})
-
-		teams.on_allocplayer(player, teamname)
+		features.on_allocplayer(player, new_team)
 	end,
-	on_leaveplayer = teams.on_leaveplayer,
-	on_dieplayer = teams.on_dieplayer,
-	on_respawnplayer = teams.on_respawnplayer,
-	can_take_flag = teams.can_take_flag,
-	on_flag_take = teams.on_flag_take,
-	on_flag_drop = teams.on_flag_drop,
-	on_flag_capture = teams.on_flag_capture,
+	on_leaveplayer = features.on_leaveplayer,
+	on_dieplayer = features.on_dieplayer,
+	on_respawnplayer = features.on_respawnplayer,
+	can_take_flag = features.can_take_flag,
+	on_flag_take = features.on_flag_take,
+	on_flag_drop = features.on_flag_drop,
+	on_flag_capture = features.on_flag_capture,
 	on_flag_rightclick = function() end,
-	get_chest_access = teams.get_chest_access,
-	on_punchplayer = teams.on_punchplayer,
-	on_healplayer = teams.on_healplayer,
+	get_chest_access = features.get_chest_access,
+	on_punchplayer = features.on_punchplayer,
+	on_healplayer = features.on_healplayer,
 	calculate_knockback = function()
 		return 0
 	end,

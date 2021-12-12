@@ -291,7 +291,6 @@ return {
 	end,
 	set = function(player, classname)
 		local meta = player:get_meta()
-		local pteam = ctf_teams.get(player)
 		local oldclassname = meta:get_string("class")
 
 		if classname == oldclassname then
@@ -308,13 +307,17 @@ return {
 
 		meta:set_string("class", classname)
 
+		local pteam = ctf_teams.get(player)
+		if not pteam then return end
+		local tcolor = ctf_teams.team[pteam].color
+
 		ctf_modebase.update_wear.cancel_player_updates(player)
 
 		ctf_modebase.player.remove_bound_items(player)
 		ctf_modebase.player.give_initial_stuff(player)
 
 		player:set_properties({
-			textures = {ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color or "white")},
+			textures = {ctf_cosmetics.get_colored_skin(player, tcolor) .. "^ctf_mode_classes_" .. classname .. "_overlay.png"},
 			hp_max = classes[classname].hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
 			visual_size = classes[classname].visual_size or vector.new(1, 1, 1)
 		})
