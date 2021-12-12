@@ -5,9 +5,6 @@ function ctf_map.announce_map(map)
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
-	if minetest.global_exists("irc") and irc.connected then
-		irc:say("Map: " .. map.name)
-	end
 end
 
 function ctf_map.place_map(mapmeta, callback)
