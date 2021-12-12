@@ -179,6 +179,8 @@ return {
 		local pteam = ctf_teams.get(player)
 		local tcolor = ctf_teams.team[pteam].color
 
+		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_BUILTIN, tcolor)
+
 		local text = " has taken the flag"
 		if many_teams then
 			text = " has taken " .. HumanReadable(teamname) .. "'s flag"
@@ -283,8 +285,6 @@ return {
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
 
 		recent_rankings.set_team(player, new_team)
-
-		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
 
 		tp_player_near_flag(player)
 	end,
