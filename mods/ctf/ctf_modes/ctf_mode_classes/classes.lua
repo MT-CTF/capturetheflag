@@ -293,7 +293,7 @@ return {
 		local meta = player:get_meta()
 		local oldclassname = meta:get_string("class")
 
-		if classname == oldclassname then
+		if classname and classname == oldclassname then
 			return
 		end
 
@@ -301,7 +301,7 @@ return {
 			classname = oldclassname
 		end
 
-		if not classes[classname] then
+		if not classname or not classes[classname] then
 			classname = "knight"
 		end
 
