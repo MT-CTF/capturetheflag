@@ -47,7 +47,7 @@ function ctf_modebase.start_match_after_vote()
 
 		ctf_map.announce_map(map)
 		if minetest.global_exists("irc") and irc.connected then
-			irc:say(string.format("Map: %s, mode: %s", map.name, HumanReadable(ctf_modebase.current_mode)))
+			irc:say(string.format("%s mode, map: %s", HumanReadable(ctf_modebase.current_mode), map.name))
 		end
 
 		ctf_modebase.on_new_match()

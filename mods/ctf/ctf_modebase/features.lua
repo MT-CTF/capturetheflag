@@ -230,9 +230,8 @@ return {
 		local team_scores = recent_rankings.teams()
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
-			local score = ((team_scores[lost_team] or {}).score or 0) / 10
-			if score < 50 then score = 50 end
-			if score > 750 then score = 750 end
+			local score = ((team_scores[lost_team] or {}).score or 0) / 4
+			score = math.max(50, math.min(500, score))
 			capture_reward = capture_reward + score
 		end
 
