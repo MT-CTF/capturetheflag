@@ -74,7 +74,7 @@ function ctf_modebase.player.update(player)
 	end
 end
 
-ctf_modebase.register_on_new_match(function()
+ctf_api.register_on_new_match(function()
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf_modebase.player.empty_inv(player)
 		ctf_modebase.player.update(player)
@@ -82,7 +82,7 @@ ctf_modebase.register_on_new_match(function()
 end)
 
 if ctf_core.settings.server_mode ~= "mapedit" then
-	ctf_modebase.register_on_respawnplayer(function(player)
+	ctf_api.register_on_respawnplayer(function(player)
 		ctf_modebase.player.empty_inv(player)
 		ctf_modebase.player.give_initial_stuff(player)
 	end)

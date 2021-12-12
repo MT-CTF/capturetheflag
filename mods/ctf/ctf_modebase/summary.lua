@@ -56,11 +56,11 @@ function ctf_modebase.summary.get(prev)
 	end
 end
 
-ctf_modebase.register_on_match_start(function()
+ctf_api.register_on_match_start(function()
 	start_time = os.time()
 end)
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
 	local rankings = current_mode.recent_rankings

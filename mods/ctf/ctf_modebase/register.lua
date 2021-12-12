@@ -3,37 +3,6 @@ function ctf_modebase.register_mode(name, func)
 	table.insert(ctf_modebase.modelist, name)
 end
 
-ctf_modebase.registered_on_mode_start = {}
-ctf_modebase.registered_on_new_match = {}
-ctf_modebase.registered_on_match_start = {}
-ctf_modebase.registered_on_match_end = {}
-ctf_modebase.registered_on_respawnplayer = {}
-
----@param func function
-function ctf_modebase.register_on_mode_start(func)
-	table.insert(ctf_modebase.registered_on_mode_start, func)
-end
-
----@param func function
-function ctf_modebase.register_on_new_match(func)
-	table.insert(ctf_modebase.registered_on_new_match, func)
-end
-
----@param func function
-function ctf_modebase.register_on_match_start(func)
-	table.insert(ctf_modebase.registered_on_match_start, func)
-end
-
----@param func function
-function ctf_modebase.register_on_match_end(func)
-	table.insert(ctf_modebase.registered_on_match_end, func)
-end
-
----@param func function
-function ctf_modebase.register_on_respawnplayer(func)
-	table.insert(ctf_modebase.registered_on_respawnplayer, func)
-end
-
 function ctf_modebase.on_mode_end()
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -41,7 +10,7 @@ function ctf_modebase.on_mode_end()
 end
 
 function ctf_modebase.on_mode_start()
-	RunCallbacks(ctf_modebase.registered_on_mode_start)
+	RunCallbacks(ctf_api.registered_on_mode_start)
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -49,7 +18,7 @@ function ctf_modebase.on_mode_start()
 end
 
 function ctf_modebase.on_new_match()
-	RunCallbacks(ctf_modebase.registered_on_new_match)
+	RunCallbacks(ctf_api.registered_on_new_match)
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -57,13 +26,13 @@ function ctf_modebase.on_new_match()
 end
 
 function ctf_modebase.on_match_start()
-	RunCallbacks(ctf_modebase.registered_on_match_start)
+	RunCallbacks(ctf_api.registered_on_match_start)
 
 	ctf_modebase.match_started = true
 end
 
 function ctf_modebase.on_match_end()
-	RunCallbacks(ctf_modebase.registered_on_match_end)
+	RunCallbacks(ctf_api.registered_on_match_end)
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -71,7 +40,7 @@ function ctf_modebase.on_match_end()
 end
 
 function ctf_modebase.on_respawnplayer(player)
-	RunCallbacks(ctf_modebase.registered_on_respawnplayer, player)
+	RunCallbacks(ctf_api.registered_on_respawnplayer, player)
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end

@@ -118,7 +118,7 @@ function ctf_combat_mode.remove(player)
 	end
 end
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	for _, combat in pairs(combats) do
 		combat.timer.cancel()
 	end

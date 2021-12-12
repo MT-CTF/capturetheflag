@@ -95,9 +95,9 @@ function ctf_modebase.bounties.reassign_timer()
 	end)
 end
 
-ctf_modebase.register_on_match_start(ctf_modebase.bounties.reassign_timer)
+ctf_api.register_on_match_start(ctf_modebase.bounties.reassign_timer)
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	bounties = {}
 	if timer then
 		timer:cancel()

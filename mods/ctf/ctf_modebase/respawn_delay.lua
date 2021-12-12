@@ -103,7 +103,7 @@ function ctf_modebase.respawn_delay.respawn(player, time, immunity_after)
 	run_respawn_timer(pname)
 end
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	for pname in pairs(respawn_delay) do
 		finish_respawn(minetest.get_player_by_name(pname), nil)
 	end

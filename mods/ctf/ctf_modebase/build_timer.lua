@@ -66,11 +66,11 @@ function ctf_modebase.build_timer.finish()
 	ctf_modebase.on_match_start()
 end
 
-ctf_modebase.register_on_new_match(function()
+ctf_api.register_on_new_match(function()
 	timer = minetest.after(1, timer_func, ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME)
 end)
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	if timer == nil then return end
 	timer:cancel()
 	timer = nil

@@ -44,7 +44,7 @@ function ctf_modebase.update_wear.start_update(pname, item, step, down, finish_c
 	end)}
 end
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	for _, timers in pairs(wear_timers) do
 		for _, timer in pairs(timers) do
 			if timer.c then

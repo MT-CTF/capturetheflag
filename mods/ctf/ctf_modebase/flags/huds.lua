@@ -175,7 +175,7 @@ function ctf_modebase.flag_huds.untrack_capturer(player)
 	update()
 end
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	hud:clear_all()
 	player_timers = {}
 end)

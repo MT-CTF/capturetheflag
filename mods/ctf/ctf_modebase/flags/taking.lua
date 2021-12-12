@@ -92,7 +92,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 	end
 end
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	ctf_modebase.taken_flags = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}

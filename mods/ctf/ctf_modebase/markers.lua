@@ -68,7 +68,7 @@ ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 	end
 end)
 
-ctf_modebase.register_on_match_end(function()
+ctf_api.register_on_match_end(function()
 	for _, marker in pairs(markers) do
 		marker.timer:cancel()
 	end

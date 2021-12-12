@@ -222,7 +222,7 @@ return {
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
 		celebrate_team(pteam)
 
-		local text = " has has captured the flag"
+		local text = " has captured the flag"
 		if many_teams then
 			text = " has captured the flag of team(s) " .. HumanReadable(teamnames)
 			minetest.chat_send_all(

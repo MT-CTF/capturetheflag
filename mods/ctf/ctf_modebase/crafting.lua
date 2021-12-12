@@ -8,7 +8,7 @@ function ctf_modebase.update_crafts(name)
 	end
 end
 
-ctf_modebase.register_on_mode_start(function()
+ctf_api.register_on_mode_start(function()
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf_modebase.update_crafts(player:get_player_name())
 	end
