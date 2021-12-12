@@ -90,8 +90,8 @@ minetest.register_on_mods_loaded(function()
 			end
 		end
 
-		for i = 1, #old_handlers do
-			if old_handlers[i](name, message) then
+		for _, handler in ipairs(old_handlers) do
+			if handler(name, message) then
 				return true
 			end
 		end
