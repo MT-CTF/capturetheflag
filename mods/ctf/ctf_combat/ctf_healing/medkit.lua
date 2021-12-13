@@ -85,15 +85,6 @@ local function start_medkit_heal(playername)
 		return
 	end
 
-	if ctf_combat_mode.in_combat(playername) then
-		hud_events.new(playername, {
-			text = "You can't heal while in combat",
-			color = "warning",
-			quick = true,
-		})
-		return
-	end
-
 	healing_players[playername] = {hp = php}
 
 	hud:add(player, "healing_overlay", {
@@ -103,7 +94,7 @@ local function start_medkit_heal(playername)
 		texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#099bd1:101"
 	})
 
-	physics.set(playername, "ctf_healing:medkit_slow", { speed = 0.6 })
+	physics.set(playername, "ctf_healing:medkit_slow", { speed = 0.3 })
 
 	medkit_heal(playername)
 end
@@ -116,11 +107,11 @@ minetest.register_on_punchplayer(function(player, hitter, _, _, _, damage)
 		if hname and ctf_teams.get(pname) == ctf_teams.get(hname) then return end
 
 		if healing_players[player] then
-			stop_medkit_heal(pname, "You can't heal while in combat")
+			stop_medkit_heal(pname, "Someone is attacking you")
 		end
 
 		if hname and healing_players[hname] then
-			stop_medkit_heal(hname, "You can't heal while attacking")
+			stop_medkit_heal(hname, "You can't attack while healing")
 		end
 	end
 end)
