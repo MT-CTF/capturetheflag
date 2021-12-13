@@ -4,7 +4,7 @@ local CLASS_SWITCH_COOLDOWN = 30
 
 local readable_class_list = {"Knight", "Ranged", "Support"}
 local class_list = {"knight", "ranged", "support"}
-local classes = {
+local class_props = {
 	knight = {
 		name = "Knight",
 		description = "High HP class with a sword capable of strong damage bursts",
@@ -51,7 +51,6 @@ local classes = {
 
 local function dist_from_flag(player)
 	local tname = ctf_teams.get(player)
-
 	if not tname then return 0 end
 
 	return vector.distance(ctf_map.current_map.teams[tname].flag_pos, player:get_pos())
@@ -268,155 +267,137 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	end
 })
 
-local function is_restricted(player, name)
-	local class = PlayerObj(player):get_meta():get_string("class")
 
-	if class and classes[class] then
-		for _, disallowed in pairs(classes[class].disallowed_items) do
-			if name:match(disallowed) then
-				return true
-			end
-		end
+local classes = {}
+function classes.get_name(player)
+	local meta = player:get_meta()
+
+	local cname = meta:get_string("class")
+	if not cname or not class_props[cname] then
+		cname = "knight"
+		meta:set_string("class", cname)
 	end
 
-	return false
+	return cname
 end
 
-return {
-	finish = function()
-		for _, player in pairs(minetest.get_connected_players()) do
-			player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
-			physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
-		end
-	end,
-	set = function(player, classname)
-		local meta = player:get_meta()
-		local oldclassname = meta:get_string("class")
+function classes.get(player)
+	return class_props[classes.get_name(player)]
+end
 
-		if classname and classname == oldclassname then
+function classes.update(player)
+	local class = classes.get(player)
+
+	player:set_properties({
+		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+		visual_size = class.visual_size or vector.new(1, 1, 1)
+	})
+
+	if class.physics then
+		physics.set(player:get_player_name(), "ctf_mode_classes:class_physics", {
+			speed   = class.physics.speed or 1,
+			jump    = class.physics.jump or 1,
+			gravity = class.physics.gravity or 1,
+		})
+	else
+		physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
+	end
+end
+
+function classes.set(player, classname)
+	if classname == classes.get_name(player) then
+		return
+	end
+
+	player:get_meta():set_string("class", classname)
+
+	local pteam = ctf_teams.get(player)
+	local tcolor = pteam and ctf_teams.team[pteam].color or "white"
+	player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
+
+	classes.update(player)
+
+	player:set_hp(player:get_properties().hp_max)
+
+	ctf_modebase.update_wear.cancel_player_updates(player)
+
+	ctf_modebase.player.remove_bound_items(player)
+	ctf_modebase.player.give_initial_stuff(player)
+end
+
+local function select_class(player, classname)
+	player = PlayerObj(player)
+	if not player then return end
+
+	if dist_from_flag(player) <= 5 then
+		cooldowns:set(player, CLASS_SWITCH_COOLDOWN)
+		classes.set(player, classname)
+	end
+end
+
+function classes.show_class_formspec(player, selected)
+	player = PlayerObj(player)
+	if not player then return end
+
+	if not selected then
+		selected = table.indexof(class_list, classes.get_name(player))
+	end
+
+	if not cooldowns:get(player) then
+		if dist_from_flag(player) > 5 then
+			hud_events.new(player, {
+				quick = true,
+				text = "You can only change class at your flag!",
+				color = "warning",
+			})
 			return
 		end
 
-		if not classname then
-			classname = oldclassname
-		end
+		local elements = {}
 
-		if not classname or not classes[classname] then
-			classname = "knight"
-		end
+		elements.class_select = {
+			type = "dropdown",
+			items = readable_class_list,
+			default_idx = selected,
+			pos = {x = 0, y = 0.5},
+			func = function(playername, fields, field_name)
+				local new_idx = table.indexof(readable_class_list, fields[field_name])
 
-		meta:set_string("class", classname)
+				if new_idx ~= selected then
+					classes.show_class_formspec(playername, new_idx)
+				end
+			end,
+		}
 
-		local pteam = ctf_teams.get(player)
-		if not pteam then return end
-		local tcolor = ctf_teams.team[pteam].color
+		elements.select_class = {
+			type = "button",
+			exit = true,
+			label = "Choose Class",
+			pos = {x = ctf_gui.ELEM_SIZE.x + 0.5, y = 0.5},
+			func = function(playername, fields, field_name)
+				select_class(playername, class_list[selected])
+			end,
+		}
 
-		ctf_modebase.update_wear.cancel_player_updates(player)
-
-		ctf_modebase.player.remove_bound_items(player)
-		ctf_modebase.player.give_initial_stuff(player)
-
-		player:set_properties({
-			textures = {ctf_cosmetics.get_colored_skin(player, tcolor) .. "^ctf_mode_classes_" .. classname .. "_overlay.png"},
-			hp_max = classes[classname].hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
-			visual_size = classes[classname].visual_size or vector.new(1, 1, 1)
+		ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", {
+			size = {x = (ctf_gui.ELEM_SIZE.x * 2) + 1, y = 3.5},
+			title = class_props[class_list[selected]].name,
+			description = class_props[class_list[selected]].description,
+			privs = {interact = true},
+			elements = elements,
 		})
+	else
+		hud_events.new(player, {
+			quick = true,
+			text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
+			color = "warning",
+		})
+	end
+end
 
-		player:set_hp(classes[classname].hp_max or minetest.PLAYER_MAX_HP_DEFAULT)
-
-		if classes[classname].physics then
-			physics.set(player:get_player_name(), "ctf_mode_classes:class_physics", {
-				speed   = classes[classname].physics.speed or 1,
-				jump    = classes[classname].physics.jump or 1,
-				gravity = classes[classname].physics.gravity or 1,
-			})
-		else
-			physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
-		end
-	end,
-	get = function(player)
-		local cname = player:get_meta():get_string("class")
-
-		return cname and (classes[cname] or {}) or false
-	end,
-	get_name = function(player)
-		return player:get_meta():get_string("class") or false
-	end,
-	select_class = function(self, player, classname)
-		player = PlayerObj(player)
-		if not player then return end
-
-		if dist_from_flag(player) <= 5 then
-			cooldowns:set(player, CLASS_SWITCH_COOLDOWN)
-			self.set(player, classname)
-		end
-	end,
-	show_class_formspec = function(self, player, selected)
-		player = PlayerObj(player)
-		if not player then return end
-
-		if not selected then
-			local name = self.get_name(player)
-			if name then
-				selected = table.indexof(class_list, name)
-			end
-		end
-
-		selected = selected or 1
-
-		if not cooldowns:get(player) then
-			if dist_from_flag(player) > 5 then
-				hud_events.new(player, {
-					quick = true,
-					text = "You can only change class at your flag!",
-					color = "warning",
-				})
-				return
-			end
-
-			local elements = {}
-
-			elements.class_select = {
-				type = "dropdown",
-				items = readable_class_list,
-				default_idx = selected,
-				pos = {x = 0, y = 0.5},
-				func = function(playername, fields, field_name)
-					local new_idx = table.indexof(readable_class_list, fields[field_name])
-
-					if new_idx ~= selected then
-						self:show_class_formspec(playername, new_idx)
-					end
-				end,
-			}
-
-			elements.select_class = {
-				type = "button",
-				exit = true,
-				label = "Choose Class",
-				pos = {x = ctf_gui.ELEM_SIZE.x + 0.5, y = 0.5},
-				func = function(playername, fields, field_name)
-					self:select_class(playername, class_list[selected])
-				end,
-			}
-
-			ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", {
-				size = {x = (ctf_gui.ELEM_SIZE.x * 2) + 1, y = 3.5},
-				title = classes[class_list[selected]].name,
-				description = classes[class_list[selected]].description,
-				privs = {interact = true},
-				elements = elements,
-			})
-		else
-			hud_events.new(player, {
-				quick = true,
-				text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
-				color = "warning",
-			})
-		end
-	end,
-	is_restricted_item = function(player, name)
-		if is_restricted(player, name) then
+function classes.is_restricted_item(player, name)
+	for _, disallowed in pairs(classes.get(player).disallowed_items) do
+		if name:match(disallowed) then
 			hud_events.new(player, {
 				quick = true,
 				text = "Your class can't use that item!",
@@ -424,5 +405,14 @@ return {
 			})
 			return true
 		end
-	end,
-}
+	end
+end
+
+function classes.finish()
+	for _, player in pairs(minetest.get_connected_players()) do
+		player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
+		physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
+	end
+end
+
+return classes

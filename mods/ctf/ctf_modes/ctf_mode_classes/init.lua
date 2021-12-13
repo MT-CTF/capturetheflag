@@ -9,6 +9,7 @@ local crafts, classes = ctf_core.include_files(
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
+local old_get_colored_skin = ctf_cosmetics.get_colored_skin
 ctf_modebase.register_mode("classes", {
 	treasures = {
 		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -60,10 +61,15 @@ ctf_modebase.register_mode("classes", {
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
+
+		ctf_cosmetics.get_colored_skin = function(player, color)
+			return old_get_colored_skin(player, color) .. "^ctf_mode_classes_" .. classes.get_name(player) .. "_overlay.png"
+		end
 	end,
 	on_mode_end = function()
 		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
+		ctf_cosmetics.get_colored_skin = old_get_colored_skin
 
 		classes.finish()
 	end,
@@ -71,8 +77,7 @@ ctf_modebase.register_mode("classes", {
 	on_match_end = features.on_match_end,
 	team_allocator = features.team_allocator,
 	on_allocplayer = function(player, new_team)
-		classes.set(player)
-
+		classes.update(player)
 		features.on_allocplayer(player, new_team)
 	end,
 	on_leaveplayer = features.on_leaveplayer,
@@ -83,7 +88,7 @@ ctf_modebase.register_mode("classes", {
 	on_flag_drop = features.on_flag_drop,
 	on_flag_capture = features.on_flag_capture,
 	on_flag_rightclick = function(clicker)
-		classes:show_class_formspec(clicker)
+		classes.show_class_formspec(clicker)
 	end,
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = features.on_punchplayer,

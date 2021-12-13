@@ -88,13 +88,6 @@ if ctf_core.settings.server_mode ~= "mapedit" then
 	end)
 end
 
-ctf_teams.register_on_allocplayer(function(player)
-	player:set_hp(player:get_properties().hp_max)
-
-	ctf_modebase.player.remove_bound_items(player)
-	ctf_modebase.player.give_initial_stuff(player)
-end)
-
 minetest.register_on_joinplayer(function(player)
 	player:set_hp(player:get_properties().hp_max)
 

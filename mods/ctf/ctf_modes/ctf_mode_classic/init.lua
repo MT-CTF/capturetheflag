@@ -63,12 +63,7 @@ ctf_modebase.register_mode("classic", {
 	on_new_match = features.on_new_match,
 	on_match_end = features.on_match_end,
 	team_allocator = features.team_allocator,
-	on_allocplayer = function(player, new_team)
-		local tcolor = ctf_teams.team[new_team].color
-		player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
-
-		features.on_allocplayer(player, new_team)
-	end,
+	on_allocplayer = features.on_allocplayer,
 	on_leaveplayer = features.on_leaveplayer,
 	on_dieplayer = features.on_dieplayer,
 	on_respawnplayer = features.on_respawnplayer,

@@ -279,12 +279,21 @@ return {
 		end
 	end,
 	on_allocplayer = function(player, new_team)
-		local tcolor = ctf_teams.team[new_team].color
+		player:set_hp(player:get_properties().hp_max)
 
+		ctf_modebase.update_wear.cancel_player_updates(player)
+
+		ctf_modebase.player.remove_bound_items(player)
+		ctf_modebase.player.give_initial_stuff(player)
+
+		local tcolor = ctf_teams.team[new_team].color
+		player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
 
 		recent_rankings.set_team(player, new_team)
+
+		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
 
 		tp_player_near_flag(player)
 	end,
