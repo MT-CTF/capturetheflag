@@ -62,7 +62,7 @@ function random_messages.read_messages()
 		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
 		.. " For example: /r mode:nade_fight randomplayer.",
 		"To check someone's team use /team player <player_name>.",
-		"To check all team members use /team."
+		"To check all team members use /team.",
 	}
 end
 
