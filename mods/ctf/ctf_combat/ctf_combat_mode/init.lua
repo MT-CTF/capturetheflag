@@ -91,7 +91,7 @@ end
 function ctf_combat_mode.set_time(player, time)
 	player = PlayerName(player)
 	if combats[player] and combats[player].in_combat then
-		combats[player].timer.cancel()
+		combats[player].timer:cancel()
 		combats[player].time = time
 		update(player)
 	end
@@ -109,18 +109,18 @@ function ctf_combat_mode.remove(player)
 	player = PlayerName(player)
 
 	if combats[player] then
-		if combats[player].in_combat then
+		if hud:exists(player, "combat_indicator") then
 			hud:remove(player, "combat_indicator")
 		end
 
-		combats[player].timer.cancel()
+		combats[player].timer:cancel()
 		combats[player] = nil
 	end
 end
 
 ctf_api.register_on_match_end(function()
 	for _, combat in pairs(combats) do
-		combat.timer.cancel()
+		combat.timer:cancel()
 	end
 	combats = {}
 	hud:remove_all()
