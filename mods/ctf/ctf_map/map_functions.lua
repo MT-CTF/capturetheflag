@@ -106,7 +106,15 @@ local ID_IGNORE = minetest.CONTENT_IGNORE
 local DEFAULT_CHEST_AMOUNT = ctf_map.DEFAULT_CHEST_AMOUNT
 local CHEST_ID = minetest.get_content_id("ctf_map:chest")
 local ID_WATER = minetest.get_content_id("default:water_source")
-local insert = table.insert
+local chest_formspec =
+	"size[8,9]" ..
+	"list[current_name;main;0,0.3;8,4;]" ..
+	"list[current_player;main;0,4.85;8,1;]" ..
+	"list[current_player;main;0,6.08;8,3;8]" ..
+	"listring[current_name;main]" ..
+	"listring[current_player;main]" ..
+	default.get_hotbar_bg(0,4.85)
+
 function ctf_map.place_chests(mapmeta, pos2, amount)
 	local pos1 = mapmeta
 	local pos_list
@@ -138,22 +146,32 @@ function ctf_map.place_chests(mapmeta, pos2, amount)
 					if (data[vi] == ID_AIR or data[vi] == ID_WATER) and
 					id_below ~= ID_AIR and id_below ~= ID_IGNORE and id_below ~= ID_WATER and
 					(id_above == ID_AIR or id_above == ID_WATER) then
-						insert(place_positions, vi)
+						table.insert(place_positions, {vi = vi, x = x, y = y, z = z})
 					end
 				end
 			end
 		end
 
-		if place_positions and #place_positions > 1 then
-			for i = 1, a.amount, 1 do
+		for i = 1, a.amount, 1 do
+			if #place_positions > 0 then
 				local idx = math.random(1, #place_positions)
+				local pos = place_positions[idx]
 
-				data[place_positions[idx]] = CHEST_ID
+				data[pos.vi] = CHEST_ID
+
+				-- Treasurefy
+				local meta = minetest.get_meta(pos)
+				meta:set_string("infotext", "Loot Chest")
+				meta:set_string("formspec", chest_formspec)
+
+				local inv = meta:get_inventory()
+				inv:set_size("main", 8*4)
+				ctf_map.treasurefy_node(inv)
 
 				table.remove(place_positions, idx)
+			else
+				minetest.log("error", "Can't place all the chests")
 			end
-		else
-			minetest.log("error", "Something went wrong with chest placement")
 		end
 	end
 
