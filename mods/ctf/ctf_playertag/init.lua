@@ -63,13 +63,15 @@ end
 
 function ctf_playertag.set(player, type, color)
 	local oldset = players[player:get_player_name()]
-	if not oldset or oldset.type ~= type or oldset.color ~= color then
+	if not oldset then return end
+
+	if oldset.type ~= type or oldset.color ~= color then
 		update(player, {type = type, color = color})
 	end
 end
 
 function ctf_playertag.get(player)
-	return players[player:get_player_by_name()]
+	return players[player:get_player_name()]
 end
 
 function ctf_playertag.get_all()
@@ -89,7 +91,7 @@ minetest.register_entity("ctf_playertag:tag", {
 })
 
 minetest.register_on_joinplayer(function(player)
-	ctf_playertag.set(player, TYPE_ENTITY)
+	players[player:get_player_name()] = {type = TYPE_BUILTIN, color = {a=255, r=255, g=255, b=255}}
 end)
 
 minetest.register_on_leaveplayer(function(player)
