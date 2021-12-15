@@ -124,15 +124,6 @@ minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 --
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
 
-local chest_formspec =
-	"size[8,9]" ..
-	"list[current_name;main;0,0.3;8,4;]" ..
-	"list[current_player;main;0,4.85;8,1;]" ..
-	"list[current_player;main;0,6.08;8,3;8]" ..
-	"listring[current_name;main]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0,4.85)
-
 minetest.register_node("ctf_map:chest", {
 	description = "Loot Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
@@ -148,33 +139,6 @@ minetest.register_node("ctf_map:chest", {
 				"You're not allowed to put things in treasure chests!")
 			return 0
 		end
-	end,
-	on_rightclick = function(pos, node, clicker, ...)
-		if not clicker:is_player() then return end
-
-		local meta = minetest.get_meta(pos)
-		local pname = clicker:get_player_name()
-
-		if meta:get_string("treasured") == "yes" then
-			return
-		else
-			minetest.registered_nodes[node.name].on_construct(pos)
-			ctf_map.treasurefy_node(pos, node, clicker, ...)
-			meta:set_string("treasured", "yes")
-		end
-
-		local special_form = chest_formspec
-		special_form = special_form:gsub("current_player", "player:"..pname)
-		special_form = special_form:gsub("current_name", string.format("nodemeta:%d,%d,%d", pos.x, pos.y, pos.z))
-
-		minetest.after(0, function() minetest.show_formspec(pname, "ctf_map:chest_formspec", special_form) end)
-	end,
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_string("formspec", chest_formspec)
-		meta:set_string("infotext", "Loot Chest")
-		local inv = meta:get_inventory()
-		inv:set_size("main", 8*4)
 	end,
 	can_dig = function(pos,player)
 		local meta = minetest.get_meta(pos);
