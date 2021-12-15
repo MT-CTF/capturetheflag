@@ -18,6 +18,7 @@ fragdef_small.clock = 1.7
 grenades.register_grenade("ctf_mode_nade_fight:small_frag", fragdef_small)
 
 local tool = {holed = {}}
+local sounds = {}
 
 local black_hole_radius = 4.5
 grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
@@ -74,6 +75,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 			loop = true,
 			max_hear_distance = black_hole_radius * 2,
 		})
+		sounds[hiss] = true
 
 		local player = minetest.get_player_by_name(name)
 		local victims = {}
@@ -131,6 +133,8 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 					tool.holed[vname] = nil
 				end
 				black_hole:remove()
+
+				sounds[hiss] = nil
 				minetest.sound_stop(hiss)
 			end)
 		end)
@@ -312,5 +316,12 @@ end
 function tool.get_grenade_tool(player)
 	return "ctf_mode_nade_fight:grenade_tool_" .. (held_grenade[PlayerName(player)] or 1)
 end
+
+ctf_api.register_on_match_end(function()
+	for sound in pairs(sounds) do
+		minetest.sound_stop(sound)
+	end
+	sounds = {}
+end)
 
 return tool

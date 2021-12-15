@@ -119,6 +119,7 @@ grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 
 -- Smoke Grenade
 
+local sounds = {}
 local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
@@ -156,8 +157,12 @@ grenades.register_grenade("grenades:smoke", {
 			loop = true,
 			max_hear_distance = 32,
 		})
+		sounds[hiss] = true
 
-		minetest.after(SMOKE_GRENADE_TIME, minetest.sound_stop, hiss)
+		minetest.after(SMOKE_GRENADE_TIME, function()
+			sounds[hiss] = nil
+			minetest.sound_stop(hiss)
+		end)
 
 		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
@@ -261,3 +266,10 @@ minetest.register_on_dieplayer(function(player)
 		flash_huds[name] = nil
 	end
 end) ]]
+
+ctf_api.register_on_match_end(function()
+	for sound in pairs(sounds) do
+		minetest.sound_stop(sound)
+	end
+	sounds = {}
+end)
