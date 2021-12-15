@@ -120,8 +120,11 @@ minetest.register_on_leaveplayer(function(player)
 		if respawn_delay[pname].timer then
 			respawn_delay[pname].timer:cancel()
 		end
+		player:set_properties({hp_max = respawn_delay[pname].hp_max})
 		respawn_delay[pname] = nil
 	end
+
+	player:set_hp(player:get_properties().hp_max)
 end)
 
 minetest.register_on_respawnplayer(function(player)
