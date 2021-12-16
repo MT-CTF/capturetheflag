@@ -281,7 +281,7 @@ for idx, info in ipairs(grenade_list) do
 					grenades.throw_grenade(info.name, 17, user)
 				end
 			else
-				def.grenade:on_explode(user:get_pos(), uname)
+				return
 			end
 
 			itemstack:set_wear(WEAR_MAX - 6000)
