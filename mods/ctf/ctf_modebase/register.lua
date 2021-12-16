@@ -135,6 +135,10 @@ minetest.item_drop = function(itemstack, dropper, ...)
 end
 
 minetest.register_allow_player_inventory_action(function(player, action, inventory, info)
+	if player:get_hp() <= 0 then
+		return 0
+	end
+
 	local current_mode = ctf_modebase:get_current_mode()
 
 	if current_mode and current_mode.is_bound_item and
