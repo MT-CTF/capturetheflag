@@ -76,12 +76,20 @@ minetest.register_on_mods_loaded(function()
 	local old_handlers = minetest.registered_on_chat_messages
 	minetest.registered_on_chat_messages = {
 	function(name, message)
-		if message:sub(1,1) ~= "/" then
-			if not minetest.check_player_privs(name, {shout = true}) then
-				minetest.chat_send_player(name, "-!- You don't have permission to speak.")
+		local chat = message:sub(1,1) ~= "/"
+
+		if chat and not minetest.check_player_privs(name, {shout = true}) then
+			minetest.chat_send_player(name, "-!- You don't have permission to speak.")
+			return true
+		end
+
+		for _, handler in ipairs(old_handlers) do
+			if handler(name, message) then
 				return true
 			end
+		end
 
+		if chat then
 			local pteam = ctf_teams.get(name)
 			if pteam then
 				minetest.chat_send_all(minetest.colorize(ctf_teams.team[pteam].color, "<" .. name .. "> ") .. message)
@@ -90,11 +98,6 @@ minetest.register_on_mods_loaded(function()
 			end
 		end
 
-		for _, handler in ipairs(old_handlers) do
-			if handler(name, message) then
-				return true
-			end
-		end
 		return true
 	end}
 end)
