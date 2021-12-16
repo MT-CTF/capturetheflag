@@ -7,8 +7,7 @@ local team_list
 local teams_left
 
 local function calculate_killscore(player)
-	local pname = PlayerName(player)
-	local match_rank = recent_rankings.players()[pname] or {}
+	local match_rank = recent_rankings.players()[player] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
 
 	return math.round(kd * 5)
@@ -53,9 +52,17 @@ end
 
 local function end_combat_mode(player, killer, leaving)
 	local killscore = calculate_killscore(player)
-	local hitters = ctf_combat_mode.get(player, "hitter")
+	local hitters = {}
 
-	if killer then
+	ctf_combat_mode.get(player, "hitter", function(pname)
+		if not killer or pname ~= killer then
+			table.insert(hitters, pname)
+		end
+	end)
+
+	if killer == player then
+		recent_rankings.add(player, {deaths = 1}, true)
+	elseif killer then
 		local rewards = {kills = 1, score = killscore}
 		local bounty = ctf_modebase.bounties.claim(player, killer)
 
@@ -68,14 +75,20 @@ local function end_combat_mode(player, killer, leaving)
 		recent_rankings.add(killer, rewards)
 
 		-- share kill score with healers
-		for _, pname in ipairs(ctf_combat_mode.get(killer, "healer")) do
+		ctf_combat_mode.get(killer, "healer", function(pname)
 			recent_rankings.add(pname, {score = rewards.score})
-		end
+		end)
 
 		recent_rankings.add(player, {deaths = 1}, true)
 
-		local killer_hitters = ctf_combat_mode.get(killer, "hitter")
-		if #killer_hitters == 1 and killer_hitters[1] == PlayerName(player) then
+		local killer_attacked = nil
+		ctf_combat_mode.get(killer, "hitter", function(pname)
+			if not killer_attacked then
+				killer_attacked = pname ~= player
+			end
+		end)
+
+		if killer_attacked == false then
 			ctf_combat_mode.set_time(killer, 5)
 		end
 	else
@@ -91,9 +104,7 @@ local function end_combat_mode(player, killer, leaving)
 	end
 
 	for _, pname in ipairs(hitters) do
-		if not killer or pname ~= killer:get_player_name() then
-			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
-		end
+		recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
 	end
 
 	ctf_combat_mode.remove(player)
@@ -298,17 +309,19 @@ return {
 		tp_player_near_flag(player)
 	end,
 	on_leaveplayer = function(player)
-		-- should be no_hud to avoid a race
-		end_combat_mode(player, nil, true)
+		local pname = player:get_player_name()
 
-		recent_rankings.on_leaveplayer(player:get_player_name())
+		-- should be no_hud to avoid a race
+		end_combat_mode(pname, nil, true)
+
+		recent_rankings.on_leaveplayer(pname)
 	end,
 	on_dieplayer = function(player, reason)
 		if ctf_modebase.build_timer.in_progress() then return end
 
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			end_combat_mode(player)
+			end_combat_mode(player:get_player_name())
 		end
 
 		ctf_modebase.respawn_delay.prepare(player)
@@ -375,16 +388,11 @@ return {
 		end
 
 		if hitter and hitter:is_player() then
-			if player ~= hitter then
-				ctf_combat_mode.set(player, hitter, "hitter", 15, true)
-
-				if player:get_hp() <= damage then
-					end_combat_mode(player, hitter)
-				end
-			end
-
 			if player:get_hp() <= damage then
+				end_combat_mode(pname, hname)
 				ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+			elseif pname ~= hname then
+				ctf_combat_mode.set(player, hitter, "hitter", 15, true)
 			end
 		end
 

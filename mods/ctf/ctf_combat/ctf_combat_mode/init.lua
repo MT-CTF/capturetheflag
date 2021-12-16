@@ -72,20 +72,16 @@ function ctf_combat_mode.set(player, combatant, type, time, in_combat)
 	end
 end
 
-function ctf_combat_mode.get(player, type)
+function ctf_combat_mode.get(player, type, callback)
 	player = PlayerName(player)
-
-	local ret = {}
 
 	if combats[player] then
 		for k, v in pairs(combats[player].combatants) do
 			if v == type then
-				table.insert(ret, k)
+				callback(k)
 			end
 		end
 	end
-
-	return ret
 end
 
 function ctf_combat_mode.set_time(player, time)

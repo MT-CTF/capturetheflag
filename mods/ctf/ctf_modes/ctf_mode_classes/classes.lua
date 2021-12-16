@@ -311,18 +311,18 @@ function classes.set(player, classname)
 
 	player:get_meta():set_string("class", classname)
 
-	local pteam = ctf_teams.get(player)
-	local tcolor = pteam and ctf_teams.team[pteam].color or "white"
-	player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
-
-	classes.update(player)
-
 	player:set_hp(player:get_properties().hp_max)
 
 	ctf_modebase.update_wear.cancel_player_updates(player)
 
 	ctf_modebase.player.remove_bound_items(player)
 	ctf_modebase.player.give_initial_stuff(player)
+
+	local pteam = ctf_teams.get(player)
+	local tcolor = pteam and ctf_teams.team[pteam].color or "white"
+	player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
+
+	classes.update(player)
 end
 
 local function select_class(player, classname)

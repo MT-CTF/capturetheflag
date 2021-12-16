@@ -34,17 +34,16 @@ local function remove(pname, pteam)
 	bounties[pteam] = nil
 end
 
-function ctf_modebase.bounties.claim(pname, killer)
-	pname = PlayerName(pname)
-	local pteam = ctf_teams.get(pname)
+function ctf_modebase.bounties.claim(player, killer)
+	local pteam = ctf_teams.get(player)
 
-	if not (pteam and bounties[pteam] and bounties[pteam].name == pname) then
+	if not (pteam and bounties[pteam] and bounties[pteam].name == player) then
 		return
 	end
 
 	local rewards = bounties[pteam].rewards
 	minetest.chat_send_all(minetest.colorize(CHAT_COLOR,
-		string.format("[Bounty] %s killed %s and got %s", PlayerName(killer), pname, get_reward_str(rewards))
+		string.format("[Bounty] %s killed %s and got %s", killer, player, get_reward_str(rewards))
 	))
 
 	bounties[pteam] = nil
