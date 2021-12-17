@@ -30,7 +30,7 @@ local function update(player)
 		})
 	end
 
-	local pos = vector.offset(minetest.get_player_by_name(player):get_pos(), 0, 1, 0)
+	local pos = vector.offset(minetest.get_player_by_name(player):get_pos(), 0, 0.5, 0)
 	local node = minetest.registered_nodes[minetest.get_node(pos).name]
 
 	if node.walkable == false then

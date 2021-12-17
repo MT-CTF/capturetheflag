@@ -66,22 +66,29 @@ ctf_teams.register_on_allocplayer(function(...)
 end)
 
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-	if not ctf_modebase.match_started then return true end
-
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
 
-	local real_damage = current_mode.on_punchplayer(player, hitter, damage, time_from_last_punch, tool_capabilities, dir)
+	local real_damage, error = current_mode.on_punchplayer(
+		player, hitter, damage, time_from_last_punch, tool_capabilities, dir
+	)
+
 	if real_damage then
 		player:set_hp(player:get_hp() - real_damage, {type="punch"})
+	end
+
+	if error then
+		hud_events.new(hitter, {
+			quick = true,
+			text = error,
+			color = "warning",
+		})
 	end
 
 	return true
 end)
 
 ctf_healing.register_on_heal(function(...)
-	if not ctf_modebase.match_started then return true end
-
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
 	return current_mode.on_healplayer(...)

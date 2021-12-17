@@ -44,10 +44,6 @@ local function timer_func(time_left)
 end
 
 
-function ctf_modebase.build_timer.in_progress()
-	return timer ~= nil
-end
-
 function ctf_modebase.build_timer.finish()
 	if timer == nil then return end
 	timer:cancel()

@@ -180,7 +180,7 @@ return {
 		end
 	end,
 	can_take_flag = function(player, teamname)
-		if ctf_modebase.build_timer.in_progress() then
+		if not ctf_modebase.match_started then
 			tp_player_near_flag(player)
 
 			return "You can't take the enemy flag during build time!"
@@ -309,6 +309,8 @@ return {
 		tp_player_near_flag(player)
 	end,
 	on_leaveplayer = function(player)
+		if not ctf_modebase.match_started then return end
+
 		local pname = player:get_player_name()
 
 		-- should be no_hud to avoid a race
@@ -317,7 +319,7 @@ return {
 		recent_rankings.on_leaveplayer(pname)
 	end,
 	on_dieplayer = function(player, reason)
-		if ctf_modebase.build_timer.in_progress() then return end
+		if not ctf_modebase.match_started then return end
 
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
@@ -346,45 +348,25 @@ return {
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
 	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
-		if not hitter:is_player() or player:get_hp() <= 0 then return end
+		if not hitter:is_player() or player:get_hp() <= 0 then return false end
 
 		local pname, hname = player:get_player_name(), hitter:get_player_name()
 		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
 
 		if not pteam then
-			hud_events.new(hname, {
-				quick = true,
-				text = pname .. " is not in a team!",
-				color = "warning",
-			})
-			return
+			return false, pname .. " is not in a team!"
 		end
 
 		if not hteam then
-			hud_events.new(hname, {
-				quick = true,
-				text = "You are not in a team!",
-				color = "warning",
-			})
-			return
+			return false, "You are not in a team!"
 		end
 
 		if pteam == hteam and pname ~= hname then
-			hud_events.new(hname, {
-				quick = true,
-				text = pname .. " is on your team!",
-				color = "warning",
-			})
-			return
+			return false, pname .. " is on your team!"
 		end
 
-		if ctf_modebase.build_timer.in_progress() then
-			hud_events.new(hname, {
-				quick = true,
-				text = "The match hasn't started yet!",
-				color = "warning",
-			})
-			return
+		if not ctf_modebase.match_started then
+			return false, "The match hasn't started yet!"
 		end
 
 		if hitter and hitter:is_player() then
@@ -399,6 +381,10 @@ return {
 		return damage
 	end,
 	on_healplayer = function(player, patient, amount)
+		if not ctf_modebase.match_started then
+			return "The match hasn't started yet!"
+		end
+
 		ctf_combat_mode.set(patient, player, "healer", 60, false)
 		recent_rankings.add(player, {hp_healed = amount}, true)
 	end,

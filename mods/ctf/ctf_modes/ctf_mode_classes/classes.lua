@@ -311,8 +311,6 @@ function classes.set(player, classname)
 
 	player:get_meta():set_string("class", classname)
 
-	player:set_hp(player:get_properties().hp_max)
-
 	ctf_modebase.update_wear.cancel_player_updates(player)
 
 	ctf_modebase.player.remove_bound_items(player)
@@ -323,6 +321,8 @@ function classes.set(player, classname)
 	player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
 
 	classes.update(player)
+
+	player:set_hp(player:get_properties().hp_max)
 end
 
 local function select_class(player, classname)
