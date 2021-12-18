@@ -125,7 +125,7 @@ minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
 
 minetest.register_node("ctf_map:chest", {
-	description = "Loot Chest",
+	description = "Treasure Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
 	paramtype2 = "facedir",

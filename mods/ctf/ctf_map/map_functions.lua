@@ -188,7 +188,7 @@ function ctf_map.place_chests(mapmeta, pos2, amount)
 
 			-- Treasurefy
 			local meta = minetest.get_meta(pos)
-			meta:set_string("infotext", "Loot Chest")
+			meta:set_string("infotext", "Treasure Chest")
 			meta:set_string("formspec", chest_formspec)
 
 			local inv = meta:get_inventory()
