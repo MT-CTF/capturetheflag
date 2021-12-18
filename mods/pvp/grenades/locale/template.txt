@@ -1,0 +1,7 @@
+# textdomain: grenades
+Frag grenade (Kills anyone near blast)=
+Frag grenade=
+Sticky Frag grenade (Sticks to surfaces)=
+Sticky Frag grenade=
+Smoke grenade (Generates smoke around blast site)=
+Smoke grenade=

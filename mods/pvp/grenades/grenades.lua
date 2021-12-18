@@ -23,7 +23,8 @@ local function check_hit(pos1, pos2, obj)
 end
 
 local fragdef = {
-	description = "Frag grenade (Kills anyone near blast)",
+	description = S("Frag grenade (Kills anyone near blast)"),
+    short_description = S("Frag grenade")
 	image = "grenades_frag.png",
 	explode_radius = 10,
 	explode_damage = 26,
@@ -112,7 +113,8 @@ local fragdef = {
 grenades.register_grenade("grenades:frag", fragdef)
 
 local fragdef_sticky = table.copy(fragdef)
-fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
+fragdef_sticky.description = S("Sticky Frag grenade (Sticks to surfaces)")
+fragdef_sticky.short_description = S("Sticky Frag grenade")
 fragdef_sticky.image = "grenades_frag_sticky.png"
 fragdef_sticky.on_collide = function() return false end
 grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
@@ -122,7 +124,8 @@ grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 local sounds = {}
 local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
-	description = "Smoke grenade (Generates smoke around blast site)",
+	description = S("Smoke grenade (Generates smoke around blast site)"),
+    short_description = S("Smoke grenade")
 	image = "grenades_smoke_grenade.png",
 	on_collide = function()
 		return true
