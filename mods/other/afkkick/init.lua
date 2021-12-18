@@ -71,7 +71,8 @@ minetest.register_globalstep(function(dtime)
 
 				--Warn player if he/she has less than WARN_TIME seconds to move or be kicked
 				if players[playerName]["lastAction"] + MAX_INACTIVE_TIME - WARN_TIME < currGameTime then
-					minetest.chat_send_player(playerName, minetest.colorize("#FF8C00", S("Warning, you have @1 seconds to move or be kicked",
+					minetest.chat_send_player(playerName, minetest.colorize("#FF8C00",
+                        S("Warning, you have @1 seconds to move or be kicked",
                     tostring(players[playerName]["lastAction"] + MAX_INACTIVE_TIME - currGameTime + 1))))
 				end
 			end
