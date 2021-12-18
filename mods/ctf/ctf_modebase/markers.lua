@@ -36,6 +36,8 @@ function ctf_modebase.markers.remove(pname)
 end
 
 function ctf_modebase.markers.add(pname, msg, pos)
+	if not ctf_modebase.in_game then return end
+
 	local pteam = ctf_teams.get(pname)
 	if not pteam then return end
 
