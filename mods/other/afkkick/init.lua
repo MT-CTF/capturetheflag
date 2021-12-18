@@ -14,6 +14,8 @@ local WARN_TIME = 20
 local players = {}
 local checkTimer = 0
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_privilege("canafk",{
     description = S("Allow to AFK without being kicked"),
 })
