@@ -309,7 +309,10 @@ return {
 		tp_player_near_flag(player)
 	end,
 	on_leaveplayer = function(player)
-		if not ctf_modebase.match_started then return end
+		if not ctf_modebase.match_started then
+			ctf_combat_mode.remove(player)
+			return
+		end
 
 		local pname = player:get_player_name()
 
