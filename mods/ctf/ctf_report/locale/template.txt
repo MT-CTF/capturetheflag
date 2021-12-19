@@ -1,0 +1,8 @@
+# textdomain: ctf_report
+<msg>=
+Report misconduct or bugs=
+Please add a message to your report. =
+If it's about (a) particular player(s), please also include their name(s).=
+If you're reporting a player,=
+you should also include a reason why (e.g. swearing, griefing, spawnkilling, etc.).=
+Report has been sent.=
