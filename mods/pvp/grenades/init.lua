@@ -3,7 +3,6 @@ grenades = {
 }
 
 local cooldown = ctf_core.init_cooldowns()
-local S = minetest.get_translator(minetest.get_current_modname())
 
 function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()

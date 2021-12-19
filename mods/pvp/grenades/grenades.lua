@@ -1,3 +1,5 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function remove_flora(pos, radius)
 	local pos1 = vector.subtract(pos, radius)
 	local pos2 = vector.add(pos, radius)
@@ -24,7 +26,7 @@ end
 
 local fragdef = {
 	description = S("Frag grenade (Kills anyone near blast)"),
-    short_description = S("Frag grenade")
+    short_description = S("Frag grenade"),
 	image = "grenades_frag.png",
 	explode_radius = 10,
 	explode_damage = 26,
@@ -125,7 +127,7 @@ local sounds = {}
 local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = S("Smoke grenade (Generates smoke around blast site)"),
-    short_description = S("Smoke grenade")
+    short_description = S("Smoke grenade"),
 	image = "grenades_smoke_grenade.png",
 	on_collide = function()
 		return true
