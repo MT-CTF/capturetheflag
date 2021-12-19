@@ -33,10 +33,10 @@ local function update(player)
 	local pos = vector.offset(minetest.get_player_by_name(player):get_pos(), 0, 0.5, 0)
 	local node = minetest.registered_nodes[minetest.get_node(pos).name]
 
-	if node.walkable == false then
-		combat.time = combat.time - 1
-	else
+	if node.groups.real_suffocation then -- From real_suffocation mod
 		combat.time = combat.time + 0.5
+	else
+		combat.time = combat.time - 1
 	end
 
 	combat.timer = minetest.after(1, update, player)
