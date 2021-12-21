@@ -201,7 +201,6 @@ local function show_scope(name, item_name, fov_mult)
 		alignment = {x = "center", y = "center"},
 	})
 
-	-- e.g. if fov_mult == 8, then FOV = 1/8 * current_FOV, a.k.a 8x zoom
 	player:set_fov(1 / fov_mult, true)
 	physics.set(name, "sniper_rifles:scoping", { speed = 0.1, jump = 0 })
 	player:hud_set_flags({ wielditem = false })
