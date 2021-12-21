@@ -1,4 +1,4 @@
-return function(rankings, recent_rankings)
+ctf_modebase.features = function(rankings, recent_rankings)
 
 local FLAG_MESSAGE_COLOR = "#d9b72a"
 local FLAG_CAPTURE_TIMER = 60 * 3
@@ -7,8 +7,7 @@ local team_list
 local teams_left
 
 local function calculate_killscore(player)
-	local pname = PlayerName(player)
-	local match_rank = recent_rankings.players()[pname] or {}
+	local match_rank = recent_rankings.players()[player] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
 
 	return math.round(kd * 5)
@@ -51,25 +50,19 @@ local function celebrate_team(teamname)
 	end
 end
 
--- Returns true if player was in combat mode
-local function end_combat_mode(player, killer)
-	local victim_combat_mode = ctf_combat_mode.get(player)
-
-	if not victim_combat_mode then return end
-
+local function end_combat_mode(player, killer, leaving)
 	local killscore = calculate_killscore(player)
-	local attackers = {}
+	local hitters = {}
 
-	-- populate attackers table
-	ctf_combat_mode.manage_extra(player, function(pname, type)
-		if type == "hitter" then
-			table.insert(attackers, pname)
-		else
-			return type
+	ctf_combat_mode.get(player, "hitter", function(pname)
+		if not killer or pname ~= killer then
+			table.insert(hitters, pname)
 		end
 	end)
 
-	if killer then
+	if killer == player then
+		recent_rankings.add(player, {deaths = 1}, true)
+	elseif killer then
 		local rewards = {kills = 1, score = killscore}
 		local bounty = ctf_modebase.bounties.claim(player, killer)
 
@@ -82,31 +75,39 @@ local function end_combat_mode(player, killer)
 		recent_rankings.add(killer, rewards)
 
 		-- share kill score with healers
-		ctf_combat_mode.manage_extra(killer, function(pname, type)
-			if type == "healer" then
-				recent_rankings.add(pname, {score = rewards.score})
-			end
-
-			return type
+		ctf_combat_mode.get(killer, "healer", function(pname)
+			recent_rankings.add(pname, {score = rewards.score})
 		end)
+
+		recent_rankings.add(player, {deaths = 1}, true)
+
+		local killer_attacked = nil
+		ctf_combat_mode.get(killer, "hitter", function(pname)
+			if not killer_attacked then
+				killer_attacked = pname ~= player
+			end
+		end)
+
+		if killer_attacked == false then
+			ctf_combat_mode.set_time(killer, 5)
+		end
 	else
-		-- Only take score for suicide if they're in combat for being healed
-		if victim_combat_mode and #attackers >= 1 then
-			recent_rankings.add(player, {score = -math.ceil(killscore/2)})
+		-- Only take score if they're in combat for being hitted
+		if #hitters > 0 then
+			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
 		end
 
-		ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player) -- suicide
+		if #hitters > 0 or not leaving then
+			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
+			recent_rankings.add(player, {deaths = 1}, true)
+		end
 	end
 
-	for _, pname in pairs(attackers) do
-		if not killer or pname ~= killer:get_player_name() then
-			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #attackers)})
-		end
+	for _, pname in ipairs(hitters) do
+		recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
 	end
 
 	ctf_combat_mode.remove(player)
-
-	return true
 end
 
 return {
@@ -179,14 +180,16 @@ return {
 		end
 	end,
 	can_take_flag = function(player, teamname)
-		if ctf_modebase.build_timer.in_progress() then
+		if not ctf_modebase.match_started then
 			tp_player_near_flag(player)
 
 			return "You can't take the enemy flag during build time!"
 		end
 	end,
 	on_flag_take = function(player, teamname)
-		local tcolor = ctf_teams.team[ctf_teams.get(player)].color
+		local pteam = ctf_teams.get(player)
+		local tcolor = ctf_teams.team[pteam].color
+
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_BUILTIN, tcolor)
 
 		local text = " has taken the flag"
@@ -198,6 +201,7 @@ return {
 			minetest.colorize(tcolor, player) ..
 			minetest.colorize(FLAG_MESSAGE_COLOR, text)
 		)
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", player, pteam, text))
 
 		celebrate_team(ctf_teams.get(player))
 
@@ -206,7 +210,8 @@ return {
 		ctf_modebase.flag_huds.track_capturer(player, FLAG_CAPTURE_TIMER)
 	end,
 	on_flag_drop = function(player, teamnames)
-		local tcolor = ctf_teams.team[ctf_teams.get(player)].color
+		local pteam = ctf_teams.get(player)
+		local tcolor = ctf_teams.team[pteam].color
 
 		local text = " has dropped the flag"
 		if many_teams then
@@ -217,6 +222,8 @@ return {
 			minetest.colorize(tcolor, player) ..
 			minetest.colorize(FLAG_MESSAGE_COLOR, text)
 		)
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", player, pteam, text))
+
 		ctf_modebase.flag_huds.untrack_capturer(player)
 
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
@@ -228,21 +235,23 @@ return {
 		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
 		celebrate_team(pteam)
 
+		local text = " has captured the flag"
 		if many_teams then
+			text = " has captured the flag of team(s) " .. HumanReadable(teamnames)
 			minetest.chat_send_all(
 				minetest.colorize(tcolor, player) ..
-				minetest.colorize(FLAG_MESSAGE_COLOR, " has captured the flag of team(s) " .. HumanReadable(teamnames))
+				minetest.colorize(FLAG_MESSAGE_COLOR, text)
 			)
 		end
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", player, pteam, text))
 
 		ctf_modebase.flag_huds.untrack_capturer(player)
 
 		local team_scores = recent_rankings.teams()
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
-			local score = ((team_scores[lost_team] or {}).score or 0) / 10
-			if score < 50 then score = 50 end
-			if score > 750 then score = 750 end
+			local score = ((team_scores[lost_team] or {}).score or 0) / 4
+			score = math.max(50, math.min(500, score))
 			capture_reward = capture_reward + score
 		end
 
@@ -251,19 +260,23 @@ return {
 		teams_left = teams_left - #teamnames
 
 		if teams_left <= 1 then
-			local text = "Player %s captured"
+			local capture_text = "Player %s captured"
 			if many_teams then
-				text = "Player %s captured the last flag"
+				capture_text = "Player %s captured the last flag"
 			end
 
-			ctf_modebase.summary.set_winner(string.format(text, minetest.colorize(tcolor, player)))
+			ctf_modebase.summary.set_winner(string.format(capture_text, minetest.colorize(tcolor, player)))
+
+			local win_text = HumanReadable(pteam) .. " Team Wins!"
 
 			local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get()
-			formdef.title = HumanReadable(pteam) .. " Team Wins!"
+			formdef.title = win_text
 
 			for _, p in ipairs(minetest.get_connected_players()) do
 				ctf_modebase.summary.show_gui(p:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
 			end
+
+			ctf_modebase.announce(win_text)
 
 			ctf_modebase.start_new_match(5)
 		else
@@ -276,67 +289,50 @@ return {
 			end
 		end
 	end,
-	on_allocplayer = function(player, teamname)
-		local tcolor = ctf_teams.team[teamname].color
+	on_allocplayer = function(player, new_team)
+		player:set_hp(player:get_properties().hp_max)
 
-		player:set_properties({
-			textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}
-		})
+		ctf_modebase.update_wear.cancel_player_updates(player)
 
+		ctf_modebase.player.remove_bound_items(player)
+		ctf_modebase.player.give_initial_stuff(player)
+
+		local tcolor = ctf_teams.team[new_team].color
+		player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
 
-		recent_rankings.set_team(player, teamname)
+		recent_rankings.set_team(player, new_team)
 
 		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
 
-		player:set_hp(player:get_properties().hp_max)
-
 		tp_player_near_flag(player)
-
-		give_initial_stuff(player)
-
-		ctf_modebase.flag_huds.on_allocplayer(player)
-
-		ctf_modebase.bounties.on_player_join(player)
 	end,
 	on_leaveplayer = function(player)
+		if not ctf_modebase.match_started then
+			ctf_combat_mode.remove(player)
+			return
+		end
+
 		local pname = player:get_player_name()
 
-		if end_combat_mode(player) then
-			recent_rankings.add(player, {deaths = 1})
-		end
+		-- should be no_hud to avoid a race
+		end_combat_mode(pname, nil, true)
 
 		recent_rankings.on_leaveplayer(pname)
 	end,
 	on_dieplayer = function(player, reason)
+		if not ctf_modebase.match_started then return end
+
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			if not end_combat_mode(player) then
-				ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
-			end
+			end_combat_mode(player:get_player_name())
 		end
 
-		if ctf_modebase.respawn_delay.prepare(player) then
-			if not ctf_modebase.build_timer.in_progress() then
-				recent_rankings.add(player, {deaths = 1})
-			end
-		end
+		ctf_modebase.respawn_delay.prepare(player)
 	end,
 	on_respawnplayer = function(player)
-		if not ctf_modebase.build_timer.in_progress() then
-			if ctf_modebase.respawn_delay.respawn(player, 7, 4) then
-				return true
-			end
-		else
-			if ctf_modebase.respawn_delay.respawn(player, 3) then
-				return true
-			end
-		end
-
-		give_initial_stuff(player)
-
-		return tp_player_near_flag(player)
+		tp_player_near_flag(player)
 	end,
 	get_chest_access = function(pname)
 		local rank = rankings:get(pname)
@@ -355,54 +351,45 @@ return {
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
 	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
-		if not hitter:is_player() or player:get_hp() <= 0 then return end
+		if not hitter:is_player() or player:get_hp() <= 0 then return false end
 
 		local pname, hname = player:get_player_name(), hitter:get_player_name()
 		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
 
 		if not pteam then
-			minetest.chat_send_player(hname, pname .. " is not in a team!")
-			return
-		elseif not hteam then
-			minetest.chat_send_player(hname, "You are not in a team!")
-			return
+			return false, pname .. " is not in a team!"
+		end
+
+		if not hteam then
+			return false, "You are not in a team!"
 		end
 
 		if pteam == hteam and pname ~= hname then
-			minetest.chat_send_player(hname, pname .. " is on your team!")
+			return false, pname .. " is on your team!"
+		end
 
-			return
-		elseif ctf_modebase.build_timer.in_progress() then
-			minetest.chat_send_player(hname, "The match hasn't started yet!")
-			return
+		if not ctf_modebase.match_started then
+			return false, "The match hasn't started yet!"
 		end
 
 		if hitter and hitter:is_player() then
-			if player ~= hitter then
-				ctf_combat_mode.set(player, 15, {[hitter:get_player_name()] = "hitter"})
-
-				if player:get_hp() <= damage then
-					end_combat_mode(player, hitter)
-				end
-			end
-
 			if player:get_hp() <= damage then
+				end_combat_mode(pname, hname)
 				ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+			elseif pname ~= hname then
+				ctf_combat_mode.set(player, hitter, "hitter", 15, true)
 			end
 		end
 
 		return damage
 	end,
 	on_healplayer = function(player, patient, amount)
-		local stats = {hp_healed = amount}
-
-		if ctf_combat_mode.get(patient) then
-			ctf_combat_mode.set(patient, 15, {[player:get_player_name()] = "healer"})
-		else
-			stats.score = math.ceil(amount/2)
+		if not ctf_modebase.match_started then
+			return "The match hasn't started yet!"
 		end
 
-		recent_rankings.add(player, stats, true)
+		ctf_combat_mode.set(patient, player, "healer", 60, false)
+		recent_rankings.add(player, {hp_healed = amount}, true)
 	end,
 }
 

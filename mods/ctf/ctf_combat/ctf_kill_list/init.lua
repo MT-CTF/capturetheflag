@@ -99,9 +99,8 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-ctf_modebase.register_on_new_match(function()
+ctf_api.register_on_match_end(function()
 	kill_list = {}
-
 	hud:clear_all()
 end)
 

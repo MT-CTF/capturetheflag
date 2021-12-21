@@ -1,11 +1,10 @@
 local TREASURE_VERSION = 1
 
-ctf_map.treasurefy_node = function(pos, node, clicker)
+ctf_map.treasurefy_node = function(inv)
+	inv:set_list("main", {})
 	if not ctf_modebase.current_mode then return end
 
-	local meta = minetest.get_meta(pos)
-	local inv = meta:get_inventory()
-	local treasures = ctf_modebase:get_current_mode().treasures or {}
+	local treasures = table.copy(ctf_modebase:get_current_mode().treasures or {})
 	if ctf_map.current_map then
 		local map_treasures = ctf_map.treasure_from_string(ctf_map.current_map.treasures)
 

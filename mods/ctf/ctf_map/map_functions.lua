@@ -5,9 +5,6 @@ function ctf_map.announce_map(map)
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
-	if minetest.global_exists("irc") and irc.connected then
-		irc:say("Map: " .. map.name)
-	end
 end
 
 function ctf_map.place_map(mapmeta, callback)
@@ -109,7 +106,64 @@ local ID_IGNORE = minetest.CONTENT_IGNORE
 local DEFAULT_CHEST_AMOUNT = ctf_map.DEFAULT_CHEST_AMOUNT
 local CHEST_ID = minetest.get_content_id("ctf_map:chest")
 local ID_WATER = minetest.get_content_id("default:water_source")
-local insert = table.insert
+local chest_formspec =
+	"size[8,9]" ..
+	"list[current_name;main;0,0.3;8,4;]" ..
+	"list[current_player;main;0,4.85;8,1;]" ..
+	"list[current_player;main;0,6.08;8,3;8]" ..
+	"listring[current_name;main]" ..
+	"listring[current_player;main]" ..
+	default.get_hotbar_bg(0,4.85)
+
+local function get_place_positions(a, data, pos1, pos2)
+	if a.amount <= 0 then return {} end
+
+	local Nx = pos2.x - pos1.x + 1
+	local Ny = pos2.y - pos1.y + 1
+
+	local Sx = math.min(a.pos1.x, a.pos2.x)
+	local Mx = math.max(a.pos1.x, a.pos2.x) - Sx + 1
+
+	local Sy = math.min(a.pos1.y, a.pos2.y)
+	local My = math.max(a.pos1.y, a.pos2.y) - Sy + 1
+
+	local Sz = math.min(a.pos1.z, a.pos2.z)
+	local Mz = math.max(a.pos1.z, a.pos2.z) - Sz + 1
+
+	local ret = {}
+	local random_state = {}
+	local random_count = Mx * My * Mz
+
+	while random_count > 0 do
+		local pos = math.random(1, random_count)
+		pos = random_state[pos] or pos
+
+		local x = pos % Mx + Sx
+		local y = math.floor(pos / Mx) % My + Sy
+		local z = math.floor(pos / My / Mx) + Sz
+
+		local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
+		local id_below = data[(z - pos1.z) * Ny * Nx + (y - 1 - pos1.y) * Nx + (x - pos1.x) + 1]
+		local id_above = data[(z - pos1.z) * Ny * Nx + (y + 1 - pos1.y) * Nx + (x - pos1.x) + 1]
+
+		if (data[vi] == ID_AIR or data[vi] == ID_WATER) and
+			id_below ~= ID_AIR and id_below ~= ID_IGNORE and id_below ~= ID_WATER and
+			(id_above == ID_AIR or id_above == ID_WATER)
+		then
+			table.insert(ret, {vi=vi, x=x, y=y, z=z})
+			if #ret >= a.amount then
+				return ret
+			end
+		end
+
+		random_state[pos] = random_state[random_count] or random_count
+		random_state[random_count] = nil
+		random_count = random_count - 1
+	end
+
+	return ret
+end
+
 function ctf_map.place_chests(mapmeta, pos2, amount)
 	local pos1 = mapmeta
 	local pos_list
@@ -125,38 +179,27 @@ function ctf_map.place_chests(mapmeta, pos2, amount)
 	pos1, pos2 = vm:read_from_map(pos1, pos2)
 
 	local data = vm:get_data()
-	local Nx = pos2.x - pos1.x + 1
-	local Ny = pos2.y - pos1.y + 1
 
-	for _, a in pairs(pos_list) do
-		local place_positions = {}
+	for i, a in pairs(pos_list) do
+		local place_positions = get_place_positions(a, data, pos1, pos2)
 
-		for z = a.pos1.z, a.pos2.z, (a.pos1.z <= a.pos2.z) and 1 or -1 do
-			for y = a.pos1.y, a.pos2.y, (a.pos1.y <= a.pos2.y) and 1 or -1 do
-				for x = a.pos1.x, a.pos2.x, (a.pos1.x <= a.pos2.x) and 1 or -1 do
-					local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
-					local id_below = data[(z - pos1.z) * Ny * Nx + (y-1 - pos1.y) * Nx + (x - pos1.x) + 1]
-					local id_above = data[(z - pos1.z) * Ny * Nx + (y+1 - pos1.y) * Nx + (x - pos1.x) + 1]
+		for _, pos in ipairs(place_positions) do
+			data[pos.vi] = CHEST_ID
 
-					if (data[vi] == ID_AIR or data[vi] == ID_WATER) and
-					id_below ~= ID_AIR and id_below ~= ID_IGNORE and id_below ~= ID_WATER and
-					(id_above == ID_AIR or id_above == ID_WATER) then
-						insert(place_positions, vi)
-					end
-				end
-			end
+			-- Treasurefy
+			local meta = minetest.get_meta(pos)
+			meta:set_string("infotext", "Treasure Chest")
+			meta:set_string("formspec", chest_formspec)
+
+			local inv = meta:get_inventory()
+			inv:set_size("main", 8*4)
+			ctf_map.treasurefy_node(inv)
 		end
 
-		if place_positions and #place_positions > 1 then
-			for i = 1, a.amount, 1 do
-				local idx = math.random(1, #place_positions)
-
-				data[place_positions[idx]] = CHEST_ID
-
-				table.remove(place_positions, idx)
-			end
-		else
-			minetest.log("error", "Something went wrong with chest placement")
+		if #place_positions < a.amount then
+			minetest.log("error",
+				string.format("[MAP] Couldn't place %d from %d chests from pos %d", a.amount - #place_positions, a.amount, i)
+			)
 		end
 	end
 

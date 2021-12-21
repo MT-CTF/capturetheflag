@@ -1,6 +1,6 @@
 ctf_healing = {}
 
-ctf_core.include_files("bandage.lua")
+ctf_core.include_files("bandage.lua", "medkit.lua")
 
 ctf_healing.registered_on_heal = {}
 ---@param func function

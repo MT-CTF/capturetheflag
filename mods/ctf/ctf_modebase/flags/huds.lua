@@ -8,6 +8,8 @@ local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teamma
 local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"     }
 local OTHER_FLAG_STOLEN     = {color = 0xAA00FF, text = "Kill %s, they've got some flags!"                    }
 
+ctf_modebase.flag_huds = {}
+
 local function concat_players(players)
 	local list = {}
 	for pname in pairs(players) do
@@ -74,7 +76,7 @@ local function get_flag_status(you)
 	end
 end
 
-local function update_player(player)
+function ctf_modebase.flag_huds.update_player(player)
 	local flag_status = get_flag_status(player:get_player_name())
 
 	if hud:exists(player, "flag_status") then
@@ -115,7 +117,7 @@ end
 
 local function update()
 	for _, player in pairs(minetest.get_connected_players()) do
-		update_player(player)
+		ctf_modebase.flag_huds.update_player(player)
 	end
 end
 
@@ -138,8 +140,6 @@ local function update_timer(pname)
 		end
 	end
 end
-
-ctf_modebase.flag_huds = {}
 
 function ctf_modebase.flag_huds.track_capturer(player, time)
 	player = PlayerName(player)
@@ -175,12 +175,7 @@ function ctf_modebase.flag_huds.untrack_capturer(player)
 	update()
 end
 
-function ctf_modebase.flag_huds.on_match_end()
+ctf_api.register_on_match_end(function()
 	hud:clear_all()
-
 	player_timers = {}
-end
-
-function ctf_modebase.flag_huds.on_allocplayer(player)
-	update_player(player)
-end
+end)

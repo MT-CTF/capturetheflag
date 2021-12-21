@@ -14,10 +14,6 @@ if ctf_core.settings.server_mode == "play" then
 	end
 end
 
-local function flag_taken(puncher)
-	minetest.chat_send_player(PlayerName(puncher), "This flag was taken!")
-end
-
 local function show_flag_color_form(player, target_pos, param2)
 	ctf_gui.show_formspec(player, "ctf_modebase:flag_color_select", {
 		title = "Flag Color Selection",
@@ -156,7 +152,11 @@ minetest.register_node("ctf_modebase:flag_captured_top",{
 	},
 	groups = {immortal=1,is_flag=1,flag_top=1,not_in_creative_inventory=1},
 	on_punch = function(pos, node, puncher, pointed_thing)
-		flag_taken(puncher)
+		hud_events.new(puncher, {
+			quick = true,
+			text = "This flag was taken!",
+			color = "warning",
+		})
 	end,
 	on_rightclick = function(_, _, clicker)
 		ctf_modebase.on_flag_rightclick(clicker)

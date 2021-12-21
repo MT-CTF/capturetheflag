@@ -1,4 +1,4 @@
-return function(rankings)
+ctf_modebase.recent_rankings = function(rankings)
 
 local rankings_players = {}
 local rankings_teams = {}

@@ -209,11 +209,11 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	texture = "ctf_ranged_shotgun.png",
 	fire_sound = "ctf_ranged_shotgun",
 	bullet = {
-		amount = 32,
-		spread = 3.6,
+		amount = 28,
+		spread = 4,
 	},
 	rounds = 10,
-	range = 25,
+	range = 24,
 	damage = 1,
 	fire_interval = 2,
 })
@@ -224,12 +224,12 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	texture = "ctf_ranged_smgun.png",
 	fire_sound = "ctf_ranged_pistol",
 	bullet = {
-		spread = 1,
+		spread = 2,
 	},
 	automatic = true,
 	rounds = 36,
 	range = 75,
-	damage = 2,
+	damage = 1,
 	fire_interval = 0.1,
 	liquid_travel_dist = 2,
 })

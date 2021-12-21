@@ -16,7 +16,6 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 local function update(name)
-	assert(players[name])
 	local player = minetest.get_player_by_name(name)
 	local override = table.copy(default_overrides)
 
@@ -30,11 +29,7 @@ local function update(name)
 end
 
 function physics.set(name, layer, modifiers)
-	-- Basic sanity checks
-	assert(
-		type(name) == "string" and type(layer) == "string" and type(modifiers) == "table",
-		"physics.set: Invalid function arguments!"
-	)
+	name = PlayerName(name)
 
 	if not players[name] then
 		return
@@ -55,9 +50,7 @@ function physics.set(name, layer, modifiers)
 end
 
 function physics.remove(name, layer)
-	-- Basic sanity checks
-	assert(type(name) == "string" and type(layer) == "string",
-		"physics.remove: Invalid function arguments!")
+	name = PlayerName(name)
 
 	if not players[name] then
 		return
