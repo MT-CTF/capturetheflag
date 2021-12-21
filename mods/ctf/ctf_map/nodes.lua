@@ -172,3 +172,11 @@ minetest.register_node("ctf_map:chest", {
 		end
 	end,
 })
+
+-- Add ctf_map fences to group:fence
+
+minetest.registered_nodes["ctf_map:fence_aspen_wood"].groups.fence = 1
+minetest.registered_nodes["ctf_map:fence_acacia_wood"].groups.fence = 1
+minetest.registered_nodes["ctf_map:fence_junglewood"].groups.fence = 1
+minetest.registered_nodes["ctf_map:fence_wood"].groups.fence = 1
+minetest.registered_nodes["ctf_map:fence_pine_wood"].groups.fence = 1
