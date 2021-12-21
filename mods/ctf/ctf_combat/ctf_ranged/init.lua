@@ -3,7 +3,6 @@ local hud = mhud.init()
 local shoot_cooldown = ctf_core.init_cooldowns()
 
 local scoped = {}
-local scoped_hud_id = {}
 local scale_const = 6
 local timer = 0.2
 
