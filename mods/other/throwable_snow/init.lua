@@ -3,7 +3,7 @@ local S = minetest.get_translator(minetest.get_current_modname())
 
 function throwable_snow.on_hit_player(thrower, player)
 	hud_events.new(player, {
-		text = S("@1 hit you with a snowball!",thrower),
+		text = S("@1 hit you with a snowball!", thrower),
 		quick = true,
 	})
 end
