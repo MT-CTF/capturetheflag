@@ -1,7 +1,7 @@
 # textdomain: ctf_report
 <msg>=<信息>
 Report misconduct or bugs=回報不當行為或程序錯誤
-Please add a message to your report. =請為你的回報添加信息。
+Please add a message to your report.=請為你的回報添加信息。
 If it's about (a) particular player(s), please also include their name(s).=如果回報關於（一個或多個）玩家，請包含其名稱
 If you're reporting a player,=如果你正在回報玩家，
 you should also include a reason why (e.g. swearing, griefing, spawnkilling, etc.).=你應該包含原因（如：咒罵、破壞、出生點屠殺等）
