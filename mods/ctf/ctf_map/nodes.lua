@@ -81,6 +81,7 @@ local mod_prefixes = {
 -- See Lua API, section "Node-only groups"
 local preserved_groups = {
 	bouncy = true;
+	fence = true;
 	connect_to_raillike = true;
 	disable_jump = true;
 	fall_damage_add_percent = true;
@@ -172,11 +173,3 @@ minetest.register_node("ctf_map:chest", {
 		end
 	end,
 })
-
--- Add ctf_map fences to group:fence
-
-minetest.registered_nodes["ctf_map:fence_aspen_wood"].groups.fence = 1
-minetest.registered_nodes["ctf_map:fence_acacia_wood"].groups.fence = 1
-minetest.registered_nodes["ctf_map:fence_junglewood"].groups.fence = 1
-minetest.registered_nodes["ctf_map:fence_wood"].groups.fence = 1
-minetest.registered_nodes["ctf_map:fence_pine_wood"].groups.fence = 1
