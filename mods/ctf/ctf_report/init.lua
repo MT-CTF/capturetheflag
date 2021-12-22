@@ -16,7 +16,7 @@ minetest.register_chatcommand("report", {
 	func = function(name, param)
 		param = param:trim()
 		if param == "" then
-			return false, S("Please add a message to your report. ") ..
+			return false, S("Please add a message to your report.") .. " " ..
 				S("If it's about (a) particular player(s), please also include their name(s).")
 		end
 
@@ -25,7 +25,7 @@ minetest.register_chatcommand("report", {
 		local _, count = string.gsub(param, " ", "")
 		if count == 0 then
 			return false,
-                S("If you're reporting a player,") ..
+                S("If you're reporting a player,") .. " " ..
                 S("you should also include a reason why (e.g. swearing, griefing, spawnkilling, etc.).")
 		end
 
