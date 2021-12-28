@@ -1,6 +1,6 @@
 minetest.register_node("ctf_map:unwalkable_dirt", {
 	description = "Unwalkable Dirt",
-	tiles = {"ctf_traps_dirt.png"},
+	tiles = {"ctf_map_dirt.png"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {crumbly=3, soil=1}
@@ -8,7 +8,7 @@ minetest.register_node("ctf_map:unwalkable_dirt", {
 
 minetest.register_node("ctf_map:unwalkable_stone", {
 	description = "Unwalkable Stone",
-	tiles = {"ctf_traps_stone.png"},
+	tiles = {"ctf_map_stone.png"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=1}
@@ -16,7 +16,7 @@ minetest.register_node("ctf_map:unwalkable_stone", {
 
 minetest.register_node("ctf_map:unwalkable_cobble", {
 	description = "Unwalkable Cobblestone",
-	tiles = {"ctf_traps_cobble.png"},
+	tiles = {"ctf_map_cobble.png"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=2}
@@ -25,8 +25,8 @@ minetest.register_node("ctf_map:unwalkable_cobble", {
 minetest.register_node("ctf_map:spike", {
 	description = "Spike",
 	drawtype = "plantlike",
-	tiles = {"ctf_traps_spike.png"},
-	inventory_image = "ctf_traps_spike.png",
+	tiles = {"ctf_map_spike.png"},
+	inventory_image = "ctf_map_spike.png",
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = false,
@@ -40,7 +40,7 @@ minetest.register_node("ctf_map:spike", {
 
 minetest.register_node("ctf_map:damage_cobble", {
 	description = "Cobblestone that damages digger of enemy team",
-	tiles = {"ctf_traps_damage_cobble.png"},
+	tiles = {"ctf_map_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3, stone=2},
