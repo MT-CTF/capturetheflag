@@ -1,6 +1,7 @@
 local VOTING_TIME = 30
 
 local timer = nil
+local formspec_send_timer = nil
 local votes = nil
 local voted = nil
 local voters_count = nil
@@ -39,12 +40,8 @@ local function show_modechoose_form(player)
 			exit = true,
 			pos = {"center", idx + 0.5},
 			func = function()
-				if votes then
-					if ctf_modebase.modes[modename] then
-						player_vote(player, modename)
-					else
-						show_modechoose_form(player)
-					end
+				if votes and ctf_modebase.modes[modename] then
+					player_vote(player, modename)
 				end
 			end,
 		}
@@ -56,13 +53,18 @@ local function show_modechoose_form(player)
 		size = {x = 8, y = 8},
 		title = "Mode Selection",
 		description = "Please vote on what gamemode you would like to play",
-		on_quit = function()
-			if votes and not voted[player] then
-				show_modechoose_form(player)
-			end
-		end,
 		elements = elements,
 	})
+end
+
+local function send_formspec()
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local pname = player:get_player_name()
+		if not voted[pname] then
+			show_modechoose_form(pname)
+		end
+	end
+	formspec_send_timer = minetest.after(1, send_formspec)
 end
 
 function ctf_modebase.mode_vote.start_vote()
@@ -76,12 +78,18 @@ function ctf_modebase.mode_vote.start_vote()
 	end
 
 	timer = minetest.after(VOTING_TIME, ctf_modebase.mode_vote.end_vote)
+	formspec_send_timer = minetest.after(1, send_formspec)
 end
 
 function ctf_modebase.mode_vote.end_vote()
 	if timer then
 		timer:cancel()
 		timer = nil
+	end
+
+	if formspec_send_timer then
+		formspec_send_timer:cancel()
+		formspec_send_timer = nil
 	end
 
 	for _, player in ipairs(minetest.get_connected_players()) do
