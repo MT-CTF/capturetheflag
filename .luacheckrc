@@ -1,16 +1,20 @@
 unused_args = false
 
 globals = {
-	"ctf_api", "ctf_core", "ctf_map", "ctf_chat", "ctf_teams", "ctf_modebase",
-	"ctf_rankings", "ctf_playertag", "ctf_melee", "ctf_ranged", "ctf_combat_mode",
-	"ctf_kill_list", "ctf_healing", "ctf_cosmetics", "ctf_report", "ctf_hpbar",
-
-	"mhud", "rawf", "physics", "hud_events", "ctf_gui",
-
 	"PlayerObj", "PlayerName", "HumanReadable", "RunCallbacks",
 
-	"grenades", "email", "hb", "dropondie", "random_messages", "default",
-	"skybox", "crafting", "doors", "throwable_snow", "chatcmdbuilder",
+	"ctf_gui", "hud_events", "mhud", "physics", "rawf",
+
+	"ctf_api", "ctf_chat", "ctf_combat_mode", "ctf_core", "ctf_cosmetics",
+	"ctf_healing", "ctf_kill_list", "ctf_map", "ctf_melee", "ctf_modebase",
+	"ctf_ranged", "ctf_rankings", "ctf_report", "ctf_teams",
+
+	"dropondie", "grenades",
+
+	"chatcmdbuilder", "crafting", "hpbar", "playertag", "random_messages",
+	"skybox", "throwable_snow",
+
+	"default", "doors",
 
 	"vector",
 	math = {

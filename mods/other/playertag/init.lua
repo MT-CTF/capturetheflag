@@ -4,7 +4,7 @@ local ATTACH_POSITION = minetest.rgba and {x=0, y=20, z=0} or {x=0, y=10, z=0}
 local TYPE_BUILTIN = 0
 local TYPE_ENTITY = 1
 
-ctf_playertag = {
+playertag = {
 	TYPE_BUILTIN = TYPE_BUILTIN,
 	TYPE_ENTITY  = TYPE_ENTITY,
 }
@@ -15,7 +15,7 @@ local function add_entity_tag(player)
 		color = {a = 0, r = 0, g = 0, b = 0}
 	})
 
-	local ent = minetest.add_entity(player:get_pos(), "ctf_playertag:tag")
+	local ent = minetest.add_entity(player:get_pos(), "playertag:tag")
 
 	-- Build name from font texture
 	local texture = "npcf_tag_bg.png"
@@ -61,7 +61,7 @@ local function update(player, settings)
 	end
 end
 
-function ctf_playertag.set(player, type, color)
+function playertag.set(player, type, color)
 	local oldset = players[player:get_player_name()]
 	if not oldset then return end
 
@@ -70,15 +70,15 @@ function ctf_playertag.set(player, type, color)
 	end
 end
 
-function ctf_playertag.get(player)
+function playertag.get(player)
 	return players[player:get_player_name()]
 end
 
-function ctf_playertag.get_all()
+function playertag.get_all()
 	return players
 end
 
-minetest.register_entity("ctf_playertag:tag", {
+minetest.register_entity("playertag:tag", {
 	visual = "sprite",
 	visual_size = {x=2.16, y=0.18, z=2.16}, --{x=1.44, y=0.12, z=1.44},
 	textures = {"blank.png"},

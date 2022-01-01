@@ -7,18 +7,6 @@ local MOD_JUMP    = tonumber(minetest.settings:get("sprint_jump")      or 1.1)
 local STAMINA_MAX = tonumber(minetest.settings:get("sprint_stamina")   or 20)
 local HEAL_RATE   = tonumber(minetest.settings:get("sprint_heal_rate") or 0.5)
 local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
-local SPRINT_HUDBARS_USED
-
-if minetest.get_modpath("hudbars") ~= nil then
-	hb.register_hudbar("sprint", 0xFFFFFF, "Stamina",
-		{ bar = "sprint_stamina_bar.png", icon = "sprint_stamina_icon.png" },
-		STAMINA_MAX, STAMINA_MAX,
-		false, "%s: %.1f/%.1f")
-
-	SPRINT_HUDBARS_USED = true
-else
-	SPRINT_HUDBARS_USED = false
-end
 
 local players = {}
 
@@ -77,14 +65,10 @@ minetest.register_globalstep(function(dtime)
 			end
 
 			if staminaChanged then
-				if SPRINT_HUDBARS_USED then
-					hb.change_hudbar(player, "sprint", info.stamina)
-				else
-					local numBars = math.floor(20 * info.stamina / STAMINA_MAX)
-					if info.lastHudSendValue ~= numBars then
-						info.lastHudSendValue = numBars
-						player:hud_change(info.hud, "number", numBars)
-					end
+				local numBars = math.floor(20 * info.stamina / STAMINA_MAX)
+				if info.lastHudSendValue ~= numBars then
+					info.lastHudSendValue = numBars
+					player:hud_change(info.hud, "number", numBars)
 				end
 			end
 		end
@@ -98,19 +82,15 @@ minetest.register_on_joinplayer(function(player)
 		sprintRequested = false,       -- is the sprint key down / etc?
 	}
 
-	if SPRINT_HUDBARS_USED then
-		hb.init_hudbar(player, "sprint")
-	else
-		info.hud = player:hud_add({
-			hud_elem_type = "statbar",
-			position      = {x=0.5, y=1},
-			size          = {x=24, y=24},
-			text          = "sprint_stamina_icon.png",
-			number        = 20,
-			alignment     = {x=0, y=1},
-			offset        = {x=-263, y=-110},
-		})
-	end
+	info.hud = player:hud_add({
+		hud_elem_type = "statbar",
+		position      = {x=0.5, y=1},
+		size          = {x=24, y=24},
+		text          = "sprint_stamina_icon.png",
+		number        = 20,
+		alignment     = {x=0, y=1},
+		offset        = {x=-263, y=-110},
+	})
 
 	players[player:get_player_name()] = info
 end)

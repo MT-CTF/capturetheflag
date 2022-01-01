@@ -190,7 +190,7 @@ return {
 		local pteam = ctf_teams.get(player)
 		local tcolor = ctf_teams.team[pteam].color
 
-		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_BUILTIN, tcolor)
+		playertag.set(minetest.get_player_by_name(player), playertag.TYPE_BUILTIN, tcolor)
 
 		local text = " has taken the flag"
 		if many_teams then
@@ -226,13 +226,13 @@ return {
 
 		ctf_modebase.flag_huds.untrack_capturer(player)
 
-		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
+		playertag.set(minetest.get_player_by_name(player), playertag.TYPE_ENTITY)
 	end,
 	on_flag_capture = function(player, teamnames)
 		local pteam = ctf_teams.get(player)
 		local tcolor = ctf_teams.team[pteam].color
 
-		ctf_playertag.set(minetest.get_player_by_name(player), ctf_playertag.TYPE_ENTITY)
+		playertag.set(minetest.get_player_by_name(player), playertag.TYPE_ENTITY)
 		celebrate_team(pteam)
 
 		local text = " has captured the flag"
@@ -304,7 +304,7 @@ return {
 
 		recent_rankings.set_team(player, new_team)
 
-		ctf_playertag.set(player, ctf_playertag.TYPE_ENTITY)
+		playertag.set(player, playertag.TYPE_ENTITY)
 
 		tp_player_near_flag(player)
 	end,
