@@ -4,7 +4,7 @@ local shoot_cooldown = ctf_core.init_cooldowns()
 
 local scoped = {}
 local scale_const = 6
-local timer = 0.2
+local timer = 1
 
 minetest.register_craftitem("ctf_ranged:ammo", {
 	description = "Ammo",
@@ -113,8 +113,6 @@ function ctf_ranged.simple_register_gun(name, def)
 		loaded_def.wield_image = def.wield_texture or def.texture
 		loaded_def.groups.not_in_creative_inventory = nil
 		loaded_def.on_use = function(itemstack, user)
-			if not scoped[user:get_player_name()] then return end
-
 			if not ctf_ranged.can_use_gun(user, name) then
 				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
 				return
@@ -184,6 +182,11 @@ function ctf_ranged.simple_register_gun(name, def)
 	end))
 end
 
+minetest.register_on_leaveplayer(function(player)
+	if scoped[player:get_player_name()] then
+		scoped[player:get_player_name()] = nil
+	end
+end)
 
 local function show_scope(name, item_name, fov_mult)
 	local player = minetest.get_player_by_name(name)
