@@ -2,27 +2,6 @@ local restart_on_next_match = false
 ctf_modebase.map_on_next_match = nil
 ctf_modebase.mode_on_next_match = nil
 
-local map_pools = {}
-
-local function select_map(mode, mapidx, callback)
-	if not mapidx then
-		if not map_pools[mode] or #map_pools[mode] == 0 then
-			map_pools[mode] = {}
-
-			for idx, map in ipairs(ctf_modebase.map_catalog.maps) do
-				if not map.game_modes or table.indexof(map.game_modes, mode) ~= -1 then
-					table.insert(map_pools[mode], idx)
-				end
-			end
-		end
-
-		local idx = math.random(1, #map_pools[mode])
-		mapidx = table.remove(map_pools[mode], idx)
-	end
-
-	ctf_modebase.map_catalog.current_map = mapidx
-end
-
 function ctf_modebase.start_match_after_vote()
 	for _, pos in pairs(ctf_teams.team_chests) do
 		minetest.remove_node(pos)
@@ -36,8 +15,14 @@ function ctf_modebase.start_match_after_vote()
 		ctf_modebase.current_mode = ctf_modebase.mode_on_next_match
 		ctf_modebase.on_mode_start()
 	end
+	ctf_modebase.mode_on_next_match = nil
 
-	select_map(ctf_modebase.mode_on_next_match, ctf_modebase.map_on_next_match)
+	if ctf_modebase.map_on_next_match then
+		ctf_modebase.map_catalog.current_map = ctf_modebase.map_catalog.map_dirnames[ctf_modebase.map_on_next_match]
+		ctf_modebase.map_on_next_match = nil
+	else
+		ctf_modebase.map_catalog.select_map_for_mode(ctf_modebase.current_mode)
+	end
 
 	local map = ctf_modebase.map_catalog.maps[ctf_modebase.map_catalog.current_map]
 	ctf_map.place_map(map, function()
@@ -55,9 +40,6 @@ function ctf_modebase.start_match_after_vote()
 
 		ctf_modebase.current_mode_matches = ctf_modebase.current_mode_matches + 1
 	end)
-
-	ctf_modebase.map_on_next_match = nil
-	ctf_modebase.mode_on_next_match = nil
 end
 
 local function start_new_match()
@@ -119,8 +101,7 @@ minetest.register_chatcommand("ctf_next", {
 			return false, "Map switching is in progress"
 		end
 
-		local map = nil
-		local map_name, mode = ctf_modebase.match_mode(param)
+		local map, mode = ctf_modebase.match_mode(param)
 
 		if mode then
 			if not ctf_modebase.modes[mode] then
@@ -128,10 +109,9 @@ minetest.register_chatcommand("ctf_next", {
 			end
 		end
 
-		if map_name then
-			map = ctf_modebase.map_catalog.map_dirnames[map_name]
-			if not map then
-				return false, "No such map: " .. map_name
+		if map then
+			if not ctf_modebase.map_catalog.map_dirnames[map] then
+				return false, "No such map: " .. map
 			end
 		end
 

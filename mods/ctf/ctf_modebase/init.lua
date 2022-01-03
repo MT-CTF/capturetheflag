@@ -36,9 +36,6 @@ ctf_modebase = {
 
 	--flag_captured[Team name] = true if captured, otherwise nil
 	flag_captured        = {},
-
-	-- mode feature presets
-	feature_presets     = {},
 }
 
 ctf_gui.init()
@@ -49,6 +46,7 @@ end
 ctf_core.include_files(
 	"register.lua",
 	"map_catalog.lua",
+	"map_catalog_show.lua",
 	"ranking_commands.lua",
 	"summary.lua",
 	"player.lua",

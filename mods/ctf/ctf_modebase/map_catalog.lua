@@ -5,186 +5,85 @@ ctf_modebase.map_catalog = {
 	current_map = false,
 }
 
-local maps = minetest.get_dir_list(ctf_map.maps_dir, true)
-table.sort(maps)
+local function init()
+	local maps = minetest.get_dir_list(ctf_map.maps_dir, true)
+	table.sort(maps)
 
-for i, dirname in ipairs(maps) do
-	local map = ctf_map.load_map_meta(i, dirname)
-	if map.map_version then
-		table.insert(ctf_modebase.map_catalog.maps, map)
-		table.insert(ctf_modebase.map_catalog.map_names, map.name)
-		ctf_modebase.map_catalog.map_dirnames[map.dirname] = #ctf_modebase.map_catalog.maps
+	for i, dirname in ipairs(maps) do
+		local map = ctf_map.load_map_meta(i, dirname)
+		if map.map_version then
+			table.insert(ctf_modebase.map_catalog.maps, map)
+			table.insert(ctf_modebase.map_catalog.map_names, map.name)
+			ctf_modebase.map_catalog.map_dirnames[map.dirname] = #ctf_modebase.map_catalog.maps
+		end
 	end
 end
 
+init()
 assert(#ctf_modebase.map_catalog.maps > 0 or ctf_core.settings.server_mode == "mapedit")
 
-local function show_catalog(pname, current_map)
-	local map_names = {}
-	for _, map in ipairs(ctf_modebase.map_catalog.maps) do
-		table.insert(map_names, map.name)
+-- List of shuffled map indices, used in conjunction with random map selection
+local shuffled_order
+local shuffled_idx
+
+-- Fisher-Yates-Savilli shuffling algorithm, used for shuffling map selection order
+-- Adapted from snippet provided in https://stackoverflow.com/a/35574006
+-- Improved to ensure that the first maps from current shuffled order differ
+-- from the last maps from previous shuffled order
+-- You can set the minimum distance between the same map using map_recurrence_threshold param
+local function shuffle_maps(previous_order, map_recurrence_threshold)
+	local maps_count = #ctf_modebase.map_catalog.maps
+
+	map_recurrence_threshold = math.min(map_recurrence_threshold or 0, maps_count - 1)
+
+	if not previous_order then
+		map_recurrence_threshold = 0
+		previous_order = {}
+		for i = 1, maps_count do
+			previous_order[i] = i
+		end
 	end
 
-	if not current_map then
-		current_map = ctf_modebase.map_catalog.current_map
+	-- Reset shuffled_idx
+	shuffled_idx = 1
+
+	-- Create table of ordered indices
+	shuffled_order = {}
+
+	-- At first select maps that don't intersect with the last maps from previous order
+	for i = 1, map_recurrence_threshold do
+		local j = math.random(1, maps_count - map_recurrence_threshold)
+		local k = maps_count - map_recurrence_threshold + i
+		shuffled_order[i] = previous_order[j]
+		previous_order[j] = previous_order[k]
 	end
 
-	if not current_map then
-		current_map = 1
+	-- Select remaining maps
+	for i = map_recurrence_threshold + 1, maps_count do
+		local j = math.random(1, maps_count - i + 1)
+		local k = maps_count - i + 1
+		shuffled_order[i] = previous_order[j]
+		previous_order[j] = previous_order[k]
 	end
-
-	local current_map_meta = ctf_modebase.map_catalog.maps[current_map]
-
-	local formspec = {
-		title = "Maps catalog",
-		elements = {
-			list = {
-				type = "table",
-				pos = {1, 1},
-				size = {5, ctf_gui.FORM_SIZE.y - 5},
-				columns = {
-					{type = "text"},
-				},
-				rows = map_names,
-				default_idx = current_map,
-				func = function(_, fields, name)
-					local evt = minetest.explode_table_event(fields[name])
-					if evt.type == "CHG" then
-						show_catalog(pname, evt.row)
-					end
-				end,
-			}
-		}
-	}
-
-	local y = 1
-
-	if current_map_meta.author and current_map_meta.author ~= "" then
-		formspec.elements.author = {
-			type = "label",
-			pos = {7, y},
-			label = "By: " .. minetest.colorize("#cccccc", current_map_meta.author),
-		}
-		y = y + 0.5
-	end
-
-	-- "maps/{current_map}/screenshot.png" is copied to "textures/{current_map}_screenshot.png"
-	local image_texture = current_map_meta.dirname .. "_screenshot.png"
-	if ctf_core.file_exists(string.format("%s/textures/%s", minetest.get_modpath("ctf_map"), image_texture)) then
-		formspec.elements.image = {
-			type = "image",
-			pos = {7, y},
-			size = {10, 6},
-			texture = image_texture,
-		}
-		y = y + 6.5
-	end
-
-	if current_map_meta.hint and current_map_meta.hint ~= "" then
-		formspec.elements.hint = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 1},
-			label = minetest.colorize("#ffff00", "HINT:"),
-			read_only = true,
-			default = current_map_meta.hint,
-		}
-		y = y + 1.5
-	end
-
-	if current_map_meta.license and current_map_meta.license ~= "" then
-		formspec.elements.license = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 1},
-			label = minetest.colorize("#ffff00", "LICENSE:"),
-			read_only = true,
-			default = current_map_meta.license,
-		}
-		y = y + 1.5
-	end
-
-	if current_map_meta.game_modes and #current_map_meta.game_modes > 0 then
-		formspec.elements.game_modes = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 3},
-			label = minetest.colorize("#ffff00", "GAME MODES"),
-			read_only = true,
-			default = HumanReadable(current_map_meta.game_modes),
-		}
-		y = y + 1.5
-	end
-
-	if current_map_meta.others and current_map_meta.others ~= "" then
-		formspec.elements.others = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 3},
-			label = minetest.colorize("#ffff00", "MORE INFORMATION"),
-			read_only = true,
-			default = current_map_meta.others,
-		}
-	end
-
-	if current_map > 1 then
-		formspec.elements.previous = {
-			type = "button",
-			label = "<<",
-			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
-			func = function()
-				show_catalog(pname, current_map - 1)
-			end,
-		}
-	end
-
-	if current_map < #ctf_modebase.map_catalog.maps then
-		formspec.elements.next = {
-			type = "button",
-			label = ">>",
-			pos = {5, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
-			func = function()
-				show_catalog(pname, current_map + 1)
-			end,
-		}
-	end
-
-	if minetest.check_player_privs(pname, {ctf_admin=true}) then
-		formspec.elements.skip_to_map = {
-			type = "button",
-			exit = true,
-			label = "Skip to map",
-			pos = {9, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
-			func = function()
-				local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
-				minetest.log("action", string.format("[ctf_admin] %s skipped to new map %s", pname, mapname))
-
-				ctf_modebase.map_on_next_match = current_map
-				ctf_modebase.start_new_match()
-			end
-		}
-	end
-
-	if minetest.check_player_privs(pname, {ctf_admin=true}) then
-		formspec.elements.set_as_next_map = {
-			type = "button",
-			label = "Set as next map",
-			pos = {13, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
-			func = function()
-				local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
-				minetest.log("action",string.format("[ctf_admin] %s set new map %s", pname, mapname))
-
-				ctf_modebase.map_on_next_match = current_map
-			end
-		}
-	end
-
-	ctf_gui.show_formspec(pname, "ctf_map:catalog", formspec)
 end
 
-minetest.register_chatcommand("maps", {
-	description = "Show the map catalog",
-	func = function(name)
-		show_catalog(name)
+function ctf_modebase.map_catalog.select_map()
+	-- If shuffled_idx overflows, re-shuffle map selection order
+	if not shuffled_order or shuffled_idx > #shuffled_order then
+		shuffle_maps(shuffled_order, 3)
 	end
-})
+
+	-- Get the real idx stored in table shuffled_order at index [shuffled_idx]
+	ctf_modebase.map_catalog.current_map = shuffled_order[shuffled_idx]
+	shuffled_idx = shuffled_idx + 1
+end
+
+function ctf_modebase.map_catalog.select_map_for_mode(mode)
+	while true do
+		ctf_modebase.map_catalog.select_map()
+		local map = ctf_modebase.map_catalog.maps[ctf_modebase.map_catalog.current_map]
+		if not map.game_modes or table.indexof(map.game_modes, mode) ~= -1 then
+			break
+		end
+	end
+end
