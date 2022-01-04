@@ -1,4 +1,5 @@
-function ctf_modebase.drop_flags(pname)
+function ctf_modebase.drop_flags(player)
+	local pname = player:get_player_name()
 	local flagteams = ctf_modebase.taken_flags[pname]
 	if not flagteams then return end
 
@@ -20,11 +21,11 @@ function ctf_modebase.drop_flags(pname)
 	ctf_modebase.taken_flags[pname] = nil
 
 	ctf_modebase.skip_vote.on_flag_drop(#flagteams)
-	ctf_modebase:get_current_mode().on_flag_drop(pname, flagteams)
+	ctf_modebase:get_current_mode().on_flag_drop(player, flagteams)
 end
 
 function ctf_modebase.flag_on_punch(puncher, nodepos, node)
-	local pname = PlayerName(puncher)
+	local pname = puncher:get_player_name()
 	local pteam = ctf_teams.get(pname)
 
 	if not pteam then
@@ -48,7 +49,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			return
 		end
 
-		local result = ctf_modebase:get_current_mode().can_take_flag(pname, target_team)
+		local result = ctf_modebase:get_current_mode().can_take_flag(puncher, target_team)
 		if result then
 			hud_events.new(puncher, {
 				quick = true,
@@ -67,7 +68,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		ctf_modebase.flag_taken[target_team] = {p=pname, t=pteam}
 
 		ctf_modebase.skip_vote.on_flag_take()
-		ctf_modebase:get_current_mode().on_flag_take(pname, target_team)
+		ctf_modebase:get_current_mode().on_flag_take(puncher, target_team)
 
 		minetest.set_node(nodepos, {name = "ctf_modebase:flag_captured_top", param2 = node.param2})
 	else
@@ -87,7 +88,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			end
 
 			ctf_modebase.skip_vote.on_flag_capture(#flagteams)
-			ctf_modebase:get_current_mode().on_flag_capture(pname, flagteams)
+			ctf_modebase:get_current_mode().on_flag_capture(puncher, flagteams)
 		end
 	end
 end
@@ -99,18 +100,17 @@ ctf_api.register_on_match_end(function()
 end)
 
 ctf_teams.register_on_allocplayer(function(player)
-	local pname = player:get_player_name()
-	if ctf_modebase.taken_flags[pname] then
-		ctf_modebase.drop_flags(pname)
+	if ctf_modebase.taken_flags[player:get_player_name()] then
+		ctf_modebase.drop_flags(player)
 	else
 		ctf_modebase.flag_huds.update_player(player)
 	end
 end)
 
 minetest.register_on_dieplayer(function(player)
-	ctf_modebase.drop_flags(player:get_player_name())
+	ctf_modebase.drop_flags(player)
 end)
 
 minetest.register_on_leaveplayer(function(player)
-	ctf_modebase.drop_flags(player:get_player_name())
+	ctf_modebase.drop_flags(player)
 end)

@@ -191,10 +191,11 @@ return {
 		end
 	end,
 	on_flag_take = function(player, teamname)
+		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(player)
 		local tcolor = ctf_teams.team[pteam].color
 
-		playertag.set(minetest.get_player_by_name(player), playertag.TYPE_BUILTIN, tcolor)
+		playertag.set(player, playertag.TYPE_BUILTIN, tcolor)
 
 		local text = " has taken the flag"
 		if many_teams then
@@ -202,19 +203,20 @@ return {
 		end
 
 		minetest.chat_send_all(
-			minetest.colorize(tcolor, player) ..
+			minetest.colorize(tcolor, pname) ..
 			minetest.colorize(FLAG_MESSAGE_COLOR, text)
 		)
-		ctf_modebase.announce(string.format("Player %s (team %s)%s", player, pteam, text))
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
 
-		celebrate_team(ctf_teams.get(player))
+		celebrate_team(ctf_teams.get(pname))
 
-		recent_rankings.add(player, {score = 20, flag_attempts = 1})
+		recent_rankings.add(pname, {score = 20, flag_attempts = 1})
 
-		ctf_modebase.flag_huds.track_capturer(player, FLAG_CAPTURE_TIMER)
+		ctf_modebase.flag_huds.track_capturer(pname, FLAG_CAPTURE_TIMER)
 	end,
 	on_flag_drop = function(player, teamnames)
-		local pteam = ctf_teams.get(player)
+		local pname = player:get_player_name()
+		local pteam = ctf_teams.get(pname)
 		local tcolor = ctf_teams.team[pteam].color
 
 		local text = " has dropped the flag"
@@ -223,33 +225,34 @@ return {
 		end
 
 		minetest.chat_send_all(
-			minetest.colorize(tcolor, player) ..
+			minetest.colorize(tcolor, pname) ..
 			minetest.colorize(FLAG_MESSAGE_COLOR, text)
 		)
-		ctf_modebase.announce(string.format("Player %s (team %s)%s", player, pteam, text))
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
 
-		ctf_modebase.flag_huds.untrack_capturer(player)
+		ctf_modebase.flag_huds.untrack_capturer(pname)
 
-		playertag.set(minetest.get_player_by_name(player), playertag.TYPE_ENTITY)
+		playertag.set(player, playertag.TYPE_ENTITY)
 	end,
 	on_flag_capture = function(player, teamnames)
-		local pteam = ctf_teams.get(player)
+		local pname = player:get_player_name()
+		local pteam = ctf_teams.get(pname)
 		local tcolor = ctf_teams.team[pteam].color
 
-		playertag.set(minetest.get_player_by_name(player), playertag.TYPE_ENTITY)
+		playertag.set(player, playertag.TYPE_ENTITY)
 		celebrate_team(pteam)
 
 		local text = " has captured the flag"
 		if many_teams then
 			text = " has captured the flag of team(s) " .. HumanReadable(teamnames)
 			minetest.chat_send_all(
-				minetest.colorize(tcolor, player) ..
+				minetest.colorize(tcolor, pname) ..
 				minetest.colorize(FLAG_MESSAGE_COLOR, text)
 			)
 		end
-		ctf_modebase.announce(string.format("Player %s (team %s)%s", player, pteam, text))
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
 
-		ctf_modebase.flag_huds.untrack_capturer(player)
+		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		local team_scores = recent_rankings.teams()
 		local capture_reward = 0
@@ -259,7 +262,7 @@ return {
 			capture_reward = capture_reward + score
 		end
 
-		recent_rankings.add(player, {score = capture_reward, flag_captures = #teamnames})
+		recent_rankings.add(pname, {score = capture_reward, flag_captures = #teamnames})
 
 		teams_left = teams_left - #teamnames
 
@@ -269,7 +272,7 @@ return {
 				capture_text = "Player %s captured the last flag"
 			end
 
-			ctf_modebase.summary.set_winner(string.format(capture_text, minetest.colorize(tcolor, player)))
+			ctf_modebase.summary.set_winner(string.format(capture_text, minetest.colorize(tcolor, pname)))
 
 			local win_text = HumanReadable(pteam) .. " Team Wins!"
 
