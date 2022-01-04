@@ -50,6 +50,7 @@ ctf_core.include_files(
 	"ranking_commands.lua",
 	"summary.lua",
 	"player.lua",
+	"immunity.lua",
 	"treasure.lua",
 	"flags/nodes.lua",
 	"flags/taking.lua",
