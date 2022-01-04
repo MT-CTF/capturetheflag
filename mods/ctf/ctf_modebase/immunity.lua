@@ -49,7 +49,7 @@ function ctf_modebase.remove_immunity(player)
 	player:set_armor_groups({fleshy = 100})
 end
 
-minetest.register_on_joinplayer(function(player)
+ctf_teams.register_on_allocplayer(function(player)
 	ctf_modebase.give_immunity(player, RESPAWN_IMMUNITY_SECONDS)
 end)
 
