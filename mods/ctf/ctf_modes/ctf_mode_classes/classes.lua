@@ -97,13 +97,13 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 					end
 				end
 			end,
-		function()
-			local player = minetest.get_player_by_name(pname)
+			function()
+				local player = minetest.get_player_by_name(pname)
 
-			if player then
-				player:get_inventory():remove_item("main", "ctf_melee:sword_diamond")
-			end
-		end)
+				if player then
+					player:get_inventory():remove_item("main", "ctf_melee:sword_diamond")
+				end
+			end)
 
 			return "ctf_melee:sword_diamond"
 		end
@@ -135,11 +135,11 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 
 		if itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
-			itemstack:set_wear(65534)
 
 			local step = math.floor(65534 / RANGED_COOLDOWN_TIME)
 			ctf_modebase.update_wear.start_update(user:get_player_name(), "ctf_mode_classes:ranged_rifle_loaded", step, true)
 
+			itemstack:set_wear(65534)
 			return itemstack
 		end
 	end
@@ -237,31 +237,29 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
-			local old_textures = user:get_properties().textures
+			if ctf_modebase.taken_flags[pname] then
+				hud_events.new(user, {
+					quick = true,
+					text = "You can't become immune while holding the flag",
+					color = "warning",
+				})
+				return
+			end
 
-			user:set_properties({pointable = false, textures = {old_textures[1].."^[brighten^[multiply:#7ba5ff"}})
-
-			itemstack:set_wear(1)
+			ctf_modebase.give_immunity(user)
 
 			local step = math.floor(65534 / IMMUNITY_TIME)
 			ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", step, false,
 			function()
-				local player = minetest.get_player_by_name(pname)
-
-				if player then
-					player:set_properties({pointable = true, textures = old_textures})
-
-					local dstep = math.floor(65534 / IMMUNITY_COOLDOWN)
-					ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", dstep, true)
-				end
+				ctf_modebase.remove_immunity(user)
+				local dstep = math.floor(65534 / IMMUNITY_COOLDOWN)
+				ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", dstep, true)
 			end,
 			function()
-				local player = minetest.get_player_by_name(pname)
-				if player then
-					player:set_properties({pointable = true, textures = old_textures})
-				end
+				ctf_modebase.remove_immunity(user)
 			end)
 
+			itemstack:set_wear(1)
 			return itemstack
 		end
 	end
@@ -316,9 +314,7 @@ function classes.set(player, classname)
 	ctf_modebase.player.remove_bound_items(player)
 	ctf_modebase.player.give_initial_stuff(player)
 
-	local pteam = ctf_teams.get(player)
-	local tcolor = pteam and ctf_teams.team[pteam].color or "white"
-	player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
+	player:set_properties({textures = {ctf_cosmetics.get_skin(player)}})
 
 	classes.update(player)
 

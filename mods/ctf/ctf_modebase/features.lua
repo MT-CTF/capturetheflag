@@ -18,7 +18,7 @@ local function tp_player_near_flag(player)
 
 	if not tname then return end
 
-	PlayerObj(player):set_pos(
+	player:set_pos(
 		vector.offset(ctf_map.current_map.teams[tname].flag_pos,
 			math.random(-1, 1),
 			0.5,
@@ -185,6 +185,10 @@ return {
 
 			return "You can't take the enemy flag during build time!"
 		end
+
+		if ctf_modebase.is_immune(player) then
+			return "You can't take the flag while immune"
+		end
 	end,
 	on_flag_take = function(player, teamname)
 		local pteam = ctf_teams.get(player)
@@ -298,9 +302,10 @@ return {
 		ctf_modebase.player.give_initial_stuff(player)
 
 		local tcolor = ctf_teams.team[new_team].color
-		player:set_properties({textures = {ctf_cosmetics.get_colored_skin(player, tcolor)}})
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
+
+		player:set_properties({textures = {ctf_cosmetics.get_skin(player)}})
 
 		recent_rankings.set_team(player, new_team)
 
@@ -329,7 +334,7 @@ return {
 			end_combat_mode(player:get_player_name())
 		end
 
-		ctf_modebase.respawn_delay.prepare(player)
+		ctf_modebase.prepare_respawn_delay(player)
 	end,
 	on_respawnplayer = function(player)
 		tp_player_near_flag(player)
@@ -353,8 +358,16 @@ return {
 	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
 		if not hitter:is_player() or player:get_hp() <= 0 then return false end
 
+		if not ctf_modebase.match_started then
+			return false, "The match hasn't started yet!"
+		end
+
 		local pname, hname = player:get_player_name(), hitter:get_player_name()
 		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
+
+		if ctf_modebase.is_immune(hname) then
+			return false, "You can't attack while immune"
+		end
 
 		if not pteam then
 			return false, pname .. " is not in a team!"
@@ -368,17 +381,11 @@ return {
 			return false, pname .. " is on your team!"
 		end
 
-		if not ctf_modebase.match_started then
-			return false, "The match hasn't started yet!"
-		end
-
-		if hitter and hitter:is_player() then
-			if player:get_hp() <= damage then
-				end_combat_mode(pname, hname)
-				ctf_kill_list.on_kill(player, hitter, tool_capabilities)
-			elseif pname ~= hname then
-				ctf_combat_mode.set(player, hitter, "hitter", 15, true)
-			end
+		if player:get_hp() <= damage then
+			end_combat_mode(pname, hname)
+			ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+		elseif pname ~= hname then
+			ctf_combat_mode.set(player, hitter, "hitter", 15, true)
 		end
 
 		return damage

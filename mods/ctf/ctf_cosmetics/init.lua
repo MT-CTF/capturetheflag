@@ -1,6 +1,9 @@
 ctf_cosmetics = {}
 
-function ctf_cosmetics.get_colored_skin(player, color)
+function ctf_cosmetics.get_skin(player)
+	local pteam = ctf_teams.get(player)
+	local color = pteam and ctf_teams.team[pteam].color or "white"
+
 	local extras = ""
 
 	for clothing, clothcolor in pairs(ctf_cosmetics.get_extra_clothing(player)) do

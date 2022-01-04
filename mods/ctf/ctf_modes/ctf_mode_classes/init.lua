@@ -9,7 +9,7 @@ local crafts, classes = ctf_core.include_files(
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
-local old_get_colored_skin = ctf_cosmetics.get_colored_skin
+local old_get_skin = ctf_cosmetics.get_skin
 ctf_modebase.register_mode("classes", {
 	treasures = {
 		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -62,14 +62,14 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 
-		ctf_cosmetics.get_colored_skin = function(player, color)
-			return old_get_colored_skin(player, color) .. "^ctf_mode_classes_" .. classes.get_name(player) .. "_overlay.png"
+		ctf_cosmetics.get_skin = function(player)
+			return old_get_skin(player) .. "^ctf_mode_classes_" .. classes.get_name(player) .. "_overlay.png"
 		end
 	end,
 	on_mode_end = function()
 		ctf_modebase.bounties.bounty_reward_func = old_bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
-		ctf_cosmetics.get_colored_skin = old_get_colored_skin
+		ctf_cosmetics.get_skin = old_get_skin
 
 		classes.finish()
 	end,
