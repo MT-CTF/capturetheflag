@@ -36,7 +36,6 @@ function random_messages.read_messages()
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
 		"Use apples to quickly restore your health.",
 		"Moving or fighting can avoid an inactivity kick.",
-		"Vote every "..ctf_modebase.MAPS_PER_MODE.." matches what game mode you want to play next.",
 		"Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",

@@ -1,7 +1,4 @@
 ctf_modebase = {
-	-- Amount of maps that need to be played before a mode vote starts
-	MAPS_PER_MODE        = 5,     ---@type integer
-
 	-- Table containing all registered modes and their definitions
 	modes                = {},    ---@type table
 
@@ -23,7 +20,10 @@ ctf_modebase = {
 	end,
 
 	-- Amount of matches played since this mode won the last vote
-	current_mode_matches = 0,     ---@type integer
+	current_mode_matches_played = 0, ---@type integer
+
+	-- How many matches will be played for the current mode
+	current_mode_matches        = 5, ---@type integer
 
 	-- taken_flags[Player Name] = list of team names
 	taken_flags          = {},
