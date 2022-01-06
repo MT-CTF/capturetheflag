@@ -72,7 +72,7 @@ minetest.register_on_joinplayer(function(player)
 		minetest.after(10, function()
 			minetest.chat_send_player(player:get_player_name(),
 				minetest.colorize("#00FF00",
-					S("(@1) You have mail! Type /inbox to recieve",#inbox)))
+					S("(@1) You have mail! Type /inbox to recieve", #inbox)))
 		end)
 	end
 end)
@@ -91,7 +91,7 @@ function email.get_formspec(name)
 	fs  = fs .. "tablecolumns[color;text;color;text;text]"
 	fs  = fs .. "tableoptions[highlight=#ffffff33]"
 	fs  = fs .. "table[0.5,0;11.25,7;inbox;"
-	fs  = fs .. ("#ffffff,%s,,%s,%s"):format(S("Date"),S("From"),S("Message"))
+	fs  = fs .. ("#ffffff,%s,,%s,%s"):format(S("Date"), S("From"), S("Message"))
 	if #inbox == 0 then
 		fs = row(fs, "#d0d0d0", "", ":)", S("Well done! Your inbox is empty!"))
 	else
@@ -124,13 +124,13 @@ function email.show_inbox(name, text_mode)
 		if #inbox == 0 then
 			return true, S("Your inbox is empty!")
 		else
-			minetest.chat_send_player(name, S("@1 items in your inbox:",#inbox))
+			minetest.chat_send_player(name, S("@1 items in your inbox:", #inbox))
 			for i = 1, #inbox do
 				local item = inbox[i]
 				minetest.chat_send_player(name, i .. ") " ..item.date ..
 					" <" .. item.from .. "> " .. item.msg)
 			end
-			return true, S("End of mail (@1 items)",#inbox)
+			return true, S("End of mail (@1 items)", #inbox)
 		end
 	else
 		local fs = "size[12,8]" .. email.get_formspec(name)
@@ -176,7 +176,7 @@ function email.send_mail(aname, ato, msg)
 	minetest.log("action", string.format("[EMAIL] from %s to %s: %s", name, to, msg))
 	email.log(string.format("Email from %s to %s: %s", name, to, msg))
 	if not minetest.player_exists(to) then
-		return false, S("Player '@1' does not exist",to)
+		return false, S("Player '@1' does not exist", to)
 	end
 
 	local mail = {
