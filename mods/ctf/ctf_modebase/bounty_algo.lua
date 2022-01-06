@@ -31,5 +31,5 @@ function ctf_modebase.bounty_algo.kd.bounty_reward_func(pname)
 	local recent = ctf_modebase:get_current_mode().recent_rankings.players()[pname] or {}
 	local kd = (recent.kills or 1) / (recent.deaths or 1)
 
-	return {bounty_kills = 1, score = math.max(0, math.min(250, 10 + kd * 24))}
+	return {bounty_kills = 1, score = math.max(0, math.min(120, kd * 14))}
 end

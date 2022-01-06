@@ -10,7 +10,7 @@ local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
 
-	return math.round(kd * 5)
+	return math.min(1, math.round(kd * 7))
 end
 
 local function tp_player_near_flag(player)
@@ -92,7 +92,7 @@ local function end_combat_mode(player, killer, leaving)
 			ctf_combat_mode.set_time(killer, 5)
 		end
 	else
-		-- Only take score if they're in combat for being hitted
+		-- Only take score if they're in combat for being hit
 		if #hitters > 0 then
 			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
 		end
@@ -210,7 +210,7 @@ return {
 
 		celebrate_team(ctf_teams.get(pname))
 
-		recent_rankings.add(pname, {score = 20, flag_attempts = 1})
+		recent_rankings.add(pname, {score = 30, flag_attempts = 1})
 
 		ctf_modebase.flag_huds.track_capturer(pname, FLAG_CAPTURE_TIMER)
 	end,
@@ -258,7 +258,7 @@ return {
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
 			local score = ((team_scores[lost_team] or {}).score or 0) / 4
-			score = math.max(50, math.min(500, score))
+			score = math.max(75, math.min(500, score))
 			capture_reward = capture_reward + score
 		end
 
