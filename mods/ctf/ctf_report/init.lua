@@ -1,5 +1,7 @@
 ctf_report = {staff = {}}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 function ctf_report.default_send_report(msg)
 	for name in pairs(ctf_report.staff) do
 		minetest.chat_send_player(name, '[REPORT] ' .. msg)
@@ -9,21 +11,22 @@ end
 ctf_report.send_report = ctf_report.default_send_report
 
 minetest.register_chatcommand("report", {
-	params = "<msg>",
-	description = "Report misconduct or bugs",
+	params = S("<msg>"),
+	description = S("Report misconduct or bugs"),
 	func = function(name, param)
 		param = param:trim()
 		if param == "" then
-			return false, "Please add a message to your report. " ..
-				"If it's about (a) particular player(s), please also include their name(s)."
+			return false, S("Please add a message to your report.") .. " " ..
+				S("If it's about (a) particular player(s), please also include their name(s).")
 		end
 
 		-- Count the number of words, by counting for replaced spaces
 		-- Number of spaces = Number of words - 1
 		local _, count = string.gsub(param, " ", "")
 		if count == 0 then
-			return false, "If you're reporting a player, you should" ..
-				" also include a reason why (e.g. swearing, griefing, spawnkilling, etc.)."
+			return false,
+                S("If you're reporting a player,") .. " " ..
+                S("you should also include a reason why (e.g. swearing, griefing, spawnkilling, etc.).")
 		end
 
 		local msg = name .. " reported: " .. param
@@ -49,7 +52,7 @@ minetest.register_chatcommand("report", {
 
 		ctf_report.send_report(msg)
 
-		return true, "Report has been sent."
+		return true, S("Report has been sent.")
 	end
 })
 
