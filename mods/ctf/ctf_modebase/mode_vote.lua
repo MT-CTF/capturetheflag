@@ -61,11 +61,6 @@ local function send_formspec()
 end
 
 function ctf_modebase.mode_vote.start_vote()
-	if #ctf_modebase.modelist <= 0 then -- Wait for modes to register
-		minetest.after(1, ctf_modebase.mode_vote.start_vote)
-		return
-	end
-
 	votes = {}
 	voted = {}
 	voters_count = 0
@@ -115,7 +110,7 @@ function ctf_modebase.mode_vote.end_vote()
 	local entry_count = 0
 	for length, vote_count in pairs(length_votes) do
 		votes_result = votes_result .. string.format(
-			"%d vote%s for %d match%s",
+			"    %d vote%s for %d match%s\n",
 			vote_count,
 			vote_count == 1 and "" or "s",
 			length,
@@ -127,7 +122,7 @@ function ctf_modebase.mode_vote.end_vote()
 	end
 
 	if entry_count > 0 then
-		if length_votes[0] / entry_count >= 0.7 then
+		if length_votes[0] and length_votes[0] / entry_count >= 0.7 then
 			-- More than 70% of votes are for 0, so just force that
 			average_vote = 0
 		else
@@ -145,7 +140,7 @@ function ctf_modebase.mode_vote.end_vote()
 		HumanReadable(new_mode),
 		average_vote,
 		average_vote == 1 and "" or "es",
-		votes_result
+		votes_result:sub(1, -2)
 	))
 
 	ctf_modebase.current_mode_matches = average_vote

@@ -71,5 +71,14 @@ ctf_core.include_files(
 )
 
 if ctf_core.settings.server_mode == "play" then
-	ctf_modebase.start_new_match()
+	local function start()
+		if #ctf_modebase.modelist > 0 then
+			table.sort(ctf_modebase.modelist)
+			ctf_modebase.start_new_match()
+		else
+			minetest.after(1, start)
+		end
+	end
+
+	start()
 end
