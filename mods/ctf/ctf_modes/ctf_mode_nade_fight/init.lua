@@ -38,7 +38,13 @@ ctf_modebase.register_mode("nade_fight", {
 
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 3},
 	},
-	crafts = {},
+	crafts = {
+		"ctf_map:unwalkable_dirt 5",
+		"ctf_map:unwalkable_stone",
+		"ctf_map:unwalkable_cobble 4",
+		"ctf_map:damage_cobble",
+		"ctf_map:spike",
+	},
 	physics = {sneak_glitch = true, new_move = false},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
