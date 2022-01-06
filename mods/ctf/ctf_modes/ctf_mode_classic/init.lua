@@ -22,8 +22,6 @@ ctf_modebase.register_mode("classic", {
 		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
 
 		["ctf_melee:sword_steel"  ] = {rarity = 0.2  , max_stacks = 2},
-		["ctf_melee:sword_mese"   ] = {rarity = 0.01 , max_stacks = 1},
-		["ctf_melee:sword_diamond"] = {rarity = 0.001, max_stacks = 1},
 
 		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
 		["ctf_ranged:rifle_loaded"  ] = {rarity = 0.2                 },
