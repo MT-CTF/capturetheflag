@@ -16,7 +16,7 @@ local checkTimer = 0
 
 local S = minetest.get_translator(minetest.get_current_modname())
 
-minetest.register_privilege("canafk",{
+minetest.register_privilege("canafk", {
     description = S("Allow to AFK without being kicked"),
 })
 
