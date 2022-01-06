@@ -1,14 +1,15 @@
 throwable_snow = {}
+local S = minetest.get_translator(minetest.get_current_modname())
 
 function throwable_snow.on_hit_player(thrower, player)
 	hud_events.new(player, {
-		text = thrower .. " hit you with a snowball!",
+		text = S("@1 hit you with a snowball!", thrower),
 		quick = true,
 	})
 end
 
 grenades.register_grenade("throwable_snow:snowball", {
-	description = "Snowball",
+	description = S("Snowball"),
 	image = "default_snowball.png",
 	range = 4,
 	collide_with_objects = true,
