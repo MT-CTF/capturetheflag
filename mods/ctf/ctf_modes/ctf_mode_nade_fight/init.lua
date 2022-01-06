@@ -92,12 +92,16 @@ ctf_modebase.register_mode("nade_fight", {
 	on_flag_capture = features.on_flag_capture,
 	on_flag_rightclick = function() end,
 	get_chest_access = features.get_chest_access,
-	on_punchplayer = function(player, hitter, damage, ...)
+	on_punchplayer = function(player, hitter, damage, unneeded, tool_capabilities, ...)
 		if tool.holed[player:get_player_name()] then
-			damage = damage * 2
+			if tool_capabilities.grenade then
+				damage = damage * 2
+			else
+				damage = damage * 1.3
+			end
 		end
 
-		return features.on_punchplayer(player, hitter, damage, ...)
+		return features.on_punchplayer(player, hitter, damage, unneeded, tool_capabilities, ...)
 	end,
 	on_healplayer = features.on_healplayer,
 	calculate_knockback = function()
