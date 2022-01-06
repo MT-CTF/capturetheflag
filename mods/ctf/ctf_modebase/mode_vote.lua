@@ -127,13 +127,21 @@ function ctf_modebase.mode_vote.end_vote()
 	end
 
 	if entry_count > 0 then
-		average_vote = math.floor((average_vote / entry_count) + 0.5)
+		if length_votes[0] / entry_count >= 0.7 then
+			-- More than 70% of votes are for 0, so just force that
+			average_vote = 0
+		else
+			average_vote = math.max( -- Don't allow 0 matches, 70+% of votes were not for 0
+				math.round(average_vote / entry_count),
+				1
+			)
+		end
 	else
-		average_vote = 5
+		average_vote = 5 -- no votes, default to 5 rounds
 	end
 
 	minetest.chat_send_all(string.format(
-		"Voting is over. The mode %s will be played for %d match%s (Average of votes)\n%s",
+		"Voting is over. The mode %s will be played for %d match%s\n%s",
 		HumanReadable(new_mode),
 		average_vote,
 		average_vote == 1 and "" or "es",
