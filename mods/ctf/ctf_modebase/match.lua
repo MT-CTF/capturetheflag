@@ -38,7 +38,7 @@ function ctf_modebase.start_match_after_vote()
 		ctf_modebase.in_game = true
 		ctf_teams.allocate_teams(ctf_map.current_map.teams)
 
-		ctf_modebase.current_mode_matches = ctf_modebase.current_mode_matches + 1
+		ctf_modebase.current_mode_matches_played = ctf_modebase.current_mode_matches_played + 1
 	end)
 end
 
@@ -58,11 +58,12 @@ local function start_new_match()
 	ctf_modebase.on_match_end()
 
 	if ctf_modebase.mode_on_next_match then
-		ctf_modebase.current_mode_matches = 0
+		ctf_modebase.current_mode_matches_played = 0
 		ctf_modebase.start_match_after_vote()
-	-- Show mode selection form every 'ctf_modebase.MAPS_PER_MODE'-th match
-	elseif ctf_modebase.current_mode_matches >= ctf_modebase.MAPS_PER_MODE or not ctf_modebase.current_mode then
-		ctf_modebase.current_mode_matches = 0
+	-- Show mode selection form every 'current_mode_matches'-th match
+	elseif ctf_modebase.current_mode_matches_played >= ctf_modebase.current_mode_matches or
+	not ctf_modebase.current_mode then
+		ctf_modebase.current_mode_matches_played = 0
 		ctf_modebase.mode_vote.start_vote()
 	else
 		ctf_modebase.mode_on_next_match = ctf_modebase.current_mode
