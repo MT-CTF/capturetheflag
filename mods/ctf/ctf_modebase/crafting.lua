@@ -120,6 +120,13 @@ crafting.register_recipe({
 	always_known = true,
 })
 
+-- Ammo
+crafting.register_recipe({
+	output = "ctf_ranged:ammo",
+	items  = { "default:steel_ingot 2", "default:coal_lump" },
+	always_known = false,
+})
+
 -- Shovels and Axes
 for ore, ore_item in pairs(full_ores) do
 	local show = true

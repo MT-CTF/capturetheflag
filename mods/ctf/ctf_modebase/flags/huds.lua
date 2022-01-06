@@ -128,7 +128,7 @@ local function update_timer(pname)
 		local timeleft = player_timers[pname]
 
 		if timeleft <= 1 then
-			ctf_modebase.drop_flags(pname)
+			ctf_modebase.drop_flags(minetest.get_player_by_name(pname))
 		else
 			player_timers[pname] = timeleft - 1
 

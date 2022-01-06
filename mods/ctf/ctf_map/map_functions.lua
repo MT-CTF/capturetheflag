@@ -134,13 +134,17 @@ local function get_place_positions(a, data, pos1, pos2)
 	local random_state = {}
 	local random_count = Mx * My * Mz
 
+	local math_random = math.random
+	local math_floor = math.floor
+	local table_insert = table.insert
+
 	while random_count > 0 do
-		local pos = math.random(1, random_count)
+		local pos = math_random(1, random_count)
 		pos = random_state[pos] or pos
 
 		local x = pos % Mx + Sx
-		local y = math.floor(pos / Mx) % My + Sy
-		local z = math.floor(pos / My / Mx) + Sz
+		local y = math_floor(pos / Mx) % My + Sy
+		local z = math_floor(pos / My / Mx) + Sz
 
 		local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
 		local id_below = data[(z - pos1.z) * Ny * Nx + (y - 1 - pos1.y) * Nx + (x - pos1.x) + 1]
@@ -150,7 +154,7 @@ local function get_place_positions(a, data, pos1, pos2)
 			id_below ~= ID_AIR and id_below ~= ID_IGNORE and id_below ~= ID_WATER and
 			(id_above == ID_AIR or id_above == ID_WATER)
 		then
-			table.insert(ret, {vi=vi, x=x, y=y, z=z})
+			table_insert(ret, {vi=vi, x=x, y=y, z=z})
 			if #ret >= a.amount then
 				return ret
 			end

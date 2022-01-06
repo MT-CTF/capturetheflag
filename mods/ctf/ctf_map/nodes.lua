@@ -81,6 +81,7 @@ local mod_prefixes = {
 -- See Lua API, section "Node-only groups"
 local preserved_groups = {
 	bouncy = true;
+	fence = true;
 	connect_to_raillike = true;
 	disable_jump = true;
 	fall_damage_add_percent = true;

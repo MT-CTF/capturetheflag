@@ -7,14 +7,14 @@ local location = {
 
 local players = {}
 
-minetest.register_item("ctf_wield3d:hand", {
+minetest.register_item("wield3d:hand", {
 	type = "none",
 	wield_image = "blank.png",
 })
 
-minetest.register_entity("ctf_wield3d:entity", {
+minetest.register_entity("wield3d:entity", {
 	visual = "wielditem",
-	wield_item = "ctf_wield3d:hand",
+	wield_item = "wield3d:hand",
 	visual_size = location[4],
 	physical = false,
 	makes_footstep_sound = false,
@@ -29,7 +29,7 @@ local function update_entity(player)
 	local item = player:get_wielded_item():get_name()
 
 	if item == "" then
-		item = "ctf_wield3d:hand"
+		item = "wield3d:hand"
 	end
 
 	if players[pname].item == item then
@@ -40,22 +40,24 @@ local function update_entity(player)
 	players[pname].entity:set_properties({wield_item = item})
 end
 
-local function update_all()
+local globalstep_timer = 0
+minetest.register_globalstep(function(dtime)
+	globalstep_timer = globalstep_timer + dtime
+	if globalstep_timer < 1 then return end
+
+	globalstep_timer = 0
+
 	for _, player in ipairs(minetest.get_connected_players()) do
 		if players[player:get_player_name()] ~= nil then
 			update_entity(player)
 		end
 	end
-
-	minetest.after(1, update_all)
-end
-
-minetest.after(1, update_all)
+end)
 
 minetest.register_on_joinplayer(function(player)
-	local entity = minetest.add_entity(player:get_pos(), "ctf_wield3d:entity")
+	local entity = minetest.add_entity(player:get_pos(), "wield3d:entity")
 	entity:set_attach(player, location[1], location[2], location[3])
-	players[player:get_player_name()] = {entity=entity, item="ctf_wield3d:hand"}
+	players[player:get_player_name()] = {entity=entity, item="wield3d:hand"}
 
 	update_entity(player)
 end)
