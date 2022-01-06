@@ -1,3 +1,5 @@
+local COOLDOWN = ctf_core.init_cooldowns()
+
 local DISALLOW_MOD_ABMS = {"default", "fire", "flowers", "tnt"}
 
 local disabled_ores = {
@@ -98,3 +100,13 @@ minetest.register_on_mods_loaded(function()
 		minetest.override_item(name, {drop = name})
 	end
 end)
+
+minetest.override_item("default:apple", {
+	on_use = function(itemstack, user, ...)
+		if not COOLDOWN:get(user) then
+			COOLDOWN:set(user, 0.2)
+
+			return minetest.item_eat(3)(itemstack, user, ...)
+		end
+	end,
+})
