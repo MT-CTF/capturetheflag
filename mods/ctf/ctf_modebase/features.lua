@@ -344,12 +344,12 @@ return {
 	end,
 	get_chest_access = function(pname)
 		local rank = rankings:get(pname)
-		local deny_pro = "You need to have more than 1.5 kills per death, "..
-				"10 captures, and at least 10,000 score to access the pro section"
+		local deny_pro = "You need to have more than 1.4 kills per death, "..
+				"5 captures, and at least 8,000 score to access the pro section"
 
 		-- Remember to update /makepro in ranking_commands.lua if you change anything here
 		if rank then
-			if (rank.score or 0) >= 10000 and (rank.kills or 0) / (rank.deaths or 0) >= 1.5 and rank.flag_captures >= 10 then
+			if (rank.score or 0) >= 8000 and (rank.kills or 0) / (rank.deaths or 0) >= 1.4 and rank.flag_captures >= 5 then
 				return true, true
 			elseif (rank.score or 0) >= 10 then
 				return true, deny_pro
