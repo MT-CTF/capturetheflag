@@ -66,7 +66,8 @@ ctf_core.include_files(
 	"map_meta.lua",
 	"map_functions.lua",
 	"editor_functions.lua",
-	"mapedit_gui.lua"
+	"mapedit_gui.lua",
+	"ctf_traps.lua"
 )
 
 minetest.register_chatcommand("ctf_map", {
