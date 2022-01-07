@@ -183,9 +183,7 @@ function ctf_ranged.simple_register_gun(name, def)
 end
 
 minetest.register_on_leaveplayer(function(player)
-	if scoped[player:get_player_name()] then
-		scoped[player:get_player_name()] = nil
-	end
+	scoped[player:get_player_name()] = nil
 end)
 
 local function show_scope(name, item_name, fov_mult)
