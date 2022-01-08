@@ -10,7 +10,7 @@ local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
 
-	return math.min(1, math.round(kd * 7))
+	return math.max(1, math.round(kd * 7))
 end
 
 local function tp_player_near_flag(player)
