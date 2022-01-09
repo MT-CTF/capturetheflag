@@ -104,7 +104,7 @@ end)
 minetest.override_item("default:apple", {
 	on_use = function(itemstack, user, ...)
 		if not COOLDOWN:get(user) then
-			COOLDOWN:set(user, 0.2)
+			COOLDOWN:set(user, 0.3)
 
 			return minetest.item_eat(3)(itemstack, user, ...)
 		end
