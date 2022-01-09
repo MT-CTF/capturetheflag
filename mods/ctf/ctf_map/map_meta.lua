@@ -119,7 +119,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			offset        = offset,
 			size          = size,
 			dirname       = dirname,
-			enabled       = meta:get("enabled"),
+			enabled       = meta:get("enabled") == "true",
 			name          = meta:get("name"),
 			author        = meta:get("author"),
 			hint          = meta:get("hint"),
