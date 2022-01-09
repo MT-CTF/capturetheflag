@@ -97,7 +97,7 @@ ctf_modebase.register_mode("nade_fight", {
 			if tool_capabilities.grenade then
 				damage = damage * 2
 			else
-				damage = damage * 1.3
+				damage = math.round(damage * 1.3)
 			end
 		end
 
