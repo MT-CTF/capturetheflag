@@ -1,4 +1,4 @@
-function ctf_modebase.drop_flags(player)
+local function drop_flags(player, pteam)
 	local pname = player:get_player_name()
 	local flagteams = ctf_modebase.taken_flags[pname]
 	if not flagteams then return end
@@ -21,7 +21,11 @@ function ctf_modebase.drop_flags(player)
 	ctf_modebase.taken_flags[pname] = nil
 
 	ctf_modebase.skip_vote.on_flag_drop(#flagteams)
-	ctf_modebase:get_current_mode().on_flag_drop(player, flagteams)
+	ctf_modebase:get_current_mode().on_flag_drop(player, flagteams, pteam)
+end
+
+function ctf_modebase.drop_flags(player)
+	drop_flags(player, ctf_teams.get(player))
 end
 
 function ctf_modebase.flag_on_punch(puncher, nodepos, node)
@@ -99,9 +103,9 @@ ctf_api.register_on_match_end(function()
 	ctf_modebase.flag_captured = {}
 end)
 
-ctf_teams.register_on_allocplayer(function(player)
+ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 	if ctf_modebase.taken_flags[player:get_player_name()] then
-		ctf_modebase.drop_flags(player)
+		drop_flags(player, old_team)
 	else
 		ctf_modebase.flag_huds.update_player(player)
 	end

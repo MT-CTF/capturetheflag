@@ -214,9 +214,8 @@ return {
 
 		ctf_modebase.flag_huds.track_capturer(pname, FLAG_CAPTURE_TIMER)
 	end,
-	on_flag_drop = function(player, teamnames)
+	on_flag_drop = function(player, teamnames, pteam)
 		local pname = player:get_player_name()
-		local pteam = ctf_teams.get(pname)
 		local tcolor = ctf_teams.team[pteam].color
 
 		local text = " has dropped the flag"
