@@ -334,13 +334,9 @@ minetest.register_globalstep(function(dtime)
 	time = 0
 	for name, original_item in pairs(scoped) do
 		local player = minetest.get_player_by_name(name)
-		if not player then
-			scoped[name] = nil
-		else
-			local wielded_item = player:get_wielded_item():get_name():gsub("_loaded", "")
-			if wielded_item ~= original_item then
-				hide_scope(name)
-			end
+		local wielded_item = player:get_wielded_item():get_name():gsub("_loaded", "")
+		if wielded_item ~= original_item then
+			hide_scope(name)
 		end
 	end
 end)
