@@ -8,13 +8,16 @@ local function drop_flags(player, pteam)
 
 		local fpos = vector.offset(ctf_map.current_map.teams[flagteam].flag_pos, 0, 1, 0)
 
+		minetest.load_area(fpos)
 		local node = minetest.get_node(fpos)
 
-		if node.name == "ctf_modebase:flag_captured_top" or node.name == "ignore" then
+		if node.name == "ctf_modebase:flag_captured_top" then
 			node.name = "ctf_modebase:flag_top_" .. flagteam
 			minetest.set_node(fpos, node)
 		else
-			ctf_core.error("ctf_modebase:flag_taking", "Failed to return flag to its base!")
+			minetest.log("error", string.format("[ctf_flags] Unable to return flag node=%s, pos=%s",
+				node.name, vector.to_string(fpos))
+			)
 		end
 	end
 

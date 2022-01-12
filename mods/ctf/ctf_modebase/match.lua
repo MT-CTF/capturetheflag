@@ -150,7 +150,7 @@ minetest.register_chatcommand("queue_restart", {
 		privs = {server = true},
 		func = function(name)
 				restart_on_next_match = true
-				minetest.log("action", name .. " queued a restart")
+				minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
 				return true, "Restart is queued."
 		end
 })
@@ -160,7 +160,7 @@ minetest.register_chatcommand("unqueue_restart", {
 		privs = {server = true},
 		func = function(name)
 				restart_on_next_match = false
-				minetest.log("action", name .. " un-queued a restart")
+				minetest.log("action", string.format("[ctf_admin] %s un-queued a restart", name))
 				return true, "Restart is cancelled."
 		end
 })
