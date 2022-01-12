@@ -104,7 +104,7 @@ end
 local ID_AIR = minetest.CONTENT_AIR
 local ID_IGNORE = minetest.CONTENT_IGNORE
 local DEFAULT_CHEST_AMOUNT = ctf_map.DEFAULT_CHEST_AMOUNT
-local CHEST_ID = minetest.get_content_id("ctf_map:chest")
+local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local ID_WATER = minetest.get_content_id("default:water_source")
 local chest_formspec =
 	"size[8,9]" ..
@@ -183,12 +183,14 @@ function ctf_map.place_chests(mapmeta, pos2, amount)
 	pos1, pos2 = vm:read_from_map(pos1, pos2)
 
 	local data = vm:get_data()
+	local param2_data = vm:get_param2_data()
 
 	for i, a in pairs(pos_list) do
 		local place_positions = get_place_positions(a, data, pos1, pos2)
 
 		for _, pos in ipairs(place_positions) do
-			data[pos.vi] = CHEST_ID
+			data[pos.vi] = ID_CHEST
+			param2_data[pos.vi] = 0
 
 			-- Treasurefy
 			local meta = minetest.get_meta(pos)
@@ -208,6 +210,7 @@ function ctf_map.place_chests(mapmeta, pos2, amount)
 	end
 
 	vm:set_data(data)
+	vm:set_param2_data(param2_data)
 	vm:update_liquids()
 	vm:write_to_map(false)
 end
