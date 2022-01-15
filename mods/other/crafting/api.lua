@@ -90,7 +90,7 @@ function crafting.get_all_recipes(player_items, unlocked)
 end
 
 local function fetch_items_from_inv(inv, listname)
-	items = {}
+	local items = {}
 
 	for _, stack in ipairs(inv:get_list(listname)) do
 		if not stack:is_empty() then
