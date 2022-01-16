@@ -65,12 +65,11 @@ function ctf_modebase.mode_vote.start_vote()
 	voted = {}
 	voters_count = 0
 
-	new_mode = (ctf_modebase.current_mode and table.indexof(ctf_modebase.modelist, ctf_modebase.current_mode)) or -1
-
-	if new_mode == -1 or new_mode+1 > #ctf_modebase.modelist then
+	local mode_index = new_mode and table.indexof(ctf_modebase.modelist, new_mode) or -1
+	if mode_index == -1 or mode_index+1 > #ctf_modebase.modelist then
 		new_mode = ctf_modebase.modelist[1]
 	else
-		new_mode = ctf_modebase.modelist[new_mode + 1]
+		new_mode = ctf_modebase.modelist[mode_index + 1]
 	end
 
 	for _, player in pairs(minetest.get_connected_players()) do
@@ -145,7 +144,6 @@ function ctf_modebase.mode_vote.end_vote()
 
 	ctf_modebase.current_mode_matches = average_vote
 	if average_vote <= 0 then
-		ctf_modebase.current_mode = new_mode
 		ctf_modebase.mode_vote.start_vote()
 	else
 		ctf_modebase.mode_on_next_match = new_mode
