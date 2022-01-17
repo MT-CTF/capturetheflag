@@ -8,7 +8,7 @@ end
 local old_get_skin = ctf_cosmetics.get_skin
 ctf_cosmetics.get_skin = function(player, color)
 	if ctf_modebase.is_immune(player) then
-		return old_get_skin(player, color) .. "^[brighten^[multiply:#7ba5ff"
+		return old_get_skin(player, color) .. "^[colorize:#fff:80^[multiply:#85beff"
 	else
 		return old_get_skin(player, color)
 	end
