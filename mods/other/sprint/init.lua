@@ -101,6 +101,13 @@ ctf_api.register_on_new_match(function()
 	end
 end)
 
+ctf_api.register_on_flag_take(function(taker, flag_team)
+	local tname = taker:get_player_name()
+
+	players[tname].stamina = STAMINA_MAX
+	updateHud(taker, players[tname])
+end)
+
 minetest.register_on_leaveplayer(function(player)
 	players[player:get_player_name()] = nil
 end)

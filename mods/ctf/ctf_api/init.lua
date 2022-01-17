@@ -1,10 +1,11 @@
 ctf_api = {}
 
-ctf_api.registered_on_mode_start = {}
-ctf_api.registered_on_new_match = {}
-ctf_api.registered_on_match_start = {}
-ctf_api.registered_on_match_end = {}
+ctf_api.registered_on_mode_start    = {}
+ctf_api.registered_on_new_match     = {}
+ctf_api.registered_on_match_start   = {}
+ctf_api.registered_on_match_end     = {}
 ctf_api.registered_on_respawnplayer = {}
+ctf_api.registered_on_flag_take     = {}
 
 ---@param func function
 function ctf_api.register_on_mode_start(func)
@@ -27,7 +28,14 @@ function ctf_api.register_on_match_end(func)
 end
 
 ---@param func function
+--- * player
 function ctf_api.register_on_respawnplayer(func)
 	table.insert(ctf_api.registered_on_respawnplayer, func)
 end
 
+---@param func function
+--- * taker
+--- * flag_team
+function ctf_api.register_on_flag_take(func)
+	table.insert(ctf_api.registered_on_flag_take, func)
+end

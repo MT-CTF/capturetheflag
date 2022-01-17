@@ -77,6 +77,8 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		ctf_modebase.skip_vote.on_flag_take()
 		ctf_modebase:get_current_mode().on_flag_take(puncher, target_team)
 
+		RunCallbacks(ctf_api.registered_on_flag_take, puncher, target_team)
+
 		minetest.set_node(nodepos, {name = "ctf_modebase:flag_captured_top", param2 = node.param2})
 	else
 		local flagteams = ctf_modebase.taken_flags[pname]
