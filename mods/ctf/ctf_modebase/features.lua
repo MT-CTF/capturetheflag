@@ -110,6 +110,48 @@ local function end_combat_mode(player, killer, leaving)
 	ctf_combat_mode.remove(player)
 end
 
+local function on_punchplayer_custom(func)
+	return function(player, hitter, damage, _, tool_capabilities)
+		if not hitter:is_player() or player:get_hp() <= 0 then return false end
+
+		if not ctf_modebase.match_started then
+			return false, "The match hasn't started yet!"
+		end
+
+		local pname, hname = player:get_player_name(), hitter:get_player_name()
+		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
+
+		if func then
+			local val, msg = func(pname, pteam, hname, hteam)
+
+			if val == false then
+				return false, msg
+			end
+		end
+
+		if not pteam then
+			return false, pname .. " is not in a team!"
+		end
+
+		if not hteam then
+			return false, "You are not in a team!"
+		end
+
+		if pteam == hteam and pname ~= hname then
+			return false, pname .. " is on your team!"
+		end
+
+		if player:get_hp() <= damage then
+			end_combat_mode(pname, hname)
+			ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+		elseif pname ~= hname then
+			ctf_combat_mode.set(player, hitter, "hitter", 15, true)
+		end
+
+		return damage
+	end
+end
+
 return {
 	on_new_match = function()
 		team_list = {}
@@ -357,41 +399,8 @@ return {
 
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
-	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
-		if not hitter:is_player() or player:get_hp() <= 0 then return false end
-
-		if not ctf_modebase.match_started then
-			return false, "The match hasn't started yet!"
-		end
-
-		local pname, hname = player:get_player_name(), hitter:get_player_name()
-		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
-
-		if ctf_modebase.is_immune(hname) then
-			return false, "You can't attack while immune"
-		end
-
-		if not pteam then
-			return false, pname .. " is not in a team!"
-		end
-
-		if not hteam then
-			return false, "You are not in a team!"
-		end
-
-		if pteam == hteam and pname ~= hname then
-			return false, pname .. " is on your team!"
-		end
-
-		if player:get_hp() <= damage then
-			end_combat_mode(pname, hname)
-			ctf_kill_list.on_kill(player, hitter, tool_capabilities)
-		elseif pname ~= hname then
-			ctf_combat_mode.set(player, hitter, "hitter", 15, true)
-		end
-
-		return damage
-	end,
+	on_punchplayer_custom = on_punchplayer_custom,
+	on_punchplayer = on_punchplayer_custom(),
 	on_healplayer = function(player, patient, amount)
 		if not ctf_modebase.match_started then
 			return "The match hasn't started yet!"

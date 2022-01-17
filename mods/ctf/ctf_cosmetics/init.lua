@@ -30,6 +30,7 @@ end
 
 function ctf_cosmetics.get_skin(player)
 	local pteam = ctf_teams.get(player)
+
 	return ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color)
 end
 
