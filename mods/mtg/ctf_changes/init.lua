@@ -109,4 +109,17 @@ minetest.override_item("default:apple", {
 			return minetest.item_eat(3)(itemstack, user, ...)
 		end
 	end,
+	can_dig = function(pos)
+		if ctf_modebase then
+			local mode = ctf_modebase:get_current_mode()
+
+			if mode and mode.on_apple_dig then
+				return mode.on_apple_dig(pos)
+			end
+		end
+
+		minetest.remove_node(pos)
+
+		return false
+	end,
 })
