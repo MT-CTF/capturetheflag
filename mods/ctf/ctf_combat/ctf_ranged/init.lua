@@ -1,6 +1,10 @@
 ctf_ranged = {}
-
+local hud = mhud.init()
 local shoot_cooldown = ctf_core.init_cooldowns()
+
+local scoped = {}
+local scale_const = 6
+local timer = 1
 
 minetest.register_craftitem("ctf_ranged:ammo", {
 	description = "Ammo",
@@ -178,6 +182,45 @@ function ctf_ranged.simple_register_gun(name, def)
 	end))
 end
 
+minetest.register_on_leaveplayer(function(player)
+	scoped[player:get_player_name()] = nil
+end)
+
+local function show_scope(name, item_name, fov_mult)
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		return
+	end
+
+	scoped[name] = item_name
+	hud:add(player, "ctf_ranged:scope", {
+		hud_elem_type = "image",
+		position = {x = 0.5, y = 0.5},
+		text = "ctf_ranged_rifle_crosshair.png",
+		scale = {x = scale_const, y = scale_const},
+		alignment = {x = "center", y = "center"},
+	})
+
+	player:set_fov(1 / fov_mult, true)
+	physics.set(name, "sniper_rifles:scoping", { speed = 0.1, jump = 0 })
+	player:hud_set_flags({ wielditem = false })
+
+end
+
+local function hide_scope(name)
+	local player = minetest.get_player_by_name(name)
+	if not player then
+		return
+	end
+
+	scoped[name] = nil
+	hud:remove(name, "ctf_ranged:scope")
+	player:set_fov(0)
+	physics.remove(name, "sniper_rifles:scoping")
+	player:hud_set_flags({ wielditem = true })
+
+end
+
 ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	type = "pistol",
 	description = "Pistol",
@@ -233,3 +276,67 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	fire_interval = 0.1,
 	liquid_travel_dist = 2,
 })
+
+ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
+	type = "sniper",
+	description = "Sniper rifle",
+	texture = "ctf_ranged_sniper_rifle.png",
+	fire_sound = "ctf_ranged_sniper_shot",
+	rounds = 25,
+	range = 300,
+	damage = 12,
+	fire_interval = 2,
+	liquid_travel_dist = 10,
+	rightclick_func = function(itemstack, user, pointed, ...)
+		if scoped[user:get_player_name()] then
+			hide_scope(user:get_player_name())
+		else
+			local item_name = itemstack:get_name():gsub("_loaded", "")
+			show_scope(user:get_player_name(), item_name, 4)
+		end
+	end
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
+	type = "sniper",
+	description = "Magnum sniper rifle",
+	texture = "ctf_ranged_sniper_rifle_magnum.png",
+	fire_sound = "ctf_ranged_sniper_shot",
+	rounds = 20,
+	range = 400,
+	damage = 16,
+	fire_interval = 2,
+	liquid_travel_dist = 15,
+	rightclick_func = function(itemstack, user, pointed, ...)
+		if scoped[user:get_player_name()] then
+			hide_scope(user:get_player_name())
+		else
+			local item_name = itemstack:get_name():gsub("_loaded", "")
+			show_scope(user:get_player_name(), item_name, 8)
+		end
+	end
+})
+
+------------------
+-- Scope-check --
+------------------
+
+-- Hide scope if currently wielded item is not the same item
+-- player wielded when scoping
+
+local time = 0
+minetest.register_globalstep(function(dtime)
+	time = time + dtime
+	if time < timer then
+		return
+	end
+
+	time = 0
+	for name, original_item in pairs(scoped) do
+		local player = minetest.get_player_by_name(name)
+		local wielded_item = player:get_wielded_item():get_name():gsub("_loaded", "")
+		if wielded_item ~= original_item then
+			hide_scope(name)
+		end
+	end
+end)
