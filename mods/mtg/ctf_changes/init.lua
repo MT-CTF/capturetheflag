@@ -123,3 +123,23 @@ minetest.override_item("default:apple", {
 		return false
 	end,
 })
+
+local function furnace_on_destruct(pos)
+	local inv = minetest.get_inventory({ type = "node", pos = pos })
+	if not inv then return end
+	for _, list in pairs(inv:get_lists()) do
+		for _, item in ipairs(list) do
+			minetest.add_item(pos, item)
+		end
+	end
+end
+
+minetest.override_item("default:furnace", {
+	can_dig = function() return true end,
+	on_destruct = furnace_on_destruct,
+})
+
+minetest.override_item("default:furnace_active", {
+	can_dig = function() return true end,
+	on_destruct = furnace_on_destruct,
+})
