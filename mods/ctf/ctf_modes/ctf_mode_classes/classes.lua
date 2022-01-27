@@ -7,7 +7,7 @@ local class_list = {"knight", "ranged", "support"}
 local class_props = {
 	knight = {
 		name = "Knight",
-		description = "High HP class with a sword capable of strong damage bursts",
+		description = "High HP class with a sword capable of strong damage bursts, +50% health points",
 		hp_max = 28,
 		visual_size = vector.new(1.1, 1.05, 1.1),
 		items = {
@@ -20,7 +20,8 @@ local class_props = {
 	},
 	support = {
 		name = "Support",
-		description = "Normal HP class with healing bandages, an immunity ability, and building tools",
+		description = "Normal HP class with healing bandages, an immunity ability, and building tools, +10% speed",
+		physics = {speed = 1.1},
 		items = {
 			"ctf_mode_classes:support_bandage",
 			"ctf_mode_classes:support_paxel",
@@ -36,8 +37,7 @@ local class_props = {
 	ranged = {
 		name = "Ranged",
 		description = "Low HP ranged class with a rifle/grenade launcher gun, and a scaling ladder for reaching high places",
-		hp_max = 10,
-		physics = {speed = 1.1},
+		hp_max = 15,
 		visual_size = vector.new(0.9, 0.95, 0.9),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
