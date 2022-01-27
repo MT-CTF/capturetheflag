@@ -37,7 +37,7 @@ local class_props = {
 	ranged = {
 		name = "Ranged",
 		description = "Low HP ranged class with a rifle/grenade launcher gun, and a scaling ladder for reaching high places",
-		hp_max = 15,
+		hp_max = 14,
 		visual_size = vector.new(0.9, 0.95, 0.9),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
