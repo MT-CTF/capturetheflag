@@ -185,16 +185,13 @@ return {
 
 			return "You can't take the enemy flag during build time!"
 		end
-
-		if ctf_modebase.is_immune(player) then
-			return "You can't take the flag while immune"
-		end
 	end,
 	on_flag_take = function(player, teamname)
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(player)
 		local tcolor = ctf_teams.team[pteam].color
 
+		ctf_modebase.remove_immunity(player)
 		playertag.set(player, playertag.TYPE_BUILTIN, tcolor)
 
 		local text = " has taken the flag"
