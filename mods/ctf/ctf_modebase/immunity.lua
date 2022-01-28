@@ -1,4 +1,5 @@
 local RESPAWN_IMMUNITY_SECONDS = 4
+-- The value is a table if it's respawn immunity and false if it's a custom immunity
 local immune_players = {}
 
 function ctf_modebase.is_immune(player)
@@ -14,7 +15,7 @@ ctf_cosmetics.get_skin = function(player, color)
 	end
 end
 
-function ctf_modebase.give_immunity(player, remove_after)
+function ctf_modebase.give_immunity(player, respawn_timer)
 	local pname = player:get_player_name()
 	local old = immune_players[pname]
 
@@ -22,8 +23,8 @@ function ctf_modebase.give_immunity(player, remove_after)
 		old:cancel()
 	end
 
-	if remove_after then
-		immune_players[pname] = minetest.after(remove_after, ctf_modebase.remove_immunity, player)
+	if respawn_timer then
+		immune_players[pname] = minetest.after(respawn_timer, ctf_modebase.remove_immunity, player)
 	else
 		immune_players[pname] = false
 	end
@@ -47,6 +48,24 @@ function ctf_modebase.remove_immunity(player)
 
 	player:set_properties({pointable = true, textures = {ctf_cosmetics.get_skin(player)}})
 	player:set_armor_groups({fleshy = 100})
+end
+
+-- Remove immunity and return true if it's respawn immunity, return false otherwise
+function ctf_modebase.remove_respawn_immunity(player)
+	local pname = player:get_player_name()
+	local old = immune_players[pname]
+
+	if old == nil then return true end
+	if old == false then return false end
+
+	immune_players[pname] = nil
+
+	old:cancel()
+
+	player:set_properties({pointable = true, textures = {ctf_cosmetics.get_skin(player)}})
+	player:set_armor_groups({fleshy = 100})
+
+	return true
 end
 
 ctf_teams.register_on_allocplayer(function(player)

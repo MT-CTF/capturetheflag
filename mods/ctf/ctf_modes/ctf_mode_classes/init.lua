@@ -91,11 +91,7 @@ ctf_modebase.register_mode("classes", {
 		classes.show_class_formspec(clicker)
 	end,
 	get_chest_access = features.get_chest_access,
-	on_punchplayer = features.on_punchplayer_custom(function(pname, pteam, hname, hteam)
-		if ctf_modebase.is_immune(hname) and classes.get_name(minetest.get_player_by_name(hname)) == "support" then
-			return false, "You can't attack while immune"
-		end
-	end),
+	on_punchplayer = features.on_punchplayer,
 	on_healplayer = features.on_healplayer,
 	calculate_knockback = function()
 		return 0
