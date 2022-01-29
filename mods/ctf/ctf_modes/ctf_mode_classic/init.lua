@@ -76,8 +76,4 @@ ctf_modebase.register_mode("classic", {
 	calculate_knockback = function()
 		return 0
 	end,
-
-	on_apple_dig = function()
-		return true
-	end,
 })

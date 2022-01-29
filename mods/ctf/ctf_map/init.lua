@@ -15,7 +15,6 @@ ctf_map = {
 	skyboxes = {"none"},
 	current_map = false,
 	barrier_nodes = {}, -- populated in nodes.lua
-	treasurefy_node = function(inv) end, -- See ctf_modebase for function
 }
 
 for _, s in ipairs(skybox.get_skies()) do

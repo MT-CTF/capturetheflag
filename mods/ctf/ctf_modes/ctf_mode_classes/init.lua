@@ -35,6 +35,7 @@ ctf_modebase.register_mode("classes", {
 	},
 	crafts = crafts,
 	physics = {sneak_glitch = true, new_move = false},
+	blacklisted_nodes = {"default:apple"},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
 	summary_ranks = {

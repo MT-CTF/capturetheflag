@@ -103,7 +103,6 @@ end
 
 local ID_AIR = minetest.CONTENT_AIR
 local ID_IGNORE = minetest.CONTENT_IGNORE
-local DEFAULT_CHEST_AMOUNT = ctf_map.DEFAULT_CHEST_AMOUNT
 local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local ID_WATER = minetest.get_content_id("default:water_source")
 local chest_formspec =
@@ -168,24 +167,27 @@ local function get_place_positions(a, data, pos1, pos2)
 	return ret
 end
 
-function ctf_map.place_chests(mapmeta, pos2, amount)
-	local pos1 = mapmeta
-	local pos_list
-
-	if not pos2 then -- place_chests(mapmeta) was called
-		pos_list = mapmeta.chests
-		pos1, pos2 = mapmeta.pos1, mapmeta.pos2
-	else -- place_chests(pos1, pos2, amount?) was called
-		pos_list = {{pos1 = pos1, pos2 = pos2, amount = amount or DEFAULT_CHEST_AMOUNT}}
-	end
-
+function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, blacklisted_nodes)
 	local vm = VoxelManip()
-	pos1, pos2 = vm:read_from_map(pos1, pos2)
+	local pos1, pos2 = vm:read_from_map(mapmeta.pos1, mapmeta.pos2)
 
 	local data = vm:get_data()
 	local param2_data = vm:get_param2_data()
 
-	for i, a in pairs(pos_list) do
+	if blacklisted_nodes then
+		local blacklist = {}
+		for _, node in ipairs(blacklisted_nodes) do
+			blacklist[minetest.get_content_id(node)] = true
+		end
+
+		for i, v in ipairs(data) do
+			if blacklist[v] then
+				data[i] = ID_AIR
+			end
+		end
+	end
+
+	for i, a in pairs(mapmeta.chests) do
 		local place_positions = get_place_positions(a, data, pos1, pos2)
 
 		for _, pos in ipairs(place_positions) do
@@ -199,7 +201,10 @@ function ctf_map.place_chests(mapmeta, pos2, amount)
 
 			local inv = meta:get_inventory()
 			inv:set_size("main", 8*4)
-			ctf_map.treasurefy_node(inv)
+			inv:set_list("main", {})
+			if treasurefy_node_callback then
+				treasurefy_node_callback(inv)
+			end
 		end
 
 		if #place_positions < a.amount then

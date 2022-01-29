@@ -119,7 +119,17 @@ return {
 		teams_left = #team_list
 		many_teams = #team_list > 2
 
-		ctf_map.place_chests(ctf_map.current_map)
+		local map_treasures = table.copy(ctf_modebase:get_current_mode().treasures or {})
+
+		for k, v in pairs(ctf_map.treasure.treasure_from_string(ctf_map.current_map.treasures)) do
+			map_treasures[k] = v
+		end
+
+		ctf_map.prepare_map_nodes(
+			ctf_map.current_map,
+			function(inv) ctf_map.treasure.treasurefy_node(inv, map_treasures) end,
+			ctf_modebase:get_current_mode().blacklisted_nodes
+		)
 	end,
 	on_match_end = function()
 		recent_rankings.on_match_end()

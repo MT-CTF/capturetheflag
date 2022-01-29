@@ -1,19 +1,9 @@
 local TREASURE_VERSION = 1
 
-ctf_map.treasurefy_node = function(inv)
-	inv:set_list("main", {})
-	if not ctf_modebase.current_mode then return end
+ctf_map.treasure = {}
 
-	local treasures = table.copy(ctf_modebase:get_current_mode().treasures or {})
-	if ctf_map.current_map then
-		local map_treasures = ctf_map.treasure_from_string(ctf_map.current_map.treasures)
-
-		for k, v in pairs(map_treasures) do
-			treasures[k] = v
-		end
-	end
-
-	for item, def in pairs(treasures) do
+function ctf_map.treasure.treasurefy_node(inv, map_treasures)
+	for item, def in pairs(map_treasures) do
 		local treasure = ItemStack(item)
 
 		for c = 1, def.max_stacks or 1, 1 do
@@ -26,7 +16,7 @@ ctf_map.treasurefy_node = function(inv)
 end
 
 -- name ; min_count ; max_count ; max_stacks ; rarity ;;
-ctf_map.treasure_from_string = function(str)
+function ctf_map.treasure.treasure_from_string(str)
 	if not str then return {} end
 
 	local out = {}
@@ -44,7 +34,7 @@ ctf_map.treasure_from_string = function(str)
 	return out
 end
 
-ctf_map.treasure_to_string = function(treasures)
+function ctf_map.treasure.treasure_to_string(treasures)
 	if not treasures then return "" end
 
 	local out = ""
