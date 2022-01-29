@@ -145,7 +145,6 @@ function grenades.register_grenade(name, def)
 
 	newdef.description = def.description
 	newdef.stack_max = def.stack_max or 1
-	newdef.range = 0
 	newdef.inventory_image = def.image
 	local on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
