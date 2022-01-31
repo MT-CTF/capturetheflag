@@ -246,25 +246,19 @@ for _, chest_color in pairs(colors) do
 	end
 
 	function def.on_metadata_inventory_put(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves " .. (stack:get_name() or "stuff") .. " " ..
-			(stack:get_count() or 0) .. " to chest at " ..
-			minetest.pos_to_string(pos))
+		minetest.log("action", string.format("%s puts %s to team chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
 	end
 
 	function def.on_metadata_inventory_take(pos, listname, index, stack, player)
-		local chestinv = minetest.get_inventory({type = "node", pos = pos})
-		local swapped_item = chestinv:get_stack(listname, index)
-
-		if not ctf_teams.is_allowed_in_team_chest(listname, swapped_item, player) then
-			chestinv:remove_item(listname, swapped_item)
-			player:get_inventory():add_item("main", swapped_item)
-		end
-
-		minetest.log("action", player:get_player_name() ..
-			" takes " .. (stack:get_name() or "stuff") .. " " ..
-			(stack:get_count() or 0) .. " from chest at " ..
-			minetest.pos_to_string(pos))
+		minetest.log("action", string.format("%s takes %s from team chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
 	end
 
 	minetest.register_node("ctf_teams:chest_" .. chest_color, def)
