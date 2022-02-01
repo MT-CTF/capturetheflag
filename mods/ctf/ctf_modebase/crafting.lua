@@ -150,24 +150,6 @@ end
 -- Traps
 
 crafting.register_recipe({
-	output = "ctf_map:unwalkable_dirt 5",
-	items  = { "default:dirt 5", "default:coal_lump" },
-	always_known = false,
-})
-
-crafting.register_recipe({
-	output = "ctf_map:unwalkable_stone",
-	items  = { "default:stone 5", "default:coal_lump" },
-	always_known = false,
-})
-
-crafting.register_recipe({
-	output = "ctf_map:unwalkable_cobble 4",
-	items  = { "default:cobble 4", "default:coal_lump" },
-	always_known = false,
-})
-
-crafting.register_recipe({
 	output = "ctf_map:spike",
 	items  = { "default:steel_ingot 4" },
 	always_known = false,
@@ -176,5 +158,11 @@ crafting.register_recipe({
 crafting.register_recipe({
 	output = "ctf_map:damage_cobble",
 	items = { "ctf_map:unwalkable_cobble", "ctf_map:spike" },
+	always_known = false,
+})
+
+crafting.register_recipe({
+	output = "ctf_map:reinforced_cobble 2",
+	items  = { "default:cobble 6", "default:steel_ingot" },
 	always_known = false,
 })
