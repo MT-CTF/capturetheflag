@@ -404,8 +404,14 @@ return {
 			return "The match hasn't started yet!"
 		end
 
+		local score = nil
+
+		if ctf_combat_mode.in_combat(patient) then
+			score = 1
+		end
+
 		ctf_combat_mode.set(patient, player, "healer", 60, false)
-		recent_rankings.add(player, {hp_healed = amount}, true)
+		recent_rankings.add(player, {hp_healed = amount, score = score}, true)
 	end,
 }
 
