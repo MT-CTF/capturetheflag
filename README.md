@@ -1,9 +1,7 @@
 # Capture The Flag
 
-[![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
+[![ContentDB](https://content.minetest.net/packages/rubenwardy/capturetheflag/shields/downloads/)](https://content.minetest.net/packages/rubenwardy/capturetheflag/)  [![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
 
-* Fast rounds of CTF games.
-* Removed nodes for focus.
 
 ## Installation
 
@@ -12,10 +10,11 @@ Capture the flag uses several submodules. Make sure to grab them all by cloning 
 ```sh
 git clone --recursive https://github.com/MT-CTF/capturetheflag.git
 ```
+(Using ssh to clone is recommended for developers/contributors)
 
 ## Development
 
-* Lone_Wolf uses Visual Studio Code with these extensions:
+* If you use Visual Studio Code we recommend these extensions:
   * https://marketplace.visualstudio.com/items?itemName=sumneko.lua
   * https://marketplace.visualstudio.com/items?itemName=dwenegar.vscode-luacheck
 
@@ -35,7 +34,8 @@ git clone --recursive https://github.com/MT-CTF/capturetheflag.git
 
 ## License
 
-Created by [rubenwardy](https://rubenwardy.com/) and [Lone_Wolf](https://github.com/LoneWolfHT).
+Created by [rubenwardy](https://rubenwardy.com/).
+Developed by [LandarVargan](https://github.com/LoneWolfHT) and [savilli](https://github.com/savilli).
 
 Licenses where not specified:
 Code: LGPLv2.1+
@@ -44,6 +44,7 @@ Textures: CC-BY-SA 3.0
 ### Textures
 
 * [Header](menu/header.png): CC BY-SA 4.0 by xenonca
+* [Background Image](menu/background.png): CC0 (where applicable) by Apelta (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed CC-BY-SA 3.0). The player skin used is licensed CC-BY-SA 3.0
 
 ### Mods
 
