@@ -76,7 +76,9 @@ minetest.register_on_joinplayer(function(player)
 		position      = {x=0.5, y=1},
 		size          = {x=24, y=24},
 		text          = "sprint_stamina_icon.png",
+		text2         = "sprint_stamina_icon_gone.png",
 		number        = 20,
+		item          = 2 * STAMINA_MAX,
 		alignment     = {x=0, y=1},
 		offset        = {x=-263, y=-110},
 	})
