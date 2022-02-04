@@ -126,8 +126,12 @@ minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
 minetest.register_node("ctf_map:chest_opened", {
 	description = "Treasure Chest Opened",
-	tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_top.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_side.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"},
+	tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"},
 	paramtype2 = "facedir",
 	groups = {immortal = 1},
 	light_source = 1,
