@@ -124,14 +124,13 @@ minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 
 --
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
-
-minetest.register_node("ctf_map:chest", {
-	description = "Treasure Chest",
-	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
-		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
+minetest.register_node("ctf_map:chest_opened", {
+	description = "Treasure Chest Opened",
+	tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_top.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_side.png^[colorize:#000000:50^[crack:1:1:1", "default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"},
 	paramtype2 = "facedir",
 	groups = {immortal = 1},
-	light_source = 2,
+	light_source = 1,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
@@ -170,5 +169,19 @@ minetest.register_node("ctf_map:chest", {
 			minetest.set_node(pos, {name="air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
 		end
+	end,
+})
+
+minetest.register_node("ctf_map:chest", {
+	description = "Treasure Chest",
+	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
+		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
+	paramtype2 = "facedir",
+	groups = {immortal = 1},
+	light_source = 2,
+	is_ground_content = false,
+	sounds = default.node_sound_wood_defaults(),
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
 	end,
 })
