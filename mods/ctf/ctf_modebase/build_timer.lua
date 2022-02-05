@@ -7,7 +7,7 @@ local timer = nil
 ctf_modebase.build_timer = {}
 
 local function timer_func(time_left)
-	if time_left <= 1 then
+	if time_left <= 0 then
 		ctf_modebase.build_timer.finish()
 		return
 	end
