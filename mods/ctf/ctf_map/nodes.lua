@@ -144,11 +144,6 @@ minetest.register_node("ctf_map:chest_opened", {
 			return 0
 		end
 	end,
-	can_dig = function(pos,player)
-		local meta = minetest.get_meta(pos);
-		local inv = meta:get_inventory()
-		return inv:is_empty("main")
-	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
 		minetest.log("action", player:get_player_name() ..
@@ -185,6 +180,38 @@ minetest.register_node("ctf_map:chest", {
 	light_source = 2,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
+	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
+		if player then
+			minetest.chat_send_player(player:get_player_name(),
+				"You're not allowed to put things in treasure chests!")
+			return 0
+		end
+	end,
+	on_metadata_inventory_move = function(pos, from_list, from_index,
+			to_list, to_index, count, player)
+		minetest.log("action", player:get_player_name() ..
+			" moves stuff in chest at " .. minetest.pos_to_string(pos))
+	end,
+	on_metadata_inventory_put = function(pos, listname, index, stack, player)
+		minetest.log("action", string.format("%s puts %s to treasure chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
+	end,
+	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		minetest.log("action", string.format("%s takes %s from treasure chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
+
+		local inv = minetest.get_inventory({type = "node", pos = pos})
+		if not inv or inv:is_empty("main") then
+			minetest.set_node(pos, {name="air"})
+			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
+		end
+	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
 	end,
