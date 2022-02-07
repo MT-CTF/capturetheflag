@@ -23,7 +23,7 @@ local function player_vote(name, length)
 end
 
 local function show_modechoose_form(player)
-	ctf_gui.show_formspec(player, "ctf_modebase:mode_select", {
+	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
 		size = {x = 8, y = 8},
 		title = "Mode: "..HumanReadable(new_mode),
 		description = "Please vote on how many matches you would like to play",

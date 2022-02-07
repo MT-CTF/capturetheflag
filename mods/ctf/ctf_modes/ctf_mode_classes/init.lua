@@ -71,7 +71,7 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 
 		ctf_cosmetics.get_skin = function(player)
-			return old_get_skin(player) .. "^ctf_mode_classes_" .. classes.get_name(player) .. "_overlay.png"
+			return old_get_skin(player) .. classes.get_skin_overlay(player)
 		end
 	end,
 	on_mode_end = function()

@@ -237,7 +237,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		}
 	end
 
-	ctf_gui.show_formspec(name, "ctf_modebase:summary", formspec)
+	ctf_gui.old_show_formspec(name, "ctf_modebase:summary", formspec)
 end
 
 ctf_core.register_chatcommand_alias("summary", "s", {

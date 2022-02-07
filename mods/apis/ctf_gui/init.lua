@@ -17,9 +17,9 @@ function ctf_gui.init()
 	ctf_core.register_on_formspec_input(modname..":", function(pname, formname, fields)
 		if not context[pname] then return end
 
-		if context[pname].formname == formname and context[pname].elements then
+		if context[pname]._info.formname == formname and context[pname].elements then
 			for name, info in pairs(fields) do
-				if context[pname].elements[name] and context[pname].elements[name].func then
+				if context[pname].elements[name] then
 					if context[pname].privs then
 						local playerprivs = minetest.get_player_privs(pname)
 
@@ -32,7 +32,17 @@ function ctf_gui.init()
 						end
 					end
 
-					context[pname].elements[name].func(pname, fields, name)
+					if type(context[pname].elements[name]) == "table" then
+						if context[pname].elements[name].func then
+							context[pname].elements[name].func(pname, fields, context[pname])
+						end
+					else
+						local action = context[pname].elements[name](pname, fields, context[pname])
+
+						if action == "refresh" then
+							minetest.show_formspec(pname, context[pname]._info.formname, context[pname]._info.formspec(context[pname]))
+						end
+					end
 				end
 			end
 		end
@@ -43,7 +53,64 @@ function ctf_gui.init()
 	end)
 end
 
-function ctf_gui.show_formspec(player, formname, formdef)
+function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
+	local filepath = minetest.get_worldpath().."/ctf_gui/"
+	local filename = filepath.."file_edit.txt"
+
+	minetest.mkdir(filepath)
+
+	local file, error = io.open(filename, "w")
+
+	assert(file, error)
+
+	file:write(formspec)
+
+	file:close()
+
+	local function interval()
+		if formspec:sub(1, 3) == "[f]" then
+			local result, form = pcall(loadstring(formspec:sub(4)), formcontext)
+			ctf_gui.show_formspec(player, formname, result and form or "")
+		else
+			ctf_gui.show_formspec(player, formname, formspec)
+		end
+
+		minetest.after(1, function()
+			local f = io.open(filename, "r")
+
+			formspec = f:read("*a")
+
+			f:close()
+
+			if formspec ~= "exit" then
+				interval()
+			else
+				minetest.request_shutdown("Formspec dev requested shutdown", true)
+			end
+		end)
+	end
+
+	interval()
+end
+
+function ctf_gui.show_formspec(player, formname, formspec, formcontext)
+	player = PlayerName(player)
+
+	context[player] = formcontext or {}
+
+	context[player]._info = {
+		formname = formname,
+		formspec = formspec
+	}
+
+	if type(formspec) == "function" then
+		minetest.show_formspec(player, formname, formspec(formcontext))
+	else
+		minetest.show_formspec(player, formname, formspec)
+	end
+end
+
+function ctf_gui.old_show_formspec(player, formname, formdef)
 	player = PlayerName(player)
 
 	formdef.formname = formname
@@ -268,6 +335,7 @@ function ctf_gui.show_formspec(player, formname, formdef)
 				"]"
 	end
 
+	formdef._info = formdef
 	context[player] = formdef
 
 	minetest.show_formspec(player, formdef.formname, formspec)

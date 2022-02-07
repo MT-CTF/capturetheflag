@@ -15,7 +15,7 @@ if ctf_core.settings.server_mode == "play" then
 end
 
 local function show_flag_color_form(player, target_pos, param2)
-	ctf_gui.show_formspec(player, "ctf_modebase:flag_color_select", {
+	ctf_gui.old_show_formspec(player, "ctf_modebase:flag_color_select", {
 		title = "Flag Color Selection",
 		description = "Choose a color for this flag",
 		privs = {ctf_map_editor = true},
@@ -30,7 +30,7 @@ local function show_flag_color_form(player, target_pos, param2)
 				label = "Choose",
 				exit = true,
 				pos = {"center", 1.5},
-				func = function(playername, fields, field_name)
+				func = function(playername, fields)
 					if not target_pos or not fields.teams then return end
 
 					minetest.set_node(target_pos, {name = "ctf_modebase:flag_top_"..fields.teams, param2 = param2})
