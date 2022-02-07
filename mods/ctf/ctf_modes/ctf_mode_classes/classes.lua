@@ -400,13 +400,9 @@ local function select_class(player, classname)
 	end
 end
 
-function classes.show_class_formspec(player, selected)
+function classes.show_class_formspec(player)
 	player = PlayerObj(player)
 	if not player then return end
-
-	if not selected then
-		selected = table.indexof(class_list, classes.get_name(player))
-	end
 
 	if not cooldowns:get(player) then
 		if dist_from_flag(player) > 5 then
@@ -511,40 +507,6 @@ function classes.show_class_formspec(player, selected)
 				end
 			}
 		})
-
-		-- local elements = {}
-
-		-- elements.class_select = {
-		-- 	type = "dropdown",
-		-- 	items = readable_class_list,
-		-- 	default_idx = selected,
-		-- 	pos = {x = 0, y = 0.5},
-		-- 	func = function(playername, fields, field_name)
-		-- 		local new_idx = table.indexof(readable_class_list, fields[field_name])
-
-		-- 		if new_idx ~= selected then
-		-- 			classes.show_class_formspec(playername, new_idx)
-		-- 		end
-		-- 	end,
-		-- }
-
-		-- elements.select_class = {
-		-- 	type = "button",
-		-- 	exit = true,
-		-- 	label = "Choose Class",
-		-- 	pos = {x = ctf_gui.ELEM_SIZE.x + 0.5, y = 0.5},
-		-- 	func = function(playername, fields, field_name)
-		-- 		select_class(playername, class_list[selected])
-		-- 	end,
-		-- }
-
-		-- ctf_gui.old_show_formspec(player, "ctf_mode_classes:class_form", {
-		-- 	size = {x = (ctf_gui.ELEM_SIZE.x * 2) + 1, y = 3.5},
-		-- 	title = class_props[class_list[selected]].name,
-		-- 	description = class_props[class_list[selected]].description,
-		-- 	privs = {interact = true},
-		-- 	elements = elements,
-		-- })
 	else
 		hud_events.new(player, {
 			quick = true,

@@ -47,6 +47,7 @@ read_globals = {
 	"ItemStack",
 	"Settings",
 	"unpack",
+	"loadstring",
 
 	table = {
 		fields = {
