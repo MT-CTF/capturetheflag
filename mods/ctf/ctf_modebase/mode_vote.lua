@@ -42,7 +42,10 @@ local function show_modechoose_form(player)
 				pos = {"center", 4},
 				func = function(playername, fields)
 					if votes then
-						player_vote(player, tonumber(fields.amount) or 5)
+						local amount = tonumber(fields.amount)
+						if amount and amount % 1 == 0 and amount >= 0 and amount <= 5 then
+							player_vote(player, amount)
+						end
 					end
 				end,
 			}
