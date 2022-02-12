@@ -4,6 +4,7 @@
 
 local DIG_SPEED = 0.1
 local PAXEL_POWER = 50 -- currently just blocks count
+local PAXEL_RETRY = 3
 local PAXEL_COOLDOWN_TIME = 20
 
 local dig_timers = {}
@@ -21,7 +22,7 @@ local function is_diggable(node)
 	or name:find("stairs:")
 end
 
-local function dig(pname, ppos, power)
+local function dig(pname, ppos, power, retry)
 	if power <= 1 then
 		hud_events.new(pname, {
 			quick = true,
@@ -38,7 +39,7 @@ local function dig(pname, ppos, power)
 		if node.name ~= "air" then
 			if is_diggable(node) then
 				minetest.dig_node(pos)
-				dig_timers[pname] = minetest.after(DIG_SPEED, dig, pname, pos, power - 1)
+				dig_timers[pname] = minetest.after(DIG_SPEED, dig, pname, pos, power - 1, PAXEL_RETRY)
 			else
 				hud_events.new(pname, {
 					quick = true,
@@ -52,12 +53,16 @@ local function dig(pname, ppos, power)
 		end
 	end
 
-	hud_events.new(pname, {
-		quick = true,
-		text = "Pillar digging has nothing more to dig",
-		color = "warning",
-	})
-	dig_timers[pname] = nil
+	if retry > 0 then
+		dig_timers[pname] = minetest.after(1, dig, pname, ppos, power, retry - 1)
+	else
+		hud_events.new(pname, {
+			quick = true,
+			text = "Pillar digging has nothing more to dig",
+			color = "warning",
+		})
+		dig_timers[pname] = nil
+	end
 end
 
 minetest.register_tool("ctf_mode_classes:support_paxel", {
@@ -89,7 +94,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 					dig_timers[pname]:cancel()
 				end
 
-				dig_timers[pname] = minetest.after(DIG_SPEED, dig, pname, pos, PAXEL_POWER)
+				dig_timers[pname] = minetest.after(DIG_SPEED, dig, pname, pos, PAXEL_POWER, PAXEL_RETRY)
 
 				local dstep = math.floor(65534 / PAXEL_COOLDOWN_TIME)
 				ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_paxel", dstep, true)
