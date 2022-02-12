@@ -10,7 +10,7 @@ if backend == "redis" then
 	local old_require = require
 
 	env.rawset(_G, "require", env.require)
-	rankings = env.dofile(env.core.get_modpath(env.core.get_current_modname()).."/redis.lua")
+	rankings = env.dofile(env.debug.getinfo(1, "S").source:sub(2, -9) .. "redis.lua")
 	env.rawset(_G, "require", old_require)
 else
 	rankings = ctf_core.include_files(backend..".lua")
