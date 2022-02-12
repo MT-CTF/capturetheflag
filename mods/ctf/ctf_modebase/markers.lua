@@ -23,11 +23,15 @@ local function add_marker(pname, pteam, message, pos, owner)
 	end
 end
 
-function ctf_modebase.markers.remove(pname)
+function ctf_modebase.markers.remove(pname, no_notify)
 	if markers[pname] then
 		markers[pname].timer:cancel()
 
 		for teammate in pairs(ctf_teams.online_players[markers[pname].team].players) do
+			if not no_notify and teammate ~= pname then
+				minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " removed a marker!"))
+			end
+
 			hud:remove(teammate, "marker_" .. pname)
 		end
 
@@ -35,7 +39,7 @@ function ctf_modebase.markers.remove(pname)
 	end
 end
 
-function ctf_modebase.markers.add(pname, msg, pos)
+function ctf_modebase.markers.add(pname, msg, pos, no_notify)
 	if not ctf_modebase.in_game then return end
 
 	local pteam = ctf_teams.get(pname)
@@ -45,12 +49,18 @@ function ctf_modebase.markers.add(pname, msg, pos)
 		markers[pname].timer:cancel()
 	end
 
+	minetest.log("action", string.format("%s placed a marker at %s: '%s'", pname, minetest.pos_to_string(pos), msg))
+
 	markers[pname] = {
 		msg = msg, pos = pos, team = pteam,
-		timer = minetest.after(MARKER_LIFETIME, ctf_modebase.markers.remove, pname),
+		timer = minetest.after(MARKER_LIFETIME, ctf_modebase.markers.remove, pname, true),
 	}
 
 	for teammate in pairs(ctf_teams.online_players[pteam].players) do
+		if not no_notify and teammate ~= pname then
+			minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " placed a marker!"))
+		end
+
 		add_marker(teammate, pteam, msg, pos, pname)
 	end
 end
@@ -59,7 +69,7 @@ ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 	local pname = player:get_player_name()
 
 	if old_team and old_team ~= new_team then
-		ctf_modebase.markers.remove(pname)
+		ctf_modebase.markers.remove(pname, true)
 		hud:remove(pname)
 	end
 
