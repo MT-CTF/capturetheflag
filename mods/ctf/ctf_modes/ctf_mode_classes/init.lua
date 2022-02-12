@@ -4,6 +4,7 @@ local features = ctf_modebase.features(rankings, recent_rankings)
 
 local crafts, classes = ctf_core.include_files(
 	"crafts.lua",
+	"paxel.lua",
 	"classes.lua"
 )
 

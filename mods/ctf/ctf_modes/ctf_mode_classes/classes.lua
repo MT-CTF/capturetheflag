@@ -188,28 +188,6 @@ local scaling_def = {
 minetest.register_node("ctf_mode_classes:scaling_ladder", scaling_def)
 
 --
---- Medic Paxel
---
-
-minetest.register_tool("ctf_mode_classes:support_paxel", {
-	description = "Paxel",
-	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
-	tool_capabilities = {
-		full_punch_interval = 1.0,
-		max_drop_level=1,
-		groupcaps={
-			cracky = {times={[1]=4.00, [2]=1.60, [3]=0.80}, uses=0, maxlevel=2},
-			crumbly = {times={[1]=1.50, [2]=0.90, [3]=0.40}, uses=0, maxlevel=2},
-			choppy={times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=0, maxlevel=2},
-		},
-		damage_groups = {fleshy=4},
-		punch_attack_uses = 0,
-	},
-	groups = {pickaxe = 1, tier = 10},
-	sound = {breaks = "default_tool_breaks"},
-})
-
---
 --- Medic Bandage
 --
 
