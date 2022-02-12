@@ -18,20 +18,30 @@ function ctf_gui.init()
 		if not context[pname] then return end
 
 		if context[pname].formname == formname and context[pname].elements then
+			if context[pname].privs then
+				local playerprivs = minetest.get_player_privs(pname)
+
+				for priv, needed in pairs(context[pname].privs) do
+					if needed and not playerprivs[priv] then
+						minetest.log("warning", "Player " .. dump(pname) ..
+								" doesn't have the privs needed to access the formspec " .. dump(formname))
+						return
+					end
+				end
+			end
+
+			for name, info in pairs(fields) do
+				if context[pname].elements[name] and
+					context[pname].elements[name].type == "dropdown" and table.indexof(context[pname].elements[name].items, info) == -1
+				then
+					minetest.log("warning", "Player " .. dump(pname) ..
+							" sent unallowed values for formspec " .. dump(formname) .. " : " .. dump(fields))
+					return
+				end
+			end
+
 			for name, info in pairs(fields) do
 				if context[pname].elements[name] and context[pname].elements[name].func then
-					if context[pname].privs then
-						local playerprivs = minetest.get_player_privs(pname)
-
-						for priv, needed in pairs(context[pname].privs) do
-							if needed and not playerprivs[priv] then
-								minetest.log("warning", "Player " .. dump(pname) ..
-										" doesn't have the privs needed to access the formspec " .. dump(formname))
-								return
-							end
-						end
-					end
-
 					context[pname].elements[name].func(pname, fields, name)
 				end
 			end
