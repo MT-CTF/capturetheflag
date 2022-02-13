@@ -178,8 +178,8 @@ function minetest.calculate_knockback(player, ...)
 end
 
 -- Check each player and apply animations
-function player_api.globalstep()
-	for _, player in ipairs(minetest.get_connected_players()) do
+minetest.register_globalstep(function()
+	for _, player in pairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		local player_data = players[name]
 		local model = models[player_data.model]
@@ -208,11 +208,6 @@ function player_api.globalstep()
 			end
 		end
 	end
-end
-
--- Mods can modify the globalstep by overriding player_api.globalstep
-minetest.register_globalstep(function(...)
-	player_api.globalstep(...)
 end)
 
 for _, api_function in pairs({"get_animation", "set_animation", "set_model", "set_textures"}) do
