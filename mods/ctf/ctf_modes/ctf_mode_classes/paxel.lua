@@ -88,7 +88,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 		if pointed_thing and itemstack:get_wear() == 0 then
 			local pos = pointed_thing.under
 			if is_diggable(minetest.get_node(pos)) then
-				if ctf_modebase.match_started then
+				if not ctf_modebase.match_started then
 					hud_events.new(user, {
 						quick = true,
 						text = "Can't use during build time",
