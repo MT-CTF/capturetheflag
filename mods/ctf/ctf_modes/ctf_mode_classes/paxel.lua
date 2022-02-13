@@ -43,7 +43,7 @@ local function dig(pname, ppos, power, retry)
 			else
 				hud_events.new(pname, {
 					quick = true,
-					text = "Pillar digging stopped at undiggable node",
+					text = "Pillar digging stopped on undiggable node",
 					color = "warning",
 				})
 				dig_timers[pname] = nil
@@ -66,8 +66,10 @@ local function dig(pname, ppos, power, retry)
 end
 
 minetest.register_tool("ctf_mode_classes:support_paxel", {
-	description = "Paxel",
+	description = "Paxel\nRightclick bottom of pillar to dig it.\nCan't use during build time",
 	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
+	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
+	inventory_overlay = "ctf_modebase_special_item.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
 		max_drop_level = 1,
@@ -86,6 +88,15 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 		if pointed_thing and itemstack:get_wear() == 0 then
 			local pos = pointed_thing.under
 			if is_diggable(minetest.get_node(pos)) then
+				if ctf_modebase.match_started then
+					hud_events.new(user, {
+						quick = true,
+						text = "Can't use during build time",
+						color = "warning",
+					})
+					return
+				end
+
 				local pname = user:get_player_name()
 
 				minetest.dig_node(pos)
@@ -102,11 +113,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 				itemstack:set_wear(65534)
 				return itemstack
 			else
-				hud_events.new(user, {
-					quick = true,
-					text = "Can't start pillar digging at undiggable node",
-					color = "warning",
-				})
+				minetest.item_place(itemstack, user, pointed_thing)
 			end
 		end
 	end,
