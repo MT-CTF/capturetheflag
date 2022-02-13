@@ -15,40 +15,51 @@ function ctf_gui.init()
 	gui_users_initialized[modname] = true
 
 	ctf_core.register_on_formspec_input(modname..":", function(pname, formname, fields)
-		if not context[pname] then return end
+		local ctx = context[pname]
+		if not ctx then return end
 
-		if context[pname].formname == formname and context[pname].elements then
-			if context[pname].privs then
+		if ctx.formname == formname and ctx.elements then
+			if ctx.privs then
 				local playerprivs = minetest.get_player_privs(pname)
 
-				for priv, needed in pairs(context[pname].privs) do
+				for priv, needed in pairs(ctx.privs) do
 					if needed and not playerprivs[priv] then
 						minetest.log("warning", "Player " .. dump(pname) ..
-								" doesn't have the privs needed to access the formspec " .. dump(formname))
+							" doesn't have the privs needed to access the formspec " .. dump(formname))
 						return
 					end
 				end
 			end
 
 			for name, info in pairs(fields) do
-				if context[pname].elements[name] and
-					context[pname].elements[name].type == "dropdown" and table.indexof(context[pname].elements[name].items, info) == -1
-				then
+				local element = ctx.elements[name]
+				local bad = false
+				if element then
+					if element.type == "dropdown" then
+						if element.give_idx then
+							bad = not element.items[info]
+						else
+							bad = table.indexof(element.items, info) == -1
+						end
+					end
+				end
+				if bad then
 					minetest.log("warning", "Player " .. dump(pname) ..
-							" sent unallowed values for formspec " .. dump(formname) .. " : " .. dump(fields))
+						" sent unallowed values for formspec " .. dump(formname) .. " : " .. dump(fields))
 					return
 				end
 			end
 
 			for name, info in pairs(fields) do
-				if context[pname].elements[name] and context[pname].elements[name].func then
-					context[pname].elements[name].func(pname, fields, name)
+				local element = ctx.elements[name]
+				if element and element.func then
+					element.func(pname, fields, name)
 				end
 			end
 		end
 
-		if fields.quit and context[pname].on_quit then
-			context[pname].on_quit(pname, fields)
+		if fields.quit and ctx.on_quit then
+			ctx.on_quit(pname, fields)
 		end
 	end)
 end
