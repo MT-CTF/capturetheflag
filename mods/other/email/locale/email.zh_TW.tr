@@ -1,0 +1,23 @@
+# textdomain: email
+(@1) You have mail! Type /inbox to recieve=（@1）你有新郵件！輸入 /inbox 以查看
+Your Inbox=你的收件箱
+Date=日期
+From=寄件者
+Message=信息
+Well done! Your inbox is empty!=做得好！你的收件箱是空的！
+Delete All=全部刪除
+Close=關閉
+Exit then type /mail username message to reply=離開並輸入 /mail 用戶名 信息 以回覆
+Your inbox is empty!=你的收件箱是空的！
+@1 items in your inbox:=你的收件箱有@1條信息
+End of mail (@1 items)=郵件完畢（@1條信息）
+Opened inbox!=收件箱已開啟！
+Inbox=收件箱
+Inbox cleared!=收件箱已清除！
+Player '@1' does not exist=玩家「@1」不存在
+Message sent to @1=信息已發送到@1
+Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only.=收件箱：空參數以查看收件箱；‘clear’以清空收件箱；‘text’以文字模式查看。
+Inbox cleared=收件箱已清除
+<playername> <some message>=<玩家名稱> <信息>
+mail: add a message to a player's inbox=郵件：將信息投遞到玩家的收件箱
+Usage: mail <playername> <some message>=用法：mail <玩家名稱> <信息>

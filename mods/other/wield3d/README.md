@@ -1,15 +1,1 @@
-[mod] 3d wielded items [wield3d]
-================================
-
-Mod Version: 0.3.0
-
-Minetest Version: 0.4.12 or later
-
-Decription: Visible 3d wielded items for Minetest
-
-Depends: default
-
-Makes hand wielded items visible to other players.
-
-See wield3d.conf.example for config options (save as wield3d.conf)
-
+Based on wield3d mod (MIT License) https://forum.minetest.net/viewtopic.php?t=6407 https://github.com/stujones11/wield3d

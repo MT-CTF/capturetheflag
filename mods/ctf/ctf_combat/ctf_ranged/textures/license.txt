@@ -1,0 +1,6 @@
+LoneWolfHT, CC-BY 4.0
+	* ctf_ranged_bullethole.png
+	* ctf_ranged_bullet.png
+
+Stuart Jones - CC0 1.0 Universal (CC0 1.0)
+	* All the other textures in the folder

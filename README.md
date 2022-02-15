@@ -1,9 +1,7 @@
 # Capture The Flag
 
-[![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
+[![ContentDB](https://content.minetest.net/packages/rubenwardy/capturetheflag/shields/downloads/)](https://content.minetest.net/packages/rubenwardy/capturetheflag/)  [![Build status](https://github.com/MT-CTF/capturetheflag/workflows/build/badge.svg)](https://github.com/MT-CTF/capturetheflag/actions)
 
-* Fast rounds of CTF games.
-* Removed nodes for focus.
 
 ## Installation
 
@@ -12,35 +10,42 @@ Capture the flag uses several submodules. Make sure to grab them all by cloning 
 ```sh
 git clone --recursive https://github.com/MT-CTF/capturetheflag.git
 ```
+(Using ssh to clone is recommended for developers/contributors)
+
+## Development
+
+* If you use Visual Studio Code we recommend these extensions:
+  * https://marketplace.visualstudio.com/items?itemName=sumneko.lua
+  * https://marketplace.visualstudio.com/items?itemName=dwenegar.vscode-luacheck
 
 ## System Requirements
 
 ### Recommended
 
-Hosting your server using the `dummy` backend.
+* Hosting your server using the `dummy` backend.
 
-### Minimum
-
-Hosting your server using the `leveldb` or `redis` backend.
-
-Hosting using `sqlite3` on an SSD or ramdisk ([with this guide](https://forum.minetest.net/viewtopic.php?f=10&t=9588)).
+* Storing rankings using the `redis` backend:
+  * Ubuntu:
+    * `sudo apt install luarocks redis`
+    * `sudo luarocks install luaredis`
+    * Add `ctf_rankings` to your secure.trusted_mods. MIGHT BE POSSIBLE FOR OTHER MODS TO BREACH SECURITY. MAKE SURE YOU ADD NO MALICIOUS MODS TO YOUR CTF SERVER
+    * Run something like this when starting your server (With parentheses): (cd minetest/worlds/yourworld && redis-server) | <command to launch your minetest server>
+    * If you run your Minetest server using a system service it is recommended to run redis-server in it's own service, with the Minetest one depending upon it
 
 ## License
 
 Created by [rubenwardy](https://rubenwardy.com/).
+Developed by [LandarVargan](https://github.com/LoneWolfHT) and [savilli](https://github.com/savilli).
+
+Licenses where not specified:
 Code: LGPLv2.1+
 Textures: CC-BY-SA 3.0
 
 ### Textures
 
-* ctf_classes_skin_* created by GreenDimond/GreenXenith
-    * ctf_classes_skin_rocketeer with help from Lone_Wolf
 * [Header](menu/header.png): CC BY-SA 4.0 by xenonca
+* [Background Image](menu/background.png): CC0 (where applicable) by Apelta (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed CC-BY-SA 3.0). The player skin used is licensed CC-BY-SA 3.0
 
 ### Mods
 
 Check out [mods/](mods/) to see all the installed mods and their respective licenses.
-
-## update.sh
-
-Content in this repository and its sub-modules are arranged in a manner best optimised for distribution. For all features of CTF to work properly, run update.sh instead of manually syncing the local copy. update.sh automatically pulls the latest master of the repository and all its submodules, and does some extra processing to make stuff work.
