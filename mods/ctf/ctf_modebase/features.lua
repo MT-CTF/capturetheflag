@@ -92,11 +92,6 @@ local function end_combat_mode(player, killer, leaving)
 			ctf_combat_mode.set_time(killer, 5)
 		end
 	else
-		-- Only take score if they're in combat for being hit
-		if #hitters > 0 then
-			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
-		end
-
 		if #hitters > 0 or not leaving then
 			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
 			recent_rankings.add(player, {deaths = 1}, true)
