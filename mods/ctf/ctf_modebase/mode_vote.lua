@@ -1,4 +1,5 @@
 local VOTING_TIME = 30
+local MAX_ROUNDS = 5
 
 local timer = nil
 local formspec_send_timer = nil
@@ -23,30 +24,27 @@ local function player_vote(name, length)
 end
 
 local function show_modechoose_form(player)
+	local elements = {}
+
+	for i = 0, MAX_ROUNDS do
+		elements[string.format("vote_%d", i)] = {
+			type = "button",
+			label = i,
+			exit = true,
+			pos = {"center", i},
+			func = function()
+				if votes then
+					player_vote(player, i)
+				end
+			end,
+		}
+	end
+
 	ctf_gui.show_formspec(player, "ctf_modebase:mode_select", {
 		size = {x = 8, y = 8},
 		title = "Mode: "..HumanReadable(new_mode),
 		description = "Please vote on how many matches you would like to play",
-		elements = {
-			amount = {
-				type = "dropdown",
-				items = {"0", "1", "2", "3", "4", "5"},
-				default_idx = 6,
-				pos = {x = "center", y = 0.1},
-				size = {x = 4, y = 0.7},
-			},
-			submit = {
-				type = "button",
-				label = "Submit",
-				exit = true,
-				pos = {"center", 4},
-				func = function(playername, fields)
-					if votes then
-						player_vote(player, tonumber(fields.amount))
-					end
-				end,
-			}
-		},
+		elements = elements,
 	})
 end
 
@@ -121,26 +119,21 @@ function ctf_modebase.mode_vote.end_vote()
 	end
 
 	if entry_count > 0 then
-		if length_votes[0] and length_votes[0] / entry_count >= 0.7 then
-			-- More than 70% of votes are for 0, so just force that
-			average_vote = 0
-		else
-			average_vote = math.max( -- Don't allow 0 matches, 70+% of votes were not for 0
-				math.round(average_vote / entry_count),
-				1
-			)
-		end
+		average_vote = math.round(average_vote / entry_count)
 	else
-		average_vote = 5 -- no votes, default to 5 rounds
+		average_vote = MAX_ROUNDS -- no votes, default to max rounds
 	end
 
-	minetest.chat_send_all(string.format(
+	votes_result = string.format(
 		"Voting is over. The mode %s will be played for %d match%s\n%s",
 		HumanReadable(new_mode),
 		average_vote,
 		average_vote == 1 and "" or "es",
 		votes_result:sub(1, -2)
-	))
+	)
+
+	minetest.chat_send_all(votes_result)
+	ctf_modebase.announce(votes_result)
 
 	ctf_modebase.current_mode_matches = average_vote
 	if average_vote <= 0 then
