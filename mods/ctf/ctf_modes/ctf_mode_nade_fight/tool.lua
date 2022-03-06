@@ -155,8 +155,9 @@ minetest.register_entity("ctf_mode_nade_fight:black_hole", {
 	on_punch = function() return true end,
 })
 
-local knockback_amount = 36
-local knockback_radius = 3.2
+local KNOCKBACK_AMOUNT = 40
+local KNOCKBACK_AMOUNT_WITH_FLAG = 25
+local KNOCKBACK_RADIUS = 3.2
 grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 	description = "Knockback Grenade, Blasts players far away",
 	image = "ctf_mode_nade_fight_knockback_grenade.png",
@@ -183,10 +184,10 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 			pos = pos,
 			gain = 1.5,
 			pitch = 2.2,
-			max_hear_distance = knockback_radius * 4,
+			max_hear_distance = KNOCKBACK_RADIUS * 4,
 		})
 
-		for _, v in pairs(minetest.get_objects_inside_radius(pos, knockback_radius)) do
+		for _, v in pairs(minetest.get_objects_inside_radius(pos, KNOCKBACK_RADIUS)) do
 			local vname = v:get_player_name()
 
 			if v:is_player() and v:get_hp() > 0 and v:get_properties().pointable and
@@ -231,7 +232,14 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 						vertical = false,
 						texture = "grenades_smoke.png",
 					})
-					v:add_velocity(vector.multiply(vector.direction(pos, headpos), knockback_amount))
+
+					local kb
+					if ctf_modebase.taken_flags[name] then
+						kb = KNOCKBACK_AMOUNT_WITH_FLAG
+					else
+						kb = KNOCKBACK_AMOUNT
+					end
+					v:add_velocity(vector.multiply(vector.direction(pos, headpos), kb))
 				end
 			end
 		end
