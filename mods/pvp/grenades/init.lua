@@ -32,7 +32,7 @@ function grenades.register_grenade(name, def)
 			visual = "sprite",
 			visual_size = {x = 0.5, y = 0.5, z = 0.5},
 			textures = {def.image},
-			collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.15, 0.2},
+			collisionbox = {-0.05, -0.05, -0.05, 0.05, 0.05, 0.05},
 			pointable = false,
 			static_save = false,
 		},
