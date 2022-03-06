@@ -234,7 +234,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 					})
 
 					local kb
-					if ctf_modebase.taken_flags[name] then
+					if ctf_modebase.taken_flags[vname] then
 						kb = KNOCKBACK_AMOUNT_WITH_FLAG
 					else
 						kb = KNOCKBACK_AMOUNT

@@ -18,13 +18,17 @@ local function tp_player_near_flag(player)
 
 	if not tname then return end
 
-	player:set_pos(
-		vector.offset(ctf_map.current_map.teams[tname].flag_pos,
-			math.random(-1, 1),
-			0.5,
-			math.random(-1, 1)
-		)
+	local pos = vector.offset(ctf_map.current_map.teams[tname].flag_pos,
+		math.random(-1, 1),
+		0.5,
+		math.random(-1, 1)
 	)
+	player:set_pos(pos)
+	minetest.after(0.1, function() -- TODO remove after respawn bug will be fixed
+		if player:is_player() then
+			player:set_pos(pos)
+		end
+	end)
 
 	return true
 end
