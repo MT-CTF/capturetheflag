@@ -352,7 +352,7 @@ return {
 		local deny_pro = "You need to have more than 1.4 kills per death, "..
 				"5 captures, and at least 8,000 score to access the pro section"
 
-		-- Remember to update /makepro in ranking_commands.lua if you change anything here
+		-- Remember to update /make_pro in ranking_commands.lua if you change anything here
 		if rank then
 			if
 				(rank.score or 0) >= 8000 and

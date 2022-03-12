@@ -20,7 +20,7 @@ end
 
 ctf_core.register_chatcommand_alias("rank", "r", {
 	description = "Get the rank of yourself or a player",
-	params = "<mode:technical modename> <playername>",
+	params = "[mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
 		if not mode_name then
@@ -61,7 +61,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 local allow_reset = {}
 minetest.register_chatcommand("reset_rankings", {
 	description = minetest.colorize("red", "Resets rankings of you or another player to nothing"),
-	params = "<mode:technical modename> <playername>",
+	params = "[mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
 		if not mode_name then
@@ -72,6 +72,9 @@ minetest.register_chatcommand("reset_rankings", {
 			if minetest.check_player_privs(name, {ctf_admin = true}) then
 				mode_data.rankings:set(pname, {}, true)
 
+				minetest.log("action", string.format(
+					"[ctf_admin] %s reset rankings for player '%s' in mode %s", name, pname, mode_name
+				))
 				return true, "Rankings reset for player " .. pname
 			else
 				return false, "The ctf_admin priv is required to reset the rankings of other players!"
@@ -98,62 +101,10 @@ minetest.register_chatcommand("reset_rankings", {
 	end
 })
 
-minetest.register_chatcommand("makepro", {
-	description = "Make yourself or another player into a pro",
-	params = "<mode:technical modename> <playername>",
-	privs = {ctf_admin = true},
-	func = function(name, param)
-		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
-			return false, mode_data
-		end
-
-		if not pname then
-			return false, "You should provide the player name"
-		end
-
-		mode_data.rankings:set(pname, {score = 10000, kills = 15, deaths = 10, flag_captures = 10})
-
-		return true, "Player " .. pname .. " is now a pro!"
-	end
-})
-
-minetest.register_chatcommand("addscore", {
-	description = "Add score to player",
-	params = "<mode:technical modename> [playername] [score]",
-	privs = {ctf_admin = true},
-	func = function(name, param)
-		local mode_name, mode_data, opt_param = get_gamemode(param)
-		if not mode_name then
-			return false, mode_data
-		end
-
-		local pname, score = string.match(opt_param or "", "^(.*) (.*)$")
-
-		if not pname then
-			return false, "You should provide the player name"
-		end
-
-		score = tonumber(score)
-		if not score then
-			return false, "You should provide score amount"
-		end
-
-		local old_ranks = mode_data.rankings:get(pname)
-		if not old_ranks then
-			return false, string.format("Player %s has no rankings", pname)
-		end
-
-		local old_score = old_ranks.score or 0
-		mode_data.rankings:set(pname, {score = old_score + score})
-
-		return true, string.format("Added %s score to player %s", score, pname)
-	end
-})
 
 minetest.register_chatcommand("top50", {
 	description = "Show the top 50 players",
-	params = "<mode:technical modename>",
+	params = "[mode:technical modename]",
 	func = function(name, param)
 		local mode_name, mode_data = get_gamemode(param)
 		if not mode_name then
@@ -182,4 +133,128 @@ minetest.register_chatcommand("top50", {
 			disable_nonuser_colors = true,
 		})
 	end,
+})
+
+minetest.register_chatcommand("make_pro", {
+	description = "Make yourself or another player a pro",
+	params = "[mode:technical modename] <playername>",
+	privs = {ctf_admin = true},
+	func = function(name, param)
+		local mode_name, mode_data, pname = get_gamemode(param)
+		if not mode_name then
+			return false, mode_data
+		end
+
+		if not pname then
+			return false, "You should provide the player name"
+		end
+
+		local old_ranks = mode_data.rankings:get(pname)
+		if not old_ranks then
+			return false, string.format("Player '%s' has no rankings!", pname)
+		end
+
+		mode_data.rankings:add(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 5})
+
+		minetest.log("action", string.format(
+			"[ctf_admin] %s made player '%s' a pro in mode %s: %s", name, pname, mode_name, dump(old_ranks)
+		))
+		return true, string.format("Player '%s' is now a pro!", pname)
+	end
+})
+
+minetest.register_chatcommand("add_score", {
+	description = "Add score to player",
+	params = "[mode:technical modename] <playername> <score>",
+	privs = {ctf_admin = true},
+	func = function(name, param)
+		local mode_name, mode_data, opt_param = get_gamemode(param)
+		if not mode_name then
+			return false, mode_data
+		end
+
+		local pname, score = string.match(opt_param or "", "^(.*) (.*)$")
+
+		if not pname then
+			return false, "You should provide the player name!"
+		end
+
+		score = tonumber(score)
+		if not score then
+			return false, "You should provide score amount!"
+		end
+
+		local old_ranks = mode_data.rankings:get(pname)
+		if not old_ranks then
+			return false, string.format("Player '%s' has no rankings!", pname)
+		end
+
+		local old_score = old_ranks.score or 0
+		mode_data.rankings:set(pname, {score = old_score + score})
+
+		minetest.log("action", string.format(
+			"[ctf_admin] %s added %s score to player '%s' in mode %s", name, score, pname, mode_name
+		))
+		return true, string.format("Added %s score to player '%s'", score, pname)
+	end
+})
+
+minetest.register_chatcommand("transfer_rankings", {
+	description = "Transfer rankings of one player to another.",
+	params = "<src> <dest>",
+	privs = {ctf_admin = true},
+	func = function(name, param)
+		local src, dst = param:trim():match("^(.*) (.*)$")
+
+		if not src then
+			return false, "You should provide source player name!"
+		end
+		if not dst then
+			return false, "You should provide destination player name!"
+		end
+
+		local src_rankings = {}
+		local dst_rankings = {}
+		local src_exists = false
+		local dst_exists = false
+
+		for mode_name, mode in pairs(ctf_modebase.modes) do
+			local src_rank = mode.rankings:get(src)
+			src_rankings[mode_name] = src_rank or {}
+			if src_rank then
+				src_exists = true
+			end
+
+			local dst_rank = mode.rankings:get(dst)
+			dst_rankings[mode_name] = dst_rank or {}
+			if dst_rank then
+				dst_exists = true
+			end
+		end
+
+		if not src_exists then
+			return false, string.format("Source player '%s' has no rankings!", src)
+		end
+		if not dst_exists then
+			return false, string.format("Destination player '%s' has no rankings!", dst)
+		end
+
+		if src == dst then
+			return false, "Source name and destination name cannot be the same!"
+		end
+
+		for mode_name, mode in pairs(ctf_modebase.modes) do
+			mode.rankings:add(dst, src_rankings[mode_name])
+		end
+
+		for _, mode in pairs(ctf_modebase.modes) do
+			mode.rankings:set(src, {}, true)
+		end
+
+		minetest.log("action", string.format(
+			"[ctf_admin] %s transferred rankings from '%s' to '%s': %s -> %s",
+			name, src, dst, dump(src_rankings), dump(dst_rankings)
+		))
+		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
+	end
 })
