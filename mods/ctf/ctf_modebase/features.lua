@@ -127,7 +127,8 @@ return {
 		ctf_map.prepare_map_nodes(
 			ctf_map.current_map,
 			function(inv) ctf_map.treasure.treasurefy_node(inv, map_treasures) end,
-			ctf_modebase:get_current_mode().blacklisted_nodes
+			ctf_modebase:get_current_mode().team_chest_items or {},
+			ctf_modebase:get_current_mode().blacklisted_nodes or {}
 		)
 	end,
 	on_match_end = function()

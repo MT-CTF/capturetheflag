@@ -52,6 +52,10 @@ ctf_modebase.register_mode("nade_fight", {
 	},
 	physics = {sneak_glitch = true, new_move = false},
 	blacklisted_nodes = {"default:apple"},
+	team_chest_items = {
+		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
+		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
 	summary_ranks = {

@@ -125,6 +125,15 @@ minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 --
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
 
+local chest_formspec =
+	"size[8,9]" ..
+	"list[current_name;main;0,0.3;8,4;]" ..
+	"list[current_player;main;0,4.85;8,1;]" ..
+	"list[current_player;main;0,6.08;8,3;8]" ..
+	"listring[current_name;main]" ..
+	"listring[current_player;main]" ..
+	default.get_hotbar_bg(0,4.85)
+
 minetest.register_node("ctf_map:chest", {
 	description = "Treasure Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
@@ -134,6 +143,14 @@ minetest.register_node("ctf_map:chest", {
 	light_source = 2,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", "Treasure Chest")
+		meta:set_string("formspec", chest_formspec)
+
+		local inv = meta:get_inventory()
+		inv:set_size("main", 8*4)
+	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
 			minetest.chat_send_player(player:get_player_name(),

@@ -2,8 +2,7 @@ local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
-local crafts, classes = ctf_core.include_files(
-	"crafts.lua",
+local classes = ctf_core.include_files(
 	"paxel.lua",
 	"classes.lua"
 )
@@ -41,9 +40,16 @@ ctf_modebase.register_mode("classes", {
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
 	},
-	crafts = crafts,
+	crafts = {
+		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
+		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+	},
 	physics = {sneak_glitch = true, new_move = false},
 	blacklisted_nodes = {"default:apple"},
+	team_chest_items = {
+		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",
+		"default:torch 30", "ctf_teams:door_steel 2",
+	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
 	summary_ranks = {

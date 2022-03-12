@@ -105,14 +105,6 @@ local ID_AIR = minetest.CONTENT_AIR
 local ID_IGNORE = minetest.CONTENT_IGNORE
 local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local ID_WATER = minetest.get_content_id("default:water_source")
-local chest_formspec =
-	"size[8,9]" ..
-	"list[current_name;main;0,0.3;8,4;]" ..
-	"list[current_player;main;0,4.85;8,1;]" ..
-	"list[current_player;main;0,6.08;8,3;8]" ..
-	"listring[current_name;main]" ..
-	"listring[current_player;main]" ..
-	default.get_hotbar_bg(0,4.85)
 
 local function get_place_positions(a, data, pos1, pos2)
 	if a.amount <= 0 then return {} end
@@ -167,26 +159,44 @@ local function get_place_positions(a, data, pos1, pos2)
 	return ret
 end
 
-function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, blacklisted_nodes)
-	local vm = VoxelManip()
-	local pos1, pos2 = vm:read_from_map(mapmeta.pos1, mapmeta.pos2)
+local function prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nodes)
+	local Nx = pos2.x - pos1.x + 1
+	local Ny = pos2.y - pos1.y + 1
 
-	local data = vm:get_data()
-	local param2_data = vm:get_param2_data()
+	local math_floor = math.floor
 
-	if blacklisted_nodes then
-		local blacklist = {}
-		for _, node in ipairs(blacklisted_nodes) do
-			blacklist[minetest.get_content_id(node)] = true
-		end
-
-		for i, v in ipairs(data) do
-			if blacklist[v] then
-				data[i] = ID_AIR
-			end
-		end
+	local nodes = {}
+	for _, node in ipairs(blacklisted_nodes) do
+		nodes[minetest.get_content_id(node)] = false
 	end
 
+	for _, team in ipairs(ctf_teams.teamlist) do
+		local node = "ctf_teams:chest_" .. team
+		nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+	end
+
+	for i, v in ipairs(data) do
+		local op = nodes[v]
+		if op == false then
+			data[i] = ID_AIR
+		elseif op then
+			-- it's a team chest
+			local x = (i - 1) % Nx + pos1.x
+			local y = math_floor((i - 1) / Nx) % Ny + pos1.y
+			local z = math_floor((i - 1) / Ny / Nx) + pos1.z
+			local pos = {x=x, y=y, z=z}
+
+			op.on_construct(pos)
+
+			local inv = minetest.get_meta(pos):get_inventory()
+			inv:set_list("main", team_chest_items)
+			inv:set_list("pro", {})
+			inv:set_list("helper", {})
+		end
+	end
+end
+
+local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, treasurefy_node_callback)
 	for i, a in pairs(mapmeta.chests) do
 		local place_positions = get_place_positions(a, data, pos1, pos2)
 
@@ -195,12 +205,9 @@ function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, blackliste
 			param2_data[pos.vi] = 0
 
 			-- Treasurefy
-			local meta = minetest.get_meta(pos)
-			meta:set_string("infotext", "Treasure Chest")
-			meta:set_string("formspec", chest_formspec)
+			minetest.registered_nodes["ctf_map:chest"].on_construct(pos)
 
-			local inv = meta:get_inventory()
-			inv:set_size("main", 8*4)
+			local inv = minetest.get_meta(pos):get_inventory()
 			inv:set_list("main", {})
 			if treasurefy_node_callback then
 				treasurefy_node_callback(inv)
@@ -213,6 +220,17 @@ function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, blackliste
 			)
 		end
 	end
+end
+
+function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest_items, blacklisted_nodes)
+	local vm = VoxelManip()
+	local pos1, pos2 = vm:read_from_map(mapmeta.pos1, mapmeta.pos2)
+
+	local data = vm:get_data()
+	local param2_data = vm:get_param2_data()
+
+	prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nodes)
+	place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, treasurefy_node_callback)
 
 	vm:set_data(data)
 	vm:set_param2_data(param2_data)
