@@ -62,7 +62,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"deaths",
 		"hp_healed"
 	},
-	build_timer = 60,
+	build_timer = 60 * 2,
 
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_nade_fight:") then
