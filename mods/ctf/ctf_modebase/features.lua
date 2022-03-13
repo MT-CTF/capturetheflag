@@ -45,6 +45,25 @@ local function get_weapon_image(hitter, tool_capabilities)
 	return image
 end
 
+local function get_suicide_image(reason)
+	local image = "ctf_modebase_skull.png"
+
+	if reason.type == "node_damage" then
+		local node = reason.node
+		if node == "ctf_map:spike" then
+			image = "ctf_map_spike.png"
+		elseif node:match("default:lava") then
+			image = "default_lava.png"
+		elseif node:match("fire:") then
+			image = "fire_basic_flame.png"
+		end
+	elseif reason.type == "drown" then
+		image = "default_water.png"
+	end
+
+	return image
+end
+
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
 
@@ -86,19 +105,31 @@ local function celebrate_team(teamname)
 	end
 end
 
-local function end_combat_mode(player, suicide, killer, weapon_image)
-	local killscore = calculate_killscore(player)
+local function end_combat_mode(player, reason, killer, weapon_image)
+	local comment = nil
 
-	local punch = true
-	if not killer then
-		punch = false
+	if reason == "combatlog" then
 		killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+		if killer then
+			comment = " (Combat Log)"
+			recent_rankings.add(player, {deaths = 1}, true)
+		end
+	else
+		if reason ~= "punch" or killer == player then
+			if reason == "punch" then
+				ctf_kill_list.add(player, player, weapon_image)
+			else
+				ctf_kill_list.add("", player, get_suicide_image(reason))
+			end
+			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+			comment = " (Suicide)"
+		end
+		recent_rankings.add(player, {deaths = 1}, true)
 	end
 
-	if killer == player then
-		ctf_kill_list.add(killer, player, weapon_image)
-		recent_rankings.add(player, {deaths = 1}, true)
-	elseif killer then
+	if killer then
+		local killscore = calculate_killscore(player)
+
 		local rewards = {kills = 1, score = killscore}
 		local bounty = ctf_modebase.bounties.claim(player, killer)
 
@@ -110,7 +141,13 @@ local function end_combat_mode(player, suicide, killer, weapon_image)
 
 		recent_rankings.add(killer, rewards)
 
-		ctf_kill_list.add(killer, player, weapon_image, punch and "" or suicide and " (Suicide)" or " (Combat Log)")
+		ctf_kill_list.add(killer, player, weapon_image, comment)
+
+		-- share kill score with other hitters
+		local hitters = ctf_combat_mode.get_other_hitters(player, killer)
+		for _, pname in ipairs(hitters) do
+			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
+		end
 
 		-- share kill score with healers
 		local healers = ctf_combat_mode.get_healers(killer)
@@ -121,16 +158,6 @@ local function end_combat_mode(player, suicide, killer, weapon_image)
 		if ctf_combat_mode.is_only_hitter(killer, player) then
 			ctf_combat_mode.set_kill_time(killer, 5)
 		end
-
-		recent_rankings.add(player, {deaths = 1}, true)
-	elseif suicide then
-		ctf_kill_list.add("", player, "ctf_modebase_skull.png")
-		recent_rankings.add(player, {deaths = 1}, true)
-	end
-
-	local hitters = ctf_combat_mode.get_other_hitters(player, killer)
-	for _, pname in ipairs(hitters) do
-		recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
 	end
 
 	ctf_combat_mode.end_combat(player)
@@ -358,7 +385,7 @@ return {
 		local pname = player:get_player_name()
 
 		-- should be no_hud to avoid a race
-		end_combat_mode(pname)
+		end_combat_mode(pname, "combatlog")
 
 		recent_rankings.on_leaveplayer(pname)
 	end,
@@ -367,7 +394,7 @@ return {
 
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			end_combat_mode(player:get_player_name(), true)
+			end_combat_mode(player:get_player_name(), reason)
 		end
 
 		ctf_modebase.prepare_respawn_delay(player)
@@ -426,7 +453,7 @@ return {
 		local weapon_image = get_weapon_image(hitter, tool_capabilities)
 
 		if player:get_hp() <= damage then
-			end_combat_mode(pname, false, hname, weapon_image)
+			end_combat_mode(pname, "punch", hname, weapon_image)
 		elseif pname ~= hname then
 			ctf_combat_mode.add_hitter(player, hitter, weapon_image, 15)
 		end
