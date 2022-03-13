@@ -61,7 +61,12 @@ minetest.register_node("ctf_map:damage_cobble", {
 			local placerobj = placer and minetest.get_player_by_name(placer.name)
 
 			if placerobj then
-				digger:punch(placerobj, 10, {damage_groups = {fleshy = 7}}, vector.new(0, 1, 0))
+				digger:punch(placerobj, 10, {
+					damage_groups = {
+						fleshy = 7,
+						damage_cobble = 1,
+					}
+				}, vector.new(0, 1, 0))
 			else
 				local hp = digger:get_hp()
 				if hp > 0 then

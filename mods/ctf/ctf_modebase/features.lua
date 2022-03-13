@@ -13,6 +13,38 @@ local function calculate_killscore(player)
 	return math.max(1, math.round(kd * 7))
 end
 
+local damage_group_textures = {
+	grenade = "grenades_frag.png",
+	knockback_grenade = "ctf_mode_nade_fight_knockback_grenade.png",
+	black_hole_grenade = "ctf_mode_nade_fight_black_hole_grenade.png",
+	damage_cobble = "ctf_map_damage_cobble.png",
+}
+
+local function get_weapon_image(hitter, tool_capabilities)
+	local image
+
+	for group, texture in pairs(damage_group_textures) do
+		if tool_capabilities.damage_groups[group] then
+			image = texture
+			break
+		end
+	end
+
+	if not image then
+		image = hitter:get_wielded_item():get_definition().inventory_image
+	end
+
+	if image == "" then
+		image = "ctf_kill_list_punch.png"
+	end
+
+	if tool_capabilities.damage_groups.ranged then
+		image = image .. "^[transformFX"
+	end
+
+	return image
+end
+
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
 
@@ -54,17 +86,17 @@ local function celebrate_team(teamname)
 	end
 end
 
-local function end_combat_mode(player, killer, leaving)
+local function end_combat_mode(player, suicide, killer, weapon_image)
 	local killscore = calculate_killscore(player)
-	local hitters = {}
 
-	ctf_combat_mode.get(player, "hitter", function(pname)
-		if not killer or pname ~= killer then
-			table.insert(hitters, pname)
-		end
-	end)
+	local punch = true
+	if not killer then
+		punch = false
+		killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+	end
 
 	if killer == player then
+		ctf_kill_list.add(killer, player, weapon_image)
 		recent_rankings.add(player, {deaths = 1}, true)
 	elseif killer then
 		local rewards = {kills = 1, score = killscore}
@@ -78,35 +110,30 @@ local function end_combat_mode(player, killer, leaving)
 
 		recent_rankings.add(killer, rewards)
 
+		ctf_kill_list.add(killer, player, weapon_image, punch and "" or suicide and " (Suicide)" or " (Combat Log)")
+
 		-- share kill score with healers
-		ctf_combat_mode.get(killer, "healer", function(pname)
-			recent_rankings.add(pname, {score = rewards.score})
-		end)
+		local healers = ctf_combat_mode.get_healers(killer)
+		for _, pname in ipairs(healers) do
+			recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
+		end
+
+		if ctf_combat_mode.is_only_hitter(killer, player) then
+			ctf_combat_mode.set_kill_time(killer, 5)
+		end
 
 		recent_rankings.add(player, {deaths = 1}, true)
-
-		local killer_attacked = nil
-		ctf_combat_mode.get(killer, "hitter", function(pname)
-			if not killer_attacked then
-				killer_attacked = pname ~= player
-			end
-		end)
-
-		if killer_attacked == false then
-			ctf_combat_mode.set_time(killer, 5)
-		end
-	else
-		if #hitters > 0 or not leaving then
-			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
-			recent_rankings.add(player, {deaths = 1}, true)
-		end
+	elseif suicide then
+		ctf_kill_list.add("", player, "ctf_modebase_skull.png")
+		recent_rankings.add(player, {deaths = 1}, true)
 	end
 
+	local hitters = ctf_combat_mode.get_other_hitters(player, killer)
 	for _, pname in ipairs(hitters) do
 		recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
 	end
 
-	ctf_combat_mode.remove(player)
+	ctf_combat_mode.end_combat(player)
 end
 
 return {
@@ -324,14 +351,14 @@ return {
 	end,
 	on_leaveplayer = function(player)
 		if not ctf_modebase.match_started then
-			ctf_combat_mode.remove(player)
+			ctf_combat_mode.end_combat(player)
 			return
 		end
 
 		local pname = player:get_player_name()
 
 		-- should be no_hud to avoid a race
-		end_combat_mode(pname, nil, true)
+		end_combat_mode(pname)
 
 		recent_rankings.on_leaveplayer(pname)
 	end,
@@ -340,7 +367,7 @@ return {
 
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			end_combat_mode(player:get_player_name())
+			end_combat_mode(player:get_player_name(), true)
 		end
 
 		ctf_modebase.prepare_respawn_delay(player)
@@ -396,11 +423,12 @@ return {
 			return false, pname .. " is on your team!"
 		end
 
+		local weapon_image = get_weapon_image(hitter, tool_capabilities)
+
 		if player:get_hp() <= damage then
-			end_combat_mode(pname, hname)
-			ctf_kill_list.on_kill(player, hitter, tool_capabilities)
+			end_combat_mode(pname, false, hname, weapon_image)
 		elseif pname ~= hname then
-			ctf_combat_mode.set(player, hitter, "hitter", 15, true)
+			ctf_combat_mode.add_hitter(player, hitter, weapon_image, 15)
 		end
 
 		return damage
@@ -416,7 +444,7 @@ return {
 			score = 1
 		end
 
-		ctf_combat_mode.set(patient, player, "healer", 60, false)
+		ctf_combat_mode.add_healer(patient, player, 60)
 		recent_rankings.add(player, {hp_healed = amount, score = score}, true)
 	end,
 }

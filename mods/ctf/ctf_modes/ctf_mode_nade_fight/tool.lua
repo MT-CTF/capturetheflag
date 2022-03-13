@@ -105,8 +105,8 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 						v:punch(player, 1, {
 							punch_interval = 1,
 							damage_groups = {
-								grenade = 1,
 								fleshy = 1,
+								black_hole_grenade = 1,
 							}
 						}, nil)
 					end
@@ -209,8 +209,8 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 					v:punch(minetest.get_player_by_name(name), 1, {
 						punch_interval = 1,
 						damage_groups = {
-							grenade = 1,
 							fleshy = 1,
+							knockback_grenade = 1,
 						}
 					}, nil)
 					minetest.add_particlespawner({

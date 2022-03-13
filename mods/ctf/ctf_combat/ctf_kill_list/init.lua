@@ -108,38 +108,12 @@ minetest.register_on_joinplayer(function(player)
 	update_kill_list_hud(player)
 end)
 
-local damage_group_textures = {grenade = "grenades_frag.png"}
-function ctf_kill_list.on_kill(player, hitter, tool_capabilities)
-	local killwep_invimage
+function ctf_kill_list.add(killer, victim, weapon_image, comment)
+	killer = PlayerName(killer)
+	victim = PlayerName(victim)
 
-	for group, texture in pairs(damage_group_textures) do
-		if tool_capabilities.damage_groups[group] then
-			killwep_invimage = texture
-			break
-		end
-	end
-
-	if not killwep_invimage then
-		killwep_invimage = hitter:get_wielded_item():get_definition().inventory_image
-	end
-
-	if killwep_invimage == "" then
-		killwep_invimage = "ctf_kill_list_punch.png"
-	end
-
-	if tool_capabilities.damage_groups.ranged then
-		killwep_invimage = killwep_invimage .. "^[transformFX"
-	end
-
-	ctf_kill_list.add_kill(hitter, killwep_invimage, player)
-end
-
-function ctf_kill_list.add_kill(hitter, weapon_image, player)
-	hitter = PlayerName(hitter)
-	player = PlayerName(player)
-
-	local k_teamcolor = ctf_teams.get(hitter)
-	local v_teamcolor = ctf_teams.get(player)
+	local k_teamcolor = ctf_teams.get(killer)
+	local v_teamcolor = ctf_teams.get(victim)
 
 	if k_teamcolor then
 		k_teamcolor = ctf_teams.team[k_teamcolor].color_hex
@@ -149,8 +123,8 @@ function ctf_kill_list.add_kill(hitter, weapon_image, player)
 	end
 
 	add_kill(
-		{text = hitter, color = k_teamcolor or 0xFFF},
-		weapon_image or "default_tool_steelsword.png",
-		{text = player, color = v_teamcolor or 0xFFF}
+		{text = killer, color = k_teamcolor or 0xFFF},
+		weapon_image or "ctf_kill_list_punch.png",
+		{text = victim .. (comment or ""), color = v_teamcolor or 0xFFF}
 	)
 end

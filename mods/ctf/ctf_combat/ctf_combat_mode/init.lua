@@ -1,14 +1,15 @@
 local hud = mhud.init()
-local combats = {}
+local hitters = {}
+local healers = {}
 
 ctf_combat_mode = {}
 
 local function update(player)
-	local combat = combats[player]
+	local combat = hitters[player]
 
 	if combat.time <= 0 then
 		hud:remove(player, "combat_indicator")
-		combats[player] = nil
+		hitters[player] = nil
 		return
 	end
 
@@ -42,82 +43,131 @@ local function update(player)
 	combat.timer = minetest.after(1, update, player)
 end
 
-function ctf_combat_mode.set(player, combatant, type, time, in_combat)
+function ctf_combat_mode.add_hitter(player, hitter, weapon_image, time)
 	player = PlayerName(player)
-	combatant = PlayerName(combatant)
+	hitter = PlayerName(hitter)
 
-	if not combats[player] then
-		combats[player] = {combatants = {}, in_combat = false}
+	if not hitters[player] then
+		hitters[player] = {hitters={}, time=time}
 	end
 
-	combats[player].combatants[combatant] = type
+	local combat = hitters[player]
+	combat.hitters[hitter] = true
+	combat.time = time
+	combat.last_hitter = hitter
+	combat.weapon_image = weapon_image
 
-	if in_combat then
-		combats[player].in_combat = true
-		combats[player].time = time
-
-		if combats[player].timer then
-			combats[player].timer:cancel()
-		end
-
+	if not combat.timer then
 		update(player)
-	elseif not combats[player].in_combat then
-		if combats[player].timer then
-			combats[player].timer:cancel()
-		end
-
-		combats[player].timer = minetest.after(time, function()
-			combats[player] = nil
-		end)
 	end
 end
 
-function ctf_combat_mode.get(player, type, callback)
+function ctf_combat_mode.add_healer(player, healer, time)
+	player = PlayerName(player)
+	healer = PlayerName(healer)
+
+	if not healers[player] then
+		healers[player] = {healers={}, timer=minetest.after(time, function()
+			healers[player] = nil
+		end)}
+	end
+
+	healers[player].healers[healer] = true
+end
+
+function ctf_combat_mode.get_last_hitter(player)
 	player = PlayerName(player)
 
-	if combats[player] then
-		for k, v in pairs(combats[player].combatants) do
-			if v == type then
-				callback(k)
+	if hitters[player] then
+		return hitters[player].last_hitter, hitters[player].weapon_image
+	end
+end
+
+function ctf_combat_mode.get_other_hitters(player, last_hitter)
+	player = PlayerName(player)
+
+	local ret = {}
+
+	if hitters[player] then
+		for pname in pairs(hitters[player].hitters) do
+			if pname ~= last_hitter then
+				table.insert(ret, pname)
 			end
 		end
 	end
+
+	return ret
 end
 
-function ctf_combat_mode.set_time(player, time)
+
+function ctf_combat_mode.get_healers(player)
 	player = PlayerName(player)
-	if combats[player] and combats[player].in_combat then
-		combats[player].timer:cancel()
-		combats[player].time = time
-		update(player)
+
+	local ret = {}
+
+	if healers[player] then
+		for pname in pairs(healers[player].healers) do
+			table.insert(ret, pname)
+		end
+	end
+
+	return ret
+end
+
+function ctf_combat_mode.is_only_hitter(player, hitter)
+	player = PlayerName(player)
+
+	if not hitters[player] then
+		return false
+	end
+
+	for pname in pairs(hitters[player].hitters) do
+		if pname ~= hitter then
+			return false
+		end
+	end
+
+	return true
+end
+
+function ctf_combat_mode.set_kill_time(player, time)
+	player = PlayerName(player)
+
+	if hitters[player] then
+		hitters[player].time = time
 	end
 end
 
 function ctf_combat_mode.in_combat(player)
-	player = PlayerName(player)
-	if combats[player] and combats[player].in_combat then
-		return true
-	end
-	return false
+	return hitters[PlayerName(player)] and true or false
 end
 
-function ctf_combat_mode.remove(player)
+function ctf_combat_mode.end_combat(player)
 	player = PlayerName(player)
 
-	if combats[player] then
+	if hitters[player] then
 		if hud:exists(player, "combat_indicator") then
 			hud:remove(player, "combat_indicator")
 		end
 
-		combats[player].timer:cancel()
-		combats[player] = nil
+		hitters[player].timer:cancel()
+		hitters[player] = nil
+	end
+
+	if healers[player] then
+		healers[player].timer:cancel()
+		healers[player] = nil
 	end
 end
 
 ctf_api.register_on_match_end(function()
-	for _, combat in pairs(combats) do
+	for _, combat in pairs(hitters) do
 		combat.timer:cancel()
 	end
-	combats = {}
+	hitters = {}
+	for _, combat in pairs(healers) do
+		combat.timer:cancel()
+	end
+	healers = {}
 	hud:remove_all()
 end)
