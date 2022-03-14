@@ -5,10 +5,10 @@ ctf_modebase.map_catalog = {
 	current_map = false,
 }
 
-local MAP_REPEAT_INTERVAL = 4
 local maps_pool = {}
 local used_maps = {}
 local used_maps_idx = 1
+local map_repeat_interval
 
 local function init()
 	local maps = minetest.get_dir_list(ctf_map.maps_dir, true)
@@ -26,6 +26,8 @@ local function init()
 	for i = 1, #ctf_modebase.map_catalog.maps do
 		table.insert(maps_pool, i)
 	end
+
+	map_repeat_interval = math.floor(#ctf_modebase.map_catalog.maps / 2)
 end
 
 init()
@@ -42,8 +44,8 @@ function ctf_modebase.map_catalog.select_map(filter)
 	local selected = maps[math.random(1, #maps)]
 	ctf_modebase.map_catalog.current_map = maps_pool[selected]
 
-	if MAP_REPEAT_INTERVAL > 0 then
-		if #used_maps < MAP_REPEAT_INTERVAL then
+	if map_repeat_interval > 0 then
+		if #used_maps < map_repeat_interval then
 			table.insert(used_maps, maps_pool[selected])
 			maps_pool[selected] = maps_pool[#maps_pool]
 			maps_pool[#maps_pool] = nil
