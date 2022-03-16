@@ -2,7 +2,7 @@ local location = {
 	"Arm_Right",          -- default bone
 	{x=0, y=5.5, z=3},    -- default position
 	{x=-90, y=225, z=90}, -- default rotation
-	{x=0.25, y=0.25},     -- default scale
+	{x=0.3, y=0.3, z=0.25},     -- default scale
 }
 
 local players = {}
@@ -21,6 +21,7 @@ minetest.register_entity("wield3d:entity", {
 	backface_culling = false,
 	static_save = false,
 	pointable = false,
+	glow = 7,
 	on_punch = function() return true end,
 })
 
@@ -43,7 +44,7 @@ end
 local globalstep_timer = 0
 minetest.register_globalstep(function(dtime)
 	globalstep_timer = globalstep_timer + dtime
-	if globalstep_timer < 1 then return end
+	if globalstep_timer < 0.6 then return end
 
 	globalstep_timer = 0
 
@@ -56,9 +57,10 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	local entity = minetest.add_entity(player:get_pos(), "wield3d:entity")
-	entity:set_attach(player, location[1], location[2], location[3])
+	entity:set_attach(player, location[1], location[2], location[3], true)
 	players[player:get_player_name()] = {entity=entity, item="wield3d:hand"}
 
+	player:hud_set_flags({wielditem = false})
 	update_entity(player)
 end)
 

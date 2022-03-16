@@ -163,6 +163,33 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 	ctf_combat_mode.end_combat(player)
 end
 
+local function can_punchplayer(player, hitter)
+	if not ctf_modebase.match_started then
+		return false, "The match hasn't started yet!"
+	end
+
+	local pname, hname = player:get_player_name(), hitter:get_player_name()
+	local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
+
+	if not ctf_modebase.remove_respawn_immunity(hitter) then
+		return false, "You can't attack while immune"
+	end
+
+	if not pteam then
+		return false, pname .. " is not in a team!"
+	end
+
+	if not hteam then
+		return false, "You are not in a team!"
+	end
+
+	if pteam == hteam and pname ~= hname then
+		return false, pname .. " is on your team!"
+	end
+
+	return true
+end
+
 return {
 	on_new_match = function()
 		team_list = {}
@@ -424,37 +451,21 @@ return {
 
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
+	can_punchplayer = can_punchplayer,
 	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
 		if not hitter:is_player() or player:get_hp() <= 0 then return false end
 
-		if not ctf_modebase.match_started then
-			return false, "The match hasn't started yet!"
-		end
+		local allowed, message = can_punchplayer(player, hitter)
 
-		local pname, hname = player:get_player_name(), hitter:get_player_name()
-		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
-
-		if not ctf_modebase.remove_respawn_immunity(hitter) then
-			return false, "You can't attack while immune"
-		end
-
-		if not pteam then
-			return false, pname .. " is not in a team!"
-		end
-
-		if not hteam then
-			return false, "You are not in a team!"
-		end
-
-		if pteam == hteam and pname ~= hname then
-			return false, pname .. " is on your team!"
+		if not allowed then
+			return false, message
 		end
 
 		local weapon_image = get_weapon_image(hitter, tool_capabilities)
 
 		if player:get_hp() <= damage then
-			end_combat_mode(pname, "punch", hname, weapon_image)
-		elseif pname ~= hname then
+			end_combat_mode(player:get_player_name(), "punch", hitter:get_player_name(), weapon_image)
+		elseif player:get_player_name() ~= hitter:get_player_name() then
 			ctf_combat_mode.add_hitter(player, hitter, weapon_image, 15)
 		end
 

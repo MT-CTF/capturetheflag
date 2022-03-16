@@ -38,7 +38,7 @@ ctf_modebase = {
 	flag_captured        = {},
 }
 
-ctf_gui.init()
+ctf_gui.old_init()
 
 function ctf_modebase.announce(msg)
 end

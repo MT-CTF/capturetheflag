@@ -32,6 +32,7 @@ local function show_modechoose_form(player)
 			label = i,
 			exit = true,
 			pos = {"center", i},
+			size = {1.4, 0.7},
 			func = function()
 				if votes then
 					player_vote(player, i)
@@ -40,8 +41,8 @@ local function show_modechoose_form(player)
 		}
 	end
 
-	ctf_gui.show_formspec(player, "ctf_modebase:mode_select", {
-		size = {x = 8, y = 8},
+	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
+		size = {x = 8, y = MAX_ROUNDS + 3},
 		title = "Mode: "..HumanReadable(new_mode),
 		description = "Please vote on how many matches you would like to play",
 		elements = elements,

@@ -23,11 +23,17 @@ local function process_ray(ray, user, look_dir, def)
 
 	if hitpoint then
 		if hitpoint.type == "node" then
-			local nodedef = minetest.registered_nodes[minetest.get_node(hitpoint.under).name]
+			local node = minetest.get_node(hitpoint.under)
+			local nodedef = minetest.registered_nodes[node.name]
 
-			if nodedef.groups.snappy or (nodedef.groups.oddly_breakable_by_hand or 0) >= 3 then
+			if nodedef.groups.snappy or nodedef.groups.ranged_breakable or
+			(nodedef.groups.oddly_breakable_by_hand or 0) >= 3 then
 				if not minetest.is_protected(hitpoint.under, user:get_player_name()) then
-					minetest.dig_node(hitpoint.under)
+					if nodedef.groups.ranged_breakable and nodedef.on_dig then
+						nodedef.on_dig(hitpoint.under, node, user)
+					else
+						minetest.dig_node(hitpoint.under)
+					end
 				end
 			else
 				if nodedef.walkable and nodedef.pointable then
@@ -112,6 +118,7 @@ function ctf_ranged.simple_register_gun(name, def)
 		loaded_def.inventory_overlay = def.texture_overlay
 		loaded_def.wield_image = def.wield_texture or def.texture
 		loaded_def.groups.not_in_creative_inventory = nil
+		loaded_def.on_secondary_use = def.on_secondary_use
 		loaded_def.on_use = function(itemstack, user)
 			if not ctf_ranged.can_use_gun(user, name) then
 				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)

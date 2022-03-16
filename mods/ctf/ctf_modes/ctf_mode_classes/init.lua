@@ -60,7 +60,7 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
-	build_timer = 60 * 1.5,
+	build_timer = 42,
 
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
@@ -78,7 +78,7 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 
 		ctf_cosmetics.get_skin = function(player)
-			return old_get_skin(player) .. "^ctf_mode_classes_" .. classes.get_name(player) .. "_overlay.png"
+			return old_get_skin(player) .. classes.get_skin_overlay(player)
 		end
 	end,
 	on_mode_end = function()
@@ -108,7 +108,11 @@ ctf_modebase.register_mode("classes", {
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = features.on_punchplayer,
 	on_healplayer = features.on_healplayer,
-	calculate_knockback = function()
-		return 0
+	calculate_knockback = function(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)
+		if features.can_punchplayer(player, hitter) then
+			return 2 * (tool_capabilities.damage_groups.knockback or 1)
+		else
+			return 0
+		end
 	end,
 })

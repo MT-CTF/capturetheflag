@@ -43,7 +43,7 @@ minetest.register_node("ctf_map:damage_cobble", {
 	tiles = {"ctf_map_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,
-	groups = {cracky=3, stone=2},
+	groups = {cracky=3, stone=2, ranged_breakable=1},
 	on_dig = function(pos, node, digger, extra)
 		if not digger:is_player() then return end
 
