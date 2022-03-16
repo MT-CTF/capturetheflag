@@ -44,7 +44,7 @@ end
 local globalstep_timer = 0
 minetest.register_globalstep(function(dtime)
 	globalstep_timer = globalstep_timer + dtime
-	if globalstep_timer < 0.6 then return end
+	if globalstep_timer < 0.5 then return end
 
 	globalstep_timer = 0
 
@@ -55,19 +55,41 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-minetest.register_on_joinplayer(function(player)
+local function add_wielditem(player)
 	local entity = minetest.add_entity(player:get_pos(), "wield3d:entity")
-	entity:set_attach(player, location[1], location[2], location[3], true)
+	local setting = ctf_settings.get(player, "use_old_wielditem_display")
+
+	entity:set_attach(
+		player,
+		location[1], location[2], location[3],
+		setting == "false"
+	)
 	players[player:get_player_name()] = {entity=entity, item="wield3d:hand"}
 
-	player:hud_set_flags({wielditem = false})
+	player:hud_set_flags({wielditem = setting == "true"})
 	update_entity(player)
-end)
+end
 
-minetest.register_on_leaveplayer(function(player)
+local function remove_wielditem(player)
 	local pname = player:get_player_name()
 	if players[pname] ~= nil then
 		players[pname].entity:remove()
 		players[pname] = nil
 	end
-end)
+end
+
+minetest.register_on_joinplayer(add_wielditem)
+minetest.register_on_leaveplayer(remove_wielditem)
+
+
+ctf_settings.register("use_old_wielditem_display", {
+	label = "Use old wielditem display",
+	type = "bool",
+	default = "false",
+	description = "Will use Minetest's default method of showing the wielded item.\n" ..
+		"This won't show custom animations, but might be less jarring",
+	on_change = function(player, new_value)
+		remove_wielditem(player)
+		add_wielditem(player)
+	end,
+})
