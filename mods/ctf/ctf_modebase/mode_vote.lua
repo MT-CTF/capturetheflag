@@ -105,17 +105,19 @@ function ctf_modebase.mode_vote.end_vote()
 	local votes_result = ""
 	local average_vote = 0
 	local entry_count = 0
-	for length, vote_count in pairs(length_votes) do
-		votes_result = votes_result .. string.format(
-			"    %d vote%s for %d match%s\n",
-			vote_count,
-			vote_count == 1 and "" or "s",
-			length,
-			length == 1 and "" or "es"
-		)
-
-		entry_count = entry_count + vote_count
-		average_vote = average_vote + (length * vote_count)
+	for length = 1, MAX_ROUNDS do
+		vote_count = length_votes[length]
+		if vote_count then
+			votes_result = votes_result .. string.format(
+				"    %d vote%s for %d match%s\n",
+				vote_count,
+				vote_count == 1 and "" or "s",
+				length,
+				length == 1 and "" or "es"
+			)
+			entry_count = entry_count + vote_count
+			average_vote = average_vote + (length * vote_count)
+		end
 	end
 
 	if entry_count > 0 then
