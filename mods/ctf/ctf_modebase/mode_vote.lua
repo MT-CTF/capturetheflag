@@ -106,7 +106,7 @@ function ctf_modebase.mode_vote.end_vote()
 	local average_vote = 0
 	local entry_count = 0
 	for length = 1, MAX_ROUNDS do
-		vote_count = length_votes[length]
+		local vote_count = length_votes[length]
 		if vote_count then
 			votes_result = votes_result .. string.format(
 				"    %d vote%s for %d match%s\n",
