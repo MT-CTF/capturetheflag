@@ -791,8 +791,8 @@ minetest.register_node("default:apple", {
 	on_use = minetest.item_eat(2),
 	sounds = default.node_sound_leaves_defaults(),
 
-	on_place = function()
-		return nil
+	after_place_node = function(pos, placer, itemstack)
+		minetest.set_node(pos, {name = "default:apple", param2 = 1})
 	end,
 
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
