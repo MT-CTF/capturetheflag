@@ -29,7 +29,8 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 	on_collide = function()
 		return true
 	end,
-	on_explode = function(def, pos, name)
+	on_explode = function(def, obj, pos, name)
+		pos = vector.round(pos)
 		local black_hole = minetest.add_entity(pos, "ctf_mode_nade_fight:black_hole")
 
 		local corners = {-black_hole_radius, black_hole_radius}
@@ -165,7 +166,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 	on_collide = function()
 		return true
 	end,
-	on_explode = function(def, pos, name)
+	on_explode = function(def, obj, pos, name)
 		minetest.add_particle({
 			pos = pos,
 			velocity = {x=0, y=0, z=0},
