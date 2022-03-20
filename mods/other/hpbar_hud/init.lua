@@ -28,12 +28,14 @@ end)
 
 -- HACK `register_playerevent` is not documented, but used to implement statbars by MT internally
 minetest.register_playerevent(function(player, eventname)
+	local id = ids[player:get_player_name()]
+	if not id then return end
+
 	if eventname == "health_changed" then
-		player:hud_change(ids[player:get_player_name()], "number", player:get_hp())
+		player:hud_change(id, "number", player:get_hp())
 	elseif eventname == "properties_changed" then
 		-- HP max has probably changed, update HP bar background size ("item") accordingly
 		local hp_max = player:get_properties().hp_max
-		local id = ids[player:get_player_name()]
 		player:hud_change(id, "item", hp_max)
 		player:hud_change(id, "offset", calculate_offset(hp_max / 2))
 	end
