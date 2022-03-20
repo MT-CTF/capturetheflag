@@ -166,6 +166,21 @@ function ctf_map.load_map_meta(idx, dirname)
 		map.skybox_forced = true
 	end
 
+	map.inner_bounds = {["pos1"] = {}, ["pos2"] = {}}
+	first_loop = true
+	for _, team in pairs(map.teams) do
+		min_team_pos, max_team_pos = vector.sort(team.pos1, team.pos2)
+
+		if first_loop then
+			map.inner_bounds.pos1 = min_team_pos
+			map.inner_bounds.pos2 = max_team_pos
+			first_loop = false
+		else
+			map.inner_bounds.pos1, _ = vector.sort(map.inner_bounds.pos1, min_team_pos)
+			_, map.inner_bounds.pos2 = vector.sort(map.inner_bounds.pos2, max_team_pos)
+		end
+	end
+
 	return map
 end
 

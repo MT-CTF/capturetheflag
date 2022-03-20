@@ -30,6 +30,9 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 		return true
 	end,
 	on_explode = function(def, pos, name)
+		_, pos = vector.sort(pos, ctf_map.current_map.inner_bounds.pos1 + vector.new(1,1,1))
+		pos, _ = vector.sort(pos, ctf_map.current_map.inner_bounds.pos2 - vector.new(1,1,1))
+
 		local black_hole = minetest.add_entity(pos, "ctf_mode_nade_fight:black_hole")
 
 		local corners = {-black_hole_radius, black_hole_radius}
