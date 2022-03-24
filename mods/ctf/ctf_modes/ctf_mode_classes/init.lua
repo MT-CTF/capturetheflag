@@ -107,6 +107,7 @@ ctf_modebase.register_mode("classes", {
 	end,
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = features.on_punchplayer,
+	can_punchplayer = features.can_punchplayer,
 	on_healplayer = features.on_healplayer,
 	calculate_knockback = function(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)
 		if features.can_punchplayer(player, hitter) then

@@ -102,6 +102,7 @@ ctf_modebase.register_mode("nade_fight", {
 	on_flag_capture = features.on_flag_capture,
 	on_flag_rightclick = function() end,
 	get_chest_access = features.get_chest_access,
+	can_punchplayer = features.can_punchplayer,
 	on_punchplayer = function(player, hitter, damage, unneeded, tool_capabilities, ...)
 		if tool.holed[player:get_player_name()] then
 			if tool_capabilities.grenade then

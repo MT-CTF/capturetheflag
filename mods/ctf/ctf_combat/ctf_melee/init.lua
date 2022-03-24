@@ -81,169 +81,171 @@ local EXTRA_ANIM_LENGTH = {
 	slash = slash_stab_anim_length * 0.5,
 	stab = 0.1,
 }
-local HIT_KNOCKBACK = 10
-local MISS_KNOCKBACK = 5
-local SLASH_KNOCKBACK_MULT = 6
+
+local SWOOSH_SOUND_DISTANCE = 8
+local COMBAT_SOUND_DISTANCE = 16
+local KNOCKBACK = {slash = 6, stab = 0}
+local HIT_BOOST = 11
+
+local function dopunch(target, attacker, ignores, attack_capabilities, dir, attack_interval)
+	if target.ref:is_player() and not ignores[target.ref] and
+	ctf_modebase:get_current_mode().can_punchplayer(attacker, target.ref) then
+		ignores[target.ref] = true -- add to the table we were passed
+
+		target.ref:punch(attacker, attack_interval, attack_capabilities, dir)
+
+		minetest.sound_play("player_damage", {
+			object = attacker,
+			exclude_player = target.ref:get_player_name(),
+			pitch = 0.8,
+			gain = 0.4,
+			max_hear_distance = COMBAT_SOUND_DISTANCE,
+		}, true)
+
+		return true
+	end
+
+	return false
+end
 
 local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 	local uname = user:get_player_name()
+	local cooldown = attack_cooldown:get(uname)
+	local anim = (keypress == "LMB" and "stab") or "slash"
 
-	if attack_cooldown:get(uname) then
-		local a_c = attack_cooldown:get(uname)
+	if cooldown then
+		-- if the cooldown has <= 0.3 seconds left then let them queue another stab
+		if anim == "stab" and cooldown._time - (os.clock() - cooldown.start_time) <= 0.3 then
+			-- Don't queue a miss
+			if not pointed or pointed.type ~= "object" then
+				return
+			end
 
-		a_c.keypress = keypress
-		a_c._on_end = function(self)
-			local player = minetest.get_player_by_name(uname)
+			cooldown._on_end = function(self)
+				local player = minetest.get_player_by_name(uname)
 
-			if not player then return end
+				if not player then return end
 
-			local controls = player:get_player_control()
-			local next_keypress = self.keypress
+				local wielded = player:get_wielded_item()
 
-			if controls.LMB or controls.RMB then
-				local item = player:get_wielded_item()
-				if item:get_name() == itemstack:get_name() then
-					-- player switched attack
-					if not controls[next_keypress] then
-						if next_keypress == "LMB" then
-							next_keypress = "RMB"
-						else
-							next_keypress = "LMB"
-						end
-					end
+				if wielded:get_name() ~= itemstack:get_name() then return end
 
-					slash_stab_sword_func(next_keypress, itemstack, user, pointed)
-				end
+				slash_stab_sword_func(keypress, itemstack, user, pointed)
 			end
 		end
 
 		return
 	end
 
-	local anim = (keypress == "LMB" and "stab") or "slash"
+	local attack_interval = slash_stab_anim_length + EXTRA_ANIM_LENGTH[anim]
 
 	ctf_player.set_stab_slash_anim(anim, user, EXTRA_ANIM_LENGTH[anim])
 
 	attack_cooldown:set(uname, {
-		keypress = keypress,
-		_time = slash_stab_anim_length + EXTRA_ANIM_LENGTH[anim],
+		_time = attack_interval,
+		_on_end = function(self) -- Repeat attack if player is holding down the button
+			local player = minetest.get_player_by_name(uname)
+
+			if not player then return end
+
+			local controls = player:get_player_control()
+			local wielded = player:get_wielded_item()
+
+			if wielded:get_name() == itemstack:get_name() and controls.LMB or controls.RMB then
+				if not controls[keypress] then
+					keypress = keypress == "LMB" and "RMB" or "LMB"
+				end
+
+				slash_stab_sword_func(keypress, wielded, player, nil)
+			end
+		end,
 	})
 
-	local dir = user:get_look_dir()
+	local startpos = vector.offset(user:get_pos(), 0, user:get_properties().eye_height, 0)
+
 	local def = itemstack:get_definition()
 	local attack_capabilities = def.tool_capabilities
+
+	local dir = user:get_look_dir()
 	local user_kb_dir = vector.new(dir)
 
+	local ignores = {[user] = true}
+	local section = math.pi/12
+	local hit_player = false
+	local axis
+	local rays
+
 	attack_capabilities.damage_groups = def.damage_groups
+	attack_capabilities.damage_groups.knockback = KNOCKBACK[anim]
+
+	axis = vector.cross(vector.new(dir.z, 0, -dir.x), dir)
+
+	if pointed and pointed.type == "object" then
+		hit_player = dopunch(pointed, user, ignores, attack_capabilities, dir, attack_interval) or hit_player
+
+		pointed = true
+	end
 
 	if anim == "slash" then
-		local section = math.pi/12
-		local axis
-
 		user_kb_dir = -user_kb_dir
-		user_kb_dir.y = math.max(math.min(user_kb_dir.y, 0.4), 0)
+		rays = {
+			vector.rotate_around_axis(dir, axis,  section * 3),
+			vector.rotate_around_axis(dir, axis,  section * 2),
+			vector.rotate_around_axis(dir, axis,  section    ),
 
-		axis = vector.cross(vector.new(dir.z, 0, -dir.x), dir)
-
-		local rays = {
 			vector.rotate_around_axis(dir, axis, -section * 3),
 			vector.rotate_around_axis(dir, axis, -section * 2),
-			vector.rotate_around_axis(dir, axis, -section),
-			dir,
-			vector.rotate_around_axis(dir, axis, section),
-			vector.rotate_around_axis(dir, axis, section * 2),
-			vector.rotate_around_axis(dir, axis, section * 3),
+			vector.rotate_around_axis(dir, axis, -section    ),
+
+			pointed ~= true and dir or nil,
 		}
 
-		local startpos = vector.offset(user:get_pos(), 0, user:get_properties().eye_height, 0)
-		local ignores = {[user] = true}
-		local hit_player = false
-		for _, shootdir in ipairs(rays) do
-			local ray = minetest.raycast(startpos, startpos + (shootdir * 4), true, false)
-
-			minetest.add_particle({
-				pos = startpos,
-				velocity = shootdir * 44,
-				expirationtime = 0.1,
-				size = 5,
-				collisiondetection = true,
-				collision_removal = true,
-				object_collision = false,
-				texture = "ctf_melee_slash.png",
-				glow = 5,
-			})
-
-			for hit in ray do
-				if hit.type ~= "object" then break end
-
-				if hit.ref:is_player() and not ignores[hit.ref] then
-					ignores[hit.ref] = true
-					hit_player = true
-
-					attack_capabilities.damage_groups.knockback = SLASH_KNOCKBACK_MULT
-
-					hit.ref:punch(user, slash_stab_anim_length + EXTRA_ANIM_LENGTH[anim], attack_capabilities, shootdir)
-
-					minetest.sound_play("player_damage", {
-						object = user,
-						exclude_player = hit.ref:get_player_name(),
-						pitch = 0.8,
-						gain = 0.4,
-						max_hear_distance = 10,
-					}, true)
-				end
-			end
-		end
-
-		if hit_player then
-			user:add_velocity(user_kb_dir * HIT_KNOCKBACK)
-
-			minetest.sound_play("ctf_melee_whoosh", {
-				object = user,
-				pitch = 1.1,
-				gain = 1.2,
-				max_hear_distance = 4,
-			}, true)
-		else
-			user:add_velocity(user_kb_dir * MISS_KNOCKBACK)
-
-			minetest.sound_play("ctf_melee_whoosh", {
-				object = user,
-				pitch = 1.1,
-				gain = 0.5,
-				max_hear_distance = 4,
-			}, true)
-		end
+		minetest.sound_play("ctf_melee_whoosh", {
+			object = user,
+			pitch = 1.1,
+			gain = 1.2,
+			max_hear_distance = SWOOSH_SOUND_DISTANCE,
+		}, true)
 	else
-		user_kb_dir.y = math.max(math.min(user_kb_dir.y, 0.4), 0)
+		rays = {
+			pointed ~= true and dir or nil,
+			vector.rotate_around_axis(dir, axis, -section),
+			vector.rotate_around_axis(dir, axis,  section),
+		}
 
-		if pointed and pointed.type == "object" then
-			attack_capabilities.damage_groups.knockback = 0 -- This attack is for catching people
-			pointed.ref:punch(user, slash_stab_anim_length + EXTRA_ANIM_LENGTH[anim], attack_capabilities, dir)
-			user:add_velocity(user_kb_dir * HIT_KNOCKBACK)
+		minetest.sound_play("ctf_melee_whoosh", {
+			object = user,
+			gain = 1.1,
+			max_hear_distance = SWOOSH_SOUND_DISTANCE,
+		}, true)
+	end
 
-			minetest.sound_play("ctf_melee_whoosh", {
-				object = user,
-				max_hear_distance = 3,
-				gain = 1.2,
-			}, true)
+	user_kb_dir.y = math.max(math.min(user_kb_dir.y, 0.4), 0)
 
-			minetest.sound_play("player_damage", {
-				object = user,
-				exclude_player = pointed.ref:get_player_name(),
-				pitch = 0.9,
-				gain = 0.3,
-				max_hear_distance = 8,
-			}, true)
-		else
-			user:add_velocity(user_kb_dir * MISS_KNOCKBACK)
+	for _, shootdir in ipairs(rays) do
+		local ray = minetest.raycast(startpos, startpos + (shootdir * 4), true, false)
 
-			minetest.sound_play("ctf_melee_whoosh", {
-				object = user,
-				gain = 0.5,
-				max_hear_distance = 3,
-			}, true)
+		minetest.add_particle({
+			pos = startpos,
+			velocity = shootdir * 44,
+			expirationtime = 0.1,
+			size = 5,
+			collisiondetection = true,
+			collision_removal = true,
+			object_collision = false,
+			texture = "ctf_melee_slash.png",
+			glow = 5,
+		})
+
+		for hit in ray do
+			if hit.type ~= "object" then break end
+
+			hit_player = dopunch(hit, user, ignores, attack_capabilities, shootdir, attack_interval) or hit_player
 		end
+	end
+
+	if hit_player then
+		user:add_velocity(user_kb_dir * HIT_BOOST)
 	end
 end
 
@@ -282,9 +284,11 @@ function ctf_melee.register_sword(name, def)
 
 	base_def.on_use = function(itemstack, user, pointed, ...)
 		if pointed then
-			if pointed.type == "object" and not pointed.ref:is_player() then
-				pointed.ref:punch(user, slash_stab_anim_length, damage_capabilities, vector.new())
-				return
+			if pointed.type == "object" then
+				if not pointed.ref:is_player() then
+					pointed.ref:punch(user, slash_stab_anim_length, damage_capabilities, vector.new())
+					return
+				end
 			elseif pointed.type == "node" then
 				local node = minetest.get_node(pointed.under)
 				local node_on_punch = minetest.registered_nodes[node.name].on_punch
