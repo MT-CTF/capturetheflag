@@ -14,7 +14,7 @@ globals = {
 	"chatcmdbuilder", "crafting", "hpbar", "playertag", "random_messages",
 	"skybox", "throwable_snow",
 
-	"default", "doors", "player_api", "sfinv",
+	"default", "doors", "player_api", "sfinv", "binoculars",
 
 	"vector",
 	math = {
