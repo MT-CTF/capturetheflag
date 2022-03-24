@@ -119,12 +119,14 @@ ctf_melee.register_sword("ctf_mode_classes:knight_sword", {
 --- Ranged Gun
 --
 
-local RANGED_COOLDOWN_TIME = 18
+local RANGED_COOLDOWN_TIME = 31
+local RANGED_ZOOM_MULT = 3
 
+local scoped = ctf_ranged.scoped
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "classes_rifle",
 	description = "Scout Rifle\n" .. minetest.colorize("gold",
-			"Rightclick enemy to bayonet stab (deals damage and knockback) ("..RANGED_COOLDOWN_TIME.."s cooldown)"),
+			"Rightclick + (Sneak/Run) to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown), otherwise will toggle scope"),
 	texture = "ctf_mode_classes_ranged_rifle.png",
 	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
 	wield_texture = "ctf_mode_classes_ranged_rifle.png",
@@ -134,27 +136,25 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	damage = 5,
 	fire_interval = 0.8,
 	liquid_travel_dist = 4,
-	on_secondary_use = function(itemstack, user, pointed_thing)
-		if not pointed_thing or pointed_thing.type ~= "object" then
+	rightclick_func = function(itemstack, user, pointed)
+		local ctl = user:get_player_control()
+
+		if not ctl.sneak and not ctl.aux1 then
+			local uname = user:get_player_name()
+
+			if not ctl.zoom then
+				if scoped[uname] then
+					ctf_ranged.hide_scope(uname)
+				else
+					ctf_ranged.show_scope(uname, "ctf_mode_classes:ranged_rifle", RANGED_ZOOM_MULT)
+				end
+			end
+
 			return
 		end
 
-		local enemy = pointed_thing.ref
-
-		if itemstack:get_wear() == 0 and enemy and enemy:is_player() then
-			local p1, p2 = user:get_pos(), enemy:get_pos()
-
-			if vector.distance(p1, p2) > 4.4 then -- The player hitboxes extend reach a bit
-				minetest.log("[classes]: Cancelling bayonet hit for "..user:get_player_name())
-				return
-			end
-
-			local dir = vector.direction(p1, p2)
-
-			dir.y = 0.5
-
-			enemy:punch(user, 1, {damage_groups = {fleshy = 6}}, dir)
-			enemy:add_velocity(dir * 13)
+		if itemstack:get_wear() == 0 then
+			grenades.throw_grenade("grenades:frag", 24, user)
 
 			local step = math.floor(65534 / RANGED_COOLDOWN_TIME)
 			ctf_modebase.update_wear.start_update(user:get_player_name(), "ctf_mode_classes:ranged_rifle_loaded", step, true)
