@@ -28,6 +28,8 @@ function ctf_core.init_cooldowns()
 				end
 			end)
 
+			time.start_time = os.clock()
+
 			self.players[pname] = time
 		end,
 		get = function(self, player)
