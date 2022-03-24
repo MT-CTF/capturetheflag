@@ -1,4 +1,5 @@
 local RESPAWN_SECONDS = 7
+local AUTO_RESPAWN_TIME = 0.4
 local respawn_delay = {}
 local hud = mhud.init()
 
@@ -75,6 +76,19 @@ local function respawn(player, time)
 	run_respawn_timer(pname)
 end
 
+local function trigger_respawn(pname)
+	if respawn_delay[pname] then
+		if respawn_delay[pname].autorespawn then
+			respawn_delay[pname].autorespawn:cancel()
+			respawn_delay[pname].autorespawn = nil
+		end
+
+		respawn(minetest.get_player_by_name(pname), RESPAWN_SECONDS)
+	else
+		ctf_modebase.on_respawnplayer(minetest.get_player_by_name(pname))
+	end
+end
+
 function ctf_modebase.prepare_respawn_delay(player)
 	local pname = player:get_player_name()
 	if respawn_delay[pname] then return end
@@ -90,6 +104,11 @@ function ctf_modebase.prepare_respawn_delay(player)
 		player:set_attach(obj)
 		respawn_delay[pname].obj = obj
 	end
+
+	respawn_delay[pname].autorespawn = minetest.after(AUTO_RESPAWN_TIME, function()
+		minetest.close_formspec(pname, "") -- This is the only way to close clientside formspecs
+		trigger_respawn(pname)
+	end)
 end
 
 ctf_api.register_on_match_end(function()
@@ -117,11 +136,9 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_on_respawnplayer(function(player)
-	if respawn_delay[player:get_player_name()] then
-		respawn(player, RESPAWN_SECONDS)
-	else
-		ctf_modebase.on_respawnplayer(player)
-	end
+	local pname = player:get_player_name()
+
+	trigger_respawn(pname)
 
 	return true
 end)
