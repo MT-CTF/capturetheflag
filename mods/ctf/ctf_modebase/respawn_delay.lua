@@ -85,7 +85,11 @@ local function trigger_respawn(pname)
 
 		respawn(minetest.get_player_by_name(pname), RESPAWN_SECONDS)
 	else
-		ctf_modebase.on_respawnplayer(minetest.get_player_by_name(pname))
+		local player = minetest.get_player_by_name(pname)
+
+		if player then
+			ctf_modebase.on_respawnplayer(player)
+		end
 	end
 end
 
