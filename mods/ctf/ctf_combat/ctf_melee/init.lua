@@ -109,6 +109,8 @@ local function dopunch(target, attacker, ignores, attack_capabilities, dir, atta
 end
 
 local function slash_stab_sword_func(keypress, itemstack, user, pointed)
+	if not itemstack then return end
+
 	local uname = user:get_player_name()
 	local cooldown = attack_cooldown:get(uname)
 	local anim = (keypress == "LMB" and "stab") or "slash"
