@@ -66,7 +66,7 @@ local function add_wielditem(player)
 	)
 	players[player:get_player_name()] = {entity=entity, item="wield3d:hand"}
 
-	player:hud_set_flags({wielditem = setting == "true"})
+	player:hud_set_flags({wielditem = (setting == "true")})
 	update_entity(player)
 end
 
@@ -85,7 +85,7 @@ minetest.register_on_leaveplayer(remove_wielditem)
 ctf_settings.register("use_old_wielditem_display", {
 	label = "Use old wielditem display",
 	type = "bool",
-	default = "false",
+	default = "true",
 	description = "Will use Minetest's default method of showing the wielded item.\n" ..
 		"This won't show custom animations, but might be less jarring",
 	on_change = function(player, new_value)
