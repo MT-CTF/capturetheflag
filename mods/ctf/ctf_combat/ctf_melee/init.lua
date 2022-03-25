@@ -132,7 +132,7 @@ local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 
 				if wielded:get_name() ~= itemstack:get_name() then return end
 
-				slash_stab_sword_func(keypress, itemstack, user, pointed)
+				slash_stab_sword_func(keypress, wielded, user, pointed)
 			end
 		end
 
