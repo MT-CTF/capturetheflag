@@ -153,7 +153,7 @@ local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 
 			if wielded:get_name() == itemstack:get_name() and (controls.LMB or controls.RMB) then
 				if not controls[keypress] then
-					keypress = keypress == "LMB" and "RMB" or "LMB"
+					keypress = (keypress == "LMB") and "RMB" or "LMB"
 				end
 
 				slash_stab_sword_func(keypress, wielded, player, nil)
@@ -196,7 +196,7 @@ local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 			vector.rotate_around_axis(dir, axis, -section * 2),
 			vector.rotate_around_axis(dir, axis, -section    ),
 
-			pointed ~= true and dir or nil,
+			(pointed ~= true) and dir or nil,
 		}
 
 		minetest.sound_play("ctf_melee_whoosh", {
@@ -207,7 +207,7 @@ local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 		}, true)
 	else
 		rays = {
-			pointed ~= true and dir or nil,
+			(pointed ~= true) and dir or nil,
 			vector.rotate_around_axis(dir, axis, -section),
 			vector.rotate_around_axis(dir, axis,  section),
 		}
