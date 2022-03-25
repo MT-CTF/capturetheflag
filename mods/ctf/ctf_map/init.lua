@@ -87,7 +87,7 @@ minetest.register_chatcommand("ctf_map", {
 				inv:add_item("main", "ctf_map:adminpick")
 			end
 
-			if not ctf_core.settings.server_mode == "mapedit" then
+			if ctf_core.settings.server_mode ~= "mapedit" then
 				minetest.chat_send_player(name,
 						minetest.colorize("red", "It is not recommended to edit maps unless the server is in mapedit mode"))
 			end

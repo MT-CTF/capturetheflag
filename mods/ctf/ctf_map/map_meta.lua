@@ -3,7 +3,7 @@ local CURRENT_MAP_VERSION = "2"
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
 
-	return not (table.indexof(list, "skybox") == -1)
+	return table.indexof(list, "skybox") ~= -1
 end
 
 function ctf_map.load_map_meta(idx, dirname)
