@@ -151,7 +151,7 @@ local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 			local controls = player:get_player_control()
 			local wielded = player:get_wielded_item()
 
-			if wielded:get_name() == itemstack:get_name() and controls.LMB or controls.RMB then
+			if wielded:get_name() == itemstack:get_name() and (controls.LMB or controls.RMB) then
 				if not controls[keypress] then
 					keypress = keypress == "LMB" and "RMB" or "LMB"
 				end
