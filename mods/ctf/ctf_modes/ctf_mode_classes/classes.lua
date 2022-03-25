@@ -9,7 +9,7 @@ local class_list = {"knight", "ranged", "support"}
 local class_props = {
 	knight = {
 		name = "Knight",
-		description = "High HP class with a sword capable of damage bursts",
+		description = "High HP class with a sword capable of lunging stabs or retreating slashes",
 		hp_max = 30,
 		visual_size = vector.new(1.1, 1.05, 1.1),
 		items = {
@@ -41,7 +41,7 @@ local class_props = {
 	},
 	ranged = {
 		name = "Scout",
-		description = "Ranged class with a close-range knockback attack and a scaling ladder for reaching high places",
+		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
 		visual_size = vector.new(0.9, 1, 0.9),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
