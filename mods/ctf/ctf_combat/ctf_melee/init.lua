@@ -109,8 +109,6 @@ local function dopunch(target, attacker, ignores, attack_capabilities, dir, atta
 end
 
 local function slash_stab_sword_func(keypress, itemstack, user, pointed)
-	if not itemstack then return end
-
 	local uname = user:get_player_name()
 	local cooldown = attack_cooldown:get(uname)
 	local anim = (keypress == "LMB" and "stab") or "slash"
@@ -177,7 +175,6 @@ local function slash_stab_sword_func(keypress, itemstack, user, pointed)
 	local axis
 	local rays
 
-	attack_capabilities.damage_groups = def.damage_groups
 	attack_capabilities.damage_groups.knockback = KNOCKBACK[anim]
 
 	axis = vector.cross(vector.new(dir.z, 0, -dir.x), dir)
