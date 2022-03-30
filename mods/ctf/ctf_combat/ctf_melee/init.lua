@@ -85,7 +85,7 @@ local EXTRA_ANIM_LENGTH = {
 local SWOOSH_SOUND_DISTANCE = 8
 local COMBAT_SOUND_DISTANCE = 16
 local KNOCKBACK = {slash = 6, stab = 0}
-local HIT_BOOST = 11
+local HIT_BOOST = 9
 
 local function dopunch(target, attacker, ignores, attack_capabilities, dir, attack_interval)
 	if target.ref:is_player() and not ignores[target.ref] and

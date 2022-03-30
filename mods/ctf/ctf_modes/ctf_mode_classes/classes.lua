@@ -9,7 +9,7 @@ local class_list = {"knight", "ranged", "support"}
 local class_props = {
 	knight = {
 		name = "Knight",
-		description = "High HP class with a sword capable of lunging stabs or retreating slashes",
+		description = "High HP class with a sword capable of short damage bursts",
 		hp_max = 30,
 		visual_size = vector.new(1.1, 1.05, 1.1),
 		items = {
@@ -109,11 +109,71 @@ end
 --- Knight Sword
 --
 
-ctf_melee.register_sword("ctf_mode_classes:knight_sword", {
-	description = "Knight Sword",
-	inventory_image = "default_tool_bronzesword.png",
-	damage_groups = {fleshy = 6},
+-- ctf_melee.register_sword("ctf_mode_classes:knight_sword", {
+-- 	description = "Knight Sword",
+-- 	inventory_image = "default_tool_bronzesword.png",
+-- 	damage_groups = {fleshy = 5},
+-- })
+
+local KNIGHT_COOLDOWN_TIME = 26
+local KNIGHT_USAGE_TIME = 8
+
+ctf_settings.register("ctf_mode_classes:simple_knight_activate", {
+	type = "bool",
+	label = "[Classes] Simple Knight sword activation",
+	description = "If enabled you don't need to hold Sneak/Run to activate the rage ability",
+	default = "false",
 })
+
+ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
+	description = "Knight Sword\n" .. minetest.colorize("gold",
+			"(Sneak/Run) + Rightclick to use Rage ability (Lasts "..
+			KNIGHT_USAGE_TIME.."s, "..KNIGHT_COOLDOWN_TIME.."s cooldown)"),
+	inventory_image = "default_tool_bronzesword.png",
+	inventory_overlay = "ctf_modebase_special_item.png",
+	wield_image = "default_tool_bronzesword.png",
+	damage_groups = {fleshy = 7},
+	full_punch_interval = 0.7,
+	rightclick_func = function(itemstack, user, pointed)
+		if ctf_settings.get(user, "ctf_mode_classes:simple_knight_activate") ~= "true" then
+			local ctl = user:get_player_control()
+			if not ctl.sneak and not ctl.aux1 then return end
+		end
+
+		local pname = user:get_player_name()
+
+		if itemstack:get_wear() == 0 then
+			local step = math.floor(65534 / KNIGHT_USAGE_TIME)
+			ctf_modebase.update_wear.start_update(pname, "ctf_melee:sword_diamond", step, false, function()
+				local player = minetest.get_player_by_name(pname)
+
+				if player then
+					local pinv = player:get_inventory()
+					local pos = ctf_modebase.update_wear.find_item(pinv, "ctf_melee:sword_diamond")
+
+					if pos then
+						local newstack = ItemStack("ctf_mode_classes:knight_sword")
+						newstack:set_wear(65534)
+						player:get_inventory():set_stack("main", pos, newstack)
+
+						local dstep = math.floor(65534 / KNIGHT_COOLDOWN_TIME)
+						ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:knight_sword", dstep, true)
+					end
+				end
+			end,
+			function()
+				local player = minetest.get_player_by_name(pname)
+
+				if player then
+					player:get_inventory():remove_item("main", "ctf_melee:sword_diamond")
+				end
+			end)
+
+			return "ctf_melee:sword_diamond"
+		end
+	end,
+})
+
 
 --
 --- Ranged Gun

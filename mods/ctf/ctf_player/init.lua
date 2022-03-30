@@ -1,4 +1,4 @@
-local stab_slash_time = 20/60 - 0.1
+local stab_slash_time = 20/60 - 0.2
 local stab_slash_cooldown_after = 0.2
 
 ctf_player = {

@@ -15,6 +15,7 @@ Settings should only be registered at loadtime
 
 {
 	type = "bool",
+	label = "Setting name/label",
 	description = "Text in tooltip",
 	default = "default value",
 	on_change = function(player, new_value)
