@@ -1,14 +1,16 @@
 ctf_gui.init()
+
 local cooldowns = ctf_core.init_cooldowns()
 local CLASS_SWITCH_COOLDOWN = 30
 
-local readable_class_list = {"Knight", "Ranged", "Support"}
+local classes = {}
+
 local class_list = {"knight", "ranged", "support"}
 local class_props = {
 	knight = {
 		name = "Knight",
-		description = "High HP class with a sword capable of strong damage bursts, +50% health points",
-		hp_max = 28,
+		description = "High HP class with a sword capable of short damage bursts",
+		hp_max = 30,
 		visual_size = vector.new(1.1, 1.05, 1.1),
 		items = {
 			"ctf_mode_classes:knight_sword",
@@ -20,7 +22,7 @@ local class_props = {
 	},
 	support = {
 		name = "Support",
-		description = "Normal HP class with healing bandages, an immunity ability, and building tools, +10% speed",
+		description = "Helper class with healing bandages, an immunity ability, and building gear",
 		physics = {speed = 1.1},
 		items = {
 			"ctf_mode_classes:support_bandage",
@@ -33,12 +35,14 @@ local class_props = {
 			"ctf_ranged:shotgun",
 			"ctf_melee:",
 		},
+		disallowed_items_markup = {
+			["ctf_melee:"] = "default_tool_steelsword.png^ctf_modebase_group.png",
+		},
 	},
 	ranged = {
-		name = "Ranged",
-		description = "Low HP ranged class with a rifle/grenade launcher gun, and a scaling ladder for reaching high places",
-		hp_max = 14,
-		visual_size = vector.new(0.9, 0.95, 0.9),
+		name = "Scout",
+		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
+		visual_size = vector.new(0.9, 1, 0.9),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
 			"ctf_mode_classes:scaling_ladder"
@@ -46,8 +50,53 @@ local class_props = {
 		disallowed_items = {
 			"ctf_melee:",
 		},
+		disallowed_items_markup = {
+			["ctf_melee:"] = "default_tool_steelsword.png^ctf_modebase_group.png",
+		},
 	}
 }
+
+minetest.register_on_mods_loaded(function()
+	for k, class_prop in pairs(class_props) do
+		local items_markup = ""
+		local disallowed_items_markup = ""
+
+		for _, iname in ipairs(class_prop.items or {}) do
+			local item = ItemStack(iname)
+			local count = item:get_count()
+
+			if count <= 1 then
+				count = nil
+			else
+				count = " x"..count
+			end
+
+			local desc = string.split(item:get_description(), "\n", false, 1)
+			items_markup = string.format("%s%s\n<item name=%s float=left width=48>\n\n\n",
+				items_markup,
+				minetest.formspec_escape(desc[1]) .. (count and count or ""),
+				item:get_name()
+			)
+		end
+
+		for _, iname in ipairs(class_prop.disallowed_items or {}) do
+			if minetest.registered_items[iname] then
+				disallowed_items_markup = string.format("%s<item name=%s width=48>",
+					disallowed_items_markup,
+					iname
+				)
+			else
+				disallowed_items_markup = string.format("%s<img name=%s width=48>",
+					disallowed_items_markup,
+					class_prop.disallowed_items_markup[iname]
+				)
+			end
+		end
+
+		class_props[k].items_markup = items_markup:sub(1, -2) -- Remove \n at the end of str
+		class_props[k].disallowed_items_markup = disallowed_items_markup
+	end
+end)
 
 local function dist_from_flag(player)
 	local tname = ctf_teams.get(player)
@@ -60,8 +109,21 @@ end
 --- Knight Sword
 --
 
-local KNIGHT_COOLDOWN_TIME = 42
-local KNIGHT_USAGE_TIME = 12
+-- ctf_melee.register_sword("ctf_mode_classes:knight_sword", {
+-- 	description = "Knight Sword",
+-- 	inventory_image = "default_tool_bronzesword.png",
+-- 	damage_groups = {fleshy = 5},
+-- })
+
+local KNIGHT_COOLDOWN_TIME = 26
+local KNIGHT_USAGE_TIME = 8
+
+ctf_settings.register("ctf_mode_classes:simple_knight_activate", {
+	type = "bool",
+	label = "[Classes] Simple Knight sword activation",
+	description = "If enabled you don't need to hold Sneak/Run to activate the rage ability",
+	default = "false",
+})
 
 ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	description = "Knight Sword\n" .. minetest.colorize("gold",
@@ -73,8 +135,10 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	damage_groups = {fleshy = 7},
 	full_punch_interval = 0.7,
 	rightclick_func = function(itemstack, user, pointed)
-		local ctl = user:get_player_control()
-		if not ctl.sneak and not ctl.aux1 then return end
+		if ctf_settings.get(user, "ctf_mode_classes:simple_knight_activate") ~= "true" then
+			local ctl = user:get_player_control()
+			if not ctl.sneak and not ctl.aux1 then return end
+		end
 
 		local pname = user:get_player_name()
 
@@ -110,16 +174,19 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	end,
 })
 
+
 --
 --- Ranged Gun
 --
 
-local RANGED_COOLDOWN_TIME = 36
+local RANGED_COOLDOWN_TIME = 31
+local RANGED_ZOOM_MULT = 3
 
+local scoped = ctf_ranged.scoped
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "classes_rifle",
-	description = "Rifle\n" .. minetest.colorize("gold",
-			"(Sneak/Run) + Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown)"),
+	description = "Scout Rifle\n" .. minetest.colorize("gold",
+			"Rightclick + (Sneak/Run) to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown), otherwise will toggle scope"),
 	texture = "ctf_mode_classes_ranged_rifle.png",
 	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
 	wield_texture = "ctf_mode_classes_ranged_rifle.png",
@@ -131,7 +198,20 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	liquid_travel_dist = 4,
 	rightclick_func = function(itemstack, user, pointed)
 		local ctl = user:get_player_control()
-		if not ctl.sneak and not ctl.aux1 then return end
+
+		if not ctl.sneak and not ctl.aux1 then
+			local uname = user:get_player_name()
+
+			if not ctl.zoom then
+				if scoped[uname] then
+					ctf_ranged.hide_scope(uname)
+				else
+					ctf_ranged.show_scope(uname, "ctf_mode_classes:ranged_rifle", RANGED_ZOOM_MULT)
+				end
+			end
+
+			return
+		end
 
 		if itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
@@ -243,8 +323,6 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	end
 })
 
-
-local classes = {}
 function classes.get_name(player)
 	local meta = player:get_meta()
 
@@ -259,6 +337,10 @@ end
 
 function classes.get(player)
 	return class_props[classes.get_name(player)]
+end
+
+function classes.get_skin_overlay(player_or_class, class)
+	return "^ctf_mode_classes_" .. (class and player_or_class or classes.get_name(player_or_class)) .. "_overlay.png"
 end
 
 function classes.update(player)
@@ -309,13 +391,9 @@ local function select_class(player, classname)
 	end
 end
 
-function classes.show_class_formspec(player, selected)
+function classes.show_class_formspec(player)
 	player = PlayerObj(player)
 	if not player then return end
-
-	if not selected then
-		selected = table.indexof(class_list, classes.get_name(player))
-	end
 
 	if not cooldowns:get(player) then
 		if dist_from_flag(player) > 5 then
@@ -327,38 +405,96 @@ function classes.show_class_formspec(player, selected)
 			return
 		end
 
-		local elements = {}
+		local pteam = ctf_teams.get(player)
 
-		elements.class_select = {
-			type = "dropdown",
-			items = readable_class_list,
-			default_idx = selected,
-			pos = {x = 0, y = 0.5},
-			func = function(playername, fields, field_name)
-				local new_idx = table.indexof(readable_class_list, fields[field_name])
+		ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", function(context)
+			local form_x, form_y = 12, 10
 
-				if new_idx ~= selected then
-					classes.show_class_formspec(playername, new_idx)
+			local bar_h = 2.2
+			local bw = 5
+
+			local class = context.class
+			local class_prop = class_props[class]
+
+			return ctf_gui.list_to_formspec_str({
+				"formspec_version[4]",
+				{"size[%f,%f]", form_x, form_y+1.1},
+				"real_coordinates[true]",
+				{"hypertext[0,0.2;%f,1.3;title;<bigger><center><b>Class Selection</b></center></bigger>]", form_x},
+
+				{"hypertext[0,%f;%f,1;classname;<bigger><center><style color=#0DD>%s</style></center></bigger>]",
+					bar_h-0.9,
+					form_x,
+					class_prop.name
+				},
+				{"box[0,%f;%f,0.8;#00000022]", bar_h-0.9, form_x},
+				{"image_button[0.1,%f;0.8,0.8;creative_prev_icon.png;prev_class;]", bar_h-0.9},
+				{"image_button[%f,%f;0.8,0.8;creative_next_icon.png;next_class;]", form_x-0.9, bar_h-0.9},
+
+				{"box[0.1,2.3;%f,%f;#00000077]", (form_x/2)-0.8, form_y-2.4},
+				{"model[0.1,2.3;%f,%f;classpreview;character.b3d;%s;{0,160};;;]",
+					(form_x/2)-0.8,
+					form_y-2.4,
+					ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color) ..
+							classes.get_skin_overlay(class, true) or ""
+				},
+				{[[hypertext[%f,2.3;%f,%f;info;<global font=mono background=#00000044>
+					<center>%s</center>
+					<img name=heart.png width=20 float=left> %d HP
+					%s
+					%s
+					Disallowed Items
+					%s
+					] ]],
+					(form_x/2)-0.6,
+					(form_x/2)+0.5,
+					form_y-2.4,
+					class_prop.description,
+					class_prop.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+					class_prop.physics and class_prop.physics.speed and
+							"<img name=sprint_stamina_icon.png width=20 float=left> "..class_prop.physics.speed.."x Speed\n" or "",
+					class_prop.items_markup,
+					class_prop.disallowed_items_markup
+				},
+				"style[select;font_size=*1.5]",
+				{"button_exit[%f,%f;%f,1;select;Choose Class]", (form_x/2) - (bw/2), form_y, bw},
+			})
+		end, {
+			class = classes.get_name(player) or "knight",
+			_on_formspec_input = function(pname, context, fields)
+				if fields.prev_class then
+					local classidx = table.indexof(class_list, context.class) - 1
+
+					if classidx < 1 then
+						classidx = #class_list
+					end
+
+					context.class = class_list[classidx]
+
+					return "refresh"
+				elseif fields.next_class then
+					local classidx = table.indexof(class_list, context.class) + 1
+
+					if classidx > #class_list then
+						classidx = 1
+					end
+
+					context.class = class_list[classidx]
+
+					return "refresh"
+				elseif fields.select and classes.get_name(player) ~= context.class then
+					if dist_from_flag(player) > 5 then
+						hud_events.new(player, {
+							quick = true,
+							text = "You can only change class at your flag!",
+							color = "warning",
+						})
+						return
+					end
+
+					select_class(pname, context.class)
 				end
 			end,
-		}
-
-		elements.select_class = {
-			type = "button",
-			exit = true,
-			label = "Choose Class",
-			pos = {x = ctf_gui.ELEM_SIZE.x + 0.5, y = 0.5},
-			func = function(playername, fields, field_name)
-				select_class(playername, class_list[selected])
-			end,
-		}
-
-		ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", {
-			size = {x = (ctf_gui.ELEM_SIZE.x * 2) + 1, y = 3.5},
-			title = class_props[class_list[selected]].name,
-			description = class_props[class_list[selected]].description,
-			privs = {interact = true},
-			elements = elements,
 		})
 	else
 		hud_events.new(player, {

@@ -5,12 +5,51 @@ ctf_gui = {
 }
 
 local context = {}
-
 local gui_users_initialized = {}
+
 function ctf_gui.init()
 	local modname = minetest.get_current_modname()
 
 	assert(not gui_users_initialized[modname], "Already initialized for mod "..dump(modname))
+
+	gui_users_initialized[modname] = true
+
+	ctf_core.register_on_formspec_input(modname..":", function(pname, formname, fields, ...)
+		local ctx = context[pname]
+		if not ctx then return end
+
+		if ctx._formname == formname and ctx._on_formspec_input then
+			if ctx._privs then
+				local playerprivs = minetest.get_player_privs(pname)
+
+				for priv, needed in pairs(ctx._privs) do
+					if needed and not playerprivs[priv] then
+						minetest.log("warning", string.format(
+							"Player '%q' doesn't have the privs needed to access the formspec '%s'",
+							pname, formname
+						))
+						return
+					end
+				end
+			end
+
+			if fields.quit and ctx._on_quit then
+				ctx._on_quit(pname, fields)
+			else
+				local action = ctx._on_formspec_input(pname, ctx, fields, ...)
+
+				if action == "refresh" then
+					minetest.show_formspec(pname, ctx._formname, ctx._formspec(ctx))
+				end
+			end
+		end
+	end)
+end
+
+function ctf_gui.old_init()
+	local modname = minetest.get_current_modname()
+
+	assert(not gui_users_initialized[modname], "Already initialized for mod: "..modname)
 
 	gui_users_initialized[modname] = true
 
@@ -24,8 +63,10 @@ function ctf_gui.init()
 
 				for priv, needed in pairs(ctx.privs) do
 					if needed and not playerprivs[priv] then
-						minetest.log("warning", "Player " .. dump(pname) ..
-							" doesn't have the privs needed to access the formspec " .. dump(formname))
+						minetest.log("warning", string.format(
+							"Player '%q' doesn't have the privs needed to access the formspec '%s'",
+							pname, formname
+						))
 						return
 					end
 				end
@@ -44,8 +85,10 @@ function ctf_gui.init()
 					end
 				end
 				if bad then
-					minetest.log("warning", "Player " .. dump(pname) ..
-						" sent unallowed values for formspec " .. dump(formname) .. " : " .. dump(fields))
+					minetest.log("warning", string.format(
+						"Player %s sent unallowed values for formspec %s : %s",
+						pname, formname, dump(fields)
+					))
 					return
 				end
 			end
@@ -64,7 +107,52 @@ function ctf_gui.init()
 	end)
 end
 
-function ctf_gui.show_formspec(player, formname, formdef)
+function ctf_gui.show_formspec(player, formname, formspec, formcontext)
+	player = PlayerName(player)
+
+	context[player] = formcontext or {}
+
+	context[player]._formname = formname
+	context[player]._formspec = formspec
+
+	if type(formspec) == "function" then
+		minetest.show_formspec(player, formname, formspec(formcontext))
+	else
+		minetest.show_formspec(player, formname, formspec)
+	end
+end
+
+do
+	local remove = table.remove
+	local concat = table.concat
+	local formspec_escape = minetest.formspec_escape
+	local format = string.format
+	local unpck = unpack
+
+	function ctf_gui.list_to_element(l)
+		local base = remove(l, 1)
+
+		for k, format_var in ipairs(l) do
+			l[k] = formspec_escape(format_var)
+		end
+
+		return format(base, unpck(l))
+	end
+
+	local lte = ctf_gui.list_to_element
+
+	function ctf_gui.list_to_formspec_str(l)
+		for k, v in ipairs(l) do
+			if type(v) == "table" then
+				l[k] = lte(v)
+			end
+		end
+
+		return concat(l, "")
+	end
+end
+
+function ctf_gui.old_show_formspec(player, formname, formdef)
 	player = PlayerName(player)
 
 	formdef.formname = formname
@@ -289,7 +377,10 @@ function ctf_gui.show_formspec(player, formname, formdef)
 				"]"
 	end
 
+	formdef._info = formdef
 	context[player] = formdef
 
 	minetest.show_formspec(player, formdef.formname, formspec)
 end
+
+dofile(minetest.get_modpath("ctf_gui").."/dev.lua")
