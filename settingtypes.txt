@@ -1,9 +1,4 @@
 # Options:
-# - play: Regular mode. Requires singlenode mapgen for world
-# - mapedit: Used for making maps. Singlenode not required
-ctf_server_mode (Server Mode) enum play play,mapedit
-
-# Options:
 # - default: Store rankings in modstorage, not recommended for servers
 # - redis: Store rankings in a redis DB, recommended for servers, requires some setup
 ctf_rankings_backend (Rankings Backend) enum default default,redis
