@@ -12,12 +12,12 @@ end)
 
 --[[
 Settings should only be registered at loadtime
-
 {
-	type = "bool",
-	label = "Setting name/label",
+	type = "bool" || "list",
+	label = "Setting name/label", -- not used for list
 	description = "Text in tooltip",
-	default = "default value",
+	list = {i1, i2, i3, i4}, -- used for list, remember to escape contents
+	default = "default value/index",
 	on_change = function(player, new_value)
 		<...>
 	end
@@ -46,13 +46,12 @@ minetest.register_on_mods_loaded(function()
 		title = "Settings",
 		get = function(self, player, context)
 			local setting_list = {}
-			local lastypos
+			local lastypos = -0.5
 
 			for k, setting in ipairs(ctf_settings.settings_list) do
 				local settingdef = ctf_settings.settings[setting]
 
 				if settingdef.type == "bool" then
-					lastypos = (k / 2) - 1
 					setting_list[k] = {
 						"checkbox[0,%f;%s;%s;%s]tooltip[%s;%s]",
 						lastypos,
@@ -62,6 +61,23 @@ minetest.register_on_mods_loaded(function()
 						setting,
 						settingdef.description or HumanReadable(setting)
 					}
+
+					lastypos = lastypos + 0.5
+				elseif settingdef.type == "list" then
+					lastypos = lastypos + 0.3
+					setting_list[k] = {
+						"dropdown[0,%f;%f;%s;%s;%d]tooltip[0,%f;%f,0.6;%s]",
+						lastypos,
+						FORMSIZE.x/1.7,
+						setting,
+						settingdef.list,
+						ctf_settings.get(player, setting),
+						--label
+						lastypos,
+						(FORMSIZE.x/1.7) - 0.3,
+						settingdef.description or HumanReadable(setting),
+					}
+					lastypos = lastypos + 0.6
 				end
 			end
 
@@ -99,6 +115,16 @@ minetest.register_on_mods_loaded(function()
 						if setting.on_change then
 							setting.on_change(player, newvalue)
 						end
+					elseif setting.type == "list" then
+						local idx = table.indexof(setting.list, value)
+
+						if idx ~= -1 then
+							ctf_settings.set(player, field, tostring(idx))
+
+							if setting.on_change then
+								setting.on_change(player, idx)
+							end
+						end
 					end
 
 					refresh = true
@@ -120,3 +146,5 @@ minetest.register_on_mods_loaded(function()
 		end,
 	})
 end)
+
+ctf_core.include_files("global_settings.lua")

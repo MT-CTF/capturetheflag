@@ -133,7 +133,15 @@ do
 		local base = remove(l, 1)
 
 		for k, format_var in ipairs(l) do
-			l[k] = formspec_escape(format_var)
+			if type(format_var) == "string" then
+				l[k] = formspec_escape(format_var)
+			elseif type(format_var) == "table" then -- Assuming it's a list of strings
+				for a, v in ipairs(format_var) do
+					format_var[a] = formspec_escape(v)
+				end
+
+				l[k] = table.concat(format_var, ",")
+			end
 		end
 
 		return format(base, unpck(l))

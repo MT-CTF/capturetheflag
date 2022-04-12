@@ -20,7 +20,6 @@ local HUD_DEFINITIONS = {
 	{
 		hud_elem_type = "image",
 		position = {x = 0, y = 0.8},
-		image_scale = 2,
 		offset = {x = (MAX_NAME_LENGTH*10) + 28, y = 0},
 		alignment = {x = "center", y = "center"},
 	},
@@ -35,8 +34,13 @@ local HUD_DEFINITIONS = {
 
 local kill_list = {}
 
+local image_scale_map = ctf_settings.settings["ctf_kill_list:tp_size"].image_scale_map
 local function update_hud_line(player, idx, new)
 	idx = HUD_LINES - (idx-1)
+
+	local image_scale = tonumber(ctf_settings.get(player, "ctf_kill_list:tp_size"))
+
+	image_scale = image_scale_map[image_scale] * 2
 
 	for i=1, 3, 1 do
 		local hname = string.format(HUDNAME_FORMAT, idx, i)
@@ -45,14 +49,16 @@ local function update_hud_line(player, idx, new)
 		if new then
 			if phud then
 				hud:change(player, hname, {
-					text = (new[i].text or new[i]),
+					text = (new[i].text or new[i].image),
+					image_scale = image_scale,
 					color = new[i].color or 0xFFF
 				})
 			else
 				local newhud = table.copy(HUD_DEFINITIONS[i])
 
 				newhud.offset.y = -(idx-1)*HUD_LINE_HEIGHT
-				newhud.text = new[i].text or new[i]
+				newhud.text = new[i].text or new[i].image
+				newhud.image_scale = image_scale
 				newhud.color = new[i].color or 0xFFF
 				hud:add(player, hname, newhud)
 			end
@@ -124,7 +130,7 @@ function ctf_kill_list.add(killer, victim, weapon_image, comment)
 
 	add_kill(
 		{text = killer, color = k_teamcolor or 0xFFF},
-		weapon_image or "ctf_kill_list_punch.png",
+		{image = weapon_image or "ctf_kill_list_punch.png"},
 		{text = victim .. (comment or ""), color = v_teamcolor or 0xFFF}
 	)
 end
