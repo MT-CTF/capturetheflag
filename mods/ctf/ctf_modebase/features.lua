@@ -264,7 +264,7 @@ return {
 			return remembered_team
 		end
 
-		if players_diff == 0 or kd_diff > 0.2 and players_diff < 2 then
+		if players_diff == 0 or (kd_diff > 0.2 and players_diff < 2) then
 			return worst_kd.t
 		else
 			return worst_players.t
