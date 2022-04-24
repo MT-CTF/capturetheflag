@@ -31,8 +31,6 @@ ctf_teams = {
 	player_team = {},
 	online_players = {},
 	current_team_list = {},
-
-	team_chests = {}, -- Whenever a team chest is initialized it'll be put in this table
 }
 
 for team, def in pairs(ctf_teams.team) do

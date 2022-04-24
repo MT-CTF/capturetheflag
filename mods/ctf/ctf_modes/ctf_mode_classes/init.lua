@@ -2,8 +2,8 @@ local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
-local crafts, classes = ctf_core.include_files(
-	"crafts.lua",
+local classes = ctf_core.include_files(
+	"paxel.lua",
 	"classes.lua"
 )
 
@@ -40,9 +40,16 @@ ctf_modebase.register_mode("classes", {
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
 	},
-	crafts = crafts,
+	crafts = {
+		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
+		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+	},
 	physics = {sneak_glitch = true, new_move = false},
 	blacklisted_nodes = {"default:apple"},
+	team_chest_items = {
+		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",
+		"default:torch 30", "ctf_teams:door_steel 2",
+	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
 	summary_ranks = {
@@ -53,8 +60,7 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
-	build_timer = 60 * 1.5,
-
+	build_timer = 60,
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
 			return true
@@ -71,7 +77,7 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 
 		ctf_cosmetics.get_skin = function(player)
-			return old_get_skin(player) .. "^ctf_mode_classes_" .. classes.get_name(player) .. "_overlay.png"
+			return old_get_skin(player) .. classes.get_skin_overlay(player)
 		end
 	end,
 	on_mode_end = function()
@@ -100,8 +106,13 @@ ctf_modebase.register_mode("classes", {
 	end,
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = features.on_punchplayer,
+	can_punchplayer = features.can_punchplayer,
 	on_healplayer = features.on_healplayer,
-	calculate_knockback = function()
-		return 0
+	calculate_knockback = function(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)
+		if features.can_punchplayer(player, hitter) then
+			return 2 * (tool_capabilities.damage_groups.knockback or 1)
+		else
+			return 0
+		end
 	end,
 })

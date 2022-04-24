@@ -109,6 +109,10 @@ minetest.override_item("default:apple", {
 			return minetest.item_eat(3)(itemstack, user, ...)
 		end
 	end,
+	after_place_node = nil,
+	on_place = function()
+		return nil
+	end
 })
 
 local function furnace_on_destruct(pos)

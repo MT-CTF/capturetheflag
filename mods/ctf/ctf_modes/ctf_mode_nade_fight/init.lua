@@ -52,6 +52,10 @@ ctf_modebase.register_mode("nade_fight", {
 	},
 	physics = {sneak_glitch = true, new_move = false},
 	blacklisted_nodes = {"default:apple"},
+	team_chest_items = {
+		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
+		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
 	summary_ranks = {
@@ -62,7 +66,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"deaths",
 		"hp_healed"
 	},
-	build_timer = 60,
+	build_timer = 60 * 2,
 
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_nade_fight:") then
@@ -98,6 +102,7 @@ ctf_modebase.register_mode("nade_fight", {
 	on_flag_capture = features.on_flag_capture,
 	on_flag_rightclick = function() end,
 	get_chest_access = features.get_chest_access,
+	can_punchplayer = features.can_punchplayer,
 	on_punchplayer = function(player, hitter, damage, unneeded, tool_capabilities, ...)
 		if tool.holed[player:get_player_name()] then
 			if tool_capabilities.grenade then

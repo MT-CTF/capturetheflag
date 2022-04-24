@@ -10,9 +10,10 @@ grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'fla
 	image = "", -- The name of the grenade's texture
 	collide_with_objects = false, -- (Default: false) Controls whether the grenade collides with objects. Grenade will never collide with thrower regardless of this setting
 	throw_cooldown = 0, -- How often player can throw grenades, in seconds
-	on_explode = function(def, pos, name)
+	on_explode = function(def, obj, pos, name)
 		-- This function is called when the grenade 'explodes'
 		-- <def> grenade object definition
+		-- <obj> the grenade object
 		-- <pos> the place the grenade 'exploded' at
 		-- <name> the name of the player that threw the grenade
 	end,
@@ -21,8 +22,9 @@ grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'fla
 		-- <def> grenade object definition
 		-- <obj> the grenade object
 		-- <name> the name of the player that threw the grenade
+		-- <moveresult> table with collision info
 		-- return true to cause grenade explosion
-		-- return "stop" to stop the grenade from moving
+		-- return false to stop the grenade from moving
 	end,
 	clock = 3, -- Optional, controls how long until grenade detonates. Default is 3
 	particle = { -- Adds particles in the grenade's trail

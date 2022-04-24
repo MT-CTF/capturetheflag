@@ -1,4 +1,4 @@
-ctf_gui.init()
+ctf_gui.old_init()
 
 local context = {}
 
@@ -40,7 +40,7 @@ function ctf_map.show_map_editor(player)
 	table.sort(dirlist_sorted)
 
 	local selected_map = 1
-	ctf_gui.show_formspec(player, "ctf_map:start", {
+	ctf_gui.old_show_formspec(player, "ctf_map:start", {
 		size = {x = 8, y = 10.2},
 		title = "Capture The Flag Map Editor",
 		description = "Would you like to edit an existing map or create a new one?",
@@ -92,7 +92,7 @@ function ctf_map.show_map_editor(player)
 				pos = {0.1, 1.8},
 				func = function(pname, fields)
 					minetest.after(0.1, function()
-						ctf_gui.show_formspec(pname, "ctf_map:loading", {
+						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = "Capture The Flag Map Editor",
 							description = "Placing map '"..dirlist_sorted[selected_map].."'. This will take a few seconds..."
@@ -114,7 +114,7 @@ function ctf_map.show_map_editor(player)
 				pos = {(8-ctf_gui.ELEM_SIZE.x) - 0.3, 1.8},
 				func = function(pname, fields)
 					minetest.after(0.1, function()
-						ctf_gui.show_formspec(pname, "ctf_map:loading", {
+						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = "Capture The Flag Map Editor",
 							description = "Resuming map '"..dirlist_sorted[selected_map]..
@@ -188,7 +188,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	-- MAP ENABLED
 	elements.enabled = {
 		type = "checkbox", label = "Map Enabled", pos = {0, 2}, default = context[player].enabled,
-		func = function(pname, fields, name) context[pname].enabled = fields[name] == "true" or false end,
+		func = function(pname, fields) context[pname].enabled = fields.enabled == "true" or false end,
 	}
 
 	-- FOLDER NAME, MAP NAME, MAP AUTHOR(S), MAP HINT, MAP LICENSE, OTHER INFO
@@ -201,8 +201,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			type = "field", label = label,
 			pos = {0, ypos}, size = {6, 0.7},
 			default = context[player][name],
-			func = function(pname, fields, fname)
-				context[pname][name] = fields[fname]
+			func = function(pname, fields)
+				context[pname][name] = fields[name]
 			end,
 		}
 
@@ -213,8 +213,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.initial_stuff = {
 		type = "field", label = "Map Initial Stuff", pos = {0, ypos}, size = {6, 0.7},
 		default = table.concat(context[player].initial_stuff or {"none"}, ","),
-		func = function(pname, fields, name)
-			context[pname].initial_stuff = string.split(fields[name]:gsub("%s?,%s?", ","), ",")
+		func = function(pname, fields)
+			context[pname].initial_stuff = string.split(fields.initial_stuff:gsub("%s?,%s?", ","), ",")
 		end,
 	}
 	ypos = ypos + 1.4
@@ -223,8 +223,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.treasures = {
 		type = "textarea", label = "Map Treasures", pos = {0, ypos}, size = {ctf_gui.FORM_SIZE.x-3.6, 2.1},
 		default = context[player].treasures,
-		func = function(pname, fields, name)
-			context[pname].treasures = fields[name]
+		func = function(pname, fields)
+			context[pname].treasures = fields.treasures
 		end,
 	}
 	ypos = ypos + 3.1
@@ -243,12 +243,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			size = {6, ctf_gui.ELEM_SIZE.y},
 			items = ctf_map.skyboxes,
 			default_idx = table.indexof(ctf_map.skyboxes, context[player].skybox),
-			func = function(pname, fields, name)
+			func = function(pname, fields)
 				local oldval = context[pname].skybox
-				context[pname].skybox = fields[name]
+				context[pname].skybox = fields.skybox
 
 				if context[pname].skybox ~= oldval then
-					skybox.set(PlayerObj(pname), table.indexof(ctf_map.skyboxes, fields[name])-1)
+					skybox.set(PlayerObj(pname), table.indexof(ctf_map.skyboxes, fields.skybox)-1)
 				end
 			end,
 		}
@@ -279,7 +279,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		pos = {0, ypos},
 		size = {ctf_gui.FORM_SIZE.x/2 - 0.2, 2},
 		items = context[player].game_modes,
-		func = function(pname, fields, fname)
+		func = function(pname, fields)
 			local event = minetest.explode_textlist_event(fields.game_modes)
 
 			if event.type == "DCL" then
@@ -289,12 +289,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end
 		end
 	}
-	elements["available_game_modes"] = {
+	elements.available_game_modes = {
 		type = "textlist",
 		pos = {ctf_gui.FORM_SIZE.x/2 + 0.2, ypos},
 		size = {ctf_gui.FORM_SIZE.x/2 - 0.2, 2},
 		items = available_game_modes,
-		func = function(pname, fields, fname)
+		func = function(pname, fields)
 			local event = minetest.explode_textlist_event(fields.available_game_modes)
 
 			if event.type == "DCL" then
@@ -312,12 +312,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			type = "field", label = label,
 			pos = {0, ypos}, size = {4, 0.7},
 			default = context[player]["phys_"..name] or 1,
-			func = function(pname, fields, fname)
+			func = function(pname, fields)
 				local oldval = context[pname]["phys_"..name]
-				context[pname]["phys_"..name] = tonumber(fields[fname]) or 1
+				context[pname]["phys_"..name] = tonumber(fields[name]) or 1
 
 				if context[pname]["phys_"..name] ~= oldval then
-					physics.set(pname, "ctf_map_editor_"..name, {[name] = tonumber(fields[fname] or 1)})
+					physics.set(pname, "ctf_map_editor_"..name, {[name] = tonumber(fields[name] or 1)})
 				end
 			end,
 		}
@@ -329,9 +329,9 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.start_time = {
 		type = "field", label = "Map start_time", pos = {0, ypos}, size = {4, 0.7},
 		default = context[player].start_time or ctf_map.DEFAULT_START_TIME,
-		func = function(pname, fields, name)
+		func = function(pname, fields)
 			local oldval = context[pname].start_time
-			context[pname].start_time = tonumber(fields[name] or ctf_map.DEFAULT_START_TIME)
+			context[pname].start_time = tonumber(fields.start_time or ctf_map.DEFAULT_START_TIME)
 
 			if context[pname].start_time ~= oldval then
 				minetest.registered_chatcommands["time"].func(pname, tostring(context[pname].start_time))
@@ -344,9 +344,9 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.time_speed = {
 		type = "field", label = "Map time_speed (Multiplier)", pos = {0, ypos},
 		size = {4, 0.7}, default = context[player].time_speed or "1",
-		func = function(pname, fields, name)
+		func = function(pname, fields)
 			local oldval = context[pname].time_speed
-			context[pname].time_speed = tonumber(fields[name] or "1")
+			context[pname].time_speed = tonumber(fields.time_speed or "1")
 
 			if context[pname].time_speed ~= oldval then
 				minetest.settings:set("time_speed", context[pname].time_speed * 72)
@@ -363,8 +363,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			label = HumanReadable(teamname) .. " Team",
 			pos = {0, idx},
 			default = def.enabled,
-			func = function(pname, fields, name)
-				context[pname].teams[teamname].enabled = fields[name] == "true" or false
+			func = function(pname, fields)
+				context[pname].teams[teamname].enabled = fields[teamname.."_checkbox"] == "true" or false
 			end,
 		}
 		idx = idx + 1
@@ -464,10 +464,10 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				pos = {7.2, idx},
 				size = {1, ctf_gui.ELEM_SIZE.y},
 				default = context[player].chests[id].amount,
-				func = function(pname, fields, name)
+				func = function(pname, fields)
 					if not context[pname].chests[id] then return end
 
-					local newnum = tonumber(fields[name])
+					local newnum = tonumber(fields["chestzone_chests_"..id])
 					if newnum then
 						context[pname].chests[id].amount = newnum
 					end
@@ -530,7 +530,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	idx = idx + 1
 
 	-- Show formspec
-	ctf_gui.show_formspec(player, "ctf_map:save", {
+	ctf_gui.old_show_formspec(player, "ctf_map:save", {
 		title = "Capture The Flag Map Editor",
 		description = "Save your map or edit the config.\nRemember to press ENTER after writing to a field",
 		scrollheight = 176 + ((idx - 24) * 10) + 4,

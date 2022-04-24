@@ -6,8 +6,9 @@ local cooldown = ctf_core.init_cooldowns()
 
 function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()
-	local pos = player:get_pos()
-	local obj = minetest.add_entity(vector.new(pos.x, pos.y + player:get_properties().eye_height, pos.z), name)
+	local pos = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
+
+	local obj = minetest.add_entity(pos, name)
 	if not obj then
 		return
 	end
@@ -15,9 +16,10 @@ function grenades.throw_grenade(name, startspeed, player)
 	obj:set_velocity(vector.add(vector.multiply(dir, startspeed), player:get_velocity()))
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
-	obj:get_luaentity().thrower_name = player:get_player_name()
+	local data = obj:get_luaentity()
+	data.thrower_name = player:get_player_name()
 
-	return obj:get_luaentity()
+	return data
 end
 
 function grenades.register_grenade(name, def)
@@ -32,7 +34,7 @@ function grenades.register_grenade(name, def)
 			visual = "sprite",
 			visual_size = {x = 0.5, y = 0.5, z = 0.5},
 			textures = {def.image},
-			collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.15, 0.2},
+			collisionbox = {-0.05, -0.05, -0.05, 0.05, 0.05, 0.05},
 			pointable = false,
 			static_save = false,
 		},
@@ -54,34 +56,31 @@ function grenades.register_grenade(name, def)
 			-- Check for a collision on the x/y/z axis
 
 			if moveresult.collides and moveresult.collisions then
-				if self.thrower_name and moveresult.collisions[1] and (moveresult.collisions[1].type ~= "object" or
-				moveresult.collisions[1].object ~= minetest.get_player_by_name(self.thrower_name)) then
-					if def.on_collide then
-						local c_result = def:on_collide(obj, self.thrower_name, moveresult)
+				if def.on_collide then
+					local c_result = def:on_collide(obj, self.thrower_name, moveresult)
 
-						if c_result == true then
-							if self.thrower_name then
-								minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
-										" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-								def:on_explode(pos, self.thrower_name)
-							end
-							obj:remove()
-						elseif c_result == "stop" then
-							vel = vector.new()
-							self.last_vel = vector.new()
-							obj:set_velocity(vector.new())
-							obj:set_acceleration(vector.new(0, 0, 0))
+					if c_result == true then
+						if self.thrower_name then
+							minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
+									" explodes at " .. minetest.pos_to_string(vector.round(pos)))
+							def:on_explode(obj, pos, self.thrower_name)
 						end
-					else
-						if moveresult.collisions[1] and moveresult.collisions[1].axis then
-							local axis = moveresult.collisions[1].axis
-
-							vel[axis] = self.last_vel[axis] * -0.3
-						end
+						obj:remove()
+					elseif c_result == false then
+						vel = vector.new()
+						self.last_vel = vector.new()
+						obj:set_velocity(vector.new())
+						obj:set_acceleration(vector.new(0, 0, 0))
 					end
+				else
+					if moveresult.collisions[1] and moveresult.collisions[1].axis then
+						local axis = moveresult.collisions[1].axis
 
-					obj:set_velocity(vel)
+						vel[axis] = self.last_vel[axis] * -0.3
+					end
 				end
+
+				obj:set_velocity(vel)
 			end
 
 			self.last_vel = vel
@@ -131,7 +130,7 @@ function grenades.register_grenade(name, def)
 				if self.thrower_name then
 					minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 					" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-					def:on_explode(pos, self.thrower_name)
+					def:on_explode(obj, pos, self.thrower_name)
 				end
 
 				obj:remove()

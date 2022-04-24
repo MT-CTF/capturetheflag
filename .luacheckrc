@@ -3,18 +3,18 @@ unused_args = false
 globals = {
 	"PlayerObj", "PlayerName", "HumanReadable", "RunCallbacks",
 
-	"ctf_gui", "hud_events", "mhud", "physics", "rawf",
+	"ctf_gui", "hud_events", "mhud", "physics", "rawf", "ctf_settings",
 
 	"ctf_api", "ctf_chat", "ctf_combat_mode", "ctf_core", "ctf_cosmetics",
 	"ctf_healing", "ctf_kill_list", "ctf_map", "ctf_melee", "ctf_modebase",
-	"ctf_ranged", "ctf_rankings", "ctf_report", "ctf_teams",
+	"ctf_ranged", "ctf_rankings", "ctf_report", "ctf_teams", "ctf_player",
 
 	"dropondie", "grenades",
 
 	"chatcmdbuilder", "crafting", "hpbar", "playertag", "random_messages",
 	"skybox", "throwable_snow",
 
-	"default", "doors",
+	"default", "doors", "player_api", "sfinv", "binoculars",
 
 	"vector",
 	math = {
@@ -47,6 +47,7 @@ read_globals = {
 	"ItemStack",
 	"Settings",
 	"unpack",
+	"loadstring",
 
 	table = {
 		fields = {

@@ -15,7 +15,7 @@ grenades.register_grenade("throwable_snow:snowball", {
 	collide_with_objects = true,
 	stack_max = 99,
 	throw_cooldown = 0.9,
-	on_explode = function(def, pos, name)
+	on_explode = function(def, obj, pos, name)
 		minetest.add_particlespawner({
 			amount = 9,
 			time = 0.01,

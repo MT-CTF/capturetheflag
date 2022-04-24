@@ -13,18 +13,73 @@ local function calculate_killscore(player)
 	return math.max(1, math.round(kd * 7))
 end
 
+local damage_group_textures = {
+	grenade = "grenades_frag.png",
+	knockback_grenade = "ctf_mode_nade_fight_knockback_grenade.png",
+	black_hole_grenade = "ctf_mode_nade_fight_black_hole_grenade.png",
+	damage_cobble = "ctf_map_damage_cobble.png",
+}
+
+local function get_weapon_image(hitter, tool_capabilities)
+	local image
+
+	for group, texture in pairs(damage_group_textures) do
+		if tool_capabilities.damage_groups[group] then
+			image = texture
+			break
+		end
+	end
+
+	if not image then
+		image = hitter:get_wielded_item():get_definition().inventory_image
+	end
+
+	if image == "" then
+		image = "ctf_kill_list_punch.png"
+	end
+
+	if tool_capabilities.damage_groups.ranged then
+		image = image .. "^[transformFX"
+	end
+
+	return image
+end
+
+local function get_suicide_image(reason)
+	local image = "ctf_modebase_skull.png"
+
+	if reason.type == "node_damage" then
+		local node = reason.node
+		if node == "ctf_map:spike" then
+			image = "ctf_map_spike.png"
+		elseif node:match("default:lava") then
+			image = "default_lava.png"
+		elseif node:match("fire:") then
+			image = "fire_basic_flame.png"
+		end
+	elseif reason.type == "drown" then
+		image = "default_water.png"
+	end
+
+	return image
+end
+
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
 
 	if not tname then return end
 
-	player:set_pos(
-		vector.offset(ctf_map.current_map.teams[tname].flag_pos,
-			math.random(-1, 1),
-			0.5,
-			math.random(-1, 1)
-		)
+	local pos = vector.offset(ctf_map.current_map.teams[tname].flag_pos,
+		math.random(-1, 1),
+		0.5,
+		math.random(-1, 1)
 	)
+	player:set_pos(pos)
+	minetest.after(0.1, function() -- TODO remove after respawn bug will be fixed
+		if player:is_player() then
+			player:set_pos(pos)
+		end
+	end)
 
 	return true
 end
@@ -50,19 +105,31 @@ local function celebrate_team(teamname)
 	end
 end
 
-local function end_combat_mode(player, killer, leaving)
-	local killscore = calculate_killscore(player)
-	local hitters = {}
+local function end_combat_mode(player, reason, killer, weapon_image)
+	local comment = nil
 
-	ctf_combat_mode.get(player, "hitter", function(pname)
-		if not killer or pname ~= killer then
-			table.insert(hitters, pname)
+	if reason == "combatlog" then
+		killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+		if killer then
+			comment = " (Combat Log)"
+			recent_rankings.add(player, {deaths = 1}, true)
 		end
-	end)
-
-	if killer == player then
+	else
+		if reason ~= "punch" or killer == player then
+			if reason == "punch" then
+				ctf_kill_list.add(player, player, weapon_image)
+			else
+				ctf_kill_list.add("", player, get_suicide_image(reason))
+			end
+			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+			comment = " (Suicide)"
+		end
 		recent_rankings.add(player, {deaths = 1}, true)
-	elseif killer then
+	end
+
+	if killer then
+		local killscore = calculate_killscore(player)
+
 		local rewards = {kills = 1, score = killscore}
 		local bounty = ctf_modebase.bounties.claim(player, killer)
 
@@ -74,40 +141,53 @@ local function end_combat_mode(player, killer, leaving)
 
 		recent_rankings.add(killer, rewards)
 
+		ctf_kill_list.add(killer, player, weapon_image, comment)
+
+		-- share kill score with other hitters
+		local hitters = ctf_combat_mode.get_other_hitters(player, killer)
+		for _, pname in ipairs(hitters) do
+			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
+		end
+
 		-- share kill score with healers
-		ctf_combat_mode.get(killer, "healer", function(pname)
-			recent_rankings.add(pname, {score = rewards.score})
-		end)
-
-		recent_rankings.add(player, {deaths = 1}, true)
-
-		local killer_attacked = nil
-		ctf_combat_mode.get(killer, "hitter", function(pname)
-			if not killer_attacked then
-				killer_attacked = pname ~= player
-			end
-		end)
-
-		if killer_attacked == false then
-			ctf_combat_mode.set_time(killer, 5)
-		end
-	else
-		-- Only take score if they're in combat for being hit
-		if #hitters > 0 then
-			recent_rankings.add(player, {score = -math.ceil(killscore/2)}, leaving)
+		local healers = ctf_combat_mode.get_healers(killer)
+		for _, pname in ipairs(healers) do
+			recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
 		end
 
-		if #hitters > 0 or not leaving then
-			ctf_kill_list.add_kill("", "ctf_modebase_skull.png", player)
-			recent_rankings.add(player, {deaths = 1}, true)
+		if ctf_combat_mode.is_only_hitter(killer, player) then
+			ctf_combat_mode.set_kill_time(killer, 5)
 		end
 	end
 
-	for _, pname in ipairs(hitters) do
-		recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
+	ctf_combat_mode.end_combat(player)
+end
+
+local function can_punchplayer(player, hitter)
+	if not ctf_modebase.match_started then
+		return false, "The match hasn't started yet!"
 	end
 
-	ctf_combat_mode.remove(player)
+	local pname, hname = player:get_player_name(), hitter:get_player_name()
+	local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
+
+	if not ctf_modebase.remove_respawn_immunity(hitter) then
+		return false, "You can't attack while immune"
+	end
+
+	if not pteam then
+		return false, pname .. " is not in a team!"
+	end
+
+	if not hteam then
+		return false, "You are not in a team!"
+	end
+
+	if pteam == hteam and pname ~= hname then
+		return false, pname .. " is on your team!"
+	end
+
+	return true
 end
 
 return {
@@ -128,7 +208,8 @@ return {
 		ctf_map.prepare_map_nodes(
 			ctf_map.current_map,
 			function(inv) ctf_map.treasure.treasurefy_node(inv, map_treasures) end,
-			ctf_modebase:get_current_mode().blacklisted_nodes
+			ctf_modebase:get_current_mode().team_chest_items or {},
+			ctf_modebase:get_current_mode().blacklisted_nodes or {}
 		)
 	end,
 	on_match_end = function()
@@ -183,7 +264,7 @@ return {
 			return remembered_team
 		end
 
-		if players_diff == 0 or kd_diff > 0.2 and players_diff < 2 then
+		if players_diff == 0 or (kd_diff > 0.2 and players_diff < 2) then
 			return worst_kd.t
 		else
 			return worst_players.t
@@ -324,14 +405,14 @@ return {
 	end,
 	on_leaveplayer = function(player)
 		if not ctf_modebase.match_started then
-			ctf_combat_mode.remove(player)
+			ctf_combat_mode.end_combat(player)
 			return
 		end
 
 		local pname = player:get_player_name()
 
 		-- should be no_hud to avoid a race
-		end_combat_mode(pname, nil, true)
+		end_combat_mode(pname, "combatlog")
 
 		recent_rankings.on_leaveplayer(pname)
 	end,
@@ -340,7 +421,7 @@ return {
 
 		-- punch is handled in on_punchplayer
 		if reason.type ~= "punch" then
-			end_combat_mode(player:get_player_name())
+			end_combat_mode(player:get_player_name(), reason)
 		end
 
 		ctf_modebase.prepare_respawn_delay(player)
@@ -353,48 +434,39 @@ return {
 		local deny_pro = "You need to have more than 1.4 kills per death, "..
 				"5 captures, and at least 8,000 score to access the pro section"
 
-		-- Remember to update /makepro in ranking_commands.lua if you change anything here
+		-- Remember to update /make_pro in ranking_commands.lua if you change anything here
 		if rank then
-			if (rank.score or 0) >= 8000 and (rank.kills or 0) / (rank.deaths or 0) >= 1.4 and rank.flag_captures >= 5 then
+			if
+				(rank.score or 0) >= 8000 and
+				(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
+				(rank.flag_captures or 0) >= 5
+			then
 				return true, true
-			elseif (rank.score or 0) >= 10 then
+			end
+
+			if (rank.score or 0) >= 10 then
 				return true, deny_pro
 			end
 		end
 
 		return "You need at least 10 score to access this chest", deny_pro
 	end,
+	can_punchplayer = can_punchplayer,
 	on_punchplayer = function(player, hitter, damage, _, tool_capabilities)
 		if not hitter:is_player() or player:get_hp() <= 0 then return false end
 
-		if not ctf_modebase.match_started then
-			return false, "The match hasn't started yet!"
+		local allowed, message = can_punchplayer(player, hitter)
+
+		if not allowed then
+			return false, message
 		end
 
-		local pname, hname = player:get_player_name(), hitter:get_player_name()
-		local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
-
-		if not ctf_modebase.remove_respawn_immunity(hitter) then
-			return false, "You can't attack while immune"
-		end
-
-		if not pteam then
-			return false, pname .. " is not in a team!"
-		end
-
-		if not hteam then
-			return false, "You are not in a team!"
-		end
-
-		if pteam == hteam and pname ~= hname then
-			return false, pname .. " is on your team!"
-		end
+		local weapon_image = get_weapon_image(hitter, tool_capabilities)
 
 		if player:get_hp() <= damage then
-			end_combat_mode(pname, hname)
-			ctf_kill_list.on_kill(player, hitter, tool_capabilities)
-		elseif pname ~= hname then
-			ctf_combat_mode.set(player, hitter, "hitter", 15, true)
+			end_combat_mode(player:get_player_name(), "punch", hitter:get_player_name(), weapon_image)
+		elseif player:get_player_name() ~= hitter:get_player_name() then
+			ctf_combat_mode.add_hitter(player, hitter, weapon_image, 15)
 		end
 
 		return damage
@@ -410,7 +482,7 @@ return {
 			score = 1
 		end
 
-		ctf_combat_mode.set(patient, player, "healer", 60, false)
+		ctf_combat_mode.add_healer(patient, player, 60)
 		recent_rankings.add(player, {hp_healed = amount, score = score}, true)
 	end,
 }

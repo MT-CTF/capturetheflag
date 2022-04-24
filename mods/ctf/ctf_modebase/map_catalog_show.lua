@@ -21,8 +21,8 @@ local function show_catalog(pname, current_map)
 				},
 				rows = ctf_modebase.map_catalog.map_names,
 				default_idx = current_map,
-				func = function(_, fields, name)
-					local evt = minetest.explode_table_event(fields[name])
+				func = function(_, fields)
+					local evt = minetest.explode_table_event(fields.list)
 					if evt.type == "CHG" then
 						show_catalog(pname, evt.row)
 					end
@@ -153,7 +153,7 @@ local function show_catalog(pname, current_map)
 		}
 	end
 
-	ctf_gui.show_formspec(pname, "ctf_map:catalog", formspec)
+	ctf_gui.old_show_formspec(pname, "ctf_map:catalog", formspec)
 end
 
 minetest.register_chatcommand("maps", {

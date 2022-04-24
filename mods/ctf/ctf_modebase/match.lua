@@ -3,11 +3,6 @@ ctf_modebase.map_on_next_match = nil
 ctf_modebase.mode_on_next_match = nil
 
 function ctf_modebase.start_match_after_vote()
-	for _, pos in pairs(ctf_teams.team_chests) do
-		minetest.remove_node(pos)
-	end
-	ctf_teams.team_chests = {}
-
 	local old_mode = ctf_modebase.current_mode
 
 	if ctf_modebase.mode_on_next_match ~= old_mode then
@@ -50,7 +45,7 @@ local function start_new_match()
 	end
 
 	if restart_on_next_match then
-		minetest.request_shutdown("Restarting server at imperator request.", true)
+		minetest.request_shutdown("Restarting server at imperator request.\nTip: Count to 7 before clicking reconnect", true)
 		return
 	end
 
