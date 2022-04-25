@@ -166,3 +166,9 @@ crafting.register_recipe({
 	items  = { "default:cobble 6", "default:steel_ingot" },
 	always_known = false,
 })
+
+crafting.register_recipe({
+	output = "ctf_map:landmine",
+	items  = { "default:steel_ingot 4", "grenades:frag" },
+	always_known = false,
+})
