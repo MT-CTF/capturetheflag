@@ -64,9 +64,25 @@ local function get_suicide_image(reason)
 	return image
 end
 
+-- calc_flag_center() calculates the center of the map from the positions of the flags.
+local function calc_flag_center()
+	local flag_center = vector.zero()
+	local flag_count = 0
+
+	for _, team in pairs(ctf_map.current_map.teams) do
+		flag_center = flag_center + team.flag_pos
+		flag_count = flag_count + 1
+	end
+
+	flag_center = flag_center:apply(function(value)
+		return value / flag_count
+	end)
+
+	return flag_center
+end
+
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
-
 	if not tname then return end
 
 	local pos = vector.offset(ctf_map.current_map.teams[tname].flag_pos,
@@ -74,10 +90,18 @@ local function tp_player_near_flag(player)
 		0.5,
 		math.random(-1, 1)
 	)
-	player:set_pos(pos)
+	local rotation_y = vector.dir_to_rotation(vector.direction(pos, calc_flag_center())).y
+
+	local function apply()
+		player:set_pos(pos)
+		player:set_look_vertical(0)
+		player:set_look_horizontal(rotation_y)
+	end
+
+	apply()
 	minetest.after(0.1, function() -- TODO remove after respawn bug will be fixed
 		if player:is_player() then
-			player:set_pos(pos)
+			apply()
 		end
 	end)
 
