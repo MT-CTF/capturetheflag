@@ -66,7 +66,6 @@ end
 
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
-
 	if not tname then return end
 
 	local pos = vector.offset(ctf_map.current_map.teams[tname].flag_pos,
@@ -74,10 +73,20 @@ local function tp_player_near_flag(player)
 		0.5,
 		math.random(-1, 1)
 	)
-	player:set_pos(pos)
+	local rotation_y = vector.dir_to_rotation(
+		vector.direction(pos, ctf_map.current_map.teams[tname].look_pos or ctf_map.current_map.flag_center)
+	).y
+
+	local function apply()
+		player:set_pos(pos)
+		player:set_look_vertical(0)
+		player:set_look_horizontal(rotation_y)
+	end
+
+	apply()
 	minetest.after(0.1, function() -- TODO remove after respawn bug will be fixed
 		if player:is_player() then
-			player:set_pos(pos)
+			apply()
 		end
 	end)
 
