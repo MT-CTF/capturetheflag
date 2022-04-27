@@ -135,7 +135,7 @@ minetest.register_abm({
 	nodenames = {"ctf_map:landmine"},
 	interval = 1,
 	chance = 1,
-	min_y = -3000,
+	min_y = 0,
 	max_y = 3000,
 	action = function(pos, node, active_object_count, active_object_count_wider)
 		local objs = minetest.get_objects_in_area({x=pos.x-0.5, y=pos.y-0.5, z=pos.z-0.5},
