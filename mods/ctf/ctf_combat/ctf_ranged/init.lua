@@ -29,11 +29,10 @@ local function process_ray(ray, user, look_dir, def)
 			local node = minetest.get_node(hitpoint.under)
 			local nodedef = minetest.registered_nodes[node.name]
 
-			if nodedef.groups.snappy or nodedef.groups.ranged_breakable or
-			(nodedef.groups.oddly_breakable_by_hand or 0) >= 3 then
+			if nodedef.on_ranged_shoot or nodedef.groups.snappy or (nodedef.groups.oddly_breakable_by_hand or 0) >= 3 then
 				if not minetest.is_protected(hitpoint.under, user:get_player_name()) then
-					if nodedef.groups.ranged_breakable and nodedef.on_dig then
-						nodedef.on_dig(hitpoint.under, node, user)
+					if nodedef.on_ranged_shoot then
+						nodedef.on_ranged_shoot(hitpoint.under, node, user)
 					else
 						minetest.dig_node(hitpoint.under)
 					end
