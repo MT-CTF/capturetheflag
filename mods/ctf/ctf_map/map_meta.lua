@@ -6,6 +6,23 @@ function ctf_map.skybox_exists(subdir)
 	return table.indexof(list, "skybox") ~= -1
 end
 
+-- calc_flag_center() calculates the center of a map from the positions of the flags.
+local function calc_flag_center(map)
+	local flag_center = vector.zero()
+	local flag_count = 0
+
+	for _, team in pairs(map.teams) do
+		flag_center = flag_center + team.flag_pos
+		flag_count = flag_count + 1
+	end
+
+	flag_center = flag_center:apply(function(value)
+		return value / flag_count
+	end)
+
+	return flag_center
+end
+
 function ctf_map.load_map_meta(idx, dirname)
 	local meta = Settings(ctf_map.maps_dir .. dirname .. "/map.conf")
 
@@ -158,6 +175,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			map.barrier_area = {pos1 = map.pos1, pos2 = map.pos2}
 		end
 	end
+
+	map.flag_center = calc_flag_center(map)
 
 	if ctf_map.skybox_exists(ctf_map.maps_dir .. dirname) then
 		skybox.add({dirname, "#ffffff", [5] = "png"})

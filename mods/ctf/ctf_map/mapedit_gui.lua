@@ -414,7 +414,55 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				end)
 			end,
 		}
-		idx = idx + 1.5
+		idx = idx + (0.7 / 2) + 0.3 + (0.3 / 2)
+
+		local look_pos = context[player].teams[teamname].look_pos
+
+		elements[teamname .. "_look_pos"] = {
+			type = "label",
+			label = "Look position: " .. (look_pos and vector.to_string(look_pos) or "auto"),
+			pos = {0.2, idx},
+			-- "The first line of text is now positioned centered exactly at the position specified."
+			-- https://github.com/minetest/minetest/blob/480d5f2d51ca8f7c4400b0918bb53b776e4ff440/doc/lua_api.txt#L2929
+		}
+		idx = idx + (0.3 / 2) + 0.1 + (0.7 / 2)
+
+		local btn_width = (9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1) - 0.1) / 2
+
+		elements[teamname.."_look_pos_auto"] = {
+			type = "button",
+			label = "Auto",
+			pos = {0.2, idx - (ctf_gui.ELEM_SIZE.y / 2)},
+			size = {btn_width, ctf_gui.ELEM_SIZE.y},
+
+			func = function(pname, fields)
+				context[pname].teams[teamname].look_pos = nil
+
+				minetest.after(0.1, function()
+					ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+				end)
+			end,
+		}
+
+		elements[teamname.."_look_pos_choose"] = {
+			type = "button",
+			label = "Choose",
+			pos = {0.2 + btn_width + 0.1, idx - (ctf_gui.ELEM_SIZE.y / 2)},
+			size = {btn_width, ctf_gui.ELEM_SIZE.y},
+
+			func = function(pname, fields)
+				ctf_map.get_pos_from_player(pname, 1, function(_, positions)
+					context[pname].teams[teamname].look_pos = positions[1]
+
+					minetest.after(0.1, function()
+						ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+					end)
+				end)
+			end,
+			exit = true,
+		}
+
+		idx = idx + (0.7 / 2) + 0.3 + (0.7 / 2) + 0.5
 	end
 
 	-- CHEST ZONES
