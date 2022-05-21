@@ -328,3 +328,24 @@ for mat, def in pairs(sword_mats) do
 
 	minetest.register_alias_force("default:sword_"..mat, "ctf_melee:sword_"..mat)
 end
+
+
+-----------------------------
+-- Melees for Shooters Mod --
+-----------------------------
+
+ctf_melee.simple_register_sword("ctf_melee:dagger",{
+    description = "Dagger",
+	inventory_image = "ctf_melee_dagger.png",
+	damage_groups = {fleshy=3},
+	sound = {breaks = "default_tool_breaks"},
+	groups = {sword = 1}
+})
+
+ctf_melee.simple_register_sword("ctf_melee:mace",{
+    description = "Mace",
+	inventory_image = "ctf_melee_mace.png",
+	damage_groups = {fleshy=6},
+	sound = {breaks = "default_tool_breaks"},
+	groups = {sword = 1}
+})
