@@ -329,6 +329,102 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	end
 })
 
+-----------------------------
+-- Rifles for Shooters Mod --
+-----------------------------
+
+ctf_ranged.simple_register_gun("ctf_ranged:desert_eagle", {
+	type = "pistol",
+	description = "Desert Eagle",
+	texture = "ctf_ranged_desert_eagle.png",
+	fire_sound = "ctf_ranged_rifle",
+	rounds = 24,
+	range = 100,
+	damage = 5,
+	fire_interval = 1.6,
+	liquid_travel_dist = 5,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:marksman_rifle", {
+	type = "rifle",
+	description = "Marksman Rifle",
+	texture = "ctf_ranged_marksman_rifle.png",
+	fire_sound = "ctf_ranged_pistol",
+	rounds = 30,
+	range = 100,
+	damage = 5,
+	fire_interval = 0.6,
+	liquid_travel_dist = 4,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:mese_desert_eagle", {
+	type = "pistol",
+	description = "Mese Desert Eagle",
+	texture = "ctf_ranged_mese_desert_eagle.png",
+	fire_sound = "ctf_ranged_rifle",
+	rounds = 8,
+	range = 200,
+	damage = 20,
+	fire_interval = 6,
+	liquid_travel_dist = 20,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:pistol_shoot", {
+	type = "pistol",
+	description = "Pistol",
+	texture = "ctf_ranged_pistol.png",
+	fire_sound = "ctf_ranged_pistol",
+	rounds = 36,
+	range = 60,
+	damage = 4,
+	automatic = true,
+	fire_interval = 0.5,
+	liquid_travel_dist = 2
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:ak_fortyseven", {
+	type = "rifle",
+	description = "Rifle",
+	texture = "ctf_ranged_rifle.png",
+	fire_sound = "ctf_ranged_rifle",
+	rounds = 36,
+	range = 120,
+	damage = 5,
+	fire_interval = 0.8,
+	liquid_travel_dist = 4,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:shotgun_shoot", {
+	type = "shotgun",
+	description = "Shotgun",
+	texture = "ctf_ranged_shotgun.png",
+	fire_sound = "ctf_ranged_shotgun",
+	bullet = {
+		amount = 36,
+		spread = 4.5,
+	},
+	rounds = 8,
+	range = 40,
+	damage = 1,
+	fire_interval = 4,
+})
+
+ctf_ranged.simple_register_gun("ctf_ranged:smg_shooter", {
+	type = "smg",
+	description = "Submachinegun",
+	texture = "ctf_ranged_smgun.png",
+	fire_sound = "ctf_ranged_pistol",
+	bullet = {
+		spread = 2,
+	},
+	automatic = true,
+	rounds = 60,
+	range = 50,
+	damage = 1,
+	fire_interval = 0.075,
+	liquid_travel_dist = 2,
+})
+
 ------------------
 -- Scope-check --
 ------------------
