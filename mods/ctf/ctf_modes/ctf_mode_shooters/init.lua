@@ -16,14 +16,14 @@ ctf_modebase.register_mode("shooters", {
 		["default:shovel_steel"] = {rarity = 0.4, max_stacks = 2},
 		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
 
-		["ctf_ranged:desert_eagle"      ] = {rarity = 0.1  , max_stacks = 1},
-		["ctf_melee:mese_desert_eagle"  ] = {rarity = 0.03 , max_stacks = 1},
+		["ctf_ranged:desert_eagle_loaded"      ] = {rarity = 0.1  , max_stacks = 1},
+		["ctf_melee:mese_desert_eagle_loaded"  ] = {rarity = 0.03 , max_stacks = 1},
 
-		["ctf_ranged:pistol_shoot"   ] = {rarity = 0.4 , max_stacks = 2},
-		["ctf_ranged:ak_fortyseven"  ] = {rarity = 0.35                },
-		["ctf_ranged:shotgun_shoot"  ] = {rarity = 0.15                },
-		["ctf_ranged:smg_shooter"     ] = {rarity = 0.2                 },
-		["ctf_ranged:marksman_rifle" ] = {rarity = 0.1                 },
+		["ctf_ranged:pistol_shoot_loaded"   ] = {rarity = 0.4 , max_stacks = 2},
+		["ctf_ranged:ak_fortyseven_loaded"  ] = {rarity = 0.35                },
+		["ctf_ranged:shotgun_shoot_loaded"  ] = {rarity = 0.15                },
+		["ctf_ranged:smg_shooter_loaded"     ] = {rarity = 0.2                 },
+		["ctf_ranged:marksman_rifle_loaded" ] = {rarity = 0.1                 },
 		
 		["ctf_melee:mace"     ] = {rarity = 0.2                 },
 		["ctf_melee:dagger"   ] = {rarity = 0.4 , max_stacks = 2},
@@ -110,4 +110,5 @@ ctf_modebase.register_mode("shooters", {
 		return 0
 	end,
 })
+
 
