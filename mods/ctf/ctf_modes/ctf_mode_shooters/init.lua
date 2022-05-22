@@ -17,7 +17,7 @@ ctf_modebase.register_mode("shooters", {
 		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
 
 		["ctf_ranged:desert_eagle_loaded"      ] = {rarity = 0.1  , max_stacks = 1},
-		["ctf_melee:mese_desert_eagle_loaded"  ] = {rarity = 0.03 , max_stacks = 1},
+		["ctf_ranged:mese_desert_eagle_loaded" ] = {rarity = 0.03 , max_stacks = 1},
 
 		["ctf_ranged:pistol_shoot_loaded"   ] = {rarity = 0.4 , max_stacks = 2},
 		["ctf_ranged:ak_fortyseven_loaded"  ] = {rarity = 0.35                },
