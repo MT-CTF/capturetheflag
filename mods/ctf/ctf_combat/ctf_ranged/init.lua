@@ -10,7 +10,7 @@ local scale_const = 6
 local timer = 1
 
 minetest.register_craftitem("ctf_ranged:ammo", {
-	description = "Ammo",
+	description = "Ammo\nUsed to reload guns",
 	inventory_image = "ctf_ranged_ammo.png",
 })
 
