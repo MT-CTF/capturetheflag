@@ -75,7 +75,11 @@ minetest.register_node("ctf_map:damage_cobble", {
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3, stone=2},
-	on_ranged_shoot = function(pos, node, shooter)
+	on_ranged_shoot = function(pos, node, shooter, type)
+		if type == "pistol" then
+			return
+		end
+
 		if not damage_cobble_dig(pos, node, shooter) then
 			return minetest.dig_node(pos)
 		end
