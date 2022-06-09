@@ -168,15 +168,18 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 	if not formdef.size then
 		formdef.size = ctf_gui.FORM_SIZE
 	end
+	if not formdef.header_height then
+		formdef.header_height = 1.6
+	end
 
 	local maxyscroll = 0
 	local formspec = "formspec_version[4]" ..
 			string.format("size[%f,%f]", formdef.size.x, formdef.size.y) ..
-				"hypertext[0,0.2;"..formdef.size.x..
-					",1.6;title;<center><big>"..formdef.title.."</big>\n" ..
+				"hypertext[0,0.2;"..formdef.size.x..","..formdef.header_height..
+					";title;<center><big>"..formdef.title.."</big>\n" ..
 					(formdef.description or "\b") .."</center>]" ..
-				"scroll_container[0.1,1.5;"..formdef.size.x..
-				","..formdef.size.y..";formcontent;vertical]"
+				"scroll_container[0.1,"..(formdef.header_height-0.1)..";"
+					..formdef.size.x..","..formdef.size.y..";formcontent;vertical]"
 
 	local using_scrollbar = false
 	if formdef.elements then

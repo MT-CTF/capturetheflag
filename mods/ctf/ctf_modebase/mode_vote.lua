@@ -42,9 +42,10 @@ local function show_modechoose_form(player)
 	end
 
 	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
-		size = {x = 8, y = MAX_ROUNDS + 3},
+		size = {x = 8, y = MAX_ROUNDS + 3.5},
 		title = "Mode: "..HumanReadable(new_mode),
 		description = "Please vote on how many matches you would like to play",
+		header_height = 2.4,
 		elements = elements,
 	})
 end
