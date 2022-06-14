@@ -124,7 +124,6 @@ minetest.register_node("ctf_map:landmine", {
 		local name = placer:get_player_name()
 
 		meta:set_string("placer", minetest.serialize({
-			team = ctf_teams.get(name),
 			name = name,
 		}))
 	end
@@ -133,69 +132,76 @@ minetest.register_node("ctf_map:landmine", {
 minetest.register_abm({
 	label = "Landmine",
 	nodenames = {"ctf_map:landmine"},
-	interval = 1,
+	interval = 0.5,
 	chance = 1,
-	min_y = 0,
-	max_y = 3000,
 	action = function(pos, node, active_object_count, active_object_count_wider)
-		local objs = minetest.get_objects_in_area({x=pos.x-0.5, y=pos.y-0.5, z=pos.z-0.5},
-				{x=pos.x+0.5, y=pos.y-0.3, z=pos.z+0.5})
-		if #objs == 0 then
-			return
-		else
-			local plyrs = minetest.get_objects_inside_radius(pos, 3)
-			local meta = minetest.get_meta(pos)
-			local placer = minetest.deserialize(meta:get_string("placer"))
-			local placer_obj = placer and minetest.get_player_by_name(placer.name)
-
-			minetest.add_particlespawner({
-				amount = 20,
-				time = 0.5,
-				minpos = vector.subtract(pos, 3),
-				maxpos = vector.add(pos, 3),
-				minvel = {x = 0, y = 5, z = 0},
-				maxvel = {x = 0, y = 7, z = 0},
-				minacc = {x = 0, y = 1, z = 0},
-				maxacc = {x = 0, y = 1, z = 0},
-				minexptime = 0.3,
-				maxexptime = 0.6,
-				minsize = 7,
-				maxsize = 10,
-				collisiondetection = true,
-				collision_removal = false,
-				vertical = false,
-				texture = "grenades_smoke.png",
-			})
-
-			minetest.add_particle({
-				pos = pos,
-				velocity = {x=0, y=0, z=0},
-				acceleration = {x=0, y=0, z=0},
-				expirationtime = 0.3,
-				size = 15,
-				collisiondetection = false,
-				collision_removal = false,
-				object_collision = false,
-				vertical = false,
-				texture = "grenades_boom.png",
-				glow = 10
-			})
-
-			minetest.sound_play("grenades_explode", {
-				pos = pos,
-				gain = 1.0,
-				max_hear_distance = 64,
-			})
-
-			for _, v in pairs(plyrs) do
-				if placer_obj then
-					v:punch(placer_obj, 1, {damage_groups = {fleshy = 10}}, nil)
-				else
-					local chp = v:get_hp()
-					v:set_hp(chp - 10)
-				end
+		local players = minetest.get_objects_inside_radius(pos, 2)
+		local to_be_damaged = {}
+		local i = 1
+		local meta = minetest.get_meta(pos)
+		local placer = minetest.deserialize(meta:get_string("placer"))
+		local placer_team = ctf_teams.get(placer.name) 
+		local placer_obj = placer and minetest.get_player_by_name(placer.name)
+		
+		for _, v in pairs(players) do
+			if v:is_player() and ctf_teams.get(v:get_player_name()) ~= placer_team then
+				to_be_damaged[i] = v
+				i = i + 1 -- Why Lua doesn't have += :| :| :|
 			end
-			minetest.remove_node(pos)
 		end
+
+		if i == 1 then
+			return
+		end
+		
+
+		minetest.add_particlespawner({
+			amount = 20,
+			time = 0.5,
+			minpos = vector.subtract(pos, 3),
+			maxpos = vector.add(pos, 3),
+			minvel = {x = 0, y = 5, z = 0},
+			maxvel = {x = 0, y = 7, z = 0},
+			minacc = {x = 0, y = 1, z = 0},
+			maxacc = {x = 0, y = 1, z = 0},
+			minexptime = 0.3,
+			maxexptime = 0.6,
+			minsize = 7,
+			maxsize = 10,
+			collisiondetection = true,
+			collision_removal = false,
+			vertical = false,
+			texture = "grenades_smoke.png",
+		})
+
+		minetest.add_particle({
+			pos = pos,
+			velocity = {x=0, y=0, z=0},
+			acceleration = {x=0, y=0, z=0},
+			expirationtime = 0.3,
+			size = 15,
+			collisiondetection = false,
+			collision_removal = false,
+			object_collision = false,
+			vertical = false,
+			texture = "grenades_boom.png",
+			glow = 10
+		})
+
+		minetest.sound_play("grenades_explode", {
+			pos = pos,
+			gain = 1.0,
+			max_hear_distance = 64,
+		})
+
+		for _, v in pairs(to_be_damaged) do
+			if placer_obj then
+				v:punch(placer_obj, 1, {damage_groups = {fleshy = 10}}, nil)
+			else
+				local chp = v:get_hp()
+				v:set_hp(chp - 10)
+			end
+		end
+		minetest.remove_node(pos)
 	end
 })
