@@ -125,6 +125,7 @@ minetest.register_node("ctf_map:landmine", {
 
 		meta:set_string("placer", minetest.serialize({
 			name = name,
+			team = ctf_teams.get(name)
 		}))
 	end
 })
@@ -140,7 +141,7 @@ minetest.register_abm({
 		local i = 1
 		local meta = minetest.get_meta(pos)
 		local placer = minetest.deserialize(meta:get_string("placer"))
-		local placer_team = ctf_teams.get(placer.name) 
+		local placer_team = placer.team
 		local placer_obj = placer and minetest.get_player_by_name(placer.name)
 		
 		for _, v in pairs(players) do
@@ -154,7 +155,6 @@ minetest.register_abm({
 			return
 		end
 		
-
 		minetest.add_particlespawner({
 			amount = 20,
 			time = 0.5,
