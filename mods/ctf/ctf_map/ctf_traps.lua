@@ -143,18 +143,15 @@ minetest.register_abm({
 		local placer = minetest.deserialize(meta:get_string("placer"))
 		local placer_team = placer.team
 		local placer_obj = placer and minetest.get_player_by_name(placer.name)
-		
 		for _, v in pairs(players) do
 			if v:is_player() and ctf_teams.get(v:get_player_name()) ~= placer_team then
 				to_be_damaged[i] = v
 				i = i + 1 -- Why Lua doesn't have += :| :| :|
 			end
 		end
-
 		if i == 1 then
 			return
 		end
-		
 		minetest.add_particlespawner({
 			amount = 20,
 			time = 0.5,
