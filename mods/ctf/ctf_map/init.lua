@@ -1,7 +1,7 @@
 if not ctf_core.settings.server_mode or ctf_core.settings.server_mode == "play" then
 	assert(
 		minetest.get_mapgen_setting("mg_name") == "singlenode",
-		"You must use singlenode mapgen when ctf_server_mode is set to 'play'"
+		"If you create a map, you must enable creative mode. If you want to play, you must use the singlenode mapgen."
 	)
 end
 
@@ -89,7 +89,8 @@ minetest.register_chatcommand("ctf_map", {
 
 			if ctf_core.settings.server_mode ~= "mapedit" then
 				minetest.chat_send_player(name,
-						minetest.colorize("red", "It is not recommended to edit maps unless the server is in mapedit mode"))
+						minetest.colorize("red", "It is not recommended to edit maps unless the server is in mapedit mode\n"..
+							"To enable mapedit mode, enable creative mode."))
 			end
 
 			ctf_map.show_map_editor(name)
