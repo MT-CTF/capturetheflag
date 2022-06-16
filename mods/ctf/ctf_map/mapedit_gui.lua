@@ -431,10 +431,14 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 					" - " .. minetest.pos_to_string(context[player].teams[teamname].pos2, 0),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
-			func = function(pname)
+			func = function(pname, fields)
 				ctf_map.get_pos_from_player(pname, 2, function(p, positions)
 					context[pname].teams[teamname].pos1 = positions[1]
 					context[pname].teams[teamname].pos2 = positions[2]
+
+					minetest.after(0.1, function()
+						ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+					end)
 				end)
 			end,
 		}
@@ -569,10 +573,14 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				" - " .. minetest.pos_to_string(context[player].barrier_area.pos2, 0),
 		pos = {0, idx},
 		size = {9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
-		func = function(pname)
+		func = function(pname, fields)
 			ctf_map.get_pos_from_player(pname, 2, function(p, positions)
 				context[pname].barrier_area.pos1 = positions[1]
 				context[pname].barrier_area.pos2 = positions[2]
+
+				minetest.after(0.1, function()
+					ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+				end)
 			end)
 		end,
 	}
