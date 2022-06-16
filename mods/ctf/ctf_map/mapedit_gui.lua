@@ -2,6 +2,30 @@ ctf_gui.old_init()
 
 local context = {}
 
+local function greet_player(player)
+	minetest.chat_send_player(
+		player:get_player_name(),
+		minetest.colorize(ctf_map.CHAT_COLOR, "Welcome! This server is in mapedit mode.\n")
+	)
+	if not minetest.check_player_privs(player, "ctf_map_editor") then
+		minetest.chat_send_player(
+			player:get_player_name(),
+			minetest.colorize(ctf_map.CHAT_COLOR,
+					"To start, grant yourself \"ctf_map_editor\""..
+					"using \"/grantme ctf_map_editor\" Then run \"/ctf_map editor\"")
+		)
+	else
+		minetest.chat_send_player(
+			player:get_player_name(),
+			minetest.colorize(ctf_map.CHAT_COLOR, "To start, run \"/ctf_map editor\"")
+		)
+	end
+end
+
+if ctf_core.settings.server_mode == "mapedit" then
+	minetest.register_on_joinplayer(greet_player)
+end
+
 local function edit_map(pname, map)
 	local p = minetest.get_player_by_name(pname)
 
@@ -83,7 +107,7 @@ function ctf_map.show_map_editor(player)
 							game_modes    = {},
 						}
 
-						minetest.chat_send_player(pname, "Build away!")
+						minetest.chat_send_player(pname, "Build away! When you are done, run \"/ctf_map editor\"")
 					end)
 				end,
 			},
