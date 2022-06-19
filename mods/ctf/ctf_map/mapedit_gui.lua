@@ -399,9 +399,20 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			size = {5, ctf_gui.ELEM_SIZE.y},
 			func = function(pname, fields)
 					ctf_map.get_pos_from_player(pname, 1, function(name, positions)
-						local p = positions[1]
+						local pos = positions[1]
+						local node = minetest.get_node(pos).name
 
-						context[pname].teams[teamname].flag_pos = p
+						if string.match(node, "^ctf_modebase:flag_top_.*$") then
+							pos = vector.offset(pos, 0, -1, 0)
+						elseif node ~= "air" and node ~= "ctf_modebase:flag" then
+							pos = vector.offset(pos, 0, 1, 0)
+						end
+
+						context[pname].teams[teamname].flag_pos = pos
+
+						local facedir = minetest.dir_to_facedir(minetest.get_player_by_name(pname):get_look_dir())
+						minetest.set_node(pos, {name="ctf_modebase:flag", param2=facedir})
+						minetest.set_node(vector.offset(pos, 0, 1, 0), {name="ctf_modebase:flag_top_"..teamname, param2 = facedir})
 
 						minetest.after(0.1, ctf_map.show_map_save_form, pname,
 								minetest.explode_scrollbar_event(fields.formcontent).value)
