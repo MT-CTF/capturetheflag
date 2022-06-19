@@ -619,6 +619,20 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end)
 		end,
 	}
+
+	-- CANCEL EDITING
+	elements.cancelediting = {
+		type = "button",
+		exit = true,
+		pos = {ctf_gui.FORM_SIZE.x - ctf_gui.SCROLLBAR_WIDTH - ctf_gui.ELEM_SIZE.x - 1, idx},
+		label = "Cancel Editing",
+		func = function(pname)
+			minetest.after(0.1, function()
+				context[pname] = nil
+				ctf_map.show_map_editor(player)
+			end)
+		end,
+	}
 	idx = idx + 1
 
 	-- Show formspec
