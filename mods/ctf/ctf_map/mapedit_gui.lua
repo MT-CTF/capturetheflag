@@ -121,9 +121,22 @@ function ctf_map.show_map_editor(player)
 					end)
 				end,
 			},
+			currentmaps = {
+				type = "textlist",
+				pos = {"center", 1.7},
+				size = {6, 6},
+				items = dirlist_sorted,
+				func = function(pname, fields)
+					local event = minetest.explode_textlist_event(fields.currentmaps)
+
+					if event.type ~= "INV" then
+						selected_map = event.index
+					end
+				end,
+			},
 			editexisting = {
-				type = "button", exit = true, label = "Edit Existing Map",
-				pos = {0.1, 1.8},
+				type = "button", exit = true, label = "Start Editing",
+				pos = {0.1, 7.8},
 				func = function(pname, fields)
 					minetest.after(0.1, function()
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
@@ -144,8 +157,8 @@ function ctf_map.show_map_editor(player)
 				end,
 			},
 			resume_edit = {
-				type = "button", exit = true, label = "Resume Editing Map",
-				pos = {(8-ctf_gui.ELEM_SIZE.x) - 0.3, 1.8},
+				type = "button", exit = true, label = "Resume Editing",
+				pos = {(8-ctf_gui.ELEM_SIZE.x) - 0.3, 7.8},
 				func = function(pname, fields)
 					minetest.after(0.1, function()
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
@@ -162,19 +175,6 @@ function ctf_map.show_map_editor(player)
 
 						minetest.after(2, edit_map, pname, map)
 					end)
-				end,
-			},
-			currentmaps = {
-				type = "textlist",
-				pos = {"center", 1.9 + ctf_gui.ELEM_SIZE.y},
-				size = {6, 6},
-				items = dirlist_sorted,
-				func = function(pname, fields)
-					local event = minetest.explode_textlist_event(fields.currentmaps)
-
-					if event.type ~= "INV" then
-						selected_map = event.index
-					end
 				end,
 			},
 		}
