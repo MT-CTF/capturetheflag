@@ -46,9 +46,7 @@ local function edit_map(pname, map)
 	minetest.settings:set("time_speed", map.time_speed * 72)
 	minetest.registered_chatcommands["time"].func(pname, tostring(map.start_time))
 
-	minetest.after(8, function()
-		minetest.fix_light(map.pos1, map.pos2)
-	end)
+	minetest.after(8, minetest.fix_light, map.pos1, map.pos2)
 
 	context[pname] = map
 end
@@ -405,9 +403,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 						context[pname].teams[teamname].flag_pos = p
 
-						minetest.after(0.1, function()
-							ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-						end)
+						minetest.after(0.1, ctf_map.show_map_save_form, pname,
+								minetest.explode_scrollbar_event(fields.formcontent).value)
 					end)
 			end,
 		}
@@ -436,9 +433,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 					context[pname].teams[teamname].pos1 = positions[1]
 					context[pname].teams[teamname].pos2 = positions[2]
 
-					minetest.after(0.1, function()
-						ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-					end)
+					minetest.after(0.1, ctf_map.show_map_save_form, pname,
+							minetest.explode_scrollbar_event(fields.formcontent).value)
 				end)
 			end,
 		}
@@ -466,9 +462,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			func = function(pname, fields)
 				context[pname].teams[teamname].look_pos = nil
 
-				minetest.after(0.1, function()
-					ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-				end)
+				minetest.after(0.1, ctf_map.show_map_save_form, pname,
+						scrollbar_event(fields.formcontent).value)
 			end,
 		}
 
@@ -482,9 +477,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				ctf_map.get_pos_from_player(pname, 1, function(_, positions)
 					context[pname].teams[teamname].look_pos = positions[1]
 
-					minetest.after(0.1, function()
-						ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-					end)
+					minetest.after(0.1, ctf_map.show_map_save_form, pname,
+							minetest.explode_scrollbar_event(fields.formcontent).value)
 				end)
 			end,
 			exit = true,
@@ -505,9 +499,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				pos2 = vector.new(),
 				amount = ctf_map.DEFAULT_CHEST_AMOUNT,
 			})
-			minetest.after(0.1, function()
-				ctf_map.show_map_save_form(pname, "max")
-			end)
+			minetest.after(0.1, ctf_map.show_map_save_form, pname, "max")
 		end,
 	}
 	idx = idx + 1
@@ -528,9 +520,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 						context[pname].chests[id].pos1 = new_positions[1]
 						context[pname].chests[id].pos2 = new_positions[2]
 
-						minetest.after(0.1, function()
-							ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-						end)
+						minetest.after(0.1, ctf_map.show_map_save_form, pname,
+								minetest.explode_scrollbar_event(fields.formcontent).value)
 					end)
 				end,
 			}
@@ -557,9 +548,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				size = {ctf_gui.ELEM_SIZE.y, ctf_gui.ELEM_SIZE.y},
 				func = function(pname, fields)
 					table.remove(context[pname].chests, id)
-					minetest.after(0.1, function()
-						ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-					end)
+					minetest.after(0.1, ctf_map.show_map_save_form, pname,
+							minetest.explode_scrollbar_event(fields.formcontent).value)
 				end,
 			}
 			idx = idx + 1
@@ -578,9 +568,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				context[pname].barrier_area.pos1 = positions[1]
 				context[pname].barrier_area.pos2 = positions[2]
 
-				minetest.after(0.1, function()
-					ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
-				end)
+				minetest.after(0.1, ctf_map.show_map_save_form, pname,
+						minetest.explode_scrollbar_event(fields.formcontent).value)
 			end)
 		end,
 	}
