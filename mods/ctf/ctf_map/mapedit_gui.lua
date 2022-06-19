@@ -51,6 +51,18 @@ local function edit_map(pname, map)
 	context[pname] = map
 end
 
+function ctf_map.set_flag_location(pname, teamname, pos)
+	if context[pname] == nil then
+		return
+	end
+
+	if context[pname].teams[teamname] == nil then
+		context[pname].teams[teamname] = {}
+	end
+
+	context[pname].teams[teamname].flag_pos = pos
+end
+
 function ctf_map.show_map_editor(player)
 	if context[player] then
 		ctf_map.show_map_save_form(player)
@@ -408,7 +420,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 							pos = vector.offset(pos, 0, 1, 0)
 						end
 
-						context[pname].teams[teamname].flag_pos = pos
+						ctf_map.set_flag_location(pname, teamname, pos)
 
 						local facedir = minetest.dir_to_facedir(minetest.get_player_by_name(pname):get_look_dir())
 						minetest.set_node(pos, {name="ctf_modebase:flag", param2=facedir})

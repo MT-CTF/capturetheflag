@@ -34,6 +34,7 @@ local function show_flag_color_form(player, target_pos, param2)
 					if not target_pos or not fields.teams then return end
 
 					minetest.set_node(target_pos, {name = "ctf_modebase:flag_top_"..fields.teams, param2 = param2})
+					ctf_map.set_flag_location(player:get_player_name(), fields.teams, vector.offset(target_pos, 0, -1, 0))
 				end,
 			},
 		},
