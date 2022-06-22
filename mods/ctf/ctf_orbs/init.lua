@@ -17,37 +17,27 @@ minetest.register_craftitem("ctf_orbs:safety_orb", {
 
 		local pname = user:get_player_name()
 		local pteam = ctf_teams.get(pname)
-		local teammates = ctf_teams.online_players[pteam].players
-		-- ^ get all this player's teammates
-		for i = 1, #teammates do
-			minetest.chat_send_all(teammates[i])
-		end
-
-		local e
-		for i = 1, #teammates do
-			if teammates[i] == pname then
-				e = i
-			end
-		end
-		if e then table.remove(teammates, e) end
-		minetest.chat_send_all(pname)
-		minetest.chat_send_all(pteam)
-		for i = 1, #teammates do
-			minetest.chat_send_all(teammates[i])
-		end
-		if #teammates == 0 then
+		
+		local teammates_count = ctf_teams.online_players[pteam].count
+		if teammates_count == 1 then
 			minetest.chat_send_player(pname, "You are the only one in your team")
 			return
-		else
-			local random_teammate_name = teammates[math.random(1, #teammates)]
-			local random_teammate = minetest.get_player_by_name(random_teammate_name)
-			local random_teammate_pos = random_teammate.get_pos()
-			user:set_pos(random_teammate_pos)
-			ctf_teams.chat_send_team(pteam, pname .. " teleported to " .. random_teammate_name)
-			itemstack.take_craftitem(1)
-			return itemstack
 		end
-
+		local teammates = {}
+		local i = 1
+		for player, _ in pairs(ctf_teams.online_players[pteam].players) do
+			if pname ~= player then
+				teammates[i] = player
+				i = i + 1 -- Why no += in Lua? :|
+			end
+		end
+		local random_teammate_name = teammates[math.random(1, #teammates)]
+		local random_teammate = minetest.get_player_by_name(random_teammate_name)
+		local random_teammate_pos = random_teammate:get_pos()
+		user:set_pos(random_teammate_pos)
+		ctf_teams.chat_send_team(pteam, pname .. " teleported to " .. random_teammate_name)
+		itemstack:take_item()
+		return itemstack
 	end,
 })
 
