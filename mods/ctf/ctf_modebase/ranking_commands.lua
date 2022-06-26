@@ -79,7 +79,7 @@ minetest.register_chatcommand("donate", {
 			return false, "You should provide the player name!"
 		end
 
-		score = tonumber(score)
+		score = ctf_core.to_number(score)
 		if not score then
 			return false, "You should provide score amount!"
 		end
@@ -252,7 +252,7 @@ minetest.register_chatcommand("add_score", {
 			return false, "You should provide the player name!"
 		end
 
-		score = tonumber(score)
+		score = ctf_core.to_number(score)
 		if not score then
 			return false, "You should provide score amount!"
 		end
