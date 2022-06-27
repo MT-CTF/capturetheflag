@@ -84,8 +84,14 @@ minetest.register_chatcommand("donate", {
 			return false, "You should provide score amount!"
 		end
 
-		if score < 1 then
-			return false, "You should donate at least 1 score!"
+		score = math.floor(score)
+
+		if score < 5 then
+			return false, "You should donate at least 5 score!"
+		end
+
+		if score > 100 then
+			return false, "You can donate no more than 100 score!"
 		end
 
 		if pname == name then
@@ -98,7 +104,7 @@ minetest.register_chatcommand("donate", {
 			return false, string.format("Player %s is not online!", pname)
 		end
 
-		if ctf_teams.get(pname) ~= ctf_teams.get(name) then
+		if team ~= ctf_teams.get(name) then
 			return false, string.format("Player %s is not on your team!", pname)
 		end
 
