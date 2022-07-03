@@ -17,14 +17,12 @@ minetest.register_craftitem("ctf_orbs:safety_orb", {
 
 		local pname = user:get_player_name()
 		local pteam = ctf_teams.get(pname)
-		
 		local teammates_count = ctf_teams.online_players[pteam].count
 		if teammates_count == 1 then
 			minetest.chat_send_player(pname, "You are the only one in your team")
 			return
 		end
 		local teammates = {}
-		local i = 1
 		for player, _ in pairs(ctf_teams.online_players[pteam].players) do
 			if pname ~= player then
 				table.insert(teammates, player)
@@ -59,13 +57,11 @@ minetest.register_craftitem("ctf_orbs:protection_orb", {
 
 		local pname = user:get_player_name()
 		local pteam = ctf_teams.get(pname)
-		
 		local teammates_count = ctf_teams.online_players[pteam].count
 		if teammates_count == 1 then
 			minetest.chat_send_player(pname, "You are the only one in your team")
 			return
 		end
-	
 		if not ctf_modebase.team_flag_takers[pteam] then
 			minetest.chat_send_player(pname, "No one carring flag")
 			return
@@ -77,10 +73,8 @@ minetest.register_craftitem("ctf_orbs:protection_orb", {
 				teammate_flag_carriers[i] = flag_carrier
 			end
 		end
-		
 		local random_flag_carrier_name = teammate_flag_carriers[math.random(1, #teammate_flag_carriers)]
 		local random_flag_carrier = minetest.get_player_by_name(random_flag_carrier_name)
-
 		local random_flag_carrier_pos = random_teammate:get_pos()
 		user:set_pos(random_flag_carrier_pos)
 		ctf_teams.chat_send_team(pteam, pname .. " teleported to " .. random_flag_carrier_name)
