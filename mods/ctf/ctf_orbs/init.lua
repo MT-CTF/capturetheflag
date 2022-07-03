@@ -27,8 +27,7 @@ minetest.register_craftitem("ctf_orbs:safety_orb", {
 		local i = 1
 		for player, _ in pairs(ctf_teams.online_players[pteam].players) do
 			if pname ~= player then
-				teammates[i] = player
-				i = i + 1 -- Why no += in Lua? :|
+				table.insert(teammates, player)
 			end
 		end
 		local random_teammate_name = teammates[math.random(1, #teammates)]
