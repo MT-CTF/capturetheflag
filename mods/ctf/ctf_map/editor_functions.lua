@@ -2,7 +2,7 @@ local getpos_players = {}
 function ctf_map.get_pos_from_player(name, amount, donefunc)
 	getpos_players[name] = {amount = amount, func = donefunc, positions = {}}
 
-	if amount == 2 and worldedit ~= nil then
+	if amount == 2 and minetest.get_modpath("worldedit") then
 		worldedit.pos1[name] = nil
 		worldedit.pos2[name] = nil
 		worldedit.marker_update(name)

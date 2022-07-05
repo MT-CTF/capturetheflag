@@ -486,7 +486,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				context[pname].teams[teamname].look_pos = nil
 
 				minetest.after(0.1, ctf_map.show_map_save_form, pname,
-						scrollbar_event(fields.formcontent).value)
+						minetest.explode_scrollbar_event(fields.formcontent).value)
 			end,
 		}
 
