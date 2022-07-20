@@ -190,6 +190,8 @@ local chest_def = {
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", "Treasure Chest (visited)")
 	end
 }
 
