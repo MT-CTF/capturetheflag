@@ -45,7 +45,10 @@ local function start_new_match()
 	end
 
 	if restart_on_next_match then
-		minetest.request_shutdown("Restarting server at imperator request.\nTip: Count to 7 before clicking reconnect", true)
+		minetest.request_shutdown(
+			"Restarting server at imperator request.\n\nTip: Count to 7 before clicking reconnect",
+			true
+		)
 		return
 	end
 

@@ -32,6 +32,10 @@ return {
 
 		rankings:add(player, amounts)
 	end,
+	get = function(player)
+		player = PlayerName(player)
+		return rankings_players[player] or {}
+	end,
 	set_team = function(player, team)
 		player = PlayerName(player)
 		local tcolor = ctf_teams.team[team].color
