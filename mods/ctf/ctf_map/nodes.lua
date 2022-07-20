@@ -124,52 +124,6 @@ minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 
 --
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
-minetest.register_node("ctf_map:chest_opened", {
-	description = "Treasure Chest Opened",
-	tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"},
-	paramtype2 = "facedir",
-	groups = {immortal = 1},
-	light_source = 1,
-	is_ground_content = false,
-	sounds = default.node_sound_wood_defaults(),
-	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
-		if player then
-			minetest.chat_send_player(player:get_player_name(),
-				"You're not allowed to put things in treasure chests!")
-			return 0
-		end
-	end,
-	on_metadata_inventory_move = function(pos, from_list, from_index,
-			to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff in chest at " .. minetest.pos_to_string(pos))
-	end,
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", string.format("%s puts %s to treasure chest at %s",
-			player:get_player_name(),
-			stack:to_string(),
-			minetest.pos_to_string(pos)
-		))
-	end,
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", string.format("%s takes %s from treasure chest at %s",
-			player:get_player_name(),
-			stack:to_string(),
-			minetest.pos_to_string(pos)
-		))
-
-		local inv = minetest.get_inventory({type = "node", pos = pos})
-		if not inv or inv:is_empty("main") then
-			minetest.set_node(pos, {name="air"})
-			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
-		end
-	end,
-})
 
 local chest_formspec =
 	"size[8,9]" ..
@@ -180,7 +134,7 @@ local chest_formspec =
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
 
-minetest.register_node("ctf_map:chest", {
+local chest_def = {
 	description = "Treasure Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
@@ -189,20 +143,17 @@ minetest.register_node("ctf_map:chest", {
 	light_source = 2,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", "Treasure Chest")
-		meta:set_string("formspec", chest_formspec)
-
-		local inv = meta:get_inventory()
-		inv:set_size("main", 8*4)
-	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
 			minetest.chat_send_player(player:get_player_name(),
 				"You're not allowed to put things in treasure chests!")
 			return 0
 		end
+	end,
+	can_dig = function(pos,player)
+		local meta = minetest.get_meta(pos);
+		local inv = meta:get_inventory()
+		return inv:is_empty("main")
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
@@ -231,5 +182,19 @@ minetest.register_node("ctf_map:chest", {
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
-	end,
-})
+	end
+}
+
+local ochest_def = table.copy(chest_def)
+ochest_def.description = "Treasure Chest Opened"
+ochest_def.tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"}
+ochest_def.light_source = 1
+ochest_def.on_rightclick = nil
+
+minetest.register_node("ctf_map:chest_opened", ochest_def)
+minetest.register_node("ctf_map:chest", chest_def)
