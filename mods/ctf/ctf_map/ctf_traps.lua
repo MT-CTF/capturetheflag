@@ -110,7 +110,7 @@ minetest.register_node("ctf_map:landmine", {
 	inventory_image = "ctf_map_landmine.png",
 	paramtype = "light",
 	sunlight_propagates = true,
-	walkable = false,
+	walkable = true,
 	groups = {cracky=1, level=2},
 	node_box = {
 		type = "fixed",
@@ -125,8 +125,7 @@ minetest.register_node("ctf_map:landmine", {
 		local name = placer:get_player_name()
 
 		meta:set_string("placer", minetest.serialize({
-			team = ctf_teams.get(name),
-			name = name,
+			name = name
 		}))
 	end
 })
@@ -134,20 +133,24 @@ minetest.register_node("ctf_map:landmine", {
 minetest.register_abm({
 	label = "Landmine",
 	nodenames = {"ctf_map:landmine"},
-	interval = 1,
+	interval = 0.5,
 	chance = 1,
-	min_y = 0,
-	max_y = 3000,
 	action = function(pos, node, active_object_count, active_object_count_wider)
-		local objs = minetest.get_objects_in_area({x=pos.x-0.5, y=pos.y-0.5, z=pos.z-0.5},
+		local meta = minetest.get_meta(pos)
+		local placer = minetest.deserialize(meta:get_string("placer"))
+		local is_team = 0
+		local trigger = minetest.get_objects_in_area({x=pos.x-0.5, y=pos.y-0.5, z=pos.z-0.5},
 				{x=pos.x+0.5, y=pos.y-0.3, z=pos.z+0.5})
-		if #objs == 0 then
+		for _, v in pairs(trigger) do
+			if v:is_player() and ctf_teams.get(v:get_player_name()) ~= ctf_teams.get(placer.name) then
+				is_team = is_team + 1
+			end
+		end
+		if is_team == 0 then
 			return
 		else
 			local plyrs = minetest.get_objects_inside_radius(pos, 3)
-			local meta = minetest.get_meta(pos)
-			local placer = minetest.deserialize(meta:get_string("placer"))
-			local placer_obj = placer and minetest.get_player_by_name(placer.name)
+			local placerobj = placer and minetest.get_player_by_name(placer.name)
 
 			minetest.add_particlespawner({
 				amount = 20,
@@ -189,11 +192,13 @@ minetest.register_abm({
 			})
 
 			for _, v in pairs(plyrs) do
-				if placer_obj then
-					v:punch(placer_obj, 1, {damage_groups = {fleshy = 10}}, nil)
-				else
-					local chp = v:get_hp()
-					v:set_hp(chp - 10)
+				if v:is_player() and ctf_teams.get(v:get_player_name()) ~= ctf_teams.get(placer.name) then
+					if placerobj then
+						v:punch(placerobj, 1, {damage_groups = {fleshy = 15, landmine = 1}})
+					else
+						local chp = v:get_hp()
+						v:set_hp(chp - 15)
+					end
 				end
 			end
 			minetest.remove_node(pos)
