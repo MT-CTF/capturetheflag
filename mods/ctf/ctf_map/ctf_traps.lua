@@ -1,6 +1,6 @@
 minetest.register_node("ctf_map:unwalkable_dirt", {
 	description = "Unwalkable Dirt",
-	tiles = {"ctf_map_dirt.png"},
+	tiles = {"default_dirt.png^[colorize:#00ff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {crumbly=3, soil=1}
@@ -8,7 +8,7 @@ minetest.register_node("ctf_map:unwalkable_dirt", {
 
 minetest.register_node("ctf_map:unwalkable_stone", {
 	description = "Unwalkable Stone",
-	tiles = {"ctf_map_stone.png"},
+	tiles = {"default_stone.png^[colorize:#00ff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=1}
@@ -16,7 +16,7 @@ minetest.register_node("ctf_map:unwalkable_stone", {
 
 minetest.register_node("ctf_map:unwalkable_cobble", {
 	description = "Unwalkable Cobblestone",
-	tiles = {"ctf_map_cobble.png"},
+	tiles = {"default_cobble.png^[colorize:#00ff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=2}
@@ -36,6 +36,14 @@ minetest.register_node("ctf_map:spike", {
 		type = "fixed",
 		fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 	},
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		local name = placer:get_player_name()
+
+		meta:set_string("placer", minetest.serialize({
+			name = name
+		}))
+	end
 })
 
 local function damage_cobble_dig(pos, node, digger)
@@ -71,7 +79,7 @@ end
 
 minetest.register_node("ctf_map:damage_cobble", {
 	description = "Cobblestone that damages digger of enemy team",
-	tiles = {"ctf_map_damage_cobble.png"},
+	tiles = {"default_cobble.png^[colorize:#ff0000:20"},
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3, stone=2},
