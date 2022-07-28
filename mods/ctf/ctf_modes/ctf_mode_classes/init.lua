@@ -23,9 +23,11 @@ ctf_modebase.register_mode("classes", {
 		["default:shovel_steel"] = {rarity = 0.4, max_stacks = 2},
 		["default:axe_steel"   ] = {rarity = 0.4, max_stacks = 2},
 
-		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
-		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
-		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
+		["ctf_ranged:pistol_loaded"        ] = {rarity = 0.2 , max_stacks = 2},
+		["ctf_ranged:shotgun_loaded"       ] = {rarity = 0.05                },
+		["ctf_ranged:smg_loaded"           ] = {rarity = 0.05                },
+		["ctf_ranged:sniper_loaded"        ] = {rarity = 0.2 , max_stacks = 2},
+		["ctf_ranged:sniper_magnum_loaded" ] = {rarity = 0.05                },
 
 		["ctf_map:unwalkable_dirt"  ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
 		["ctf_map:unwalkable_stone" ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
