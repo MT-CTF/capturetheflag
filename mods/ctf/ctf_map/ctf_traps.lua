@@ -35,15 +35,7 @@ minetest.register_node("ctf_map:spike", {
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-	},
-	after_place_node = function(pos, placer, itemstack, pointed_thing)
-		local meta = minetest.get_meta(pos)
-		local name = placer:get_player_name()
-
-		meta:set_string("placer", minetest.serialize({
-			name = name
-		}))
-	end
+	}
 })
 
 local function damage_cobble_dig(pos, node, digger)
