@@ -15,6 +15,12 @@ local function get_reward_str(rewards)
 end
 
 local function set(pname, pteam, rewards)
+	-- pname(str) is the player's name
+	-- pteam(str) is the player's team(e.g. "red")
+	-- rewards(table) has two entries:
+	-- -- bounty_kills(int) which is usually 1
+	-- -- score(int) which is the amount of score given to the one
+	-- -- -- who claims the bounty
 	local bounty_message = minetest.colorize(CHAT_COLOR, string.format(
 		"[Bounty] %s. Rewards: %s",
 		pname, get_reward_str(rewards)
@@ -137,17 +143,54 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 	func = function(name)
 		local pteam = ctf_teams.get(name)
 		local output = {}
+		local x = 0
+		local y = 0
 
 		for tname, bounty in pairs(bounties) do
 			if pteam ~= tname then
-				table.insert(output, bounty.msg)
+				model = "model[%d,%d;48,48;player;character.b3d;%s;{0,160};;;]"
+				model = string.format(
+					model,
+					x,
+					y,
+					ctf_cosmetics.get_skin(bounty.name)
+				)
+				label = string.format("label[%d,%d;%s]", x, y-1, bounty.name)
+				table.insert(output, label)
+				table.insert(output, model)
+				if x > 120 then
+					y = y + 130
+				else
+					x = x + 130
+				end
 			end
 		end
 
 		if #output <= 0 then
 			return false, "There are no bounties you can claim"
 		end
-
-		return true, table.concat(output, "\n")
+		
+		formspec = "size[10,10]\n" .. table.concat(output, "\n")
+		minetest.show_formspec(name, "ctf_modebase:lb", formspec)
+		return true, ""
 	end
+})
+
+ctf_core.register_chatcommand_alias("put_bounty", "pb", {
+	description = "Put bounty on some player",
+	params = "<player> <pteam> <amount>",
+	func = function(name, param)
+		local player, pteam, amount = string.match(param, "(.*) (.*) (.*)")
+		if not (player and pteam and amount) then
+			return false, "Incorrect parameters"
+		end
+		amount = tonumber(amount)
+		set(
+			player,
+			pteam,
+			{ bounty_kills=1, score=amount }
+		)
+		return true, "I just put " .. amount .. " on " .. player
+	end,
+	privs = {ctf_admin=true}
 })
