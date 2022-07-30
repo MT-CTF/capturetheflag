@@ -148,14 +148,14 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 
 		for tname, bounty in pairs(bounties) do
 			if pteam ~= tname then
-				model = "model[%d,%d;48,48;player;character.b3d;%s;{0,160};;;]"
+				local model = "model[%d,%d;48,48;player;character.b3d;%s;{0,160};;;]"
 				model = string.format(
 					model,
 					x,
 					y,
 					ctf_cosmetics.get_skin(bounty.name)
 				)
-				label = string.format("label[%d,%d;%s]", x, y-1, bounty.name)
+				local label = string.format("label[%d,%d;%s]", x, y-1, bounty.name)
 				table.insert(output, label)
 				table.insert(output, model)
 				if x > 120 then
@@ -170,7 +170,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 			return false, "There are no bounties you can claim"
 		end
 		
-		formspec = "size[10,10]\n" .. table.concat(output, "\n")
+		local formspec = "size[10,10]\n" .. table.concat(output, "\n")
 		minetest.show_formspec(name, "ctf_modebase:lb", formspec)
 		return true, ""
 	end
