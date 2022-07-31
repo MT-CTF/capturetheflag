@@ -85,7 +85,9 @@ function ctf_map.show_map_editor(player)
 				pos = {"center", 0},
 				func = function(pname)
 					minetest.chat_send_player(pname,
-							"Please decide what the size of your map will be and punch nodes on two opposite corners of it")
+							minetest.colorize(ctf_map.CHAT_COLOR,
+									"Please decide what the size of your map will be "..
+									"and punch nodes on two opposite corners of it"))
 					ctf_map.get_pos_from_player(pname, 2, function(p, positions)
 						local pos1, pos2 = vector.sort(positions[1], positions[2])
 
@@ -117,7 +119,8 @@ function ctf_map.show_map_editor(player)
 							game_modes    = {},
 						}
 
-						minetest.chat_send_player(pname, "Build away! When you are done, run \"/ctf_map editor\"")
+						minetest.chat_send_player(pname, minetest.colorize(ctf_map.CHAT_COLOR,
+								"Build away! When you are done, run \"/ctf_map editor\""))
 					end)
 				end,
 			},
