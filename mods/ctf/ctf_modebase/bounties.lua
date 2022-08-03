@@ -148,20 +148,21 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 
 		for tname, bounty in pairs(bounties) do
 			if pteam ~= tname then
-				local model = "model[%d,%d;48,48;player;character.b3d;%s;{0,160};;;]"
+				local label = string.format("label[%d,%d;%s]", x, y, bounty.name .. " => " .. bounty.rewards.score)
+				y = y + 1
+				table.insert(output, label)
+				local model = "model[%d,%d;4,6;player;character.b3d;%s;{0,160};;;]"
 				model = string.format(
 					model,
 					x,
 					y,
-					ctf_cosmetics.get_skin(bounty.name)
+					ctf_cosmetics.get_colored_skin(bounty.name, ctf_teams.get(bounty.name))
 				)
-				local label = string.format("label[%d,%d;%s]", x, y-1, bounty.name)
-				table.insert(output, label)
 				table.insert(output, model)
-				if x > 120 then
-					y = y + 130
+				if y > 8 then
+					y = 0
 				else
-					x = x + 130
+					x = x + 4.5
 				end
 			end
 		end
@@ -178,9 +179,11 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 
 ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 	description = "Put bounty on some player",
-	params = "<player> <pteam> <amount>",
+	params = "<player> <amount>",
+	privs = {ctf_admin=true},
 	func = function(name, param)
-		local player, pteam, amount = string.match(param, "(.*) (.*) (.*)")
+		local player, amount = string.match(param, "(.*) (.*)")
+		local pteam = ctf_teams.get(player)
 		if not (player and pteam and amount) then
 			return false, "Incorrect parameters"
 		end
@@ -192,5 +195,4 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 		)
 		return true, "I just put " .. amount .. " on " .. player
 	end,
-	privs = {ctf_admin=true}
 })
