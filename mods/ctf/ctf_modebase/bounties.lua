@@ -187,7 +187,7 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 		if not (player and pteam and amount) then
 			return false, "Incorrect parameters"
 		end
-		amount = tonumber(amount)
+		amount = ctf_core.tonumber(amount)
 		set(
 			player,
 			pteam,
