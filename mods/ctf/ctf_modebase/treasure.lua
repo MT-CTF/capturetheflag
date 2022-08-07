@@ -21,7 +21,7 @@ function ctf_map.treasure.treasure_from_string(str)
 
 	local out = {}
 
-	for name, min_count, max_count, max_stacks, rarity in str:gmatch("([^%;]+);(%d*);(%d*);(%d*);([%d.]*);%d;") do
+	for name, min_count, max_count, max_stacks, rarity in str:gmatch("([^%;]+);(%d*);(%d*);(%d*);(%d*%.%d*);%d;") do
 		out[name] = {
 			min_count  = min_count        or 1,
 			max_count  = max_count        or 1,
