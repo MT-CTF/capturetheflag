@@ -124,9 +124,7 @@ minetest.register_node("ctf_map:landmine", {
 		local meta = minetest.get_meta(pos)
 		local name = placer:get_player_name()
 
-		meta:set_string("placer", minetest.serialize({
-			name = name
-		}))
+		meta:set_string("placer", name)
 	end
 })
 
