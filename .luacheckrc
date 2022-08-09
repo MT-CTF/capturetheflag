@@ -12,7 +12,7 @@ globals = {
 	"dropondie", "grenades",
 
 	"chatcmdbuilder", "crafting", "hpbar", "playertag", "random_messages",
-	"skybox", "throwable_snow",
+	"skybox", "throwable_snow", "worldedit",
 
 	"default", "doors", "player_api", "sfinv", "binoculars",
 
