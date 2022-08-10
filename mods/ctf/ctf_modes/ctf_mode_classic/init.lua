@@ -47,6 +47,7 @@ ctf_modebase.register_mode("classic", {
 	stuff_provider = function()
 		return {"default:sword_stone", "default:pick_stone", "default:torch 15", "default:stick 5"}
 	end,
+	initial_stuff_item_levels = features.initial_stuff_item_levels,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
