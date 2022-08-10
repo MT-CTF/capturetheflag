@@ -199,6 +199,15 @@ local function can_punchplayer(player, hitter)
 	return true
 end
 
+local item_levels = {
+	"wood",
+	"stone",
+	"bronze",
+	"steel",
+	"mese",
+	"diamond",
+}
+
 return {
 	on_new_match = function()
 		team_list = {}
@@ -494,6 +503,36 @@ return {
 		ctf_combat_mode.add_healer(patient, player, 60)
 		recent_rankings.add(player, {hp_healed = amount, score = score}, true)
 	end,
+	initial_stuff_item_levels = {
+		pick = function(item)
+			local match = item:get_name():match("default:pick_(%a+)")
+
+			if match then
+				return table.indexof(item_levels, match)
+			end
+		end,
+		axe = function(item)
+			local match = item:get_name():match("default:axe_(%a+)")
+
+			if match then
+				return table.indexof(item_levels, match)
+			end
+		end,
+		shovel = function(item)
+			local match = item:get_name():match("default:shovel_(%a+)")
+
+			if match then
+				return table.indexof(item_levels, match)
+			end
+		end,
+		sword = function(item)
+			local mod, match = item:get_name():match("(%a+):sword_(%a+)")
+
+			if mod and (mod == "default" or mod == "ctf_melee") and match then
+				return table.indexof(item_levels, match)
+			end
+		end,
+	}
 }
 
 end
