@@ -62,6 +62,7 @@ function random_messages.read_messages()
 		.. " For example: /r mode:nade_fight randomplayer.",
 		"To check someone's team use /team player <player_name>.",
 		"To check all team members use /team.",
+		"You can capture multiple enemy flags at once!",
 	}
 end
 
