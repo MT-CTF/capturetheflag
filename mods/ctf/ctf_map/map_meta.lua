@@ -1,4 +1,5 @@
 local CURRENT_MAP_VERSION = "2"
+local modname = minetest.get_current_modname();
 
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
@@ -265,6 +266,9 @@ function ctf_map.save_map(mapmeta)
 		local filepath = path .. "map.mts"
 		if minetest.create_schematic(mapmeta.pos1, mapmeta.pos2, nil, filepath) then
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
+			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
+									"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
+									"start a normal ctf game, and run \"/ctf_next "..mapmeta.dirname.."\" then \"/ctf_skip\""));
 		else
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
 		end

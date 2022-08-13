@@ -14,32 +14,6 @@ if ctf_core.settings.server_mode == "play" then
 	end
 end
 
-local function show_flag_color_form(player, target_pos, param2)
-	ctf_gui.old_show_formspec(player, "ctf_modebase:flag_color_select", {
-		title = "Flag Color Selection",
-		description = "Choose a color for this flag",
-		privs = {ctf_map_editor = true},
-		elements = {
-			teams = {
-				type = "dropdown",
-				pos = {"center", 0.5},
-				items = ctf_teams.teamlist,
-			},
-			choose = {
-				type = "button",
-				label = "Choose",
-				exit = true,
-				pos = {"center", 1.5},
-				func = function(playername, fields)
-					if not target_pos or not fields.teams then return end
-
-					minetest.set_node(target_pos, {name = "ctf_modebase:flag_top_"..fields.teams, param2 = param2})
-				end,
-			},
-		},
-	})
-end
-
 -- The flag
 minetest.register_node("ctf_modebase:flag", {
 	description = "Flag",
@@ -62,7 +36,7 @@ minetest.register_node("ctf_modebase:flag", {
 			{0.250000,-0.500000,0.000000,0.312500,0.500000,0.062500}
 		}
 	},
-	groups = {immortal=1,is_flag=1,flag_bottom=1},
+	groups = {immortal=1,is_flag=1,flag_bottom=1,not_in_creative_inventory=1},
 	on_punch = function(pos, node, puncher, pointed_thing, ...)
 		local pos_above = vector.offset(pos, 0, 1, 0)
 		local node_above = minetest.get_node(pos_above)
@@ -74,11 +48,7 @@ minetest.register_node("ctf_modebase:flag", {
 		minetest.node_punch(pos, node, puncher, pointed_thing, ...)
 	end,
 	on_rightclick = function(pos, node, clicker)
-		local pos_above = vector.offset(pos, 0, 1, 0)
-
-		if ctf_core.settings.server_mode == "mapedit" then
-			show_flag_color_form(clicker, pos_above, node.param2)
-		else
+		if ctf_core.settings.server_mode ~= "mapedit" then
 			ctf_modebase.on_flag_rightclick(clicker)
 		end
 	end,
@@ -120,9 +90,7 @@ for name, def in pairs(ctf_teams.team) do
 			minetest.node_punch(pos, node, puncher, pointed_thing, ...)
 		end,
 		on_rightclick = function(pos, node, clicker)
-			if ctf_core.settings.server_mode == "mapedit" then
-				show_flag_color_form(clicker, pos, node.param2)
-			else
+			if ctf_core.settings.server_mode ~= "mapedit" then
 				ctf_modebase.on_flag_rightclick(clicker)
 			end
 		end,

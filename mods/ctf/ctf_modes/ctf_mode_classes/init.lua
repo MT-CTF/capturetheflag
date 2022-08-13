@@ -10,6 +10,28 @@ local classes = ctf_core.include_files(
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 local old_get_skin = ctf_cosmetics.get_skin
+local custom_item_levels = table.copy(features.initial_stuff_item_levels)
+
+local function prioritize_medic_paxel(tooltype)
+	return function(item)
+		local iname = item:get_name()
+
+		if iname == "ctf_mode_classes:support_paxel" then
+			return
+				features.initial_stuff_item_levels[tooltype](
+					ItemStack(string.format("default:%s_steel", tooltype))
+				) + 0.1,
+				true
+		else
+			return features.initial_stuff_item_levels[tooltype](item)
+		end
+	end
+end
+
+custom_item_levels.pick   = prioritize_medic_paxel("pick"  )
+custom_item_levels.axe    = prioritize_medic_paxel("axe"   )
+custom_item_levels.shovel = prioritize_medic_paxel("shovel")
+
 ctf_modebase.register_mode("classes", {
 	treasures = {
 		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
@@ -72,6 +94,7 @@ ctf_modebase.register_mode("classes", {
 		table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
 		return initial_stuff
 	end,
+	initial_stuff_item_levels = custom_item_levels,
 	is_restricted_item = classes.is_restricted_item,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
