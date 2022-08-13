@@ -133,6 +133,7 @@ local chest_formspec =
 	"listring[current_name;main]" ..
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
+local chestv = "Treasure Chest (visited)"
 
 local chest_def = {
 	description = "Treasure Chest",
@@ -191,12 +192,12 @@ local chest_def = {
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", "Treasure Chest (visited)")
+		meta:set_string("infotext", chestv)
 	end
 }
 
 local ochest_def = table.copy(chest_def)
-ochest_def.description = "Treasure Chest (visited)"
+ochest_def.description = chestv
 ochest_def.tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
 "default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
 "default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
@@ -204,14 +205,6 @@ ochest_def.tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
 "default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
 "default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"}
 ochest_def.light_source = 1
-ochest_def.on_construct = function(pos)
-	local meta = minetest.get_meta(pos)
-	meta:set_string("infotext", "Treasure Chest (visited)")
-	meta:set_string("formspec", chest_formspec)
-
-	local inv = meta:get_inventory()
-	inv:set_size("main", 8*4)
-end
 ochest_def.on_rightclick = nil
 
 minetest.register_node("ctf_map:chest_opened", ochest_def)
