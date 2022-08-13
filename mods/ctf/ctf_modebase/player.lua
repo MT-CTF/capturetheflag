@@ -19,7 +19,41 @@ function ctf_modebase.player.give_initial_stuff(player)
 	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
 
 	local inv = player:get_inventory()
+	local item_level = {}
 	get_initial_stuff(player, function(item)
+		local mode = ctf_modebase:get_current_mode()
+
+		if mode and mode.initial_stuff_item_levels then
+			for itype, get_level in pairs(mode.initial_stuff_item_levels) do
+				local ilevel, keep = get_level(item)
+
+				if ilevel then
+					if item_level[itype] then
+						-- This item is a higher level than any of its type so far
+						if ilevel > item_level[itype].level then
+							-- remove the other lesser item unless it's a keeper
+							if not item_level[itype].keep then
+								-- minetest.log(dump(item_level[itype].item:get_name()).." r< "..dump(item:get_name()))
+
+								inv:remove_item("main", item_level[itype].item)
+							end
+
+							item_level[itype] = {level = ilevel, item = item, keep = keep}
+						elseif not keep then
+							-- minetest.log(dump(item:get_name()).." s< "..dump(item_level[itype].item:get_name()))
+
+							return -- skip addition, something better is present
+						end
+					else
+						-- First item of this type!
+						item_level[itype] = {level = ilevel, item = item, keep = keep}
+					end
+
+					-- We can't break after discovering an item type, as it might have multiple types
+				end
+			end
+		end
+
 		inv:remove_item("main", item)
 		inv:add_item("main", item)
 	end)

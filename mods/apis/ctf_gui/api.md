@@ -13,6 +13,7 @@ ctf_gui.old_show_formspec(player, "modname:formname", {
 	size = {x = <x size>, y = <y size>},
 	title = "Formspec Title",
 	description = "Text below the title",
+	header_height = 1.6,
 	privs = {server = true},
 	on_quit = function(playername, fields)
 		-- Called when player ESCs out of formspec

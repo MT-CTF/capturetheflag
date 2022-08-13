@@ -53,8 +53,8 @@ ctf_modebase.register_mode("nade_fight", {
 	physics = {sneak_glitch = true, new_move = false},
 	blacklisted_nodes = {"default:apple"},
 	team_chest_items = {
-		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
-		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",
+		"default:torch 30", "ctf_teams:door_steel 2",
 	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
@@ -81,6 +81,7 @@ ctf_modebase.register_mode("nade_fight", {
 			"default:axe_steel"
 		}
 	end,
+	initial_stuff_item_levels = features.initial_stuff_item_levels,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
