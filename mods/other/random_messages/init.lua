@@ -6,6 +6,8 @@ arsdragonfly@gmail.com
 --Time between two subsequent messages.
 local MESSAGE_INTERVAL = 0
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 math.randomseed(os.time())
 
 random_messages = {}
@@ -33,38 +35,38 @@ end
 
 function random_messages.read_messages()
 	random_messages.messages = {
-		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
-		"Use apples to quickly restore your health.",
-		"Moving or fighting can avoid an inactivity kick.",
-		"Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag.",
-		"You gain more score the better the opponent you defeat.",
-		"Find weapons in chests or mine and use furnaces to make stronger swords.",
-		"Use team doors (steel) to stop the enemy walking into your base.",
-		"Sprint by pressing the fast key (E) when you have stamina.",
-		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
-		"Want to submit your own map? Visit ctf.rubenwardy.com to get involved.",
-		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
-		"To report misbehaving players to moderators, please use /report <name> <action>",
-		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
-		"Trapping team mates on purpose is strictly against the rules and you will be kicked immediately.",
-		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
-		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
-		"Use /r to check your rank and other statistics.",
-		"Use /r <playername> to check the rankings of another player.",
-		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
-		"Use /m to add a team marker at pointed location, that's visible only to team-mates.",
-		"Use /summary (or /s) to check scores of the current match and the previous match.",
-		"Strengthen your team by capturing enemy flags.",
-		"Hitting your enemy does more damage than not hitting them.",
-		"Use /top50 command to see the leaderboard.",
-		"Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.",
-		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
-		.. " For example: /r mode:nade_fight randomplayer.",
-		"To check someone's team use /team player <player_name>.",
-		"To check all team members use /team.",
-		"You can capture multiple enemy flags at once!",
-		"Consider joining our Discord server at https://discord.gg/vcZTRPX",
-		"You can press sneak while jumping, to jump up two blocks."
+		S("To talk to only your team, start your messages with /t. For example, /t Hello team!"),
+		S("Use apples to quickly restore your health."),
+		S("Moving or fighting can avoid an inactivity kick."),
+		S("Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag."),
+		S("You gain more score the better the opponent you defeat."),
+		S("Find weapons in chests or mine and use furnaces to make stronger swords."),
+		S("Use team doors (steel) to stop the enemy walking into your base."),
+		S("Sprint by pressing the fast key (E) when you have stamina."),
+		S("Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate"),
+		S("Want to submit your own map? Visit ctf.rubenwardy.com to get involved."),
+		S("Using limited resources for building structures that don't strengthen your base's defences is discouraged."),
+		S("To report misbehaving players to moderators, please use /report <name> <action>"),
+		S("Swearing, trolling and being rude will not be tolerated and strict action will be taken."),
+		S("Trapping team mates on purpose is strictly against the rules and you will be kicked immediately."),
+		S("Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need."),
+		S("Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given."),
+		S("Use /r to check your rank and other statistics."),
+		S("Use /r <playername> to check the rankings of another player."),
+		S("Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP."),
+		S("Use /m to add a team marker at pointed location, that's visible only to team-mates."),
+		S("Use /summary (or /s) to check scores of the current match and the previous match."),
+		S("Strengthen your team by capturing enemy flags."),
+		S("Hitting your enemy does more damage than not hitting them."),
+		S("Use /top50 command to see the leaderboard."),
+		S("Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight."),
+		S("To check someone's rank on another mode use /r <mode:technical modename> <playername>."
+		.. " For example: /r mode:nade_fight randomplayer."),
+		S("To check someone's team use /team player <player_name>."),
+		S("To check all team members use /team."),
+		S("You can capture multiple enemy flags at once!"),
+		S("Consider joining our Discord server at https://discord.gg/vcZTRPX"),
+		S("You can press sneak while jumping, to jump up two blocks.")
 	}
 end
 
