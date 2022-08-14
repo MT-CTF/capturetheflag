@@ -5,7 +5,6 @@ arsdragonfly@gmail.com
 --]]
 --Time between two subsequent messages.
 local MESSAGE_INTERVAL = 0
-
 local S = minetest.get_translator(minetest.get_current_modname())
 
 math.randomseed(os.time())
