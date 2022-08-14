@@ -58,10 +58,10 @@ function random_messages.read_messages()
 		S("Strengthen your team by capturing enemy flags."),
 		S("Hitting your enemy does more damage than not hitting them."),
 		S("Use /top50 command to see the leaderboard."),
-		S("Use /top50 <mode:technical modename> to see the leaderboard on another mode."
-		.. "For example: /top50 mode:nade_fight."),
-		S("To check someone's rank on another mode use /r <mode:technical modename> <playername>."
-		.. " For example: /r mode:nade_fight randomplayer."),
+		S("Use /top50 <mode:technical modename> to see the leaderboard on another mode.")
+		.. S("For example: /top50 mode:nade_fight."),
+		S("To check someone's rank on another mode use /r <mode:technical modename> <playername>.)"
+		.. S(" For example: /r mode:nade_fight randomplayer."),
 		S("To check someone's team use /team player <player_name>."),
 		S("To check all team members use /team."),
 		S("You can capture multiple enemy flags at once!"),
