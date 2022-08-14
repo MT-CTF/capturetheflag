@@ -1,0 +1,32 @@
+# textdomain: random_messages
+
+To talk to only your team, start your messages with /t. For example, /t Hello team!=Um nur mit deinem Team zu reden, beginne deine Nachricht mit /t. Zum Beispiel, /t Hallo Team!
+Use apples to quickly restore your health.=Benutze Äpfel um dich schnell zu heilen.
+Moving or fighting can avoid an inactivity kick.=Um einen kick für Inaktivität zu vermeiden, bewege dich oder kämpfe.
+Gain more score by killing more than you die, by healing team-mates with bandages, or by capturing the flag.=Erziele mehr Punkte, indem du mehr tötest als zu sterben, indem du Teammitglieder mit der Bandage heilst, oder indem du die Flagge holst.
+You gain more score the better the opponent you defeat=Du erhälst mehr Punkte, je besser dein Gegenspieler ist.
+Find weapons in chests or mine and use furnaces to make stronger swords.=Finde Waffen in Kisten oder baue Rohstoffe ab. Benutze Öfen um bessere Schwerte zu bauen.
+Use team doors (steel) to stop the enemy walking into your base.=Benutze Team-Türen (Eisen) um Feinde daran zu hindern in deine Base zu gelangen.
+Sprint by pressing the fast key (E) when you have stamina.=Sprinte in dem du E drückst während du Stamina hast.
+Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate=Gefällt dir CTF? Dann gib uns Feedback, indem du /report nutzt und denke darüber nach unter rubenwardy.com/donate zu spenden.
+Want to submit your own map? Visit ctf.rubenwardy.com to get involved.=Möchtest du deine eigene Map einreichen? Besuche ctf.rubenwardy.com um zu starten.
+Using limited resources for building structures that don't strengthen your base's defences is discouraged.=Benutze keine begrenzten Ressourcen zu nutzen um Dinge zu bauen, die nicht deine Base stärken.
+To report misbehaving players to moderators, please use /report <name> <action>=Um Spieler zu melden, die sich nicht an die Regeln halten, bitte nutze /report <name> <action>
+Swearing, trolling and being rude will not be tolerated and strict action will be taken=Fluchen, trollen und unangemessenes Verhalten wird nicht toleriert und zieht Konsequenzen nach sich.
+Trapping team-mates on purpose is strictly against the rules and you will be kicked immediately.=Teammitglieder zu blockieren ist gegen die Regeln und du wirst sofort gekickt.
+Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.=Helfe deinem Team zu gewinnen, indem zu übrige Waffen in der Team Kiste aufbewahrst und nie mehr nimmst als du brauchst.
+Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.=Übermäßiges spawn-killing ist ein direkter Regelverstoß - eine angemessene Bestrafung wird folgen.
+Use /r to check your rank and other statistics.=Nutze /r um deinen Platz und andere Statistiken nachzuschauen.
+Use /r <playername> to check the rankings of the player in the given rank.=Nutze /r <playername> um den Platz eines Mitspielers nachzuschauen.
+Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.=Benutze Bandagen um Teammitglieder zu heilen.
+Use /m to add a team marker at pointed location, that's visible only to team-mates.=Nutze /m um eine Markierung zu setzen. Diese ist nur für deine Teammitglieder sichtbar.
+Use /summary (Or /s) to check scores of the current match and the previous match.=Nutze /summar (oder /s) um die Statistik des aktuellen und vorherigen Spiels nachzuschauen.
+Strengthen your team by capturing enemy flags.=Stärke dein Team, indem du die Flaggen der Gegner holst.
+Hitting your enemy does more damage than not hitting them.=Deine Gegner zu schlagen macht mehr Schaden als sie nicht zu schlagen.
+Use /top50 command to see the leaderboard.=Nutze /top50 um das Leaderboard zu sehen.
+Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.=Nutze /top50 <mode:technical modename> um das Leaderboard in eines anderen Modus zu sehen
+To check someone's rank on another mode use /r <mode:technical modename> <playername>.=Um den Platz eines anderen Spielers in einem anderen Mode nachzuschauen nutze /r <mode:technical modename> <playername>.
+For example: /r mode:nade_fight randomplayer."=Zum Beispiel: /r mode:nade_fight randomplayer
+To check someone's team use /team player <player_name>.=Um das Team eines Spielers nachzuschauen, nutze /team player <player_name>
+To check all team members use /team.=Um alle Teammitglieder nachzuschauen, nutze /team.
+Use /donate <playername> <amount> to reward a team-mate for their work.=Nutze /donate <playername> <amount> um ein Teammitglied für seine Arbeit zu belohnen.
