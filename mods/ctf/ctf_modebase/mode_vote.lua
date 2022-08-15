@@ -1,21 +1,22 @@
 local VOTING_TIME = 30
+local MAX_ROUNDS = 5
 
 local timer = nil
+local formspec_send_timer = nil
 local votes = nil
 local voted = nil
 local voters_count = nil
+local new_mode
 
 ctf_modebase.mode_vote = {}
 
-local function player_vote(name, modename)
+local function player_vote(name, length)
 	if not voted[name] then
 		voters_count = voters_count - 1
 	end
 
 	voted[name] = true
-	votes[minetest.get_player_information(name).address] = modename
-
-	minetest.chat_send_all(string.format("%s voted for the mode '%s'", name, HumanReadable(modename)))
+	votes[minetest.get_player_information(name).address] = length
 
 	if voters_count == 0 then
 		ctf_modebase.mode_vote.end_vote()
@@ -23,48 +24,40 @@ local function player_vote(name, modename)
 end
 
 local function show_modechoose_form(player)
-	local modenames = {}
-
-	for modename in pairs(ctf_modebase.modes) do
-		if modename ~= ctf_modebase.current_mode then
-			table.insert(modenames, modename)
-		end
-	end
-	table.sort(modenames)
-
 	local elements = {}
-	local idx = 0
-	for _, modename in ipairs(modenames) do
-		elements[modename] = {
+
+	for i = 0, MAX_ROUNDS do
+		elements[string.format("vote_%d", i)] = {
 			type = "button",
-			label = HumanReadable(modename),
+			label = i,
 			exit = true,
-			pos = {"center", idx + 0.5},
+			pos = {"center", i},
+			size = {1.4, 0.7},
 			func = function()
 				if votes then
-					if ctf_modebase.modes[modename] then
-						player_vote(player, modename)
-					else
-						show_modechoose_form(player)
-					end
+					player_vote(player, i)
 				end
 			end,
 		}
-
-		idx = idx + 1
 	end
 
-	ctf_gui.show_formspec(player, "ctf_modebase:mode_select", {
-		size = {x = 8, y = 8},
-		title = "Mode Selection",
-		description = "Please vote on what gamemode you would like to play",
-		on_quit = function()
-			if votes and not voted[player] then
-				show_modechoose_form(player)
-			end
-		end,
+	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
+		size = {x = 8, y = MAX_ROUNDS + 3.5},
+		title = "Mode: "..HumanReadable(new_mode),
+		description = "Please vote on how many matches you would like to play",
+		header_height = 2.4,
 		elements = elements,
 	})
+end
+
+local function send_formspec()
+	for _, player in pairs(minetest.get_connected_players()) do
+		local pname = player:get_player_name()
+		if not voted[pname] then
+			show_modechoose_form(pname)
+		end
+	end
+	formspec_send_timer = minetest.after(1, send_formspec)
 end
 
 function ctf_modebase.mode_vote.start_vote()
@@ -72,12 +65,20 @@ function ctf_modebase.mode_vote.start_vote()
 	voted = {}
 	voters_count = 0
 
-	for _, player in ipairs(minetest.get_connected_players()) do
+	local mode_index = new_mode and table.indexof(ctf_modebase.modelist, new_mode) or -1
+	if mode_index == -1 or mode_index+1 > #ctf_modebase.modelist then
+		new_mode = ctf_modebase.modelist[1]
+	else
+		new_mode = ctf_modebase.modelist[mode_index + 1]
+	end
+
+	for _, player in pairs(minetest.get_connected_players()) do
 		show_modechoose_form(player:get_player_name())
 		voters_count = voters_count + 1
 	end
 
 	timer = minetest.after(VOTING_TIME, ctf_modebase.mode_vote.end_vote)
+	formspec_send_timer = minetest.after(1, send_formspec)
 end
 
 function ctf_modebase.mode_vote.end_vote()
@@ -86,45 +87,65 @@ function ctf_modebase.mode_vote.end_vote()
 		timer = nil
 	end
 
-	for _, player in ipairs(minetest.get_connected_players()) do
+	if formspec_send_timer then
+		formspec_send_timer:cancel()
+		formspec_send_timer = nil
+	end
+
+	for _, player in pairs(minetest.get_connected_players()) do
 		minetest.close_formspec(player:get_player_name(), "ctf_modebase:mode_select")
 	end
 
-	local modes = {}
-	for _, mode in ipairs(ctf_modebase.modelist) do
-		if ctf_modebase.current_mode ~= mode then
-			modes[mode] = 0
-		end
-	end
-
-	for _, mode in pairs(votes) do
-		modes[mode] = modes[mode] + 1
+	local length_votes = {}
+	for _, length in pairs(votes) do
+		length_votes[length] = (length_votes[length] or 0) + 1
 	end
 
 	votes = nil
 	voted = nil
 
-	local max_votes = 0
-	for _, count in pairs(modes) do
-		max_votes = math.max(max_votes, count)
-	end
-
-	local best_modes = {}
-	for mode, count in pairs(modes) do
-		if count == max_votes then
-			table.insert(best_modes, mode)
+	local votes_result = ""
+	local average_vote = 0
+	local entry_count = 0
+	for length = 0, MAX_ROUNDS do
+		local vote_count = length_votes[length]
+		if vote_count then
+			votes_result = votes_result .. string.format(
+				"    %d vote%s for %d match%s\n",
+				vote_count,
+				vote_count == 1 and "" or "s",
+				length,
+				length == 1 and "" or "es"
+			)
+			entry_count = entry_count + vote_count
+			average_vote = average_vote + (length * vote_count)
 		end
 	end
 
-	local new_mode = best_modes[math.random(1, #best_modes)]
+	if entry_count > 0 then
+		average_vote = math.round(average_vote / entry_count)
+	else
+		average_vote = MAX_ROUNDS -- no votes, default to max rounds
+	end
 
-	minetest.chat_send_all(string.format("Voting is over, '%s' won with %d votes!",
+	votes_result = string.format(
+		"Voting is over. The mode %s will be played for %d match%s\n%s",
 		HumanReadable(new_mode),
-		max_votes
-	))
+		average_vote,
+		average_vote == 1 and "" or "es",
+		votes_result:sub(1, -2)
+	)
 
-	ctf_modebase.mode_on_next_match = new_mode
-	ctf_modebase.start_match_after_vote()
+	minetest.chat_send_all(votes_result)
+	ctf_modebase.announce(votes_result)
+
+	ctf_modebase.current_mode_matches = average_vote
+	if average_vote <= 0 then
+		ctf_modebase.mode_vote.start_vote()
+	else
+		ctf_modebase.mode_on_next_match = new_mode
+		ctf_modebase.start_match_after_vote()
+	end
 end
 
 minetest.register_on_joinplayer(function(player)

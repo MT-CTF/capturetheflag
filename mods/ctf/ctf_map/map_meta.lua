@@ -1,9 +1,27 @@
 local CURRENT_MAP_VERSION = "2"
+local modname = minetest.get_current_modname();
 
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
 
-	return not (table.indexof(list, "skybox") == -1)
+	return table.indexof(list, "skybox") ~= -1
+end
+
+-- calc_flag_center() calculates the center of a map from the positions of the flags.
+local function calc_flag_center(map)
+	local flag_center = vector.zero()
+	local flag_count = 0
+
+	for _, team in pairs(map.teams) do
+		flag_center = flag_center + team.flag_pos
+		flag_count = flag_count + 1
+	end
+
+	flag_center = flag_center:apply(function(value)
+		return value / flag_count
+	end)
+
+	return flag_center
 end
 
 function ctf_map.load_map_meta(idx, dirname)
@@ -119,7 +137,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			offset        = offset,
 			size          = size,
 			dirname       = dirname,
-			enabled       = meta:get("enabled"),
+			enabled       = meta:get("enabled") == "true",
 			name          = meta:get("name"),
 			author        = meta:get("author"),
 			hint          = meta:get("hint"),
@@ -158,6 +176,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			map.barrier_area = {pos1 = map.pos1, pos2 = map.pos2}
 		end
 	end
+
+	map.flag_center = calc_flag_center(map)
 
 	if ctf_map.skybox_exists(ctf_map.maps_dir .. dirname) then
 		skybox.add({dirname, "#ffffff", [5] = "png"})
@@ -246,6 +266,9 @@ function ctf_map.save_map(mapmeta)
 		local filepath = path .. "map.mts"
 		if minetest.create_schematic(mapmeta.pos1, mapmeta.pos2, nil, filepath) then
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
+			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
+									"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
+									"start a normal ctf game, and run \"/ctf_next "..mapmeta.dirname.."\" then \"/ctf_skip\""));
 		else
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
 		end

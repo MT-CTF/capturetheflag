@@ -1,15 +1,20 @@
 ctf_cosmetics = {}
 
 function ctf_cosmetics.get_colored_skin(player, color)
+	color = color or "white"
 	local extras = ""
 
 	for clothing, clothcolor in pairs(ctf_cosmetics.get_extra_clothing(player)) do
 		if clothing:sub(1, 1) ~= "_" then
-			extras = string.format(
-				"%s^(%s^[multiply:%s)", extras,
-				ctf_cosmetics.get_clothing_texture(player, clothing),
-				clothcolor
-			)
+			local texture = ctf_cosmetics.get_clothing_texture(player, clothing)
+
+			if texture then
+				extras = string.format(
+					"%s^(%s^[multiply:%s)", extras,
+					texture,
+					clothcolor
+				)
+			end
 		end
 	end
 
@@ -21,6 +26,12 @@ function ctf_cosmetics.get_colored_skin(player, color)
 		color,
 		extras
 	)
+end
+
+function ctf_cosmetics.get_skin(player)
+	local pteam = ctf_teams.get(player)
+
+	return ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color)
 end
 
 function ctf_cosmetics.get_clothing_texture(player, clothing)

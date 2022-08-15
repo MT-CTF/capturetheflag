@@ -150,6 +150,17 @@ function ctf_core.file_exists(path)
 	return false
 end
 
+do
+	local inf = 1/0
+	local minf = -1/0
+	function ctf_core.to_number(s)
+		local n = tonumber(s)
+		if n == n and n ~= inf and n ~= minf then
+			return n
+		end
+	end
+end
+
 --
 ---Debug helpers
 --

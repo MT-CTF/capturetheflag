@@ -1,0 +1,3 @@
+# textdomain: throwable_snow
+@1 hit you with a snowball!=
+Snowball=

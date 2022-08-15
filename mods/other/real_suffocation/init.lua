@@ -41,13 +41,13 @@ local function add_suffocation()
 			table.insert(no_suffocate_nodes, itemstring)
 		end
 	end
-	minetest.log("info", "[real_suffocation] Suffocation has been hacked into "..#suffocate_nodes.." nodes.")
-	minetest.log("verbose", "[real_suffocation] Nodes with suffocation: "..dump(suffocate_nodes))
-	minetest.log("verbose", "[real_suffocation] Suffocation has not been hacked into "..#no_suffocate_nodes.." nodes: "..dump(no_suffocate_nodes))
+	minetest.log("info", "[real_suffocation] Suffocation has been hacked into " .. #suffocate_nodes .. " nodes.")
+	minetest.log("verbose", "[real_suffocation] Nodes with suffocation: " .. dump(suffocate_nodes))
+	minetest.log("verbose", "[real_suffocation] Suffocation has not been hacked into " .. #no_suffocate_nodes .. " nodes: " .. dump(no_suffocate_nodes))
 end
 
 -- This is a minor hack to make sure our loop runs after all nodes have been registered
-minetest.after(0, add_suffocation)
+minetest.register_on_mods_loaded(add_suffocation)
 
 end
 

@@ -1,20 +1,9 @@
 local TREASURE_VERSION = 1
 
-ctf_map.treasurefy_node = function(pos, node, clicker)
-	if not ctf_modebase.current_mode then return end
+ctf_map.treasure = {}
 
-	local meta = minetest.get_meta(pos)
-	local inv = meta:get_inventory()
-	local treasures = ctf_modebase:get_current_mode().treasures or {}
-	if ctf_map.current_map then
-		local map_treasures = ctf_map.treasure_from_string(ctf_map.current_map.treasures)
-
-		for k, v in pairs(map_treasures) do
-			treasures[k] = v
-		end
-	end
-
-	for item, def in pairs(treasures) do
+function ctf_map.treasure.treasurefy_node(inv, map_treasures)
+	for item, def in pairs(map_treasures) do
 		local treasure = ItemStack(item)
 
 		for c = 1, def.max_stacks or 1, 1 do
@@ -27,17 +16,17 @@ ctf_map.treasurefy_node = function(pos, node, clicker)
 end
 
 -- name ; min_count ; max_count ; max_stacks ; rarity ;;
-ctf_map.treasure_from_string = function(str)
+function ctf_map.treasure.treasure_from_string(str)
 	if not str then return {} end
 
 	local out = {}
 
-	for name, min_count, max_count, max_stacks, rarity in str:gmatch("([^%;]+);(%d*);(%d*);(%d*);(%d*);%d;") do
+	for name, min_count, max_count, max_stacks, rarity in str:gmatch("([^%;]+);(%d*);(%d*);(%d*);([%d.]*);%d;") do
 		out[name] = {
-			min_count  = min_count  or 1,
-			max_count  = max_count  or 1,
-			max_stacks = max_stacks or 1,
-			rarity     = rarity     or 0.5,
+			min_count  = tonumber(min_count)  or 1,
+			max_count  = tonumber(max_count)  or 1,
+			max_stacks = tonumber(max_stacks) or 1,
+			rarity     = tonumber(rarity)     or 0.5,
 			TREASURE_VERSION,
 		}
 	end
@@ -45,7 +34,7 @@ ctf_map.treasure_from_string = function(str)
 	return out
 end
 
-ctf_map.treasure_to_string = function(treasures)
+function ctf_map.treasure.treasure_to_string(treasures)
 	if not treasures then return "" end
 
 	local out = ""

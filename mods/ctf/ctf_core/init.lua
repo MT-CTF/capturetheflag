@@ -1,6 +1,7 @@
 ctf_core = {
 	settings = {
-		server_mode = minetest.settings:get("ctf_server_mode") or "play"
+		-- server_mode = minetest.settings:get("ctf_server_mode") or "play",
+		server_mode = minetest.settings:get_bool("creative_mode", false) and "mapedit" or "play",
 	}
 }
 

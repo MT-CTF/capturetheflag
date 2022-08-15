@@ -16,28 +16,30 @@ function ctf_teams.remove_online_player(player)
 end
 
 ---@param player string | ObjectRef
----@param teamname string | nil
-function ctf_teams.set(player, teamname)
+---@param new_team string | nil
+---@param force boolean
+function ctf_teams.set(player, new_team, force)
 	player = PlayerName(player)
 
-	if not teamname then
+	if not new_team then
 		ctf_teams.player_team[player] = nil
 		return
 	end
 
-	assert(type(teamname) == "string")
+	assert(type(new_team) == "string")
 
-	if ctf_teams.player_team[player] == teamname then
+	local old_team = ctf_teams.player_team[player]
+	if not force and old_team == new_team then
 		return
 	end
 
 	ctf_teams.remove_online_player(player)
 
-	ctf_teams.player_team[player] = teamname
-	ctf_teams.online_players[teamname].players[player] = true
-	ctf_teams.online_players[teamname].count = ctf_teams.online_players[teamname].count + 1
+	ctf_teams.player_team[player] = new_team
+	ctf_teams.online_players[new_team].players[player] = true
+	ctf_teams.online_players[new_team].count = ctf_teams.online_players[new_team].count + 1
 
-	RunCallbacks(ctf_teams.registered_on_allocplayer, PlayerObj(player), teamname)
+	RunCallbacks(ctf_teams.registered_on_allocplayer, PlayerObj(player), new_team, old_team)
 end
 
 ---@param player string | ObjectRef
@@ -73,15 +75,11 @@ function ctf_teams.default_team_allocator(player)
 end
 ctf_teams.team_allocator = ctf_teams.default_team_allocator
 
-function ctf_teams.allocate_player(player, on_join)
+function ctf_teams.allocate_player(player, force)
 	player = PlayerName(player)
 	local team = ctf_teams.team_allocator(player)
 
-	if on_join then
-		ctf_teams.player_team[player] = nil
-	end
-
-	ctf_teams.set(player, team)
+	ctf_teams.set(player, team, force)
 end
 
 ---@param teams table

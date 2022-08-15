@@ -1,21 +1,24 @@
+local hud = mhud.init()
+local hitters = {}
+local healers = {}
+
 ctf_combat_mode = {}
 
-local hud = mhud.init()
+local function update(player)
+	local combat = hitters[player]
 
-local in_combat = {}
-
-local function update_hud(player, time)
-	player = PlayerName(player)
-
-	if time <= 0 then
-		return ctf_combat_mode.remove(player)
+	if combat.time <= 0 then
+		hud:remove(player, "combat_indicator")
+		hitters[player] = nil
+		return
 	end
 
 	local hud_message = "You are in combat [%ds left]"
+	hud_message = hud_message:format(combat.time)
 
 	if hud:exists(player, "combat_indicator") then
 		hud:change(player, "combat_indicator", {
-			text = hud_message:format(time)
+			text = hud_message
 		})
 	else
 		hud:add(player, "combat_indicator", {
@@ -23,82 +26,148 @@ local function update_hud(player, time)
 			position = {x = 1, y = 0.2},
 			alignment = {x = "left", y = "down"},
 			offset = {x = -6, y = 0},
-			text = hud_message:format(time),
+			text = hud_message,
 			color = 0xF00000,
 		})
 	end
 
-	minetest.after(1, function()
-		local playerobj = minetest.get_player_by_name(player)
+	local pos = vector.offset(minetest.get_player_by_name(player):get_pos(), 0, 0.5, 0)
+	local node = minetest.registered_nodes[minetest.get_node(pos).name]
 
-		if playerobj and in_combat[player] then
-			local pos = vector.offset(playerobj:get_pos(), 0, 1, 0)
-			local node = minetest.registered_nodes[minetest.get_node(pos).name]
+	if node.groups.real_suffocation then -- From real_suffocation mod
+		combat.time = combat.time + 0.5
+	else
+		combat.time = combat.time - 1
+	end
 
-			if node.walkable == false then
-				in_combat[player].time = in_combat[player].time - 1
-			else
-				in_combat[player].time = in_combat[player].time + 0.5
-			end
-
-			update_hud(player, in_combat[player].time)
-		end
-	end)
+	combat.timer = minetest.after(1, update, player)
 end
 
-function ctf_combat_mode.set(player, time, extra)
+function ctf_combat_mode.add_hitter(player, hitter, weapon_image, time)
+	player = PlayerName(player)
+	hitter = PlayerName(hitter)
+
+	if not hitters[player] then
+		hitters[player] = {hitters={}, time=time}
+	end
+
+	local combat = hitters[player]
+	combat.hitters[hitter] = true
+	combat.time = time
+	combat.last_hitter = hitter
+	combat.weapon_image = weapon_image
+
+	if not combat.timer then
+		update(player)
+	end
+end
+
+function ctf_combat_mode.add_healer(player, healer, time)
+	player = PlayerName(player)
+	healer = PlayerName(healer)
+
+	if not healers[player] then
+		healers[player] = {healers={}, timer=minetest.after(time, function()
+			healers[player] = nil
+		end)}
+	end
+
+	healers[player].healers[healer] = true
+end
+
+function ctf_combat_mode.get_last_hitter(player)
 	player = PlayerName(player)
 
-	if not in_combat[player] then
-		in_combat[player] = {time = time, extra = extra}
-		update_hud(player, time)
-	else
-		in_combat[player].time = time
+	if hitters[player] then
+		return hitters[player].last_hitter, hitters[player].weapon_image
+	end
+end
 
-		if extra._set then
-			in_combat[player].extra = extra
-		else
-			for k, v in pairs(extra) do
-				in_combat[player].extra[k] = v
+function ctf_combat_mode.get_other_hitters(player, last_hitter)
+	player = PlayerName(player)
+
+	local ret = {}
+
+	if hitters[player] then
+		for pname in pairs(hitters[player].hitters) do
+			if pname ~= last_hitter then
+				table.insert(ret, pname)
 			end
 		end
 	end
+
+	return ret
 end
 
-function ctf_combat_mode.get(player)
-	return in_combat[PlayerName(player)]
-end
 
-function ctf_combat_mode.get_all()
-	return in_combat
-end
+function ctf_combat_mode.get_healers(player)
+	player = PlayerName(player)
 
-function ctf_combat_mode.manage_extra(player, func)
-	local pname = PlayerName(player)
+	local ret = {}
 
-	if in_combat[pname] and in_combat[pname].extra then
-		for k, v in pairs(in_combat[pname].extra) do
-			in_combat[pname].extra[k] = func(k, v)
+	if healers[player] then
+		for pname in pairs(healers[player].healers) do
+			table.insert(ret, pname)
 		end
 	end
+
+	return ret
 end
 
-function ctf_combat_mode.remove(player)
-	in_combat[PlayerName(player)] = nil
+function ctf_combat_mode.is_only_hitter(player, hitter)
+	player = PlayerName(player)
 
-	if hud:get(player, "combat_indicator") then
-		hud:remove(player, "combat_indicator")
+	if not hitters[player] then
+		return false
 	end
-end
 
-function ctf_combat_mode.remove_all()
-	for _, player in pairs(minetest.get_connected_players()) do
-		if in_combat[player:get_player_name()] then
-			ctf_combat_mode.remove(player)
+	for pname in pairs(hitters[player].hitters) do
+		if pname ~= hitter then
+			return false
 		end
 	end
+
+	return true
 end
 
-minetest.register_on_leaveplayer(function(player)
-	minetest.after(0, function() in_combat[player:get_player_name()] = nil end)
+function ctf_combat_mode.set_kill_time(player, time)
+	player = PlayerName(player)
+
+	if hitters[player] then
+		hitters[player].time = time
+	end
+end
+
+function ctf_combat_mode.in_combat(player)
+	return hitters[PlayerName(player)] and true or false
+end
+
+function ctf_combat_mode.end_combat(player)
+	player = PlayerName(player)
+
+	if hitters[player] then
+		if hud:exists(player, "combat_indicator") then
+			hud:remove(player, "combat_indicator")
+		end
+
+		hitters[player].timer:cancel()
+		hitters[player] = nil
+	end
+
+	if healers[player] then
+		healers[player].timer:cancel()
+		healers[player] = nil
+	end
+end
+
+ctf_api.register_on_match_end(function()
+	for _, combat in pairs(hitters) do
+		combat.timer:cancel()
+	end
+	hitters = {}
+	for _, combat in pairs(healers) do
+		combat.timer:cancel()
+	end
+	healers = {}
+	hud:remove_all()
 end)

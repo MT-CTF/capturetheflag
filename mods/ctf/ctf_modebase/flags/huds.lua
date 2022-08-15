@@ -1,12 +1,14 @@
 local hud = mhud.init()
 
-local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flag(s)! Protect your flag!"         }
+local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flags! Protect your flag!"           }
 local FLAG_STOLEN           = {color = 0xFF0000, text = "Kill %s, they've got your flag!"                     }
 local FLAG_STOLEN_YOU       = {color = 0xFF0000, text = "You've got a flag! Run back and punch your flag!"    }
-local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammate(s) %s! They have the enemy flag!"   }
-local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammate(s) %s to capture the flag!"}
+local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammates %s! They have the enemy flag!"     }
+local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammates %s to capture the flag!"  }
 local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"     }
 local OTHER_FLAG_STOLEN     = {color = 0xAA00FF, text = "Kill %s, they've got some flags!"                    }
+
+ctf_modebase.flag_huds = {}
 
 local function concat_players(players)
 	local list = {}
@@ -24,7 +26,7 @@ end
 local function get_flag_status(you)
 	local teamname = ctf_teams.get(you)
 
-	if not teamname then return end
+	if not teamname then return FLAG_SAFE end
 
 	local enemy_thief = ctf_modebase.flag_taken[teamname]
 	local your_thieves = {}
@@ -45,41 +47,36 @@ local function get_flag_status(you)
 	your_thieves = concat_players(your_thieves)
 	other_thieves = concat_players(other_thieves)
 
-	local status
+	local format = function(template, ...)
+		return {color = template.color, text=string.format(template.text, ...)}
+	end
 
 	if enemy_thief then
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = table.copy(BOTH_FLAGS_STOLEN_YOU)
-				status.text = status.text:format(enemy_thief)
+				return format(BOTH_FLAGS_STOLEN_YOU, enemy_thief)
 			else
-				status = table.copy(BOTH_FLAGS_STOLEN)
-				status.text = status.text:format(enemy_thief, your_thieves)
+				return format(BOTH_FLAGS_STOLEN, enemy_thief, your_thieves)
 			end
 		else
-			status = table.copy(FLAG_STOLEN)
-			status.text = status.text:format(enemy_thief)
+			return format(FLAG_STOLEN, enemy_thief)
 		end
 	else
 		if your_thieves then
 			if ctf_modebase.taken_flags[you] then
-				status = table.copy(FLAG_STOLEN_YOU)
+				return format(FLAG_STOLEN_YOU)
 			else
-				status = table.copy(FLAG_STOLEN_TEAMMATE)
-				status.text = status.text:format(your_thieves)
+				return format(FLAG_STOLEN_TEAMMATE, your_thieves)
 			end
 		elseif other_thieves then
-			status = table.copy(OTHER_FLAG_STOLEN)
-			status.text = status.text:format(other_thieves)
+			return format(OTHER_FLAG_STOLEN, other_thieves)
 		else
-			status = table.copy(FLAG_SAFE)
+			return FLAG_SAFE
 		end
 	end
-
-	return status
 end
 
-local function update_player(player)
+function ctf_modebase.flag_huds.update_player(player)
 	local flag_status = get_flag_status(player:get_player_name())
 
 	if hud:exists(player, "flag_status") then
@@ -120,7 +117,7 @@ end
 
 local function update()
 	for _, player in pairs(minetest.get_connected_players()) do
-		update_player(player)
+		ctf_modebase.flag_huds.update_player(player)
 	end
 end
 
@@ -131,7 +128,7 @@ local function update_timer(pname)
 		local timeleft = player_timers[pname]
 
 		if timeleft <= 1 then
-			ctf_modebase.drop_flags(pname)
+			ctf_modebase.drop_flags(minetest.get_player_by_name(pname))
 		else
 			player_timers[pname] = timeleft - 1
 
@@ -143,8 +140,6 @@ local function update_timer(pname)
 		end
 	end
 end
-
-ctf_modebase.flag_huds = {}
 
 function ctf_modebase.flag_huds.track_capturer(player, time)
 	player = PlayerName(player)
@@ -180,12 +175,7 @@ function ctf_modebase.flag_huds.untrack_capturer(player)
 	update()
 end
 
-function ctf_modebase.flag_huds.on_match_end()
+ctf_api.register_on_match_end(function()
 	hud:clear_all()
-
 	player_timers = {}
-end
-
-function ctf_modebase.flag_huds.on_allocplayer(player)
-	update_player(player)
-end
+end)

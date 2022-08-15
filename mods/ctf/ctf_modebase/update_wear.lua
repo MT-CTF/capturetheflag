@@ -44,7 +44,7 @@ function ctf_modebase.update_wear.start_update(pname, item, step, down, finish_c
 	end)}
 end
 
-function ctf_modebase.update_wear.cancel_updates()
+ctf_api.register_on_match_end(function()
 	for _, timers in pairs(wear_timers) do
 		for _, timer in pairs(timers) do
 			if timer.c then
@@ -55,7 +55,7 @@ function ctf_modebase.update_wear.cancel_updates()
 	end
 
 	wear_timers = {}
-end
+end)
 
 function ctf_modebase.update_wear.cancel_player_updates(pname)
 	pname = PlayerName(pname)

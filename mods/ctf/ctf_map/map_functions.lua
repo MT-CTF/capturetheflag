@@ -5,9 +5,6 @@ function ctf_map.announce_map(map)
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
-	if minetest.global_exists("irc") and irc.connected then
-		irc:say("Map: " .. map.name)
-	end
 end
 
 function ctf_map.place_map(mapmeta, callback)
@@ -106,61 +103,137 @@ end
 
 local ID_AIR = minetest.CONTENT_AIR
 local ID_IGNORE = minetest.CONTENT_IGNORE
-local DEFAULT_CHEST_AMOUNT = ctf_map.DEFAULT_CHEST_AMOUNT
-local CHEST_ID = minetest.get_content_id("ctf_map:chest")
+local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local ID_WATER = minetest.get_content_id("default:water_source")
-local insert = table.insert
-function ctf_map.place_chests(mapmeta, pos2, amount)
-	local pos1 = mapmeta
-	local pos_list
 
-	if not pos2 then -- place_chests(mapmeta) was called
-		pos_list = mapmeta.chests
-		pos1, pos2 = mapmeta.pos1, mapmeta.pos2
-	else -- place_chests(pos1, pos2, amount?) was called
-		pos_list = {{pos1 = pos1, pos2 = pos2, amount = amount or DEFAULT_CHEST_AMOUNT}}
-	end
+local function get_place_positions(a, data, pos1, pos2)
+	if a.amount <= 0 then return {} end
 
-	local vm = VoxelManip()
-	pos1, pos2 = vm:read_from_map(pos1, pos2)
-
-	local data = vm:get_data()
 	local Nx = pos2.x - pos1.x + 1
 	local Ny = pos2.y - pos1.y + 1
 
-	for _, a in pairs(pos_list) do
-		local place_positions = {}
+	local Sx = math.min(a.pos1.x, a.pos2.x)
+	local Mx = math.max(a.pos1.x, a.pos2.x) - Sx + 1
 
-		for z = a.pos1.z, a.pos2.z, (a.pos1.z <= a.pos2.z) and 1 or -1 do
-			for y = a.pos1.y, a.pos2.y, (a.pos1.y <= a.pos2.y) and 1 or -1 do
-				for x = a.pos1.x, a.pos2.x, (a.pos1.x <= a.pos2.x) and 1 or -1 do
-					local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
-					local id_below = data[(z - pos1.z) * Ny * Nx + (y-1 - pos1.y) * Nx + (x - pos1.x) + 1]
-					local id_above = data[(z - pos1.z) * Ny * Nx + (y+1 - pos1.y) * Nx + (x - pos1.x) + 1]
+	local Sy = math.min(a.pos1.y, a.pos2.y)
+	local My = math.max(a.pos1.y, a.pos2.y) - Sy + 1
 
-					if (data[vi] == ID_AIR or data[vi] == ID_WATER) and
-					id_below ~= ID_AIR and id_below ~= ID_IGNORE and id_below ~= ID_WATER and
-					(id_above == ID_AIR or id_above == ID_WATER) then
-						insert(place_positions, vi)
-					end
-				end
+	local Sz = math.min(a.pos1.z, a.pos2.z)
+	local Mz = math.max(a.pos1.z, a.pos2.z) - Sz + 1
+
+	local ret = {}
+	local random_state = {}
+	local random_count = Mx * My * Mz
+
+	local math_random = math.random
+	local math_floor = math.floor
+	local table_insert = table.insert
+
+	while random_count > 0 do
+		local pos = math_random(1, random_count)
+		pos = random_state[pos] or pos
+
+		local x = pos % Mx + Sx
+		local y = math_floor(pos / Mx) % My + Sy
+		local z = math_floor(pos / My / Mx) + Sz
+
+		local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
+		local id_below = data[(z - pos1.z) * Ny * Nx + (y - 1 - pos1.y) * Nx + (x - pos1.x) + 1]
+		local id_above = data[(z - pos1.z) * Ny * Nx + (y + 1 - pos1.y) * Nx + (x - pos1.x) + 1]
+
+		if (data[vi] == ID_AIR or data[vi] == ID_WATER) and
+			id_below ~= ID_AIR and id_below ~= ID_IGNORE and id_below ~= ID_WATER and
+			(id_above == ID_AIR or id_above == ID_WATER)
+		then
+			table_insert(ret, {vi=vi, x=x, y=y, z=z})
+			if #ret >= a.amount then
+				return ret
 			end
 		end
 
-		if place_positions and #place_positions > 1 then
-			for i = 1, a.amount, 1 do
-				local idx = math.random(1, #place_positions)
-
-				data[place_positions[idx]] = CHEST_ID
-
-				table.remove(place_positions, idx)
-			end
-		else
-			minetest.log("error", "Something went wrong with chest placement")
-		end
+		random_state[pos] = random_state[random_count] or random_count
+		random_state[random_count] = nil
+		random_count = random_count - 1
 	end
 
+	return ret
+end
+
+local function prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nodes)
+	local Nx = pos2.x - pos1.x + 1
+	local Ny = pos2.y - pos1.y + 1
+
+	local math_floor = math.floor
+
+	local nodes = {}
+	for _, node in ipairs(blacklisted_nodes) do
+		nodes[minetest.get_content_id(node)] = false
+	end
+
+	for _, team in ipairs(ctf_teams.teamlist) do
+		local node = "ctf_teams:chest_" .. team
+		nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+	end
+
+	for i, v in ipairs(data) do
+		local op = nodes[v]
+		if op == false then
+			data[i] = ID_AIR
+		elseif op then
+			-- it's a team chest
+			local x = (i - 1) % Nx + pos1.x
+			local y = math_floor((i - 1) / Nx) % Ny + pos1.y
+			local z = math_floor((i - 1) / Ny / Nx) + pos1.z
+			local pos = {x=x, y=y, z=z}
+
+			op.on_construct(pos)
+
+			local inv = minetest.get_meta(pos):get_inventory()
+			inv:set_list("main", team_chest_items)
+			inv:set_list("pro", {})
+			inv:set_list("helper", {})
+		end
+	end
+end
+
+local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, treasurefy_node_callback)
+	for i, a in pairs(mapmeta.chests) do
+		local place_positions = get_place_positions(a, data, pos1, pos2)
+
+		for _, pos in ipairs(place_positions) do
+			data[pos.vi] = ID_CHEST
+			param2_data[pos.vi] = 0
+
+			-- Treasurefy
+			minetest.registered_nodes["ctf_map:chest"].on_construct(pos)
+
+			local inv = minetest.get_meta(pos):get_inventory()
+			inv:set_list("main", {})
+			if treasurefy_node_callback then
+				treasurefy_node_callback(inv)
+			end
+		end
+
+		if #place_positions < a.amount then
+			minetest.log("error",
+				string.format("[MAP] Couldn't place %d from %d chests from pos %d", a.amount - #place_positions, a.amount, i)
+			)
+		end
+	end
+end
+
+function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest_items, blacklisted_nodes)
+	local vm = VoxelManip()
+	local pos1, pos2 = vm:read_from_map(mapmeta.pos1, mapmeta.pos2)
+
+	local data = vm:get_data()
+	local param2_data = vm:get_param2_data()
+
+	prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nodes)
+	place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, treasurefy_node_callback)
+
 	vm:set_data(data)
+	vm:set_param2_data(param2_data)
 	vm:update_liquids()
 	vm:write_to_map(false)
 end

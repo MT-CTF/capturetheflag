@@ -17,53 +17,60 @@ function ctf_healing.register_bandage(name, def)
 			local pname = object:get_player_name()
 			local uname = player:get_player_name()
 
-			if ctf_teams.get(pname) == ctf_teams.get(uname) then
-				local hp = object:get_hp()
-				local limit = def.heal_percent * object:get_properties().hp_max
+			if pname == uname then return end
 
-				if hp <= 0 then
-					hud_events.new(uname, {
-						quick = true,
-						text = pname .. " is dead!",
-						color = "warning",
-					})
-				elseif hp >= limit then
-					hud_events.new(uname, {
-						quick = true,
-						text = pname .. " already has " .. limit .. " HP!",
-						color = "warning",
-					})
-				else
-					local hp_add = math.random(def.heal_min or 3, def.heal_max or 4)
-
-					if hp + hp_add > limit then
-						hp_add = limit - hp
-						hp = limit
-					else
-						hp = hp + hp_add
-					end
-
-					local result = RunCallbacks(ctf_healing.registered_on_heal, player, object, hp_add)
-
-					if not result then
-						object:set_hp(hp)
-						hud_events.new(pname, {
-							quick = true,
-							text = uname .. " healed you!",
-							color = 0xC1FF44,
-						})
-					elseif type(result) == "string" then
-						hud_events.new(uname, {
-							quick = true,
-							text = result,
-							color = "warning",
-						})
-					end
-				end
-			else
+			if ctf_teams.get(pname) ~= ctf_teams.get(uname) then
 				hud_events.new(uname, {
 					quick = true,
 					text = pname .. " isn't in your team!",
+					color = "warning",
+				})
+				return
+			end
+
+			local hp = object:get_hp()
+			local limit = def.heal_percent * object:get_properties().hp_max
+
+			if hp <= 0 then
+				hud_events.new(uname, {
+					quick = true,
+					text = pname .. " is dead!",
+					color = "warning",
+				})
+				return
+			end
+
+			if hp >= limit then
+				hud_events.new(uname, {
+					quick = true,
+					text = pname .. " already has " .. limit .. " HP!",
+					color = "warning",
+				})
+				return
+			end
+
+			local hp_add = math.random(def.heal_min or 3, def.heal_max or 4)
+
+			if hp + hp_add > limit then
+				hp_add = limit - hp
+				hp = limit
+			else
+				hp = hp + hp_add
+			end
+
+			local result = RunCallbacks(ctf_healing.registered_on_heal, player, object, hp_add)
+
+			if not result then
+				object:set_hp(hp)
+				hud_events.new(pname, {
+					quick = true,
+					text = uname .. " healed you!",
+					color = 0xC1FF44,
+				})
+			elseif type(result) == "string" then
+				hud_events.new(uname, {
+					quick = true,
+					text = result,
 					color = "warning",
 				})
 			end

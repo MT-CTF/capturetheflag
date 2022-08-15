@@ -8,7 +8,7 @@ function ctf_modebase.update_crafts(name)
 	end
 end
 
-ctf_modebase.register_on_new_mode(function()
+ctf_api.register_on_mode_start(function()
 	for _, player in pairs(minetest.get_connected_players()) do
 		ctf_modebase.update_crafts(player:get_player_name())
 	end
@@ -28,11 +28,9 @@ local sword_materials = {
 -- Swords
 for material, craft_material in pairs(sword_materials) do
 	crafting.register_recipe({
-		type   = "inv",
 		output = "ctf_melee:sword_" .. material,
 		items  = { "default:stick", craft_material .. " 2" },
 		always_known = false,
-		level  = 1,
 	})
 end
 
@@ -46,84 +44,87 @@ local full_ores = {
 -- Pickaxes
 for ore, ore_item in pairs(full_ores) do
 	crafting.register_recipe({
-		type   = "inv",
 		output = "default:pick_" .. ore,
 		items  = { "default:stick 2", ore_item .. " 3" },
 		always_known = true,
-		level  = 1,
 	})
 end
 
 -- Mese crystal x9 <== Mese block
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:mese_crystal 9",
 	items  = { "default:mese"},
 	always_known = true,
-	level  = 1,
 })
 
 -- Furnace <== group:stone x8
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:furnace",
 	items  = { "group:stone 8" },
 	always_known = true,
-	level  = 1,
 })
 
 -- Team door
 crafting.register_recipe({
-	type   = "inv",
 	output = "ctf_teams:door_steel",
 	items  = { "default:steel_ingot 6" },
 	always_known = true,
-	level  = 1,
+})
+
+-- Cobble Stairs
+crafting.register_recipe({
+	output = "stairs:stair_cobble 8",
+	items  = { "default:cobble 6"},
+	always_known = true,
+})
+
+-- Desert Cobble Stairs
+crafting.register_recipe({
+	output = "stairs:stair_desert_cobble 8",
+	items  = { "default:desert_cobble 6"},
+	always_known = true,
 })
 
 -- Wood x4
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:wood 4",
 	items  = { "group:tree" },
 	always_known = true,
-	level  = 1,
 })
 
 -- Stick x4
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:stick 4",
 	items  = { "group:wood" },
 	always_known = true,
-	level  = 1,
 })
 
 -- Torch x5
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:torch 5",
 	items  = { "default:stick", "default:coal_lump" },
 	always_known = true,
-	level  = 1,
 })
 
 -- Wooden ladder x4
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:ladder 4",
 	items  = { "default:stick 8" },
 	always_known = true,
-	level  = 1,
 })
 
 -- Stick x2 <== Wooden ladder
 crafting.register_recipe({
-	type   = "inv",
 	output = "default:stick 2",
 	items  = { "default:ladder" },
 	always_known = true,
-	level  = 1,
+})
+
+-- Ammo
+crafting.register_recipe({
+	output = "ctf_ranged:ammo",
+	items  = { "default:steel_ingot 2", "default:coal_lump" },
+	always_known = false,
 })
 
 -- Shovels and Axes
@@ -134,18 +135,34 @@ for ore, ore_item in pairs(full_ores) do
 	end
 
 	crafting.register_recipe({
-		type   = "inv",
 		output = "default:shovel_" .. ore,
 		items  = { "default:stick 2", ore_item },
 		always_known = show,
-		level  = 1,
 	})
 
 	crafting.register_recipe({
-		type   = "inv",
 		output = "default:axe_" .. ore,
 		items  = { "default:stick 2", ore_item},
 		always_known = show,
-		level  = 1,
 	})
 end
+
+-- Traps
+
+crafting.register_recipe({
+	output = "ctf_map:spike",
+	items  = { "default:steel_ingot 4" },
+	always_known = false,
+})
+
+crafting.register_recipe({
+	output = "ctf_map:damage_cobble",
+	items = { "ctf_map:unwalkable_cobble", "ctf_map:spike" },
+	always_known = false,
+})
+
+crafting.register_recipe({
+	output = "ctf_map:reinforced_cobble 2",
+	items  = { "default:cobble 6", "default:steel_ingot" },
+	always_known = false,
+})

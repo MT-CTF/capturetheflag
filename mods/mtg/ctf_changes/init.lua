@@ -1,3 +1,5 @@
+local COOLDOWN = ctf_core.init_cooldowns()
+
 local DISALLOW_MOD_ABMS = {"default", "fire", "flowers", "tnt"}
 
 local disabled_ores = {
@@ -70,12 +72,22 @@ minetest.register_on_mods_loaded(function()
 			for tier, needle in pairs(tiers) do
 				if name:match(needle) then
 					def.groups.tier = tier
+
+					if tier <= 2 then
+						def.tool_capabilities.full_punch_interval = 1
+						def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy + 1
+					end
+
 					break
 				end
 			end
 		end
 
-		minetest.override_item(name, {groups = def.groups, _g_category = new_category})
+		minetest.override_item(name, {
+			groups = def.groups,
+			_g_category = new_category,
+			tool_capabilities = def.tool_capabilities,
+		})
 	end
 
 	local drop_self = {
@@ -88,3 +100,37 @@ minetest.register_on_mods_loaded(function()
 		minetest.override_item(name, {drop = name})
 	end
 end)
+
+minetest.override_item("default:apple", {
+	on_use = function(itemstack, user, ...)
+		if not COOLDOWN:get(user) then
+			COOLDOWN:set(user, 0.3)
+
+			return minetest.item_eat(3)(itemstack, user, ...)
+		end
+	end,
+	after_place_node = nil,
+	on_place = function()
+		return nil
+	end
+})
+
+local function furnace_on_destruct(pos)
+	local inv = minetest.get_inventory({ type = "node", pos = pos })
+	if not inv then return end
+	for _, list in pairs(inv:get_lists()) do
+		for _, item in ipairs(list) do
+			minetest.add_item(pos, item)
+		end
+	end
+end
+
+minetest.override_item("default:furnace", {
+	can_dig = function() return true end,
+	on_destruct = furnace_on_destruct,
+})
+
+minetest.override_item("default:furnace_active", {
+	can_dig = function() return true end,
+	on_destruct = furnace_on_destruct,
+})

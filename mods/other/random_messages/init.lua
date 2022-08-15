@@ -36,7 +36,6 @@ function random_messages.read_messages()
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
 		"Use apples to quickly restore your health.",
 		"Moving or fighting can avoid an inactivity kick.",
-		"Vote every "..ctf_modebase.MAPS_PER_MODE.." matches what game mode you want to play next.",
 		"Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
 		"Find weapons in chests or mine and use furnaces to make stronger swords.",
@@ -51,12 +50,21 @@ function random_messages.read_messages()
 		"Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.",
 		"Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.",
 		"Use /r to check your rank and other statistics.",
-		"Use /r <playername> to check the rankings of the player in the given rank.",
+		"Use /r <playername> to check the rankings of another player.",
 		"Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.",
 		"Use /m to add a team marker at pointed location, that's visible only to team-mates.",
-		"Use /summary (Or /s) to check scores of the current match and the previous match.",
+		"Use /summary (or /s) to check scores of the current match and the previous match.",
 		"Strengthen your team by capturing enemy flags.",
 		"Hitting your enemy does more damage than not hitting them.",
+		"Use /top50 command to see the leaderboard.",
+		"Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.",
+		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
+		.. " For example: /r mode:nade_fight randomplayer.",
+		"To check someone's team use /team player <player_name>.",
+		"To check all team members use /team.",
+		"You can capture multiple enemy flags at once!",
+		"Consider joining our Discord server at https://discord.gg/vcZTRPX",
+		"You can press sneak while jumping, to jump up two blocks."
 	}
 end
 

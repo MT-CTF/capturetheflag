@@ -24,9 +24,8 @@ function ctf_teams.is_allowed_in_team_chest(listname, stack, player)
 	return true
 end
 
-local colors = ctf_teams.teamlist
-for _, chest_color in pairs(colors) do
-	local chestcolor = ctf_teams.team[chest_color].color
+for _, team in ipairs(ctf_teams.teamlist) do
+	local chestcolor = ctf_teams.team[team].color
 	local function get_chest_texture(chest_side, color, mask, extra)
 		return string.format(
 			"(default_chest_%s.png^[colorize:%s:130)^(default_chest_%s.png^[mask:ctf_teams_chest_%s_mask.png^[colorize:%s:60)%s",
@@ -40,7 +39,7 @@ for _, chest_color in pairs(colors) do
 	end
 
 	local def = {
-		description = HumanReadable(chest_color).." Team's Chest",
+		description = HumanReadable(team).." Team's Chest",
 		tiles = {
 			get_chest_texture("top", chestcolor, "top"),
 			get_chest_texture("top", chestcolor, "top"),
@@ -58,7 +57,8 @@ for _, chest_color in pairs(colors) do
 
 	function def.on_construct(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", string.format("%s Team's Chest", HumanReadable(chest_color)))
+		meta:set_string("infotext", string.format("%s Team's Chest", HumanReadable(team)))
+
 		local inv = meta:get_inventory()
 		inv:set_size("main", 4 * 7)
 		inv:set_size("pro", 4 * 7)
@@ -70,18 +70,15 @@ for _, chest_color in pairs(colors) do
 	end
 
 	function def.on_rightclick(pos, node, player)
-		local meta = minetest.get_meta(pos)
 		local name = player:get_player_name()
 
-		if meta:get_string("infotext") == "" then
-			table.insert(ctf_teams.team_chests, pos)
-
-			def.on_construct(pos)
-		end
-
-		local flag_captured = ctf_modebase.flag_captured[chest_color]
-		if not flag_captured and chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, string.format("You're not on team %s", chest_color))
+		local flag_captured = ctf_modebase.flag_captured[team]
+		if not flag_captured and team ~= ctf_teams.get(name) then
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. team,
+				color = "warning",
+			})
 			return
 		end
 
@@ -142,8 +139,12 @@ for _, chest_color in pairs(colors) do
 			to_list, to_index, count, player)
 		local name = player:get_player_name()
 
-		if chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, "You're not on team " .. chest_color)
+		if team ~= ctf_teams.get(name) then
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. team,
+				color = "warning",
+			})
 			return 0
 		end
 
@@ -174,8 +175,12 @@ for _, chest_color in pairs(colors) do
 	function def.allow_metadata_inventory_put(pos, listname, index, stack, player)
 		local name = player:get_player_name()
 
-		if chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, "You're not on team " .. chest_color)
+		if team ~= ctf_teams.get(name) then
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. team,
+				color = "warning",
+			})
 			return 0
 		end
 
@@ -209,14 +214,18 @@ for _, chest_color in pairs(colors) do
 			return 0
 		end
 
-		if ctf_modebase.flag_captured[chest_color] then
+		if ctf_modebase.flag_captured[team] then
 			return stack:get_count()
 		end
 
 		local name = player:get_player_name()
 
-		if chest_color ~= ctf_teams.get(name) then
-			minetest.chat_send_player(name, "You're not on team " .. chest_color)
+		if team ~= ctf_teams.get(name) then
+			hud_events.new(player, {
+				quick = true,
+				text = "You're not on team " .. team,
+				color = "warning",
+			})
 			return 0
 		end
 
@@ -230,26 +239,20 @@ for _, chest_color in pairs(colors) do
 	end
 
 	function def.on_metadata_inventory_put(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves " .. (stack:get_name() or "stuff") .. " " ..
-			(stack:get_count() or 0) .. " to chest at " ..
-			minetest.pos_to_string(pos))
+		minetest.log("action", string.format("%s puts %s to team chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
 	end
 
 	function def.on_metadata_inventory_take(pos, listname, index, stack, player)
-		local chestinv = minetest.get_inventory({type = "node", pos = pos})
-		local swapped_item = chestinv:get_stack(listname, index)
-
-		if not ctf_teams.is_allowed_in_team_chest(listname, swapped_item, player) then
-			chestinv:remove_item(listname, swapped_item)
-			player:get_inventory():add_item("main", swapped_item)
-		end
-
-		minetest.log("action", player:get_player_name() ..
-			" takes " .. (stack:get_name() or "stuff") .. " " ..
-			(stack:get_count() or 0) .. " from chest at " ..
-			minetest.pos_to_string(pos))
+		minetest.log("action", string.format("%s takes %s from team chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
 	end
 
-	minetest.register_node("ctf_teams:chest_" .. chest_color, def)
+	minetest.register_node("ctf_teams:chest_" .. team, def)
 end

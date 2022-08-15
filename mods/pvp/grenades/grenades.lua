@@ -27,10 +27,10 @@ local fragdef = {
 	image = "grenades_frag.png",
 	explode_radius = 10,
 	explode_damage = 26,
-	on_collide = function(def, obj)
+	on_collide = function()
 		return true
 	end,
-	on_explode = function(def, pos, name)
+	on_explode = function(def, obj, pos, name)
 		if not name or not pos then return end
 
 		local player = minetest.get_player_by_name(name)
@@ -114,19 +114,22 @@ grenades.register_grenade("grenades:frag", fragdef)
 local fragdef_sticky = table.copy(fragdef)
 fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
 fragdef_sticky.image = "grenades_frag_sticky.png"
-fragdef_sticky.on_collide = function(def, obj) return false end
+fragdef_sticky.on_collide = function()
+	return
+end
 grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 
 -- Smoke Grenade
 
+local sounds = {}
 local SMOKE_GRENADE_TIME = 30
 grenades.register_grenade("grenades:smoke", {
 	description = "Smoke grenade (Generates smoke around blast site)",
 	image = "grenades_smoke_grenade.png",
-	on_collide = function(def, obj)
+	on_collide = function()
 		return true
 	end,
-	on_explode = function(def, pos, pname)
+	on_explode = function(def, obj, pos, pname)
 		local player = minetest.get_player_by_name(pname)
 		if not player or not pos then return end
 
@@ -156,8 +159,12 @@ grenades.register_grenade("grenades:smoke", {
 			loop = true,
 			max_hear_distance = 32,
 		})
+		sounds[hiss] = true
 
-		minetest.after(SMOKE_GRENADE_TIME, minetest.sound_stop, hiss)
+		minetest.after(SMOKE_GRENADE_TIME, function()
+			sounds[hiss] = nil
+			minetest.sound_stop(hiss)
+		end)
 
 		for i = 0, 5, 1 do
 			minetest.add_particlespawner({
@@ -197,7 +204,7 @@ grenades.register_grenade("grenades:flashbang", {
 	description = "Flashbang grenade (Blinds all who look at blast)",
 	image = "grenades_flashbang.png",
 	clock = 4,
-	on_explode = function(def, pos)
+	on_explode = function(def, obj, pos)
 		for _, v in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
 			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
 
@@ -261,3 +268,10 @@ minetest.register_on_dieplayer(function(player)
 		flash_huds[name] = nil
 	end
 end) ]]
+
+ctf_api.register_on_match_end(function()
+	for sound in pairs(sounds) do
+		minetest.sound_stop(sound)
+	end
+	sounds = {}
+end)

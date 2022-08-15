@@ -7,7 +7,7 @@ local timer = nil
 ctf_modebase.build_timer = {}
 
 local function timer_func(time_left)
-	if time_left <= 1 then
+	if time_left <= 0 then
 		ctf_modebase.build_timer.finish()
 		return
 	end
@@ -31,7 +31,11 @@ local function timer_func(time_left)
 
 		local pteam = ctf_teams.get(player)
 		if pteam and not ctf_core.pos_inside(player:get_pos(), ctf_teams.get_team_territory(pteam)) then
-			minetest.chat_send_player(player:get_player_name(), "You can't cross the barrier until build time is over!")
+			hud_events.new(player, {
+				quick = true,
+				text = "You can't cross the barrier until build time is over!",
+				color = "warning",
+			})
 			player:set_pos(ctf_map.current_map.teams[pteam].flag_pos)
 		end
 	end
@@ -39,16 +43,6 @@ local function timer_func(time_left)
 	timer = minetest.after(1, timer_func, time_left - 1)
 end
 
-
-function ctf_modebase.build_timer.start(time)
-	if timer ~= nil then return end
-
-	timer = minetest.after(1, timer_func, time or DEFAULT_BUILD_TIME)
-end
-
-function ctf_modebase.build_timer.in_progress()
-	return timer ~= nil
-end
 
 function ctf_modebase.build_timer.finish()
 	if timer == nil then return end
@@ -68,12 +62,16 @@ function ctf_modebase.build_timer.finish()
 	ctf_modebase.on_match_start()
 end
 
-function ctf_modebase.build_timer.on_match_end()
+ctf_api.register_on_new_match(function()
+	timer = minetest.after(1, timer_func, ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME)
+end)
+
+ctf_api.register_on_match_end(function()
 	if timer == nil then return end
 	timer:cancel()
 	timer = nil
 	hud:remove_all()
-end
+end)
 
 local old_protected = minetest.is_protected
 minetest.is_protected = function(pos, pname, ...)
@@ -84,7 +82,11 @@ minetest.is_protected = function(pos, pname, ...)
 	local pteam = ctf_teams.get(pname)
 
 	if pteam and not ctf_core.pos_inside(pos, ctf_teams.get_team_territory(pteam)) then
-		minetest.chat_send_player(pname, "You can't interact outside of your team territory during build time!")
+		hud_events.new(pname, {
+			quick = true,
+			text = "You can't interact outside of your team territory during build time!",
+			color = "warning",
+		})
 
 		return true
 	else

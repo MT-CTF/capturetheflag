@@ -1,7 +1,7 @@
 if not ctf_core.settings.server_mode or ctf_core.settings.server_mode == "play" then
 	assert(
 		minetest.get_mapgen_setting("mg_name") == "singlenode",
-		"You must use singlenode mapgen when ctf_server_mode is set to 'play'"
+		"If you create a map, you must enable creative mode. If you want to play, you must use the singlenode mapgen."
 	)
 end
 
@@ -15,7 +15,6 @@ ctf_map = {
 	skyboxes = {"none"},
 	current_map = false,
 	barrier_nodes = {}, -- populated in nodes.lua
-	treasurefy_node = function(pos) end, -- See ctf_modebase for function
 }
 
 for _, s in ipairs(skybox.get_skies()) do
@@ -66,7 +65,8 @@ ctf_core.include_files(
 	"map_meta.lua",
 	"map_functions.lua",
 	"editor_functions.lua",
-	"mapedit_gui.lua"
+	"mapedit_gui.lua",
+	"ctf_traps.lua"
 )
 
 minetest.register_chatcommand("ctf_map", {
@@ -87,9 +87,10 @@ minetest.register_chatcommand("ctf_map", {
 				inv:add_item("main", "ctf_map:adminpick")
 			end
 
-			if not ctf_core.settings.server_mode == "mapedit" then
+			if ctf_core.settings.server_mode ~= "mapedit" then
 				minetest.chat_send_player(name,
-						minetest.colorize("red", "It is not recommended to edit maps unless the server is in mapedit mode"))
+						minetest.colorize("red", "It is not recommended to edit maps unless the server is in mapedit mode\n"..
+							"To enable mapedit mode, enable creative mode."))
 			end
 
 			ctf_map.show_map_editor(name)

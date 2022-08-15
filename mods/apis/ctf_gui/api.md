@@ -2,13 +2,18 @@
 
 A tool for easily creating basic CTF-themed GUIs
 
+**There is a new API in the works, use of this is not recommended**
+
 # API
 
 ```lua
-ctf_gui.show_formspec(player, "modname:formname", {
+ctf_gui.old_init()
+
+ctf_gui.old_show_formspec(player, "modname:formname", {
 	size = {x = <x size>, y = <y size>},
 	title = "Formspec Title",
 	description = "Text below the title",
+	header_height = 1.6,
 	privs = {server = true},
 	on_quit = function(playername, fields)
 		-- Called when player ESCs out of formspec
@@ -86,4 +91,3 @@ ctf_gui.show_formspec(player, "modname:formname", {
 			-- Called when this element shows up in on_player_recieve_fields
 		end,
 	}
-

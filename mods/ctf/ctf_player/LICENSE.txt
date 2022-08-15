@@ -1,0 +1,1 @@
+Player Model taken from Minetest Game and modified for CTF, Licensed CC BY-SA 3.0 (mods/mtg/mtg_player_api/)

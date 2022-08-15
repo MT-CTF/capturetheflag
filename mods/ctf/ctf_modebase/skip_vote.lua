@@ -75,11 +75,13 @@ function ctf_modebase.skip_vote.end_vote()
 end
 
 -- Automatically start a skip vote after 50m, and subsequent votes every 15m
-function ctf_modebase.skip_vote.on_match_start()
-	timer = minetest.after(SKIP_DELAY, ctf_modebase.skip_vote.start_vote)
-end
+ctf_api.register_on_match_start(function()
+	if timer then return end -- There was /vote_skip
 
-function ctf_modebase.skip_vote.on_match_end()
+	timer = minetest.after(SKIP_DELAY, ctf_modebase.skip_vote.start_vote)
+end)
+
+ctf_api.register_on_match_end(function()
 	if timer then
 		timer:cancel()
 		timer = nil
@@ -91,7 +93,7 @@ function ctf_modebase.skip_vote.on_match_end()
 
 	voted_skip = false
 	flags_hold = 0
-end
+end)
 
 function ctf_modebase.skip_vote.on_flag_take()
 	flags_hold = flags_hold + 1
@@ -135,6 +137,10 @@ minetest.register_chatcommand("vote_skip", {
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /vote_skip", name))
 
+		if not ctf_modebase.in_game then
+			return false, "Map switching is in progress"
+		end
+
 		if votes then
 			return false, "Vote is already in progress"
 		end
@@ -160,8 +166,6 @@ local function player_vote(name, vote)
 	if hud:exists(player, "skip_vote:vote") then
 		hud:remove(player, "skip_vote:vote")
 	end
-
-	minetest.chat_send_all(string.format("%s voted %s", name, vote))
 
 	if voters_count == 0 then
 		ctf_modebase.skip_vote.end_vote()

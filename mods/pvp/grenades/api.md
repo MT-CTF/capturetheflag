@@ -8,19 +8,23 @@ Please suggest new features here: https://forum.minetest.net/viewtopic.php?f=9&t
 grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'flashbang')
 	description = "", -- A short description of the grenade.
 	image = "", -- The name of the grenade's texture
-	on_explode = function(def, pos, name)
+	collide_with_objects = false, -- (Default: false) Controls whether the grenade collides with objects. Grenade will never collide with thrower regardless of this setting
+	throw_cooldown = 0, -- How often player can throw grenades, in seconds
+	on_explode = function(def, obj, pos, name)
 		-- This function is called when the grenade 'explodes'
 		-- <def> grenade object definition
+		-- <obj> the grenade object
 		-- <pos> the place the grenade 'exploded' at
 		-- <name> the name of the player that threw the grenade
 	end,
-	on_collide = function(def, obj, name)
+	on_collide = function(def, obj, name, moveresult)
 		-- This function is called when the grenade collides with a surface
 		-- <def> grenade object definition
 		-- <obj> the grenade object
 		-- <name> the name of the player that threw the grenade
+		-- <moveresult> table with collision info
 		-- return true to cause grenade explosion
-		-- return "stop" to stop the grenade from moving
+		-- return false to stop the grenade from moving
 	end,
 	clock = 3, -- Optional, controls how long until grenade detonates. Default is 3
 	particle = { -- Adds particles in the grenade's trail

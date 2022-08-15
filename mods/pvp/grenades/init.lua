@@ -2,10 +2,13 @@ grenades = {
 	grenade_deaccel = 8
 }
 
+local cooldown = ctf_core.init_cooldowns()
+
 function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()
-	local pos = player:get_pos()
-	local obj = minetest.add_entity(vector.new(pos.x, pos.y + player:get_properties().eye_height, pos.z), name)
+	local pos = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
+
+	local obj = minetest.add_entity(pos, name)
 	if not obj then
 		return
 	end
@@ -13,9 +16,10 @@ function grenades.throw_grenade(name, startspeed, player)
 	obj:set_velocity(vector.add(vector.multiply(dir, startspeed), player:get_velocity()))
 	obj:set_acceleration({x = 0, y = -9.8, z = 0})
 
-	obj:get_luaentity().thrower_name = player:get_player_name()
+	local data = obj:get_luaentity()
+	data.thrower_name = player:get_player_name()
 
-	return obj:get_luaentity()
+	return data
 end
 
 function grenades.register_grenade(name, def)
@@ -26,11 +30,11 @@ function grenades.register_grenade(name, def)
 	local grenade_entity = {
 		initial_properties = {
 			physical = true,
-			collide_with_objects = false,
+			collide_with_objects = def.collide_with_objects or false,
 			visual = "sprite",
 			visual_size = {x = 0.5, y = 0.5, z = 0.5},
 			textures = {def.image},
-			collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.15, 0.2},
+			collisionbox = {-0.05, -0.05, -0.05, 0.05, 0.05, 0.05},
 			pointable = false,
 			static_save = false,
 		},
@@ -53,27 +57,27 @@ function grenades.register_grenade(name, def)
 
 			if moveresult.collides and moveresult.collisions then
 				if def.on_collide then
-					local c_result = def:on_collide(obj, self.thrower_name)
+					local c_result = def:on_collide(obj, self.thrower_name, moveresult)
 
 					if c_result == true then
 						if self.thrower_name then
 							minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 									" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-							def:on_explode(pos, self.thrower_name)
+							def:on_explode(obj, pos, self.thrower_name)
 						end
 						obj:remove()
-					elseif c_result == "stop" then
+					elseif c_result == false then
 						vel = vector.new()
 						self.last_vel = vector.new()
 						obj:set_velocity(vector.new())
 						obj:set_acceleration(vector.new(0, 0, 0))
 					end
-				end
+				else
+					if moveresult.collisions[1] and moveresult.collisions[1].axis then
+						local axis = moveresult.collisions[1].axis
 
-				if moveresult.collisions[1] and moveresult.collisions[1].axis then
-					local axis = moveresult.collisions[1].axis
-
-					vel[axis] = self.last_vel[axis] * -0.3
+						vel[axis] = self.last_vel[axis] * -0.3
+					end
 				end
 
 				obj:set_velocity(vel)
@@ -126,7 +130,7 @@ function grenades.register_grenade(name, def)
 				if self.thrower_name then
 					minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
 					" explodes at " .. minetest.pos_to_string(vector.round(pos)))
-					def:on_explode(pos, self.thrower_name)
+					def:on_explode(obj, pos, self.thrower_name)
 				end
 
 				obj:remove()
@@ -140,9 +144,8 @@ function grenades.register_grenade(name, def)
 
 	newdef.description = def.description
 	newdef.stack_max = def.stack_max or 1
-	newdef.range = 0
 	newdef.inventory_image = def.image
-	newdef.on_use = function(itemstack, user, pointed_thing)
+	local on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
 			grenades.throw_grenade(name, 17, user)
 
@@ -152,6 +155,20 @@ function grenades.register_grenade(name, def)
 		end
 
 		return itemstack
+	end
+
+	if def.throw_cooldown then
+		newdef.on_use = function(itemstack, user, ...)
+			if cooldown:get(user) then
+				return
+			else
+				cooldown:set(user, def.throw_cooldown)
+			end
+
+			return on_use(itemstack, user, ...)
+		end
+	else
+		newdef.on_use = on_use
 	end
 
 	minetest.register_craftitem(name, newdef)

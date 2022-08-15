@@ -28,7 +28,7 @@ minetest.register_node("ctf_map:ind_glass", {
 	walkable = true,
 	buildable_to = false,
 	pointable = ctf_core.settings.server_mode == "mapedit",
-	groups = {immortal = 1, not_in_creative_inventory = 1},
+	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
 
@@ -45,14 +45,14 @@ minetest.register_node("ctf_map:ind_glass_red", {
 	use_texture_alpha = false,
 	alpha = 0,
 	pointable = ctf_core.settings.server_mode == "mapedit",
-	groups = {immortal = 1, not_in_creative_inventory = 1},
+	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_glass_red")] = minetest.CONTENT_AIR
 
 minetest.register_node("ctf_map:ind_stone_red", {
 	description = "Indestructible Red Barrier Stone",
-	groups = {immortal = 1, not_in_creative_inventory = 1},
+	groups = {immortal = 1},
 	tiles = {"ctf_map_stone_red.png"},
 	is_ground_content = false
 })
@@ -81,6 +81,7 @@ local mod_prefixes = {
 -- See Lua API, section "Node-only groups"
 local preserved_groups = {
 	bouncy = true;
+	fence = true;
 	connect_to_raillike = true;
 	disable_jump = true;
 	fall_damage_add_percent = true;
@@ -134,7 +135,7 @@ local chest_formspec =
 	default.get_hotbar_bg(0,4.85)
 
 minetest.register_node("ctf_map:chest", {
-	description = "Loot Chest",
+	description = "Treasure Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
 	paramtype2 = "facedir",
@@ -142,39 +143,20 @@ minetest.register_node("ctf_map:chest", {
 	light_source = 2,
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("infotext", "Treasure Chest")
+		meta:set_string("formspec", chest_formspec)
+
+		local inv = meta:get_inventory()
+		inv:set_size("main", 8*4)
+	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
 			minetest.chat_send_player(player:get_player_name(),
 				"You're not allowed to put things in treasure chests!")
 			return 0
 		end
-	end,
-	on_rightclick = function(pos, node, clicker, ...)
-		if not clicker:is_player() then return end
-
-		local meta = minetest.get_meta(pos)
-		local pname = clicker:get_player_name()
-
-		if meta:get_string("treasured") == "yes" then
-			return
-		else
-			minetest.registered_nodes[node.name].on_construct(pos)
-			ctf_map.treasurefy_node(pos, node, clicker, ...)
-			meta:set_string("treasured", "yes")
-		end
-
-		local special_form = chest_formspec
-		special_form = special_form:gsub("current_player", "player:"..pname)
-		special_form = special_form:gsub("current_name", string.format("nodemeta:%d,%d,%d", pos.x, pos.y, pos.z))
-
-		minetest.after(0, function() minetest.show_formspec(pname, "ctf_map:chest_formspec", special_form) end)
-	end,
-	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
-		meta:set_string("formspec", chest_formspec)
-		meta:set_string("infotext", "Loot Chest")
-		local inv = meta:get_inventory()
-		inv:set_size("main", 8*4)
 	end,
 	can_dig = function(pos,player)
 		local meta = minetest.get_meta(pos);
@@ -187,21 +169,20 @@ minetest.register_node("ctf_map:chest", {
 			" moves stuff in chest at " .. minetest.pos_to_string(pos))
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff to chest at " .. minetest.pos_to_string(pos))
+		minetest.log("action", string.format("%s puts %s to treasure chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
+		minetest.log("action", string.format("%s takes %s from treasure chest at %s",
+			player:get_player_name(),
+			stack:to_string(),
+			minetest.pos_to_string(pos)
+		))
+
 		local inv = minetest.get_inventory({type = "node", pos = pos})
-		local swapped_item = inv:get_stack(listname, index)
-
-		if swapped_item:get_name() ~= "" then
-			inv:remove_item(listname, swapped_item)
-			player:get_inventory():add_item("main", swapped_item)
-		end
-
-		minetest.log("action", player:get_player_name() ..
-			" takes stuff from chest at " .. minetest.pos_to_string(pos))
-
 		if not inv or inv:is_empty("main") then
 			minetest.set_node(pos, {name="air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())

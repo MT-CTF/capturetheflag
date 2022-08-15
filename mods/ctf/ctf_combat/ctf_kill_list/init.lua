@@ -20,7 +20,6 @@ local HUD_DEFINITIONS = {
 	{
 		hud_elem_type = "image",
 		position = {x = 0, y = 0.8},
-		image_scale = 2,
 		offset = {x = (MAX_NAME_LENGTH*10) + 28, y = 0},
 		alignment = {x = "center", y = "center"},
 	},
@@ -35,8 +34,13 @@ local HUD_DEFINITIONS = {
 
 local kill_list = {}
 
+local image_scale_map = ctf_settings.settings["ctf_kill_list:tp_size"].image_scale_map
 local function update_hud_line(player, idx, new)
 	idx = HUD_LINES - (idx-1)
+
+	local image_scale = tonumber(ctf_settings.get(player, "ctf_kill_list:tp_size"))
+
+	image_scale = image_scale_map[image_scale] * 2
 
 	for i=1, 3, 1 do
 		local hname = string.format(HUDNAME_FORMAT, idx, i)
@@ -45,14 +49,16 @@ local function update_hud_line(player, idx, new)
 		if new then
 			if phud then
 				hud:change(player, hname, {
-					text = (new[i].text or new[i]),
+					text = (new[i].text or new[i].image),
+					image_scale = image_scale,
 					color = new[i].color or 0xFFF
 				})
 			else
 				local newhud = table.copy(HUD_DEFINITIONS[i])
 
 				newhud.offset.y = -(idx-1)*HUD_LINE_HEIGHT
-				newhud.text = new[i].text or new[i]
+				newhud.text = new[i].text or new[i].image
+				newhud.image_scale = image_scale
 				newhud.color = new[i].color or 0xFFF
 				hud:add(player, hname, newhud)
 			end
@@ -99,9 +105,8 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-ctf_modebase.register_on_new_match(function()
+ctf_api.register_on_match_end(function()
 	kill_list = {}
-
 	hud:clear_all()
 end)
 
@@ -109,38 +114,12 @@ minetest.register_on_joinplayer(function(player)
 	update_kill_list_hud(player)
 end)
 
-local damage_group_textures = {grenade = "grenades_frag.png"}
-function ctf_kill_list.on_kill(player, hitter, tool_capabilities)
-	local killwep_invimage
+function ctf_kill_list.add(killer, victim, weapon_image, comment)
+	killer = PlayerName(killer)
+	victim = PlayerName(victim)
 
-	for group, texture in pairs(damage_group_textures) do
-		if tool_capabilities.damage_groups[group] then
-			killwep_invimage = texture
-			break
-		end
-	end
-
-	if not killwep_invimage then
-		killwep_invimage = hitter:get_wielded_item():get_definition().inventory_image
-	end
-
-	if killwep_invimage == "" then
-		killwep_invimage = "ctf_kill_list_punch.png"
-	end
-
-	if tool_capabilities.damage_groups.ranged then
-		killwep_invimage = killwep_invimage .. "^[transformFX"
-	end
-
-	ctf_kill_list.add_kill(hitter, killwep_invimage, player)
-end
-
-function ctf_kill_list.add_kill(hitter, weapon_image, player)
-	hitter = PlayerName(hitter)
-	player = PlayerName(player)
-
-	local k_teamcolor = ctf_teams.get(hitter)
-	local v_teamcolor = ctf_teams.get(player)
+	local k_teamcolor = ctf_teams.get(killer)
+	local v_teamcolor = ctf_teams.get(victim)
 
 	if k_teamcolor then
 		k_teamcolor = ctf_teams.team[k_teamcolor].color_hex
@@ -150,8 +129,8 @@ function ctf_kill_list.add_kill(hitter, weapon_image, player)
 	end
 
 	add_kill(
-		{text = hitter, color = k_teamcolor or 0xFFF},
-		weapon_image or "default_tool_steelsword.png",
-		{text = player, color = v_teamcolor or 0xFFF}
+		{text = killer, color = k_teamcolor or 0xFFF},
+		{image = weapon_image or "ctf_kill_list_punch.png"},
+		{text = victim .. (comment or ""), color = v_teamcolor or 0xFFF}
 	)
 end

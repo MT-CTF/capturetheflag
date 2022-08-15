@@ -1,0 +1,23 @@
+# textdomain: email
+(@1) You have mail! Type /inbox to recieve=
+Your Inbox=
+Date=
+From=
+Message=
+Well done! Your inbox is empty!=
+Delete All=
+Close=
+Exit then type /mail username message to reply=
+Your inbox is empty!=
+@1 items in your inbox:=
+End of mail (@1 items)=
+Opened inbox!=
+Inbox=
+Inbox cleared!=
+Player '@1' does not exist=
+Message sent to @1=
+Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only.=
+Inbox cleared=
+<playername> <some message>=
+mail: add a message to a player's inbox=
+Usage: mail <playername> <some message>=

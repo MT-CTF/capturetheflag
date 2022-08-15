@@ -1,5 +1,6 @@
 local previous = nil
 local start_time = nil
+local game_stat = nil
 local winner = nil
 
 local function team_rankings(total)
@@ -38,7 +39,7 @@ function ctf_modebase.summary.get(prev)
 			rankings.players(), team_rankings(rankings.teams()), current_mode.summary_ranks, {
 				title = "Match Summary",
 				special_row_title = "Total Team Stats",
-				gamemode = ctf_modebase.current_mode,
+				game_stat = game_stat,
 				winner = winner,
 				duration = get_duration(),
 				buttons = {previous = previous ~= nil},
@@ -48,7 +49,7 @@ function ctf_modebase.summary.get(prev)
 			previous.players, team_rankings(previous.teams), previous.summary_ranks, {
 				title = "Previous Match Summary",
 				special_row_title = "Total Team Stats",
-				gamemode = previous.gamemode,
+				game_stat = previous.game_stat,
 				winner = previous.winner,
 				duration = previous.duration,
 				buttons = {next = true},
@@ -56,7 +57,19 @@ function ctf_modebase.summary.get(prev)
 	end
 end
 
-function ctf_modebase.summary.on_match_end()
+ctf_api.register_on_new_match(function()
+	game_stat = string.format("%s mode: Round %d of %d",
+		HumanReadable(ctf_modebase.current_mode),
+		ctf_modebase.current_mode_matches_played + 1,
+		ctf_modebase.current_mode_matches
+	)
+end)
+
+ctf_api.register_on_match_start(function()
+	start_time = os.time()
+end)
+
+ctf_api.register_on_match_end(function()
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
 	local rankings = current_mode.recent_rankings
@@ -64,7 +77,7 @@ function ctf_modebase.summary.on_match_end()
 	previous = {
 		players = rankings.players(),
 		teams = rankings.teams(),
-		gamemode = ctf_modebase.current_mode,
+		game_stat = game_stat,
 		winner = winner or "NO WINNER",
 		duration = get_duration(),
 		summary_ranks = current_mode.summary_ranks,
@@ -72,14 +85,10 @@ function ctf_modebase.summary.on_match_end()
 
 	start_time = nil
 	winner = nil
-end
+end)
 
 function ctf_modebase.summary.set_winner(i)
 	winner = i
-end
-
-function ctf_modebase.summary.on_match_start()
-	start_time = os.time()
 end
 
 ---@param name string Player name
@@ -213,11 +222,11 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		}
 	end
 
-	if formdef.gamemode then
-		formspec.elements.gamemode = {
+	if formdef.game_stat then
+		formspec.elements.game_stat = {
 			type = "label",
-			pos = {1, 0.5},
-			label = HumanReadable(formdef.gamemode) .. " mode",
+			pos = {11, 0.5},
+			label = formdef.game_stat,
 		}
 	end
 
@@ -232,12 +241,12 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.duration then
 		formspec.elements.duration = {
 			type = "label",
-			pos = {"center", 0.5},
+			pos = {1, 0.5},
 			label = "Duration: " .. formdef.duration,
 		}
 	end
 
-	ctf_gui.show_formspec(name, "ctf_modebase:summary", formspec)
+	ctf_gui.old_show_formspec(name, "ctf_modebase:summary", formspec)
 end
 
 ctf_core.register_chatcommand_alias("summary", "s", {
