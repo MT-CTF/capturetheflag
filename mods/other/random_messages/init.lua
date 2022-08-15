@@ -65,7 +65,7 @@ function random_messages.read_messages()
 		"You can capture multiple enemy flags at once!",
 		"Consider joining our Discord server at https://discord.gg/vcZTRPX",
 		"You can press sneak while jumping, to jump up two blocks.",
-		"Use /donate <playername> <amount> to reward a team-mate for their work."
+		"Use /donate <playername> <score> to reward a team-mate for their work."
 	}
 end
 
