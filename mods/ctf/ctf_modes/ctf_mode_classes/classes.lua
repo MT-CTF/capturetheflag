@@ -18,6 +18,7 @@ local class_props = {
 		disallowed_items = {
 			"ctf_ranged:rifle",
 			"ctf_ranged:smg",
+			"ctf_ranged:shotgun",
 		},
 	},
 	support = {
