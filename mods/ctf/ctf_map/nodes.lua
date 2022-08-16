@@ -185,12 +185,12 @@ local chest_def = {
 
 		local inv = minetest.get_inventory({type = "node", pos = pos})
 		if not inv or inv:is_empty("main") then
-			minetest.set_node(pos, {name="air"})
+			minetest.set_node(pos, {name = "air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
 		end
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
+		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
 		minetest.get_meta(pos):set_string("infotext", chestv)
 	end
 }
