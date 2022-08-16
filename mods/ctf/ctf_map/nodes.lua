@@ -191,19 +191,19 @@ local chest_def = {
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="ctf_map:chest_opened"})
-		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", chestv)
+		minetest.get_meta(pos):set_string("infotext", chestv)
 	end
 }
 
 local ochest_def = table.copy(chest_def)
 ochest_def.description = chestv
-ochest_def.tiles = {"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
-"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
-"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"}
+ochest_def.tiles = {
+	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"}
 ochest_def.light_source = 1
 ochest_def.on_rightclick = nil
 
