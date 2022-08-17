@@ -26,7 +26,6 @@ ctf_modebase.register_mode("classes", {
 		["ctf_ranged:pistol_loaded"        ] = {rarity = 0.2 , max_stacks = 2},
 		["ctf_ranged:shotgun_loaded"       ] = {rarity = 0.05                },
 		["ctf_ranged:smg_loaded"           ] = {rarity = 0.05                },
-		["ctf_ranged:sniper_loaded"        ] = {rarity = 0.2 , max_stacks = 2},
 		["ctf_ranged:sniper_magnum_loaded" ] = {rarity = 0.05                },
 
 		["ctf_map:unwalkable_dirt"  ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
