@@ -15,6 +15,14 @@ local function get_initial_stuff(player, f)
 	end
 end
 
+function ctf_modebase.player.get_initial_stuff(player)
+	local initial_stuff = {}
+	get_initial_stuff(player, function(item)
+		table.insert(initial_stuff, item)
+	end)
+	return initial_stuff
+end
+
 function ctf_modebase.player.give_initial_stuff(player)
 	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
 
