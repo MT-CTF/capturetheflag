@@ -19,10 +19,10 @@ ctf_modebase.register_mode("classic", {
 
 		["ctf_melee:sword_steel"  ] = {rarity = 0.2  , max_stacks = 2},
 
-		["ctf_ranged:pistol_loaded"        ] = {rarity = 0.2 , max_stacks = 2},
-		["ctf_ranged:rifle_loaded"         ] = {rarity = 0.2                 },
-		["ctf_ranged:shotgun_loaded"       ] = {rarity = 0.05                },
-		["ctf_ranged:smg_loaded"           ] = {rarity = 0.05                },
+		["ctf_ranged:pistol_loaded" ] = {rarity = 0.2 , max_stacks = 2},
+		["ctf_ranged:rifle_loaded"  ] = {rarity = 0.2                 },
+		["ctf_ranged:shotgun_loaded"] = {rarity = 0.05                },
+		["ctf_ranged:smg_loaded"    ] = {rarity = 0.05                },
 
 		["ctf_ranged:ammo" ] = {min_count = 3, max_count = 10, rarity = 0.3 , max_stacks = 2},
 		["default:apple"   ] = {min_count = 6, max_count = 16, rarity = 0.2 , max_stacks = 2},
