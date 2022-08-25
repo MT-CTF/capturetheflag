@@ -52,7 +52,7 @@ local function medkit_heal(playername)
 		-- In case teammates manage to place blocks inside the player while they're healing
 		local pos = player:get_pos()
 		local node_0 = minetest.get_node(pos)
-		local node_0 = minetest.get_node(pos:offset(0, 1, 0))
+		local node_1 = minetest.get_node(pos:offset(0, 1, 0))
 
 		if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
 			return stop_medkit_heal(playername, "You can't heal while inside blocks")
