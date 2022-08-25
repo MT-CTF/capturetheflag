@@ -149,12 +149,11 @@ minetest.register_tool("ctf_healing:medkit", {
 		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
 
 		if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
-			hud_events.new(uname, {
+			return hud_events.new(uname, {
 				text = "You can't heal inside blocks",
 				color = "danger",
 				quick = true,
 			})
-			return
 		end
 
 		if not healing_players[uname] then
