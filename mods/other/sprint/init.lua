@@ -10,6 +10,17 @@ local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
 
 local players = {}
 
+-- from https://github.com/rubenwardy/sprint
+if minetest.get_modpath("hudbars") ~= nil then
+	hb.register_hudbar("sprint", 0xFFFFFF, "Stamina",
+		{ bar = "sprint_stamina_bar.png", icon = "sprint_stamina_icon.png" },
+		STAMINA_MAX, STAMINA_MAX,
+		false, nil)
+	SPRINT_HUDBARS_USED = true
+else
+	SPRINT_HUDBARS_USED = false
+end
+
 local function setSprinting(player, sprinting)
 	if sprinting then
 		physics.set(player:get_player_name(), "sprint:sprint", {
@@ -22,10 +33,18 @@ local function setSprinting(player, sprinting)
 end
 
 local function updateHud(player, info)
-	local numBars = math.floor(20 * info.stamina / STAMINA_MAX)
-	if info.lastHudSendValue ~= numBars then
-		info.lastHudSendValue = numBars
-		player:hud_change(info.hud, "number", numBars)
+	if SPRINT_HUDBARS_USED then
+		if info.stamina > STAMINA_MAX then
+			hb.change_hudbar(player, "sprint", STAMINA_MAX)
+		else
+			hb.change_hudbar(player, "sprint", info.stamina)
+		end
+	else
+		local numBars = math.floor(20 * info.stamina / STAMINA_MAX)
+		if info.lastHudSendValue ~= numBars then
+			info.lastHudSendValue = numBars
+			player:hud_change(info.hud, "number", numBars)
+		end
 	end
 end
 
@@ -71,17 +90,21 @@ minetest.register_on_joinplayer(function(player)
 		stamina         = STAMINA_MAX, -- integer, the stamina we have left
 	}
 
-	info.hud = player:hud_add({
-		hud_elem_type = "statbar",
-		position      = {x=0.5, y=1},
-		size          = {x=24, y=24},
-		text          = "sprint_stamina_icon.png",
-		text2         = "sprint_stamina_icon_gone.png",
-		number        = 20,
-		item          = 2 * STAMINA_MAX,
-		alignment     = {x=0, y=1},
-		offset        = {x=-263, y=-110},
-	})
+	if SPRINT_HUDBARS_USED then
+		hb.init_hudbar(player, "sprint")
+	else
+		info.hud = player:hud_add({
+			hud_elem_type = "statbar",
+			position      = {x=0.5, y=1},
+			size          = {x=24, y=24},
+			text          = "sprint_stamina_icon.png",
+			text2         = "sprint_stamina_icon_gone.png",
+			number        = 20,
+			item          = 2 * STAMINA_MAX,
+			alignment     = {x=0, y=1},
+			offset        = {x=-263, y=-110},
+		})
+	end
 
 	players[player:get_player_name()] = info
 end)
