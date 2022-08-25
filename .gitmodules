@@ -15,3 +15,6 @@
 	path = mods/apis/mhud
 	url = https://github.com/LoneWolfHT/mhud.git
 	branch = main
+[submodule "mods/other/minetest_hudbars"]
+	path = mods/other/minetest_hudbars
+	url = https://codeberg.org/Wuzzy/minetest_hudbars
