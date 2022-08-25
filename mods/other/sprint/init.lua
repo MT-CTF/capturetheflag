@@ -10,6 +10,8 @@ local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
 
 local players = {}
 
+local SPRINT_HUDBARS_USED
+
 -- from https://github.com/rubenwardy/sprint
 if minetest.get_modpath("hudbars") ~= nil then
 	hb.register_hudbar("sprint", 0xFFFFFF, "Stamina",
