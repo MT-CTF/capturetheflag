@@ -28,7 +28,7 @@ minetest.override_chatcommand("msg", {
 		minetest.chat_send_player(sendto, str)
 
 		-- Make the sender-side message
-		str = "To " .. name .. ": " .. message
+		str = "To " .. sendto .. ": " .. message
 
 		minetest.log("action", string.format("[CHAT] PM from %s to %s: %s", name, sendto, message))
 		
