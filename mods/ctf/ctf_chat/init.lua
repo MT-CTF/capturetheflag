@@ -21,14 +21,21 @@ minetest.override_chatcommand("msg", {
 		local pteam = ctf_teams.get(name)
 		local tcolor = pteam and ctf_teams.team[pteam].color or "#FFF"
 
-		-- Colorized sender name and message
+		-- Colorize the recepient-side message and send it to the recepient
 		local str =  minetest.colorize(color, "PM from ")
 		str = str .. minetest.colorize(tcolor, name)
 		str = str .. minetest.colorize(color, ": " .. message)
 		minetest.chat_send_player(sendto, str)
 
+		-- Colorize the sender-side message
+		str = minetest.colorize (color, "To ")
+		str = str .. minetest.colorize(tcolor, name)
+		str = str .. minetest.colorize(color, ": " .. message)
+
 		minetest.log("action", string.format("[CHAT] PM from %s to %s: %s", name, sendto, message))
-		return true, "Message sent."
+		
+		-- Send the sender-side message
+		return true, str
 	end
 })
 
