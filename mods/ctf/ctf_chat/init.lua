@@ -27,10 +27,8 @@ minetest.override_chatcommand("msg", {
 		str = str .. minetest.colorize(color, ": " .. message)
 		minetest.chat_send_player(sendto, str)
 
-		-- Colorize the sender-side message
-		str = minetest.colorize (color, "To ")
-		str = str .. minetest.colorize(tcolor, name)
-		str = str .. minetest.colorize(color, ": " .. message)
+		-- Make the sender-side message
+		str = "To " .. name .. ": " .. message
 
 		minetest.log("action", string.format("[CHAT] PM from %s to %s: %s", name, sendto, message))
 		
