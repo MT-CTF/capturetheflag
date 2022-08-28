@@ -51,8 +51,8 @@ local function medkit_heal(playername)
 
 		-- In case teammates manage to place blocks inside the player while they're healing
 		local pos = player:get_pos()
-		local node_0 = minetest.get_node(pos)
-		local node_1 = minetest.get_node(pos:offset(0, 1, 0))
+		local node_0 = minetest.get_node(pos).name
+		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
 
 		if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
 			return stop_medkit_heal(playername, "You can't heal while inside blocks")
@@ -92,6 +92,19 @@ local function start_medkit_heal(playername)
 			quick = true,
 		})
 		return
+	end
+
+	-- Prevent players from using medkits while inside nodes
+	local pos = player:get_pos()
+	local node_0 = minetest.get_node(pos).name
+	local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
+
+	if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
+		return hud_events.new(uname, {
+			text = "You can't heal inside blocks",
+			color = "danger",
+			quick = true,
+		})
 	end
 
 	healing_players[playername] = {hp = php}
@@ -142,19 +155,6 @@ minetest.register_tool("ctf_healing:medkit", {
 	inventory_image = "ctf_healing_medkit.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local uname = user:get_player_name()
-		
-		-- Prevent players from using medkits while inside nodes
-		local pos = user:get_pos()
-		local node_0 = minetest.get_node(pos).name
-		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
-
-		if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
-			return hud_events.new(uname, {
-				text = "You can't heal inside blocks",
-				color = "danger",
-				quick = true,
-			})
-		end
 
 		if not healing_players[uname] then
 			start_medkit_heal(uname)
