@@ -59,7 +59,7 @@ function random_messages.read_messages()
 		"Hitting your enemy does more damage than not hitting them.",
 		"Use /top50 command to see the leaderboard.",
 		"Use /top50 <mode:technical modename> to see the leaderboard on another mode."
-		.. "For example: /top50 mode:nade_fight.",
+		.. " For example: /top50 mode:nade_fight.",
 		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
 		.. " For example: /r mode:nade_fight randomplayer.",
 		"To check someone's team use /team player <player_name>.",
