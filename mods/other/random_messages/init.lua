@@ -5,6 +5,7 @@ arsdragonfly@gmail.com
 --]]
 --Time between two subsequent messages.
 local MESSAGE_INTERVAL = 0
+local S = minetest.get_translator(minetest.get_current_modname())
 
 math.randomseed(os.time())
 
@@ -57,7 +58,8 @@ function random_messages.read_messages()
 		"Strengthen your team by capturing enemy flags.",
 		"Hitting your enemy does more damage than not hitting them.",
 		"Use /top50 command to see the leaderboard.",
-		"Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.",
+		"Use /top50 <mode:technical modename> to see the leaderboard on another mode."
+		.. " For example: /top50 mode:nade_fight.",
 		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
 		.. " For example: /r mode:nade_fight randomplayer.",
 		"To check someone's team use /team player <player_name>.",
@@ -72,7 +74,7 @@ end
 function random_messages.display_message(message_number)
 	local msg = random_messages.messages[message_number] or message_number
 	if msg then
-		minetest.chat_send_all(minetest.colorize("#808080", msg))
+		minetest.chat_send_all(minetest.colorize("#808080", S(msg)))
 	end
 end
 
@@ -84,7 +86,7 @@ end
 function random_messages.list_messages()
 	local str = ""
 	for k,v in pairs(random_messages.messages) do
-		str = str .. k .. " | " .. v .. "\n"
+		str = str .. k .. " | " .. S(v) .. "\n"
 	end
 	return str
 end
