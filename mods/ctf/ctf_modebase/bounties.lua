@@ -180,7 +180,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 	description = "Put bounty on some player",
 	params = "<player> <amount>",
-	privs = {ctf_admin=true},
+	privs = { ctf_admin = true },
 	func = function(name, param)
 		local player, amount = string.match(param, "(.*) (.*)")
 		local pteam = ctf_teams.get(player)
