@@ -193,6 +193,6 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 			pteam,
 			{ bounty_kills=1, score=amount }
 		)
-		return true, "I just put " .. amount .. " on " .. player
+		return true, "Successfully placed a bounty of " .. amount .. " on " .. player .. "!"
 	end,
 })
