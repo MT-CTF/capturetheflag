@@ -170,7 +170,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 		if #output <= 0 then
 			return false, "There are no bounties you can claim"
 		end
-		
+
 		local formspec = "size[10,10]\n" .. table.concat(output, "\n")
 		minetest.show_formspec(name, "ctf_modebase:lb", formspec)
 		return true, ""
@@ -184,15 +184,16 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 	func = function(name, param)
 		local player, amount = string.match(param, "(.*) (.*)")
 		local pteam = ctf_teams.get(player)
+		local team_colour = ctf_teams.team[pteam].color
 		if not (player and pteam and amount) then
 			return false, "Incorrect parameters"
 		end
-		amount = ctf_core.tonumber(amount)
+		amount = ctf_core.to_number(amount)
 		set(
 			player,
 			pteam,
 			{ bounty_kills=1, score=amount }
 		)
-		return true, "Successfully placed a bounty of " .. amount .. " on " .. player .. "!"
+		return true, "Successfully placed a bounty of " .. amount .. " on " .. minetest.colorize(team_colour, player) .. "!"
 	end,
 })
