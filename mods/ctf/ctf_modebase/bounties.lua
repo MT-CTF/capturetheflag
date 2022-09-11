@@ -144,34 +144,26 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 		local pteam = ctf_teams.get(name)
 		local output = {}
 		local x = 0
-		local y = 0
-
 		for tname, bounty in pairs(bounties) do
 			if pteam ~= tname then
-				local label = string.format("label[%d,%d;%s]", x, y, bounty.name .. " => " .. bounty.rewards.score)
-				y = y + 1
+				local label = string.format("label[%d,0.1;%s]", x, bounty.rewards.score .. " on " .. bounty.name)
 				table.insert(output, label)
-				local model = "model[%d,%d;4,6;player;character.b3d;%s;{0,160};;;]"
+				local model = "model[%d,1;4,6;player;character.b3d;%s;{0,160};;;]"
 				model = string.format(
 					model,
 					x,
-					y,
 					ctf_cosmetics.get_colored_skin(bounty.name, ctf_teams.get(bounty.name))
 				)
 				table.insert(output, model)
-				if y > 8 then
-					y = 0
-				else
-					x = x + 4.5
-				end
+				x = x + 4.5
 			end
 		end
 
 		if #output <= 0 then
 			return false, "There are no bounties you can claim"
 		end
-
-		local formspec = "size[10,10]\n" .. table.concat(output, "\n")
+		x = x - 1.5
+		local formspec = "size[" .. x .. ",6]\n" .. table.concat(output, "\n")
 		minetest.show_formspec(name, "ctf_modebase:lb", formspec)
 		return true, ""
 	end
