@@ -1,6 +1,6 @@
 minetest.register_node("ctf_map:unwalkable_dirt", {
 	description = "Unwalkable Dirt",
-	tiles = {"default_dirt.png^[colorize:#00ff00:20"},
+	tiles = {"default_dirt.png^[colorize:#ffff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {crumbly=3, soil=1}
@@ -8,7 +8,7 @@ minetest.register_node("ctf_map:unwalkable_dirt", {
 
 minetest.register_node("ctf_map:unwalkable_stone", {
 	description = "Unwalkable Stone",
-	tiles = {"default_stone.png^[colorize:#00ff00:20"},
+	tiles = {"default_stone.png^[colorize:#ffff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=1}
@@ -16,7 +16,7 @@ minetest.register_node("ctf_map:unwalkable_stone", {
 
 minetest.register_node("ctf_map:unwalkable_cobble", {
 	description = "Unwalkable Cobblestone",
-	tiles = {"default_cobble.png^[colorize:#00ff00:20"},
+	tiles = {"default_cobble.png^[colorize:#ffff00:20"},
 	is_ground_content = false,
 	walkable = false,
 	groups = {cracky=3, stone=2}
