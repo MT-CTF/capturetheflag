@@ -79,9 +79,9 @@ function ctf_modebase.start_new_match(delay)
 end
 
 minetest.register_chatcommand("ctf_next", {
-	description = "Set a new map and mode",
+	description = "Set a new map and mode. If a new map is not specified one will be chosen randomly.",
 	privs = {ctf_admin = true},
-	params = "[-f] <mode:technical modename> <technical mapname>",
+	params = "[-f] <mode:technical modename> [technical mapname]",
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_next %s", name, param))
 
@@ -112,6 +112,9 @@ minetest.register_chatcommand("ctf_next", {
 			if not ctf_modebase.map_catalog.map_dirnames[map] then
 				return false, "No such map: " .. map
 			end
+		else
+			map_index = math.random(1, #ctf_modebase.map_catalog.map_dirnames)
+			map = ctf_modebase.map_catalog.map_dirnames[map_index]
 		end
 
 		ctf_modebase.map_on_next_match = map
