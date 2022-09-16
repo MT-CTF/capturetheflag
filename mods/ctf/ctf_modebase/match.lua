@@ -113,7 +113,7 @@ minetest.register_chatcommand("ctf_next", {
 				return false, "No such map: " .. map
 			end
 		else
-			map_index = math.random(1, #ctf_modebase.map_catalog.map_dirnames)
+			local map_index = math.random(1, #ctf_modebase.map_catalog.map_dirnames)
 			map = ctf_modebase.map_catalog.map_dirnames[map_index]
 		end
 
