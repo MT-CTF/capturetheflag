@@ -50,11 +50,11 @@ local function medkit_heal(playername)
 		end
 
 		-- In case teammates manage to place blocks inside the player while they're healing
-		local pos = player:get_pos()
+		local pos = player:get_pos():offset(0, 0.1, 0)
 		local node_0 = minetest.get_node(pos).name
 		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
 
-		if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
+		if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or minetest.registered_nodes[node_1].walkable then
 			return stop_medkit_heal(playername, "You can't heal while inside blocks")
 		end
 
@@ -95,11 +95,11 @@ local function start_medkit_heal(playername)
 	end
 
 	-- Prevent players from using medkits while inside nodes
-	local pos = player:get_pos()
+	local pos = player:get_pos():offset(0, 0.1, 0)
 	local node_0 = minetest.get_node(pos).name
 	local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
 
-	if minetest.registered_nodes[node_0].walkable or minetest.registered_nodes[node_1].walkable then
+	if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or minetest.registered_nodes[node_1].walkable then
 		return hud_events.new(playername, {
 			text = "You can't heal inside blocks",
 			color = "danger",
