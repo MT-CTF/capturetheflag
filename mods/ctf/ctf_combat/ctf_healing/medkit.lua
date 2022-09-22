@@ -54,7 +54,8 @@ local function medkit_heal(playername)
 		local node_0 = minetest.get_node(pos).name
 		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
 
-		if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or minetest.registered_nodes[node_1].walkable then
+		if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or
+		minetest.registered_nodes[node_1].walkable then
 			return stop_medkit_heal(playername, "You can't heal while inside blocks")
 		end
 
@@ -99,7 +100,8 @@ local function start_medkit_heal(playername)
 	local node_0 = minetest.get_node(pos).name
 	local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
 
-	if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or minetest.registered_nodes[node_1].walkable then
+	if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or
+	minetest.registered_nodes[node_1].walkable then
 		return hud_events.new(playername, {
 			text = "You can't heal inside blocks",
 			color = "danger",
