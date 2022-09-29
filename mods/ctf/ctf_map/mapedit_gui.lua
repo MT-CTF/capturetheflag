@@ -290,6 +290,21 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end,
 		}
 	end
+	ypos = ypos + 1.2
+
+	-- MAP shadows
+	elements.enable_shadows = {
+		type = "field", label = "Map Shadow intensity (0.0-1.0)", pos = {0, ypos},
+		size = {4, 0.7}, default = context[player].enable_shadows or "0.26",
+		func = function(pname, fields)
+			local oldval = context[pname].enable_shadows
+			context[pname].enable_shadows = math.max(0, math.min(1, tonumber(fields.enable_shadows or "0.26")))
+
+			if context[pname].enable_shadows ~= oldval then
+				PlayerObj(pname):set_lighting({shadows = {intensity = context[pname].enable_shadows}})
+			end
+		end,
+	}
 	ypos = ypos + 1.5
 
 	-- MODE SELECTOR

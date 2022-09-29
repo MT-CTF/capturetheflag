@@ -86,12 +86,15 @@ function ctf_modebase.player.remove_initial_stuff(player)
 end
 
 function ctf_modebase.player.update(player)
-	-- Set skyboxes and physics
+	-- Set skyboxes, shadows and physics
 
 	local mode = ctf_modebase:get_current_mode()
 	if mode and ctf_map.current_map then
 		local map = ctf_map.current_map
+
 		skybox.set(player, table.indexof(ctf_map.skyboxes, map.skybox)-1)
+
+		player:set_lighting({shadows = {intensity = map.enable_shadows}})
 
 		physics.set(player:get_player_name(), "ctf_modebase:map_physics", {
 			speed = map.phys_speed,

@@ -125,36 +125,37 @@ function ctf_map.load_map_meta(idx, dirname)
 		end
 	elseif meta:get("map_version") == CURRENT_MAP_VERSION then
 		-- If new items are added also remember to change the table in mapedit_gui.lua
-		-- You should also update the version number too
+		-- The version number should be updated if you change an item
 		local size = minetest.deserialize(meta:get("size"))
 
 		offset.y = -size.y/2
 
 		map = {
-			map_version   = CURRENT_MAP_VERSION,
-			pos1          = offset,
-			pos2          = vector.add(offset, size),
-			offset        = offset,
-			size          = size,
-			dirname       = dirname,
-			enabled       = meta:get("enabled") == "true",
-			name          = meta:get("name"),
-			author        = meta:get("author"),
-			hint          = meta:get("hint"),
-			license       = meta:get("license"),
-			others        = meta:get("others"),
-			initial_stuff = minetest.deserialize(meta:get("initial_stuff")),
-			treasures     = meta:get("treasures"),
-			skybox        = meta:get("skybox"),
-			start_time    = tonumber(meta:get("start_time")),
-			time_speed    = tonumber(meta:get("time_speed")),
-			phys_speed    = tonumber(meta:get("phys_speed")),
-			phys_jump     = tonumber(meta:get("phys_jump")),
-			phys_gravity  = tonumber(meta:get("phys_gravity")),
-			chests        = minetest.deserialize(meta:get("chests")),
-			teams         = minetest.deserialize(meta:get("teams")),
-			barrier_area  = minetest.deserialize(meta:get("barrier_area")),
-			game_modes    = minetest.deserialize(meta:get("game_modes")),
+			map_version    = CURRENT_MAP_VERSION,
+			pos1           = offset,
+			pos2           = vector.add(offset, size),
+			offset         = offset,
+			size           = size,
+			dirname        = dirname,
+			enabled        = meta:get("enabled") == "true",
+			name           = meta:get("name"),
+			author         = meta:get("author"),
+			hint           = meta:get("hint"),
+			license        = meta:get("license"),
+			others         = meta:get("others"),
+			initial_stuff  = minetest.deserialize(meta:get("initial_stuff")),
+			treasures      = meta:get("treasures"),
+			skybox         = meta:get("skybox"),
+			start_time     = tonumber(meta:get("start_time")),
+			time_speed     = tonumber(meta:get("time_speed")),
+			phys_speed     = tonumber(meta:get("phys_speed")),
+			phys_jump      = tonumber(meta:get("phys_jump")),
+			phys_gravity   = tonumber(meta:get("phys_gravity")),
+			chests         = minetest.deserialize(meta:get("chests")),
+			teams          = minetest.deserialize(meta:get("teams")),
+			barrier_area   = minetest.deserialize(meta:get("barrier_area")),
+			game_modes     = minetest.deserialize(meta:get("game_modes")),
+			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
 
 		for id, def in pairs(map.chests) do
@@ -239,26 +240,27 @@ function ctf_map.save_map(mapmeta)
 	mapmeta.barrier_area.pos1 = vector.subtract(mapmeta.barrier_area.pos1, mapmeta.offset)
 	mapmeta.barrier_area.pos2 = vector.subtract(mapmeta.barrier_area.pos2, mapmeta.offset)
 
-	meta:set("map_version"  , CURRENT_MAP_VERSION)
-	meta:set("size"         , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))
-	meta:set("enabled"      , mapmeta.enabled and "true" or "false")
-	meta:set("name"         , mapmeta.name)
-	meta:set("author"       , mapmeta.author)
-	meta:set("hint"         , mapmeta.hint)
-	meta:set("license"      , mapmeta.license)
-	meta:set("others"       , mapmeta.others)
-	meta:set("initial_stuff", minetest.serialize(mapmeta.initial_stuff))
-	meta:set("treasures"    , mapmeta.treasures or "")
-	meta:set("skybox"       , mapmeta.skybox)
-	meta:set("start_time"   , mapmeta.start_time)
-	meta:set("time_speed"   , mapmeta.time_speed)
-	meta:set("phys_speed"   , mapmeta.phys_speed)
-	meta:set("phys_jump"    , mapmeta.phys_jump)
-	meta:set("phys_gravity" , mapmeta.phys_gravity)
-	meta:set("chests"       , minetest.serialize(mapmeta.chests))
-	meta:set("teams"        , minetest.serialize(mapmeta.teams))
-	meta:set("barrier_area" , minetest.serialize(mapmeta.barrier_area))
-	meta:set("game_modes"   , minetest.serialize(mapmeta.game_modes))
+	meta:set("map_version"   , CURRENT_MAP_VERSION)
+	meta:set("size"          , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))
+	meta:set("enabled"       , mapmeta.enabled and "true" or "false")
+	meta:set("name"          , mapmeta.name)
+	meta:set("author"        , mapmeta.author)
+	meta:set("hint"          , mapmeta.hint)
+	meta:set("license"       , mapmeta.license)
+	meta:set("others"        , mapmeta.others)
+	meta:set("initial_stuff" , minetest.serialize(mapmeta.initial_stuff))
+	meta:set("treasures"     , mapmeta.treasures or "")
+	meta:set("skybox"        , mapmeta.skybox)
+	meta:set("start_time"    , mapmeta.start_time)
+	meta:set("time_speed"    , mapmeta.time_speed)
+	meta:set("phys_speed"    , mapmeta.phys_speed)
+	meta:set("phys_jump"     , mapmeta.phys_jump)
+	meta:set("phys_gravity"  , mapmeta.phys_gravity)
+	meta:set("chests"        , minetest.serialize(mapmeta.chests))
+	meta:set("teams"         , minetest.serialize(mapmeta.teams))
+	meta:set("barrier_area"  , minetest.serialize(mapmeta.barrier_area))
+	meta:set("game_modes"    , minetest.serialize(mapmeta.game_modes))
+	meta:set("enable_shadows", mapmeta.enable_shadows)
 
 	meta:write()
 
