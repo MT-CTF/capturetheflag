@@ -1,6 +1,6 @@
 ctf_gui = {
 	ELEM_SIZE = {x = 3, y = 0.7},
-	SCROLLBAR_WIDTH = 0.6,
+	SCROLLBAR_WIDTH = 0.7,
 	FORM_SIZE = {x = 18, y = 13},
 }
 
@@ -171,45 +171,64 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 	if not formdef.header_height then
 		formdef.header_height = 1.6
 	end
+	if not formdef.scroll_extra then
+		formdef.scroll_extra = {}
+	end
+	if not formdef.scroll_pos then
+		formdef.scroll_pos = {}
+	end
 
-	local maxyscroll = 0
+	local maxscroll = {x = 0, y = 0}
 	local formspec = "formspec_version[4]" ..
-			string.format("size[%f,%f]", formdef.size.x, formdef.size.y) ..
+			string.format("size[%f,%f]", formdef.size.x + ctf_gui.SCROLLBAR_WIDTH, formdef.size.y + ctf_gui.SCROLLBAR_WIDTH) ..
 				"hypertext[0,0.2;"..formdef.size.x..","..formdef.header_height..
-					";title;<center><big>"..formdef.title.."</big>\n" ..
-					(formdef.description or "\b") .."</center>]" ..
-				"scroll_container[0.1,"..(formdef.header_height-0.1)..";"
-					..formdef.size.x..","..formdef.size.y..";formcontent;vertical]"
+					";title;<center><big>"..formdef.title.."</big>" ..
+					(formdef.description and ("\n"..formdef.description) or "") .."</center>]"
 
-	local using_scrollbar = false
+	local using_scrollbar = {x = false, y = false}
 	if formdef.elements then
 		for _, def in pairs(formdef.elements) do
 			if def.pos then
 				if not def.pos.x then def.pos.x = def.pos[1] end
 				if not def.pos.y then def.pos.y = def.pos[2] end
 
-				if def.pos.y > maxyscroll then
-					maxyscroll = def.pos.y
+				if not def.size then
+					def.size = ctf_gui.ELEM_SIZE
+				else
+					if not def.size.x then def.size.x = def.size[1] or ctf_gui.ELEM_SIZE.x end
+					if not def.size.y then def.size.y = def.size[2] or ctf_gui.ELEM_SIZE.y end
+				end
+
+				if def.pos.x == "center" then
+					def.pos.x = ( (formdef.size.x-(using_scrollbar.y and ctf_gui.SCROLLBAR_WIDTH or 0)) - def.size.x )/2
+				end
+
+				if def.pos.x + def.size.x > maxscroll.x then
+					maxscroll.x = def.pos.x + def.size.x
+				end
+				if def.pos.y + def.size.y > maxscroll.y then
+					maxscroll.y = def.pos.y + def.size.y
 				end
 			end
 		end
 
-		using_scrollbar = maxyscroll > 10
+		formspec = string.format([[
+			%s
+			scroll_container[0.1,%f;%f,%f;formcontenty;vertical;0.1]
+			scroll_container[0.1,0.1;%f,%f;formcontentx;horizontal;0.1]
+			]],
+			formspec,
+
+			formdef.header_height-0.1,
+			formdef.size.x,
+			formdef.size.y,
+
+			formdef.size.x,
+			maxscroll.y
+		)
 
 		for id, def in pairs(formdef.elements) do
 			id = minetest.formspec_escape(id)
-
-			if not def.size then
-				def.size = ctf_gui.ELEM_SIZE
-			else
-				if not def.size.x then def.size.x = def.size[1] or ctf_gui.ELEM_SIZE.x end
-				if not def.size.y then def.size.y = def.size[2] or ctf_gui.ELEM_SIZE.y end
-			end
-
-
-			if def.pos.x == "center" then
-				def.pos.x = ( (formdef.size.x-(using_scrollbar and ctf_gui.SCROLLBAR_WIDTH or 0)) - def.size.x )/2
-			end
 
 			if def.type == "label" then
 				if def.centered then
@@ -369,23 +388,64 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 					)
 			end
 		end
-	end
-	formspec = formspec .. "scroll_container_end[]"
 
-	-- Add scrollbar if needed
-	if using_scrollbar then
-		if not formdef.scroll_pos then
-			formdef.scroll_pos = 0
-		elseif formdef.scroll_pos == "max" then
-			formdef.scroll_pos = formdef.scrollheight or 500
+		formspec = formspec .. "scroll_container_end[]scroll_container_end[]"
+
+		local extscroll = {
+			x = (maxscroll.x - formdef.size.x) * 10,
+			y = ((maxscroll.y + formdef.header_height) - formdef.size.y) * 10,
+		}
+
+		for _, a in pairs({"x", "y"}) do
+			if not formdef.scroll_pos[a] then
+				formdef.scroll_pos[a] = 0
+			elseif formdef.scroll_pos[a] == "max" then
+				formdef.scroll_pos[a] = extscroll[a] or 0
+			end
+			if not formdef.scroll_extra[a] or formdef.scroll_extra[a] == "max" then
+				formdef.scroll_extra[a] = extscroll[a] or 0
+			end
 		end
 
-		formspec = formspec ..
-				"scrollbaroptions[max=" .. (formdef.scrollheight or 500) ..";]" ..
-				"scrollbar["..formdef.size.x-(ctf_gui.SCROLLBAR_WIDTH - 0.1) ..
-					",1.8;"..(ctf_gui.SCROLLBAR_WIDTH - 0.1)..","..formdef.size.y - 1.8 ..
-					";vertical;formcontent;" .. formdef.scroll_pos ..
-				"]"
+		if formdef.scroll_extra.x ~= "hide" and formdef.scroll_extra.x > 0 then
+			formspec = string.format([[
+				%s
+				box[0,%f;%f,%f;#333333DD]
+				scrollbaroptions[max=%f]
+				scrollbar[0.1,%f;%f,%f;horizontal;formcontentx;%f]
+				]],
+				formspec,
+
+				formdef.size.y+0.1,
+				formdef.size.x + ctf_gui.SCROLLBAR_WIDTH,
+				ctf_gui.SCROLLBAR_WIDTH,
+
+				formdef.scroll_extra.x + 2,
+
+				formdef.size.y+0.2,
+				formdef.size.x,
+				ctf_gui.SCROLLBAR_WIDTH - 0.3,
+				formdef.scroll_pos.x
+			)
+		end
+
+		if formdef.scroll_extra.y ~= "hide" and formdef.scroll_extra.y > 0 then
+			formspec = string.format([[
+				%s
+				scrollbaroptions[max=%f]
+				scrollbar[%f,%f;%f,%f;vertical;formcontenty;%f]
+				]],
+				formspec,
+
+				formdef.scroll_extra.y + 2,
+
+				formdef.size.x+0.2,
+				formdef.header_height,
+				ctf_gui.SCROLLBAR_WIDTH - 0.3,
+				(formdef.size.y + ctf_gui.SCROLLBAR_WIDTH) - (formdef.header_height + 0.1),
+				formdef.scroll_pos.y
+			)
+		end
 	end
 
 	formdef._info = formdef

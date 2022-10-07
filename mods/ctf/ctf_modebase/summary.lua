@@ -180,15 +180,18 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		elements = {
 			rankings = {
 				type = "table",
-				pos = {"center", 1},
-				size = {ctf_gui.FORM_SIZE.x - 1, ctf_gui.FORM_SIZE.y - 1 - (ctf_gui.ELEM_SIZE.y + 3)},
+				pos = {0.1, 1},
+				size = {
+					math.max(ctf_gui.FORM_SIZE.x - 0.2, ((1 + 8 + 16 + table.concat(rank_values, "  ,"):len())) * 0.3),
+					ctf_gui.FORM_SIZE.y - 1 - (ctf_gui.ELEM_SIZE.y + 3)
+				},
 				options = {
 					highlight = "#00000000",
 				},
 				columns = {
-					{type = "text", width = 1},
-					{type = "color"}, -- Player team color
-					{type = "text", width = 16}, -- Player name
+					{type = "text",  width = 1 },
+					{type = "color", width = 8 }, -- Player team color
+					{type = "text",  width = 16}, -- Player name
 					("text;"):rep(#rank_values):sub(1, -2),
 				},
 				rows = {
