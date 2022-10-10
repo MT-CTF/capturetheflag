@@ -10,19 +10,30 @@ minetest.override_chatcommand("msg", {
 			return false, "The player " .. sendto .. " is not online."
 		end
 
+		-- Run the message through filter if it exists
+		if filter and not filter.check_message(name, message) then
+			filter.on_violation(name, message)
+			return false
+		end
+
 		-- Message color
 		local color = minetest.settings:get("ctf_chat.message_color") or "#E043FF"
 		local pteam = ctf_teams.get(name)
 		local tcolor = pteam and ctf_teams.team[pteam].color or "#FFF"
 
-		-- Colorized sender name and message
+		-- Colorize the recepient-side message and send it to the recepient
 		local str =  minetest.colorize(color, "PM from ")
 		str = str .. minetest.colorize(tcolor, name)
 		str = str .. minetest.colorize(color, ": " .. message)
 		minetest.chat_send_player(sendto, str)
 
+		-- Make the sender-side message
+		str = "Message sent to " .. sendto .. ": " .. message
+
 		minetest.log("action", string.format("[CHAT] PM from %s to %s: %s", name, sendto, message))
-		return true, "Message sent."
+
+		-- Send the sender-side message
+		return true, str
 	end
 })
 

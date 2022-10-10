@@ -290,6 +290,21 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end,
 		}
 	end
+	ypos = ypos + 1.2
+
+	-- MAP shadows
+	elements.enable_shadows = {
+		type = "field", label = "Map Shadow intensity (0.0-1.0)", pos = {0, ypos},
+		size = {4, 0.7}, default = context[player].enable_shadows or "0.26",
+		func = function(pname, fields)
+			local oldval = context[pname].enable_shadows
+			context[pname].enable_shadows = math.max(0, math.min(1, tonumber(fields.enable_shadows or "0.26")))
+
+			if context[pname].enable_shadows ~= oldval then
+				PlayerObj(pname):set_lighting({shadows = {intensity = context[pname].enable_shadows}})
+			end
+		end,
+	}
 	ypos = ypos + 1.5
 
 	-- MODE SELECTOR
@@ -307,14 +322,14 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	}
 	elements.available_game_modeslabel = {
 		type = "label",
-		pos = {ctf_gui.FORM_SIZE.x/2 + 0.2, ypos},
+		pos = {ctf_gui.FORM_SIZE.x/2 - 0.2, ypos},
 		label = "Available Modes"
 	}
 	ypos = ypos + 0.3
 	elements["game_modes"] = {
 		type = "textlist",
 		pos = {0, ypos},
-		size = {ctf_gui.FORM_SIZE.x/2 - 0.2, 2},
+		size = {ctf_gui.FORM_SIZE.x/2 - 0.4, 2},
 		items = context[player].game_modes,
 		func = function(pname, fields)
 			local event = minetest.explode_textlist_event(fields.game_modes)
@@ -328,8 +343,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	}
 	elements.available_game_modes = {
 		type = "textlist",
-		pos = {ctf_gui.FORM_SIZE.x/2 + 0.2, ypos},
-		size = {ctf_gui.FORM_SIZE.x/2 - 0.2, 2},
+		pos = {ctf_gui.FORM_SIZE.x/2 - 0.2, ypos},
+		size = {ctf_gui.FORM_SIZE.x/2 - 0.4, 2},
 		items = available_game_modes,
 		func = function(pname, fields)
 			local event = minetest.explode_textlist_event(fields.available_game_modes)
@@ -519,13 +534,14 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		exit = true,
 		label = "Add Chest Zone",
 		pos = {(5 - 0.2) - (ctf_gui.ELEM_SIZE.x / 2), idx},
-		func = function(pname)
+		func = function(pname, fields)
 			table.insert(context[pname].chests, {
 				pos1 = vector.new(),
 				pos2 = vector.new(),
 				amount = ctf_map.DEFAULT_CHEST_AMOUNT,
 			})
-			minetest.after(0.1, ctf_map.show_map_save_form, pname, "max")
+			minetest.after(0.1, ctf_map.show_map_save_form, pname,
+					minetest.explode_scrollbar_event(fields.formcontent).value)
 		end,
 	}
 	idx = idx + 1
@@ -636,15 +652,13 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			end)
 		end,
 	}
-	idx = idx + 1
 
 	-- Show formspec
 	ctf_gui.old_show_formspec(player, "ctf_map:save", {
 		title = "Capture The Flag Map Editor",
 		description = "Save your map or edit the config.\nRemember to press ENTER after writing to a field",
-		scrollheight = 176 + ((idx - 24) * 10) + 4,
 		privs = {ctf_map_editor = true},
 		elements = elements,
-		scroll_pos = scroll_pos or 0,
+		scroll_pos = {y = scroll_pos or 0},
 	})
 end
