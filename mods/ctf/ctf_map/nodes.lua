@@ -133,8 +133,9 @@ local chest_formspec =
 	"listring[current_name;main]" ..
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
+local chestv = "Treasure Chest (visited)"
 
-minetest.register_node("ctf_map:chest", {
+local chest_def = {
 	description = "Treasure Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
@@ -184,8 +185,27 @@ minetest.register_node("ctf_map:chest", {
 
 		local inv = minetest.get_inventory({type = "node", pos = pos})
 		if not inv or inv:is_empty("main") then
-			minetest.set_node(pos, {name="air"})
+			minetest.set_node(pos, {name = "air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
 		end
 	end,
-})
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
+		minetest.get_meta(pos):set_string("infotext", chestv)
+	end
+}
+
+local ochest_def = table.copy(chest_def)
+ochest_def.description = chestv
+ochest_def.tiles = {
+	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
+	"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"}
+ochest_def.light_source = 1
+ochest_def.on_rightclick = nil
+
+minetest.register_node("ctf_map:chest_opened", ochest_def)
+minetest.register_node("ctf_map:chest", chest_def)
