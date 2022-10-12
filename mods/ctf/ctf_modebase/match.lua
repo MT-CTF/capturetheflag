@@ -81,7 +81,7 @@ end
 minetest.register_chatcommand("ctf_next", {
 	description = "Set a new map and mode",
 	privs = {ctf_admin = true},
-	params = "[-f] <mode:technical modename> [technical mapname]",
+	params = "[-f] [mode:technical modename] [technical mapname]",
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_next %s", name, param))
 
