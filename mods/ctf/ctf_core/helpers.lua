@@ -50,36 +50,43 @@ end
 --- STRINGS
 --
 
-function HumanReadable(input)
-	if not input then return input end
+do
+	local format = string.format
+	local gsub   = string.gsub
+	local upper  = string.upper
+	local lower  = string.lower
+	local remove = table.remove
+	local sort   = table.sort
 
-	local out
-	local t = type(input)
+	function HumanReadable(input)
+		if not input then return input end
 
-	if t == "string" then
-		out = string.gsub(input, "(%a)([%w'-]*)", function(a,b)
-			return string.format("%s%s", string.upper(a), string.lower(b))
-		end)
+		local out
+		local t = type(input)
 
-		out = string.gsub(out, "_", " ")
-	elseif t == "table" then -- Only accepts lists
-		input = table.copy(input)
-		table.sort(input)
+		if t == "string" then
+			out = gsub(input, "(%a)([%w'-]*)", function(a,b) return format("%s%s", upper(a), lower(b)) end)
 
-		if #input >= 2 then
-			local last = table.remove(input)
+			out = gsub(out, "_", " ")
+		elseif t == "table" then -- Only accepts lists
+			input = table.copy(input)
+			sort(input)
 
-			for _, i in ipairs(input) do
-				out = string.format("%s%s, ", out or "", HumanReadable(i))
+			if #input >= 2 then
+				local last = remove(input)
+
+				for _, i in ipairs(input) do
+					out = format("%s%s, ", out or "", HumanReadable(i))
+				end
+
+				out = format("%sand %s", out, HumanReadable(last))
+			else
+				out = HumanReadable(input[1]) or "[ERROR]"
 			end
-
-			out = string.format("%sand %s", out, HumanReadable(last))
-		else
-			out = HumanReadable(input[1]) or "[ERROR]"
 		end
-	end
 
-	return out
+		return out
+	end
 end
 
 --

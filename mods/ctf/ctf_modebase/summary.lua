@@ -134,127 +134,122 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if not formdef then formdef = {} end
 	if not formdef.buttons then formdef.buttons = {} end
 
-	minetest.handle_async(
-	function(name_a, rankings_a, special_rankings_a, rank_values_a, formdef_a, form_size_a, elem_size_a, human_readable)
-		local render = function(sorted)
-			for i, ranks in ipairs(sorted) do
-				local color = "white"
+	local render = function(sorted)
+		for i, ranks in ipairs(sorted) do
+			local color = "white"
 
-				if not formdef_a.disable_nonuser_colors then
-					if not ranks._row_color then
-						local team = ctf_teams.get(ranks.pname)
+			if not formdef.disable_nonuser_colors then
+				if not ranks._row_color then
+					local team = ctf_teams.get(ranks.pname)
 
-						if team then
-							color = ctf_teams.team[team].color
-						end
-					else
-						color = ranks._row_color
+					if team then
+						color = ctf_teams.team[team].color
 					end
-				elseif name_a == ranks.pname then
-					color = "gold"
+				else
+					color = ranks._row_color
 				end
-
-				local row = string.format("%d,%s,%s", ranks.number or i, color, ranks.pname)
-
-				for idx, rank in ipairs(rank_values_a) do
-					row = string.format("%s,%s", row, math.round(ranks[rank] or 0))
-				end
-
-				sorted[i] = row
-			end
-		end
-
-		render(rankings_a)
-		render(special_rankings_a)
-
-		if #special_rankings_a >= 1 then
-			if formdef_a.special_row_title then
-				table.insert(special_rankings_a, 1, string.format(
-					",white,%s,%s", formdef_a.special_row_title, human_readable(table.concat(rank_values_a, "  ,"))
-				))
+			elseif name == ranks.pname then
+				color = "gold"
 			end
 
-			table.insert(special_rankings_a, string.rep(",", #rank_values_a+3))
+			local row = string.format("%d,%s,%s", ranks.number or i, color, ranks.pname)
+
+			for idx, rank in ipairs(rank_values) do
+				row = string.format("%s,%s", row, math.round(ranks[rank] or 0))
+			end
+
+			sorted[i] = row
+		end
+	end
+
+	render(rankings)
+	render(special_rankings)
+
+	if #special_rankings >= 1 then
+		if formdef.special_row_title then
+			table.insert(special_rankings, 1, string.format(
+				",white,%s,%s", formdef.special_row_title, HumanReadable(table.concat(rank_values, "  ,"))
+			))
 		end
 
-		local formspec = {
-			title = formdef_a.title or "Summary",
-			elements = {
-				rankings = {
-					type = "table",
-					pos = {0.1, 1},
-					size = {
-						math.max(form_size_a.x - 0.2, ((1 + 8 + 16 + table.concat(rank_values_a, "  ,"):len())) * 0.3),
-						form_size_a.y - 1 - (elem_size_a.y + 3)
-					},
-					options = {
-						highlight = "#00000000",
-					},
-					columns = {
-						{type = "text",  width = 1 },
-						{type = "color", width = 8 }, -- Player team color
-						{type = "text",  width = 16}, -- Player name_a
-						("text;"):rep(#rank_values_a):sub(1, -2),
-					},
-					rows = {
-						#special_rankings_a > 1 and table.concat(special_rankings_a, ",") or "",
-						"white", "Player Name", human_readable(table.concat(rank_values_a, "  ,")),
-						table.concat(rankings_a, ",")
-					}
+		table.insert(special_rankings, string.rep(",", #rank_values+3))
+	end
+
+	local formspec = {
+		title = formdef.title or "Summary",
+		elements = {
+			rankings = {
+				type = "table",
+				pos = {0.1, 1},
+				size = {
+					math.max(ctf_gui.FORM_SIZE.x - 0.2, ((1 + 8 + 16 + table.concat(rank_values, "  ,"):len())) * 0.3),
+					ctf_gui.FORM_SIZE.y - 1 - (ctf_gui.ELEM_SIZE.y + 3)
+				},
+				options = {
+					highlight = "#00000000",
+				},
+				columns = {
+					{type = "text",  width = 1 },
+					{type = "color", width = 8 }, -- Player team color
+					{type = "text",  width = 16}, -- Player name
+					("text;"):rep(#rank_values):sub(1, -2),
+				},
+				rows = {
+					#special_rankings > 1 and table.concat(special_rankings, ",") or "",
+					"white", "Player Name", HumanReadable(table.concat(rank_values, "  ,")),
+					table.concat(rankings, ",")
 				}
 			}
 		}
+	}
 
-		if formdef_a.buttons.next then
-			formspec.elements.next = {
-				type = "button",
-				label = "See Current",
-				pos = {"center", form_size_a.y - (elem_size_a.y + 2.5)},
-				func = function()
-					show_for_player(name_a, false)
-				end,
-			}
-		end
+	if formdef.buttons.next then
+		formspec.elements.next = {
+			type = "button",
+			label = "See Current",
+			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
+			func = function()
+				show_for_player(name, false)
+			end,
+		}
+	end
 
-		if formdef_a.buttons.previous then
-			formspec.elements.previous = {
-				type = "button",
-				label = "See Previous",
-				pos = {"center", form_size_a.y - (elem_size_a.y + 2.5)},
-				func = function()
-					show_for_player(name_a, true)
-				end,
-			}
-		end
+	if formdef.buttons.previous then
+		formspec.elements.previous = {
+			type = "button",
+			label = "See Previous",
+			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
+			func = function()
+				show_for_player(name, true)
+			end,
+		}
+	end
 
-		if formdef_a.game_stat then
-			formspec.elements.game_stat = {
-				type = "label",
-				pos = {11, 0.5},
-				label = formdef_a.game_stat,
-			}
-		end
+	if formdef.game_stat then
+		formspec.elements.game_stat = {
+			type = "label",
+			pos = {11, 0.5},
+			label = formdef.game_stat,
+		}
+	end
 
-		if formdef_a.winner then
-			formspec.elements.winner = {
-				type = "label",
-				pos = {4, 0.5},
-				label = formdef_a.winner,
-			}
-		end
+	if formdef.winner then
+		formspec.elements.winner = {
+			type = "label",
+			pos = {4, 0.5},
+			label = formdef.winner,
+		}
+	end
 
-		if formdef_a.duration then
-			formspec.elements.duration = {
-				type = "label",
-				pos = {1, 0.5},
-				label = "Duration: " .. formdef_a.duration,
-			}
-		end
+	if formdef.duration then
+		formspec.elements.duration = {
+			type = "label",
+			pos = {1, 0.5},
+			label = "Duration: " .. formdef.duration,
+		}
+	end
 
-		return formspec
-	end, function(form_return)
-		ctf_gui.old_show_formspec(name, "ctf_modebase:summary", form_return)
-	end, name, rankings, special_rankings, rank_values, formdef, ctf_gui.FORM_SIZE, ctf_gui.ELEM_SIZE, HumanReadable)
+	ctf_gui.old_show_formspec(name, "ctf_modebase:summary", formspec)
 end
 
 ctf_core.register_chatcommand_alias("summary", "s", {
