@@ -73,6 +73,6 @@ ctf_core.include_files(
 minetest.register_on_mods_loaded(function()
 	table.sort(ctf_modebase.modelist)
 	if ctf_core.settings.server_mode == "play" then
-		ctf_modebase.start_new_match()
+		minetest.after(1, ctf_modebase.start_new_match)
 	end
 end)
