@@ -162,7 +162,6 @@ end
 
 function ctf_gui.old_show_formspec(player, formname, formdef)
 	player = PlayerName(player)
-
 	formdef.formname = formname
 
 	if not formdef.size then
@@ -178,64 +177,98 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 		formdef.scroll_pos = {}
 	end
 
-	local maxscroll = {x = 0, y = 0}
-	local formspec = "formspec_version[4]" ..
-			string.format("size[%f,%f]", formdef.size.x + ctf_gui.SCROLLBAR_WIDTH, formdef.size.y + ctf_gui.SCROLLBAR_WIDTH) ..
-				"hypertext[0,0.2;"..formdef.size.x..","..formdef.header_height..
-					";title;<center><big>"..formdef.title.."</big>" ..
-					(formdef.description and ("\n"..formdef.description) or "") .."</center>]"
+	minetest.handle_async(function(fdef, ELEM_SIZE, SCROLLBAR_WIDTH)
+		local maxscroll = {x = 0, y = 0}
+		local formspec = "formspec_version[4]" ..
+				string.format("size[%f,%f]", fdef.size.x + SCROLLBAR_WIDTH, fdef.size.y + SCROLLBAR_WIDTH) ..
+					"hypertext[0,0.2;"..fdef.size.x..","..fdef.header_height..
+						";title;<center><big>"..fdef.title.."</big>" ..
+						(fdef.description and ("\n"..fdef.description) or "") .."</center>]"
 
-	local using_scrollbar = {x = false, y = false}
-	if formdef.elements then
-		for _, def in pairs(formdef.elements) do
-			if def.pos then
-				if not def.pos.x then def.pos.x = def.pos[1] end
-				if not def.pos.y then def.pos.y = def.pos[2] end
+		local using_scrollbar = {x = false, y = false}
+		if fdef.elements then
+			for _, def in pairs(fdef.elements) do
+				if def.pos then
+					if not def.pos.x then def.pos.x = def.pos[1] end
+					if not def.pos.y then def.pos.y = def.pos[2] end
 
-				if not def.size then
-					def.size = ctf_gui.ELEM_SIZE
-				else
-					if not def.size.x then def.size.x = def.size[1] or ctf_gui.ELEM_SIZE.x end
-					if not def.size.y then def.size.y = def.size[2] or ctf_gui.ELEM_SIZE.y end
-				end
+					if not def.size then
+						def.size = ELEM_SIZE
+					else
+						if not def.size.x then def.size.x = def.size[1] or ELEM_SIZE.x end
+						if not def.size.y then def.size.y = def.size[2] or ELEM_SIZE.y end
+					end
 
-				if def.pos.x == "center" then
-					def.pos.x = ( (formdef.size.x-(using_scrollbar.y and ctf_gui.SCROLLBAR_WIDTH or 0)) - def.size.x )/2
-				end
+					if def.pos.x == "center" then
+						def.pos.x = ( (fdef.size.x-(using_scrollbar.y and SCROLLBAR_WIDTH or 0)) - def.size.x )/2
+					end
 
-				if def.pos.x + def.size.x > maxscroll.x then
-					maxscroll.x = def.pos.x + def.size.x
-				end
-				if def.pos.y + def.size.y > maxscroll.y then
-					maxscroll.y = def.pos.y + def.size.y
+					if def.pos.x + def.size.x > maxscroll.x then
+						maxscroll.x = def.pos.x + def.size.x
+					end
+					if def.pos.y + def.size.y > maxscroll.y then
+						maxscroll.y = def.pos.y + def.size.y
+					end
 				end
 			end
-		end
 
-		formspec = string.format([[
-			%s
-			scroll_container[0.1,%f;%f,%f;formcontenty;vertical;0.1]
-			scroll_container[0.1,0.1;%f,%f;formcontentx;horizontal;0.1]
-			]],
-			formspec,
+			formspec = string.format([[
+				%s
+				scroll_container[0.1,%f;%f,%f;formcontenty;vertical;0.1]
+				scroll_container[0.1,0.1;%f,%f;formcontentx;horizontal;0.1]
+				]],
+				formspec,
 
-			formdef.header_height-0.1,
-			formdef.size.x,
-			formdef.size.y,
+				fdef.header_height-0.1,
+				fdef.size.x,
+				fdef.size.y,
 
-			formdef.size.x,
-			maxscroll.y
-		)
+				fdef.size.x,
+				maxscroll.y
+			)
 
-		for id, def in pairs(formdef.elements) do
-			id = minetest.formspec_escape(id)
+			for id, def in pairs(fdef.elements) do
+				id = minetest.formspec_escape(id)
 
-			if def.type == "label" then
-				if def.centered then
+				if def.type == "label" then
+					if def.centered then
+						formspec = formspec .. string.format(
+							"style[%s;border=false]" ..
+							"button[%f,%d;%f,%f;%s;%s]",
+							id,
+							def.pos.x,
+							def.pos.y,
+							def.size.x,
+							def.size.y,
+							id,
+							minetest.formspec_escape(def.label)
+						)
+					else
+						formspec = formspec .. string.format(
+							"label[%f,%f;%s]",
+							def.pos.x,
+							def.pos.y,
+							minetest.formspec_escape(def.label)
+						)
+					end
+				elseif def.type == "field" then
 					formspec = formspec .. string.format(
-						"style[%s;border=false]" ..
-						"button[%f,%d;%f,%f;%s;%s]",
+						"field_close_on_enter[%s;%s]"..
+						"field[%f,%f;%f,%f;%s;%s;%s]",
 						id,
+						def.close_on_enter == true and "true" or "false",
+						def.pos.x,
+						def.pos.y,
+						def.size.x,
+						def.size.y,
+						id,
+						minetest.formspec_escape(def.label or ""),
+						minetest.formspec_escape(def.default or "")
+					)
+				elseif def.type == "button" then
+					formspec = formspec .. string.format(
+						"button%s[%f,%f;%f,%f;%s;%s]",
+						def.exit and "_exit" or "",
 						def.pos.x,
 						def.pos.y,
 						def.size.x,
@@ -243,215 +276,190 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 						id,
 						minetest.formspec_escape(def.label)
 					)
-				else
+				elseif def.type == "dropdown" then
 					formspec = formspec .. string.format(
-						"label[%f,%f;%s]",
+						"dropdown[%f,%f;%f,%f;%s;%s;%d;%s]",
 						def.pos.x,
 						def.pos.y,
-						minetest.formspec_escape(def.label)
+						def.size.x,
+						def.size.y,
+						id,
+						table.concat(def.items, ","),
+						def.default_idx or 1,
+						def.give_idx and "true" or "false"
 					)
-				end
-			elseif def.type == "field" then
-				formspec = formspec .. string.format(
-					"field_close_on_enter[%s;%s]"..
-					"field[%f,%f;%f,%f;%s;%s;%s]",
-					id,
-					def.close_on_enter == true and "true" or "false",
-					def.pos.x,
-					def.pos.y,
-					def.size.x,
-					def.size.y,
-					id,
-					minetest.formspec_escape(def.label or ""),
-					minetest.formspec_escape(def.default or "")
-				)
-			elseif def.type == "button" then
-				formspec = formspec .. string.format(
-					"button%s[%f,%f;%f,%f;%s;%s]",
-					def.exit and "_exit" or "",
-					def.pos.x,
-					def.pos.y,
-					def.size.x,
-					def.size.y,
-					id,
-					minetest.formspec_escape(def.label)
-				)
-			elseif def.type == "dropdown" then
-				formspec = formspec .. string.format(
-					"dropdown[%f,%f;%f,%f;%s;%s;%d;%s]",
-					def.pos.x,
-					def.pos.y,
-					def.size.x,
-					def.size.y,
-					id,
-					table.concat(def.items, ","),
-					def.default_idx or 1,
-					def.give_idx and "true" or "false"
-				)
-			elseif def.type == "checkbox" then
-				formspec = formspec .. string.format(
-					"checkbox[%f,%f;%s;%s;%s]",
-					def.pos.x,
-					def.pos.y,
-					id,
-					minetest.formspec_escape(def.label),
-					def.default and "true" or "false"
-				)
-			elseif def.type == "textarea" then
-				formspec = formspec .. string.format(
-					"textarea[%f,%f;%f,%f;%s;%s;%s]",
-					def.pos.x,
-					def.pos.y,
-					def.size.x,
-					def.size.y,
-					def.read_only and "" or id,
-					minetest.formspec_escape(def.label or ""),
-					minetest.formspec_escape(def.default or "")
-				)
-			elseif def.type == "image" then
-				formspec = formspec .. string.format(
-					"image[%f,%f;%f,%f;%s]",
-					def.pos.x,
-					def.pos.y,
-					def.size.x,
-					def.size.y,
-					minetest.formspec_escape(def.texture or "")
-				)
-			elseif def.type == "textlist" then
-				if def.items then
-					for k, v in pairs(def.items) do
-						def.items[k] = minetest.formspec_escape(v)
-					end
-				end
-
-				formspec = formspec .. string.format(
-					"textlist[%f,%f;%f,%f;%s;%s;%d;%s]",
-					def.pos.x,
-					def.pos.y,
-					def.size.x,
-					def.size.y,
-					id,
-					def.items and table.concat(def.items, ",") or "",
-					def.default_idx or 1,
-					def.transparent and "true" or "false"
-				)
-			elseif def.type == "table" then
-				if def.options then
-					local tableoptions = {}
-					for name, option in pairs(def.options) do
-						if type(tonumber(name)) ~= "number" then
-							table.insert(tableoptions, string.format("%s=%s", name, option))
-						else
-							table.insert(tableoptions, option)
+				elseif def.type == "checkbox" then
+					formspec = formspec .. string.format(
+						"checkbox[%f,%f;%s;%s;%s]",
+						def.pos.x,
+						def.pos.y,
+						id,
+						minetest.formspec_escape(def.label),
+						def.default and "true" or "false"
+					)
+				elseif def.type == "textarea" then
+					formspec = formspec .. string.format(
+						"textarea[%f,%f;%f,%f;%s;%s;%s]",
+						def.pos.x,
+						def.pos.y,
+						def.size.x,
+						def.size.y,
+						def.read_only and "" or id,
+						minetest.formspec_escape(def.label or ""),
+						minetest.formspec_escape(def.default or "")
+					)
+				elseif def.type == "image" then
+					formspec = formspec .. string.format(
+						"image[%f,%f;%f,%f;%s]",
+						def.pos.x,
+						def.pos.y,
+						def.size.x,
+						def.size.y,
+						minetest.formspec_escape(def.texture or "")
+					)
+				elseif def.type == "textlist" then
+					if def.items then
+						for k, v in pairs(def.items) do
+							def.items[k] = minetest.formspec_escape(v)
 						end
 					end
+
+					formspec = formspec .. string.format(
+						"textlist[%f,%f;%f,%f;%s;%s;%d;%s]",
+						def.pos.x,
+						def.pos.y,
+						def.size.x,
+						def.size.y,
+						id,
+						def.items and table.concat(def.items, ",") or "",
+						def.default_idx or 1,
+						def.transparent and "true" or "false"
+					)
+				elseif def.type == "table" then
+					if def.options then
+						local tableoptions = {}
+						for name, option in pairs(def.options) do
+							if type(tonumber(name)) ~= "number" then
+								table.insert(tableoptions, string.format("%s=%s", name, option))
+							else
+								table.insert(tableoptions, option)
+							end
+						end
+
+						formspec = formspec ..
+							string.format(
+								"tableoptions[%s]",
+								table.concat(tableoptions, ";")
+							)
+					end
+
+					local tablecolumns = {}
+					for _, column in ipairs(def.columns) do
+						if type(column) == "table" then
+							local tc_out = column.type
+
+							column.type = nil
+
+							for k, v in pairs(column) do
+								tc_out = string.format("%s,%s=%s", tc_out, k, minetest.formspec_escape(v))
+							end
+
+							table.insert(tablecolumns, tc_out)
+						else
+							table.insert(tablecolumns, column)
+						end
+					end
+
 
 					formspec = formspec ..
 						string.format(
-							"tableoptions[%s]",
-							table.concat(tableoptions, ";")
+							"tablecolumns[%s]",
+							table.concat(tablecolumns, ";")
+						) ..
+						string.format(
+							"table[%f,%f;%f,%f;%s;%s;%d]",
+							def.pos.x,
+							def.pos.y,
+							def.size.x,
+							def.size.y,
+							id,
+							table.concat(def.rows, ","),
+							def.default_idx or 1
 						)
 				end
+			end
 
-				local tablecolumns = {}
-				for _, column in ipairs(def.columns) do
-					if type(column) == "table" then
-						local tc_out = column.type
+			formspec = formspec .. "scroll_container_end[]scroll_container_end[]"
 
-						column.type = nil
+			local extscroll = {
+				x = (maxscroll.x - fdef.size.x) * 10,
+				y = ((maxscroll.y + fdef.header_height) - fdef.size.y) * 10,
+			}
 
-						for k, v in pairs(column) do
-							tc_out = string.format("%s,%s=%s", tc_out, k, minetest.formspec_escape(v))
-						end
-
-						table.insert(tablecolumns, tc_out)
-					else
-						table.insert(tablecolumns, column)
-					end
+			for _, a in pairs({"x", "y"}) do
+				if not fdef.scroll_pos[a] then
+					fdef.scroll_pos[a] = 0
+				elseif fdef.scroll_pos[a] == "max" then
+					fdef.scroll_pos[a] = extscroll[a] or 0
 				end
+				if not fdef.scroll_extra[a] or fdef.scroll_extra[a] == "max" then
+					fdef.scroll_extra[a] = extscroll[a] or 0
+				end
+			end
 
+			if fdef.scroll_extra.x ~= "hide" and fdef.scroll_extra.x > 0 then
+				formspec = string.format([[
+					%s
+					box[0,%f;%f,%f;#333333DD]
+					scrollbaroptions[max=%f]
+					scrollbar[0.1,%f;%f,%f;horizontal;formcontentx;%f]
+					]],
+					formspec,
 
-				formspec = formspec ..
-					string.format(
-						"tablecolumns[%s]",
-						table.concat(tablecolumns, ";")
-					) ..
-					string.format(
-						"table[%f,%f;%f,%f;%s;%s;%d]",
-						def.pos.x,
-						def.pos.y,
-						def.size.x,
-						def.size.y,
-						id,
-						table.concat(def.rows, ","),
-						def.default_idx or 1
-					)
+					fdef.size.y+0.1,
+					fdef.size.x + SCROLLBAR_WIDTH,
+					SCROLLBAR_WIDTH,
+
+					fdef.scroll_extra.x + 2,
+
+					fdef.size.y+0.2,
+					fdef.size.x,
+					SCROLLBAR_WIDTH - 0.3,
+					fdef.scroll_pos.x
+				)
+			end
+
+			if fdef.scroll_extra.y ~= "hide" and fdef.scroll_extra.y > 0 then
+				formspec = string.format([[
+					%s
+					scrollbaroptions[max=%f]
+					scrollbar[%f,%f;%f,%f;vertical;formcontenty;%f]
+					]],
+					formspec,
+
+					fdef.scroll_extra.y + 2,
+
+					fdef.size.x+0.2,
+					fdef.header_height,
+					SCROLLBAR_WIDTH - 0.3,
+					(fdef.size.y + SCROLLBAR_WIDTH) - (fdef.header_height + 0.1),
+					fdef.scroll_pos.y
+				)
 			end
 		end
 
-		formspec = formspec .. "scroll_container_end[]scroll_container_end[]"
+		return fdef, formspec
+	end,
+	function(fdef, formspec)
+		formdef.scroll_extra = fdef.scroll_extra
+		formdef.scroll_pos = fdef.scroll_pos
 
-		local extscroll = {
-			x = (maxscroll.x - formdef.size.x) * 10,
-			y = ((maxscroll.y + formdef.header_height) - formdef.size.y) * 10,
-		}
+		formdef._info = formdef
+		context[player] = formdef
 
-		for _, a in pairs({"x", "y"}) do
-			if not formdef.scroll_pos[a] then
-				formdef.scroll_pos[a] = 0
-			elseif formdef.scroll_pos[a] == "max" then
-				formdef.scroll_pos[a] = extscroll[a] or 0
-			end
-			if not formdef.scroll_extra[a] or formdef.scroll_extra[a] == "max" then
-				formdef.scroll_extra[a] = extscroll[a] or 0
-			end
-		end
-
-		if formdef.scroll_extra.x ~= "hide" and formdef.scroll_extra.x > 0 then
-			formspec = string.format([[
-				%s
-				box[0,%f;%f,%f;#333333DD]
-				scrollbaroptions[max=%f]
-				scrollbar[0.1,%f;%f,%f;horizontal;formcontentx;%f]
-				]],
-				formspec,
-
-				formdef.size.y+0.1,
-				formdef.size.x + ctf_gui.SCROLLBAR_WIDTH,
-				ctf_gui.SCROLLBAR_WIDTH,
-
-				formdef.scroll_extra.x + 2,
-
-				formdef.size.y+0.2,
-				formdef.size.x,
-				ctf_gui.SCROLLBAR_WIDTH - 0.3,
-				formdef.scroll_pos.x
-			)
-		end
-
-		if formdef.scroll_extra.y ~= "hide" and formdef.scroll_extra.y > 0 then
-			formspec = string.format([[
-				%s
-				scrollbaroptions[max=%f]
-				scrollbar[%f,%f;%f,%f;vertical;formcontenty;%f]
-				]],
-				formspec,
-
-				formdef.scroll_extra.y + 2,
-
-				formdef.size.x+0.2,
-				formdef.header_height,
-				ctf_gui.SCROLLBAR_WIDTH - 0.3,
-				(formdef.size.y + ctf_gui.SCROLLBAR_WIDTH) - (formdef.header_height + 0.1),
-				formdef.scroll_pos.y
-			)
-		end
-	end
-
-	formdef._info = formdef
-	context[player] = formdef
-
-	minetest.show_formspec(player, formdef.formname, formspec)
+		minetest.show_formspec(player, formname, formspec)
+	end,
+	formdef, ctf_gui.ELEM_SIZE, ctf_gui.SCROLLBAR_WIDTH)
 end
 
 dofile(minetest.get_modpath("ctf_gui").."/dev.lua")
