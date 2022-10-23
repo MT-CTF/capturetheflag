@@ -83,7 +83,7 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
-	build_timer = 60,
+	build_timer = 90,
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
 			return true
