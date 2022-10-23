@@ -110,6 +110,7 @@ minetest.override_item("default:apple", {
 		end
 	end,
 	after_place_node = nil,
+	stack_max = 60,
 	on_place = function()
 		return nil
 	end
