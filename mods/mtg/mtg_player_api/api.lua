@@ -142,7 +142,7 @@ function player_api.set_animation(player, anim_name, speed)
 		end
 	end
 	-- Set the animation seen by everyone else
-	player:set_animation(anim, speed, animation_blend)
+	player:set_animation(anim, speed, animation_blend, anim.frame_loop)
 	-- Update related properties if they changed
 	if anim._equals ~= previous_anim._equals then
 		player:set_properties({
