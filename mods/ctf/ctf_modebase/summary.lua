@@ -117,13 +117,15 @@ function ctf_modebase.summary.show_gui(name, rankings, special_rankings, rank_va
 end
 
 local function show_for_player(name, prev)
-	local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get(prev)
-	if not match_rankings then
-		return false
-	end
+	return function()
+		local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get(prev)
+		if not match_rankings then
+			return false
+		end
 
-	ctf_modebase.summary.show_gui(name, match_rankings, special_rankings, rank_values, formdef)
-	return true
+		ctf_modebase.summary.show_gui(name, match_rankings, special_rankings, rank_values, formdef)
+		return true
+	end
 end
 
 ---@param name string Player name
@@ -240,9 +242,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 				type = "button",
 				label = "See Current",
 				pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
-				func = function()
-					show_for_player(name, false)
-				end,
+				func = show_for_player(name, false),
 			}
 		end
 
@@ -251,9 +251,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 				type = "button",
 				label = "See Previous",
 				pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
-				func = function()
-					show_for_player(name, true)
-				end,
+				func = show_for_player(name, true),
 			}
 		end
 
@@ -276,7 +274,7 @@ ctf_core.register_chatcommand_alias("summary", "s", {
 			return false, "Can't understand param " .. dump(param)
 		end
 
-		if not show_for_player(name, prev) then
+		if not show_for_player(name, prev)() then
 			return false, "No match summary!"
 		end
 
