@@ -182,7 +182,7 @@ function player_api.globalstep()
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		local player_data = players[name]
-		local model = models[player_data.model]
+		local model = player_data and models[player_data.model]
 		if model and not player_attached[name] then
 			local controls = player:get_player_control()
 			local animation_speed_mod = model.animation_speed or 30

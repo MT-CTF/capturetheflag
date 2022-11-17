@@ -42,8 +42,20 @@ function email.load()
 		end
 	end
 
-	forward_to = minetest.parse_json(storage:get_string("forward_to")) or {}
-	send_as    = minetest.parse_json(storage:get_string("send_as"))    or {}
+	local forward_to = storage:get_string("forward_to")
+	local send_as = storage:get_string("send_as")
+
+	if forward_to ~= "" then
+		forward_to = minetest.parse_json(forward_to) or {}
+	else
+		forward_to = {}
+	end
+
+	if send_as ~= "" then
+		send_as = minetest.parse_json(send_as) or {}
+	else
+		send_as = {}
+	end
 end
 
 function email.save()

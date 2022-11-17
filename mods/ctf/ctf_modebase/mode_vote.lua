@@ -57,7 +57,7 @@ local function send_formspec()
 			show_modechoose_form(pname)
 		end
 	end
-	formspec_send_timer = minetest.after(1, send_formspec)
+	formspec_send_timer = minetest.after(2, send_formspec)
 end
 
 function ctf_modebase.mode_vote.start_vote()
@@ -78,7 +78,7 @@ function ctf_modebase.mode_vote.start_vote()
 	end
 
 	timer = minetest.after(VOTING_TIME, ctf_modebase.mode_vote.end_vote)
-	formspec_send_timer = minetest.after(1, send_formspec)
+	formspec_send_timer = minetest.after(2, send_formspec)
 end
 
 function ctf_modebase.mode_vote.end_vote()

@@ -1,0 +1,33 @@
+# textdomain: random_messages
+
+To talk to only your team, start your messages with /t. For example, /t Hello team!=Чтобы разговаривать лишь со своей командой, начинайте свои сообщения с /t. Например, /t Привет, команда!
+Use apples to quickly restore your health.=Ешьте яблоки, чтобы быстро восстанавливать здоровье.
+Moving or fighting can avoid an inactivity kick.=Двигайтесь или сражайтесь, чтобы вас не кикнули за неактивность.
+Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag.=Получайте больше очков, убивая больше раз, чем вы умираете. Также очки можно получить за лечение товарищей по команде и захват флагов.
+You gain more score the better the opponent you defeat.=Чем лучше соперник, тем больше очков вы получаете за его убийство.
+Find weapons in chests or mine and use furnaces to make stronger swords.=Находите оружие в сундуках, или добывайте и плавьте ресурсы, чтобы делать более сильные мечи.
+Use team doors (steel) to stop the enemy walking into your base.=Используйте командные двери из стали, чтобы препятствовать врагу на вашей базе.
+Sprint by pressing the fast key (E) when you have stamina.=Если у вас есть стамина, то можно бежать, нажимая кнопку E.
+Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate=Нравится CTF? Можно давать обратную связь через /report, и донатить на rubenwardy.com/donate 
+Want to submit your own map? Visit ctf.rubenwardy.com to get involved.=Хотите предложить свою карту? Зайдите на ctf.rubenwardy.com.
+Using limited resources for building structures that don't strengthen your base's defences is discouraged.=Не рекомендуется использовать скудные ресурсы для сооружений, которые не укрепляют защиту базы.
+To report misbehaving players to moderators, please use /report <name> <action>=Чтобы написать жалобу на нарушителя правил, пожалуйста используйте /report <игрок> <действие>
+Swearing, trolling and being rude will not be tolerated and strict action will be taken.=Мат, троллинг и хамство неприемлемы и строго наказуемы.
+Trapping team mates on purpose is strictly against the rules and you will be kicked immediately.=Захват напарников в ловушки запрещён и карается мгновенным киком.
+Help your team claim victory by storing extra weapons in the team chest, and never taking more than you need.=Помогайте своей команде, складируя лишнее оружие в командном сундуке и не беря из негго больше, чем необходимо.
+Excessive spawn-killing is a direct violation of the rules - appropriate punishments will be given.=Слишком частые убийства на спавне врага являются прямым нарушением правил. Вам будет выдано соотвествующее наказание.
+Use /r to check your rank and other statistics.=Используйте /r, чтобы посмотреть свой ранг и другую статистику.
+Use /r <playername> to check the rankings of another player.= Используйте /r <имя игрока>, чтобы посмотреть ранг другого игрока.
+Use bandages on team-mates to heal them by 3-4 HP if their health is below 15 HP.=Используйте повязки на товарищах по команде, чтобы вылечить их на 3-4 HP, если их здоровье меньше 15 HP.
+Use /m to add a team marker at pointed location, that's visible only to team-mates.=Пропишите /m, чтобы добавить метку, который виден лишь товарищам по команде. 
+Use /summary (or /s) to check scores of the current match and the previous match.=Пропишите /summary (или /s), чтобы посмотреть очки текущего и передущих матчей.
+Strengthen your team by capturing enemy flags.=Помогайте своей команде, захватывая вражеские флаги.
+Hitting your enemy does more damage than not hitting them.=Не бездействуйте, атакуйте врага.
+Use /top50 command to see the leaderboard.=Используйте команду /top50, чтобы увидеть таблицу рейтингов.
+Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.=Используйте /top50 <mode:техническое название режима>, чтобы увидеть таблицу рейтингов для другого режима. Например: /top50 mode:nade_fight.
+To check someone's rank on another mode use /r <mode:technical modename> <playername>. For example: /r mode:nade_fight randomplayer.=Чтобы увидеть чей-то рейтинг в другом режиме, используйте /r <mode:техническое название режима>. Например: /r mode:nade_fight randomplayer.
+To check someone's team use /team player <player_name>.=Чтобы посмотреть, к какой команде принадлежит игрок, используйте /team player <имя игрока>
+You can capture multiple enemy flags at once!=Можно захватить сразу несколько вражеских флагов.
+Consider joining our Discord server at https://discord.gg/vcZTRPX=Вы можете присоединиться к нашему Discord-серверу по ссылке: https://discord.gg/vcZTRPX
+You can press sneak while jumping, to jump up two blocks.=Можно присесть во время прыжка, чтобы прыгнуть на два блока.
+Use /donate <playername> <score> to reward a team-mate for their work.=Пропишите /donate <имя игрока> <количество очка>, чтобы наградить напарника за его работу.

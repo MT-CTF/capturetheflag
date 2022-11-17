@@ -62,20 +62,31 @@ minetest.register_on_mods_loaded(function()
 	minetest.send_join_message = empty_func
 	minetest.send_leave_message = empty_func
 
-	minetest.register_on_joinplayer(function(player, ...)
-		ctf_teams.allocate_player(player, true)
+	minetest.register_on_joinplayer(function(player, last_login)
+		local name = player:get_player_name()
 
-		local pteam = ctf_teams.get(player)
+		minetest.after(0.5, function()
+			player = minetest.get_player_by_name(name)
 
-		if not pteam then
-			old_join_func(player:get_player_name(), ...)
-		else
-			local tcolor = ctf_teams.team[pteam].color
+			if not player then
+				old_join_func(name, last_login)
+				return
+			end
 
-			minetest.chat_send_all(string.format("*** %s joined the game.",
-				minetest.colorize(tcolor, player:get_player_name())
-			))
-		end
+			ctf_teams.allocate_player(player, true)
+
+			local pteam = ctf_teams.get(player)
+
+			if not pteam then
+				old_join_func(player:get_player_name(), last_login)
+			else
+				local tcolor = ctf_teams.team[pteam].color
+
+				minetest.chat_send_all(string.format("*** %s joined the game.",
+					minetest.colorize(tcolor, name))
+				)
+			end
+		end)
 	end)
 
 	minetest.register_on_leaveplayer(function(player, timed_out, ...)

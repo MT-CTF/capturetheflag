@@ -15,7 +15,9 @@ function ctf_map.place_map(mapmeta, callback)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
 		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
 
-		minetest.log("action", string.format("Placed map %s in %.2fms", dirname, (os.clock() - ctx.start_time) * 1000))
+		minetest.log("action", string.format(
+			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - ctx.start_time) / 1000000
+		))
 
 		for name, def in pairs(mapmeta.teams) do
 			local p = def.flag_pos
@@ -38,7 +40,7 @@ function ctf_map.place_map(mapmeta, callback)
 			end
 		end
 
-		minetest.after(3, function()
+		minetest.after(1, function()
 			for _, object_drop in pairs(minetest.get_objects_in_area(mapmeta.pos1, mapmeta.pos2)) do
 				if not object_drop:is_player() then
 					local drop = object_drop:get_luaentity()
@@ -48,11 +50,10 @@ function ctf_map.place_map(mapmeta, callback)
 					end
 				end
 			end
+
+			minetest.after(1, minetest.fix_light, mapmeta.pos1, mapmeta.pos2)
 		end)
 
-		minetest.after(7, function()
-			minetest.fix_light(mapmeta.pos1, mapmeta.pos2)
-		end)
 
 		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 
@@ -78,27 +79,33 @@ function ctf_map.remove_barrier(mapmeta, pos2)
 	pos1, pos2 = vm:read_from_map(pos1, pos2)
 
 	local data = vm:get_data()
-	local Nx = pos2.x - pos1.x + 1
-	local Ny = pos2.y - pos1.y + 1
 
-	for z = pos1.z, pos2.z do
-		for y = pos1.y, pos2.y do
-			for x = pos1.x, pos2.x do
-				local vi = (z - pos1.z) * Ny * Nx + (y - pos1.y) * Nx + (x - pos1.x) + 1
+	-- Shave off ~0.1 seconds from the main loop
+	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
+		local Nx = p2.x - p1.x + 1
+		local Ny = p2.y - p1.y + 1
 
-				for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
-					if data[vi] == barriernode_id then
-						data[vi] = replacement_id
-						break
+		for z = p1.z, p2.z do
+			for y = p1.y, p2.y do
+				for x = p1.x, p2.x do
+					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
+
+					for barriernode_id, replacement_id in pairs(barrier_nodes) do
+						if d[vi] == barriernode_id then
+							d[vi] = replacement_id
+							break
+						end
 					end
 				end
 			end
 		end
-	end
 
-	vm:set_data(data)
-	vm:update_liquids()
-	vm:write_to_map(false)
+		return d
+	end, function(d)
+		vm:set_data(d)
+		vm:update_liquids()
+		vm:write_to_map(false)
+	end, data, pos1, pos2, ctf_map.barrier_nodes)
 end
 
 local ID_AIR = minetest.CONTENT_AIR

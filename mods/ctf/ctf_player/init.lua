@@ -73,7 +73,7 @@ end
 function player_api.globalstep()
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
-		local player_data = get_animation(player)
+		local player_data = get_animation(player) or {}
 		local model = models[player_data.model]
 
 		if model and not player_attached[name] then
