@@ -122,7 +122,9 @@ function hb.get_hudbar_position_index(identifier)
 	end
 end
 
-function hb.register_hudbar(identifier, text_color, label, textures, default_start_value, default_start_max, default_start_hidden, format_string, format_string_config)
+function hb.register_hudbar(identifier, text_color, label, textures, default_start_value, default_start_max,
+	default_start_hidden, format_string, format_string_config)
+
 	minetest.log("action", "hb.register_hudbar: "..tostring(identifier))
 	local hudtable = {}
 	local pos, offset
@@ -171,10 +173,10 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 		format_string_config.format_max_value = "%d"
 	end
 
-	hudtable.add_all = function(player, hudtable, start_value, start_max, start_hidden)
-		if start_value == nil then start_value = hudtable.default_start_value end
-		if start_max == nil then start_max = hudtable.default_start_max end
-		if start_hidden == nil then start_hidden = hudtable.default_start_hidden end
+	hudtable.add_all = function(player, hudtable_, start_value, start_max, start_hidden)
+		if start_value == nil then start_value = hudtable_.default_start_value end
+		if start_max == nil then start_max = hudtable_.default_start_max end
+		if start_hidden == nil then start_hidden = hudtable_.default_start_hidden end
 		local ids = {}
 		local state = {}
 		local name = player:get_player_name()
@@ -265,10 +267,12 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 		state.barlength = hb.value_to_barlength(start_value, start_max)
 
 		local main_error_text =
-			"[hudbars] Bad initial values of HUD bar identifier “"..tostring(identifier).."” for player "..name..". "
+			"[hudbars] Bad initial values of HUD bar identifier “"..
+			tostring(identifier).."” for player "..name..". "
 
 		if start_max < start_value then
-			minetest.log("error", main_error_text.."start_max ("..start_max..") is smaller than start_value ("..start_value..")!")
+			minetest.log("error", main_error_text.."start_max ("..
+				start_max..") is smaller than start_value ("..start_value..")!")
 		end
 		if start_max < 0 then
 			minetest.log("error", main_error_text.."start_max ("..start_max..") is smaller than 0!")
@@ -292,7 +296,7 @@ function hb.register_hudbar(identifier, text_color, label, textures, default_sta
 	hudtable.default_start_max = default_start_max
 
 	hb.hudbars_count= hb.hudbars_count + 1
-	
+
 	hb.hudtables[identifier] = hudtable
 end
 
@@ -303,8 +307,11 @@ function hb.init_hudbar(player, identifier, start_value, start_max, start_hidden
 	return true
 end
 
-function hb.change_hudbar(player, identifier, new_value, new_max_value, new_icon, new_bgicon, new_bar, new_label, new_text_color)
-	if new_value == nil and new_max_value == nil and new_icon == nil and new_bgicon == nil and new_bar == nil and new_label == nil and new_text_color == nil then
+function hb.change_hudbar(player, identifier, new_value, new_max_value, new_icon,
+	new_bgicon, new_bar, new_label, new_text_color)
+
+	if new_value == nil and new_max_value == nil and new_icon == nil and new_bgicon == nil
+		and new_bar == nil and new_label == nil and new_text_color == nil then
 		return true
 	end
 	if not player_exists(player) then
@@ -347,7 +354,8 @@ function hb.change_hudbar(player, identifier, new_value, new_max_value, new_icon
 		end
 		if new_label ~= nil then
 			hudtable.label = new_label
-			local new_text = make_label(hudtable.format_string, hudtable.format_string_config, new_label, hudtable.hudstate[name].value, hudtable.hudstate[name].max)
+			local new_text = make_label(hudtable.format_string, hudtable.format_string_config,
+				new_label, hudtable.hudstate[name].value, hudtable.hudstate[name].max)
 			player:hud_change(hudtable.hudids[name].text, "text", new_text)
 		end
 		if new_text_color ~= nil then
@@ -365,7 +373,8 @@ function hb.change_hudbar(player, identifier, new_value, new_max_value, new_icon
 	local main_error_text =
 		"[hudbars] Bad call to hb.change_hudbar, identifier: “"..tostring(identifier).."”, player name: “"..name.."”. "
 	if new_max_value < new_value then
-		minetest.log("error", main_error_text.."new_max_value ("..new_max_value..") is smaller than new_value ("..new_value..")!")
+		minetest.log("error", main_error_text.."new_max_value ("..new_max_value..
+			") is smaller than new_value ("..new_value..")!")
 	end
 	if new_max_value < 0 then
 		minetest.log("error", main_error_text.."new_max_value ("..new_max_value..") is smaller than 0!")
@@ -391,7 +400,8 @@ function hb.change_hudbar(player, identifier, new_value, new_max_value, new_icon
 			end
 
 			if hb.settings.bar_type == "progress_bar" then
-				local new_text = make_label(hudtable.format_string, hudtable.format_string_config, hudtable.label, new_value, new_max_value)
+				local new_text = make_label(hudtable.format_string, hudtable.format_string_config,
+					hudtable.label, new_value, new_max_value)
 				if new_text ~= hudtable.hudstate[name].text then
 					player:hud_change(hudtable.hudids[name].text, "text", new_text)
 					hudtable.hudstate[name].text = new_text
@@ -436,7 +446,8 @@ function hb.unhide_hudbar(player, identifier)
 		if hudtable.hudstate[name].max ~= 0 then
 			player:hud_change(hudtable.hudids[name].bg, "scale", {x=1,y=1})
 		end
-		player:hud_change(hudtable.hudids[name].text, "text", make_label(hudtable.format_string, hudtable.format_string_config, hudtable.label, value, max))
+		player:hud_change(hudtable.hudids[name].text, "text", make_label(hudtable.format_string,
+			hudtable.format_string_config, hudtable.label, value, max))
 	elseif hb.settings.bar_type == "statbar_modern" then
 		player:hud_change(hudtable.hudids[name].bar, "scale", {x=1,y=1})
 	end
@@ -470,8 +481,10 @@ end
 
 --register built-in HUD bars
 if minetest.settings:get_bool("enable_damage") or hb.settings.forceload_default_hudbars then
-	hb.register_hudbar("health", 0xFFFFFF, S("Health"), { bar = "hudbars_bar_health.png", icon = "hudbars_icon_health.png", bgicon = "hudbars_bgicon_health.png" }, 20, 20, false)
-	hb.register_hudbar("breath", 0xFFFFFF, S("Breath"), { bar = "hudbars_bar_breath.png", icon = "hudbars_icon_breath.png", bgicon = "hudbars_bgicon_breath.png" }, 10, 10, true)
+	hb.register_hudbar("health", 0xFFFFFF, S("Health"), { bar = "hudbars_bar_health.png",
+		icon = "hudbars_icon_health.png", bgicon = "hudbars_bgicon_health.png" }, 20, 20, false)
+	hb.register_hudbar("breath", 0xFFFFFF, S("Breath"), { bar = "hudbars_bar_breath.png",
+		icon = "hudbars_icon_breath.png", bgicon = "hudbars_bgicon_breath.png" }, 10, 10, true)
 end
 
 local function hide_builtin(player)
@@ -516,7 +529,7 @@ local function update_hud(player)
 		--air
 		local breath_max = player:get_properties().breath_max
 		local breath = player:get_breath()
-		
+
 		if breath >= breath_max and hb.settings.autohide_breath == true then
 			hb.hide_hudbar(player, "breath")
 		else

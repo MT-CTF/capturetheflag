@@ -12,7 +12,7 @@ local players = {}
 
 local HUDBAR_REGISTERED
 
-function use_hudbars(player)
+local function use_hudbars(player)
 	return HUDBAR_REGISTERED and ctf_settings.get(player, "use_hudbars") == "true"
 end
 
