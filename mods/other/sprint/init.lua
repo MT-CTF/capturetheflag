@@ -10,7 +10,11 @@ local MIN_SPRINT  = tonumber(minetest.settings:get("sprint_min")       or 0.5)
 
 local players = {}
 
-local SPRINT_HUDBARS_USED
+local HUDBAR_REGISTERED
+
+function use_hudbars(player)
+	return HUDBAR_REGISTERED and ctf_settings.get(player, "use_hudbars") == "true"
+end
 
 -- from https://github.com/rubenwardy/sprint
 if minetest.get_modpath("hudbars") ~= nil then
@@ -18,9 +22,9 @@ if minetest.get_modpath("hudbars") ~= nil then
 		{ bar = "sprint_stamina_bar.png", icon = "sprint_stamina_icon.png" },
 		STAMINA_MAX, STAMINA_MAX,
 		false, nil)
-	SPRINT_HUDBARS_USED = true
+	HUDBAR_REGISTERED = true
 else
-	SPRINT_HUDBARS_USED = false
+	HUDBAR_REGISTERED = false
 end
 
 local function setSprinting(player, sprinting)
@@ -35,7 +39,7 @@ local function setSprinting(player, sprinting)
 end
 
 local function updateHud(player, info)
-	if SPRINT_HUDBARS_USED then
+	if use_hudbars(player) then
 		if info.stamina > STAMINA_MAX then
 			hb.change_hudbar(player, "sprint", STAMINA_MAX)
 		else
@@ -92,7 +96,7 @@ minetest.register_on_joinplayer(function(player)
 		stamina         = STAMINA_MAX, -- integer, the stamina we have left
 	}
 
-	if SPRINT_HUDBARS_USED then
+	if use_hudbars(player) then
 		hb.init_hudbar(player, "sprint")
 	else
 		info.hud = player:hud_add({

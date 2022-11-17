@@ -9,7 +9,7 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	-- If the hudbars mod is installed, we don't need to change the hp bar
-	if minetest.get_modpath("hudbars") == nil then
+	if minetest.get_modpath("hudbars") == nil and ctf_settings.get(player, "use_hudbars") == "false" then
 		player:hud_set_flags({healthbar = false}) -- Hide the builtin HP bar
 		-- Add own HP bar with the same visuals as the builtin one
 		ids[player:get_player_name()] = player:hud_add({

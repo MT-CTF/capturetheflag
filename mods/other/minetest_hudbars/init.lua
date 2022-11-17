@@ -48,7 +48,10 @@ end
 dofile(minetest.get_modpath("hudbars").."/default_settings.lua")
 
 local function player_exists(player)
-	return player ~= nil and player:is_player()
+	-- hack to convince functions that players without hudbars aren't players
+	if player ~= nil and player:is_player() then
+		return ctf_settings.get(player, "use_hudbars") == "true"
+	end
 end
 
 local function make_label(format_string, format_string_config, label, start_value, max_value)
@@ -529,23 +532,27 @@ local function update_hud(player)
 end
 
 minetest.register_on_player_hpchange(function(player)
+	if not player_exists(player) then return end
 	if hb.players[player:get_player_name()] ~= nil then
 		update_health(player)
 	end
 end)
 
 minetest.register_on_respawnplayer(function(player)
+	if not player_exists(player) then return end
 	update_health(player)
 	hb.hide_hudbar(player, "breath")
 end)
 
 minetest.register_on_joinplayer(function(player)
+	if not player_exists(player) then return end
 	hide_builtin(player)
 	custom_hud(player)
 	hb.players[player:get_player_name()] = player
 end)
 
 minetest.register_on_leaveplayer(function(player)
+	if not player_exists(player) then return end
 	hb.players[player:get_player_name()] = nil
 end)
 
