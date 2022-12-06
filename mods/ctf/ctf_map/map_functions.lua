@@ -84,17 +84,26 @@ function ctf_map.remove_barrier(mapmeta, pos2)
 	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
 		local Nx = p2.x - p1.x + 1
 		local Ny = p2.y - p1.y + 1
+		local ID_IGNORE = minetest.CONTENT_IGNORE
+		local ID_AIR = minetest.CONTENT_AIR
 
 		for z = p1.z, p2.z do
 			for y = p1.y, p2.y do
 				for x = p1.x, p2.x do
 					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
+					local done = false
 
 					for barriernode_id, replacement_id in pairs(barrier_nodes) do
 						if d[vi] == barriernode_id then
 							d[vi] = replacement_id
+							done = true
 							break
 						end
+					end
+
+					-- Liquid updates fail if I turn everything but changes into ignore
+					if not done and d[vi] == ID_AIR then
+						d[vi] = ID_IGNORE
 					end
 				end
 			end
