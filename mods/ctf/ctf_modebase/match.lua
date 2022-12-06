@@ -49,12 +49,11 @@ local function start_new_match()
 
 	if restart_on_next_match then
 		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server restarting in 5 seconds..."))
-		minetest.after(5, function()
-			minetest.request_shutdown(
-				"Restarting server at imperator request.\n\nTip: Count to 8 before clicking reconnect",
-				true
-			)
-		end)
+		minetest.request_shutdown(
+			"Restarting server at imperator request.\n\nTip: Count to 8 before clicking reconnect",
+			true, 5
+		)
+
 		return
 	end
 
