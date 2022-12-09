@@ -68,7 +68,7 @@ function random_messages.read_messages()
 		"Consider joining our Discord server at https://discord.gg/vcZTRPX",
 		"You can press sneak while jumping, to jump up two blocks.",
 		"Use /donate <playername> <score> to reward a team-mate for their work.",
-		"Combination of medic and knight can be really deadly for the enemy team(s)"
+		"A medic and knight working together can wreak havoc on the enemy team(s)",
 	}
 end
 
