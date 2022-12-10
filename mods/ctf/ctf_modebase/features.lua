@@ -208,6 +208,8 @@ local item_levels = {
 	"diamond",
 }
 
+local delete_queue = {}
+
 return {
 	on_new_match = function()
 		team_list = {}
@@ -223,6 +225,11 @@ return {
 			map_treasures[k] = v
 		end
 
+		if #delete_queue > 0 then
+			minetest.delete_area(unpack(delete_queue))
+			delete_queue = {}
+		end
+
 		ctf_map.prepare_map_nodes(
 			ctf_map.current_map,
 			function(inv) ctf_map.treasure.treasurefy_node(inv, map_treasures) end,
@@ -232,6 +239,11 @@ return {
 	end,
 	on_match_end = function()
 		recent_rankings.on_match_end()
+
+		if ctf_map.current_map then
+			-- Queue deletion for after the players have left
+			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
+		end
 	end,
 	team_allocator = function(player)
 		player = PlayerName(player)
