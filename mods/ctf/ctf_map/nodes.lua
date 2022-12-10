@@ -109,6 +109,9 @@ for name, def in pairs(minetest.registered_nodes) do
 		if def.drop == name then
 			new_def.drop = new_name
 		end
+		if ctf_core.settings.server_mode ~= "mapedit" and def.drawtype == "normal" and def.walkable ~= false then
+			new_def.damage_per_second = 100
+		end
 		make_immortal(new_def)
 		table.insert(queue, {name = new_name, def = new_def})
 	end
