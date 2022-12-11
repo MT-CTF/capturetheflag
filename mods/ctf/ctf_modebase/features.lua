@@ -226,7 +226,20 @@ return {
 		end
 
 		if #delete_queue > 0 then
-			minetest.delete_area(unpack(delete_queue))
+			local p1, p2 = unpack(delete_queue)
+
+			for _, object_drop in pairs(minetest.get_objects_in_area(p1, p2)) do
+				if not object_drop:is_player() then
+					local drop = object_drop:get_luaentity()
+
+					if drop and drop.name == "__builtin:item" then
+						object_drop:remove()
+					end
+				end
+			end
+
+			minetest.delete_area(p1, p2)
+
 			delete_queue = {}
 		end
 
