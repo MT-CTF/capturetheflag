@@ -54,12 +54,13 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 
 		pos = vector.round(pos)
 
-		if minetest.get_node(vector.offset(pos, 0, 1, 0)).name ~= "air" then
-			local positions = minetest.find_nodes_in_area_under_air(vector.subtract(pos, 2), vector.add(pos, 2), "air")
+		local node = minetest.get_node(vector.offset(pos, 0, 1, 0)).name
+		if node ~= "air" then
+			local nodedef = minetest.registered_nodes[node]
 
-			if not positions or #positions <= 0 then return end
-
-			pos = positions[math.random(#positions)]
+			if nodedef.groups and nodedef.groups.immortal then
+				return
+			end
 		end
 
 		if player:get_pos().y - pos.y >= 22 then
