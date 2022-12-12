@@ -123,7 +123,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			formspec = formspec .. "label[6.5,3;" ..
 				minetest.formspec_escape(minetest.wrap_text(
 					pro_access or "You aren't allowed to access the pro section",
-					36
+					20
 				)) ..
 			"]"
 		end
