@@ -1,6 +1,10 @@
 local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
+local teamchest_open = false
+local openers = {} -- player_name:open_gametime
+local job = nil
+
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
@@ -58,11 +62,20 @@ ctf_modebase.register_mode("classic", {
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 	end,
 	on_new_match = features.on_new_match,
-	on_match_end = features.on_match_end,
+	on_match_end = function()
+		openers = {}
+		features.on_match_end()
+	end,
 	team_allocator = features.team_allocator,
 	on_allocplayer = features.on_allocplayer,
-	on_leaveplayer = features.on_leaveplayer,
-	on_dieplayer = features.on_dieplayer,
+	on_leaveplayer = function(player)
+		openers[player:get_player_name()] = nil
+		features.on_leaveplayer(player)
+	end,
+	on_dieplayer = function(player, reason)
+		openers[player:get_player_name()] = nil
+		features.on_dieplayer(player, reason)
+	end,
 	on_respawnplayer = features.on_respawnplayer,
 	can_take_flag = features.can_take_flag,
 	on_flag_take = features.on_flag_take,
@@ -76,4 +89,39 @@ ctf_modebase.register_mode("classic", {
 	calculate_knockback = function()
 		return 0
 	end,
+	on_teamchest_open = function(opener)
+		minetest.chat_send_all(opener:get_player_name())
+		teamchest_open = true
+		close_teamchest = function()
+			if teamchest_open then
+				now = minetest.get_gametime()
+				for player_name, open_time in pairs(openers) do
+					if (now - open_time) >= 5 then
+						openers[player_name] = nil
+					end
+				end
+				if #openers == 0 then
+					teamchest_open = false
+				end
+			end
+			job = minetest.after(2, close_teamchest)
+		end
+		openers[opener:get_player_name()] = minetest.get_gametime()
+		if job == nil then
+			close_teamchest()
+		end
+	end,
+	on_teamchest_item_take = function(taker, pos, is_enemy)
+		if is_enemy then
+			minetest.sound_play({
+				pos = pos,
+				name = "ctf_teams_steal"
+			}, {})
+		end
+	end,
 })
+
+
+function is_teamchest_open()
+	return teamchest_open
+end

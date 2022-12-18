@@ -120,4 +120,6 @@ ctf_modebase.register_mode("nade_fight", {
 	calculate_knockback = function()
 		return 0
 	end,
+	on_teamchest_open = function(opener) end,
+	on_teamchest_item_take = function(taker, pos, is_enemy) end,
 })

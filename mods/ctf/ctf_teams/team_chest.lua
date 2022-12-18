@@ -73,7 +73,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		local name = player:get_player_name()
 
 		local flag_captured = ctf_modebase.flag_captured[team]
-		if not flag_captured and team ~= ctf_teams.get(name) then
+		if not flag_captured and team ~= ctf_teams.get(name) and not is_teamchest_open() then
 			hud_events.new(player, {
 				quick = true,
 				text = "You're not on team " .. team,
@@ -131,7 +131,9 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		formspec = formspec ..
 			"listring[" .. chestinv ..";main]" ..
 			"listring[current_player;main]"
-
+		if team == ctf_teams.get(name) then
+			ctf_modebase.on_teamchest_open(player)
+		end
 		minetest.show_formspec(name, "ctf_teams:chest",  formspec)
 	end
 
@@ -220,7 +222,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 		local name = player:get_player_name()
 
-		if team ~= ctf_teams.get(name) then
+		if team ~= ctf_teams.get(name) and not is_teamchest_open() then
 			hud_events.new(player, {
 				quick = true,
 				text = "You're not on team " .. team,
@@ -252,6 +254,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			stack:to_string(),
 			minetest.pos_to_string(pos)
 		))
+		ctf_modebase.on_teamchest_item_take(player, pos, team == ctf_teams.get(player:get_player_name()))
 	end
 
 	minetest.register_node("ctf_teams:chest_" .. team, def)
