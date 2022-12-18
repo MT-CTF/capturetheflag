@@ -92,9 +92,9 @@ ctf_modebase.register_mode("classic", {
 	on_teamchest_open = function(opener)
 		minetest.chat_send_all(opener:get_player_name())
 		teamchest_open = true
-		close_teamchest = function()
+		local close_teamchest = function()
 			if teamchest_open then
-				now = minetest.get_gametime()
+				local now = minetest.get_gametime()
 				for player_name, open_time in pairs(openers) do
 					if (now - open_time) >= 5 then
 						openers[player_name] = nil
