@@ -3,6 +3,7 @@ local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 local teamchest_open = false
 local openers = {} -- player_name:open_gametime
+local number_of_openers = 0
 local job = nil
 
 
@@ -90,21 +91,28 @@ ctf_modebase.register_mode("classic", {
 		return 0
 	end,
 	on_teamchest_open = function(opener)
-		minetest.chat_send_all(opener:get_player_name())
+		local pname = opener:get_player_name()
 		teamchest_open = true
-		local close_teamchest = function()
+		close_teamchest = function()
 			if teamchest_open then
 				local now = minetest.get_gametime()
 				for player_name, open_time in pairs(openers) do
 					if (now - open_time) >= 5 then
 						openers[player_name] = nil
+						number_of_openers = number_of_openers - 1
 					end
 				end
-				if #openers == 0 then
+				if number_of_openers <= 0 then
+					-- I've done le instead of eq to cover
+					-- possible bugs in which the var becomes
+					-- negative --farooqkz
 					teamchest_open = false
 				end
 			end
 			job = minetest.after(2, close_teamchest)
+		end
+		if openers[pname] == nil then
+			number_of_openers = number_of_openers + 1
 		end
 		openers[opener:get_player_name()] = minetest.get_gametime()
 		if job == nil then
