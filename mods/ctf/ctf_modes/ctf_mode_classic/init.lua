@@ -123,7 +123,7 @@ ctf_modebase.register_mode("classic", {
 		if is_enemy then
 			minetest.sound_play({
 				pos = pos,
-				name = "ctf_teams_steal"
+				name = "ctf_mode_classic_steal"
 			}, {})
 		end
 	end,
