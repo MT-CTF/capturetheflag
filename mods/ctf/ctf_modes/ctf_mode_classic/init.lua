@@ -65,6 +65,7 @@ ctf_modebase.register_mode("classic", {
 	on_new_match = features.on_new_match,
 	on_match_end = function()
 		openers = {}
+		teamchest_open = false
 		features.on_match_end()
 	end,
 	team_allocator = features.team_allocator,
