@@ -60,7 +60,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		meta:set_string("infotext", string.format("%s Team's Chest", HumanReadable(team)))
 
 		local inv = meta:get_inventory()
-		inv:set_size("main", 4 * 7)
+		inv:set_size("main", 6 * 7)
 		inv:set_size("pro", 4 * 7)
 		inv:set_size("helper", 1 * 1)
 	end
@@ -83,10 +83,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		end
 
 		local formspec = table.concat({
-			"size[8,12]",
-			default.get_hotbar_bg(0,7.85),
-			"list[current_player;main;0,7.85;8,1;]",
-			"list[current_player;main;0,9.08;8,3;8]",
+			"size[10,12]",
+			default.get_hotbar_bg(1,7.85),
+			"list[current_player;main;1,7.85;8,1;]",
+			"list[current_player;main;1,9.08;8,3;8]",
 		}, "")
 
 		local reg_access, pro_access
@@ -110,20 +110,20 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 		local chestinv = "nodemeta:" .. pos.x .. "," .. pos.y .. "," .. pos.z
 
-		formspec = formspec .. "list[" .. chestinv .. ";main;0,0.3;4,7;]" ..
-			"background[4,-0.2;4.15,7.7;ctf_map_pro_section.png;false]"
+		formspec = formspec .. "list[" .. chestinv .. ";main;0,0.3;6,7;]" ..
+			"background[6,-0.2;4.15,7.7;ctf_map_pro_section.png;false]"
 
 		if pro_access == true then
-			formspec = formspec .. "list[" .. chestinv .. ";pro;4,0.3;4,7;]" ..
+			formspec = formspec .. "list[" .. chestinv .. ";pro;6,0.3;4,7;]" ..
 				"listring[" .. chestinv ..";pro]" ..
 				"listring[" .. chestinv .. ";helper]" ..
-				"label[5,-0.2;" ..
+				"label[7,-0.2;" ..
 				minetest.formspec_escape("Pro players only") .. "]"
 		else
-			formspec = formspec .. "label[4.5,3;" ..
+			formspec = formspec .. "label[6.5,3;" ..
 				minetest.formspec_escape(minetest.wrap_text(
 					pro_access or "You aren't allowed to access the pro section",
-					36
+					20
 				)) ..
 			"]"
 		end
