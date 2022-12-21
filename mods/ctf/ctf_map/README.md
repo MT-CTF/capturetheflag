@@ -105,7 +105,7 @@ Areas where chests can be placed. Some maps allow placing chests anywhere, while
 
 1. Press "Finish Editing"
 2. Find the exported map
-3. Move to \[Minetest folder]/games/capturetheflag/mods/ctf/ctf_map/maps
+3. Move to the Minetest folder, which should be similar to `.../games/capturetheflag/mods/ctf/ctf_map/maps`
 
 ### 7. Play
 
