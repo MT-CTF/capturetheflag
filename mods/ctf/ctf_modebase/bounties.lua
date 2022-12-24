@@ -152,7 +152,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 					"label[%d,0.1;%s: %s score]",
 					x,
 					bounty.name,
-					minetest.colorize("cyan", bounty.rewards.score)
+					minetest.colorize("cyan", math.floor(bounty.rewards.score))
 				)
 
 				table.insert(output, label)
