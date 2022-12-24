@@ -124,13 +124,10 @@ end
 --
 
 function ctf_core.register_chatcommand_alias(name, alias, def)
-	minetest.register_chatcommand(name, def)
-	if alias then
-		minetest.register_chatcommand(alias, {
-			description = "An alias for /" .. name,
-			func = def.func,
-		})
-	end
+	minetest.register_chatcommand(name, table.copy(def))
+
+	def.description = "An alias for /" .. name
+	minetest.register_chatcommand(alias, def)
 end
 
 function ctf_core.file_exists(path)
