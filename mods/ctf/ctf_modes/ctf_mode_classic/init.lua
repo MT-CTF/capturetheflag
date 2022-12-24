@@ -1,3 +1,6 @@
+ctf_mode_classic = {}
+
+
 local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
@@ -131,6 +134,6 @@ ctf_modebase.register_mode("classic", {
 })
 
 
-function is_teamchest_open()
+ctf_mode_classic.is_teamchest_open = function()
 	return teamchest_open
 end
