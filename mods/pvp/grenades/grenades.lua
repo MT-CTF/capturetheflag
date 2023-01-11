@@ -55,7 +55,7 @@ local fragdef = {
 			collisiondetection = true,
 			collision_removal = false,
 			vertical = false,
-			texture = "grenades_smoke.png",
+			texture = "grenades_smoke.png^[noalpha",
 		})
 
 		minetest.add_particle({
