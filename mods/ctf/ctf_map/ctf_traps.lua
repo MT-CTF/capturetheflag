@@ -141,7 +141,7 @@ local function damage_cobble_dig(pos, node, digger)
 end
 
 minetest.register_node("ctf_map:damage_cobble", {
-	description = "Cobblestone that damages digger of enemy team",
+	description = "Damage Cobble\n(Damages any enemy that breaks it)",
 	tiles = {"ctf_map_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,
