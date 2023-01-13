@@ -128,3 +128,13 @@ function ctf_teams.chat_send_team(teamname, message)
 		minetest.chat_send_player(player, message)
 	end
 end
+
+
+---@praram player string The player who tries to access teamchest
+---@param teamchest string The team of teamchest
+---@returns bool True if the player can access teamchest
+---                   e.g. if the player is a teammate or
+---                   if the chest is open in classic
+function ctf_teams.can_access_chest(teamchest, player) 
+	return ctf_teams.get(player) == teamchest
+end

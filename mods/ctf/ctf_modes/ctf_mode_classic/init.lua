@@ -94,46 +94,13 @@ ctf_modebase.register_mode("classic", {
 	calculate_knockback = function()
 		return 0
 	end,
-	on_teamchest_open = function(opener)
-		local pname = opener:get_player_name()
-		teamchest_open = true
-		close_teamchest = function()
-			if teamchest_open then
-				local now = minetest.get_gametime()
-				for player_name, open_time in pairs(openers) do
-					if (now - open_time) >= 5 then
-						openers[player_name] = nil
-						number_of_openers = number_of_openers - 1
-					end
-				end
-				if number_of_openers <= 0 then
-					-- I've done le instead of eq to cover
-					-- possible bugs in which the var becomes
-					-- negative --farooqkz
-					teamchest_open = false
-				end
-			end
-			job = minetest.after(2, close_teamchest)
-		end
-		if openers[pname] == nil then
-			number_of_openers = number_of_openers + 1
-		end
-		openers[opener:get_player_name()] = minetest.get_gametime()
-		if job == nil then
-			close_teamchest()
-		end
-	end,
-	on_teamchest_item_take = function(taker, pos, is_enemy)
-		if is_enemy then
-			minetest.sound_play({
-				pos = pos,
-				name = "ctf_mode_classic_steal"
-			}, {})
-		end
-	end,
 })
 
 
-ctf_mode_classic.is_teamchest_open = function()
-	return teamchest_open
+ctf_teams.can_access_chest = function(team, player)
+	if ctf_teams.team_chests[team].open then 
+		return true
+	else
+		return ctf_teams.get(player) == team
+	end
 end

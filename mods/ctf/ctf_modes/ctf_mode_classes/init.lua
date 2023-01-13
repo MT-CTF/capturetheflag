@@ -140,6 +140,4 @@ ctf_modebase.register_mode("classes", {
 			return 0
 		end
 	end,
-	on_teamchest_open = function(opener) end,
-	on_teamchest_item_take = function(taker, pos, is_enemy) end,
 })

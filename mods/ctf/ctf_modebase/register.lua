@@ -186,17 +186,5 @@ function ctf_modebase.match_mode(param)
 end
 
 
-function ctf_modebase.on_teamchest_open(opener)
-	if ctf_modebase.current_mode then
-		ctf_modebase:get_current_mode().on_teamchest_open(opener)
-	end
-end
-
-function ctf_modebase.on_teamchest_item_take(taker, pos, is_enemy)
-	if ctf_modebase.current_mode then
-		ctf_modebase:get_current_mode().on_teamchest_item_take(taker,pos, is_enemy)
-	end
-end
-
 --- end
 --
