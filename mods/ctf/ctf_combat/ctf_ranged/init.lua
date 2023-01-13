@@ -235,7 +235,7 @@ end
 
 ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	type = "pistol",
-	description = "Pistol",
+	description = "Pistol\nDmg: 2 | FR: 0.6s | Mag: 75",
 	texture = "ctf_ranged_pistol.png",
 	fire_sound = "ctf_ranged_pistol",
 	rounds = 75,
@@ -248,7 +248,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	type = "rifle",
-	description = "Rifle",
+	description = "Rifle\nDmg: 1 | FR: 0.8s | Mag: 40",
 	texture = "ctf_ranged_rifle.png",
 	fire_sound = "ctf_ranged_rifle",
 	rounds = 40,
@@ -260,7 +260,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	type = "shotgun",
-	description = "Shotgun",
+	description = "Shotgun\nDmg: 1x28 | FR: 2s | Mag: 10",
 	texture = "ctf_ranged_shotgun.png",
 	fire_sound = "ctf_ranged_shotgun",
 	bullet = {
@@ -275,7 +275,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	type = "smg",
-	description = "Submachinegun",
+	description = "Submachinegun\nDmg: 1 | FR: 0.1s | Mag: 36",
 	texture = "ctf_ranged_smgun.png",
 	fire_sound = "ctf_ranged_pistol",
 	bullet = {
@@ -291,7 +291,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	type = "sniper",
-	description = "Sniper rifle",
+	description = "Sniper rifle\nDmg: 12 | FR: 2s | Mag: 25",
 	texture = "ctf_ranged_sniper_rifle.png",
 	fire_sound = "ctf_ranged_sniper_shot",
 	rounds = 25,
@@ -311,7 +311,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	type = "sniper",
-	description = "Magnum sniper rifle",
+	description = "Magnum sniper rifle\nDmg: 16 | FR: 2s | Mag: 20",
 	texture = "ctf_ranged_sniper_rifle_magnum.png",
 	fire_sound = "ctf_ranged_sniper_shot",
 	rounds = 20,
