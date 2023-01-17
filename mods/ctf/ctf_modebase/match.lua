@@ -50,7 +50,7 @@ local function start_new_match()
 	if restart_on_next_match then
 		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server restarting in 5 seconds..."))
 		minetest.request_shutdown(
-			"Restarting server at imperator request.\n\nTip: Count to 8 before clicking reconnect",
+			"Restarting server at imperator request.\n\nTip: Count to 15 before clicking reconnect",
 			true, 5
 		)
 
@@ -146,26 +146,30 @@ minetest.register_chatcommand("ctf_skip", {
 })
 
 minetest.register_chatcommand("queue_restart", {
-		description = "Queue server restart",
-		privs = {server = true},
-		func = function(name)
-				restart_on_next_match = true
-				minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
-				minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server will restart after this match is over"))
-				return true, "Restart is queued."
-		end
+	description = "Queue server restart",
+	privs = {server = true},
+	func = function(name, param)
+		if not param then param = "" end
+
+		restart_on_next_match = true
+		minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
+		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server will restart after this match is over. " .. param))
+		return true, "Restart is queued."
+	end
 })
 
 minetest.register_chatcommand("unqueue_restart", {
-		description = "Unqueue server restart",
-		privs = {server = true},
-		func = function(name)
-				restart_on_next_match = false
-				minetest.log("action", string.format("[ctf_admin] %s un-queued a restart", name))
+	description = "Unqueue server restart",
+	privs = {server = true},
+	func = function(name, param)
+		if not param then param = "" end
 
-				minetest.chat_send_all(minetest.colorize("red",
-					"[NOTICE] Restart cancelled. Server will NOT restart after this match"
-				))
-				return true, "Restart is cancelled."
-		end
+		restart_on_next_match = false
+		minetest.log("action", string.format("[ctf_admin] %s un-queued a restart", name))
+
+		minetest.chat_send_all(minetest.colorize("red",
+			"[NOTICE] Restart cancelled. Server will NOT restart after this match. " .. param
+		))
+		return true, "Restart is cancelled."
+	end
 })

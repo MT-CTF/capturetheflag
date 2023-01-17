@@ -303,11 +303,11 @@ return {
 		end
 
 		-- Allocate player to remembered team unless they're desperately needed in the other
-		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and kd_diff <= 0.4 and players_diff < 3 then
+		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and kd_diff <= 0.6 and players_diff < 5 then
 			return remembered_team
 		end
 
-		if players_diff == 0 or (kd_diff > 0.2 and players_diff < 2) then
+		if players_diff == 0 or (kd_diff > 0.4 and players_diff < 2) then
 			return worst_kd.t
 		else
 			return worst_players.t
