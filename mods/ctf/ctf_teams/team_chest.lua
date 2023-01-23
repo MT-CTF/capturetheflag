@@ -5,9 +5,8 @@ local blacklist = {
 
 ctf_teams.team_chests = {}
 
-for _, team in pairs(ctf_teams.team) do
+for team, _ in pairs(ctf_teams.team) do
 	ctf_teams.team_chests[team] = {
-		open = false,
 		openers = {},
 	}
 end
@@ -82,8 +81,9 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		local name = player:get_player_name()
 
 		local flag_captured = ctf_modebase.flag_captured[team]
+
+		minetest.chat_send_all(minetest.serialize(ctf_teams.teamchests))
 		if not flag_captured and not ctf_teams.can_access_chest(team, name) then
-			minetest.chat_send_all(minetest.serialize(ctf_teams.teamchests))
 			hud_events.new(player, {
 				quick = true,
 				text = "You're not on team " .. team,
@@ -142,8 +142,13 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			"listring[" .. chestinv ..";main]" ..
 			"listring[current_player;main]"
 		if team == ctf_teams.get(name) then
-			ctf_teams.team_chest[team].open = true
-			ctf_teams.team_chest[team].openers[name] = minetest.get_gmtime()
+			minetest.after(5, function() 
+				for opener_name, open_time in pairs(ctf_teams.team_chests[team].openers) do
+					if (minetest.get_gametime() - open_time) >= 5 then
+						ctf_teams.team_chests[team].openers[opener_name] = nil
+					end
+				end
+			end)
 		end
 		minetest.show_formspec(name, "ctf_teams:chest",  formspec)
 	end
@@ -266,31 +271,11 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			minetest.pos_to_string(pos)
 		))
 		if ctf_teams.get(player:get_player_name()) ~= team then
-			minetest.sound_player({
+			minetest.sound_play({
 				pos = pos,
 				name = "ctf_teams_teamchest_steal",
 			})
 		end
 	end
-	
-	function def.on_timer(pos, elasped)
-		local now = minetest.get_gametime()
-		if not ctf_teams.team_chests[team].open then
-			return
-		end
-		local number_of_openers = 0
-		for opener, open_time in pairs(ctf_teams.team_chests[team].openers) do
-			if (now - open_time) >= 5 then
-				ctf_teams.team_chests[team].openers[opener] = nil
-			else
-				number_of_openers = number_of_openers + 1
-			end
-		end
-		if number_of_openers > 0 then
-			ctf_teams.team_chests[team].open = true
-		end
-		return true
-	end
-
 	minetest.register_node("ctf_teams:chest_" .. team, def)
 end

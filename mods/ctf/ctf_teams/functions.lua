@@ -135,6 +135,6 @@ end
 ---@returns bool True if the player can access teamchest
 ---                   e.g. if the player is a teammate or
 ---                   if the chest is open in classic
-function ctf_teams.can_access_chest(teamchest, player) 
+function ctf_teams.can_access_chest(teamchest, player)
 	return ctf_teams.get(player) == teamchest
 end

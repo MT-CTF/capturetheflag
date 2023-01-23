@@ -5,7 +5,6 @@ local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 local teamchest_open = false
-local openers = {} -- player_name:open_gametime
 local number_of_openers = 0
 local job = nil
 
@@ -98,9 +97,10 @@ ctf_modebase.register_mode("classic", {
 
 
 ctf_teams.can_access_chest = function(team, player)
-	if ctf_teams.team_chests[team].open then 
-		return true
-	else
-		return ctf_teams.get(player) == team
+	local number_of_openers = 0
+	for _, __ in pairs(ctf_teams.team_chests[team]) do
+		number_of_openers = number_of_openers + 1
 	end
+	minetest.chat_send_all(tostring(number_of_openers))
+	return number_of_openers > 0
 end
