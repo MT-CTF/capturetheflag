@@ -200,13 +200,10 @@ local chest_def = {
 
 local ochest_def = table.copy(chest_def)
 ochest_def.description = chestv
-ochest_def.tiles = {
-	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_top.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_side.png^[colorize:#000000:50^[crack:1:1:1",
-	"default_chest_front.png^[colorize:#000000:50^[crack:1:1:1"}
+ochest_def.drawtype = "mesh"
+ochest_def.tiles[5] = "default_chest_front.png"
+ochest_def.tiles[6] = "default_chest_inside.png"
+ochest_def.mesh = "chest_open.obj"
 ochest_def.light_source = 1
 ochest_def.on_rightclick = nil
 
