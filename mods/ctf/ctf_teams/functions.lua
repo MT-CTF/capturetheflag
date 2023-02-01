@@ -75,11 +75,16 @@ function ctf_teams.default_team_allocator(player)
 end
 ctf_teams.team_allocator = ctf_teams.default_team_allocator
 
+---@param player string | ObjectRef
+---@param force boolean [optional]
+---@return nil | string
 function ctf_teams.allocate_player(player, force)
 	player = PlayerName(player)
 	local team = ctf_teams.team_allocator(player)
 
 	ctf_teams.set(player, team, force)
+
+	return team
 end
 
 ---@param teams table
