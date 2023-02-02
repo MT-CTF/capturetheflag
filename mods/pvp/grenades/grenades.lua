@@ -123,78 +123,126 @@ grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 
 local sounds = {}
 local SMOKE_GRENADE_TIME = 30
-grenades.register_grenade("grenades:smoke", {
-	description = "Smoke grenade (Generates smoke around blast site)",
-	image = "grenades_smoke_grenade.png",
-	on_collide = function()
-		return true
-	end,
-	on_explode = function(def, obj, pos, pname)
-		local player = minetest.get_player_by_name(pname)
-		if not player or not pos then return end
 
-		local pteam = ctf_teams.get(pname)
+minetest.register_node("grenades:poison_plant", {
+	drawtype = "airlike",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+})
 
-		if pteam then
-			local fpos = ctf_map.current_map.teams[pteam].flag_pos
-
-			if not fpos then return end
-
-			if vector.distance(pos, fpos) <= 15 then
-				minetest.chat_send_player(pname, "You can't explode smoke grenades so close to your flag!")
-				player:get_inventory():add_item("main", "grenades:smoke")
-				return
+minetest.register_abm({
+	label = "poisoning",
+	nodenames = {"grenades:poison_plant"},
+	interval = 3,
+	chance = 100/90,
+	catch_up = false,
+	action = function(pos, node, active_object_count, w_active_object_count)
+		if active_object_count == 0 then
+			return
+		end
+		local meta = minetest.get_meta(pos)
+		local player = minetest.get_player_by_name(meta:get_string("thrower"))
+		local team = meta:get_string("thrower_team")
+		local objects = minetest.get_objects_inside_radius(pos, 15)
+		for _, object in pairs(objects) do
+			local pname = object:get_player_name()
+			if pname ~= "" and team ~= ctf_teams.get(pname) and pname ~= thrower then
+				local damagee = minetest.get_player_by_name(pname)
+				if damagee then
+					damagee:punch(player, 10, {
+						fleshy = 3,
+					})
+				end
 			end
 		end
-
-		minetest.sound_play("grenades_glasslike_break", {
-			pos = pos,
-			gain = 1.0,
-			max_hear_distance = 32,
-		})
-
-		local hiss = minetest.sound_play("grenades_hiss", {
-			pos = pos,
-			gain = 1.0,
-			loop = true,
-			max_hear_distance = 32,
-		})
-		sounds[hiss] = true
-
-		minetest.after(SMOKE_GRENADE_TIME, function()
-			sounds[hiss] = nil
-			minetest.sound_stop(hiss)
-		end)
-
-		for i = 0, 5, 1 do
-			minetest.add_particlespawner({
-				amount = 40,
-				time = SMOKE_GRENADE_TIME + 3,
-				minpos = vector.subtract(pos, 2),
-				maxpos = vector.add(pos, 2),
-				minvel = {x = 0, y = 2, z = 0},
-				maxvel = {x = 0, y = 3, z = 0},
-				minacc = {x = 1, y = 0.2, z = 1},
-				maxacc = {x = 1, y = 0.2, z = 1},
-				minexptime = 1,
-				maxexptime = 1,
-				minsize = 125,
-				maxsize = 140,
-				collisiondetection = false,
-				collision_removal = false,
-				vertical = false,
-				texture = "grenades_smoke.png^[noalpha",
-			})
-		end
-	end,
-	particle = {
-		image = "grenades_smoke.png",
-		life = 1,
-		size = 4,
-		glow = 0,
-		interval = 0.3,
-	}
+	end
 })
+
+function register_smoke_grenade(name, description, image, damage, particlespawn) 
+	grenades.register_grenade("grenades:"..name, {
+		description = description,
+		image = image, 
+		on_collide = function()
+			return true
+		end,
+		on_explode = function(def, obj, pos, pname)
+			local player = minetest.get_player_by_name(pname)
+			if not player or not pos then return end
+
+			local pteam = ctf_teams.get(pname)
+
+			if pteam then
+				local fpos = ctf_map.current_map.teams[pteam].flag_pos
+
+				if not fpos then return end
+
+				if vector.distance(pos, fpos) <= 15 then
+					minetest.chat_send_player(pname, "You can't explode smoke grenades so close to your flag!")
+					player:get_inventory():add_item("main", "grenades:smoke")
+					return
+				end
+			end
+			
+			minetest.sound_play("grenades_glasslike_break", {
+				pos = pos,
+				gain = 1.0,
+				max_hear_distance = 32,
+			})
+
+			local hiss = minetest.sound_play("grenades_hiss", {
+				pos = pos,
+				gain = 1.0,
+				loop = true,
+				max_hear_distance = 32,
+			})
+			sounds[hiss] = true
+		    if damage then	
+				minetest.set_node(pos, "grenades:poison_plant")
+				local meta = minetest.get_meta(pos)
+				meta:set_string("thrower", pname)
+				meta:set_string("thrower_team", ctf_teams.get(pname))
+			end
+
+			minetest.after(SMOKE_GRENADE_TIME, function()
+				sounds[hiss] = nil
+				minetest.sound_stop(hiss)
+				minetest.set_node(pos, "air")
+			end)
+
+			for i = 0, 5, 1 do
+				minetest.add_particlespawner({
+					amount = 40,
+					time = SMOKE_GRENADE_TIME + 3,
+					minpos = vector.subtract(pos, 2),
+					maxpos = vector.add(pos, 2),
+					minvel = {x = 0, y = 2, z = 0},
+					maxvel = {x = 0, y = 3, z = 0},
+					minacc = {x = 1, y = 0.2, z = 1},
+					maxacc = {x = 1, y = 0.2, z = 1},
+					minexptime = 1,
+					maxexptime = 1,
+					minsize = 125,
+					maxsize = 140,
+					collisiondetection = false,
+					collision_removal = false,
+					vertical = false,
+					texture = particlespawn,
+				})
+			end
+		end,
+		particle = {
+			image = "grenades_smoke.png",
+			life = 1,
+			size = 4,
+			glow = 0,
+			interval = 0.3,
+		}
+	})
+end
+
+register_smoke_grenade("smoke", "Smoke grenade (Generates smoke around blast site)", "grenades_smoke_grenade.png", false, "grenades_smoke.png^[noalpha")
+register_smoke_grenade("poison", "Poison grenade (Generates poisonous smoke around blast site)", "grenades_smoke_grenade.png^[001f00", true, "grenades_smoke.png^[00ff00")
 
 -- Flashbang Grenade
 
