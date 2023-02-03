@@ -88,12 +88,12 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			local itemstack, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
+			local itemstack_, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
 			if placer then
 				local meta = minetest.get_meta(pos)
 				meta:set_string("placer", placer:get_player_name())
 			end
-			return itemstack, pos
+			return itemstack_, pos
 		end
 	})
 end
@@ -107,7 +107,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		end
 		local pattern = "ctf_map:spike_"
 		if string.sub(reason.node, 1, string.len(pattern)) == pattern then
-			-- I'm assuming the spike and the player will be 
+			-- I'm assuming the spike and the player will be
 			-- in the same position
 			local pos = player:get_pos()
 			pos["x"] = math.floor(pos["x"])
