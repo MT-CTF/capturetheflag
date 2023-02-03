@@ -138,20 +138,20 @@ minetest.register_abm({
 	chance = 100/90,
 	catch_up = false,
 	action = function(pos, node, active_object_count, w_active_object_count)
-		if active_object_count == 0 then
-			return
-		end
 		local meta = minetest.get_meta(pos)
 		local player = minetest.get_player_by_name(meta:get_string("thrower"))
 		local team = meta:get_string("thrower_team")
-		local objects = minetest.get_objects_inside_radius(pos, 15)
+		local objects = minetest.get_objects_inside_radius(pos, 7)
 		for _, object in pairs(objects) do
 			local pname = object:get_player_name()
 			if pname ~= "" and team ~= ctf_teams.get(pname) and pname ~= thrower then
 				local damagee = minetest.get_player_by_name(pname)
 				if damagee then
 					damagee:punch(player, 10, {
-						fleshy = 3,
+						damage_groups = {
+							fleshy = 4,
+							poison = 1,
+						},
 					})
 				end
 			end
@@ -159,7 +159,7 @@ minetest.register_abm({
 	end
 })
 
-function register_smoke_grenade(name, description, image, damage, particlespawn) 
+function register_smoke_grenade(name, description, image, damage)
 	grenades.register_grenade("grenades:"..name, {
 		description = description,
 		image = image, 
@@ -198,7 +198,7 @@ function register_smoke_grenade(name, description, image, damage, particlespawn)
 			})
 			sounds[hiss] = true
 		    if damage then	
-				minetest.set_node(pos, "grenades:poison_plant")
+				minetest.set_node(pos, { name = "grenades:poison_plant" })
 				local meta = minetest.get_meta(pos)
 				meta:set_string("thrower", pname)
 				meta:set_string("thrower_team", ctf_teams.get(pname))
@@ -207,8 +207,16 @@ function register_smoke_grenade(name, description, image, damage, particlespawn)
 			minetest.after(SMOKE_GRENADE_TIME, function()
 				sounds[hiss] = nil
 				minetest.sound_stop(hiss)
-				minetest.set_node(pos, "air")
+				minetest.remove_node(pos)
 			end)
+			
+			local p = "grenades_smoke.png^["
+			local particletexture
+			if damage then
+				particletexture = p .. "colorize:" .. ctf_teams["team"][ctf_teams.get(pname)].color .. ":50"
+			else
+				particletexture = p .. "noalpha"
+			end
 
 			for i = 0, 5, 1 do
 				minetest.add_particlespawner({
@@ -227,7 +235,7 @@ function register_smoke_grenade(name, description, image, damage, particlespawn)
 					collisiondetection = false,
 					collision_removal = false,
 					vertical = false,
-					texture = particlespawn,
+					texture = particletexture,
 				})
 			end
 		end,
@@ -241,8 +249,8 @@ function register_smoke_grenade(name, description, image, damage, particlespawn)
 	})
 end
 
-register_smoke_grenade("smoke", "Smoke grenade (Generates smoke around blast site)", "grenades_smoke_grenade.png", false, "grenades_smoke.png^[noalpha")
-register_smoke_grenade("poison", "Poison grenade (Generates poisonous smoke around blast site)", "grenades_smoke_grenade.png^[001f00", true, "grenades_smoke.png^[00ff00")
+register_smoke_grenade("smoke", "Smoke grenade (Generates smoke around blast site)", "grenades_smoke_grenade.png", false)
+register_smoke_grenade("poison", "Poison grenade (Generates poisonous smoke around blast site)", "grenades_smoke_grenade.png^[colorize:#001f00:90", true)
 
 -- Flashbang Grenade
 
