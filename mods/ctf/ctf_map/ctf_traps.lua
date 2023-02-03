@@ -80,7 +80,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		paramtype2 = "meshoptions",
 		sunlight_propagates = true,
 		walkable = false,
-		damage_per_second = 7,
+		damage_per_second = 1,
 		groups = {cracky=1, level=2},
 		drop = "ctf_map:spike",
 		selection_box = {
@@ -88,7 +88,12 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			return minetest.item_place(itemstack, placer, pointed_thing, 34)
+			local itemstack, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
+			if placer then
+				local meta = minetest.get_meta(pos)
+				meta:set_string("placer", placer:get_player_name())
+			end
+			return itemstack, pos
 		end
 	})
 end
@@ -99,6 +104,34 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
+		end
+		local pattern = "ctf_map:spike_"
+		if string.sub(reason.node, 1, string.len(pattern)) == pattern then
+			-- I'm assuming the spike and the player will be 
+			-- in the same position
+			local pos = player:get_pos()
+			pos["x"] = math.floor(pos["x"])
+			pos["y"] = math.floor(pos["y"])
+			pos["z"] = math.floor(pos["z"])
+			local meta = minetest.get_meta(pos)
+			local placer_name = meta:get_string("placer")
+			local spike_team = string.sub(reason.node, string.len(pattern) + 1, -1)
+			if placer_name then
+				minetest.chat_send_all(placer_name)
+				minetest.chat_send_all(spike_team)
+				minetest.chat_send_all(minetest.serialize(placer_name == ""))
+			end
+			if placer_name ~= "" and ctf_teams.get(placer_name) ~= spike_team then
+
+				minetest.chat_send_all(placer_name)
+				local placer = minetest.get_player_by_name(placer_name)
+				player:punch(placer, 10, {
+					damage_groups = {
+						spike = 1,
+						fleshy = 6
+					}
+				})
+			end
 		end
 	end
 

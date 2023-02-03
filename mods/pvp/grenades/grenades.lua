@@ -139,15 +139,16 @@ minetest.register_abm({
 	catch_up = false,
 	action = function(pos, node, active_object_count, w_active_object_count)
 		local meta = minetest.get_meta(pos)
-		local player = minetest.get_player_by_name(meta:get_string("thrower"))
+		local thrower_name = meta:get_string("thrower")
+		local thrower = minetest.get_player_by_name(thrower_name)
 		local team = meta:get_string("thrower_team")
 		local objects = minetest.get_objects_inside_radius(pos, 7)
 		for _, object in pairs(objects) do
 			local pname = object:get_player_name()
-			if pname ~= "" and team ~= ctf_teams.get(pname) and pname ~= thrower then
+			if pname ~= "" and team ~= ctf_teams.get(pname) and pname ~= thrower_name then
 				local damagee = minetest.get_player_by_name(pname)
 				if damagee then
-					damagee:punch(player, 10, {
+					damagee:punch(thrower, 10, {
 						damage_groups = {
 							fleshy = 4,
 							poison = 1,
@@ -159,10 +160,10 @@ minetest.register_abm({
 	end
 })
 
-function register_smoke_grenade(name, description, image, damage)
+local register_smoke_grenade = function(name, description, image, damage)
 	grenades.register_grenade("grenades:"..name, {
 		description = description,
-		image = image, 
+		image = image,
 		on_collide = function()
 			return true
 		end,
@@ -183,7 +184,7 @@ function register_smoke_grenade(name, description, image, damage)
 					return
 				end
 			end
-			
+
 			minetest.sound_play("grenades_glasslike_break", {
 				pos = pos,
 				gain = 1.0,
@@ -197,7 +198,7 @@ function register_smoke_grenade(name, description, image, damage)
 				max_hear_distance = 32,
 			})
 			sounds[hiss] = true
-		    if damage then	
+		    if damage then
 				minetest.set_node(pos, { name = "grenades:poison_plant" })
 				local meta = minetest.get_meta(pos)
 				meta:set_string("thrower", pname)
@@ -209,7 +210,7 @@ function register_smoke_grenade(name, description, image, damage)
 				minetest.sound_stop(hiss)
 				minetest.remove_node(pos)
 			end)
-			
+
 			local p = "grenades_smoke.png^["
 			local particletexture
 			if damage then
@@ -249,8 +250,18 @@ function register_smoke_grenade(name, description, image, damage)
 	})
 end
 
-register_smoke_grenade("smoke", "Smoke grenade (Generates smoke around blast site)", "grenades_smoke_grenade.png", false)
-register_smoke_grenade("poison", "Poison grenade (Generates poisonous smoke around blast site)", "grenades_smoke_grenade.png^[colorize:#001f00:90", true)
+register_smoke_grenade(
+	"smoke",
+	"Smoke grenade (Generates smoke around blast site)",
+	"grenades_smoke_grenade.png",
+	false
+)
+register_smoke_grenade(
+	"poison",
+	"Poison grenade (Generates poisonous smoke around blast site)",
+	"grenades_smoke_grenade.png^[colorize:#001f00:90",
+	true
+)
 
 -- Flashbang Grenade
 
