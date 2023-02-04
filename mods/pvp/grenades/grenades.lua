@@ -124,42 +124,6 @@ grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
 local sounds = {}
 local SMOKE_GRENADE_TIME = 30
 
-minetest.register_node("grenades:poison_plant", {
-	drawtype = "airlike",
-	walkable = false,
-	pointable = false,
-	diggable = false,
-})
-
-minetest.register_abm({
-	label = "poisoning",
-	nodenames = {"grenades:poison_plant"},
-	interval = 3,
-	chance = 100/90,
-	catch_up = false,
-	action = function(pos, node, active_object_count, w_active_object_count)
-		local meta = minetest.get_meta(pos)
-		local thrower_name = meta:get_string("thrower")
-		local thrower = minetest.get_player_by_name(thrower_name)
-		local team = meta:get_string("thrower_team")
-		local objects = minetest.get_objects_inside_radius(pos, 7)
-		for _, object in pairs(objects) do
-			local pname = object:get_player_name()
-			if pname ~= "" and team ~= ctf_teams.get(pname) and pname ~= thrower_name then
-				local damagee = minetest.get_player_by_name(pname)
-				if damagee then
-					damagee:punch(thrower, 10, {
-						damage_groups = {
-							fleshy = 4,
-							poison = 1,
-						},
-					})
-				end
-			end
-		end
-	end
-})
-
 local register_smoke_grenade = function(name, description, image, damage)
 	grenades.register_grenade("grenades:"..name, {
 		description = description,
@@ -199,10 +163,23 @@ local register_smoke_grenade = function(name, description, image, damage)
 			})
 			sounds[hiss] = true
 		    if damage then
-				minetest.set_node(pos, { name = "grenades:poison_plant" })
-				local meta = minetest.get_meta(pos)
-				meta:set_string("thrower", pname)
-				meta:set_string("thrower_team", ctf_teams.get(pname))
+				local function damage_fn(self)
+					local objects = minetest.get_objects_inside_radius(pos, 6)
+					local thrower = minetest.get_player_by_name(pname)
+					for _, object in pairs(objects) do
+						local name = object:get_player_name()
+						if name ~= pname and ctf_teams.get(name) ~= ctf_teams.get(pname) then
+							object:punch(thrower, 10, {
+								damage_groups = {
+									fleshy = 1,
+									poison = 1,
+								}
+							})
+						end
+					end
+					minetest.after(1, self)
+				end
+				damage_fn()
 			end
 
 			minetest.after(SMOKE_GRENADE_TIME, function()
