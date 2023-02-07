@@ -173,7 +173,9 @@ local register_smoke_grenade = function(name, description, image, damage)
 					local thrower = minetest.get_player_by_name(pname)
 					for _, object in pairs(objects) do
 						local dname = object:get_player_name()
-						if dname ~= pname and ctf_teams.get(dname) ~= ctf_teams.get(pname) then
+						local dteam = ctf_teams.get(dname)
+						local pteam = ctf_teams.get(pteam)
+						if dname ~= pname and object:is_player() and dteam ~= pteam then
 							object:punch(thrower, 10, {
 								damage_groups = {
 									fleshy = 1,
