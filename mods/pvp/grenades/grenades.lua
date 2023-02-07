@@ -1,3 +1,8 @@
+local poison_grenades = {} -- This keeps tracks of poison grenade locations
+-- key: minetest.serialize(pos)
+-- value: minetest.get_game_time()
+
+
 local function remove_flora(pos, radius)
 	local pos1 = vector.subtract(pos, radius)
 	local pos2 = vector.add(pos, radius)
@@ -177,8 +182,13 @@ local register_smoke_grenade = function(name, description, image, damage)
 							})
 						end
 					end
-					minetest.after(1, damage_fn)
+					if (minetest.get_gametime() - poison_grenades[minetest.serialize(pos)]) < SMOKE_GRENADE_TIME then
+						minetest.after(1, damage_fn)
+					else
+						poison_grenades[minetest.serialize(pos)] = nil
+					end
 				end
+				poison_grenades[minetest.serialize(pos)] = minetest.get_gametime()
 				damage_fn()
 			end
 
