@@ -174,7 +174,6 @@ local register_smoke_grenade = function(name, description, image, damage)
 					for _, object in pairs(objects) do
 						local dname = object:get_player_name()
 						local dteam = ctf_teams.get(dname)
-						local pteam = ctf_teams.get(pteam)
 						if dname ~= pname and object:is_player() and dteam ~= pteam then
 							object:punch(thrower, 10, {
 								damage_groups = {
