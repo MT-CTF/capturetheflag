@@ -163,7 +163,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			})
 			sounds[hiss] = true
 		    if damage then
-				local function damage_fn(self)
+				local function damage_fn()
 					local objects = minetest.get_objects_inside_radius(pos, 6)
 					local thrower = minetest.get_player_by_name(pname)
 					for _, object in pairs(objects) do
@@ -177,7 +177,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 							})
 						end
 					end
-					minetest.after(1, self)
+					minetest.after(1, damage_fn)
 				end
 				damage_fn()
 			end
