@@ -163,6 +163,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 				max_hear_distance = 32,
 			})
 			sounds[hiss] = true
+			local stop = false
 		    if damage then
 				local function damage_fn()
 					local online_players = minetest.get_connected_players()
