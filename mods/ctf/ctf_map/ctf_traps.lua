@@ -113,7 +113,7 @@ local function damage_cobble_dig(pos, node, digger)
 	if not digger:is_player() then return end
 
 	local digger_name = digger:get_player_name()
-	local digger_team = ctf_teams.get(digger_name) 
+	local digger_team = ctf_teams.get(digger_name)
 
 	local meta = minetest.get_meta(pos)
 	local placer_name = meta:get_string("placer")
