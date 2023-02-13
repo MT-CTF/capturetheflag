@@ -192,7 +192,6 @@ local register_smoke_grenade = function(name, description, image, damage)
 			minetest.after(SMOKE_GRENADE_TIME, function()
 				sounds[hiss] = nil
 				minetest.sound_stop(hiss)
-				minetest.remove_node(pos)
 				stop = true
 			end)
 
