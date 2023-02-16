@@ -120,6 +120,9 @@ local function damage_cobble_dig(pos, node, digger)
 	meta:set_string("placer", "")
 
 	local placer_team = ctf_teams.get(placer_name)
+	if placer_team ~= digger_team and not ctf_modebase.match_started then
+		return
+	end
 
 	if digger_team == placer_team then return end
 
