@@ -3,6 +3,14 @@ local blacklist = {
 	".*leaves$",
 }
 
+ctf_teams.team_chests = {}
+
+for team, _ in pairs(ctf_teams.team) do
+	ctf_teams.team_chests[team] = {
+		openers = {},
+	}
+end
+
 local function get_chest_access(name)
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return false, false end
@@ -73,7 +81,9 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		local name = player:get_player_name()
 
 		local flag_captured = ctf_modebase.flag_captured[team]
-		if not flag_captured and team ~= ctf_teams.get(name) then
+
+		minetest.chat_send_all(minetest.serialize(ctf_teams.teamchests))
+		if not flag_captured and not ctf_teams.can_access_chest(team, name) then
 			hud_events.new(player, {
 				quick = true,
 				text = "You're not on team " .. team,
@@ -131,7 +141,15 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		formspec = formspec ..
 			"listring[" .. chestinv ..";main]" ..
 			"listring[current_player;main]"
-
+		if team == ctf_teams.get(name) then
+			minetest.after(5, function() 
+				for opener_name, open_time in pairs(ctf_teams.team_chests[team].openers) do
+					if (minetest.get_gametime() - open_time) >= 5 then
+						ctf_teams.team_chests[team].openers[opener_name] = nil
+					end
+				end
+			end)
+		end
 		minetest.show_formspec(name, "ctf_teams:chest",  formspec)
 	end
 
@@ -220,7 +238,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 		local name = player:get_player_name()
 
-		if team ~= ctf_teams.get(name) then
+		if not ctf_teams.can_access_chest(team, name) then
 			hud_events.new(player, {
 				quick = true,
 				text = "You're not on team " .. team,
@@ -252,7 +270,12 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			stack:to_string(),
 			minetest.pos_to_string(pos)
 		))
+		if ctf_teams.get(player:get_player_name()) ~= team then
+			minetest.sound_play({
+				pos = pos,
+				name = "ctf_teams_teamchest_steal",
+			})
+		end
 	end
-
 	minetest.register_node("ctf_teams:chest_" .. team, def)
 end
