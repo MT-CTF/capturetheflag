@@ -13,6 +13,8 @@ local function drop_list(pos, inv, list)
 end
 
 function dropondie.drop_all(player)
+	if not ctf_teams.get(player) then return end
+
 	ctf_modebase.player.remove_bound_items(player)
 	ctf_modebase.player.remove_initial_stuff(player)
 
