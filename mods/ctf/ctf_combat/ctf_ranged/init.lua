@@ -254,6 +254,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	rounds = 40,
 	range = 150,
 	damage = 4,
+	automatic = true,
 	fire_interval = 0.8,
 	liquid_travel_dist = 4,
 })
