@@ -157,7 +157,8 @@ local function marker_func(name, param)
 				local itemdef = minetest.registered_items[stack:get_name()]
 
 				-- Fallback to itemstring if description doesn't exist
-				concat = itemdef.description or entity.itemstring
+				-- Only use first line of itemstring
+				concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
 				concat = concat .. " " .. stack:get_count()
 			end
 		end

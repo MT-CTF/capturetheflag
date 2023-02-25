@@ -50,43 +50,36 @@ end
 --- STRINGS
 --
 
-do
-	local format = string.format
-	local gsub   = string.gsub
-	local upper  = string.upper
-	local lower  = string.lower
-	local remove = table.remove
-	local sort   = table.sort
+function HumanReadable(input)
+	if not input then return input end
 
-	function HumanReadable(input)
-		if not input then return input end
+	local out
+	local t = type(input)
 
-		local out
-		local t = type(input)
+	if t == "string" then
+		out = string.gsub(input, "(%a)([%w'-]*)", function(a,b)
+			return string.format("%s%s", string.upper(a), string.lower(b))
+		end)
 
-		if t == "string" then
-			out = gsub(input, "(%a)([%w'-]*)", function(a,b) return format("%s%s", upper(a), lower(b)) end)
+		out = string.gsub(out, "_", " ")
+	elseif t == "table" then -- Only accepts lists
+		input = table.copy(input)
+		table.sort(input)
 
-			out = gsub(out, "_", " ")
-		elseif t == "table" then -- Only accepts lists
-			input = table.copy(input)
-			sort(input)
+		if #input >= 2 then
+			local last = table.remove(input)
 
-			if #input >= 2 then
-				local last = remove(input)
-
-				for _, i in ipairs(input) do
-					out = format("%s%s, ", out or "", HumanReadable(i))
-				end
-
-				out = format("%sand %s", out, HumanReadable(last))
-			else
-				out = HumanReadable(input[1]) or "[ERROR]"
+			for _, i in ipairs(input) do
+				out = string.format("%s%s, ", out or "", HumanReadable(i))
 			end
-		end
 
-		return out
+			out = string.format("%sand %s", out, HumanReadable(last))
+		else
+			out = HumanReadable(input[1]) or "[ERROR]"
+		end
 	end
+
+	return out
 end
 
 --
@@ -131,13 +124,10 @@ end
 --
 
 function ctf_core.register_chatcommand_alias(name, alias, def)
-	minetest.register_chatcommand(name, def)
-	if alias then
-		minetest.register_chatcommand(alias, {
-			description = "An alias for /" .. name,
-			func = def.func,
-		})
-	end
+	minetest.register_chatcommand(name, table.copy(def))
+
+	def.description = "An alias for /" .. name
+	minetest.register_chatcommand(alias, def)
 end
 
 function ctf_core.file_exists(path)

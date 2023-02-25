@@ -12,9 +12,27 @@ local function check_hit(pos1, pos2, obj)
 end
 
 local fragdef_small = table.copy(minetest.registered_craftitems["grenades:frag"].grenade)
+fragdef_small.description = "Firecracker (Hurts anyone near blast)"
+fragdef_small.image = "ctf_mode_nade_fight_firecracker_grenade.png"
 fragdef_small.explode_radius = 4
 fragdef_small.explode_damage = 16
 fragdef_small.clock = 1.7
+
+local old_explode = fragdef_small.on_explode
+fragdef_small.on_explode = function(def, obj, pos, name, ...)
+	local player = minetest.get_player_by_name(name or "")
+
+	if player and pos then
+		local dist = pos.y - player:get_pos().y
+
+		if dist <= -20 then
+			return
+		end
+	end
+
+	return old_explode(def, obj, pos, name, ...)
+end
+
 grenades.register_grenade("ctf_mode_nade_fight:small_frag", fragdef_small)
 
 local tool = {holed = {}}
@@ -22,15 +40,33 @@ local sounds = {}
 
 local black_hole_radius = 4.5
 grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
-	description = "Void Grenade, sucks players in and holds them for a few seconds."..
+	description = "Void Present, sucks players in and freezes them temporarily."..
 			"\nGrenades thrown while sucked in will instantly explode. All damage recieved is doubled",
 	image = "ctf_mode_nade_fight_black_hole_grenade.png",
 	clock = 1.8,
-	on_collide = function()
+	on_collide = function(def, obj)
 		return true
 	end,
 	on_explode = function(def, obj, pos, name)
+		local player = minetest.get_player_by_name(name or "")
+
+		if not player then return end
+
 		pos = vector.round(pos)
+
+		local node = minetest.get_node(vector.offset(pos, 0, 1, 0)).name
+		if node ~= "air" then
+			local nodedef = minetest.registered_nodes[node]
+
+			if nodedef.groups and nodedef.groups.immortal then
+				return
+			end
+		end
+
+		if player:get_pos().y - pos.y >= 22 then
+			return
+		end
+
 		local black_hole = minetest.add_entity(pos, "ctf_mode_nade_fight:black_hole")
 
 		local corners = {-black_hole_radius, black_hole_radius}
@@ -67,7 +103,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 			gain = 1.8,
 			pitch = 0.4,
 			max_hear_distance = black_hole_radius * 3,
-		})
+		}, true)
 
 		local hiss = minetest.sound_play("grenades_hiss", {
 			pos = pos,
@@ -78,7 +114,6 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 		})
 		sounds[hiss] = true
 
-		local player = minetest.get_player_by_name(name)
 		local victims = {}
 
 		for _, v in pairs(minetest.get_objects_inside_radius(pos, black_hole_radius)) do
@@ -160,7 +195,7 @@ local KNOCKBACK_AMOUNT = 40
 local KNOCKBACK_AMOUNT_WITH_FLAG = 25
 local KNOCKBACK_RADIUS = 3.2
 grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
-	description = "Knockback Grenade, Blasts players far away",
+	description = "Knockback Grenade, players within a very small area take extreme knockback",
 	image = "ctf_mode_nade_fight_knockback_grenade.png",
 	clock = 1.8,
 	on_collide = function()
@@ -183,9 +218,15 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 
 		minetest.sound_play("grenades_explode", {
 			pos = pos,
-			gain = 1.5,
-			pitch = 2.2,
+			gain = 0.6,
+			pitch = 3.0,
 			max_hear_distance = KNOCKBACK_RADIUS * 4,
+		}, true)
+		minetest.sound_play("grenades_glasslike_break", {
+			pos = pos,
+			gain = 1.2,
+			pitch = 0.8,
+			max_hear_distance = black_hole_radius * 3,
 		})
 
 		for _, v in pairs(minetest.get_objects_inside_radius(pos, KNOCKBACK_RADIUS)) do

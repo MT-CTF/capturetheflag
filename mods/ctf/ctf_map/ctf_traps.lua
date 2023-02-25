@@ -22,12 +22,18 @@ minetest.register_node("ctf_map:unwalkable_cobble", {
 	groups = {cracky=3, stone=2}
 })
 
+--
+--- Spike Trap
+--
+
 minetest.register_node("ctf_map:spike", {
-	description = "Spike",
+	description = "Spike\n7 DPS",
 	drawtype = "plantlike",
 	tiles = {"ctf_map_spike.png"},
 	inventory_image = "ctf_map_spike.png",
+	use_texture_alpha = "clip",
 	paramtype = "light",
+	paramtype2 = "meshoptions",
 	sunlight_propagates = true,
 	walkable = false,
 	damage_per_second = 7,
@@ -35,8 +41,73 @@ minetest.register_node("ctf_map:spike", {
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-	}
+	},
+	on_place = function(itemstack, placer, pointed_thing)
+		local pteam = ctf_teams.get(placer)
+
+		if pteam then
+			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
+				minetest.chat_send_player(placer:get_player_name(), "You can only place spikes in your own territory!")
+				return itemstack
+			end
+
+			local newitemstack = ItemStack("ctf_map:spike_"..pteam)
+			newitemstack:set_count(itemstack:get_count())
+
+			local result = minetest.item_place(newitemstack, placer, pointed_thing, 34)
+
+			if result then
+				itemstack:set_count(result:get_count())
+			end
+
+			return itemstack
+		end
+
+		return minetest.item_place(itemstack, placer, pointed_thing, 34)
+	end
 })
+
+for _, team in ipairs(ctf_teams.teamlist) do
+	local spikecolor = ctf_teams.team[team].color
+
+	minetest.register_node("ctf_map:spike_"..team, {
+		description = HumanReadable(team).." Team Spike",
+		drawtype = "plantlike",
+		tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
+		inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",
+		use_texture_alpha = "clip",
+		paramtype = "light",
+		paramtype2 = "meshoptions",
+		sunlight_propagates = true,
+		walkable = false,
+		damage_per_second = 7,
+		groups = {cracky=1, level=2},
+		drop = "ctf_map:spike",
+		selection_box = {
+			type = "fixed",
+			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+		},
+		on_place = function(itemstack, placer, pointed_thing)
+			return minetest.item_place(itemstack, placer, pointed_thing, 34)
+		end
+	})
+end
+
+minetest.register_on_player_hpchange(function(player, hp_change, reason)
+	if reason.type == "node_damage" then
+		local team = ctf_teams.get(player)
+
+		if team and reason.node == string.format("ctf_map:spike_%s", team) then
+			return 0, true
+		end
+	end
+
+	return hp_change
+end, true)
+
+--
+-- Damage Cobble
+--
 
 local function damage_cobble_dig(pos, node, digger)
 	if not digger:is_player() then return end
@@ -49,6 +120,9 @@ local function damage_cobble_dig(pos, node, digger)
 	meta:set_string("placer", "")
 
 	local placer_team = ctf_teams.get(placer_name)
+	if placer_team ~= digger_team and not ctf_modebase.match_started then
+		return
+	end
 
 	if digger_team == placer_team then return end
 
@@ -70,7 +144,7 @@ local function damage_cobble_dig(pos, node, digger)
 end
 
 minetest.register_node("ctf_map:damage_cobble", {
-	description = "Cobblestone that damages digger of enemy team",
+	description = "Damage Cobble\n(Damages any enemy that breaks it)",
 	tiles = {"ctf_map_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,

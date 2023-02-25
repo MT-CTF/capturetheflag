@@ -40,20 +40,22 @@ end
 local function start_new_match()
 	local path = minetest.get_worldpath() .. "/queue_restart.txt"
 	if ctf_core.file_exists(path) then
-		assert(os.remove(path))
+		os.remove(path)
 		restart_on_next_match = true
-	end
-
-	if restart_on_next_match then
-		minetest.request_shutdown(
-			"Restarting server at imperator request.\n\nTip: Count to 7 before clicking reconnect",
-			true
-		)
-		return
 	end
 
 	ctf_modebase.in_game = false
 	ctf_modebase.on_match_end()
+
+	if restart_on_next_match then
+		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server restarting in 5 seconds..."))
+		minetest.request_shutdown(
+			"Restarting server at imperator request.\n\nTip: Count to 15 before clicking reconnect",
+			true, 5
+		)
+
+		return
+	end
 
 	if ctf_modebase.mode_on_next_match then
 		ctf_modebase.current_mode_matches_played = 0
@@ -81,7 +83,7 @@ end
 minetest.register_chatcommand("ctf_next", {
 	description = "Set a new map and mode",
 	privs = {ctf_admin = true},
-	params = "[-f] <mode:technical modename> <technical mapname>",
+	params = "[-f] [mode:technical modename] [technical mapname]",
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_next %s", name, param))
 
@@ -144,21 +146,30 @@ minetest.register_chatcommand("ctf_skip", {
 })
 
 minetest.register_chatcommand("queue_restart", {
-		description = "Queue server restart",
-		privs = {server = true},
-		func = function(name)
-				restart_on_next_match = true
-				minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
-				return true, "Restart is queued."
-		end
+	description = "Queue server restart",
+	privs = {server = true},
+	func = function(name, param)
+		if not param then param = "" end
+
+		restart_on_next_match = true
+		minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
+		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server will restart after this match is over. " .. param))
+		return true, "Restart is queued."
+	end
 })
 
 minetest.register_chatcommand("unqueue_restart", {
-		description = "Unqueue server restart",
-		privs = {server = true},
-		func = function(name)
-				restart_on_next_match = false
-				minetest.log("action", string.format("[ctf_admin] %s un-queued a restart", name))
-				return true, "Restart is cancelled."
-		end
+	description = "Unqueue server restart",
+	privs = {server = true},
+	func = function(name, param)
+		if not param then param = "" end
+
+		restart_on_next_match = false
+		minetest.log("action", string.format("[ctf_admin] %s un-queued a restart", name))
+
+		minetest.chat_send_all(minetest.colorize("red",
+			"[NOTICE] Restart cancelled. Server will NOT restart after this match. " .. param
+		))
+		return true, "Restart is cancelled."
+	end
 })

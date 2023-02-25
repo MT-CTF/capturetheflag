@@ -36,8 +36,9 @@ ctf_modebase.register_mode("classes", {
 	treasures = {
 		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:torch"       ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
-		["default:cobble"      ] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 5},
-		["default:wood"        ] = {min_count = 10, max_count = 60, rarity = 0.5, max_stacks = 4},
+
+		["default:cobble"      ] = {min_count = 50, max_count = 99, rarity = 0.3, max_stacks = 2},
+		["default:wood"        ] = {min_count = 50, max_count = 99, rarity = 0.2, max_stacks = 2},
 
 		["ctf_teams:door_steel"] = {rarity = 0.2, max_stacks = 3},
 
@@ -53,7 +54,7 @@ ctf_modebase.register_mode("classes", {
 		["ctf_map:unwalkable_dirt"  ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
 		["ctf_map:unwalkable_stone" ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
 		["ctf_map:unwalkable_cobble"] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
-		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 3, rarity = 0.2},
+		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 2, rarity = 0.2},
 		["ctf_map:damage_cobble"    ] = {min_count = 5, max_count = 20, max_stacks = 2, rarity = 0.2},
 		["ctf_map:reinforced_cobble"] = {min_count = 5, max_count = 25, max_stacks = 2, rarity = 0.2},
 		["ctf_map:landmine"         ] = {min_count = 1, max_count =  5, max_stacks = 1, rarity = 0.2},
@@ -84,7 +85,7 @@ ctf_modebase.register_mode("classes", {
 		"deaths",
 		"hp_healed"
 	},
-	build_timer = 60,
+	build_timer = 90,
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
 			return true
@@ -102,6 +103,10 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 
 		ctf_cosmetics.get_skin = function(player)
+			if not ctf_teams.get(player) then
+				return old_get_skin(player)
+			end
+
 			return old_get_skin(player) .. classes.get_skin_overlay(player)
 		end
 	end,

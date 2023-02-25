@@ -174,7 +174,7 @@ local function player_vote(name, vote)
 	return true
 end
 
-minetest.register_chatcommand("yes", {
+ctf_core.register_chatcommand_alias("yes", "y", {
 	description = "Vote yes",
 	privs = {interact = true},
 	func = function(name, params)
@@ -182,7 +182,7 @@ minetest.register_chatcommand("yes", {
 	end
 })
 
-minetest.register_chatcommand("no", {
+ctf_core.register_chatcommand_alias("no", "n", {
 	description = "Vote no",
 	privs = {interact = true},
 	func = function(name, params)
@@ -190,7 +190,7 @@ minetest.register_chatcommand("no", {
 	end
 })
 
-minetest.register_chatcommand("abstain", {
+ctf_core.register_chatcommand_alias("abstain", "abs", {
 	description = "Vote third party",
 	privs = {interact = true},
 	func = function(name, params)

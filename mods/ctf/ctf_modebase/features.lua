@@ -209,6 +209,8 @@ local item_levels = {
 	"diamond",
 }
 
+local delete_queue = {}
+
 return {
 	on_new_match = function()
 		team_list = {}
@@ -224,6 +226,24 @@ return {
 			map_treasures[k] = v
 		end
 
+		if #delete_queue > 0 then
+			local p1, p2 = unpack(delete_queue)
+
+			for _, object_drop in pairs(minetest.get_objects_in_area(p1, p2)) do
+				if not object_drop:is_player() then
+					local drop = object_drop:get_luaentity()
+
+					if drop and drop.name == "__builtin:item" then
+						object_drop:remove()
+					end
+				end
+			end
+
+			minetest.delete_area(p1, p2)
+
+			delete_queue = {}
+		end
+
 		ctf_map.prepare_map_nodes(
 			ctf_map.current_map,
 			function(inv) ctf_map.treasure.treasurefy_node(inv, map_treasures) end,
@@ -233,6 +253,11 @@ return {
 	end,
 	on_match_end = function()
 		recent_rankings.on_match_end()
+
+		if ctf_map.current_map then
+			-- Queue deletion for after the players have left
+			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
+		end
 	end,
 	team_allocator = function(player)
 		player = PlayerName(player)
@@ -279,11 +304,11 @@ return {
 		end
 
 		-- Allocate player to remembered team unless they're desperately needed in the other
-		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and kd_diff <= 0.4 and players_diff < 3 then
+		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and kd_diff <= 0.6 and players_diff < 5 then
 			return remembered_team
 		end
 
-		if players_diff == 0 or (kd_diff > 0.2 and players_diff < 2) then
+		if players_diff == 0 or (kd_diff > 0.4 and players_diff < 2) then
 			return worst_kd.t
 		else
 			return worst_players.t

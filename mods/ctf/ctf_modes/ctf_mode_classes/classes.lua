@@ -188,7 +188,7 @@ local scoped = ctf_ranged.scoped
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "classes_rifle",
 	description = "Scout Rifle\n" .. minetest.colorize("gold",
-			"Rightclick + (Sneak/Run) to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown), otherwise will toggle scope"),
+			"(Sneak/Run) + Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown), otherwise will toggle scope"),
 	texture = "ctf_mode_classes_ranged_rifle.png",
 	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
 	wield_texture = "ctf_mode_classes_ranged_rifle.png",

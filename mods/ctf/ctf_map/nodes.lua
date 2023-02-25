@@ -109,6 +109,9 @@ for name, def in pairs(minetest.registered_nodes) do
 		if def.drop == name then
 			new_def.drop = new_name
 		end
+		if ctf_core.settings.server_mode ~= "mapedit" and def.drawtype == "normal" and def.walkable ~= false then
+			new_def.damage_per_second = 100
+		end
 		make_immortal(new_def)
 		table.insert(queue, {name = new_name, def = new_def})
 	end
@@ -133,8 +136,9 @@ local chest_formspec =
 	"listring[current_name;main]" ..
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
+local chestv = "Treasure Chest (visited)"
 
-minetest.register_node("ctf_map:chest", {
+local chest_def = {
 	description = "Treasure Chest",
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
@@ -184,8 +188,24 @@ minetest.register_node("ctf_map:chest", {
 
 		local inv = minetest.get_inventory({type = "node", pos = pos})
 		if not inv or inv:is_empty("main") then
-			minetest.set_node(pos, {name="air"})
+			minetest.set_node(pos, {name = "air"})
 			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
 		end
 	end,
-})
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
+		minetest.get_meta(pos):set_string("infotext", chestv)
+	end
+}
+
+local ochest_def = table.copy(chest_def)
+ochest_def.description = chestv
+ochest_def.drawtype = "mesh"
+ochest_def.tiles[5] = "default_chest_front.png"
+ochest_def.tiles[6] = "default_chest_inside.png"
+ochest_def.mesh = "chest_open.obj"
+ochest_def.light_source = 1
+ochest_def.on_rightclick = nil
+
+minetest.register_node("ctf_map:chest_opened", ochest_def)
+minetest.register_node("ctf_map:chest", chest_def)
