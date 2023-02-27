@@ -250,7 +250,7 @@ register_smoke_grenade(
 register_smoke_grenade(
 	"poison",
 	"Poison grenade (Generates poisonous smoke around blast site)",
-	"grenades_smoke_grenade.png^[colorize:#001f00:90",
+	"grenades_smoke_grenade.png^[colorize:#015f01:90",
 	true
 )
 
