@@ -128,7 +128,7 @@ minetest.register_on_punchplayer(function(player, hitter, _, _, _, damage)
 		local pname = player:get_player_name()
 		local hname = hitter:is_player() and hitter:get_player_name()
 
-		if hname and ctf_teams.get(pname) == ctf_teams.get(hname) then return end
+		if hname and ctf_teams.get(pname) and ctf_teams.get(pname) == ctf_teams.get(hname) then return end
 
 		if healing_players[pname] then
 			stop_medkit_heal(pname, "Someone is attacking you")

@@ -69,6 +69,10 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
 
+	local team1, team2 = ctf_teams.get(player), ctf_teams.get(hitter)
+
+	if not team1 and not team2 then return end
+
 	local real_damage, error = current_mode.on_punchplayer(
 		player, hitter, damage, time_from_last_punch, tool_capabilities, dir
 	)
@@ -88,10 +92,14 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	return true
 end)
 
-ctf_healing.register_on_heal(function(...)
+ctf_healing.register_on_heal(function(player, patient, ...)
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return true end
-	return current_mode.on_healplayer(...)
+	local team1, team2 = ctf_teams.get(player), ctf_teams.get(patient)
+
+	if not team1 and not team2 then return end
+
+	return current_mode.on_healplayer(player, patient, ...)
 end)
 
 function ctf_modebase.on_flag_rightclick(...)
