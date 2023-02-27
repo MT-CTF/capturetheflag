@@ -166,14 +166,13 @@ local register_smoke_grenade = function(name, description, image, damage)
 			local stop = false
 		    if damage then
 				local function damage_fn()
-					local online_players = minetest.get_connected_players()
 					local thrower = minetest.get_player_by_name(pname)
-					for _, object in pairs(online_players) do
-						if vector.distance(object:get_pos(), pos) <= 6 then
-							local dname = object:get_player_name()
+					for _, target in pairs(minetest.get_connected_players()) do
+						if vector.distance(target:get_pos(), pos) <= 6 then
+							local dname = target:get_player_name()
 							local dteam = ctf_teams.get(dname)
-							if dname ~= pname and object:is_player() and dteam ~= pteam then
-								object:punch(thrower, 10, {
+							if dname ~= pname and dteam ~= pteam then
+								target:punch(thrower, 10, {
 									damage_groups = {
 										fleshy = 1,
 										poison = 1,
@@ -192,14 +191,13 @@ local register_smoke_grenade = function(name, description, image, damage)
 			minetest.after(SMOKE_GRENADE_TIME, function()
 				sounds[hiss] = nil
 				minetest.sound_stop(hiss)
-				minetest.remove_node(pos)
 				stop = true
 			end)
 
 			local p = "grenades_smoke.png^["
 			local particletexture
-			if damage then
-				particletexture = p .. "colorize:" .. ctf_teams["team"][ctf_teams.get(pname)].color .. ":50"
+			if pteam and damage then
+				particletexture = p .. "colorize:" .. ctf_teams.team[pteam].color .. ":50"
 			else
 				particletexture = p .. "noalpha"
 			end
