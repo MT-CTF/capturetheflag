@@ -137,16 +137,24 @@ local register_smoke_grenade = function(name, description, image, damage)
 			if not player or not pos then return end
 
 			local pteam = ctf_teams.get(pname)
+			local duration_multiplier = 1
+			-- it gets multiplied with the default duration
 
 			if pteam then
 				local fpos = ctf_map.current_map.teams[pteam].flag_pos
 
 				if not fpos then return end
+				for _, team in pairs(ctf_map.current_map) do
+					local distance_from_flag = vector.distance(pos, team.flag_pos)
+					if distance_from_flag <= 15 then
+						minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
+						player:get_inventory():add_item("main", "grenades:"..name)
+						return
+					end
 
-				if vector.distance(pos, fpos) <= 15 then
-					minetest.chat_send_player(pname, "You can't explode smoke grenades so close to your flag!")
-					player:get_inventory():add_item("main", "grenades:"..name)
-					return
+					if distance_from_flag <= 25 then
+						duration_multiplier = 10 / distance_from_flag
+					end
 				end
 			end
 
@@ -188,7 +196,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 				damage_fn()
 			end
 
-			minetest.after(SMOKE_GRENADE_TIME, function()
+			minetest.after(SMOKE_GRENADE_TIME * duration_multiplier, function()
 				sounds[hiss] = nil
 				minetest.sound_stop(hiss)
 				stop = true
