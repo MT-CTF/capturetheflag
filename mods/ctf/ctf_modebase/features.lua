@@ -347,7 +347,7 @@ return {
 	end,
 	on_flag_drop = function(player, teamnames, pteam)
 		local pname = player:get_player_name()
-		local tcolor = ctf_teams.team[pteam].color
+		local tcolor = pteam and ctf_teams.team[pteam].color or "#FFF"
 
 		local text = " has dropped the flag"
 		if many_teams then
