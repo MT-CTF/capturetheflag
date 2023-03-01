@@ -76,3 +76,7 @@ minetest.register_on_mods_loaded(function()
 		minetest.after(1, ctf_modebase.start_new_match)
 	end
 end)
+
+minetest.override_chatcommand("pulverize", {
+	privs = {creative = true},
+})
