@@ -148,9 +148,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 							minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
 							player:get_inventory():add_item("main", "grenades:"..name)
 							return
-						end
-
-						if distance_from_flag <= 25 then
+						elseif distance_from_flag <= 25 then
 							duration_multiplier = 10 / distance_from_flag
 						end
 					end
