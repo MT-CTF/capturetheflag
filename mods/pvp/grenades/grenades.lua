@@ -141,15 +141,15 @@ local register_smoke_grenade = function(name, description, image, damage)
 			-- it gets multiplied with the default duration
 
 			if pteam then
-				for _, team in pairs(ctf_map.current_map.teams) do
+				for flagteam, team in pairs(ctf_map.current_map.teams) do
 					if team.flag_pos then
 						local distance_from_flag = vector.distance(pos, team.flag_pos)
-						if distance_from_flag <= 15 then
+						if distance_from_flag <= 15 and (damage or pteam == flagteam) then
 							minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
 							player:get_inventory():add_item("main", "grenades:"..name)
 							return
-						elseif distance_from_flag <= 25 then
-							duration_multiplier = 10 / distance_from_flag
+						elseif damage and distance_from_flag <= 26 then
+							duration_multiplier = 0.5
 						end
 					end
 				end
@@ -169,7 +169,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			})
 			sounds[hiss] = true
 			local stop = false
-		    if damage then
+			if damage then
 				local function damage_fn()
 					local thrower = minetest.get_player_by_name(pname)
 					for _, target in pairs(minetest.get_connected_players()) do
@@ -210,7 +210,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			for i = 0, 5, 1 do
 				minetest.add_particlespawner({
 					amount = 40,
-					time = SMOKE_GRENADE_TIME + 3,
+					time = (SMOKE_GRENADE_TIME * duration_multiplier) + (damage and 1 or 3),
 					minpos = vector.subtract(pos, 2),
 					maxpos = vector.add(pos, 2),
 					minvel = {x = 0, y = 2, z = 0},
@@ -229,7 +229,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			end
 		end,
 		particle = {
-			image = "grenades_smoke.png",
+			image = "grenades_smoke.png^[multiply:#00ff00",
 			life = 1,
 			size = 4,
 			glow = 0,
@@ -247,7 +247,7 @@ register_smoke_grenade(
 register_smoke_grenade(
 	"poison",
 	"Poison grenade (Generates poisonous smoke around blast site)",
-	"grenades_smoke_grenade.png^[colorize:#015f01:90",
+	"grenades_smoke_grenade.png^[multiply:#00ff00",
 	true
 )
 
