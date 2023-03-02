@@ -40,6 +40,8 @@ local function get_weapon_image(hitter, tool_capabilities)
 
 	if tool_capabilities.damage_groups.ranged then
 		image = image .. "^[transformFX"
+	elseif tool_capabilities.damage_groups.poison_grenade then
+		image = "grenades_smoke_grenade.png^[multiply:#00ff00"
 	end
 
 	return image

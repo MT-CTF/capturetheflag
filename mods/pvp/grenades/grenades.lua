@@ -180,7 +180,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 								target:punch(thrower, 10, {
 									damage_groups = {
 										fleshy = 1,
-										poison = 1,
+										poison_grenade = 1,
 									}
 								})
 							end
