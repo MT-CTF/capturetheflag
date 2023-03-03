@@ -172,20 +172,24 @@ local register_smoke_grenade = function(name, description, image, damage)
 			if damage then
 				local function damage_fn()
 					local thrower = minetest.get_player_by_name(pname)
-					for _, target in pairs(minetest.get_connected_players()) do
-						if vector.distance(target:get_pos(), pos) <= 6 then
-							local dname = target:get_player_name()
-							local dteam = ctf_teams.get(dname)
-							if dname ~= pname and dteam ~= pteam then
-								target:punch(thrower, 10, {
-									damage_groups = {
-										fleshy = 1,
-										poison_grenade = 1,
-									}
-								})
+
+					if thrower then
+						for _, target in pairs(minetest.get_connected_players()) do
+							if vector.distance(target:get_pos(), pos) <= 6 then
+								local dname = target:get_player_name()
+								local dteam = ctf_teams.get(dname)
+								if dname ~= pname and dteam ~= pteam then
+									target:punch(thrower, 10, {
+										damage_groups = {
+											fleshy = 1,
+											poison_grenade = 1,
+										}
+									})
+								end
 							end
 						end
 					end
+
 					if not stop then
 						minetest.after(1, damage_fn)
 					end
