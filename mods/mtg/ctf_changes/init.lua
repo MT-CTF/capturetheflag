@@ -126,6 +126,48 @@ local function furnace_on_destruct(pos)
 	end
 end
 
+for _, name in pairs({
+	"doors:door_steel",
+	"xpanes:door_steel_bar",
+}) do
+	for _, variant in pairs({"_a", "_b", "_c", "_d"}) do
+		local old_on_construct = minetest.registered_nodes[name..variant].on_construct
+
+		minetest.override_item(name..variant, {
+			on_construct = function(pos, ...)
+				minetest.after(0, function()
+					local meta = minetest.get_meta(pos)
+
+					meta:set_string("owner", "")
+					meta:set_string("infotext", "")
+				end)
+
+				return old_on_construct and old_on_construct(pos, ...)
+			end
+		})
+	end
+end
+
+for _, name in pairs({
+	"doors:trapdoor_steel",
+	"xpanes:trapdoor_steel_bar",
+}) do
+	local old_after_place_node = minetest.registered_nodes[name].after_place_node
+
+	minetest.override_item(name, {
+		after_place_node = function(pos, placer, ...)
+			local meta = minetest.get_meta(pos)
+
+			local ret = old_after_place_node and old_after_place_node(pos, placer, ...)
+
+			meta:set_string("owner", "")
+			meta:set_string("infotext", "")
+
+			return ret or minetest.is_creative_enabled(placer:get_player_name())
+		end
+	})
+end
+
 minetest.override_item("default:furnace", {
 	can_dig = function() return true end,
 	on_destruct = furnace_on_destruct,
