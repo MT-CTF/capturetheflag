@@ -233,7 +233,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			end
 		end,
 		particle = {
-			image = "grenades_smoke.png^[multiply:#00ff00",
+			image = "grenades_smoke.png".. (damage and "^[multiply:#00ff00" or ""),
 			life = 1,
 			size = 4,
 			glow = 0,
