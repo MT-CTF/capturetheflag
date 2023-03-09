@@ -18,11 +18,11 @@
 ### 3. Select an area
 
 1. Decide where you will build your map. The area can be maximum 230x230 blocks in surface area, but it can be lesser.
-2. Grant yourself the `ctf_map_editor` privelege by running `/grantme ctf_map_editor`
+2. Grant yourself the `ctf_map_editor` privilege by running `/grantme ctf_map_editor`
 3. Run `/ctf_map editor`
 4. Select "Create New Map"
 5. Select a position to be one corner of the map.
-6. Select a position on the opposite corner. Place it higher/lower than the first one to give the map height.
+6. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
 
 	**Note:** you can change your area at any time by typing `/ctf_map editor` and pressing the "Corners" button.
 
@@ -33,13 +33,13 @@
 	- lakes
 	- hills
 	- etc.
-- Many blocks have an indestructable variant
+- Many blocks have an indestructible variant
 - Don't forget to add
 	- Team chests
 	- Flags. Place it, then right-click it to choose flag color.
-	- "Indestructable Barrier Glass" around the edge of the world.
-	- "Indestructable Red Barrier Glass" for the build-time wall.
-	- "Indestructable Red Barrier Stone" for underground build-time wall.
+	- "Indestructible Barrier Glass" (ctf_map:ind_glass) around the edge of the world.
+	- "Indestructible Red Barrier Glass" (ctf_map:ind_glass_red) for the build-time wall.
+	- "Indestructible Red Barrier Stone" (ctf_map:ind_stone_red) for underground build-time wall.
 
 ### 5. Fill out information about the map
 
@@ -53,7 +53,7 @@ Whether or not the map is available for play. You will want to check this.
 
 * Every map must have its own license.
 * If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
-If you want to tell more infomation, you can use the `Other info` field.
+If you want to give more information, you can use the `Other info` field.
 * If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
 * We can only accept Free Software licenses, e.g.`CC BY-SA 4.0`.
 * Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
