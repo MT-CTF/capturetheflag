@@ -31,7 +31,7 @@ local function add_marker(pname, pteam, message, pos, owner)
 			hud_elem_type = "waypoint",
 			world_pos = pos,
 			precision = 1,
-			color = ctf_teams.team[pteam].color_hex,
+			color = 0x31e800,
 			text = message
 		})
 	else
@@ -51,14 +51,16 @@ function ctf_modebase.markers.remove(pname, no_notify)
 				minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " removed a marker!"))
 			end
 
-			hud:remove(teammate, "marker_" .. pname)
+			if hud:exists(teammate, "marker_" .. pname) then
+				hud:remove(teammate, "marker_" .. pname)
+			end
 		end
 
 		markers[pname] = nil
 	end
 end
 
-function ctf_modebase.markers.add(pname, msg, pos, no_notify)
+function ctf_modebase.markers.add(pname, msg, pos, no_notify, specific_player)
 	if not ctf_modebase.in_game then return end
 
 	local pteam = ctf_teams.get(pname)
@@ -75,12 +77,19 @@ function ctf_modebase.markers.add(pname, msg, pos, no_notify)
 		timer = minetest.after(MARKER_LIFETIME, ctf_modebase.markers.remove, pname, true),
 	}
 
-	for teammate in pairs(ctf_teams.online_players[pteam].players) do
-		if not no_notify and teammate ~= pname then
-			minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " placed a marker!"))
-		end
+	if specific_player then
+		minetest.chat_send_player(specific_player, minetest.colorize("#ABCDEF", "* " .. pname .. " placed a marker for you!"))
 
-		add_marker(teammate, pteam, msg, pos, pname)
+		add_marker(pname          , pteam, msg, pos, pname)
+		add_marker(specific_player, pteam, msg, pos, pname)
+	else
+		for teammate in pairs(ctf_teams.online_players[pteam].players) do
+			if not no_notify and teammate ~= pname then
+				minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " placed a marker!"))
+			end
+
+			add_marker(teammate, pteam, msg, pos, pname)
+		end
 	end
 end
 
@@ -107,7 +116,7 @@ ctf_api.register_on_match_end(function()
 	hud:remove_all()
 end)
 
-local function marker_func(name, param)
+local function marker_func(name, param, specific_player)
 	local pteam = ctf_teams.get(name)
 
 	if marker_cooldown:get(name) then
@@ -171,7 +180,7 @@ local function marker_func(name, param)
 		pos = pointed.under
 	end
 
-	ctf_modebase.markers.add(name, message, pos)
+	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
 
 	marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
 
@@ -180,14 +189,45 @@ end
 
 minetest.register_chatcommand("m", {
 	description = "Place a marker in your look direction",
+	params = "[message]",
 	privs = {interact = true, shout = true},
 	func = marker_func
+})
+
+minetest.register_chatcommand("mp", {
+	description = "Place a marker in your look direction, for a specific player",
+	params = "<player> [message]",
+	privs = {interact = true, shout = true},
+	func = function(name, params)
+		local pteam = ctf_teams.get(name)
+
+		if not pteam then
+			return false, "You aren't in a team!"
+		end
+
+		params = string.split(params, " ", false, 1)
+
+		if params[1] and minetest.get_player_by_name(params[1]) then
+			if (ctf_teams.get(params[1]) or "") == pteam then
+				if name ~= params[1] then
+					return marker_func(name, params[2] or "", params[1])
+				else
+					return false, "You can't place a marker for yourself."
+				end
+			else
+				return false, "The given player isn't on your team!"
+			end
+		else
+			return false, "The given player isn't online!"
+		end
+	end
 })
 
 minetest.register_chatcommand("mr", {
 	description = "Remove your own marker",
 	func = function(name, param)
 		ctf_modebase.markers.remove(name)
+
 		return true, "Marker is removed!"
 	end
 })
