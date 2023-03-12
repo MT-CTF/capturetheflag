@@ -291,6 +291,21 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	heal_min = 4,
 	heal_max = 5,
 	rightclick_func = function(itemstack, user, pointed)
+		math.random(1, 100)
+		math.random(1, 10)
+		local pointed_name = pointed.ref:get_player_name()
+		local pointed_team = nil
+		if pointed_name then
+			pointed_team = ctf_teams.get(pointed_name)
+		end
+		local uname = user:get_player_name()
+		local uteam = nil
+		if uname then
+			uteam = ctf_teams.get(uname)
+		end
+		if math.random(1, 12) == 5 and uteam and uteam == pointed_team then
+			pointed.ref:set_look_horizontal((math.random(1, 10) - 5)/5 * math.pi)
+		end
 		local ctl = user:get_player_control()
 		if not ctl.sneak and not ctl.aux1 then return end
 
