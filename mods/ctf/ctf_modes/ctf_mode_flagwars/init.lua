@@ -59,7 +59,7 @@ ctf_modebase.register_mode("flagwars", {
 		"hp_healed",
 	},
 	build_timer = 90,
-	is_bound_item = function(_ name)
+	is_bound_item = function(_, name)
 		return false
 	end,
 	stuff_provider = function(player)
