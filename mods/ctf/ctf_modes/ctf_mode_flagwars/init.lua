@@ -76,7 +76,7 @@ ctf_modebase.register_mode("flagwars", {
 		return false
 	end,
 	on_mode_start = function()
-		ctf_+modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
+		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 		ctf_cosmetics.get_skin = function(player)
 			if not ctf_teams.get(player) then
@@ -95,7 +95,7 @@ ctf_modebase.register_mode("flagwars", {
 	on_match_end = features.on_match_end,
 	team_allocator = features.team_allocator,
 	on_allocplayer = features.on_allocplayer,
-	on_leaveplayer = features.on_leaveplayer
+	on_leaveplayer = features.on_leaveplayer,
 	on_dieplayer = features.on_dieplayer,
 	on_respawn_player = features.on_respawnplayer,
 	can_take_flag = features.can_take_flag,
@@ -108,7 +108,7 @@ ctf_modebase.register_mode("flagwars", {
 	get_chest_access = features.get_chest_access,
 	can_punchplayer = features.can_punchplayer,
 	on_punchplayer = features.on_punchplayer,
-	on_healplayer = feature.on_healplayer,
+	on_healplayer = features.on_healplayer,
 	calculate_knockback = function()
 		return 0
 	end,
