@@ -120,6 +120,13 @@ crafting.register_recipe({
 	always_known = true,
 })
 
+-- Fence x4
+crafting.register_recipe({
+	output = "default:fence_wood 4",
+	items  = { "group:wood 4", "default:stick 2" },
+	always_known = true,
+})
+
 -- Ammo
 crafting.register_recipe({
 	output = "ctf_ranged:ammo",
