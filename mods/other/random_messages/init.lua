@@ -43,7 +43,7 @@ function random_messages.read_messages()
 		"Use team doors (steel) to stop the enemy walking into your base.",
 		"Sprint by pressing the fast key (E) when you have stamina.",
 		"Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate",
-		"Want to submit your own map? Visit ctf.rubenwardy.com to get involved.",
+		"Want to submit your own map? Visit https://github.com/MT-CTF/maps to get involved.",
 		"Using limited resources for building structures that don't strengthen your base's defences is discouraged.",
 		"To report misbehaving players to moderators, please use /report <name> <action>",
 		"Swearing, trolling and being rude will not be tolerated and strict action will be taken.",
