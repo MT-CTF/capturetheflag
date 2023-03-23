@@ -233,7 +233,7 @@ minetest.register_chatcommand("make_pro", {
 			return false, string.format("Player '%s' has no rankings!", pname)
 		end
 
-		mode_data.rankings:add(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 5})
+		mode_data.rankings:add(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 1, hp_healed = 100})
 
 		minetest.log("action", string.format(
 			"[ctf_admin] %s made player '%s' a pro in mode %s: %s", name, pname, mode_name, dump(old_ranks)

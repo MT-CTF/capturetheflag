@@ -481,16 +481,19 @@ return {
 
 		-- Remember to update /make_pro in ranking_commands.lua if you change anything here
 		if rank then
+			if (rank.score or 0) <= 8000 then
+				if (rank.score or 0) >= 10 then
+					return true, deny_pro
+				else
+					return false, deny_pro
+				end
+			end
 			if
-				(rank.score or 0) >= 8000 and
-				(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
-				(rank.flag_captures or 0) >= 5
+				((rank.kills or 0) + (rank.kill_assists or 0) * 0.34) / (rank.deaths or 1) >= 1.4 or
+				(rank.flag_captures or 0) / (rank.deaths or 1) >= 1/14 or
+				(rank.hp_healed or 0) / (rank.deaths or 1) >= 30 
 			then
 				return true, true
-			end
-
-			if (rank.score or 0) >= 10 then
-				return true, deny_pro
 			end
 		end
 
