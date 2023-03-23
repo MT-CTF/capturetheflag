@@ -12,8 +12,8 @@ local function check_hit(pos1, pos2, obj)
 end
 
 local fragdef_small = table.copy(minetest.registered_craftitems["grenades:frag"].grenade)
-fragdef_small.description = "Firecracker (Hurts anyone near blast)"
-fragdef_small.image = "ctf_mode_nade_fight_firecracker_grenade.png"
+fragdef_small.description = "Frag Grenade (Hurts anyone near blast)"
+fragdef_small.image = "ctf_mode_nade_fight_frag_grenade.png"
 fragdef_small.explode_radius = 4
 fragdef_small.explode_damage = 16
 fragdef_small.clock = 1.7
@@ -40,7 +40,7 @@ local sounds = {}
 
 local black_hole_radius = 4.5
 grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
-	description = "Void Present, sucks players in and freezes them temporarily."..
+	description = "Void Grenade, sucks players in and freezes them temporarily."..
 			"\nGrenades thrown while sucked in will instantly explode. All damage recieved is doubled",
 	image = "ctf_mode_nade_fight_black_hole_grenade.png",
 	clock = 1.8,
