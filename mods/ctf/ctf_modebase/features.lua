@@ -491,7 +491,7 @@ return {
 			if
 				((rank.kills or 0) + (rank.kill_assists or 0) * 0.34) / (rank.deaths or 1) >= 1.4 or
 				(rank.flag_captures or 0) / (rank.deaths or 1) >= 1/14 or
-				(rank.hp_healed or 0) / (rank.deaths or 1) >= 30 
+				(rank.hp_healed or 0) / (rank.deaths or 1) >= 30
 			then
 				return true, true
 			end
