@@ -387,7 +387,7 @@ local function select_class(player, classname)
 	player = PlayerObj(player)
 	if not player then return end
 
-	if dist_from_flag(player) <= 5 then
+	if ctf_modebase.current_mode == "classes" and dist_from_flag(player) <= 5 then
 		cooldowns:set(player, CLASS_SWITCH_COOLDOWN)
 		classes.set(player, classname)
 	end
@@ -398,6 +398,8 @@ function classes.show_class_formspec(player)
 	if not player then return end
 
 	if not cooldowns:get(player) then
+		if ctf_modebase.current_mode ~= "classes" then return end
+
 		if dist_from_flag(player) > 5 then
 			hud_events.new(player, {
 				quick = true,
@@ -485,6 +487,8 @@ function classes.show_class_formspec(player)
 
 					return "refresh"
 				elseif fields.select and classes.get_name(player) ~= context.class then
+					if ctf_modebase.current_mode ~= "classes" then return end
+
 					if dist_from_flag(player) > 5 then
 						hud_events.new(player, {
 							quick = true,
