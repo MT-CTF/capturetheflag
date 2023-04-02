@@ -1,6 +1,6 @@
 local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
-local features = ctf_modebase(rankings, recent_rankings)
+local features = ctf_modebase.features(rankings, recent_rankings)
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
