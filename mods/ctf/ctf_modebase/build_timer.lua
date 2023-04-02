@@ -1,6 +1,6 @@
 local hud = mhud.init()
 
-local DEFAULT_BUILD_TIME = 150
+local DEFAULT_BUILD_TIME = 60 * 2.5
 
 local timer = nil
 
