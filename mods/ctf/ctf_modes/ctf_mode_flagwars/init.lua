@@ -2,6 +2,8 @@ local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
+ctf_core.include_files("shop.lua", "spawners.lua")
+
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
 local old_get_skin = ctf_cosmetics.get_skin
