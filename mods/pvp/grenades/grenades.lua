@@ -191,7 +191,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 					end
 
 					if not stop then
-						minetest.after(1, damage_fn)
+						minetest.after(0.33, damage_fn)
 					end
 				end
 				damage_fn()
