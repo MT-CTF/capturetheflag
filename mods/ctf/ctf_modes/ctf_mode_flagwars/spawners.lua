@@ -1,14 +1,8 @@
-minetest.register_node("ctf_modes_flagwars", {
-	walkable = true,
-	pointable = true,
-	diggable = false,
-})
-
 local function register_spawner(tiles, item, node_suffix, interval)
 	local spawn = false
-	minetest.register_node("ctf_modes_flagwars:spawner_"..node_suffix, {
+	minetest.register_node("ctf_mode_flagwars:spawner_"..node_suffix, {
 		tiles = tiles,
-		overlay_tiles = { name = "ctf_modes_flagwars_spawner_overlay.png" },
+		overlay_tiles = { name = "ctf_mode_flagwars_spawner_overlay.png" },
 		walkable = true,
 		pointable = true,
 		diggable = false,
