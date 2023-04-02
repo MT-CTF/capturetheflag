@@ -1,36 +1,35 @@
-local function explode(pos)
-	-- TODO:
-	-- make some blasts
-	-- damage nearby players?
-	-- destroy destructible nearby nodes?
-end
+local items_to_sell = {
+	{ "default:sword_diamond 1", "default:gold_ingot 6" },
+	{ "default:sword_mese 1", "default:gold_ingot 5" },
+}
+
 
 minetest.register_node("ctf_modes_flagwars:shop", {
 	walkable = true,
 	pointable = true,
 	diggable = false,
-	on_punch = function(pos, node, puncher, pointed_thing)
-		local pname = puncher:get_player_name()
-		if pname == "" then
-			return
-		end
-		local meta = minetest.get_meta(pos)
-		if ctf_teams.get(pname) == meta:get_string("team") then
-			return
-		end
-		local hp = tonumber(meta:get_string("hp"))
-		hp = hp - 1
-		if hp <= 0 then
-			minetest.remove_node(pos)
-			explode(pos)
-			return
-		end
-		meta:set_string("hp" tostring(hp))
-		-- TODO: play some notifying sound
-	end,
 	on_construct = function(pos)
-		-- shop team must be set by the game stored in "team"
+		if not ctf_map.current_map then
+			return
+		end
+		local closest_team = { team = "none", distance = -1 }
+		for team, team_props in pairs(ctf_map.current_map.teams) do
+			dist = vector.dist(team_props.flag_pos, pos)
+			if dist < closest_team["distance"] then
+				closet_team["distance"] = dist
+				closest_team["team"] = team
+			end
+		end
+		local team_number = string.match(closest_team["team"], "team\.(.*)")
+		local team_color
+		local i = 0
+		for team, _ in pairs(ctf_teams["team"]) do
+			if i == team_number then
+				team_color = team
+			end
+			i = i + 1
+		end
 		local meta = minetest.get_meta(pos)
-		meta:set_string("hp", tostring(150))		
-	end,
+		meta:set_string("team", team_color)
+	end
 })
