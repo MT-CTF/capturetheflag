@@ -69,6 +69,8 @@ function random_messages.read_messages()
 		"You can press sneak while jumping, to jump up two blocks.",
 		"Use /donate <playername> <score> to reward a team-mate for their work.",
 		"A medic and knight working together can wreak havoc on the enemy team(s)",
+		"Use /lb to see a list of bountied players you can kill for score",
+		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
 	}
 end
 
