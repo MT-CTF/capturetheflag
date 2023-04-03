@@ -25,7 +25,7 @@ end
 
 local fragdef = {
 	description = "Frag grenade (Kills anyone near blast)",
-	image = "grenades_frag.png",
+	image = "shooter_hand_grenade.png",
 	explode_radius = 10,
 	explode_damage = 26,
 	on_collide = function()
