@@ -70,7 +70,7 @@ function random_messages.read_messages()
 		"Use /donate <playername> <score> to reward a team-mate for their work.",
 		"A medic and knight working together can wreak havoc on the enemy team(s)",
 		"Use /lb to see a list of bounties you can claim and their visual propeties",
-		"In nade fights, team up with someone using void grenade and split the kill's score!",
+		"In nade fights, team up with someone using void grenade.",
 	}
 end
 
