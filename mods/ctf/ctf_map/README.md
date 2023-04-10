@@ -122,8 +122,9 @@ If you choose to submit your map, include a screenshot of it in the exported map
 You can take a screenshot easily by doing the following:
 1. Press F1 on your keyboard to hide the HUD
 2. Press F2 on your keyboard to hide the chat log
-3. Try to find a good view that shows most of the map
-4. Press F12 on your keyboard to take a screenshot
-5. You can find your screenshot inside `\[Minetest folder]/screenshots`
+3. *Optional:* Press R on your keyboard to enable unlimited viewing range if part of the map is not rendered
+4. Try to find a good view that shows most of the map
+5. Press F12 on your keyboard to take a screenshot
+6. You can find your screenshot inside `\[Minetest folder]/screenshots`
 
 Crop the screenshot into the aspect ratio mentioned above using a tool of your choice, and put the screenshot inside your exported map's folder. It should be named `screenshot.png`.
