@@ -71,6 +71,8 @@ function random_messages.read_messages()
 		"A medic and knight working together can wreak havoc on the enemy team(s)",
 		"Use /lb to see a list of bountied players you can kill for score",
 		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
+		"You can check the current game mode, map and number of players on https://shangul.de1.hashbang.sh",
+		"Shooter's grenade can be effective to combat the dangerous medic-knight combination."
 	}
 end
 
