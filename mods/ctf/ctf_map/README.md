@@ -123,7 +123,7 @@ You can take a screenshot easily by doing the following:
 1. Hide the HUD. By default <kbd>F1</kbd> does that.
 2. Hide the chat log. By default <kbd>F2</kbd> does that.
 3. Try to find a good view that shows most of the map.
-4. *(Optional)* Enable unlimited view range if important parts of the map cannot be seen. By default <kbd>R</kbd> does that.
+4. *(Optional)* Increase your view range if important parts of the map cannot be seen. By default the <kbd>=</kbd> (or <kbd>+</kbd>) and <kbd>-</kbd> keys do that.
 5. Take a screenshot **from Minetest**. By default <kbd>F12</kbd> does that.
 6. You can find the screenshot in `[Minetest folder]/screenshots` unless you have changed the path in settings.
 Crop the screenshot into the aspect ratio mentioned above using a tool of your choice, and put the screenshot inside your exported map's folder. It should be named `screenshot.png`.
