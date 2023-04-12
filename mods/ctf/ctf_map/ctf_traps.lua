@@ -88,13 +88,13 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			local itemstack, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
+			local item, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
 			local meta = minetest.get_meta(pos)
 			local pname = placer:get_player_name()
 			if pname ~= "" then
 				meta:set_string("placer", pname)
 			end
-			return itemstack, pos
+			return item, pos
 		end
 	})
 end
