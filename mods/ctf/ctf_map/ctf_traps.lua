@@ -36,7 +36,7 @@ minetest.register_node("ctf_map:spike", {
 	paramtype2 = "meshoptions",
 	sunlight_propagates = true,
 	walkable = false,
-	damage_per_second = 5,
+	damage_per_second = 7,
 	groups = {cracky=1, level=2},
 	selection_box = {
 		type = "fixed",
@@ -80,7 +80,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		paramtype2 = "meshoptions",
 		sunlight_propagates = true,
 		walkable = false,
-		damage_per_second = 5,
+		damage_per_second = 7,
 		groups = {cracky=1, level=2},
 		drop = "ctf_map:spike",
 		selection_box = {
@@ -112,13 +112,10 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 			if pname ~= "" then
 				local placer = minetest.get_player_by_name(pname)
 				if placer then
-					player:punch(placer, 10, { fleshy = 5, spike = 1})
-					return hp_change
+					player:punch(placer, 1, { fleshy = 7, spike = 1})
+					return 0
 				end
 			end
-		end
-		if not damaged then
-			hp_change = hp_change - 5
 		end
 	end
 
