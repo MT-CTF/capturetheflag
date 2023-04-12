@@ -111,7 +111,6 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		if reason.node_pos then
 			local meta = minetest.get_meta(reason.node_pos)
 			local pname = meta:get_string("placer")
-			minetest.chat_send_all(pname)
 			if pname ~= "" then
 				local placer = minetest.get_player_by_name(pname)
 				if placer then
