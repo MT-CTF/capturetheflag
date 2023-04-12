@@ -114,7 +114,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 				local placer = minetest.get_player_by_name(pname)
 				if placer then
 					player:punch(placer, 10, { fleshy = 5, spike = 1})
-					damaged = true
+					return hp_change
 				end
 			end
 		end
