@@ -106,7 +106,6 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
 		end
-		local damaged = false
 		if reason.node_pos then
 			local meta = minetest.get_meta(reason.node_pos)
 			local pname = meta:get_string("placer")
