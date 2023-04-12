@@ -37,9 +37,9 @@
 - Don't forget to add
 	- Team chests
 	- Flags. Place it, then right-click it to choose flag color.
-	- "Indestructible Barrier Glass" (ctf_map:ind_glass) around the edge of the world.
-	- "Indestructible Red Barrier Glass" (ctf_map:ind_glass_red) for the build-time wall.
-	- "Indestructible Red Barrier Stone" (ctf_map:ind_stone_red) for underground build-time wall.
+	- "Indestructible Barrier Glass" (`ctf_map:ind_glass`) around the edge of the world.
+	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall.
+	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall.
 
 ### 5. Fill out information about the map
 
@@ -119,5 +119,11 @@ Areas where chests can be placed. Some maps allow placing chests anywhere, while
 ### 8. Screenshot
 
 If you choose to submit your map, include a screenshot of it in the exported map's folder. It should have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
-
-It should be named `screenshot.png`.
+You can take a screenshot easily by doing the following:
+1. Hide the HUD. By default <kbd>F1</kbd> does that.
+2. Hide the chat log. By default <kbd>F2</kbd> does that.
+3. Try to find a good view that shows most of the map.
+4. *(Optional)* Increase your view range if important parts of the map cannot be seen. By default the <kbd>=</kbd> (or <kbd>+</kbd>) and <kbd>-</kbd> keys do that.
+5. Take a screenshot **from Minetest**. By default <kbd>F12</kbd> does that.
+6. You can find the screenshot in `[Minetest folder]/screenshots` unless you have changed the path in settings.
+Crop the screenshot into the aspect ratio mentioned above using a tool of your choice, and put the screenshot inside your exported map's folder. It should be named `screenshot.png`.
