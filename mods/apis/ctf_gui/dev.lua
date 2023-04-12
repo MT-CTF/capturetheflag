@@ -25,7 +25,7 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 
 			f:close()
 
-			if formspec ~= "exit" then
+			if formspec:match("^exit") then
 				interval()
 			else
 				minetest.request_shutdown("Formspec dev requested shutdown", true)
