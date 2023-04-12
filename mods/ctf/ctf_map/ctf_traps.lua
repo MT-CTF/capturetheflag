@@ -36,7 +36,7 @@ minetest.register_node("ctf_map:spike", {
 	paramtype2 = "meshoptions",
 	sunlight_propagates = true,
 	walkable = false,
-	damage_per_second = 7,
+	damage_per_second = 5,
 	groups = {cracky=1, level=2},
 	selection_box = {
 		type = "fixed",
@@ -80,7 +80,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		paramtype2 = "meshoptions",
 		sunlight_propagates = true,
 		walkable = false,
-		damage_per_second = 7,
+		damage_per_second = 5,
 		groups = {cracky=1, level=2},
 		drop = "ctf_map:spike",
 		selection_box = {
@@ -88,7 +88,13 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
 		},
 		on_place = function(itemstack, placer, pointed_thing)
-			return minetest.item_place(itemstack, placer, pointed_thing, 34)
+			local itemstack, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
+			local meta = minetest.get_meta(pos)
+			local pname = placer:get_player_name()
+			if pname ~= "" then
+				meta:set_string("placer", pname)
+			end
+			return itemstack, pos
 		end
 	})
 end
@@ -99,6 +105,23 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
+		end
+		local damaged = false
+		minetest.chat_send_all(minetest.serialize(reason))
+		if reason.node_pos then
+			local meta = minetest.get_meta(reason.node_pos)
+			local pname = meta:get_string("placer")
+			minetest.chat_send_all(pname)
+			if pname ~= "" then
+				local placer = minetest.get_player_by_name(pname)
+				if placer then
+					player:punch(placer, 10, { fleshy = 5, spike = 1})
+					damaged = true
+				end
+			end
+		end
+		if not damaged then
+			hp_change = hp_change - 5
 		end
 	end
 
