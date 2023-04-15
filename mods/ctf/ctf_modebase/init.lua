@@ -75,6 +75,16 @@ minetest.register_on_mods_loaded(function()
 	if ctf_core.settings.server_mode == "play" then
 		minetest.after(1, ctf_modebase.start_new_match)
 	end
+
+	for _, name in pairs(ctf_modebase.modelist) do
+		ctf_settings.register("ctf_modebase:default_vote_"..name, {
+			type = "list",
+			description = "Match count vote for the mode '"..HumanReadable(name).."'",
+			list = {HumanReadable(name).." - Ask", "0", "1", "2", "3", "4", "5"},
+			_list_map = {"ask", 0, 1, 2, 3, 4, 5},
+			default = "1", -- "Ask"
+		})
+	end
 end)
 
 minetest.override_chatcommand("pulverize", {

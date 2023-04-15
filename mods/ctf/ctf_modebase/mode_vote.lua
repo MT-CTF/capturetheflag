@@ -24,27 +24,55 @@ local function player_vote(name, length)
 end
 
 local function show_modechoose_form(player)
+	local vote_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_modebase:default_vote_"..new_mode)
+
+	vote_setting = ctf_settings.settings["ctf_modebase:default_vote_"..new_mode]._list_map[tonumber(vote_setting)]
+
+	if vote_setting ~= "ask" then
+		minetest.after(0, player_vote, player, vote_setting)
+		return
+	end
+
 	local elements = {}
 
-	for i = 0, MAX_ROUNDS do
-		elements[string.format("vote_%d", i)] = {
+	local i = 0.2
+	local vote = 0
+	while vote <= MAX_ROUNDS do
+		local vote_num = vote
+		elements[string.format("vote_%d", vote_num)] = {
 			type = "button",
-			label = i,
+			label = vote_num,
 			exit = true,
 			pos = {"center", i},
 			size = {1.4, 0.7},
 			func = function()
 				if votes then
-					player_vote(player, i)
+					player_vote(player, vote_num)
 				end
 			end,
 		}
+
+		vote = vote + 1
+		i = i + 1
 	end
 
+	i = i + 1.2
+	elements["quit_button"] = {
+		type = "button",
+		exit = true,
+		label = "Exit Game",
+		pos = {x = "center", y = i},
+		func = function(playername, fields, field_name)
+			minetest.kick_player(playername, "You clicked 'Exit Game' in the mode vote formspec")
+		end,
+	}
+	i = i + (ctf_gui.ELEM_SIZE.y - 0.2)
+
 	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
-		size = {x = 8, y = MAX_ROUNDS + 3.5},
+		size = {x = 8, y = i + 3.5},
 		title = "Mode: "..HumanReadable(new_mode),
-		description = "Please vote on how many matches you would like to play",
+		description = "Please vote on how many matches you would like to play.\n" ..
+			"You can change your default vote for this mode via the Settings tab (in your inventory)",
 		header_height = 2.4,
 		elements = elements,
 	})
