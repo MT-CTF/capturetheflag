@@ -72,7 +72,7 @@ function random_messages.read_messages()
 		"Use /lb to see a list of bountied players you can kill for score",
 		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
 		"An alternative method to place markers is by (left\right) clicking while holding the zoom key (default: Z)",
-		"As we said before, /m is for adding a mark for your team, but you can also do /mp (player) to send a marker to a specific teammate",
+		"As we said before, /m is for adding a marker for your team, but you can also do /mp <player> to send a marker to a specific teammate",
 	}
 end
 
