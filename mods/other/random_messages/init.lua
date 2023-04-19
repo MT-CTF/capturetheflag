@@ -35,7 +35,7 @@ end
 function random_messages.read_messages()
 	random_messages.messages = {
 		"To talk to only your team, start your messages with /t. For example, /t Hello team!",
-		"Use apples to quickly restore your health.",
+		"Use apples and blueberries to quickly restore your health.",
 		"Moving or fighting can avoid an inactivity kick.",
 		"Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag.",
 		"You gain more score the better the opponent you defeat.",
@@ -72,6 +72,7 @@ function random_messages.read_messages()
 		"Use /lb to see a list of bountied players you can kill for score",
 		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
 		"An alternative method to place markers is by (left\right) clicking while holding the zoom key (default: Z)",
+		"Use /mp <player> to send a marker to a specific teammate",
 	}
 end
 
