@@ -60,7 +60,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 			deaths = 1
 		end
 		
-		return_str = string.format("%s%s: %s",
+		return_str = string.format("%s%s: %s,\n\t",
 			return_str,
 			minetest.colorize("#63d437", "K/D"),
 			minetest.colorize("#ffea00", tostring(kills/deaths))
