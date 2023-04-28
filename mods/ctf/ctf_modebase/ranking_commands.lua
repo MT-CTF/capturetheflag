@@ -39,7 +39,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 		local return_str = string.format(
 			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
 		)
-		
+
 		local kills = 0
 		local deaths = 1
 		for _, rank in ipairs(mode_data.summary_ranks) do
@@ -59,7 +59,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 		if deaths == 0 then
 			deaths = 1
 		end
-		
+
 		return_str = string.format("%s%s: %s,\n\t",
 			return_str,
 			minetest.colorize("#63d437", "K/D"),
