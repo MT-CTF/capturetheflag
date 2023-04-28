@@ -52,7 +52,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 				kills = prank[rank]
 			end
 			if rank == "deaths" then
-				deaths = prank[rank]
+				deaths = prank[rank] or 1
 			end
 		end
 		
