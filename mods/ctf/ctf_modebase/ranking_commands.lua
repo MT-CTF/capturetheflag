@@ -49,10 +49,10 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 				minetest.colorize("#ffea00", math.round(prank[rank] or 0))
 			)
 			if rank == "kills" then
-				kills = prank[rank]
+				kills = prank[rank] or 0
 			end
 			if rank == "deaths" then
-				deaths = prank[rank]
+				deaths = prank[rank] or 1
 			end
 		end
 
