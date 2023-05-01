@@ -89,7 +89,7 @@ default:pick_stone,default:cobble 30,default:torch 5,ctf_ranged:pistol_loaded
 ```
 
 #### Map Constants
-1. `Map Shadow Intensity`: Sets the intensity of the shadows. In some maps shadows need to be disabled.
+1. `Map Shadow Intensity`: Sets the intensity of the shadows.
 2. `Map Gravity`: Gravitational constant of the map. (default = 1)
 3. `Map Movement Speed`: Regulates the speed at which players move. (default = 1)
 4. `Map Jump height`: Regulates the height of jumps. (default = 1)
