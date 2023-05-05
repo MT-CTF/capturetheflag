@@ -50,7 +50,7 @@ Run `/ctf_map editor`.
 An explanation of some of the fields is given below.
 
 #### Map Enabled
-Whether or not the map is available for play. You will want to tick this.
+Whether or not the map is available for play. You will want to check this.
 
 #### License
 * Every map must have its own license.
