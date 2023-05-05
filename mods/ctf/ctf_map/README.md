@@ -57,7 +57,7 @@ Whether or not the map is available for play. You will want to check this.
 * If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
 If you want to give more information, you can use the `Other info` field.
 * If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
-* We can only accept Free Software licenses, e.g. `CC BY-SA 4.0`.
+* We can only accept the free culture licences like `CC BY-SA 4.0`. Note that not licences in the Creative Commons family are free(as in freedom). For instance those with `ND` are not.
 * Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
 
 #### Map Hint
