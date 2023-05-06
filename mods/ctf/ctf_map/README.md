@@ -99,7 +99,7 @@ default:pick_stone,default:cobble 30,default:torch 5,ctf_ranged:pistol_loaded
 	* `2000` is for 2 AM
 	* etc.
 
-#### Flag positions
+#### Flag Positions
 Positions where team flags are placed. You can select the teams that you want on the map and place the flags accordingly. 
 
 #### Zone Bounds
