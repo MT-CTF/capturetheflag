@@ -119,7 +119,7 @@ Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barri
 
 1. Press "Finish Editing"
 2. Find the exported map located in `[Mintest folder]/worlds/[Map World]/schems/[Exported Map folder]`
-3. Move it to `\[Minetest folder]/games/capturetheflag/mods/ctf/ctf_map/maps`.
+3. Move the exported map folder to `\[Minetest folder]/games/capturetheflag/mods/ctf/ctf_map/maps`.
 
 ### 7. Play
 
