@@ -15,17 +15,11 @@
 3. Enable creative mode. This will enable `mapedit` mode.
 5. *Optional:* Enable `worldedit`
 
-### 3. Select an area
+### 3. Important information
 
-1. Decide where you will build your map. The area can be maximum 230x230 blocks in surface area, but it can be lesser.
-2. Grant yourself the `ctf_map_editor` privilege by running `/grantme ctf_map_editor` or by running `/grantme all` which grants you all the privileges that will be useful for map making.
-3. Run `/ctf_map editor`
-4. Select "Create New Map"
-5. Select a position to be one corner of the map.
-6. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
-7. **Note:** you can change your area at any time by typing `/ctf_map editor` and pressing the "Corners" button.
-
-> **Important:** If you ever want to exit the world in which you are making the map and want to come back to it later, simply exit it (**do not** press "Finish Editing in the CTF map editor). When you want to start working on the map again, you can simply rejoin the world and continue. *Only when you have finished making the map should you run* `/ctf_map editor` . 
+- *Do not run* `/ctf_map editor`*, follow the instructions as mentioned in this guide.* 
+- The map area can be maximum 230x230 blocks in surface area, but it can be lesser. Build it accordingly.
+- You can grant yourself the `ctf_map_editor` privilege by running `/grantme ctf_map_editor` or by running `/grantme all` which grants you all the privileges that will be useful for map making.
 
 ### 4. Build
 
@@ -48,6 +42,12 @@
 
 Run `/ctf_map editor`.
 An explanation of some of the fields is given below.
+
+#### Selecting the Map Area
+1. Select a position to be one corner of the map.
+2. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
+
+> **Note:** Run `/ctf_map editor` to fill out the rest of the fields.
 
 #### Map Enabled
 Whether or not the map is available for play. You will want to check this.
