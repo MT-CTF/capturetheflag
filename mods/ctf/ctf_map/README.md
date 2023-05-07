@@ -39,7 +39,7 @@
 	- Team chests
 	- Indestructible blocks under the flag. The minimum is 5x5 blocks in surface area.
 	- "Indestructible Barrier Glass" (`ctf_map:ind_glass`) around the edge of the world.
-	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. The setting to make it disappear upon the beginning of the match will be set at last when you will run `/ctf_map editor`.
+	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins.
 	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn to stone(`default:stone`) once the match begins.
 
 > "What about flags?," you may ask. Well, check the next section to see how to add them to your map.
