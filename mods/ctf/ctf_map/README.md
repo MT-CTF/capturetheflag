@@ -93,7 +93,7 @@ default:pick_stone,default:cobble 30,default:torch 5,ctf_ranged:pistol_loaded
 2. `Map Gravity`: Gravitational constant of the map. (default = 1)
 3. `Map Movement Speed`: Regulates the speed at which players move. (default = 1)
 4. `Map Jump Height`: Regulates the height of jumps. (default = 1)
-5. `Map start time`: Sets time of the day the match begins at. Changing this field will instantly update the time of day in the world you are editing.
+5. `Map start_time`: Sets time of the day the match begins at. Changing this field will instantly update the time of day in the world you are editing.
 	* `0` is for midnight
 	* `1000` is for 1 AM
 	* `2000` is for 2 AM
