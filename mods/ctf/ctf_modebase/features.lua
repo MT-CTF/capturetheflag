@@ -122,13 +122,13 @@ local function drop_flag(teamname)
 		local pteam = ctf_teams.get(pname)
 
 		if pteam == teamname then
-			minetest.sound_play("ctf_modebase_trumpet_negative", {
+			minetest.sound_play("ctf_modebase_drop_flag_negative", {
 				to_player = pname,
 				gain = 1.0,
 				pitch = 1.0,
 			}, true)
 		else
-			minetest.sound_play("ctf_modebase_trumpet_positive", {
+			minetest.sound_play("ctf_modebase_drop_flag_positive", {
 				to_player = pname,
 				gain = 1.0,
 				pitch = 1.0,
