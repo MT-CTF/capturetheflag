@@ -36,7 +36,6 @@
 	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins.
 	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn to stone(`default:stone`) once the match begins.
 
-> "What about flags?," you may ask. Well, check the next section to see how to add them to your map.
 
 ### 5. Fill out information about the map
 
