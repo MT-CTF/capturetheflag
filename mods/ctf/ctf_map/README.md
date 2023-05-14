@@ -6,7 +6,7 @@
 
 - Minetest 5.0.0 or later (https://minetest.net/)
 - `Capture the Flag` game (https://content.minetest.net/packages/rubenwardy/capturetheflag/)
-- *Optional:* `worldedit` (https://content.minetest.net/packages/sfan5/worldedit/)
+- *Optional:*  `worldedit` (https://content.minetest.net/packages/sfan5/worldedit/) 
 
 ### 2. Create the world
 
@@ -20,6 +20,7 @@
 - *Do not run* `/ctf_map editor`*, follow the instructions as mentioned in this guide.* 
 - The map area can be maximum 230x230 blocks in surface area, but it can be lesser. Build it accordingly.
 - You can grant yourself the `ctf_map_editor` privilege by running `/grantme ctf_map_editor` or by running `/grantme all` which grants you all the privileges that will be useful for map making.
+- A useful setting to enable is "Append Item Name". It appends the technical name of the item when you hover on it within the inventory. It will help in filling fields while running the map editor in the future.
 
 ### 4. Build
 
@@ -42,16 +43,16 @@
 Run `/ctf_map editor`.
 An explanation of some of the fields is given below.
 
-#### Selecting the Map Area
+#### Selecting the Map Area <sup><em>(*required)</em></sup>
 1. Select a position to be one corner of the map.
 2. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
 
 > **Note:** Run `/ctf_map editor` to fill out the rest of the fields.
 
-#### Map Enabled
+#### Map Enabled <sup><em>(*required)</em></sup>
 Whether or not the map is available for play. You will want to check this.
 
-#### License
+#### License <sup><em>(*required)</em></sup>
 * Every map must have its own license.
 * If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
 If you want to give more information, you can use the `Other info` field.
@@ -63,7 +64,7 @@ If you want to give more information, you can use the `Other info` field.
 Does your map have hidden treasures? You can hint about them with the "Map Hint" field.
 
 #### Treasures
-A list of treasures that could end up in treasure chests
+A list of treasures that could end up in treasure chests. Use this only if you want to add extra treasures. If not, then do not fill this filed.
 
 Format:
 ```
@@ -79,7 +80,7 @@ default:lava_source;1;10;1;0.2;1;default:water_source;1;10;1;0.2;1;
 ```
 
 #### Map Initial Stuff
-`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field is located in the `map.conf` file. At least a pickaxe and some torches should be given in the map's `initial_stuff`.
+`initial_stuff` are the items given to players at their (re)spawn. The `initial_stuff` field is located in the `map.conf` file. At least a pickaxe and some torches should be given in the map's `initial_stuff`. 
 
 An example of `initial_stuff` value that registers a stone pickaxe, 30 cobblestones, 5 torches and a pistol is given below.
 
@@ -98,18 +99,18 @@ default:pick_stone,default:cobble 30,default:torch 5,ctf_ranged:pistol_loaded
 	* `2000` is for 2 AM
 	* etc.
 
-#### Flag Positions
+#### Flag Positions <sup><em>(*required)</em></sup>
 Positions where team flags are placed. You can select the teams that you want on the map and place the flags accordingly. 
 
-#### Zone Bounds
+#### Zone Bounds <sup><em>(*required)</em></sup>
 How far the players of a certain team may go during build time. The zone bounds should overlap at the Red Barrier wall.
 
 > **Note:** Even standing on the boundary sends the player back. They do not have to go beyond it. Place the boundaries accordingly.
 
-#### Chest Zones
-Areas where chests can be placed. Some maps allow placing chests anywhere, while others only place them in certain locations. 
+#### Chest Zones <sup><em>(*required)</em></sup>
+Areas where chests can be placed. Some maps allow placing chests anywhere, while others only place them in certain locations. The chest zones should be placed such that one corner should be placed higher / lower than the other. This  will give it height.
 
-#### Barrier Area
+#### Barrier Area <sup><em>(*required)</em></sup>
 Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barrier Stone" wall is located. Setting this will allow the game to know where to make them disappear when the match begins. You can leave this by default unless the game is taking a long time to remove your barriers.
 
 ### 6. Export
