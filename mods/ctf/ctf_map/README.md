@@ -49,7 +49,7 @@ An explanation of some of the fields is given below.
 
 > **Note:** Run `/ctf_map editor` to fill out the rest of the fields.
 
-#### Map Enabled <sup><em>(*required)</em></sup>
+#### Map Enabled *(required)*
 Whether or not the map is available for play. You will want to check this.
 
 #### License <sup><em>(*required)</em></sup>
