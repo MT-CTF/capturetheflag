@@ -1,3 +1,14 @@
+local blacklist = {
+	"ctf_ranged:smg",
+	"ctf_ranged:smg_loaded",
+	"ctf_ranged:rifle",
+	"ctf_ranged:rifle_loaded",
+	"ctf_ranged:sniper_magnum",
+	"ctf_ranged:sniper_magnum_loaded",
+	"ctf_mode_classes:ranged_rifle",
+	"ctf_mode_classes:ranged_rifle_loaded"
+}
+
 local hud = mhud.init()
 local marker_cooldown = ctf_core.init_cooldowns()
 local markers = {}
@@ -245,6 +256,13 @@ minetest.register_globalstep(function(dtime)
 
 		if controls.zoom then
 			local marker_text = false
+
+			stack = player:get_wielded_item()
+			for _, itemstring in ipairs(blacklist) do
+				if stack:get_name():match(itemstring) then
+					return
+				end
+			end
 
 			if controls.LMB then
 				marker_text = ""
