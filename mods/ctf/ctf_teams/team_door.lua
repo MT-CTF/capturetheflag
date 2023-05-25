@@ -63,6 +63,11 @@ for team, def in pairs(ctf_teams.team) do
 		sound_close = "doors_steel_door_close",
 		gain_open = 0.2,
 		gain_close = 0.2,
+		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+			local door = doors.get(pos)
+			door:toggle(clicker)
+			return itemstack, minetest.after(2, function() door:toggle(clicker) end)
+		end
 	})
 end
 
