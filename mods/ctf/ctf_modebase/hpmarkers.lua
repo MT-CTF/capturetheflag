@@ -200,7 +200,7 @@ minetest.register_chatcommand("hpp", {
 			else
 				return false, "The given player isn't on your team!"
 			end
-marker			return false, "The given player isn't online!"
+			return false, "The given player isn't online!"
 		end
 	end
 })
