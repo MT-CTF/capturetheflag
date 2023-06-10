@@ -177,34 +177,6 @@ minetest.register_chatcommand("hp", {
 	func = hpmarker_func
 })
 
-minetest.register_chatcommand("hpp", {
-	description = "Place a HP marker in your look direction, for a specific player",
-	params = "<player> [message]",
-	privs = {interact = true, shout = true},
-	func = function(name, params)
-		local pteam = ctf_teams.get(name)
-
-		if not pteam then
-			return false, "You aren't in a team!"
-		end
-
-		params = string.split(params, " ", false, 1)
-
-		if params[1] and minetest.get_player_by_name(params[1]) then
-			if (ctf_teams.get(params[1]) or "") == pteam then
-				if name ~= params[1] then
-					return hpmarker_func(name, params[2] or "", params[1])
-				else
-					return false, "You can't place a HP marker for yourself."
-				end
-			else
-				return false, "The given player isn't on your team!"
-			end
-			return false, "The given player isn't online!"
-		end
-	end
-})
-
 minetest.register_chatcommand("hpr", {
 	description = "Remove your own HP marker",
 	func = function(name, param)
