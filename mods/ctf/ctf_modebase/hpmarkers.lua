@@ -193,15 +193,14 @@ minetest.register_chatcommand("hpp", {
 		if params[1] and minetest.get_player_by_name(params[1]) then
 			if (ctf_teams.get(params[1]) or "") == pteam then
 				if name ~= params[1] then
-					return marker_func(name, params[2] or "", params[1])
+					return hpmarker_func(name, params[2] or "", params[1])
 				else
 					return false, "You can't place a HP marker for yourself."
 				end
 			else
 				return false, "The given player isn't on your team!"
 			end
-		else
-			return false, "The given player isn't online!"
+marker			return false, "The given player isn't online!"
 		end
 	end
 })
@@ -230,7 +229,7 @@ minetest.register_globalstep(function(dtime)
 			local hpmarker_text = false
 
 			if hpmarker_text then
-				local success, msg = hpmarker_func(player:get_player_name(), marker_text)
+				local success, msg = hpmarker_func(player:get_player_name(), hpmarker_text)
 
 				if not success and msg then
 					hud_events.new(player, {
