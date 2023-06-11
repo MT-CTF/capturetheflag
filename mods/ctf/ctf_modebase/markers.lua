@@ -199,8 +199,6 @@ local function hpmarker_func(name, param, specific_player)
 	end
 
 	local player = minetest.get_player_by_name(name)
-	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
-	
 	local message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max, param)
 	local pos = player:get_pos()
 
