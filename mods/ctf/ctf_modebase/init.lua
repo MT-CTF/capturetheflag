@@ -60,7 +60,6 @@ ctf_core.include_files(
 	"hpregen.lua",
 	"respawn_delay.lua",
 	"markers.lua",
-	"hpmarkers.lua",
 	"bounties.lua",
 	"build_timer.lua",
 	"update_wear.lua",

@@ -187,6 +187,42 @@ local function marker_func(name, param, specific_player)
 	return true, "Marker is placed!"
 end
 
+local function hpmarker_func(name, param, specific_player)
+	local pteam = ctf_teams.get(name)
+
+	if marker_cooldown:get(name) then
+		return false, "You can only place a HP marker every "..MARKER_PLACE_INTERVAL.." seconds"
+	end
+
+	if not pteam then
+		return false, "You need to be in a team to use HP markers!"
+	end
+
+	local player = minetest.get_player_by_name(name)
+	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
+
+	local ray = minetest.raycast(
+		pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
+		true, false
+	))
+	
+	local message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max, param)
+	local pos = player:get_pos()
+
+	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
+
+	marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
+
+	return true, "HP Marker is placed!"
+end
+
+minetest.register_chatcommand("hp", {
+	description = "Place a HP marker in your look direction",
+	params = "[message]",
+	privs = {interact = true, shout = true},
+	func = hpmarker_func
+})
+
 minetest.register_chatcommand("m", {
 	description = "Place a marker in your look direction",
 	params = "[message]",
