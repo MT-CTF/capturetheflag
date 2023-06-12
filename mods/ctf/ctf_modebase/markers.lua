@@ -116,7 +116,7 @@ ctf_api.register_on_match_end(function()
 	hud:remove_all()
 end)
 
-local function marker_func(name, param, specific_player)
+local function marker_func(name, param, specific_player, hptrue)
 	local pteam = ctf_teams.get(name)
 
 	if marker_cooldown:get(name) then
@@ -128,56 +128,61 @@ local function marker_func(name, param, specific_player)
 	end
 
 	local player = minetest.get_player_by_name(name)
-	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
+	local message
+	local pos
+	if hptrue == nil then
+		local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
 
-	if param == "" then
-		param = "Look here!"
-	end
-
-	local ray = minetest.raycast(
+		if param == "" then
+			param = "Look here!"
+		end
+	
+		local ray = minetest.raycast(
 		pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
 		true, false
 	))
-	local pointed = ray:next()
+		local pointed = ray:next()
 
-	if pointed and pointed.type == "object" and pointed.ref == player then
-		pointed = ray:next()
-	end
-
-	if not pointed then
-		return false, "Can't find anything to mark, too far away!"
-	end
-
-	local message = string.format("m [%s]: %s", name, param)
-	local pos
-
-	if pointed.type == "object" then
-		local concat
-		local obj = pointed.ref
-		local entity = obj:get_luaentity()
-
-		-- If object is a player, append player name to display text
-		-- Else if obj is item entity, append item description and count to str.
-		if obj:is_player() then
-			concat = obj:get_player_name()
-		elseif entity then
-			if entity.name == "__builtin:item" then
-				local stack = ItemStack(entity.itemstring)
-				local itemdef = minetest.registered_items[stack:get_name()]
-
-				-- Fallback to itemstring if description doesn't exist
-				-- Only use first line of itemstring
-				concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
-				concat = concat .. " " .. stack:get_count()
-			end
+		if pointed and pointed.type == "object" and pointed.ref == player then
+			pointed = ray:next()
 		end
 
-		pos = obj:get_pos()
-		if concat then
-			message = message .. " <" .. concat .. ">"
+		if not pointed then
+			return false, "Can't find anything to mark, too far away!"
+		end
+
+		message = string.format("m [%s]: %s", name, param)
+
+		if pointed.type == "object" then
+			local concat
+			local obj = pointed.ref
+			local entity = obj:get_luaentity()
+
+			-- If object is a player, append player name to display text
+			-- Else if obj is item entity, append item description and count to str.
+			if obj:is_player() then
+				concat = obj:get_player_name()
+			elseif entity then
+				if entity.name == "__builtin:item" then
+					local stack = ItemStack(entity.itemstring)
+					local itemdef = minetest.registered_items[stack:get_name()]
+				
+					-- Fallback to itemstring if description doesn't exist
+					-- Only use first line of itemstring
+					concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
+					concat = concat .. " " .. stack:get_count()
+				end
+			end
+				pos = obj:get_pos()
+			if concat then
+				message = message .. " <" .. concat .. ">"
+			end
+		else
+			pos = pointed.under
 		end
 	else
-		pos = pointed.under
+		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
+		pos = player:get_pos()
 	end
 
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
@@ -188,30 +193,12 @@ local function marker_func(name, param, specific_player)
 end
 
 local function hpmarker_func(name, param, specific_player)
-	local pteam = ctf_teams.get(name)
-
-	if marker_cooldown:get(name) then
-		return false, "You can only place a HP marker every "..MARKER_PLACE_INTERVAL.." seconds"
-	end
-
-	if not pteam then
-		return false, "You need to be in a team to use HP markers!"
-	end
-
-	local player = minetest.get_player_by_name(name)
-	local message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max, param)
-	local pos = player:get_pos()
-
-	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
-
-	marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
-
-	return true, "HP Marker is placed!"
+	marker_func(name, param, specific_player, true)
 end
 
 minetest.register_chatcommand("hp", {
 	description = "Place a HP marker in your look direction",
-	params = "[message]",
+	params = "",
 	privs = {interact = true, shout = true},
 	func = hpmarker_func
 })
@@ -220,7 +207,7 @@ minetest.register_chatcommand("m", {
 	description = "Place a marker in your look direction",
 	params = "[message]",
 	privs = {interact = true, shout = true},
-	func = marker_func
+	func = marker_funcm
 })
 
 minetest.register_chatcommand("mp", {
