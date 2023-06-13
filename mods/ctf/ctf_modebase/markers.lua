@@ -190,15 +190,11 @@ local function marker_func(name, param, specific_player, hptrue)
 	return true, "Marker is placed!"
 end
 
-local function hpmarker_func(name, param, specific_player)
-	marker_func(name, param, specific_player, true)
-end
-
 minetest.register_chatcommand("hp", {
 	description = "Place a HP marker in your look direction",
 	params = "",
 	privs = {interact = true, shout = true},
-	func = hpmarker_func
+	func = function(name, param, specified_player) marker_func(name, param, specific_player, true) end
 })
 
 minetest.register_chatcommand("m", {
