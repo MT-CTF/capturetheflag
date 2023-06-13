@@ -116,7 +116,7 @@ ctf_api.register_on_match_end(function()
 	hud:remove_all()
 end)
 
-local function marker_func(name, param, specific_player, hptrue)
+local function marker_func(name, param, specific_player, hpmarker)
 	local pteam = ctf_teams.get(name)
 
 	if marker_cooldown:get(name) then
@@ -130,7 +130,10 @@ local function marker_func(name, param, specific_player, hptrue)
 	local player = minetest.get_player_by_name(name)
 	local message
 	local pos
-	if hptrue == nil then
+	if hpmarker then
+		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
+		pos = player:get_pos()
+	else
 		local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
 
 		if param == "" then
@@ -174,13 +177,10 @@ local function marker_func(name, param, specific_player, hptrue)
 				pos = obj:get_pos()
 			if concat then
 				message = message .. " <" .. concat .. ">"
-			end
+			end	
 		else
 			pos = pointed.under
 		end
-	else
-		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
-		pos = player:get_pos()
 	end
 
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
