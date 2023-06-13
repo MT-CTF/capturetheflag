@@ -177,7 +177,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 				pos = obj:get_pos()
 			if concat then
 				message = message .. " <" .. concat .. ">"
-			end	
+			end
 		else
 			pos = pointed.under
 		end
