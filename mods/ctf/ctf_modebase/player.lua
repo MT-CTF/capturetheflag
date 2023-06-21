@@ -112,12 +112,14 @@ function ctf_modebase.player.update(player)
 end
 
 ctf_api.register_on_new_match(function()
-	for _, player in pairs(minetest.get_connected_players()) do
-		if ctf_teams.get(player) then
-			ctf_modebase.player.empty_inv(player)
-			ctf_modebase.player.update(player)
+	minetest.after(0, function() -- We want this to run after team allocation
+		for _, player in pairs(minetest.get_connected_players()) do
+			if ctf_teams.get(player) then
+				ctf_modebase.player.empty_inv(player)
+				ctf_modebase.player.update(player)
+			end
 		end
-	end
+	end)
 end)
 
 if ctf_core.settings.server_mode ~= "mapedit" then
