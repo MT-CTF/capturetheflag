@@ -74,7 +74,6 @@ function ctf_modebase.remove_immunity(player)
 	local old = immune_players[pname]
 
 	if old == nil then return end
-	immune_players[pname] = nil
 
 	if old.timer then
 		old.timer:cancel()
@@ -83,6 +82,8 @@ function ctf_modebase.remove_immunity(player)
 	if old.particles then
 		minetest.delete_particlespawner(old.particles, pname)
 	end
+
+	immune_players[pname] = nil
 
 	player:set_properties({pointable = true, textures = {ctf_cosmetics.get_skin(player)}})
 	player:set_armor_groups({fleshy = 100})
