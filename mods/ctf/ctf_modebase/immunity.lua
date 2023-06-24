@@ -80,7 +80,7 @@ function ctf_modebase.remove_immunity(player)
 	end
 
 	if old.particles then
-		minetest.delete_particlespawner(old.particles, pname)
+		minetest.delete_particlespawner(old.particles)
 	end
 
 	immune_players[pname] = nil
