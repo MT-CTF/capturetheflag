@@ -86,6 +86,14 @@ minetest.register_on_joinplayer(function(player)
 	players[player:get_player_name()] = info
 end)
 
+ctf_api.register_on_respawnplayer(function(player)
+	local info = players[player:get_player_name()]
+	if info.stamina < STAMINA_MAX then
+		info.stamina = STAMINA_MAX
+		updateHud(player, info)
+	end
+end)
+
 minetest.register_on_respawnplayer(function(player)
 	local info = players[player:get_player_name()]
 	if info.stamina < STAMINA_MAX then
