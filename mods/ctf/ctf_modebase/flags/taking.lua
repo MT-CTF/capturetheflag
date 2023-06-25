@@ -96,6 +96,8 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 				ctf_modebase.flag_captured[flagteam] = true
 			end
 
+			ctf_modebase.on_flag_capture(puncher, flagteams)
+
 			ctf_modebase.skip_vote.on_flag_capture(#flagteams)
 			ctf_modebase:get_current_mode().on_flag_capture(puncher, flagteams)
 		end

@@ -41,6 +41,7 @@ Note that this version may be slightly behind the git version, but it will be a 
 
 ## Development
 
+* ### [WIP CTF API DOCS](docs/ctf-api.md)
 * If you use Visual Studio Code we recommend these extensions:
   * https://marketplace.visualstudio.com/items?itemName=sumneko.lua
   * https://marketplace.visualstudio.com/items?itemName=dwenegar.vscode-luacheck
