@@ -13,7 +13,7 @@
 1. Select the `Capture the Flag` subgame.
 2. Create a new world. You can select any mapgen you like.
 3. Enable creative mode. This will enable `mapedit` mode.
-5. *Optional:* Enable `worldedit`
+4. *Optional:* Enable `worldedit`
 
 ### 3. Important information
 
