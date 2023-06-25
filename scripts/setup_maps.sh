@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+cd ..
 cd mods/ctf/ctf_map/maps/
 
 # Copy textures from map sub-dirs to ctf_map_core/textures
