@@ -111,17 +111,25 @@ function ctf_modebase.player.update(player)
 	end
 end
 
+function ctf_modebase.player.is_playing(player)
+	return true
+end
+
 ctf_api.register_on_new_match(function()
 	for _, player in pairs(minetest.get_connected_players()) do
-		ctf_modebase.player.empty_inv(player)
-		ctf_modebase.player.update(player)
+		if ctf_modebase.player.is_playing(player) then
+			ctf_modebase.player.empty_inv(player)
+			ctf_modebase.player.update(player)
+		end
 	end
 end)
 
 if ctf_core.settings.server_mode ~= "mapedit" then
 	ctf_api.register_on_respawnplayer(function(player)
-		ctf_modebase.player.empty_inv(player)
-		ctf_modebase.player.give_initial_stuff(player)
+		if ctf_teams.get(player) then
+			ctf_modebase.player.empty_inv(player)
+			ctf_modebase.player.give_initial_stuff(player)
+		end
 	end)
 end
 
