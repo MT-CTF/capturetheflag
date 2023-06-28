@@ -127,11 +127,14 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 		end
 	else
 		if reason ~= "punch" or killer == player then
-			if reason == "punch" then
-				ctf_kill_list.add(player, player, weapon_image)
-			else
-				ctf_kill_list.add("", player, get_suicide_image(reason))
+			if ctf_teams.get(player) then
+				if reason == "punch" then
+					ctf_kill_list.add(player, player, weapon_image)
+				else
+					ctf_kill_list.add("", player, get_suicide_image(reason))
+				end
 			end
+
 			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
 			comment = " (Suicide)"
 		end
@@ -152,7 +155,9 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		recent_rankings.add(killer, rewards)
 
-		ctf_kill_list.add(killer, player, weapon_image, comment)
+		if ctf_teams.get(killer) then
+			ctf_kill_list.add(killer, player, weapon_image, comment)
+		end
 
 		-- share kill score with other hitters
 		local hitters = ctf_combat_mode.get_other_hitters(player, killer)
@@ -469,7 +474,9 @@ return {
 			end_combat_mode(player:get_player_name(), reason)
 		end
 
-		ctf_modebase.prepare_respawn_delay(player)
+		if ctf_teams.get(player) then
+			ctf_modebase.prepare_respawn_delay(player)
+		end
 	end,
 	on_respawnplayer = function(player)
 		tp_player_near_flag(player)
