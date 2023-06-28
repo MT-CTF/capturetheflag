@@ -131,7 +131,7 @@ You can access the exported map by running `/ctf_map editor`, clicking on the ex
 
 ### 8. Screenshot
 
-If you choose to submit your map, include a screenshot of it in the exported map's folder. It should have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
+If you choose to submit your map, include a screenshot of it in the exported map's folder. It should be taken with on texture packs enabled and have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
 
 You can take a screenshot easily by doing the following:
 1. Hide the HUD. By default <kbd>F1</kbd> does that.
