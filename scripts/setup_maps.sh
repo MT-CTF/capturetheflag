@@ -3,7 +3,7 @@ set -e
 
 if [ basename "$PWD" -eq "scripts" ]; then
 	cd ..
- fi
+fi
 
 cd mods/ctf/ctf_map/maps/
 
