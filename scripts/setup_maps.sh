@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ basename "$PWD" -eq "scripts" ]; then
+if [ -f setup_maps.sh ]; then
 	cd ..
 fi
 
