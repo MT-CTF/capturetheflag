@@ -256,7 +256,7 @@ minetest.register_globalstep(function(dtime)
 
 		if controls.zoom then
 			local marker_text = false
-			stack = player:get_wielded_item()
+			local stack = player:get_wielded_item()
 			local holding_blacklisted_item = false
 			for _, itemstring in ipairs(blacklist) do
 				if stack:get_name():match(itemstring) then
