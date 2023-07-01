@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# Go back if we're inside the scripts folder
 if [ -f setup_maps.sh ]; then
 	cd ..
 fi
