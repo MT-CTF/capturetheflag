@@ -116,6 +116,29 @@ local function celebrate_team(teamname)
 	end
 end
 
+local function drop_flag(teamname)
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local pname = player:get_player_name()
+		local pteam = ctf_teams.get(pname)
+
+		if pteam then
+			if pteam == teamname then
+				minetest.sound_play("ctf_modebase_trumpet_negative", {
+					to_player = pname,
+					gain = 0.2,
+					pitch = 0.8,
+				}, true)
+			else
+				minetest.sound_play("ctf_modebase_trumpet_positive", {
+					to_player = pname,
+					gain = 0.2,
+					pitch = 1.2,
+				}, true)
+			end
+		end
+	end
+end
+
 local function end_combat_mode(player, reason, killer, weapon_image)
 	local comment = nil
 
@@ -370,6 +393,7 @@ return {
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+		drop_flag(pteam)
 	end,
 	on_flag_capture = function(player, teamnames)
 		local pname = player:get_player_name()
