@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Go back if we're inside the scripts folder
+if [ -f setup_maps.sh ]; then
+	cd ..
+fi
+
 cd mods/ctf/ctf_map/maps/
 
 # Copy textures from map sub-dirs to ctf_map_core/textures
