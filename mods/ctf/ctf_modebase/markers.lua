@@ -141,31 +141,28 @@ local function marker_func(name, param, specific_player, hpmarker)
 	local player = minetest.get_player_by_name(name)
 	local message
 	local pos
-	if hpmarker then
-		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
-		pos = player:get_pos()
-	else
-		local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
+	
+	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
 
-		if param == "" then
-			param = "Look here!"
-		end
+	if param == "" then
+		param = "Look here!"
+	end
 
-		local ray = minetest.raycast(
-			pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
-			true, false
-		))
-		local pointed = ray:next()
+	local ray = minetest.raycast(
+	pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
+		true, false
+	))
+	local pointed = ray:next()
 
-		if pointed and pointed.type == "object" and pointed.ref == player then
-			pointed = ray:next()
-		end
+	if pointed and pointed.type == "object" and pointed.ref == player then
+		pointed = ray:next()
+	end
 
-		if not pointed then
-			return false, "Can't find anything to mark, too far away!"
-		end
-
-		message = string.format("m [%s]: %s", name, param)
+	if not pointed then
+		return false, "Can't find anything to mark, too far away!"
+	end
+	
+	message = string.format("m [%s]: %s", name, param)
 
 		if pointed.type == "object" then
 			local concat
@@ -193,16 +190,27 @@ local function marker_func(name, param, specific_player, hpmarker)
 		else
 			pos = pointed.under
 		end
+
+	if (math.abs(pos.x - player:get_pos().x) <= 2) and (math.abs(pos.y - player:get_pos().y) <= 2) and (math.abs(pos.z - player:get_pos().z) <= 2) then
+		hpmarker = true
+	end
+	if hpmarker then
+		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
+		pos = player:get_pos()
 	end
 
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
 
 	marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
 
-	return true, "Marker is placed!"
+	if hpmarker then
+		return true, "HP marker is placed!"
+	else
+		return true, "Marker is placed!"
+	end
 end
 
-minetest.register_chatcommand("hp", {
+minetest.register_chatcommand("mhp", {
 	description = "Place a HP marker in your look direction",
 	params = "",
 	privs = {interact = true, shout = true},
