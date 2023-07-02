@@ -189,9 +189,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 			pos = pointed.under
 		end
 
-	if (math.abs(pos.x - player:get_pos().x) <= 2)
-	and (math.abs(pos.y - player:get_pos().y) <= 2)
-	and (math.abs(pos.z - player:get_pos().z) <= 2) then
+	if vector.distance(pos, player:get_pos()) then
 		hpmarker = true
 	end
 	if hpmarker then
