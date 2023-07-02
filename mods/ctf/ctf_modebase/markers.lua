@@ -218,7 +218,7 @@ minetest.register_chatcommand("hp", {
 		if not pteam then
 			return false, "You need to be in a team to use markers!"
 		end
-		if param = "" then
+		if param == "" then
 			param = "Look here!"
 		end
 		local player = minetest.get_player_by_name(name)
