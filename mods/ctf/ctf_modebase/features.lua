@@ -116,6 +116,29 @@ local function celebrate_team(teamname)
 	end
 end
 
+local function drop_flag(teamname)
+	for _, player in ipairs(minetest.get_connected_players()) do
+		local pname = player:get_player_name()
+		local pteam = ctf_teams.get(pname)
+
+		if pteam then
+			if pteam == teamname then
+				minetest.sound_play("ctf_modebase_trumpet_negative", {
+					to_player = pname,
+					gain = 0.2,
+					pitch = 0.8,
+				}, true)
+			else
+				minetest.sound_play("ctf_modebase_trumpet_positive", {
+					to_player = pname,
+					gain = 0.2,
+					pitch = 1.2,
+				}, true)
+			end
+		end
+	end
+end
+
 local function end_combat_mode(player, reason, killer, weapon_image)
 	local comment = nil
 
@@ -127,11 +150,14 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 		end
 	else
 		if reason ~= "punch" or killer == player then
-			if reason == "punch" then
-				ctf_kill_list.add(player, player, weapon_image)
-			else
-				ctf_kill_list.add("", player, get_suicide_image(reason))
+			if ctf_teams.get(player) then
+				if reason == "punch" then
+					ctf_kill_list.add(player, player, weapon_image)
+				else
+					ctf_kill_list.add("", player, get_suicide_image(reason))
+				end
 			end
+
 			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
 			comment = " (Suicide)"
 		end
@@ -152,7 +178,9 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		recent_rankings.add(killer, rewards)
 
-		ctf_kill_list.add(killer, player, weapon_image, comment)
+		if ctf_teams.get(killer) then
+			ctf_kill_list.add(killer, player, weapon_image, comment)
+		end
 
 		-- share kill score with other hitters
 		local hitters = ctf_combat_mode.get_other_hitters(player, killer)
@@ -365,6 +393,7 @@ return {
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+		drop_flag(pteam)
 	end,
 	on_flag_capture = function(player, teamnames)
 		local pname = player:get_player_name()
@@ -469,7 +498,9 @@ return {
 			end_combat_mode(player:get_player_name(), reason)
 		end
 
-		ctf_modebase.prepare_respawn_delay(player)
+		if ctf_teams.get(player) then
+			ctf_modebase.prepare_respawn_delay(player)
+		end
 	end,
 	on_respawnplayer = function(player)
 		tp_player_near_flag(player)

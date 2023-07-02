@@ -48,6 +48,17 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 			)
 		end
 
+		for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
+			return_str = string.format("%s%s: %s,\n\t",
+				return_str,
+				minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
+				minetest.colorize("#ffea00", math.round(
+					        (prank[pair[1]] or 0   ) /
+					math.max(prank[pair[2]] or 0, 1)
+				))
+			)
+		end
+
 		return_str = string.format("%s%s: %s",
 			return_str,
 			minetest.colorize("#63d437", "Place"),

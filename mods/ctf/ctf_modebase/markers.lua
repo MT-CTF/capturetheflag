@@ -1,3 +1,14 @@
+local blacklist = {
+	"ctf_ranged:smg",
+	"ctf_ranged:smg_loaded",
+	"ctf_ranged:rifle",
+	"ctf_ranged:rifle_loaded",
+	"ctf_ranged:sniper_magnum",
+	"ctf_ranged:sniper_magnum_loaded",
+	"ctf_mode_classes:ranged_rifle",
+	"ctf_mode_classes:ranged_rifle_loaded"
+}
+
 local hud = mhud.init()
 local marker_cooldown = ctf_core.init_cooldowns()
 local markers = {}
@@ -245,6 +256,15 @@ minetest.register_globalstep(function(dtime)
 
 		if controls.zoom then
 			local marker_text = false
+			local stackname = player:get_wielded_item():get_name()
+
+			local holding_blacklisted_item = false
+			for _, itemstring in ipairs(blacklist) do
+				if stackname:match(itemstring) then
+					holding_blacklisted_item = true
+					break
+				end
+			end
 
 			if controls.LMB then
 				marker_text = ""
@@ -252,7 +272,7 @@ minetest.register_globalstep(function(dtime)
 				marker_text = "Defend!"
 			end
 
-			if marker_text then
+			if marker_text  and not holding_blacklisted_item then
 				local success, msg = marker_func(player:get_player_name(), marker_text)
 
 				if not success and msg then
