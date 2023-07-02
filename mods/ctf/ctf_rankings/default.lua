@@ -1,5 +1,4 @@
 return function(top)
-
 local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at runtime!")
 
 for k, v in pairs(modstorage:to_table()["fields"]) do
@@ -55,5 +54,4 @@ return {
 		self.modstorage:set_string(pname, minetest.write_json(newrankings))
 	end
 }
-
 end
