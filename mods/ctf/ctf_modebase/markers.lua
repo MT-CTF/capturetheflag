@@ -205,6 +205,31 @@ minetest.register_chatcommand("m", {
 	func = marker_func
 })
 
+minetest.register_chatcommand("hp", {
+	description = "Place a marker on your current pos containing your hp",
+	params = "[message]",
+	privs = {interact = true, shout = true},
+	func = function(name, param)
+		local pteam = ctf_teams.get(name)
+		if marker_cooldown:get(name) then
+			return false, "You can only place a marker every "..MARKER_PLACE_INTERVAL.." seconds"
+		end
+	
+		if not pteam then
+			return false, "You need to be in a team to use markers!"
+		end
+		if param = "" then
+			param = "Look here!"
+		end
+		local player = minetest.get_player_by_name(name)
+		local pos = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
+		local message = string.format("m [%s] [%s]: %s",player:get_hp().."/"..player:get_properties().hp_max, name, param)
+		ctf_modebase.markers.add(name, message, pos, nil, nil)
+
+		marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
+	end
+})
+
 minetest.register_chatcommand("mp", {
 	description = "Place a marker in your look direction, for a specific player",
 	params = "<player> [message]",
