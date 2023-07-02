@@ -214,7 +214,7 @@ minetest.register_chatcommand("hp", {
 		if marker_cooldown:get(name) then
 			return false, "You can only place a marker every "..MARKER_PLACE_INTERVAL.." seconds"
 		end
-		
+
 		if not pteam then
 			return false, "You need to be in a team to use markers!"
 		end
