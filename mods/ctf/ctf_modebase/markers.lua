@@ -141,7 +141,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 	local player = minetest.get_player_by_name(name)
 	local message
 	local pos
-	
 	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
 
 	if param == "" then
@@ -161,7 +160,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 	if not pointed then
 		return false, "Can't find anything to mark, too far away!"
 	end
-	
 	message = string.format("m [%s]: %s", name, param)
 
 		if pointed.type == "object" then
@@ -191,7 +189,9 @@ local function marker_func(name, param, specific_player, hpmarker)
 			pos = pointed.under
 		end
 
-	if (math.abs(pos.x - player:get_pos().x) <= 2) and (math.abs(pos.y - player:get_pos().y) <= 2) and (math.abs(pos.z - player:get_pos().z) <= 2) then
+	if (math.abs(pos.x - player:get_pos().x) <= 2)
+	and (math.abs(pos.y - player:get_pos().y) <= 2)
+	and (math.abs(pos.z - player:get_pos().z) <= 2) then
 		hpmarker = true
 	end
 	if hpmarker then
