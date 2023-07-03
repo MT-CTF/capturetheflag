@@ -2,7 +2,7 @@ local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
-classes = ctf_core.include_files(
+ctf_classes.classes = ctf_core.include_files(
 	"paxel.lua",
 	"classes.lua",
 	"thief.lua"
@@ -93,12 +93,12 @@ ctf_modebase.register_mode("classes", {
 		end
 	end,
 	stuff_provider = function(player)
-		local initial_stuff = table.copy(classes.get(player).items or {})
+		local initial_stuff = table.copy(ctf_classes.classes.get(player).items or {})
 		table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
 		return initial_stuff
 	end,
 	initial_stuff_item_levels = custom_item_levels,
-	is_restricted_item = classes.is_restricted_item,
+	is_restricted_item = ctf_classes.classes.is_restricted_item,
 	on_mode_start = function()
 		ctf_modebase.bounties.bounty_reward_func = ctf_modebase.bounty_algo.kd.bounty_reward_func
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
@@ -108,7 +108,7 @@ ctf_modebase.register_mode("classes", {
 				return old_get_skin(player)
 			end
 
-			return old_get_skin(player) .. classes.get_skin_overlay(player)
+			return old_get_skin(player) .. ctf_classes.classes.get_skin_overlay(player)
 		end
 	end,
 	on_mode_end = function()
@@ -116,13 +116,13 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.get_next_bounty = old_get_next_bounty
 		ctf_cosmetics.get_skin = old_get_skin
 
-		classes.finish()
+		ctf_classes.classes.finish()
 	end,
 	on_new_match = features.on_new_match,
 	on_match_end = features.on_match_end,
 	team_allocator = features.team_allocator,
 	on_allocplayer = function(player, new_team)
-		classes.update(player)
+		ctf_classes.classes.update(player)
 		features.on_allocplayer(player, new_team)
 	end,
 	on_leaveplayer = features.on_leaveplayer,
@@ -133,7 +133,7 @@ ctf_modebase.register_mode("classes", {
 	on_flag_drop = features.on_flag_drop,
 	on_flag_capture = features.on_flag_capture,
 	on_flag_rightclick = function(clicker)
-		classes.show_class_formspec(clicker)
+		ctf_classes.classes.show_class_formspec(clicker)
 	end,
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = features.on_punchplayer,
