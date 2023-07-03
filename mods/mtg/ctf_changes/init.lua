@@ -3,8 +3,8 @@ local COOLDOWN = ctf_core.init_cooldowns()
 local DISALLOW_MOD_ABMS = {"default", "fire", "flowers", "tnt"}
 
 local node_fall_damage_factors = {
-    {"default:snowblock", -14}, -- From a height of 13 blocks you take 5 damage
-    {"default:snow", -10}, -- From a height of 13 blocks you take 6 damage
+    ["default:snowblock"] = -14, -- From a height of 13 blocks you take 5 damage
+    ["default:snow"] = -10, -- From a height of 13 blocks you take 6 damage
 }
 
 local disabled_ores = {
@@ -184,10 +184,10 @@ minetest.override_item("default:furnace_active", {
 })
 
 minetest.register_on_mods_loaded(function()
-    for _, entry in ipairs(node_fall_damage_factors) do
-        local groups_temp = minetest.registered_items[entry[1]].groups
-        groups_temp.fall_damage_add_percent = entry[2]
-        minetest.override_item(entry[1], {
+    for nodename, value in pairs(node_fall_damage_factors) do
+        local groups_temp = minetest.registered_items[nodename].groups
+        groups_temp.fall_damage_add_percent = value
+        minetest.override_item(nodename, {
             groups = groups_temp,
         })
     end
