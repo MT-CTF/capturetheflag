@@ -8,9 +8,12 @@ local teams_left
 
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
-	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
+	local kills = (match_rank.kills or 1) + (match_rank.kill_assists or 0) / 4
+	local deaths = match_rank.deaths or 1
+	local kd = kills / deaths
+	local hd = (match_rank.hp_healed or 1) / deaths
 
-	return math.max(1, math.round(kd * 7))
+	return math.max(1, math.round(kd * 7), math.round(hd * 0.12))
 end
 
 local damage_group_textures = {
