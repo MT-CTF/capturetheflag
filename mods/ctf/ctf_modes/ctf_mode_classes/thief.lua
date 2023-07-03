@@ -6,7 +6,7 @@ local function rob_player(player, robber)
     local stack = inv:get_stack("main", math.random(1, inv:get_size("main")))
     local mode = ctf_modebase:get_current_mode()
 	if mode and mode.stuff_provider then
-        for _, item in ipairs(ctf_classes.classes.get(player).items) do
+        for _, item in ipairs(classes.get(player).items) do
             if stack:get_name() == item or stack:get_name() == "" then
                 return "You didn't find anything to rob."
             end
