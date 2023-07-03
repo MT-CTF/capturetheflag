@@ -59,7 +59,7 @@ local class_props = {
 	thief = {
 		name = "Thief",
 		description = "Criminal class, punch enemies with a bare hand to have a chance of stealing an item from them",
-		visual_size = vector.new(0.8, 0.9, 0.8),
+		visual_size = vector.new(0.9, 0.9, 0.9),
 		physics = {speed = 1.2},
 		items = {
 			"ctf_mode_classes:scaling_ladder",
