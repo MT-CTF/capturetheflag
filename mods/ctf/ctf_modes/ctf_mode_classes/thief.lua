@@ -6,7 +6,7 @@ local function rob_player(player, robber)
     local stack = inv:get_stack("main", math.random(1, inv:get_size("main")))
     local mode = ctf_modebase:get_current_mode()
 	if mode and mode.stuff_provider then
-    	for _, item in ipairs(classes.get(player).items) do
+        for _, item in ipairs(classes.get(player).items) do
             if stack:get_name() == item or stack:get_name() == "" then
                 return "You didn't find anything to rob."
             end
@@ -25,7 +25,6 @@ end
 
 minetest.register_on_punchplayer(function(punched, puncher)
     if puncher and puncher:is_player() and punched and punched:is_player() then
-        local wielded_item = puncher:get_wielded_item()
         if puncher:get_wielded_item():get_name() == "" then
             if robbery_cooldown:get(puncher:get_player_name()) then
                 hud_events.new(puncher, {
