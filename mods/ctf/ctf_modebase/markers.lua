@@ -148,7 +148,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 	end
 
 	local ray = minetest.raycast(
-	pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
+		pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
 		true, false
 	))
 	local pointed = ray:next()
