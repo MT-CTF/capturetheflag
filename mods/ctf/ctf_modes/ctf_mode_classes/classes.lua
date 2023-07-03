@@ -5,7 +5,7 @@ local CLASS_SWITCH_COOLDOWN = 30
 
 local classes = {}
 
-local class_list = {"knight", "ranged", "support"}
+local class_list = {"knight", "ranged", "support", "thief"}
 local class_props = {
 	knight = {
 		name = "Knight",
@@ -54,6 +54,26 @@ local class_props = {
 		},
 		disallowed_items_markup = {
 			["ctf_melee:"] = "default_tool_steelsword.png^ctf_modebase_group.png",
+		},
+	},
+	thief = {
+		name = "Thief",
+		description = "Criminal class, punch enemies with a bare hand to have a chance of stealing an item from them",
+		visual_size = vector.new(0.8, 0.9, 0.8),
+		physics = {speed = 1.2},
+		items = {
+			"ctf_mode_classes:scaling_ladder",
+			"default:cobble 99"
+		},
+		disallowed_items = {
+			"ctf_melee:",
+			"ctf_ranged:rifle",
+			"ctf_ranged:smg",
+			"ctf_ranged:sniper_magnum",
+			"ctf_ranged:shotgun",
+		},
+		disallowed_items_markup = {
+			["ctf_melee:"] = "default_tool_steelsword.png^ctf_modebase_group.png"
 		},
 	}
 }

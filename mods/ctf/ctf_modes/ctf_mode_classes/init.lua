@@ -2,9 +2,10 @@ local rankings = ctf_rankings.init()
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
-local classes = ctf_core.include_files(
+classes = ctf_core.include_files(
 	"paxel.lua",
-	"classes.lua"
+	"classes.lua",
+	"thief.lua"
 )
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
