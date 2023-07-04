@@ -201,7 +201,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
 
 	marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
-
 	if hpmarker then
 		return true, "HP marker is placed!"
 	else
