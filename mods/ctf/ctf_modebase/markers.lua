@@ -142,7 +142,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 	local message
 	local pos
 	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
-
 	if param == "" then
 		param = "Look here!"
 	end
@@ -155,6 +154,10 @@ local function marker_func(name, param, specific_player, hpmarker)
 
 	if pointed and pointed.type == "object" and pointed.ref == player then
 		pointed = ray:next()
+	end
+
+	if vector.distance(pointed.under, player:get_pos()) <= 2 then
+		hpmarker = true
 	end
 
 	if hpmarker then
@@ -171,7 +174,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 			local obj = pointed.ref
 			local entity = obj:get_luaentity()
 
-			-- If object is a player, append player name to display text	
+			-- If object is a player, append player name to display text
 			-- Else if obj is item entity, append item description and count to str.
 			if obj:is_player() then
 				concat = obj:get_player_name()
@@ -192,9 +195,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 		else
 			pos = pointed.under
 		end
-	end
-	if vector.distance(pos, player:get_pos()) <= 2 then
-		hpmarker = true
 	end
 
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
