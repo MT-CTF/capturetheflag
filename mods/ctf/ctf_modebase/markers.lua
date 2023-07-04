@@ -9,6 +9,13 @@ local blacklist = {
 	"ctf_mode_classes:ranged_rifle_loaded"
 }
 
+ctf_settings.register("prevent_marker_placement", {
+	type = "bool",
+	label = "Prevent automatic marker placement while sniping",
+	description = "Prevent placement of markers while holding ranged weapons,\nthis exludes the shotgun and pistol.",
+	default = true
+})
+
 local hud = mhud.init()
 local marker_cooldown = ctf_core.init_cooldowns()
 local markers = {}
@@ -274,10 +281,12 @@ minetest.register_globalstep(function(dtime)
 			local stackname = player:get_wielded_item():get_name()
 
 			local holding_blacklisted_item = false
-			for _, itemstring in ipairs(blacklist) do
-				if stackname:match(itemstring) then
-					holding_blacklisted_item = true
-					break
+			if ctf_settings.get(player, "prevent_marker_placement") == true then
+				for _, itemstring in ipairs(blacklist) do
+					if stackname:match(itemstring) then
+						holding_blacklisted_item = true
+						break
+					end
 				end
 			end
 
