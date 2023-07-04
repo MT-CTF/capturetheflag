@@ -157,17 +157,21 @@ local function marker_func(name, param, specific_player, hpmarker)
 		pointed = ray:next()
 	end
 
-	if not pointed then
-		return false, "Can't find anything to mark, too far away!"
-	end
-	message = string.format("m [%s]: %s", name, param)
+	if hpmarker then
+		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
+		pos = player:get_pos()
+	else
+		if not pointed then
+			return false, "Can't find anything to mark, too far away!"
+		end
+		message = string.format("m [%s]: %s", name, param)
 
 		if pointed.type == "object" then
 			local concat
 			local obj = pointed.ref
 			local entity = obj:get_luaentity()
 
-			-- If object is a player, append player name to display text
+			-- If object is a player, append player name to display text	
 			-- Else if obj is item entity, append item description and count to str.
 			if obj:is_player() then
 				concat = obj:get_player_name()
@@ -188,13 +192,10 @@ local function marker_func(name, param, specific_player, hpmarker)
 		else
 			pos = pointed.under
 		end
-
+	end
+	
 	if vector.distance(pos, player:get_pos()) <= 2 then
 		hpmarker = true
-	end
-	if hpmarker then
-		message = string.format("m [%s]: HP=%i/%i", name, player:get_hp(), player:get_properties().hp_max)
-		pos = player:get_pos()
 	end
 
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
