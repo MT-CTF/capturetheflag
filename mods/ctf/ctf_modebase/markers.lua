@@ -212,7 +212,7 @@ minetest.register_chatcommand("mhp", {
 	description = "Place a HP marker in your look direction",
 	params = "",
 	privs = {interact = true, shout = true},
-	func = function(name, param, specific_player) return marker_func(name, param, specific_player, true) end
+	func = function(name, param) return marker_func(name, param, nil, true) end
 })
 
 minetest.register_chatcommand("m", {
