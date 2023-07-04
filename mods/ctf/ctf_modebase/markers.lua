@@ -179,7 +179,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 				if entity.name == "__builtin:item" then
 					local stack = ItemStack(entity.itemstring)
 					local itemdef = minetest.registered_items[stack:get_name()]
-
 					-- Fallback to itemstring if description doesn't exist
 					-- Only use first line of itemstring
 					concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
