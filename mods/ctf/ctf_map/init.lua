@@ -70,15 +70,17 @@ ctf_core.include_files(
 )
 
 local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
-
-for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
-    for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
-        if filename == "init.lua" then
-            dofile(directory .. "/" .. entry .. "/"..filename)
+function ctf_map.run_map_init(map)
+    for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
+        if entry == map.foldername then
+            for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
+                if filename == "init.lua" then
+                    dofile(directory .. "/" .. entry .. "/"..filename)
+                end
+            end
         end
     end
 end
-
 
 minetest.register_chatcommand("ctf_map", {
 	description = "Run map related commands",
