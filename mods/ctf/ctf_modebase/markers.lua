@@ -178,7 +178,7 @@ local function marker_func(name, param, specific_player, hpmarker)
       end
       if entity then
         if entity.name == "__builtin:item" then
-       	  local stack = ItemStack(entity.itemstring)
+          local stack = ItemStack(entity.itemstring)
           local itemdef = minetest.registered_items[stack:get_name()]
           -- Fallback to itemstring if description doesn't exist
           -- Only use the first line of itemstring
