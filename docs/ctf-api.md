@@ -1,6 +1,9 @@
 CaptureTheFlag Lua API Reference
 ==================================
 
+# Code Style
+* Use tabs for indentation.
+
 # mods/apis/
 This folder contains a collection of mods with the main goal of providing an API
 

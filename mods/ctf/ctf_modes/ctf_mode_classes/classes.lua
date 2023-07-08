@@ -512,6 +512,11 @@ function classes.show_class_formspec(player)
 end
 
 function classes.is_restricted_item(player, name)
+	-- Don't check restricted items for players not in a team
+	if not ctf_teams.get(player) then
+		return
+	end
+
 	for _, disallowed in pairs(classes.get(player).disallowed_items) do
 		if name:match(disallowed) then
 			hud_events.new(player, {
