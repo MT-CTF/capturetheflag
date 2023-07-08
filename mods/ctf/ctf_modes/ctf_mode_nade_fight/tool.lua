@@ -2,7 +2,24 @@ local function check_hit(pos1, pos2, obj)
 	local ray = minetest.raycast(pos1, pos2, true, false)
 	local hit = ray:next()
 
-	while hit and hit.type == "node" and vector.distance(pos1, hit.under) <= 1.6 do
+	-- Skip over non-normal nodes like ladders, water, doors, glass, leaves, etc
+	-- Also skip over all objects that aren't the target
+	-- Any collisions within a 1.2 node distance from the target don't stop the grenade
+	while hit and (
+		(
+		 hit.type == "node"
+		 and
+		 (
+			hit.intersection_point:distance(pos2) <= 1.2
+			or
+			not minetest.registered_nodes[minetest.get_node(hit.under).name].walkable
+		 )
+		)
+		or
+		(
+		 hit.type == "object" and hit.ref ~= obj
+		)
+	) do
 		hit = ray:next()
 	end
 
