@@ -183,7 +183,7 @@ local function marker_func(name, param, specific_player, hpmarker)
           local itemdef = minetest.registered_items[stack:get_name()]
           -- Fallback to itemstring if description doesn't exist
           -- Only use the first line of itemstring
-          concat = string.match(itemdef.description or entity.itemstrng, "([^\n]+)")
+          concat = string.match(itemdef.description or entity.itemstring, "([^\n]+)")
           concat = concat .. " " .. stack:get_count()
         end
         if concat then
