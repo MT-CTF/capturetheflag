@@ -197,6 +197,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 		else
 			pos = pointed.under
 		end
+    message = message .. " <" .. concat .. ">"
 	else
 		if not pointed then
 			return false, "Can't find anything to mark, too far away!"
