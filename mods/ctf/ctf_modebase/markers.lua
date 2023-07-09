@@ -161,8 +161,8 @@ local function marker_func(name, param, specific_player, hpmarker)
 
 	if pointed and pointed.type == "object" and pointed.ref == player then
 		pointed = ray:next()
-  	end
-  	if pointed and (vector.distance(
+    end
+    if pointed and (vector.distance(
       pointed.under or pointed.ref:get_pos(),
       player:get_pos()
       ) <= 2) and (player:get_hp() < player:get_properties().hp_max) then
