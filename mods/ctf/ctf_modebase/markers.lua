@@ -192,6 +192,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 					pos = obj:get_pos()
 				end
 			else
+				concat = message .. " <" .. concat .. ">"
 				pos = player:get_pos()
 			end
 		else
