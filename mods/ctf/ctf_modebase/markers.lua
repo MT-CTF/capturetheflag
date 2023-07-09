@@ -169,16 +169,18 @@ local function marker_func(name, param, specific_player, hpmarker)
 		hpmarker = true
 	end
 	if hpmarker == true then
-		local concat
 		local player_hpr = string.format("HP=[%i]/[%i]", player:get_hp(),
 		player:get_properties().hp_max)
 		message = string.format("m [%s]: ", name) .. player_hpr
 		if pointed.type == "object" then
-			local obj = pointed.ref
+			local concat
+      local obj = pointed.ref
 			local entity = obj:get_luaentity()
 			if obj:is_player() then
 				concat = obj:get_player_name()
-			elseif entity then
+			  concat = message .. " <" .. concat .. ">"
+        pos = player:get_pos()
+      elseif entity then
 				if entity.name == "__builtin:item" then
 					local stack = ItemStack(entity.itemstring)
 					local itemdef = minetest.registered_items[stack:get_name()]
@@ -191,9 +193,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 					message = message .. " <" .. concat .. ">"
 					pos = obj:get_pos()
 				end
-			else
-				concat = message .. " <" .. concat .. ">"
-				pos = player:get_pos()
 			end
 		else
 			pos = pointed.under
