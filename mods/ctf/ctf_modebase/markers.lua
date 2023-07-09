@@ -168,35 +168,35 @@ local function marker_func(name, param, specific_player, hpmarker)
       ) <= 2) and (player:get_hp() < player:get_properties().hp_max) then
 		  hpmarker = true
 	end
-  if hpmarker == true then
-    local concat
-    local player_hpr = string.format("HP=[%i]/[%i]", player:get_hp(), player:get_properties().hp_max)
+  	if hpmarker == true then
+    	local concat
+    	local player_hpr = string.format("HP=[%i]/[%i]", player:get_hp(), player:get_properties().hp_max)
 		message = string.format("m [%s]: ", name) .. player_hpr
-    if pointed.type == "object" then
-      local obj = pointed.ref
-      local entity = obj:get_luaentity()
-      if obj:is_player() then
-        concat = obj:get_player_name()
-      end
-      if entity then
-        if entity.name == "__builtin:item" then
-          local stack = ItemStack(entity.itemstring)
-          local itemdef = minetest.registered_items[stack:get_name()]
-          -- Fallback to itemstring if description doesn't exist
-          -- Only use the first line of itemstring
-          concat = string.match(itemdef.description or entity.itemstring, "([^\n]+)")
-          concat = concat .. " " .. stack:get_count()
-        end
-        if concat then
-          message = message .. " <" .. concat .. ">"
-          pos = obj:get_pos()
-        end
-      else
-        pos = player:get_pos()
-      end
-    else
-      pos = pointed.under
-    end
+    	if pointed.type == "object" then
+      	local obj = pointed.ref
+      	local entity = obj:get_luaentity()
+      	if obj:is_player() then
+        	concat = obj:get_player_name()
+      	end
+      	if entity then
+        	if entity.name == "__builtin:item" then
+          		local stack = ItemStack(entity.itemstring)
+          		local itemdef = minetest.registered_items[stack:get_name()]
+          		-- Fallback to itemstring if description doesn't exist
+          		-- Only use the first line of itemstring
+          		concat = string.match(itemdef.description or entity.itemstring, "([^\n]+)")
+          		concat = concat .. " " .. stack:get_count()
+        	end
+        	if concat then
+          		message = message .. " <" .. concat .. ">"
+          		pos = obj:get_pos()
+        	end
+      	else
+        	pos = player:get_pos()
+      	end
+    	else
+      		pos = pointed.under
+    	end
 	else
 		if not pointed then
 			return false, "Can't find anything to mark, too far away!"
