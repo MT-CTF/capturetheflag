@@ -162,13 +162,15 @@ local function marker_func(name, param, specific_player, hpmarker)
 	if pointed and pointed.type == "object" and pointed.ref == player then
 		pointed = ray:next()
 	end
-	if pointed and (vector.distance(
+
+	if pointed and vector.distance(
 		pointed.under or pointed.ref:get_pos(),
 		player:get_pos()
-		) <= 2) and (player:get_hp() < player:get_properties().hp_max) then
+	) <= 2 and (player:get_hp() < player:get_properties().hp_max) then
 		hpmarker = true
 	end
-	if hpmarker == true then
+
+	if pointed and hpmarker == true then
 		local player_hpr = string.format("HP=[%i]/[%i]", player:get_hp(),
 		player:get_properties().hp_max)
 		message = string.format("m [%s]: ", name) .. player_hpr
