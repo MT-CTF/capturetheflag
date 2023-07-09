@@ -164,7 +164,8 @@ local function marker_func(name, param, specific_player, hpmarker)
   end
   if pointed and (vector.distance(
     pointed.under or pointed.ref:get_pos(),
-    player:get_pos()) <= 2) and (player:get_hp() < player:get_properties().hp_max) then
+    player:get_pos()
+    ) <= 2) and (player:get_hp() < player:get_properties().hp_max) then
 	  hpmarker = true
 	end
   if hpmarker == true then
