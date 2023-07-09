@@ -298,7 +298,10 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 					else
 						kb = KNOCKBACK_AMOUNT
 					end
-					v:add_velocity(vector.multiply(vector.direction(pos, headpos), kb))
+
+					local dir = vector.direction(pos, headpos)
+					if dir.y < 0 then dir.y = 0 end
+					v:add_velocity(vector.multiply(dir, kb))
 				end
 			end
 		end
