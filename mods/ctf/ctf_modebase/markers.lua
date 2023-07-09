@@ -174,13 +174,13 @@ local function marker_func(name, param, specific_player, hpmarker)
 		message = string.format("m [%s]: ", name) .. player_hpr
 		if pointed.type == "object" then
 			local concat
-      local obj = pointed.ref
+			local obj = pointed.ref
 			local entity = obj:get_luaentity()
 			if obj:is_player() then
 				concat = obj:get_player_name()
-			  concat = message .. " <" .. concat .. ">"
-        pos = player:get_pos()
-      elseif entity then
+				message = message .. " <" .. concat .. ">"
+				pos = player:get_pos()
+			elseif entity then
 				if entity.name == "__builtin:item" then
 					local stack = ItemStack(entity.itemstring)
 					local itemdef = minetest.registered_items[stack:get_name()]
@@ -197,7 +197,6 @@ local function marker_func(name, param, specific_player, hpmarker)
 		else
 			pos = pointed.under
 		end
-    message = message .. " <" .. concat .. ">"
 	else
 		if not pointed then
 			return false, "Can't find anything to mark, too far away!"
