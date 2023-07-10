@@ -171,7 +171,10 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 				color = "gold"
 			end
 
-			local row = string.format("%d,%s,%s,%s"..",%s,%s", ranks.number or i, color, ranks.pname, color, ranks[rank_values[sort_by_idx]] or 0, color)
+			local row = string.format(
+				"%d,%s,%s,%s"..",%s,%s",
+				ranks.number or i, color, ranks.pname, color, ranks[rank_values[sort_by_idx]] or 0, color
+			)
 			local rv = table.copy(rank_values)
 			table.remove(rv, sort_by_idx)
 
@@ -224,7 +227,9 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 				},
 				rows = {
 					#special_rankings > 1 and table.concat(special_rankings, ",") or "",
-					"white", "Player Name", "cyan", HumanReadable(sortby).."  ", "white", HumanReadable(table.concat(modified_ranks, "  ,")),
+					"white", "Player Name",
+					"cyan", HumanReadable(sortby).."  ", "white",
+					HumanReadable(table.concat(modified_ranks, "  ,")),
 					table.concat(rankings, ",")
 				}
 			}
