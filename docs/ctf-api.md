@@ -24,7 +24,7 @@ ctf_settings.register("my_setting", {
 	on_change = function(player, new_value)
 		<...>
 	end
-}
+})
 ```
 
 ### `ctf_settings.set(player, setting, value)`
