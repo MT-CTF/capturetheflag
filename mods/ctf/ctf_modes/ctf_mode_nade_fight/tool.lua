@@ -158,13 +158,16 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 						v:punch(player, 1, {
 							punch_interval = 1,
 							damage_groups = {
-								fleshy = 1,
+								fleshy = 2,
 								black_hole_grenade = 1,
 							}
 						}, nil)
 					end
 
-					v:add_velocity(vector.multiply(vector.direction(footpos, pos), vector.distance(footpos, pos) * 8))
+					local vel = vector.multiply(vector.direction(footpos, pos), vector.distance(footpos, pos) * 9)
+
+					if vel.y < -2 then vel.y = -2 end
+					v:add_velocity(vel)
 
 					tool.holed[vname] = false
 					table.insert(victims, vname)
