@@ -1,5 +1,5 @@
 local weapon_data = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
-    {"knockback_grenade",{"sent flying", "doomed to fall"}}, 
+    {"knockback_grenade",{"sent flying", "doomed to fall"}},
     {"black_hole_grenade",{"sucked into the void"}},
     {"sword",{"killed", "slashed", "stabbed", "murdered"}},
     {"axe",{"killed", "slashed", "murdered", "axed a question"}},
@@ -8,9 +8,7 @@ local weapon_data = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
     {"ctf_ranged",{"shot", "sniped"}},
     {"default_water", {"suffocated"}}}
 
-ctf_death_message = {}
-
-function ctf_death_message.death_message(player, killer, weapon_image)
+function ctf_death_message(player, killer, weapon_image)
     local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_death_message:send_death_message")
     local image_index = nil
     local assist_message = ""
@@ -46,7 +44,7 @@ function ctf_death_message.death_message(player, killer, weapon_image)
     if (death_setting == "true") then
         if player ~= killer then
             if image_index then
-                local death_message = "You were " 
+                local death_message = "You were "
                     .. weapon_data[image_index][2][math.random(1,#weapon_data[image_index][2])]
                     .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
                 minetest.chat_send_player(player, death_message)
@@ -57,7 +55,7 @@ function ctf_death_message.death_message(player, killer, weapon_image)
             end
         end
         if player == killer and #hitters == 0 then
-            local suicide_message = nil
+            local suicide_message
             if image_index then
                 suicide_message = weapon_data[image_index][2][math.random(1,#weapon_data[image_index][2])]
             else
