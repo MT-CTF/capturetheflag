@@ -302,7 +302,7 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		    local ctl = user:get_player_control()
 		    if not ctl.sneak and not ctl.aux1 then return end
         end
-		
+
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
