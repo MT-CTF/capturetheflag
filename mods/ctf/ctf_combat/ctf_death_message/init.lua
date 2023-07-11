@@ -8,7 +8,7 @@ local weapon_data = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
     {"ctf_ranged",{"shot", "sniped"}},
     {"default_water", {"suffocated"}}}
 
-function ctf_death_message(player, killer, weapon_image)
+function ctf_kill_list.ctf_death_message(player, killer, weapon_image)
     local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_death_message:send_death_message")
     local image_index = nil
     local assist_message = ""
