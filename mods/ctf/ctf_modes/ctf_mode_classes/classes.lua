@@ -129,7 +129,7 @@ ctf_settings.register("ctf_mode_classes:simple_knight_activate", {
 
 ctf_settings.register("ctf_mode_classes:simple_support_activate", {
 	type = "bool",
-	label = "[Classes] Simple support bandage immunity activation",
+	label = "[Classes] Simple Support bandage immunity activation",
 	description = "If enabled you don't need to hold Sneak/Run to activate the immunity ability",
 	default = "false",
 })
