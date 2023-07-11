@@ -153,10 +153,10 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			if ctf_teams.get(player) then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
-                    ctf_death_message(player, killer, weapon_image)
+                    ctf_kill_list.ctf_death_message(player, killer, weapon_image)
 				else
 					ctf_kill_list.add("", player, get_suicide_image(reason))
-                    ctf_death_message(player, player, get_suicide_image(reason))
+                    ctf_kill_list.ctf_death_message(player, player, get_suicide_image(reason))
 				end
 			end
 
@@ -182,7 +182,7 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		if ctf_teams.get(killer) then
 			ctf_kill_list.add(killer, player, weapon_image, comment)
-            ctf_death_message(player, killer, weapon_image)
+            ctf_kill_list.ctf_death_message(player, killer, weapon_image)
 		end
 
 		-- share kill score with other hitters
