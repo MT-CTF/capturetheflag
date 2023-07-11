@@ -1,17 +1,24 @@
-weapon_data = {{"grenades_frag",{"blown up", "bombed", "exploded"}}, {"knockback_grenade",{"sent flying", "doomed to fall"}}, {"black_hole_grenade",{"sucked into the void"}}, {"sword",{"killed", "slashed", "stabbed", "murdered"}}, {"axe",{"killed", "slashed", "murdered", "axed a question"}}, {"shovel",{"killed with a gardening mere tool"}}, {"pick",{"pickaxed to death"}}, {"ctf_ranged",{"shot", "sniped"}}, {"default_water", {"suffocated"}}}
+local weapon_data = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
+    {"knockback_grenade",{"sent flying", "doomed to fall"}}, 
+    {"black_hole_grenade",{"sucked into the void"}},
+    {"sword",{"killed", "slashed", "stabbed", "murdered"}},
+    {"axe",{"killed", "slashed", "murdered", "axed a question"}},
+    {"shovel",{"killed with a gardening mere tool"}},
+    {"pick",{"pickaxed to death"}},
+    {"ctf_ranged",{"shot", "sniped"}},
+    {"default_water", {"suffocated"}}}
 
 ctf_death_message = {}
 
 function ctf_death_message.death_message(player, killer, weapon_image)
-    local death_message_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_death_message:send_death_message")
+    local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_death_message:send_death_message")
     local image_index = nil
-    local death_message = ""
     local assist_message = ""
     local hitters = ctf_combat_mode.get_other_hitters(player, killer)
 
     local k_teamcolor = ctf_teams.get(killer)
     if k_teamcolor then
-		local k_teamcolor = ctf_teams.team[k_teamcolor].color
+		k_teamcolor = ctf_teams.team[k_teamcolor].color
 	end
     for index, data in ipairs(weapon_data) do
         if weapon_image:find(data[1]) then
@@ -30,32 +37,33 @@ function ctf_death_message.death_message(player, killer, weapon_image)
                 assist_message = assist_message .. minetest.colorize(a_teamcolor, pname)
             elseif index == #hitters then
                 assist_message = assist_message .. ", and " .. minetest.colorize(a_teamcolor, pname)
-            
 			else
                 assist_message = assist_message .. ", " .. minetest.colorize(a_teamcolor, pname)
             end
 		end
     end
 
-    if (death_message_setting == "true") then
+    if (death_setting == "true") then
         if player ~= killer then
             if image_index then
-                death_message = "You were " .. weapon_data[image_index][2][math.random(1,#weapon_data[image_index][2])] .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
+                local death_message = "You were " 
+                    .. weapon_data[image_index][2][math.random(1,#weapon_data[image_index][2])]
+                    .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
                 minetest.chat_send_player(player, death_message)
             else
-                death_message = "You were killed by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
+                local death_message = "You were killed by "
+                    .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
                 minetest.chat_send_player(player, death_message)
             end
         end
         if player == killer and #hitters == 0 then
             local suicide_message = nil
-            if image_index then 
-                suicide_message = weapon_data[image_index][2][math.random(1,#weapon_data[image_index][2])] 
-            end
-            if suicide_message == nil then 
+            if image_index then
+                suicide_message = weapon_data[image_index][2][math.random(1,#weapon_data[image_index][2])]
+            else
                 suicide_message = "suicided"
             end
-            death_message = "You " .. suicide_message .. assist_message .. "."
+            local death_message = "You " .. suicide_message .. assist_message .. "."
             minetest.chat_send_player(player, death_message)
         end
     end
