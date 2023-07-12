@@ -45,6 +45,8 @@ end
 
 minetest.override_chatcommand("me", {
 	func = function(name, param)
+		local message = param:match("^(.+)$")
+
 		if filter and not filter.check_message(name, message) then
 			filter.on_violation(name, message)
 			return false
