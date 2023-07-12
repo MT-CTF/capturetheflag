@@ -137,15 +137,6 @@ local function send_death_message(player, killer, weapon_image)
     end
 end
 
-if not ctf_settings.settings["send_death_message"] then
-    ctf_settings.register("send_death_message", {
-        type = "bool",
-        label = "Recieve death message.",
-        description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
-        default = "false",
-    })
-end
-
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
 	if not tname then return end
@@ -677,3 +668,10 @@ return {
 }
 
 end
+
+ctf_settings.register("send_death_message", {
+    type = "bool",
+    label = "Recieve death message",
+    description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
+    default = "false",
+})
