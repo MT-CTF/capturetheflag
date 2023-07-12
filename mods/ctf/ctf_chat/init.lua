@@ -45,6 +45,10 @@ end
 
 minetest.override_chatcommand("me", {
 	func = function(name, param)
+		if filter and not filter.check_message(name, message) then
+			filter.on_violation(name, message)
+			return false
+		end
 		minetest.log("action", string.format("[CHAT] ME from %s: %s", name, param))
 
 		if ctf_chat.send_me(name, param) then
