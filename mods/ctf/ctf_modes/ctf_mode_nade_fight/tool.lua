@@ -2,7 +2,24 @@ local function check_hit(pos1, pos2, obj)
 	local ray = minetest.raycast(pos1, pos2, true, false)
 	local hit = ray:next()
 
-	while hit and hit.type == "node" and vector.distance(pos1, hit.under) <= 1.6 do
+	-- Skip over non-normal nodes like ladders, water, doors, glass, leaves, etc
+	-- Also skip over all objects that aren't the target
+	-- Any collisions within a 1 node distance from the target don't stop the grenade
+	while hit and (
+		(
+		 hit.type == "node"
+		 and
+		 (
+			hit.intersection_point:distance(pos2) <= 1
+			or
+			not minetest.registered_nodes[minetest.get_node(hit.under).name].walkable
+		 )
+		)
+		or
+		(
+		 hit.type == "object" and hit.ref ~= obj
+		)
+	) do
 		hit = ray:next()
 	end
 
@@ -141,13 +158,16 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 						v:punch(player, 1, {
 							punch_interval = 1,
 							damage_groups = {
-								fleshy = 1,
+								fleshy = 2,
 								black_hole_grenade = 1,
 							}
 						}, nil)
 					end
 
-					v:add_velocity(vector.multiply(vector.direction(footpos, pos), vector.distance(footpos, pos) * 8))
+					local vel = vector.multiply(vector.direction(footpos, pos), vector.distance(footpos, pos) * 9)
+
+					if vel.y < -2 then vel.y = -2 end
+					v:add_velocity(vel)
 
 					tool.holed[vname] = false
 					table.insert(victims, vname)
@@ -281,7 +301,10 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 					else
 						kb = KNOCKBACK_AMOUNT
 					end
-					v:add_velocity(vector.multiply(vector.direction(pos, headpos), kb))
+
+					local dir = vector.direction(pos, headpos)
+					if dir.y < 0 then dir.y = 0 end
+					v:add_velocity(vector.multiply(dir, kb))
 				end
 			end
 		end
