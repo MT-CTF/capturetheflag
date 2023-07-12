@@ -9,8 +9,13 @@ local teams_left
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
-
-	return math.max(1, math.round(kd * 7))
+	local flag_multiplier = 1
+	for tname, p in pairs(ctf_modebase.flag_taken) do
+		if p.p == player then
+			flag_multiplier = flag_multiplier + .25
+		end
+	end
+	return math.max(1, math.round(kd * 7 * flag_multiplier))
 end
 
 local damage_group_textures = {
