@@ -5,6 +5,7 @@ local FLAG_CAPTURE_TIMER = 60 * 3
 local many_teams = false
 local team_list
 local teams_left
+local death_setting_registered = false
 local death_messages = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
     {"knockback_grenade",{"sent flying", "doomed to fall"}},
     {"black_hole_grenade",{"sucked into the void"}},
@@ -137,12 +138,14 @@ local function send_death_message(player, killer, weapon_image)
     end
 end
 
-ctf_settings.register("send_death_message", {
-    type = "bool",
-    label = "Recieve death message.",
-    description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
-    default = "false",
-})
+if not ctf_settings.settings["send_death_message"] then
+    ctf_settings.register("send_death_message", {
+        type = "bool",
+        label = "Recieve death message.",
+        description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
+        default = "false",
+    })
+end
 
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
