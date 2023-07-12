@@ -5,7 +5,6 @@ local FLAG_CAPTURE_TIMER = 60 * 3
 local many_teams = false
 local team_list
 local teams_left
-local death_setting_registered = false
 local death_messages = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
     {"knockback_grenade",{"sent flying", "doomed to fall"}},
     {"black_hole_grenade",{"sucked into the void"}},
