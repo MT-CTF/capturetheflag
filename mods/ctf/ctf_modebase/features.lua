@@ -5,6 +5,7 @@ local FLAG_CAPTURE_TIMER = 60 * 3
 local many_teams = false
 local team_list
 local teams_left
+local death_setting_registered = false
 local death_messages = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
     {"knockback_grenade",{"sent flying", "doomed to fall"}},
     {"black_hole_grenade",{"sucked into the void"}},
@@ -78,7 +79,7 @@ local function get_suicide_image(reason)
 	return image
 end
 
-local function death_message(player, killer, weapon_image)
+local function send_death_message(player, killer, weapon_image)
     local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
     local image_index = nil
     local assist_message = ""
@@ -137,15 +138,12 @@ local function death_message(player, killer, weapon_image)
     end
 end
 
-if not death_setting_registered then
-    ctf_settings.register("send_death_message", {
-        type = "bool",
-        label = "Recieve death message.",
-        description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
-        default = "false",
-    })
-    death_setting_registered = true
-end
+ctf_settings.register("send_death_message", {
+    type = "bool",
+    label = "Recieve death message.",
+    description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
+    default = "false",
+})
 
 local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
@@ -234,10 +232,10 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			if ctf_teams.get(player) then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
-                    death_message(player, killer, weapon_image)
+                    send_death_message(player, killer, weapon_image)
 				else
 					ctf_kill_list.add("", player, get_suicide_image(reason))
-                    death_message(player, player, get_suicide_image(reason))
+                    send_death_message(player, player, get_suicide_image(reason))
 				end
 			end
 
@@ -263,7 +261,7 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		if ctf_teams.get(killer) then
 			ctf_kill_list.add(killer, player, weapon_image, comment)
-            death_message(player, killer, weapon_image)
+            send_death_message(player, killer, weapon_image)
 		end
 
 		-- share kill score with other hitters
