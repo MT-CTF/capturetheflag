@@ -127,6 +127,13 @@ ctf_settings.register("ctf_mode_classes:simple_knight_activate", {
 	default = "false",
 })
 
+ctf_settings.register("ctf_mode_classes:simple_support_activate", {
+	type = "bool",
+	label = "[Classes] Simple Support bandage immunity activation",
+	description = "If enabled you don't need to hold Sneak/Run to activate the immunity ability",
+	default = "false",
+})
+
 ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	description = "Knight Sword\n" .. minetest.colorize("gold",
 			"(Sneak/Run) + Rightclick to use Rage ability (Lasts "..
@@ -291,8 +298,10 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	heal_min = 4,
 	heal_max = 5,
 	rightclick_func = function(itemstack, user, pointed)
-		local ctl = user:get_player_control()
-		if not ctl.sneak and not ctl.aux1 then return end
+		if ctf_settings.get(user, "ctf_mode_classes:simple_support_activate") ~= "true" then
+		    local ctl = user:get_player_control()
+		    if not ctl.sneak and not ctl.aux1 then return end
+        end
 
 		local pname = user:get_player_name()
 
@@ -512,6 +521,11 @@ function classes.show_class_formspec(player)
 end
 
 function classes.is_restricted_item(player, name)
+	-- Don't check restricted items for players not in a team
+	if not ctf_teams.get(player) then
+		return
+	end
+
 	for _, disallowed in pairs(classes.get(player).disallowed_items) do
 		if name:match(disallowed) then
 			hud_events.new(player, {

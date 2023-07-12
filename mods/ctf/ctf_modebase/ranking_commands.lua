@@ -217,6 +217,7 @@ minetest.register_chatcommand("top50", {
 			table.insert(top50, t)
 		end
 
+		mode_data.summary_ranks._sort = "score"
 		ctf_modebase.summary.show_gui_sorted(name, top50, {}, mode_data.summary_ranks, {
 			title = "Top 50 Players",
 			gamemode = mode_name,

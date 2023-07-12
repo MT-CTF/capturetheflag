@@ -55,8 +55,13 @@ end
 --
 
 -- Takes [mapmeta] or [pos1, pos2] arguments
-function ctf_map.remove_barrier(mapmeta, pos2)
+function ctf_map.remove_barrier(mapmeta, pos2, callback)
 	local pos1 = mapmeta
+
+	if type(pos2) == "function" then
+		callback = pos2
+		pos2 = nil
+	end
 
 	if not pos2 then
 		pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
@@ -101,6 +106,7 @@ function ctf_map.remove_barrier(mapmeta, pos2)
 		vm:set_data(d)
 		vm:update_liquids()
 		vm:write_to_map(false)
+		callback()
 	end, data, pos1, pos2, ctf_map.barrier_nodes)
 end
 

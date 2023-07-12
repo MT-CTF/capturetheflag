@@ -3,6 +3,10 @@ local start_time = nil
 local game_stat = nil
 local winner = nil
 
+local player_sort_by = {}
+
+minetest.register_on_leaveplayer(function(player) player_sort_by[player:get_player_name()] = nil end)
+
 local function team_rankings(total)
 	local ranks = {}
 
@@ -43,6 +47,7 @@ function ctf_modebase.summary.get(prev)
 				winner = winner,
 				duration = get_duration(),
 				buttons = {previous = previous ~= nil},
+				allow_sort = true,
 			}
 	elseif previous ~= nil then
 		return
@@ -53,6 +58,7 @@ function ctf_modebase.summary.get(prev)
 				winner = previous.winner,
 				duration = previous.duration,
 				buttons = {next = true},
+				allow_sort = true,
 			}
 	end
 end
@@ -122,6 +128,10 @@ local function show_for_player(name, prev)
 		return false
 	end
 
+	if formdef.allow_sort and player_sort_by[name] then
+		rank_values._sort = player_sort_by[name]
+	end
+
 	ctf_modebase.summary.show_gui(name, match_rankings, special_rankings, rank_values, formdef)
 	return true
 end
@@ -133,6 +143,15 @@ end
 function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, rank_values, formdef)
 	if not formdef then formdef = {} end
 	if not formdef.buttons then formdef.buttons = {} end
+
+	local sort_by_idx = table.indexof(rank_values, rank_values._sort)
+
+	if sort_by_idx == -1 then
+		sort_by_idx = 1
+	end
+
+	local modified_ranks = table.copy(rank_values)
+	local sortby = table.remove(modified_ranks, sort_by_idx)
 
 	local render = function(sorted)
 		for i, ranks in ipairs(sorted) do
@@ -152,10 +171,15 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 				color = "gold"
 			end
 
-			local row = string.format("%d,%s,%s", ranks.number or i, color, ranks.pname)
+			local row = string.format(
+				"%d,%s,%s,%s"..",%s,%s",
+				ranks.number or i, color, ranks.pname, color, math.round(ranks[rank_values[sort_by_idx]] or 0), color
+			)
+			local rv = table.copy(rank_values)
+			table.remove(rv, sort_by_idx)
 
-			for idx, rank in ipairs(rank_values) do
-				row = string.format("%s,%s", row, math.round(ranks[rank] or 0))
+			for idx, rank in ipairs(rv) do
+				row = string.format("%s,%d", row, math.round(ranks[rank] or 0))
 			end
 
 			sorted[i] = row
@@ -168,11 +192,12 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if #special_rankings >= 1 then
 		if formdef.special_row_title then
 			table.insert(special_rankings, 1, string.format(
-				",white,%s,%s", formdef.special_row_title, HumanReadable(table.concat(rank_values, "  ,"))
+				",white,%s,cyan,%s,white,%s",
+				formdef.special_row_title, HumanReadable(sortby), HumanReadable(table.concat(modified_ranks, "  ,"))
 			))
 		end
 
-		table.insert(special_rankings, string.rep(",", #rank_values+3))
+		table.insert(special_rankings, string.rep(",", #modified_ranks+6))
 	end
 
 	local formspec = {
@@ -180,28 +205,53 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		elements = {
 			rankings = {
 				type = "table",
-				pos = {0.1, 1},
+				pos = {0.1, 1 + (formdef.allow_sort and 1 or 0)},
 				size = {
-					math.max(ctf_gui.FORM_SIZE.x - 0.2, ((1 + 8 + 16 + table.concat(rank_values, "  ,"):len())) * 0.3),
-					ctf_gui.FORM_SIZE.y - 1 - (ctf_gui.ELEM_SIZE.y + 3)
+					math.max(
+						ctf_gui.FORM_SIZE.x - 0.2,
+						((1 + 8 + 16 + table.concat(rank_values, "  ,"):len())) * 0.3
+					),
+					(ctf_gui.FORM_SIZE.y - (formdef.allow_sort and 2 or 1)) - (ctf_gui.ELEM_SIZE.y + 3)
 				},
 				options = {
 					highlight = "#00000000",
 				},
 				columns = {
-					{type = "text",  width = 1 },
-					{type = "color", width = 8 }, -- Player team color
-					{type = "text",  width = 16}, -- Player name
-					("text;"):rep(#rank_values):sub(1, -2),
+					{type = "text", width = 1},
+					{type = "color"}, -- Player team color
+					{type = "text", width = 16}, -- Player name
+					"color", -- sortby text color
+					"text", -- sortby text
+					"color", -- Reset color
+					("text;"):rep(#modified_ranks):sub(1, -2),
 				},
 				rows = {
 					#special_rankings > 1 and table.concat(special_rankings, ",") or "",
-					"white", "Player Name", HumanReadable(table.concat(rank_values, "  ,")),
+					"white", "Player Name",
+					"cyan", HumanReadable(sortby).."  ", "white",
+					HumanReadable(table.concat(modified_ranks, "  ,")),
 					table.concat(rankings, ",")
 				}
 			}
 		}
 	}
+
+	if formdef.allow_sort then
+		formspec.elements.sorting = {
+			type = "dropdown",
+			items = rank_values,
+			default_idx = sort_by_idx,
+			give_idx = false,
+			pos = {x = 0.1, y = 1},
+			size = {x = ctf_gui.ELEM_SIZE.x + 1, y = ctf_gui.ELEM_SIZE.y},
+			func = function(playername, fields, field_name)
+				if fields.sorting and sortby ~= fields.sorting and table.indexof(rank_values, fields.sorting) ~= -1 then
+					player_sort_by[playername] = fields.sorting
+					show_for_player(playername, formdef.buttons.next and true or false)
+				end
+			end,
+		}
+	end
 
 	if formdef.buttons.next then
 		formspec.elements.next = {
