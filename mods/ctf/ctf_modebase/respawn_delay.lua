@@ -15,7 +15,9 @@ minetest.register_entity("ctf_modebase:respawn_movement_freezer", {
 
 local function finish_respawn(player)
 	local pname = player:get_player_name()
-	dropondie.drop_all(player)
+	if minetest.get_modpath("dropondie") then
+        dropondie.drop_all(player)
+    end
 	if respawn_delay[pname].state == true then
 		hud:remove(pname, "left")
 	end
