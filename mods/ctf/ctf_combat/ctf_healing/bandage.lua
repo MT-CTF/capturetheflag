@@ -10,6 +10,7 @@ function ctf_healing.register_bandage(name, def)
 		wield_image = def.wield_image,
 		on_use = function(itemstack, player, pointed_thing)
 			if pointed_thing.type == "object" then
+
                 local object = pointed_thing.ref
 			    if not object:is_player() then return end
 
@@ -75,7 +76,7 @@ function ctf_healing.register_bandage(name, def)
                 end
 	        elseif pointed_thing.type == "node" then
                 local node_pointed = minetest.get_node(pointed_thing.under)
-                local node_above_pos = {x = pointed_thing.under.x, y = pointed_thing.under.y + 1, z = pointed_thing.under.z}
+                local node_above_pos = {x=pointed_thing.under.x, y=pointed_thing.under.y +1, z=pointed_thing.under.z}
                 local node_above = minetest.get_node(node_above_pos)
                 if node_pointed.name ~= "ctf_modebase:flag_captured_top" then
                     if node_pointed.name:find("ctf_modebase:flag_") then
