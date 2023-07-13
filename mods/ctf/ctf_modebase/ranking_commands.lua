@@ -101,8 +101,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You should donate at least 5 score!"
 		end
 
-		if score > 100 then
-			return false, "You can donate no more than 100 score!"
+		if score > 400 then
+			return false, "You can donate no more than 400 score!"
 		end
 
 		if pname == name then
@@ -127,8 +127,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate only half of your match score!"
 		end
 
-		if donate_timer[name] and donate_timer[name] + 600 > os.time() then
-			return false, "You can donate only once in 10 minutes!"
+		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
+			return false, "You can donate only once in 5 minutes!"
 		end
 
 		current_mode.recent_rankings.add(pname, {score=score}, true)
