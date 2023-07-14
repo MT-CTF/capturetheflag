@@ -5,18 +5,21 @@ local FLAG_CAPTURE_TIMER = 60 * 3
 local many_teams = false
 local team_list
 local teams_left
-local death_messages = {{"grenades_frag",{"blown up", "bombed", "exploded"}},
-    {"knockback_grenade",{"sent flying", "doomed to fall"}},
-    {"black_hole_grenade",{"sucked into the void"}},
-    {"sword",{"killed", "slashed", "stabbed", "murdered"}},
-    {"axe",{"killed", "slashed", "murdered", "axed a question"}},
-    {"shovel",{"killed with a gardening mere tool"}},
-    {"pick",{"pickaxed to death"}},
-    {"ctf_ranged",{"shot", "sniped"}},
-    {"default_water", {"suffocated"}},
-    {"damage_cobble", {"mined something deadly placed"}},
-    {"lava", {"tried to swim in lava"}},
-    {"fire", {"burnt to a crisp"}}}
+local death_messages = {
+    ["grenades_frag"] = {"blown up", "bombed", "exploded"},
+    ["knockback_grenade"] = {"sent flying", "doomed to fall"},
+    ["black_hole_grenade"] = {"sucked into the void"},
+    ["sword"] = {"killed", "slashed", "stabbed", "murdered"},
+    ["axe"] = {"killed", "slashed", "murdered", "axed a question"},
+    ["shovel"] = {"killed with a gardening mere tool"},
+    ["pick"] = {"pickaxed to death"},
+    ["ctf_ranged"] = {"shot", "sniped"},
+    ["default_water"] = {"suffocated"},
+    ["damage_cobble"] = {"mined something deadly placed"},
+    ["lava"] = {"tried to swim in lava"},
+    ["fire"] = {"burnt to a crisp"}
+}
+    
 
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
@@ -82,15 +85,16 @@ local function send_death_message(player, killer, weapon_image)
     local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
     local image_index = nil
     local assist_message = ""
+    local weapon_message
     local hitters = ctf_combat_mode.get_other_hitters(player, killer)
 
     local k_teamcolor = ctf_teams.get(killer)
     if k_teamcolor then
 		k_teamcolor = ctf_teams.team[k_teamcolor].color
 	end
-    for index, data in ipairs(death_messages) do
-        if weapon_image:find(data[1]) then
-            image_index = index
+    for key, data in pairs(death_messages) do
+        if weapon_image:find(tostring(key)) then
+            weapon_message = data[math.random(1,#data)]
         end
     end
 
@@ -113,9 +117,8 @@ local function send_death_message(player, killer, weapon_image)
 
     if (death_setting == "true") then
         if player ~= killer then
-            if image_index then
-                local death_message = "You were "
-                    .. death_messages[image_index][2][math.random(1,#death_messages[image_index][2])]
+            if weapon_message then
+                local death_message = "You were " .. weapon_message
                     .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
                 minetest.chat_send_player(player, death_message)
             else
@@ -125,12 +128,7 @@ local function send_death_message(player, killer, weapon_image)
             end
         end
         if player == killer and #hitters == 0 then
-            local suicide_message
-            if image_index then
-                suicide_message = death_messages[image_index][2][math.random(1,#death_messages[image_index][2])]
-            else
-                suicide_message = "suicided"
-            end
+            local suicide_message = weapon_message or "suicided"
             local death_message = "You " .. suicide_message .. assist_message .. "."
             minetest.chat_send_player(player, death_message)
         end
@@ -671,7 +669,7 @@ end
 
 ctf_settings.register("send_death_message", {
     type = "bool",
-    label = "Receive death message",
-    description = "When enabled, you will receive a death message whenever you die stating who killed you and how.",
+    label = "Recieve death message.",
+    description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
     default = "false",
 })
