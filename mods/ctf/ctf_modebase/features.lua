@@ -82,7 +82,7 @@ end
 
 local function send_death_message(player, killer, weapon_image)
     local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
-    local assist_message
+    local assist_message = ""
     local weapon_message
     local hitters = ctf_combat_mode.get_other_hitters(player, killer)
 
