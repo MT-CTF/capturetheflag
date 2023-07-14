@@ -19,7 +19,6 @@ local death_messages = {
     ["lava"] = {"tried to swim in lava"},
     ["fire"] = {"burnt to a crisp"}
 }
-    
 
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
@@ -83,8 +82,7 @@ end
 
 local function send_death_message(player, killer, weapon_image)
     local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
-    local image_index = nil
-    local assist_message = ""
+    local assist_message
     local weapon_message
     local hitters = ctf_combat_mode.get_other_hitters(player, killer)
 
