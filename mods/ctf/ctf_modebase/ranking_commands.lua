@@ -20,7 +20,7 @@ end
 
 local function get_rank(return_str, mode_data, prank)
 	for _, rank in ipairs(mode_data.summary_ranks) do
-		return_str = string.format("%s%s: %s,\n\t",
+		return_str = string.format("\t%s%s: %s,\n\t",
 			return_str,
 			minetest.colorize("#63d437", HumanReadable(rank)),
 			minetest.colorize("#ffea00", math.round(prank[rank] or 0))
@@ -89,12 +89,12 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 				mode_data = ctf_modebase.modes[mode]
 				local prank = mode_data.rankings:get(pname)
 				if not prank then
-					return_str = string.format("%s\n\nPlayer %s has no rankings in mode %s!\n",
+					return_str = string.format("%s\n\nPlayer %s has no rankings in mode %s!",
 						return_str, minetest.colorize("#ffea00", pname), mode
 					)
 					no_rank_in_mode = no_rank_in_mode + 1
 				else
-					return_str =  string.format("%s\nRankings in mode %s:\n",
+					return_str =  string.format("%s\n\nRankings in mode %s:\n\t",
 						return_str, mode
 					)
 					return_str = get_rank(return_str, mode_data, prank)
