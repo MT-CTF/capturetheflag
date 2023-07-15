@@ -60,7 +60,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 			pname = name
 		end
 
-		local prank
+		local prank = mode_data.rankings:get(pname)
 		local return_str = string.format(
 			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
 		)
