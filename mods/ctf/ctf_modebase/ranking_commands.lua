@@ -60,12 +60,15 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 			pname = name
 		end
 
-		local prank = mode_data.rankings:get(pname)
+		if not mode_data and mode_name ~= "all" then
+			return false, mode_data
+		end
+
 		local return_str = string.format(
 			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
 		)
 
-		if not prank and mode_name ~= "all" then
+		if mode_name ~= "all" then
 			return false, string.format("Player %s has no rankings in mode %s!",
 				minetest.colorize("#ffea00", pname), mode_name
 			)
@@ -388,3 +391,4 @@ minetest.register_chatcommand("transfer_rankings", {
 		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
 	end
 })
+
