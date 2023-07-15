@@ -75,7 +75,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 		end
 
 		if mode_data and (mode_name ~= "all") then
-			prank = mode_data.rankings:get(pname) -- [p]layer [rank]
+			local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
 			return_str = get_rank(return_str, mode_data, prank)
 		end
 
