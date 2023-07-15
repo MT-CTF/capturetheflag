@@ -76,7 +76,7 @@ function ctf_healing.register_bandage(name, def)
                     if node_pointed.name:find("ctf_modebase:flag_") then
 		                ctf_modebase.flag_on_punch(player, pointed_thing.under, node_pointed)
                     elseif node_above.name:find("ctf_modebase:flag_") then
-                        ctf_modebase.flag_on_punch(player, node_above_pos, node_above)
+                        ctf_modebase.flag_on_punch(player, pointed_thing.under:offset(0, 1, 0), node_above)
                     end
                 end
             end
