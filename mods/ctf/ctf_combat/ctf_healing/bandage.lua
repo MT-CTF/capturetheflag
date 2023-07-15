@@ -71,8 +71,7 @@ function ctf_healing.register_bandage(name, def)
                 end
 	        elseif pointed_thing.type == "node" then
                 local node_pointed = minetest.get_node(pointed_thing.under)
-                local node_above_pos = {x=pointed_thing.under.x, y=pointed_thing.under.y +1, z=pointed_thing.under.z}
-                local node_above = minetest.get_node(node_above_pos)
+                local node_above = minetest.get_node(pointed_thing.under:offset(0, 1, 0))
                 if node_pointed.name ~= "ctf_modebase:flag_captured_top" then
                     if node_pointed.name:find("ctf_modebase:flag_") then
 		                ctf_modebase.flag_on_punch(player, pointed_thing.under, node_pointed)
