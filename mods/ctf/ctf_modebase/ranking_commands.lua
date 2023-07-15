@@ -18,7 +18,7 @@ local function get_gamemode(param)
 	end
 end
 
-local function get_rank(return_str, mode_data, prank)
+local function get_rank(return_str, mode_data, prank, pname)
 	for _, rank in ipairs(mode_data.summary_ranks) do
 		return_str = string.format("\t%s%s: %s,\n\t",
 			return_str,
@@ -76,7 +76,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 
 		if mode_data and (mode_name ~= "all") then
 			local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
-			return_str = get_rank(return_str, mode_data, prank)
+			return_str = get_rank(return_str, mode_data, prank, pname)
 		end
 
 		if mode_name == "all" then
@@ -97,7 +97,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 					return_str =  string.format("%s\n\nRankings in mode %s:\n\t",
 						return_str, mode
 					)
-					return_str = get_rank(return_str, mode_data, prank)
+					return_str = get_rank(return_str, mode_data, prank, pname)
 				end
 			end
 			if no_rank_in_mode == 3 then
