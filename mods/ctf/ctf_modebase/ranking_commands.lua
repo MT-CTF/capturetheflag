@@ -87,7 +87,7 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 			local modes = {"classes", "classic", "nade_fight"}
 			for _, mode in ipairs(modes) do
 				mode_data = ctf_modebase.modes[mode]
-				prank = mode_data.rankings:get(pname)
+				local prank = mode_data.rankings:get(pname)
 				if not prank then
 					return_str = string.format("%s\n\nPlayer %s has no rankings in mode %s!\n",
 						return_str, minetest.colorize("#ffea00", pname), mode
