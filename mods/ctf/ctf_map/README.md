@@ -131,7 +131,7 @@ You can access the exported map by running `/ctf_map editor`, clicking on the ex
 
 ### 8. Screenshot
 
-If you choose to submit your map, include a screenshot of it in the exported map's folder. It should be taken with default texture packs enabled and have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
+If you choose to submit your map, include a screenshot of it in the exported map's folder. It should be taken with on texture packs enabled and have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
 
 You can take a screenshot easily by doing the following:
 1. Hide the HUD. By default <kbd>F1</kbd> does that.
@@ -145,8 +145,10 @@ Crop the screenshot into the aspect ratio mentioned above using a tool of your c
 
 ### 9. Submission
 
-> Your PR should contain the Map Folder that should contain the files `map.conf`, `map.mts`, and `screenshot.png`.
+> Your PR should contain the Map Folder that should include the files `map.conf`, `map.mts`, and `screenshot.png`.
 
 Maps can be submitted to the CTF Maps repository through PRs (Pull Requests). If you don't know how to make them, you could ask someone else to make it for you or make your own GitHub account and make it yourself. A benefit of making it on your own is that you can actively engage in the testing and development of the map PR. If you are new to making PRs and forks, you can learn about them by reading these documentations:
 - [https://docs.github.com/en/get-started/quickstart/fork-a-repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo "https://docs.github.com/en/get-started/quickstart/fork-a-repo") 
 - [https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork "https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork")
+
+If you are creating the PR yourself, it is always better to make each PR on a different branch of your fork of the repo. For example if you want to add `map A` or make `enhancement A`, then make a separate branch for it, and so on for other maps/changes to the code. This will obviate and possible conflicts with any of your already open PRs.  
