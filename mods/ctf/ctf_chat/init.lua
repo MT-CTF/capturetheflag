@@ -114,11 +114,13 @@ minetest.register_on_mods_loaded(function()
 end)
 
 minetest.register_on_chat_message(function(name, message)
-	if message:len() < 2 and string.sub(message, 1, 1) == "!" then
+	local check_message = string.sub(message, 1, 1)
+
+	if message:len() < 2 and check_message == "!" then
 		return false
 	end
 
-	if string.sub(message, 1, 1) == "!" then
+	if check_message == "!" then
 		local message = string.sub(message, 2, string.len(message))
 		local tname = ctf_teams.get(name)
 		if tname then
