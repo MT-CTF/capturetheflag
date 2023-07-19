@@ -112,3 +112,28 @@ minetest.register_on_mods_loaded(function()
 		return true
 	end}
 end)
+
+minetest.register_on_chat_message(function(name, message)
+	if message:len() < 2 and string.sub(message, 1, 1) == "!" then
+		return false
+	end
+
+	if string.sub(message, 1, 1) == "!" then
+		local message = string.sub(message, 2, string.len(message))
+		local tname = ctf_teams.get(name)
+		if tname then
+			minetest.log("action", string.format("[CHAT] team message from %s (team %s): %s", name, tname, message))
+
+			local tcolor = ctf_teams.team[tname].color
+			for username in pairs(ctf_teams.online_players[tname].players) do
+				minetest.chat_send_player(username,
+						minetest.colorize(tcolor, "<" .. name .. "> ** " .. message .. " **"))
+			end
+			return true
+		else
+			minetest.chat_send_player(name,
+					"You're not in a team, so you have no team to talk to.")
+			return false
+		end
+	end
+end)
