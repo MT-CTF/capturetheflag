@@ -116,11 +116,11 @@ end)
 minetest.register_on_chat_message(function(name, message)
 	local check_message = string.sub(message, 1, 1)
 
-	if message:len() < 2 and check_message == "!" then
+	if message:len() < 2 and check_message == ":" then
 		return false
 	end
 
-	if check_message == "!" then
+	if check_message == ":" then
 		local message = string.sub(message, 2, string.len(message))
 		local tname = ctf_teams.get(name)
 		if tname then
