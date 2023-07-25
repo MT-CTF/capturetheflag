@@ -90,3 +90,18 @@ end)
 minetest.override_chatcommand("pulverize", {
 	privs = {creative = true},
 })
+
+minetest.register_chatcommand("mode", {
+	params = "",
+	description = "Get the current mode name",
+	privs = { interact = true, shout =true },
+	func = function ()
+		local mode = ctf_modebase.current_mode
+		if not mode then
+			return false, "The game isn't running"
+		end
+		local return_str = "The current mode is " .. mode
+
+		return true, return_str
+	end
+})
