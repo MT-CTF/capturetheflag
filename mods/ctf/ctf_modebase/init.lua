@@ -95,6 +95,7 @@ minetest.register_chatcommand("mode", {
 	description = "Prints the current mode and matches played",
 	func = function()
 		local mode = ctf_modebase.current_mode
+
 		if not mode then
 			return false, "The game isn't running"
 		end
