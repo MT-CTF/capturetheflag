@@ -128,7 +128,7 @@ minetest.register_chatcommand("donate", {
 		end
 
 		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
-			return false, "You can donate only once in 5 minutes!"
+			return false, "You can donate only once every 5 minutes!"
 		end
 
 		current_mode.recent_rankings.add(pname, {score=score}, true)
