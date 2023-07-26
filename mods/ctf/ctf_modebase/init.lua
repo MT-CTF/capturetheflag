@@ -94,7 +94,6 @@ minetest.override_chatcommand("pulverize", {
 minetest.register_chatcommand("mode", {
 	params = "",
 	description = "Get the current mode name",
-	privs = { interact = true, shout =true },
 	func = function ()
 		local mode = ctf_modebase.current_mode
 		if not mode then
