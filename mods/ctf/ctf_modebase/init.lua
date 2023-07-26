@@ -90,3 +90,20 @@ end)
 minetest.override_chatcommand("pulverize", {
 	privs = {creative = true},
 })
+
+minetest.register_chatcommand("mode", {
+	description = "Prints the current mode and matches played",
+	func = function()
+		local mode = ctf_modebase.current_mode
+
+		if not mode then
+			return false, "The game isn't running"
+		end
+
+		return true, string.format("The current mode is %s. Matches finished: %d/%d",
+			HumanReadable(ctf_modebase.current_mode),
+			ctf_modebase.current_mode_matches_played-1,
+			ctf_modebase.current_mode_matches
+		)
+	end
+})
