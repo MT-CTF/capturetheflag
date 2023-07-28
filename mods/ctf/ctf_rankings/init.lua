@@ -18,6 +18,33 @@ end
 
 ctf_rankings = {
 	init = function()
-		return rankings(top:new())
+		return rankings(minetest.get_current_modname() .. '|', top:new())
 	end,
+
+	do_reset = false, -- See ranking_reset.lua
+	current_reset = 0, -- See ranking_reset.lua
+
+	leagues = {
+		diamond = 20,
+		mese = 50,
+		gold = 250,
+		bronze = 500,
+		iron = 1000,
+		tin = 2500,
+		copper = 5000,
+	},
+	leagues_list = {
+		"diamond", "mese", "gold", "bronze", "iron", "tin", "copper",
+	},
+	league_textures = {
+		diamond = "default_diamond.png",
+		mese = "default_mese_crystal.png",
+		gold = "default_gold_ingot.png",
+		bronze = "default_bronze_ingot.png",
+		iron = "default_steel_ingot.png",
+		tin = "default_tin_ingot.png",
+		copper = "default_copper_ingot.png",
+	},
 }
+
+ctf_core.include_files("leagues.lua", "ranking_reset.lua")
