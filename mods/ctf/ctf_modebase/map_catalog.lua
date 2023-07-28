@@ -33,7 +33,9 @@ end
 init()
 assert(#ctf_modebase.map_catalog.maps > 0 or ctf_core.settings.server_mode == "mapedit")
 
-function ctf_modebase.map_catalog.select_map(filter)
+function ctf_modebase.map_catalog.select_map(filter, player_map_size_ratio)
+	local ratio = player_map_size_ratio or (20 / 139 / 139)
+	-- This reference ratio is from the walls map. 20 player per 139x139
 	local maps = {}
 	for idx, map in ipairs(maps_pool) do
 		if not filter or filter(ctf_modebase.map_catalog.maps[map]) then
@@ -41,7 +43,23 @@ function ctf_modebase.map_catalog.select_map(filter)
 		end
 	end
 
-	local selected = maps[math.random(1, #maps)]
+	local selected_one = { ratio_difference = -1, map = -1 }
+	for _i = 1, 10, 1 do
+		local map = maps[math.random(1, #maps)]
+		local new_one_map = ctf_modebase.map_catalog.maps[maps_pool[map]]
+		local size = new_one_map.size
+		local new_one_ratio = #minetest.get_connected_players() / (size.x * size.z)
+		local ratio_difference = math.abs(new_one_ratio - ratio)
+		if ratio_difference < selected_one.ratio_difference then
+			selected_one.ratio_difference = ratio_difference
+			selected_one.map = map
+		end
+	end
+	local selected = selected_one.map
+	if selected == -1 then
+		selected = maps[math.random(1, #maps)]
+	end
+
 	ctf_modebase.map_catalog.current_map = maps_pool[selected]
 
 	if map_repeat_interval > 0 then
