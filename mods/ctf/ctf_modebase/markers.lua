@@ -174,7 +174,14 @@ local function marker_func(name, param, specific_player, hpmarker)
 		local player_hpr = string.format("HP=%i/%i", player:get_hp(),
 		player:get_properties().hp_max)
 		message = string.format("m [%s]: ", name) .. player_hpr
-		pos = pointed.under or pointed.ref:get_pos()
+		if vector.distance(
+			pointed.under or pointed.ref:get_pos(),
+			player:get_pos()
+		) <= 2 then
+			pos = pointed.under or pointed.ref:get_pos()
+		else
+			pos = player:get_pos()
+		end
 	else
 		if not pointed then
 			return false, "Can't find anything to mark, too far away!"
