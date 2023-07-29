@@ -166,12 +166,12 @@ local function marker_func(name, param, specific_player, hpmarker)
 	if pointed and vector.distance(
 		pointed.under or pointed.ref:get_pos(),
 		player:get_pos()
-	) <= 2 and (player:get_hp() < player:get_properties().hp_max) then
+	) <= 2 then
 		hpmarker = true
 	end
 
 	if pointed and hpmarker == true then
-		local player_hpr = string.format("HP=[%i]/[%i]", player:get_hp(),
+		local player_hpr = string.format("HP=%i/%i", player:get_hp(),
 		player:get_properties().hp_max)
 		message = string.format("m [%s]: ", name) .. player_hpr
 		if pointed.type == "object" then
