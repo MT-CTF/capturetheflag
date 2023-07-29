@@ -46,17 +46,21 @@ minetest.register_node("ctf_map:spike", {
 		local pteam = ctf_teams.get(placer)
 
 		if pteam then
+			local pname = placer:get_player_name()
+
 			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
-				minetest.chat_send_player(placer:get_player_name(), "You can only place spikes in your own territory!")
+				minetest.chat_send_player(pname, "You can only place spikes in your own territory!")
 				return itemstack
 			end
 
 			local newitemstack = ItemStack("ctf_map:spike_"..pteam)
 			newitemstack:set_count(itemstack:get_count())
 
-			local result = minetest.item_place(newitemstack, placer, pointed_thing, 34)
+			local result, pos = minetest.item_place(newitemstack, placer, pointed_thing, 34)
 
 			if result then
+				minetest.get_meta(pos):set_string("placer", pname)
+
 				itemstack:set_count(result:get_count())
 			end
 
@@ -89,11 +93,11 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		},
 		on_place = function(itemstack, placer, pointed_thing)
 			local item, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
-			local meta = minetest.get_meta(pos)
-			local pname = placer:get_player_name()
-			if pname ~= "" then
-				meta:set_string("placer", pname)
+
+			if item then
+				minetest.get_meta(pos):set_string("placer", placer:get_player_name())
 			end
+
 			return item, pos
 		end
 	})
