@@ -56,10 +56,10 @@ minetest.register_node("ctf_map:spike", {
 			local newitemstack = ItemStack("ctf_map:spike_"..pteam)
 			newitemstack:set_count(itemstack:get_count())
 
-			local result, pos = minetest.item_place(newitemstack, placer, pointed_thing, 34)
+			local result = minetest.item_place(newitemstack, placer, pointed_thing, 34)
 
 			if result then
-				minetest.get_meta(pos):set_string("placer", pname)
+				minetest.get_meta(pointed_thing.above):set_string("placer", pname)
 
 				itemstack:set_count(result:get_count())
 			end
@@ -95,7 +95,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			local item, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
 
 			if item then
-				minetest.get_meta(pos):set_string("placer", placer:get_player_name())
+				minetest.get_meta(pointed_thing.above):set_string("placer", placer:get_player_name())
 			end
 
 			return item, pos
@@ -116,7 +116,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 			if pname ~= "" then
 				local placer = minetest.get_player_by_name(pname)
 				if placer then
-					player:punch(placer, 1, { fleshy = 7, spike = 1})
+					player:punch(placer, 1, {damage_groups = {fleshy = 7, spike = 1}})
 					return 0
 				end
 			end
