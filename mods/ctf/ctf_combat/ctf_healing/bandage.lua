@@ -51,7 +51,12 @@ function ctf_healing.register_bandage(name, def)
 
 			    local hp_add = math.random(def.heal_min or 3, def.heal_max or 4)
 
-			    hp = math.min(hp + hp_add, limit)
+				if hp + hp_add > limit then
+				    hp_add = limit - hp
+				    hp = limit
+			    else
+				    hp = hp + hp_add
+			    end
 
 			    local result = RunCallbacks(ctf_healing.registered_on_heal, player, object, hp_add)
 
