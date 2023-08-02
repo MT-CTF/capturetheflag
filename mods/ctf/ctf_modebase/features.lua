@@ -423,6 +423,14 @@ return {
 			capture_reward = capture_reward + score
 		end
 
+		for teammate in pairs(ctf_teams.online_players[pteam].players) do
+			if teammate ~= pname then
+				local teammate_value = (recent_rankings.get(teammate)[pteam.."_score"] or 0) / (team_scores[pteam].score or 1)
+				local victory_bonus = capture_reward * teammate_value
+				recent_rankings.add(teammate, {score = victory_bonus}, true)
+			end
+		end
+
 		recent_rankings.add(pname, {score = capture_reward, flag_captures = #teamnames})
 
 		teams_left = teams_left - #teamnames
