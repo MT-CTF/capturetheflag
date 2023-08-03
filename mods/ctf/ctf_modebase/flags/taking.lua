@@ -74,6 +74,49 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		table.insert(ctf_modebase.taken_flags[pname], target_team)
 		ctf_modebase.flag_taken[target_team] = {p=pname, t=pteam}
 
+
+		if ctf_modebase.flag_attempt_history[pname] == nil then
+			ctf_modebase.flag_attempt_history[pname] = {}
+		end
+		table.insert(ctf_modebase.flag_attempt_history[pname], minetest.get_gametime())
+		
+		-- this is table of streaks.
+		-- mega streak means 4 or 5 attempt in less than 10 minutes
+		local streaks = {
+			[3] = "three",
+			[4] = "four",
+			[5] = "mega",
+			[6] = "mega",
+			[7] = "giga",
+			[8] = "giga",
+			[9] = "tera",
+			[10] = "EXA",
+		}
+		
+		local number_of_attempts = 0
+		local total_time = 0 -- should be less than 60*10 = 10 minutes
+		local prev_time = nil
+		for i = #ctf_modebase.flag_attempt_history[pname], 1, -1 do
+			if prev_time then
+				total_time = math.abs(prev_time - time)
+			else
+				prev_time = time
+			end
+			number_of_attempts = number_of_attempts + 1
+			if total_time >= 60*10 then
+				break
+			end
+		end
+		minetest.chat_send_all(minetest.serialize(ctf_modebase.flag_attempt_history))	
+		local streak = streaks[number_of_attempts]
+		if number_of_attempts >= 10 then
+			streak = "EXA"
+		end
+		if streak then
+			minetest.chat_send_all(pname .. " is on a " .. streak .. " attempt streak!")
+		end
+
+
 		ctf_modebase.skip_vote.on_flag_take()
 		ctf_modebase:get_current_mode().on_flag_take(puncher, target_team)
 
@@ -108,6 +151,7 @@ ctf_api.register_on_match_end(function()
 	ctf_modebase.taken_flags = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}
+	ctf_modebase.flag_attempt_history = {}
 end)
 
 ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
