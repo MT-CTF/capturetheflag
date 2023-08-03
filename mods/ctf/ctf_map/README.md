@@ -110,7 +110,7 @@ How far the players of a certain team may go during build time. The zone bounds 
 Areas where chests can be placed. Some maps allow placing chests anywhere, while others only place them in certain locations. 
 
 #### Barrier Area
-Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barrier Stone" wall is located. Setting this will allow the game to know where to make them disappear when the match begins. You can leave this by default unless the game is taking a long time to remove your barriers.
+Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barrier Stone" wall is located. Setting this will allow the game to know where to make them disappear when the match begins. You can leave this by default unless the game is taking a long time to remove your barriers. If it is so and it is a two-team map, then set the Barrier Area to the region of the barriers only. However, it is not possible to do this with four-team maps
 
 ### 6. Export 
 
