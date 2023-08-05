@@ -79,7 +79,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			ctf_modebase.flag_attempt_history[pname] = {}
 		end
 		table.insert(ctf_modebase.flag_attempt_history[pname], minetest.get_gametime())
-		
+
 		-- this is table of streaks.
 		-- mega streak means 4 or 5 attempt in less than 10 minutes
 		local streaks = {
@@ -92,11 +92,12 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			[9] = "tera",
 			[10] = "EXA",
 		}
-		
+
 		local number_of_attempts = 0
 		local total_time = 0 -- should be less than 60*10 = 10 minutes
 		local prev_time = nil
 		for i = #ctf_modebase.flag_attempt_history[pname], 1, -1 do
+			local time = ctf_modebase.flag_attempt_history[i]
 			if prev_time then
 				total_time = math.abs(prev_time - time)
 			else
@@ -107,7 +108,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 				break
 			end
 		end
-		minetest.chat_send_all(minetest.serialize(ctf_modebase.flag_attempt_history))	
+		minetest.chat_send_all(minetest.serialize(ctf_modebase.flag_attempt_history))
 		local streak = streaks[number_of_attempts]
 		if number_of_attempts >= 10 then
 			streak = "EXA"
