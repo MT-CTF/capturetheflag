@@ -3,7 +3,9 @@ local function get_gamemode(param)
 
 	if mode_param then
 		local mode = ctf_modebase.modes[mode_param]
-		if not mode and  mode_param ~= "all" then
+		if mode_param == "all" then
+			return "all", nil, opt_param
+		elseif not mode then
 			return false, "No such game mode: " .. mode_param
 		end
 
@@ -18,9 +20,26 @@ local function get_gamemode(param)
 	end
 end
 
-local function get_rank(return_str, mode_data, prank, pname)
+local function rank(name, mode_name, mode_data, pname)
+	if not mode_name then
+		return false, mode_data
+	end
+
+	if not pname then
+		pname = name
+	end
+	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
+
+	if not prank then
+		return false, string.format("Player %s has no rankings in mode %s!\n", pname, mode_name)
+	end
+
+	local return_str = string.format(
+		"\tRankings for player %s in mode %s:\n\t\t", minetest.colorize("#ffea00", pname), mode_name
+	)
+
 	for _, rank in ipairs(mode_data.summary_ranks) do
-		return_str = string.format("\t%s%s: %s,\n\t",
+		return_str = string.format("%s%s: %s,\n\t\t",
 			return_str,
 			minetest.colorize("#63d437", HumanReadable(rank)),
 			minetest.colorize("#ffea00", math.round(prank[rank] or 0))
@@ -28,7 +47,7 @@ local function get_rank(return_str, mode_data, prank, pname)
 	end
 
 	for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
-		return_str = string.format("%s%s: %s,\n\t",
+		return_str = string.format("%s%s: %s,\n\t\t",
 			return_str,
 			minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
 			minetest.colorize("#ffea00", 0.1 * math.round(10 * (
@@ -38,13 +57,13 @@ local function get_rank(return_str, mode_data, prank, pname)
 		)
 	end
 
-	return_str = string.format("%s%s: %s",
+	return_str = string.format("%s%s: %s\n\n",
 		return_str,
 		minetest.colorize("#63d437", "Place"),
 		minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
 	)
 
-	return return_str
+	return true, return_str
 end
 
 ctf_core.register_chatcommand_alias("rank", "r", {
@@ -52,62 +71,21 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 	params = "[mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
-			return false, mode_data
-		end
-
-		if not pname then
-			pname = name
-		end
-
-		if not mode_data and mode_name ~= "all" then
-			return false, mode_data
-		end
-
-		local return_str = string.format(
-			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
-		)
-
-		if mode_name ~= "all" then
-			return false, string.format("Player %s has no rankings in mode %s!",
-				minetest.colorize("#ffea00", pname), mode_name
-			)
-		end
-
-		if mode_data and (mode_name ~= "all") then
-			local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
-			return_str = get_rank(return_str, mode_data, prank, pname)
-		end
-
 		if mode_name == "all" then
-			return_str = string.format(
-			"Rankings for player %s in all modes:\n\t", minetest.colorize("#ffea00", pname), mode_name
+			local return_str = string.format(
+				"Rankings for player %s in mode %s:\n\t",
+				minetest.colorize("#ffea00", pname or name),
+				mode_name
 			)
-			local no_rank_in_mode = 0 -- A counter if rankings don't exist in all the modes
-			local modes = {"classes", "classic", "nade_fight"}
-			for _, mode in ipairs(modes) do
+			local mode_names = {"classes", "classic", "nade_fight"}
+			for _, mode in ipairs(mode_names) do
 				mode_data = ctf_modebase.modes[mode]
-				local prank = mode_data.rankings:get(pname)
-				if not prank then
-					return_str = string.format("%s\n\nPlayer %s has no rankings in mode %s!",
-						return_str, minetest.colorize("#ffea00", pname), mode
-					)
-					no_rank_in_mode = no_rank_in_mode + 1
-				else
-					return_str =  string.format("%s\n\nRankings in mode %s:\n\t",
-						return_str, mode
-					)
-					return_str = get_rank(return_str, mode_data, prank, pname)
-				end
+				return_str = return_str .. select(2, rank(name, mode, mode_data, pname))
 			end
-			if no_rank_in_mode == 3 then
-				return false, string.format("Player %s has no rankings in all modes!",
-				minetest.colorize("#ffea00", pname)
-			)
-			end
+			return true, return_str
+		else
+			return rank(name, mode_name, mode_data, pname)
 		end
-
-		return true, return_str
 	end
 })
 
