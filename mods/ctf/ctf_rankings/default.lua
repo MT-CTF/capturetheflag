@@ -3,7 +3,6 @@ return function(prefix, top)
 local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at runtime!")
 
 local function op_all(operation)
-	minetest.log(dump(modstorage:to_table()))
 	for k, v in pairs(modstorage:to_table()["fields"]) do
 		operation(k, v)
 	end
@@ -36,8 +35,6 @@ return {
 		if not rank_str or rank_str == "" then
 			return false
 		end
-
-		minetest.log(dump(pname))
 
 		return minetest.parse_json(rank_str)
 	end,
