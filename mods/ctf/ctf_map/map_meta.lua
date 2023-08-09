@@ -270,7 +270,7 @@ function ctf_map.save_map(mapmeta)
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
 									"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
-									"start a normal ctf game, and run \"/ctf_next "..mapmeta.dirname.."\" then \"/ctf_skip\""));
+									"start a normal ctf game, and run \"/ctf_next -f "..mapmeta.dirname.."\""));
 		else
 			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
 		end

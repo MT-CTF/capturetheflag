@@ -13,7 +13,7 @@ function ctf_map.place_map(mapmeta, callback)
 
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
-		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
+		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation, {["ctf_map:chest"] = "air"})
 
 		minetest.log("action", string.format(
 			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - ctx.start_time) / 1000000
@@ -225,7 +225,11 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 
 		if #place_positions < a.amount then
 			minetest.log("error",
-				string.format("[MAP] Couldn't place %d from %d chests from pos %d", a.amount - #place_positions, a.amount, i)
+				string.format("[MAP] Couldn't place %d of the %d chests needed to place in zone %d",
+					a.amount - #place_positions,
+					a.amount,
+					i
+				)
 			)
 		end
 	end
