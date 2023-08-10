@@ -173,7 +173,6 @@ local register_smoke_grenade = function(name, description, image, damage)
 								-- Add the nade back into the thrower's inventory
 								player:get_inventory():add_item("main", "grenades:"..name)
 							end
-							
 							return
 						elseif damage and distance_from_flag <= 26 then
 							duration_multiplier = 0.5
