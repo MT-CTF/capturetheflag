@@ -78,6 +78,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 		local Ny = p2.y - p1.y + 1
 		local ID_IGNORE = minetest.CONTENT_IGNORE
 		local ID_AIR = minetest.CONTENT_AIR
+		local ID_WATER = minetest.get_content_id("default:water_source")
 
 		for z = p1.z, p2.z do
 			for y = p1.y, p2.y do
@@ -87,14 +88,33 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 
 					for barriernode_id, replacement_id in pairs(barrier_nodes) do
 						if d[vi] == barriernode_id then
-							d[vi] = replacement_id
+							local replacement_this = replacement_id
+							if replacement_id == ID_AIR then -- water flow check (for whatever reason vm:update_liquids() failed to work)
+								local check_pos = {
+									((z + 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
+									((z - 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
+									(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x + 1) - p1.x) + 1,
+									(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x - 1) - p1.x) + 1,
+								}
+								local water_count = 0
+								for _,check_vi in ipairs(check_pos) do
+									if d[check_vi] == ID_WATER then
+										water_count = water_count + 1
+										if water_count >= 2 then
+											replacement_this = ID_WATER
+											break
+										end
+									end
+								end
+							end
+							d[vi] = replacement_this
 							done = true
 							break
 						end
 					end
 
-					-- Liquid updates fail if I turn everything but changes into ignore
-					if not done and d[vi] == ID_AIR then
+					-- Avoid changing nodes players placed during async
+					if not done then
 						d[vi] = ID_IGNORE
 					end
 				end
@@ -104,6 +124,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 		return d
 	end, function(d)
 		vm:set_data(d)
+		vm:calc_lighting()
 		vm:update_liquids()
 		vm:write_to_map(false)
 		callback()
