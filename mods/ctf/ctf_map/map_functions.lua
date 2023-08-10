@@ -1,7 +1,7 @@
 function ctf_map.announce_map(map)
 	local msg = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", map.name) ..
 	minetest.colorize("#fcdb05", " by ") .. minetest.colorize("#f49200", map.author))
-	if map.hint and map.hint ~= ""then
+	if map.hint and map.hint ~= "" then
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
