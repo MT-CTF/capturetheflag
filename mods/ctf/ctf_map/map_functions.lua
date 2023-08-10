@@ -124,7 +124,6 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 		return d
 	end, function(d)
 		vm:set_data(d)
-		vm:calc_lighting()
 		vm:update_liquids()
 		vm:write_to_map(false)
 		callback()
