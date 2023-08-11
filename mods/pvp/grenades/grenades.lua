@@ -166,7 +166,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 						if distance_from_flag <= 15 and (damage or pteam == flagteam) then
 							minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
 							if player:get_hp() <= 0 then
-								-- Drop the nade at its explode point if the thrower is head
+								-- Drop the nade at its explode point if the thrower is dead
 								-- Fixes https://github.com/MT-CTF/capturetheflag/issues/1160
 								minetest.add_item(pos, ItemStack("grenades:"..name))
 							else
