@@ -29,22 +29,34 @@ ctf_rankings = {
 		mese = 50,
 		gold = 250,
 		bronze = 500,
-		iron = 1000,
-		tin = 2500,
-		copper = 5000,
+		steel = 1000,
+		stone = 2500,
+		wood = 5000,
+		none = math.huge
 	},
 	leagues_list = {
-		"diamond", "mese", "gold", "bronze", "iron", "tin", "copper",
+		"diamond", "mese", "gold", "bronze", "steel", "stone", "wood", "none",
 	},
 	league_textures = {
-		diamond = "default_diamond.png",
-		mese = "default_mese_crystal.png",
-		gold = "default_gold_ingot.png",
-		bronze = "default_bronze_ingot.png",
-		iron = "default_steel_ingot.png",
-		tin = "default_tin_ingot.png",
-		copper = "default_copper_ingot.png",
+		diamond = "ctf_rankings_league_diamond.png",
+		mese = "ctf_rankings_league_mese.png",
+		gold = "ctf_rankings_league_gold.png",
+		bronze = "ctf_rankings_league_bronze.png",
+		steel = "ctf_rankings_league_steel.png",
+		stone = "ctf_rankings_league_stone.png",
+		wood = "ctf_rankings_league_wood.png",
+		none = "blank.png",
 	},
+
+-- Used for cycling through all ranks ingame
+-- Remember to remove spaces if running with Worldedit's //lua
+--[[
+for i, n in pairs(ctf_rankings.leagues_list) do
+	minetest.after(i, function()
+		player_api.set_texture(PlayerObj("LandarVargan"), 3, ctf_rankings.league_textures[n])
+	end)
+end
+--]]
 }
 
 ctf_core.include_files("leagues.lua", "ranking_reset.lua")

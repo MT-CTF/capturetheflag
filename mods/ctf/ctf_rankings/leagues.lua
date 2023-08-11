@@ -13,8 +13,6 @@ minetest.register_on_joinplayer(function(player)
 
 		if data and data._last_reset then
 			for mode, rank in pairs(data[data._last_reset]) do
-				leagues[mode] = ctf_rankings.leagues_list[#ctf_rankings.leagues_list] -- lowest rank by default
-
 				if rank.place then
 					for _, league in ipairs(ctf_rankings.leagues_list) do
 						if rank.place <= ctf_rankings.leagues[league] then
@@ -31,6 +29,7 @@ minetest.register_on_joinplayer(function(player)
 		end
 	end
 
+	-- This code needs to be commented out post-reset, and changed to only run when there are a certain amount of players in the rankings. Maybe up to wood league?
 	for mode, def in pairs(ctf_modebase.modes) do
 		local place = def.rankings.top:get_place(player:get_player_name())
 
@@ -103,7 +102,7 @@ ctf_api.register_on_new_match(function()
 end)
 
 minetest.register_chatcommand("league", {
-	description = "See the past league placements of yourself/another player",
+	description = "See the past league/ranking placements of yourself or another player",
 	params = "[pname]",
 	func = function(name, params)
 		if params == "" then
@@ -158,10 +157,12 @@ minetest.register_chatcommand("leagues", {
 	func = function(name)
 		local out = ""
 		for _, league in pairs(ctf_rankings.leagues_list) do
-			out = out .. string.format("%s League: Top %d and above\n",
-				HumanReadable(league),
-				ctf_rankings.leagues[league]
-			)
+			if league ~= "none" then
+				out = out .. string.format("%s League: Top %d\n",
+					HumanReadable(league),
+					ctf_rankings.leagues[league]
+				)
+			end
 		end
 
 		return true, out:sub(1, -2)

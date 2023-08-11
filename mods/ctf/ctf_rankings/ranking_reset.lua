@@ -60,7 +60,7 @@ if ctf_rankings.do_reset then
 		end
 
 		-- Give the world a little time to catch up after that potentially long code loop, then continue
-		minetest.after(3, function()
+		minetest.after(5, function()
 			for mode, def in pairs(ctf_modebase.modes) do
 				local time = minetest.get_us_time()
 				def.rankings.op_all(function(pname, value)
@@ -76,7 +76,7 @@ if ctf_rankings.do_reset then
 
 			mods:set_int("_do_reset", 0)
 			mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
-			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 5)
+			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 10)
 		end)
 	end)
 end
@@ -93,7 +93,7 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 			local goal = os.date("*t", mods:get_int("_reset_date"))
 			local current = os.date("*t")
 
-			if current.year == goal.year and current.month == goal.month and current.day == current.day then
+			if current.year >= goal.year and current.month >= goal.month and current.day >= goal.day then
 				local hours_left = goal.hour - current.hour
 
 				if hours_left > 0 then
@@ -155,7 +155,7 @@ minetest.register_chatcommand("queue_ranking_reset", {
 				return false
 			end
 
-			hour  = math.min(math.max(tonumber( hour  or 6), 0), 23)
+			hour  = math.min(math.max(tonumber( hour  or 7), 0), 23)
 			day   = math.min(math.max(tonumber( day       ), 1), 31)
 			month = math.min(math.max(tonumber( month     ), 1), 12)
 			year  = math.max(tonumber(year or os.date("%Y")), tonumber(os.date("%Y")))
@@ -164,12 +164,12 @@ minetest.register_chatcommand("queue_ranking_reset", {
 				return false, "Please supply numbers for the day/month/year/hour"
 			end
 
-			confirm[name] = os.time({day = day, month = month, year = year, hour = 7})
+			confirm[name] = os.time({day = day, month = month, year = year, hour = hour})
 
 			return true, "Please run " ..
 					minetest.colorize("cyan", "/queue_ranking_reset <yes|no>") ..
 					" to confirm/deny the date: " ..
-					os.date("%a %d, %b %Y", confirm[name])
+					os.date("%a %d, %b %Y at %I:%M %p", confirm[name])
 		else
 			if params:match("yes") then
 				local date = os.date("%a %d, %b %Y at %I:%M %p", confirm[name])
