@@ -286,7 +286,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.winner then
 		formspec.elements.winner = {
 			type = "label",
-			pos = {4, 0.5},
+			pos = {5, 0.5},
 			label = formdef.winner,
 		}
 	end
