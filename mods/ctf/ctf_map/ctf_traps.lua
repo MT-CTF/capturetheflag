@@ -46,8 +46,10 @@ minetest.register_node("ctf_map:spike", {
 		local pteam = ctf_teams.get(placer)
 
 		if pteam then
+			local pname = placer:get_player_name()
+
 			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
-				minetest.chat_send_player(placer:get_player_name(), "You can only place spikes in your own territory!")
+				minetest.chat_send_player(pname, "You can only place spikes in your own territory!")
 				return itemstack
 			end
 
@@ -57,6 +59,8 @@ minetest.register_node("ctf_map:spike", {
 			local result = minetest.item_place(newitemstack, placer, pointed_thing, 34)
 
 			if result then
+				minetest.get_meta(pointed_thing.above):set_string("placer", pname)
+
 				itemstack:set_count(result:get_count())
 			end
 
@@ -89,10 +93,8 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		},
 		on_place = function(itemstack, placer, pointed_thing)
 			local item, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
-			local meta = minetest.get_meta(pos)
-			local pname = placer:get_player_name()
-			if pname ~= "" then
-				meta:set_string("placer", pname)
+			if item then
+				minetest.get_meta(pointed_thing.above):set_string("placer", placer:get_player_name())
 			end
 			return item, pos
 		end
@@ -106,22 +108,16 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
 		end
-		local damaged = false
 		if reason.node_pos then
 			local meta = minetest.get_meta(reason.node_pos)
 			local pname = meta:get_string("placer")
 			if pname ~= "" then
 				local placer = minetest.get_player_by_name(pname)
 				if placer then
-					player:punch(placer, 10, { fleshy = 5, spike = 1})
-						player:set_hp(player:get_hp() - 10)
-						end
-					damaged = true
+					player:punch(placer, 1, { fleshy = 7, spike = 1})
+					return 0
 				end
 			end
-		end
-		if not damaged then
-			hp_change = hp_change - 5
 		end
 	end
 
