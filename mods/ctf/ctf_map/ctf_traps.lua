@@ -107,15 +107,15 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 			return 0, true
 		end
 		local damaged = false
-		minetest.chat_send_all(minetest.serialize(reason))
 		if reason.node_pos then
 			local meta = minetest.get_meta(reason.node_pos)
 			local pname = meta:get_string("placer")
-			minetest.chat_send_all(pname)
 			if pname ~= "" then
 				local placer = minetest.get_player_by_name(pname)
 				if placer then
 					player:punch(placer, 10, { fleshy = 5, spike = 1})
+						player:set_hp(player:get_hp() - 10)
+						end
 					damaged = true
 				end
 			end
