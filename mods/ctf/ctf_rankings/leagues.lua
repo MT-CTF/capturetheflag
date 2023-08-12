@@ -29,7 +29,8 @@ minetest.register_on_joinplayer(function(player)
 		end
 	end
 
-	-- This code needs to be commented out post-reset, and changed to only run when there are a certain amount of players in the rankings. Maybe up to wood league?
+	-- This code needs to be commented out post-reset,
+	-- and changed to only run when there are a certain amount of players in the rankings. Maybe up to wood league?
 	for mode, def in pairs(ctf_modebase.modes) do
 		local place = def.rankings.top:get_place(player:get_player_name())
 
@@ -83,7 +84,7 @@ local function update_league(player)
 	end
 
 	if ctf_modebase.current_mode and league[ctf_modebase.current_mode] then
-		player_api.set_texture(player, 3, ctf_rankings.league_textures[league[ctf_modebase.current_mode]])
+		hpbar.set_icon(player, ctf_rankings.league_textures[league[ctf_modebase.current_mode]])
 	end
 end
 
