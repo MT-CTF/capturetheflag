@@ -1,4 +1,6 @@
+--- @type false | string
 local restart_on_next_match = false
+
 ctf_modebase.map_on_next_match = nil
 ctf_modebase.mode_on_next_match = nil
 
@@ -41,14 +43,17 @@ local function start_new_match()
 	local path = minetest.get_worldpath() .. "/queue_restart.txt"
 	if ctf_core.file_exists(path) then
 		os.remove(path)
-		restart_on_next_match = true
+		restart_on_next_match = ""
 	end
 
 	ctf_modebase.in_game = false
 	ctf_modebase.on_match_end()
 
 	if restart_on_next_match then
-		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server restarting in 5 seconds..."))
+		minetest.chat_send_all(minetest.colorize("red",
+			"[NOTICE] Server restarting in 5 seconds"..restart_on_next_match.."..."
+		))
+
 		minetest.request_shutdown(
 			"Restarting server at imperator request.\n\nTip: Count to 15 before clicking reconnect",
 			true, 5
@@ -149,9 +154,9 @@ minetest.register_chatcommand("queue_restart", {
 	description = "Queue server restart",
 	privs = {server = true},
 	func = function(name, param)
-		if not param then param = "" end
+		if not param or param == "" then param = false end
 
-		restart_on_next_match = true
+		restart_on_next_match = param and (" ("..param..")") or ""
 		minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
 		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server will restart after this match is over. " .. param))
 		return true, "Restart is queued."

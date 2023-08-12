@@ -385,7 +385,7 @@ function classes.set(player, classname)
 	ctf_modebase.player.remove_bound_items(player)
 	ctf_modebase.player.give_initial_stuff(player)
 
-	player:set_properties({textures = {ctf_cosmetics.get_skin(player)}})
+	player_api.set_texture(player, 1, ctf_cosmetics.get_skin(player))
 
 	classes.update(player)
 
