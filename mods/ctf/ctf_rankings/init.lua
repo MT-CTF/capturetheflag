@@ -55,7 +55,7 @@ ctf_rankings = {
 --[[
 for i, n in pairs(ctf_rankings.leagues_list) do
 	minetest.after(i, function()
-		player_api.set_texture(PlayerObj("LandarVargan"), 3, ctf_rankings.league_textures[n])
+		hpbar.set_icon("LandarVargan", ctf_rankings.league_textures[n])
 	end)
 end
 --]]
