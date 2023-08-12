@@ -86,8 +86,8 @@ minetest.register_chatcommand("donate", {
 
 		local pname, score = string.match(param, "^(.*) (.*)$")
 
-		if score ~= "" and ctf_core.to_number(pname) then
-            pname, score = score, ctf_core.to_number(pname)
+		if ctf_core.to_number(pname) then
+            pname, score = score, pname
         end
 
 		if not pname then
