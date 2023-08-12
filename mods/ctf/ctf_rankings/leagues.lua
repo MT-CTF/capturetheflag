@@ -120,7 +120,7 @@ minetest.register_chatcommand("league", {
 
 			for date, modes in pairs(oldrank_data) do
 				if date:sub(1, 1) ~= "_" then
-					out = out .. string.format("%s Reset:\n", date)
+					out = out .. string.format("%s Reset (%s):\n", date, params)
 
 					for mode, rank in pairs(modes) do
 						if rank.place then

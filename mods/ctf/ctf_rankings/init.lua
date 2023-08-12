@@ -21,6 +21,8 @@ ctf_rankings = {
 		return rankings(minetest.get_current_modname() .. '|', top:new())
 	end,
 
+	registered_on_rank_reset = {},
+
 	do_reset = false, -- See ranking_reset.lua
 	current_reset = 0, -- See ranking_reset.lua
 
@@ -58,5 +60,12 @@ for i, n in pairs(ctf_rankings.leagues_list) do
 end
 --]]
 }
+
+---@param func function
+--- * pname
+--- * rank
+function ctf_rankings.register_on_rank_reset(func)
+	table.insert(ctf_rankings.registered_on_rank_reset, func)
+end
 
 ctf_core.include_files("leagues.lua", "ranking_reset.lua")

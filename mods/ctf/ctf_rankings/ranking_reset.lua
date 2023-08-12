@@ -24,7 +24,9 @@ ctf_rankings.do_reset = mods:get_int("_do_reset") == 1
 local PLAYER_RANKING_PREFIX = "rank:"
 
 if ctf_rankings.do_reset then
-	minetest.after(2, function()
+	minetest.after(5, function()
+		local after_timer = 0
+
 		for mode, def in pairs(ctf_modebase.modes) do
 			local top = def.rankings.top
 			local time = minetest.get_us_time()
@@ -33,6 +35,8 @@ if ctf_rankings.do_reset then
 					local rank = minetest.parse_json(value)
 
 					rank.place = top:get_place(pname)
+
+					RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, rank)
 
 					local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
 
@@ -53,6 +57,8 @@ if ctf_rankings.do_reset then
 					minetest.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
 				end
 			end)
+
+			after_timer = after_timer + ((minetest.get_us_time()-time) / 1e6)
 			time = ((minetest.get_us_time()-time) / 1e6).."s"
 
 			minetest.chat_send_all("Saved old rankings for mode "..mode..". Took "..time)
@@ -60,14 +66,18 @@ if ctf_rankings.do_reset then
 		end
 
 		-- Give the world a little time to catch up after that potentially long code loop, then continue
-		minetest.after(5, function()
+		minetest.after(5 + after_timer, function()
+			after_timer = 0
+
 			for mode, def in pairs(ctf_modebase.modes) do
 				local time = minetest.get_us_time()
 				def.rankings.op_all(function(pname, value)
 					def.rankings:del(pname)
 
-					minetest.chat_send_all(string.format("[%s] Rankings of player %s reset", mode, pname))
+					minetest.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
 				end)
+
+				after_timer = after_timer + ((minetest.get_us_time()-time) / 1e6)
 				time = ((minetest.get_us_time()-time) / 1e6).."s"
 
 				minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..time)
@@ -76,7 +86,7 @@ if ctf_rankings.do_reset then
 
 			mods:set_int("_do_reset", 0)
 			mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
-			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 10)
+			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 10 + after_timer)
 		end)
 	end)
 end
