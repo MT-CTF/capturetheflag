@@ -38,11 +38,11 @@ local function rank(name, mode_name, mode_data, pname)
 		"\tRankings for player %s in mode %s:\n\t\t", minetest.colorize("#ffea00", pname), mode_name
 	)
 
-	for _, rank in ipairs(mode_data.summary_ranks) do
+	for _, irank in ipairs(mode_data.summary_ranks) do
 		return_str = string.format("%s%s: %s,\n\t\t",
 			return_str,
-			minetest.colorize("#63d437", HumanReadable(rank)),
-			minetest.colorize("#ffea00", math.round(prank[rank] or 0))
+			minetest.colorize("#63d437", HumanReadable(irank)),
+			minetest.colorize("#ffea00", math.round(prank[irank] or 0))
 		)
 	end
 
@@ -121,8 +121,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You should donate at least 5 score!"
 		end
 
-		if score > 400 then
-			return false, "You can donate no more than 400 score!"
+		if score > 100 then
+			return false, "You can donate no more than 100 score!"
 		end
 
 		if pname == name then
@@ -147,8 +147,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate only half of your match score!"
 		end
 
-		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
-			return false, "You can donate only once every 5 minutes!"
+		if donate_timer[name] and donate_timer[name] + 600 > os.time() then
+			return false, "You can donate only once in 10 minutes!"
 		end
 
 		current_mode.recent_rankings.add(pname, {score=score}, true)
@@ -369,3 +369,4 @@ minetest.register_chatcommand("transfer_rankings", {
 		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
 	end
 })
+
