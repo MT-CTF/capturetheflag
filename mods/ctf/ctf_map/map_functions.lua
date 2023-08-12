@@ -1,7 +1,7 @@
 function ctf_map.announce_map(map)
 	local msg = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", map.name) ..
 	minetest.colorize("#fcdb05", " by ") .. minetest.colorize("#f49200", map.author))
-	if map.hint then
+	if map.hint and map.hint ~= "" then
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
@@ -13,7 +13,7 @@ function ctf_map.place_map(mapmeta, callback)
 
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
-		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
+		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation, {["ctf_map:chest"] = "air"})
 
 		minetest.log("action", string.format(
 			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - ctx.start_time) / 1000000
@@ -78,6 +78,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 		local Ny = p2.y - p1.y + 1
 		local ID_IGNORE = minetest.CONTENT_IGNORE
 		local ID_AIR = minetest.CONTENT_AIR
+		local ID_WATER = minetest.get_content_id("default:water_source")
 
 		for z = p1.z, p2.z do
 			for y = p1.y, p2.y do
@@ -87,14 +88,33 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 
 					for barriernode_id, replacement_id in pairs(barrier_nodes) do
 						if d[vi] == barriernode_id then
-							d[vi] = replacement_id
+							local replacement_this = replacement_id
+							if replacement_id == ID_AIR then -- water flow check (for whatever reason vm:update_liquids() failed to work)
+								local check_pos = {
+									((z + 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
+									((z - 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
+									(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x + 1) - p1.x) + 1,
+									(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x - 1) - p1.x) + 1,
+								}
+								local water_count = 0
+								for _,check_vi in ipairs(check_pos) do
+									if d[check_vi] == ID_WATER then
+										water_count = water_count + 1
+										if water_count >= 2 then
+											replacement_this = ID_WATER
+											break
+										end
+									end
+								end
+							end
+							d[vi] = replacement_this
 							done = true
 							break
 						end
 					end
 
-					-- Liquid updates fail if I turn everything but changes into ignore
-					if not done and d[vi] == ID_AIR then
+					-- Avoid changing nodes players placed during async
+					if not done then
 						d[vi] = ID_IGNORE
 					end
 				end
@@ -225,7 +245,11 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 
 		if #place_positions < a.amount then
 			minetest.log("error",
-				string.format("[MAP] Couldn't place %d from %d chests from pos %d", a.amount - #place_positions, a.amount, i)
+				string.format("[MAP] Couldn't place %d of the %d chests needed to place in zone %d",
+					a.amount - #place_positions,
+					a.amount,
+					i
+				)
 			)
 		end
 	end
