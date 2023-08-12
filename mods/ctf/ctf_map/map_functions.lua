@@ -74,7 +74,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 
 	-- Shave off ~0.1 seconds from the main loop
 	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
-		local mod = {}
+		local mod = {} -- All its contents will be recreated in the loop
 		local Nx = p2.x - p1.x + 1
 		local Ny = p2.y - p1.y + 1
 		local ID_IGNORE = minetest.CONTENT_IGNORE
