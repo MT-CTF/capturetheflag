@@ -445,7 +445,7 @@ function classes.show_class_formspec(player)
 				{"image_button[%f,%f;0.8,0.8;creative_next_icon.png;next_class;]", form_x-0.9, bar_h-0.9},
 
 				{"box[0.1,2.3;%f,%f;#00000077]", (form_x/2)-0.8, form_y-2.4},
-				{"model[0.1,2.3;%f,%f;classpreview;character.b3d;%s;{0,160};;;]",
+				{"model[0.1,2.3;%f,%f;classpreview;character.b3d;%s,blank.png;{0,160};;;]",
 					(form_x/2)-0.8,
 					form_y-2.4,
 					ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color) ..
