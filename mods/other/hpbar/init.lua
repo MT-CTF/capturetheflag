@@ -57,13 +57,14 @@ local function update_entity(player, new_icon_texture)
 	local pname = player:get_player_name()
 	local hp = scaleToDefault(player, "hp")
 
-	players[pname].hp = hp
 
-	if not players[pname].entity or not players[pname].entity:get_luaentity() then
+	if not players[pname] or not players[pname].entity or not players[pname].entity:get_luaentity() then
 		if not has_entity(player) then
 			return
 		end
 	end
+
+	players[pname].hp = hp
 
 	local health_t = "blank.png"
 	local prop = players[pname].entity:get_properties()
