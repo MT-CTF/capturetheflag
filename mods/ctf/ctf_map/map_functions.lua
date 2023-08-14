@@ -74,6 +74,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 
 	-- Shave off ~0.1 seconds from the main loop
 	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
+		local mod = {} -- All its contents will be recreated in the loop
 		local Nx = p2.x - p1.x + 1
 		local Ny = p2.y - p1.y + 1
 		local ID_IGNORE = minetest.CONTENT_IGNORE
@@ -107,7 +108,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 									end
 								end
 							end
-							d[vi] = replacement_this
+							mod[vi] = replacement_this
 							done = true
 							break
 						end
@@ -115,13 +116,13 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 
 					-- Avoid changing nodes players placed during async
 					if not done then
-						d[vi] = ID_IGNORE
+						mod[vi] = ID_IGNORE
 					end
 				end
 			end
 		end
 
-		return d
+		return mod
 	end, function(d)
 		vm:set_data(d)
 		vm:update_liquids()

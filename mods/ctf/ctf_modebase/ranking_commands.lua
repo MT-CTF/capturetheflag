@@ -106,6 +106,10 @@ minetest.register_chatcommand("donate", {
 
 		local pname, score = string.match(param, "^(.*) (.*)$")
 
+		if ctf_core.to_number(pname) then
+			pname, score = score, pname
+		end
+
 		if not pname then
 			return false, "You should provide the player name!"
 		end

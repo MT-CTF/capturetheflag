@@ -156,7 +156,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 				)
 
 				table.insert(output, label)
-				local model = "model[%d,1;4,6;player;character.b3d;%s;{0,160};;;]"
+				local model = "model[%d,1;4,6;player;character.b3d;%s,blank.png;{0,160};;;]"
 				model = string.format(
 					model,
 					x,
