@@ -215,7 +215,7 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 				if scoped[uname] then
 					ctf_ranged.hide_scope(uname)
 				else
-					ctf_ranged.show_scope(uname, "ctf_mode_classes:ranged_rifle", RANGED_ZOOM_MULT)
+					ctf_ranged.show_scope(uname, itemstack:get_name(), RANGED_ZOOM_MULT)
 				end
 			end
 
