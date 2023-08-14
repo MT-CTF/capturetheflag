@@ -28,7 +28,8 @@ local function add_entity_tag(player)
 		elseif char:byte() > 64 and char:byte() < 91 then
 			n = "U" .. char
 		end
-		texture = texture.."^[combine:84x14:"..(x+i)..",0=W_".. n ..".png"
+		texture = texture.."^[combine:84x14:"..(x+i+1)..",1=(W_".. n ..".png\\^[multiply\\:#000):"..
+				(x+i)..",0=W_".. n ..".png"
 		i = i + 11
 	end)
 	ent:set_properties({ textures={texture} })
