@@ -12,6 +12,7 @@ local function update_league(player)
 		if league ~= "" then
 			league = minetest.deserialize(league)
 		else
+			hpbar.set_icon(player, "")
 			return
 		end
 

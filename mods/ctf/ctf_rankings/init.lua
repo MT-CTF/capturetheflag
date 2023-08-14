@@ -47,7 +47,7 @@ ctf_rankings = {
 		steel = "ctf_rankings_league_steel.png",
 		stone = "ctf_rankings_league_stone.png",
 		wood = "ctf_rankings_league_wood.png",
-		none = "blank.png",
+		none = "",
 	},
 
 -- Used for cycling through all ranks ingame
