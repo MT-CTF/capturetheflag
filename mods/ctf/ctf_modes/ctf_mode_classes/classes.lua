@@ -215,7 +215,7 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 				if scoped[uname] then
 					ctf_ranged.hide_scope(uname)
 				else
-					ctf_ranged.show_scope(uname, "ctf_mode_classes:ranged_rifle", RANGED_ZOOM_MULT)
+					ctf_ranged.show_scope(uname, itemstack:get_name(), RANGED_ZOOM_MULT)
 				end
 			end
 
@@ -385,7 +385,7 @@ function classes.set(player, classname)
 	ctf_modebase.player.remove_bound_items(player)
 	ctf_modebase.player.give_initial_stuff(player)
 
-	player:set_properties({textures = {ctf_cosmetics.get_skin(player)}})
+	player_api.set_texture(player, 1, ctf_cosmetics.get_skin(player))
 
 	classes.update(player)
 
@@ -445,7 +445,7 @@ function classes.show_class_formspec(player)
 				{"image_button[%f,%f;0.8,0.8;creative_next_icon.png;next_class;]", form_x-0.9, bar_h-0.9},
 
 				{"box[0.1,2.3;%f,%f;#00000077]", (form_x/2)-0.8, form_y-2.4},
-				{"model[0.1,2.3;%f,%f;classpreview;character.b3d;%s;{0,160};;;]",
+				{"model[0.1,2.3;%f,%f;classpreview;character.b3d;%s,blank.png;{0,160};;;]",
 					(form_x/2)-0.8,
 					form_y-2.4,
 					ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color) ..

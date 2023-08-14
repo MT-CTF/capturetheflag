@@ -469,7 +469,7 @@ return {
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
 		player:hud_set_hotbar_selected_image("gui_hotbar_selected.png^[multiply:" .. tcolor)
 
-		player:set_properties({textures = {ctf_cosmetics.get_skin(player)}})
+		player_api.set_texture(player, 1, ctf_cosmetics.get_skin(player))
 
 		recent_rankings.set_team(player, new_team)
 

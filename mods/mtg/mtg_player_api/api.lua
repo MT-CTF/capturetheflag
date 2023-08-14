@@ -1,4 +1,6 @@
-player_api = {}
+player_api = {
+	players = {}
+}
 
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
@@ -50,7 +52,7 @@ end
 
 -- Player stats and animations
 -- model, textures, animation
-local players = {}
+local players = player_api.players
 player_api.player_attached = {}
 
 local function get_player_data(player)
@@ -67,7 +69,11 @@ function player_api.set_model(player, model_name)
 	if player_data.model == model_name then
 		return
 	end
+	-- Update data
 	player_data.model = model_name
+	-- Clear animation data as the model has changed
+	-- (required for setting the `stand` animation not to be a no-op)
+	player_data.animation, player_data.animation_speed = nil, nil
 
 	local model = models[model_name]
 	if model then
@@ -142,7 +148,7 @@ function player_api.set_animation(player, anim_name, speed)
 		end
 	end
 	-- Set the animation seen by everyone else
-	player:set_animation(anim, speed, animation_blend, anim.frame_loop)
+	player:set_animation(anim, speed, animation_blend)
 	-- Update related properties if they changed
 	if anim._equals ~= previous_anim._equals then
 		player:set_properties({

@@ -242,7 +242,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 			items = rank_values,
 			default_idx = sort_by_idx,
 			give_idx = false,
-			pos = {x = 0.1, y = 1},
+			pos = {x = 13, y = 1},
 			size = {x = ctf_gui.ELEM_SIZE.x + 1, y = ctf_gui.ELEM_SIZE.y},
 			func = function(playername, fields, field_name)
 				if fields.sorting and sortby ~= fields.sorting and table.indexof(rank_values, fields.sorting) ~= -1 then
@@ -250,6 +250,11 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 					show_for_player(playername, formdef.buttons.next and true or false)
 				end
 			end,
+		}
+		formspec.elements.label = {
+			type = "label",
+			pos = {13, 0.5},
+			label = "Sort players by: "
 		}
 	end
 
@@ -278,7 +283,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.game_stat then
 		formspec.elements.game_stat = {
 			type = "label",
-			pos = {11, 0.5},
+			pos = {1, 0.5},
 			label = formdef.game_stat,
 		}
 	end
@@ -286,7 +291,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.winner then
 		formspec.elements.winner = {
 			type = "label",
-			pos = {4, 0.5},
+			pos = {5, 1.3},
 			label = formdef.winner,
 		}
 	end
@@ -294,7 +299,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.duration then
 		formspec.elements.duration = {
 			type = "label",
-			pos = {1, 0.5},
+			pos = {1, 1.3},
 			label = "Duration: " .. formdef.duration,
 		}
 	end
