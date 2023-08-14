@@ -50,6 +50,32 @@ minetest.register_node("ctf_map:ind_glass_red", {
 })
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_glass_red")] = minetest.CONTENT_AIR
 
+minetest.register_node("ctf_map:ind_water", {
+	description = "Indestructible Water Barrier Glass",
+	drawtype = "glasslike",
+	tiles = {"ctf_map_ind_water.png"},
+	inventory_image = minetest.inventorycube("ctf_map_ind_water.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = ctf_core.settings.server_mode == "mapedit",
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_water")] = minetest.get_content_id("default:water_source")
+
+minetest.register_node("ctf_map:ind_lava", {
+	description = "Indestructible Lava Barrier Stone",
+	groups = {immortal = 1},
+	tiles = {"ctf_map_ind_lava.png"},
+	is_ground_content = false
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_lava")] = minetest.get_content_id("default:lava_source")
+
 minetest.register_node("ctf_map:ind_stone_red", {
 	description = "Indestructible Red Barrier Stone",
 	groups = {immortal = 1},
