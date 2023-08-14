@@ -2,6 +2,27 @@ local mods = minetest.get_mod_storage()
 
 local cache = {}
 
+local function update_league(player)
+	local pname = player:get_player_name()
+	local league = cache[pname]
+
+	if not league then
+		league = player:get_meta():get_string("ctf_rankings:leagues")
+
+		if league ~= "" then
+			league = minetest.deserialize(league)
+		else
+			return
+		end
+
+		cache[pname] = league
+	end
+
+	if ctf_modebase.current_mode and league[ctf_modebase.current_mode] then
+		hpbar.set_icon(player, ctf_rankings.league_textures[league[ctf_modebase.current_mode]])
+	end
+end
+
 minetest.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
 	local leagues = {}
@@ -44,7 +65,10 @@ minetest.register_on_joinplayer(function(player)
 	end
 
 	cache[player:get_player_name()] = leagues
-	meta:set_string("ctf_rankings:leagues", minetest.serialize(leagues))
+
+	if ctf_modebase.current_mode then
+		update_league(player)
+	end
 end)
 
 -- The following with keep a rough limit on the cache size
@@ -65,33 +89,6 @@ minetest.register_on_leaveplayer(function(player)
 	else
 		removed_cache_count = removed_cache_count + 1
 		cache[player:get_player_name()] = nil
-	end
-end)
-
-local function update_league(player)
-	local pname = player:get_player_name()
-	local league = cache[pname]
-
-	if not league then
-		league = player:get_meta():get_string("ctf_rankings:leagues")
-
-		if league ~= "" then
-			league = minetest.deserialize(league)
-		else
-			return
-		end
-
-		cache[pname] = league
-	end
-
-	if ctf_modebase.current_mode and league[ctf_modebase.current_mode] then
-		hpbar.set_icon(player, ctf_rankings.league_textures[league[ctf_modebase.current_mode]])
-	end
-end
-
-ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
-	if not old_team then
-		update_league(player)
 	end
 end)
 

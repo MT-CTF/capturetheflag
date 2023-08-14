@@ -2,7 +2,7 @@ hpbar = {}
 local max = {hp = 20}
 local players = {}
 
-local HPBAR_SCALE = 0.027
+local HPBAR_SCALE = 0.023
 minetest.register_entity("hpbar:entity", {
 	visual = "sprite",
 	visual_size = {x = 58 * HPBAR_SCALE, y = 16 * HPBAR_SCALE}, -- texture is 58 x 16
@@ -41,7 +41,7 @@ local function has_entity(player)
 
 	local entity = minetest.add_entity(player:get_pos(), "hpbar:entity")
 
-	entity:set_attach(player, "", {x=0, y=18.7, z=0}, {x=0, y=0, z=0})
+	entity:set_attach(player, "", {x=0, y=18.8, z=0}, {x=0, y=0, z=0})
 
 	if not players[pname] then
 		players[pname] = {entity=entity}
@@ -70,7 +70,7 @@ local function update_entity(player, new_icon_texture)
 	local prop = players[pname].entity:get_properties()
 
 	if hp > 0 then
-		health_t = "health_" .. hp .. ".png"
+		health_t = "hpbar_hp_" .. hp .. ".png"
 	end
 
 	if new_icon_texture and players[pname].icon ~= new_icon_texture then
