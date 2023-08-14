@@ -15,10 +15,16 @@
 3. Enable creative mode. This will enable `mapedit` mode.
 4. *Optional:* Enable `worldedit`
 
-### 3. Important information
+> You can grant yourself the `ctf_map_editor` privilege by running `/grantme ctf_map_editor` or by running `/grantme all` which grants you all the privileges that will be useful for map making.
 
-- The map area can be maximum 230x230 blocks in surface area, but it can be lesser. Build it accordingly.
-- You can grant yourself the `ctf_map_editor` privilege by running `/grantme ctf_map_editor` or by running `/grantme all` which grants you all the privileges that will be useful for map making.
+###  3. Selecting the Map Area
+
+Decide where you will build your map. The area can be maximum 230x230 blocks in surface area, but it can be lesser.
+1. Run `ctf_map editor` 
+2. Press `Create New Map`
+3. Select a position to be one corner of the map.
+4. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
+**Note:** you can change your area at any time by typing `/ctf_map editor` and pressing the "Corners" button.
 
 ### 4. Build
 
@@ -41,12 +47,6 @@ If you wish to save your map for later edits, follow the note in the section abo
 
 Run `/ctf_map editor`.
 An explanation of some of the fields is given below.
-
-#### Selecting the Map Area
-1. Select a position to be one corner of the map.
-2. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
-
-> **Note:** Run `/ctf_map editor` to fill out the rest of the fields.
 
 #### Map Enabled
 Whether or not the map is available for play. You will want to check this.
@@ -118,7 +118,7 @@ Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barri
 2. Find the exported map located in `[Mintest folder]/worlds/[Map World]/schems/[Exported Map folder]`
 3. Move the exported map folder to `\[Minetest folder]/games/capturetheflag/mods/ctf/ctf_map/maps`.
 
-You can access the exported map by running `/ctf_map editor`, clicking on the exported map folder from the list of maps, and then by pressing "Start Editing". 
+You can access the exported map by running `/ctf_map editor`, clicking on the exported map folder from the list of maps, and then by pressing "Resume Editing". 
 
 ### 7. Play
 
