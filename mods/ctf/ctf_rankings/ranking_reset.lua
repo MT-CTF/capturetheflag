@@ -38,6 +38,12 @@ if ctf_rankings.do_reset then
 
 					RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, rank)
 
+					if (rank.score or 0) >= 8000 and
+					(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
+					(rank.flag_captures or 0) >= 5 then
+						rank._pro_chest = true
+					end
+
 					local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
 
 					if current and current ~= "" then

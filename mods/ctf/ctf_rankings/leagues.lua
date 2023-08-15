@@ -43,6 +43,10 @@ minetest.register_on_joinplayer(function(player)
 						end
 					end
 				end
+
+				if rank._pro_chest then
+					meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+				end
 			end
 
 			cache[player:get_player_name()] = leagues
@@ -133,9 +137,9 @@ minetest.register_chatcommand("league", {
 										th = "rd"
 									end
 
-									out = out .. string.format("\t[%s]: %s League (%s%s place)\n",
+									out = out .. string.format("\t[%s]: %s League (%s%s place%s)\n",
 										HumanReadable(mode), HumanReadable(league), rank.place,
-										th
+										th, rank._pro_chest and ", with pro chest access" or ""
 									)
 									break
 								end
