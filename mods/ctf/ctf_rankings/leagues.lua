@@ -55,21 +55,21 @@ minetest.register_on_joinplayer(function(player)
 		end
 	end
 
-	-- This code needs to be commented out post-reset,
-	-- and changed to only run when there are a certain amount of players in the rankings. Maybe up to wood league?
+	-- This commented code needs to be changed to only run when there are a certain amount of players in the rankings
+	-- Maybe up to wood league?
 
-	for mode, def in pairs(ctf_modebase.modes) do
-		local place = def.rankings.top:get_place(player:get_player_name())
+	-- for mode, def in pairs(ctf_modebase.modes) do
+	-- 	local place = def.rankings.top:get_place(player:get_player_name())
 
-		for _, league in ipairs(ctf_rankings.leagues_list) do
-			if place <= ctf_rankings.leagues[league] then
-				leagues[mode] = league
-				break
-			end
-		end
-	end
+	-- 	for _, league in ipairs(ctf_rankings.leagues_list) do
+	-- 		if place <= ctf_rankings.leagues[league] then
+	-- 			leagues[mode] = league
+	-- 			break
+	-- 		end
+	-- 	end
+	-- end
 
-	cache[player:get_player_name()] = leagues
+	-- cache[player:get_player_name()] = leagues
 
 	if ctf_modebase.current_mode then
 		update_league(player)
