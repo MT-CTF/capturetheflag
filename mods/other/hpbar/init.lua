@@ -36,7 +36,7 @@ local function has_entity(player)
 			players[pname].entity:remove()
 			players[pname] = nil
 
-			return true
+			return false
 		end
 
 		return false
