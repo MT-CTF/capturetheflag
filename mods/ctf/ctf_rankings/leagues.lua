@@ -26,11 +26,14 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
+	local pname = player:get_player_name()
 	local leagues = {}
 
 	if meta:get_string("ctf_rankings:leagues") == "" or
-	ctf_rankings.current_reset > meta:get_int("ctf_rankings:current_reset") then
-		local data = mods:get_string("rank:"..player:get_player_name())
+	ctf_rankings.current_reset > meta:get_int("ctf_rankings:last_reset") then
+		minetest.log("action", "[CTF_RANKINGS]: Getting league of player "..pname.." for the first time")
+
+		local data = mods:get_string("rank:"..pname)
 		data = (data ~= "") and minetest.parse_json(data) or false
 
 		if data and data._last_reset then
@@ -49,9 +52,9 @@ minetest.register_on_joinplayer(function(player)
 				end
 			end
 
-			cache[player:get_player_name()] = leagues
+			cache[pname] = leagues
 			meta:set_string("ctf_rankings:leagues", minetest.serialize(leagues))
-			return
+			meta:set_int("ctf_rankings:last_reset", ctf_rankings.current_reset)
 		end
 	end
 
@@ -59,7 +62,7 @@ minetest.register_on_joinplayer(function(player)
 	-- Maybe up to wood league?
 
 	-- for mode, def in pairs(ctf_modebase.modes) do
-	-- 	local place = def.rankings.top:get_place(player:get_player_name())
+	-- 	local place = def.rankings.top:get_place(pname)
 
 	-- 	for _, league in ipairs(ctf_rankings.leagues_list) do
 	-- 		if place <= ctf_rankings.leagues[league] then
@@ -69,7 +72,7 @@ minetest.register_on_joinplayer(function(player)
 	-- 	end
 	-- end
 
-	-- cache[player:get_player_name()] = leagues
+	-- cache[pname] = leagues
 
 	if ctf_modebase.current_mode then
 		update_league(player)
