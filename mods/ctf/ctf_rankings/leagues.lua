@@ -2,7 +2,8 @@ local mods = minetest.get_mod_storage()
 
 local cache = {}
 
-local function update_league(player)
+function ctf_rankings.update_league(player)
+	player = PlayerObj(player)
 	local pname = player:get_player_name()
 	local league = cache[pname]
 
@@ -75,7 +76,7 @@ minetest.register_on_joinplayer(function(player)
 	-- cache[pname] = leagues
 
 	if ctf_modebase.current_mode then
-		update_league(player)
+		ctf_rankings.update_league(player)
 	end
 end)
 
@@ -103,7 +104,7 @@ end)
 ctf_api.register_on_new_match(function()
 	minetest.after(1, function()
 		for _, p in pairs(minetest.get_connected_players()) do
-			update_league(p)
+			ctf_rankings.update_league(p)
 		end
 	end)
 end)
