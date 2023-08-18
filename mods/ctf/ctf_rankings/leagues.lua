@@ -2,7 +2,8 @@ local mods = minetest.get_mod_storage()
 
 local cache = {}
 
-local function update_league(player)
+function ctf_rankings.update_league(player)
+	player = PlayerObj(player)
 	local pname = player:get_player_name()
 	local league = cache[pname]
 
@@ -26,11 +27,14 @@ end
 
 minetest.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
+	local pname = player:get_player_name()
 	local leagues = {}
 
 	if meta:get_string("ctf_rankings:leagues") == "" or
-	ctf_rankings.current_reset > meta:get_int("ctf_rankings:current_reset") then
-		local data = mods:get_string("rank:"..player:get_player_name())
+	ctf_rankings.current_reset > meta:get_int("ctf_rankings:last_reset") then
+		minetest.log("action", "[CTF_RANKINGS]: Getting league of player "..pname.." for the first time")
+
+		local data = mods:get_string("rank:"..pname)
 		data = (data ~= "") and minetest.parse_json(data) or false
 
 		if data and data._last_reset then
@@ -43,32 +47,36 @@ minetest.register_on_joinplayer(function(player)
 						end
 					end
 				end
+
+				if rank._pro_chest then
+					meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+				end
 			end
 
-			cache[player:get_player_name()] = leagues
+			cache[pname] = leagues
 			meta:set_string("ctf_rankings:leagues", minetest.serialize(leagues))
-			return
+			meta:set_int("ctf_rankings:last_reset", ctf_rankings.current_reset)
 		end
 	end
 
-	-- This code needs to be commented out post-reset,
-	-- and changed to only run when there are a certain amount of players in the rankings. Maybe up to wood league?
+	-- This commented code needs to be changed to only run when there are a certain amount of players in the rankings
+	-- Maybe up to wood league?
 
-	for mode, def in pairs(ctf_modebase.modes) do
-		local place = def.rankings.top:get_place(player:get_player_name())
+	-- for mode, def in pairs(ctf_modebase.modes) do
+	-- 	local place = def.rankings.top:get_place(pname)
 
-		for _, league in ipairs(ctf_rankings.leagues_list) do
-			if place <= ctf_rankings.leagues[league] then
-				leagues[mode] = league
-				break
-			end
-		end
-	end
+	-- 	for _, league in ipairs(ctf_rankings.leagues_list) do
+	-- 		if place <= ctf_rankings.leagues[league] then
+	-- 			leagues[mode] = league
+	-- 			break
+	-- 		end
+	-- 	end
+	-- end
 
-	cache[player:get_player_name()] = leagues
+	-- cache[pname] = leagues
 
 	if ctf_modebase.current_mode then
-		update_league(player)
+		ctf_rankings.update_league(player)
 	end
 end)
 
@@ -96,7 +104,7 @@ end)
 ctf_api.register_on_new_match(function()
 	minetest.after(1, function()
 		for _, p in pairs(minetest.get_connected_players()) do
-			update_league(p)
+			ctf_rankings.update_league(p)
 		end
 	end)
 end)
@@ -133,9 +141,9 @@ minetest.register_chatcommand("league", {
 										th = "rd"
 									end
 
-									out = out .. string.format("\t[%s]: %s League (%s%s place)\n",
+									out = out .. string.format("\t[%s]: %s League (%s%s place%s)\n",
 										HumanReadable(mode), HumanReadable(league), rank.place,
-										th
+										th, rank._pro_chest and ", with pro chest access" or ""
 									)
 									break
 								end
