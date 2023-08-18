@@ -74,7 +74,7 @@ function random_messages.read_messages()
 		"An alternative method to place markers is by (left/right) clicking while holding the zoom key (default: Z)",
 		"Use /mp <player> to send a marker to a specific teammate",
 		"To check someone's league in all modes, use /league <player>",
-		"Use /leagues to list of leagues and the placement needed to get to them.",
+		"Use /leagues to list leagues and the placement needed to get to them.",
 	}
 end
 
