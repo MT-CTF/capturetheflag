@@ -29,14 +29,25 @@ end
 
 -- Returns true if player has entity, will give them one if they need it but don't have it for some reason
 local function has_entity(player)
+	local pname = player:get_player_name()
+
 	if not hpbar.can_show(player) then
+		if players[pname] then
+			players[pname].entity:remove()
+			players[pname] = nil
+
+			return false
+		end
+
 		return false
 	end
 
-	local pname = player:get_player_name()
-
-	if players[pname] and players[pname].entity:get_luaentity() then
-		return true
+	if players[pname] then
+		if players[pname].entity and players[pname].entity:get_luaentity() then
+			return true
+		else
+			players[pname].entity:remove()
+		end
 	end
 
 	local entity = minetest.add_entity(player:get_pos(), "hpbar:entity")
@@ -46,7 +57,6 @@ local function has_entity(player)
 	if not players[pname] then
 		players[pname] = {entity=entity}
 	else
-		players[pname].entity:remove()
 		players[pname].entity = entity
 	end
 
