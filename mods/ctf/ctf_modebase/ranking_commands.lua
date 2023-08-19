@@ -68,7 +68,7 @@ end
 
 ctf_core.register_chatcommand_alias("rank", "r", {
 	description = "Get the rank of yourself or a player",
-	params = "[mode:technical modename] <playername>",
+	params = "[ all | mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
 		if mode_name == "all" then
