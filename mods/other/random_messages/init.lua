@@ -73,6 +73,7 @@ function random_messages.read_messages()
 		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
 		"An alternative method to place markers is by (left/right) clicking while holding the zoom key (default: Z)",
 		"Use /mp <player> to send a marker to a specific teammate",
+		"Use /msg <playername> <message> to send a private message (PM) to another player.",
 	}
 end
 
