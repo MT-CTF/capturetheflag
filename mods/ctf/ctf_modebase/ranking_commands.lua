@@ -31,15 +31,15 @@ local function rank(name, mode_name, mode_data, pname)
 	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
 
 	if not prank then
-		return false, string.format("Player %s has no rankings in mode %s!\n", pname, mode_name)
+		return false, string.format("Player %s has no rankings in mode %s!", pname, mode_name)
 	end
 
 	local return_str = string.format(
-		"\tRankings for player %s in mode %s:\n\t\t", minetest.colorize("#ffea00", pname), mode_name
+		"\tRankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
 	)
 
 	for _, irank in ipairs(mode_data.summary_ranks) do
-		return_str = string.format("%s%s: %s,\n\t\t",
+		return_str = string.format("%s%s: %s,\n\t",
 			return_str,
 			minetest.colorize("#63d437", HumanReadable(irank)),
 			minetest.colorize("#ffea00", math.round(prank[irank] or 0))
@@ -47,7 +47,7 @@ local function rank(name, mode_name, mode_data, pname)
 	end
 
 	for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
-		return_str = string.format("%s%s: %s,\n\t\t",
+		return_str = string.format("%s%s: %s,\n\t",
 			return_str,
 			minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
 			minetest.colorize("#ffea00", 0.1 * math.round(10 * (
@@ -57,7 +57,7 @@ local function rank(name, mode_name, mode_data, pname)
 		)
 	end
 
-	return_str = string.format("%s%s: %s\n\n",
+	return_str = string.format("%s%s: %s",
 		return_str,
 		minetest.colorize("#63d437", "Place"),
 		minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
@@ -77,8 +77,8 @@ ctf_core.register_chatcommand_alias("rank", "r", {
 				minetest.colorize("#ffea00", pname or name),
 				mode_name
 			)
-			local mode_names = {"classes", "classic", "nade_fight"}
-			for _, mode in ipairs(mode_names) do
+
+			for _, mode in ipairs(ctf_modebase.modelist) do
 				mode_data = ctf_modebase.modes[mode]
 				return_str = return_str .. select(2, rank(name, mode, mode_data, pname))
 			end
@@ -373,4 +373,3 @@ minetest.register_chatcommand("transfer_rankings", {
 		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
 	end
 })
-
