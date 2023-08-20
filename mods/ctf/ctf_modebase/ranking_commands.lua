@@ -31,7 +31,7 @@ local function rank(name, mode_name, mode_data, pname)
 	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
 
 	if not prank then
-		return false, string.format("Player %s has no rankings in mode %s!", pname, mode_name)
+		return false, string.format("Player %s has no rankings in mode %s!\n", pname, mode_name)
 	end
 
 	local return_str = string.format(
@@ -57,7 +57,7 @@ local function rank(name, mode_name, mode_data, pname)
 		)
 	end
 
-	return_str = string.format("%s%s: %s",
+	return_str = string.format("%s%s: %s\n",
 		return_str,
 		minetest.colorize("#63d437", "Place"),
 		minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
@@ -68,12 +68,12 @@ end
 
 ctf_core.register_chatcommand_alias("rank", "r", {
 	description = "Get the rank of yourself or a player",
-	params = "[ all | mode:technical modename] <playername>",
+	params = "[ mode:all | mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
 		if mode_name == "all" then
 			local return_str = string.format(
-				"Rankings for player %s in mode %s:\n\t",
+				"Rankings for player %s in all modes:\n",
 				minetest.colorize("#ffea00", pname or name),
 				mode_name
 			)
