@@ -31,7 +31,7 @@ local function rank(name, mode_name, mode_data, pname)
 	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
 
 	if not prank then
-		return false, string.format("Player %s has no rankings in mode %s!\n", pname, mode_name)
+		return false, string.format("Player %s has no rankings in mode %s\n", pname, mode_name)
 	end
 
 	local return_str = string.format(
