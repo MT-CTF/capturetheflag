@@ -27,6 +27,9 @@ return {
 
 			if team then
 				rankings_teams[team][stat] = (rankings_teams[team][stat] or 0) + amount
+				if stat == "score" then
+					rankings_players[player][team.."_"..stat] = (rankings_players[player][team.."_"..stat] or 0) + amount
+				end
 			end
 		end
 
