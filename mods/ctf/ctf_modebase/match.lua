@@ -157,8 +157,11 @@ minetest.register_chatcommand("queue_restart", {
 		if not param or param == "" then param = false end
 
 		restart_on_next_match = param and (" ("..param..")") or ""
-		minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
-		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server will restart after this match is over. " .. param))
+
+		minetest.log("action", string.format("[ctf_admin] %s queued a restart. Reason: %s", name, restart_on_next_match))
+		minetest.chat_send_all(minetest.colorize("red",
+			"[NOTICE] Server will restart after this match is over. " .. restart_on_next_match
+		))
 		return true, "Restart is queued."
 	end
 })
