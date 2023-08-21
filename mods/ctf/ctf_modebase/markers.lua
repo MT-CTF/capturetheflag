@@ -171,7 +171,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 	end
 
 	if pointed and hpmarker == true then
-		local player_hpr = string.format("HP=%i/%i", player:get_hp(),
+		local player_hpr = string.format("HP: %i/%i", player:get_hp(),
 		player:get_properties().hp_max)
 		message = string.format("m [%s]: ", name) .. player_hpr
 		if vector.distance(
@@ -229,7 +229,9 @@ minetest.register_chatcommand("mhp", {
 	description = "Place a HP marker in your look direction",
 	params = "",
 	privs = {interact = true, shout = true},
-	func = function(name, param) return marker_func(name, param, nil, true) end
+	func = function(name, param)
+		return marker_func(name, param, nil, true)
+	end
 })
 
 minetest.register_chatcommand("m", {
