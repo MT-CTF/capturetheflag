@@ -19,12 +19,12 @@
 
 ###  3. Selecting the Map Area
 
-Decide where you will build your map. The area can be maximum 230x230 blocks in surface area, but it can be lesser.
+Decide where you will build your map. We recommend you don't make your map larger than 230x230x230 blocks.
 1. Run `ctf_map editor` 
 2. Press `Create New Map`
 3. Select a position to be one corner of the map.
 4. Select a position in the opposite corner. Place it higher/lower than the first one to give the map height.
-**Note:** you can change your area at any time by typing `/ctf_map editor` and pressing the "Corners" button.
+**Note:** you can change your map area at any time by typing `/ctf_map editor` and pressing the "Corners" button.
 
 ### 4. Build
 
@@ -36,10 +36,10 @@ Decide where you will build your map. The area can be maximum 230x230 blocks in 
 - Many blocks have an indestructible variant
 - Don't forget to add
 	- Team chests
-	- Indestructible blocks under the flag. The minimum is 5x5 blocks in surface area.
-	- "Indestructible Barrier Glass" (`ctf_map:ind_glass`) around the edge of the world.
-	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins.
-	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn to stone(`default:stone`) once the match begins.
+	- Indestructible blocks under the flag. The minimum is 5x5 blocks, with the flag on top of them in the center.
+	- "Indestructible Barrier Glass" (`ctf_map:ind_glass`) around the sides of the world (You don't need it on the ceiling)
+	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins, if the barrier area covers it (More on that later).
+	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone(`default:stone`) once the match begins, if the barrier area covers it (More on that later).
 
 If you wish to save your map for later edits, follow the note in the section about exporting the map.
 
@@ -49,15 +49,14 @@ Run `/ctf_map editor`.
 An explanation of some of the fields is given below.
 
 #### Map Enabled
-Whether or not the map is available for play. You will want to check this.
+Whether or not the map is available for play. You will want to make sure it's enabled.
 
 #### License
 * Every map must have its own license.
-* If attribution is required (for example if you modify other's map and you have to tell who is author of the original map), that has to be appended to the `license` field.
-If you want to give more information, you can use the `Other info` field.
+* You can append any attribution you need to give to the `license` field (For example: If you modified someone's map or used one of their builds you'd list their name and what map/build of theirs that you modified/used). If you want to give more information, you can use the `Other info` field.
 * If you don't know which license to use, [this list of CC licenses](https://creativecommons.org/use-remix/cc-licenses/) can help you.
-* We can only accept the free culture licences like `CC BY-SA 4.0`. Note that not licences in the Creative Commons family are free(as in freedom). For instance those with `ND` are not.
-* Please know what you are doing when choosing a certain license. For example, you can read information about various licenses and/or consult a lawyer.
+* We can only accept the free culture licenses like `CC BY-SA 4.0`. Note that not all licenses in the Creative Commons family are free(as in freedom) (e.g `CC BY-ND`).
+* Please make sure you know what you are doing when choosing a license. You could do a little research about various licenses, ask a parent for help if you're young and haven't dealt with licenses before, and/or consult a lawyer.
 
 #### Map Hint
 Does your map have hidden treasures? You can hint about them with the "Map Hint" field.
@@ -104,42 +103,47 @@ Positions where team flags are placed. You can select the teams that you want on
 #### Zone Bounds
 How far the players of a certain team may go during build time. The zone bounds should overlap at the Red Barrier wall.
 
-> **Note:** Even standing on the boundary sends the player back. They do not have to go beyond it. Place the boundaries accordingly.
+> **Note:** Even players standing on the edge of their team zone are sent back to their base. It doesn't just trigger when they go beyond it.
 
 #### Chest Zones
-Areas where chests can be placed. Some maps allow placing chests anywhere, while others only place them in certain locations. 
+Areas where treasure chests are placed. Some maps have treasure chests placed throughout the entire map, while others only have them placed in certain small areas/rooms. What you choose for your map is up to you.
 
 #### Barrier Area
-Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barrier Stone" wall is located. Setting this will allow the game to know where to make them disappear when the match begins. You can leave this by default unless the game is taking a long time to remove your barriers. If it is so and it is a two-team map, then set the Barrier Area to the region of the barriers only. However, it is not possible to do this with four-team maps.
+Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barrier Stone" wall is located. Setting this will tell the game where to look for the wall when removing them after the build time ends. You can leave this at its default unless the game is taking a long time to remove your barriers. Most 4 team maps will always have slow barrier removal though.
 
-### 6. Export 
+### 6. Map Saving
 
-1. Press "Finish Editing"
-2. Find the exported map located in `[Mintest folder]/worlds/[Map World]/schems/[Exported Map folder]`
-3. Move the exported map folder to `\[Minetest folder]/games/capturetheflag/mods/ctf/ctf_map/maps`.
+#### Saving your changes
+* Run `/ctf_map editor` and press "Finish Editing" after scrolling to the bottom
 
-You can make edits to the map without changing the actual map files by running `ctf_map editor`, clicking on the exported map folder from the list of maps, and then by pressing `Resume Editing`. You can do so each time you want to edit before moving the `schems/[Exported Map folder]` to the `maps` folder. If you only want to access the map, do so by running `ctf_map editor` selecting the map folder, and clicking `Start Editing`.  
+#### Moving your map to where CTF can load it
+* Find the exported map located in <ins>your map editor save folder</ins>`[Minetest folder]/worlds/[Map World]/schems/[Exported Map folder]`
+* Move the exported map folder to the <ins>CTF map folder</ins> `[Minetest folder]/games/capturetheflag/mods/ctf/ctf_map/maps`.
+
+#### Resuming editing
+Once you've moved your map once (See above) you can make edits to your map without having to move it again by running `/ctf_map editor`, clicking on your map in the list of maps, and then pressing `Resume Editing`, which tells CTF not to use the blocks in the map you copied to the <ins>CTF map folder</ins>.
+* Any changes you make to the `/ctf_map editor` gui (chest zones, etc) won't apply. You have to copy the map for that.
+* If you accidentally press `Start Editing` instead of `Resume Editing` you need to close the game without saving *copy your map to where CTF can load it* (See above). Otherwise your changes will be lost, because `Start Editing` tells CTF to use the blocks in the map you moved to the <ins>CTF map folder</ins>, which will be outdated if you've made changes since you last moved your map over.
 
 ### 7. Play
 
 1. Create a new world with the `singlenode` mapgen.
-2. Make sure creative mode is disabled
+2. Make sure creative mode is disabled before joining
 3. Grant yourself `ctf_admin` by issuing `/grantme ctf_admin`
-4. Type `/maps`
-5. Select your map
-6. Press "Skip to map"
+4. Run `/ctf_next -f <map_name>` Using your map's folder (or technical) name instead of `<map_name>`
 
 ### 8. Screenshot
 
-If you choose to submit your map, include a screenshot of it in the exported map's folder. It should be taken with on texture packs enabled and have an aspect ratio of 3:2 (screenshot 600x400px is suggested).
+If you choose to submit your map, include a screenshot of it in the exported map's folder. It should be taken without any texture packs enabled and must have an aspect ratio of 3:2 (screenshot `600px`x`400px` is suggested).
 
 You can take a screenshot easily by doing the following:
 1. Hide the HUD. By default <kbd>F1</kbd> does that.
 2. Hide the chat log. By default <kbd>F2</kbd> does that.
-3. Try to find a good view that shows most of the map.
-4. *(Optional)* Increase your view range if important parts of the map cannot be seen. By default the <kbd>=</kbd> (or <kbd>+</kbd>) and <kbd>-</kbd> keys do that.
-5. Take a screenshot **from Minetest**. By default <kbd>F12</kbd> does that.
-6. You can find the screenshot in `[Minetest folder]/screenshots` unless you have changed the path in settings.
+3. See if your screenshot looks better with/without fog enabled. You can toggle it with <kbd>F3</kbd> by default
+4. Try to find a good view that shows most of the map.
+5. *(Optional)* Increase your view range if important parts of the map cannot be seen. By default the <kbd>=</kbd> (or <kbd>+</kbd>) and <kbd>-</kbd> keys do that.
+6. Take a screenshot **from Minetest**. By default <kbd>F12</kbd> does that.
+7. You can find the screenshot in `[Minetest folder]/screenshots` unless you have changed the path in settings.
 
 Crop the screenshot into the aspect ratio mentioned above using a tool of your choice, and put the screenshot inside your exported map's folder. It should be named `screenshot.png`.
 
