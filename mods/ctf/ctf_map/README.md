@@ -38,8 +38,13 @@ Decide where you will build your map. We recommend you don't make your map large
 	- Team chests
 	- Indestructible blocks under the flag. The minimum is 5x5 blocks, with the flag on top of them in the center.
 	- "Indestructible Barrier Glass" (`ctf_map:ind_glass`) around the sides of the world (You don't need it on the ceiling)
-	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins, if the barrier area covers it (More on that later).
-	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone(`default:stone`) once the match begins, if the barrier area covers it (More on that later).
+	- Build-time wall. This seperates the territory of the teams and allow a peaceful build time.
+		- "Indestructible Air Glass" (`ctf_map:ind_air_red`) for barrier nodes to be replaced by air as the match starts.
+		- "Indestructible Water Barrier Glass" (`ctf_map:ind_water`) for those to be replaced by water sources (`default:water_source`) as the match starts.
+		- "Indestructible Lava Barrier Stone" (`ctf_map:ind_lava`) for those to be replaced by lava sources (`default:lava_source`) as the match starts.
+		- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone (`default:stone`) once the match begins, if the barrier area covers it (More on that later).
+- Note that the old build-time wall node, "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`), are deprecated and will cause performance downside. They can still be kept, but converting them into the air, water or lava variants is welcome.
+	- The performance downside is caused by the water flow check codes. For every old barrier, the time complexity of barrier removal increases by 4 even on maps without any water.
 
 If you wish to save your map for later edits, follow the note in the section about exporting the map.
 
