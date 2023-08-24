@@ -31,8 +31,8 @@ It's helpful to read the description of the items your class is given.
 ****
 ]]
 
-local function ctf_guide(name, markdown_guide)
-    local formspec_guide = md2f.md2f(0.3, 0, 8, 10, markdown_guide)
+local function ctf_guide(name, guide_content)
+    local formspec_guide = md2f.md2f(0.3, 0, 8, 10, guide_content)
     local formspec = "size[8,9.5]" ..
                     formspec_guide ..
                     "button_exit[3,8.75;2,1;exit;Close]"
