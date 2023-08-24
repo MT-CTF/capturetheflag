@@ -45,6 +45,7 @@ Decide where you will build your map. We recommend you don't make your map large
 		- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone (`default:stone`) once the match begins, if the barrier area covers it (More on that later).
 - Note that the old build-time wall node, "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`), are deprecated and will cause performance downside. They can still be kept, but converting them into the air, water or lava variants is welcome.
 	- The performance downside is caused by the water flow check codes. For every old barrier, the time complexity of barrier removal increases by 4 even on maps without any water.
+	- This type of barrier must not be used if your map has barriers supposed to be replaced by water sources and a barrier area is defined.
 
 If you wish to save your map for later edits, follow the note in the section about exporting the map.
 
