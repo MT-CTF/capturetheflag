@@ -2,14 +2,16 @@ local markdown_guide = [[
 # Capture the Flag Guide
 
 ### Basics
-* Click the opposite team's flag to take it. Then, click your team's flag before the enemy takes it in order to capture.
+* Click the opposite team's flag to take it.
+Then, click your team's flag before the enemy takes it in order to capture.
 * Each team has a team chest; put useful items in there and **never** take more than you need!
 
 ### Modes
-* CTF cycles through three modes: Classes, Nade Fight, and Classic. 
+* CTF cycles through three modes: Classes, Nade Fight, and Classic.
 * At the end of each mode, you get to vote for how many matches of the next mode you would like to play.
 
-* In Classes, right-click your team's flag to change classes. It's helpful to read the description of the items your class is given.
+* In Classes, right-click your team's flag to change classes.
+It's helpful to read the description of the items your class is given.
 * In Nade Fight, right-click your grenade to switch between three types of nade.
 * In Classic, eat apples to heal and find ores to craft better swords.
 
