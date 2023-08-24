@@ -78,7 +78,6 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 		local Nx = p2.x - p1.x + 1
 		local Ny = p2.y - p1.y + 1
 		local ID_IGNORE = minetest.CONTENT_IGNORE
-		local ID_AIR = minetest.CONTENT_AIR
 		local ID_WATER = minetest.get_content_id("default:water_source")
 		local ID_OLD_BARRIER = minetest.get_content_id("ctf_map:ind_glass_red")
 
@@ -93,7 +92,7 @@ function ctf_map.remove_barrier(mapmeta, pos2, callback)
 							local replacement_this = replacement_id
 							-- water flow check (for whatever reason vm:update_liquids() failed to work)
 							-- This only applies to the old barrier glass and not to the new air barrier.
-							if barriernode_id == ID_OLD_BARRIER then 
+							if barriernode_id == ID_OLD_BARRIER then
 								local check_pos = {
 									((z + 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
 									((z - 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,

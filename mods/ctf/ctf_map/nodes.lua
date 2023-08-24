@@ -34,7 +34,8 @@ minetest.register_node("ctf_map:ind_glass", {
 
 -- Kept for compactibility to old maps
 minetest.register_node("ctf_map:ind_glass_red", {
-	description = "Indestructible Red Barrier Glass\n\n" .. minetest.colorize("#FFFF00", "Deprecated. Use air, water or lava barrier node instead."),
+	description = "Indestructible Red Barrier Glass\n\n" ..
+		minetest.colorize("#FFFF00", "Deprecated. Use air, water or lava barrier node instead."),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_glass_red.png"},
 	inventory_image = minetest.inventorycube("ctf_map_glass_red.png"),
