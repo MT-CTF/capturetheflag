@@ -60,7 +60,7 @@ local function add_marker(pname, pteam, message, pos, owner)
 	end
 end
 
-local function check_pointed_entity(pointed, message, pos)
+local function check_pointed_entity(pointed, message)
 	local concat
 	local obj = pointed.ref
 	local entity = obj:get_luaentity()
@@ -78,7 +78,7 @@ local function check_pointed_entity(pointed, message, pos)
 			concat = concat .. " " .. stack:get_count()
 		end
 	end
-	pos = obj:get_pos()
+	local pos = obj:get_pos()
 	if concat then
 		message = message .. " <" .. concat .. ">"
 	end
@@ -223,7 +223,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 		end
 		message = string.format("m [%s]: %s", name, param)
 		if pointed.type == "object" then
-			message, pos = check_pointed_entity(pointed, message, pos)
+			message, pos = check_pointed_entity(pointed, message)
 		else
 			pos = pointed.under
 		end
