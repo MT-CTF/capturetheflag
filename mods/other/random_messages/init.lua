@@ -77,7 +77,7 @@ function random_messages.read_messages()
 		"Use /leagues to list leagues and the placement needed to get to them.",
 		"Use /mhp or left/right click while holding the zoom key (default: Z)"
 		.. "pointed towards your feet to place an HP marker.",
-		"Use /map to print the current map name and map author.",
+		"Use /map to print the current map name and its author.",
 		"To check someone's ranking in all modes, use /rank mode:all <player_name>",
 	}
 end
