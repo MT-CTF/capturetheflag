@@ -89,7 +89,6 @@ local function fixborder(player)
 			for y = p1.y, p2.y do
 				for x = p1.x, p2.x do
 					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
-					local done = false
 
 					if d[vi] == ID_OLD_BARRIER then
 						local replacement_id = ID_AIR_BARRIER
