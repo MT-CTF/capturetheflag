@@ -54,6 +54,98 @@ ctf_map.register_map_command("here", function(name, params)
 	end
 end)
 
+local function fixborder(player)
+	minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
+		"Converting barriers. This will take a few seconds..."))
+
+	-- From map_functions.lua
+	local pos1 = getpos_players[player].positions[1]
+	local pos2 = getpos_players[player].positions[2]
+
+	local vm = VoxelManip()
+	pos1, pos2 = vm:read_from_map(pos1, pos2)
+
+	local data = vm:get_data()
+
+	ctf_gui.old_show_formspec(player, "ctf_map:loading", {
+		size = {x = 8, y = 4},
+		title = "Capture The Flag Map Editor",
+		description = "Converting barriers. This will take a few seconds..."
+	})
+
+	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
+		local mod = {} -- All its contents will be recreated in the loop
+		local Nx = p2.x - p1.x + 1
+		local Ny = p2.y - p1.y + 1
+		local ID_IGNORE = minetest.CONTENT_IGNORE
+		local ID_WATER = minetest.get_content_id("default:water_source")
+		local ID_LAVA = minetest.get_content_id("default:lava_source")
+		local ID_OLD_BARRIER = minetest.get_content_id("ctf_map:ind_glass_red")
+		local ID_AIR_BARRIER = minetest.get_content_id("ctf_map:ind_air_red")
+		local ID_WATER_BARRIER = minetest.get_content_id("ctf_map:ind_water")
+		local ID_LAVA_BARRIER = minetest.get_content_id("ctf_map:ind_lava")
+
+		for z = p1.z, p2.z do
+			for y = p1.y, p2.y do
+				for x = p1.x, p2.x do
+					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
+					local done = false
+
+					if d[vi] == ID_OLD_BARRIER then
+						local replacement_id = ID_AIR_BARRIER
+						local check_pos = { -- Check for water and lava
+							((z + 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
+							((z - 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
+							(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x + 1) - p1.x) + 1,
+							(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x - 1) - p1.x) + 1,
+						}
+						local water_count = 0
+						local lava_count = 0
+						for _, check_vi in ipairs(check_pos) do
+							-- It is rare than water will be appearing with lava
+							-- But if that happens, water takes the priority.
+							if d[check_vi] == ID_WATER then
+								water_count = water_count + 1
+								if water_count >= 2 then
+									replacement_id = ID_WATER_BARRIER
+									break
+								end
+							elseif d[check_vi] == ID_LAVA then
+								lava_count = lava_count + 1
+								if lava_count >= 2 then
+									replacement_id = ID_LAVA_BARRIER
+									break
+								end
+							end
+						end
+						mod[vi] = replacement_id
+					else
+						mod[vi] = ID_IGNORE
+					end
+				end
+			end
+		end
+
+		return mod
+	end, function(d)
+		vm:set_data(d)
+		vm:update_liquids()
+		vm:write_to_map(false)
+		minetest.close_formspec(player, "ctf_map:loading")
+		minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
+			"Done barrier convertion. " ..
+			"Please check if there are any water or lava barriers not being replaced."))
+	end, data, pos1, pos2, ctf_map.barrier_nodes)
+	return true, "Border is being fixed. Please wait..."
+end
+
+ctf_map.register_map_command("fixborder", function(name, params)
+	ctf_map.get_pos_from_player(name, 2, function()
+		fixborder(name)
+	end)
+	return true
+end)
+
 minetest.register_on_punchnode(function(pos, _, puncher)
 	puncher = PlayerName(puncher)
 
