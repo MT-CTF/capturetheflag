@@ -60,6 +60,31 @@ local function add_marker(pname, pteam, message, pos, owner)
 	end
 end
 
+local function check_pointed_entity(pointed, message, pos)
+	local concat
+	local obj = pointed.ref
+	local entity = obj:get_luaentity()
+	-- If object is a player, append player name to display text
+	-- Else if obj is item entity, append item description and count to str.
+	if obj:is_player() then
+		concat = obj:get_player_name()
+	elseif entity then
+		if entity.name == "__builtin:item" then
+			local stack = ItemStack(entity.itemstring)
+			local itemdef = minetest.registered_items[stack:get_name()]
+			-- Fallback to itemstring if description doesn't exist
+			-- Only use first line of itemstring
+			concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
+			concat = concat .. " " .. stack:get_count()
+		end
+	end
+	pos = obj:get_pos()
+	if concat then
+		message = message .. " <" .. concat .. ">"
+	end
+	return message, pos
+end
+
 function ctf_modebase.markers.remove(pname, no_notify)
 	if markers[pname] then
 		markers[pname].timer:cancel()
@@ -182,34 +207,23 @@ local function marker_func(name, param, specific_player, hpmarker)
 		else
 			pos = player:get_pos()
 		end
+		if pointed then
+			if pointed.type == "object" then
+				message, pos = check_pointed_entity(pointed, message, pos)
+			end
+		end
+
+		-- If the player places a marker upon death, it will resort to the below
+		if player:get_hp() == 0 then
+			message = string.format("m <%s> died here", name)
+		end
 	else
 		if not pointed then
 			return false, "Can't find anything to mark, too far away!"
 		end
 		message = string.format("m [%s]: %s", name, param)
-
 		if pointed.type == "object" then
-			local concat
-			local obj = pointed.ref
-			local entity = obj:get_luaentity()
-			-- If object is a player, append player name to display text
-			-- Else if obj is item entity, append item description and count to str.
-			if obj:is_player() then
-				concat = obj:get_player_name()
-			elseif entity then
-				if entity.name == "__builtin:item" then
-					local stack = ItemStack(entity.itemstring)
-					local itemdef = minetest.registered_items[stack:get_name()]
-					-- Fallback to itemstring if description doesn't exist
-					-- Only use first line of itemstring
-					concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
-					concat = concat .. " " .. stack:get_count()
-				end
-			end
-				pos = obj:get_pos()
-			if concat then
-				message = message .. " <" .. concat .. ">"
-			end
+			message, pos = check_pointed_entity(pointed, message, pos)
 		else
 			pos = pointed.under
 		end
@@ -324,3 +338,4 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
+
