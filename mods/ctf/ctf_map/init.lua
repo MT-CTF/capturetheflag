@@ -154,4 +154,3 @@ local TIME_SPEED = minetest.settings:get("time_speed")
 minetest.register_on_shutdown(function()
 	minetest.settings:set("time_speed", TIME_SPEED)
 end)
-
