@@ -163,4 +163,3 @@ local register_chatcommand_table = {
 
 minetest.register_chatcommand("random_messages", register_chatcommand_table)
 minetest.register_chatcommand("rmessages", register_chatcommand_table)
-
