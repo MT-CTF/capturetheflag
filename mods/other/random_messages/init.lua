@@ -75,8 +75,8 @@ function random_messages.read_messages()
 		"Use /mp <player> to send a marker to a specific teammate",
 		"To check someone's league in all modes, use /league <player>",
 		"Use /leagues to list leagues and the placement needed to get to them.",
-		"Use /mhp or left/right click while holding the zoom key (default: Z)"
-		.. "pointed towards your feet to place an HP marker.",
+		"To place an HP marker run /mhp or left/right click while holding the zoom key (default: Z) "..
+			"and looking at your feet",
 		"Use /map to print the current map name and its author.",
 		"To check someone's ranking in all modes, use /rank mode:all <player_name>",
 	}
