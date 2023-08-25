@@ -15,6 +15,7 @@ ctf_map = {
 	skyboxes = {"none"},
 	current_map = false,
 	barrier_nodes = {}, -- populated in nodes.lua
+	barrier_nodes_reverse = {}, -- populated in nodes.lua
 }
 
 for _, s in ipairs(skybox.get_skies()) do

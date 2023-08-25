@@ -235,3 +235,7 @@ ochest_def.on_rightclick = nil
 
 minetest.register_node("ctf_map:chest_opened", ochest_def)
 minetest.register_node("ctf_map:chest", chest_def)
+
+for k,v in pairs(ctf_map.barrier_nodes) do
+	ctf_map.barrier_nodes_reverse[v] = k
+end
