@@ -15,6 +15,17 @@ ctf_map = {
 	skyboxes = {"none"},
 	current_map = false,
 	barrier_nodes = {}, -- populated in nodes.lua
+	get_duration = function ()
+		if not ctf_map.start_time then
+			return "-"
+		end
+
+		local time = os.time() - ctf_map.start_time
+		return string.format("%02d:%02d:%02d",
+			math.floor(time / 3600),        -- hours
+			math.floor((time % 3600) / 60), -- minutes
+			math.floor(time % 60))          -- seconds
+	end,
 }
 
 for _, s in ipairs(skybox.get_skies()) do
@@ -131,8 +142,9 @@ minetest.register_chatcommand("map", {
 
         local mapName = map.name or "Unknown"
         local mapAuthor = map.author or "Unknown Author"
+		local mapDuration =  ctf_map.get_duration()
 
-        return true, string.format("The current map is %s by %s.", mapName, mapAuthor)
+        return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
     end
 })
 
@@ -142,3 +154,4 @@ local TIME_SPEED = minetest.settings:get("time_speed")
 minetest.register_on_shutdown(function()
 	minetest.settings:set("time_speed", TIME_SPEED)
 end)
+
