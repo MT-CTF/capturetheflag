@@ -81,7 +81,6 @@ local function fixborder(player)
 		local ID_WATER = minetest.get_content_id("default:water_source")
 		local ID_LAVA = minetest.get_content_id("default:lava_source")
 		local ID_OLD_BARRIER = minetest.get_content_id("ctf_map:ind_glass_red")
-		local ID_AIR_BARRIER = minetest.get_content_id("ctf_map:ind_air_red")
 		local ID_WATER_BARRIER = minetest.get_content_id("ctf_map:ind_water")
 		local ID_LAVA_BARRIER = minetest.get_content_id("ctf_map:ind_lava")
 
@@ -89,9 +88,9 @@ local function fixborder(player)
 			for y = p1.y, p2.y do
 				for x = p1.x, p2.x do
 					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
+					local done = false
 
 					if d[vi] == ID_OLD_BARRIER then
-						local replacement_id = ID_AIR_BARRIER
 						local check_pos = { -- Check for water and lava
 							((z + 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
 							((z - 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
@@ -106,19 +105,22 @@ local function fixborder(player)
 							if d[check_vi] == ID_WATER then
 								water_count = water_count + 1
 								if water_count >= 2 then
-									replacement_id = ID_WATER_BARRIER
+									mod[vi] = ID_WATER_BARRIER
+									done = true
 									break
 								end
 							elseif d[check_vi] == ID_LAVA then
 								lava_count = lava_count + 1
 								if lava_count >= 2 then
-									replacement_id = ID_LAVA_BARRIER
+									mod[vi] = ID_LAVA_BARRIER
+									done = true
 									break
 								end
 							end
 						end
-						mod[vi] = replacement_id
-					else
+					end
+
+					if not done then
 						mod[vi] = ID_IGNORE
 					end
 				end

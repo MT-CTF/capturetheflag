@@ -73,6 +73,10 @@ local function dothenext(time, dir, func)
 	end)
 end
 
+ctf_map.register_map_command("debug", function(name,param)
+	print(dump(context[name]))
+end)
+
 ctf_map.register_map_command("resave_all", function(name, params)
 	local dirlist = minetest.get_dir_list(ctf_map.maps_dir, true)
 
