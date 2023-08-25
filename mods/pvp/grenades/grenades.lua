@@ -161,7 +161,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 
 			if pteam then
 				for flagteam, team in pairs(ctf_map.current_map.teams) do
-					if team.flag_pos then
+					if not ctf_modebase.flag_captured[flagteam] and team.flag_pos then
 						local distance_from_flag = vector.distance(pos, team.flag_pos)
 						if distance_from_flag <= 15 and (damage or pteam == flagteam) then
 							minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
