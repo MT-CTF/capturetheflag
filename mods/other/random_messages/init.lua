@@ -75,6 +75,9 @@ function random_messages.read_messages()
 		"Use /mp <player> to send a marker to a specific teammate",
 		"To check someone's league in all modes, use /league <player>",
 		"Use /leagues to list leagues and the placement needed to get to them.",
+		"Use /mhp or left/right click while holding the zoom key (default: Z) pointed towards your feet to place an HP marker.",
+		"Use /map to print the current map name and map author.",
+		"To check someone's ranking in all modes, use /rank mode:all <player_name>",
 	}
 end
 
@@ -160,3 +163,4 @@ local register_chatcommand_table = {
 
 minetest.register_chatcommand("random_messages", register_chatcommand_table)
 minetest.register_chatcommand("rmessages", register_chatcommand_table)
+
