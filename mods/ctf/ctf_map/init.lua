@@ -14,7 +14,8 @@ ctf_map = {
 	maps_dir = minetest.get_modpath("ctf_map").."/maps/",
 	skyboxes = {"none"},
 	current_map = false,
-	barrier_nodes = {}, -- populated in nodes.lua
+	barrier_nodes = {}, -- populated in nodes.lua,
+	start_time = nil,
 	get_duration = function ()
 		if not ctf_map.start_time then
 			return "-"
@@ -154,3 +155,5 @@ local TIME_SPEED = minetest.settings:get("time_speed")
 minetest.register_on_shutdown(function()
 	minetest.settings:set("time_speed", TIME_SPEED)
 end)
+
+
