@@ -72,7 +72,9 @@ minetest.register_node("ctf_map:ind_lava", {
 	description = "Indestructible Lava Barrier Stone",
 	groups = {immortal = 1},
 	tiles = {"ctf_map_ind_lava.png"},
-	is_ground_content = false
+	is_ground_content = false,
+	paramtype = "light",
+	light_source = default.LIGHT_MAX - 1,
 })
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_lava")] = minetest.get_content_id("default:lava_source")
 
