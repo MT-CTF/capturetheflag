@@ -54,7 +54,7 @@ ctf_map.register_map_command("here", function(name, params)
 	end
 end)
 
-local function fixborder(player)
+local function fixbarrier(player)
 	minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
 		"Converting barriers. This will take a few seconds..."))
 
@@ -140,14 +140,14 @@ local function fixborder(player)
 	return true, "Border is being fixed. Please wait..."
 end
 
-ctf_map.register_map_command("fixborder", function(name, params)
+ctf_map.register_map_command("fixbarrier", function(name, params)
 	ctf_map.get_pos_from_player(name, 2, function()
-		fixborder(name)
+		fixbarrier(name)
 	end)
 	return true
 end)
 
-local function setborder(player)
+local function setbarrier(player)
 	minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
 		"Placing barriers. This will take a few seconds..."))
 
@@ -198,9 +198,9 @@ local function setborder(player)
 	end, data, vpos1, vpos2, pos1, pos2, ctf_map.barrier_nodes_reverse)
 end
 
-ctf_map.register_map_command("setborder", function(name, params)
+ctf_map.register_map_command("setbarrier", function(name, params)
 	ctf_map.get_pos_from_player(name, 2, function()
-		setborder(name)
+		setbarrier(name)
 	end)
 	return true, minetest.colorize(ctf_map.CHAT_COLOR,
 		"Select two corners of where the barrier should cover.")
