@@ -143,9 +143,9 @@ minetest.register_chatcommand("map", {
 
         local mapName = map.name or "Unknown"
         local mapAuthor = map.author or "Unknown Author"
-		local mapDuration =  ctf_map.get_duration()
-		
-		return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
+        local mapDuration =  ctf_map.get_duration()
+
+        return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
     end
 })
 
