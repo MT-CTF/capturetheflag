@@ -206,6 +206,65 @@ ctf_map.register_map_command("setbarrier", function(name, params)
 		"Select two corners of where the barrier should cover.")
 end)
 
+local function clearbarrier(player)
+	minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
+		"Clearing barriers. This will take a few seconds..."))
+
+	-- From map_functions.lua
+	local pos1 = getpos_players[player].positions[1]
+	local pos2 = getpos_players[player].positions[2]
+	pos1, pos2 = vector.sort(pos1, pos2)
+
+
+	local vm = VoxelManip()
+	local vpos1, vpos2 = vm:read_from_map(pos1, pos2)
+
+	local data = vm:get_data()
+
+	ctf_gui.old_show_formspec(player, "ctf_map:loading", {
+		size = {x = 8, y = 4},
+		title = "Capture The Flag Map Editor",
+		description = "Clearing barriers. This will take a few seconds..."
+	})
+
+	minetest.handle_async(function(d, vp1, vp2, p1, p2, barrier_nodes)
+		local Nx = vp2.x - vp1.x + 1
+		local Ny = vp2.y - vp1.y + 1
+		local ID_IGNORE = minetest.CONTENT_IGNORE
+
+		for z = vp1.z, vp2.z do
+			for y = vp1.y, vp2.y do
+				for x = vp1.x, vp2.x do
+					local vi = (z - vp1.z) * Ny * Nx + (y - vp1.y) * Nx + (x - vp1.x) + 1
+
+					if vector.in_area(vector.new(x,y,z), p1, p2) then
+						d[vi] = barrier_nodes[d[vi]] or ID_IGNORE
+					else
+						d[vi] = ID_IGNORE
+					end
+				end
+			end
+		end
+
+		return d
+	end, function(d)
+		vm:set_data(d)
+		vm:update_liquids()
+		vm:write_to_map(false)
+		minetest.close_formspec(player, "ctf_map:loading")
+		minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
+			"Barrier cleared."))
+	end, data, vpos1, vpos2, pos1, pos2, ctf_map.barrier_nodes)
+end
+
+ctf_map.register_map_command("clearbarrier", function(name, params)
+	ctf_map.get_pos_from_player(name, 2, function()
+		clearbarrier(name)
+	end)
+	return true, minetest.colorize(ctf_map.CHAT_COLOR,
+		"Select two corners of where the barrier should be cleared.")
+end)
+
 minetest.register_on_punchnode(function(pos, _, puncher)
 	puncher = PlayerName(puncher)
 
