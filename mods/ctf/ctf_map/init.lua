@@ -144,8 +144,8 @@ minetest.register_chatcommand("map", {
         local mapName = map.name or "Unknown"
         local mapAuthor = map.author or "Unknown Author"
 		local mapDuration =  ctf_map.get_duration()
-
-        return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
+		
+		return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
     end
 })
 
@@ -155,5 +155,3 @@ local TIME_SPEED = minetest.settings:get("time_speed")
 minetest.register_on_shutdown(function()
 	minetest.settings:set("time_speed", TIME_SPEED)
 end)
-
-
