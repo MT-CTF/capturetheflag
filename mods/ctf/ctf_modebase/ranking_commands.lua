@@ -3,7 +3,9 @@ local function get_gamemode(param)
 
 	if mode_param then
 		local mode = ctf_modebase.modes[mode_param]
-		if not mode then
+		if mode_param == "all" then
+			return "all", nil, opt_param
+		elseif not mode then
 			return false, "No such game mode: " .. mode_param
 		end
 
@@ -18,54 +20,72 @@ local function get_gamemode(param)
 	end
 end
 
+local function rank(name, mode_name, mode_data, pname)
+	if not mode_name then
+		return false, mode_data
+	end
+
+	if not pname then
+		pname = name
+	end
+	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
+
+	if not prank then
+		return false, string.format("Player %s has no rankings in mode %s\n", pname, mode_name)
+	end
+
+	local return_str = string.format(
+		"\tRankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
+	)
+
+	for _, irank in ipairs(mode_data.summary_ranks) do
+		return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", HumanReadable(irank)),
+			minetest.colorize("#ffea00", math.round(prank[irank] or 0))
+		)
+	end
+
+	for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
+		return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
+			minetest.colorize("#ffea00", 0.1 * math.round(10 * (
+						(prank[pair[1]] or 0   ) /
+				math.max(prank[pair[2]] or 0, 1)
+			)))
+		)
+	end
+
+	return_str = string.format("%s%s: %s\n",
+		return_str,
+		minetest.colorize("#63d437", "Place"),
+		minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
+	)
+
+	return true, return_str
+end
+
 ctf_core.register_chatcommand_alias("rank", "r", {
 	description = "Get the rank of yourself or a player",
-	params = "[mode:technical modename] <playername>",
+	params = "[ mode:all | mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
-			return false, mode_data
-		end
-
-		if not pname then
-			pname = name
-		end
-		local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
-
-		if not prank then
-			return false, string.format("Player %s has no rankings in mode %s!", pname, mode_name)
-		end
-
-		local return_str = string.format(
-			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
-		)
-
-		for _, rank in ipairs(mode_data.summary_ranks) do
-			return_str = string.format("%s%s: %s,\n\t",
-				return_str,
-				minetest.colorize("#63d437", HumanReadable(rank)),
-				minetest.colorize("#ffea00", math.round(prank[rank] or 0))
+		if mode_name == "all" then
+			local return_str = string.format(
+				"Rankings for player %s in all modes:\n",
+				minetest.colorize("#ffea00", pname or name),
+				mode_name
 			)
+
+			for _, mode in ipairs(ctf_modebase.modelist) do
+				mode_data = ctf_modebase.modes[mode]
+				return_str = return_str .. select(2, rank(name, mode, mode_data, pname))
+			end
+			return true, return_str
+		else
+			return rank(name, mode_name, mode_data, pname)
 		end
-
-		for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
-			return_str = string.format("%s%s: %s,\n\t",
-				return_str,
-				minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
-				minetest.colorize("#ffea00", 0.1 * math.round(10 * (
-					        (prank[pair[1]] or 0   ) /
-					math.max(prank[pair[2]] or 0, 1)
-				)))
-			)
-		end
-
-		return_str = string.format("%s%s: %s",
-			return_str,
-			minetest.colorize("#63d437", "Place"),
-			minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
-		)
-
-		return true, return_str
 	end
 })
 
@@ -105,8 +125,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You should donate at least 5 score!"
 		end
 
-		if score > 400 then
-			return false, "You can donate no more than 400 score!"
+		if score > 100 then
+			return false, "You can donate no more than 100 score!"
 		end
 
 		if pname == name then
@@ -131,8 +151,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate only half of your match score!"
 		end
 
-		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
-			return false, "You can donate only once every 5 minutes!"
+		if donate_timer[name] and donate_timer[name] + 600 > os.time() then
+			return false, "You can donate only once in 10 minutes!"
 		end
 
 		current_mode.recent_rankings.add(pname, {score=score}, true)
@@ -156,7 +176,7 @@ minetest.register_chatcommand("reset_rankings", {
 	params = "[mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 

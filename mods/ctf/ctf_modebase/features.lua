@@ -9,8 +9,13 @@ local teams_left
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
 	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
-
-	return math.max(1, math.round(kd * 7))
+	local flag_multiplier = 1
+	for tname, carrier in pairs(ctf_modebase.flag_taken) do
+		if carrier.p == player then
+			flag_multiplier = flag_multiplier + 0.25
+		end
+	end
+	return math.max(1, math.round(kd * 7 * flag_multiplier))
 end
 
 local damage_group_textures = {
@@ -421,6 +426,15 @@ return {
 			local score = ((team_scores[lost_team] or {}).score or 0) / 4
 			score = math.max(75, math.min(500, score))
 			capture_reward = capture_reward + score
+		end
+
+		local team_score = team_scores[pteam].score
+		for teammate in pairs(ctf_teams.online_players[pteam].players) do
+			if teammate ~= pname then
+				local teammate_value = (recent_rankings.get(teammate)[pteam.."_score"] or 0) / (team_score or 1)
+				local victory_bonus = math.max(5, math.min(capture_reward / 2, capture_reward * teammate_value))
+				recent_rankings.add(teammate, {score = victory_bonus}, true)
+			end
 		end
 
 		recent_rankings.add(pname, {score = capture_reward, flag_captures = #teamnames})
