@@ -31,7 +31,7 @@ local function show_catalog(pname, current_map)
 		}
 	}
 
-	local y = 1
+	local y = 0.7
 
 	if current_map_meta.author and current_map_meta.author ~= "" then
 		formspec.elements.author = {
@@ -105,7 +105,8 @@ local function show_catalog(pname, current_map)
 		formspec.elements.previous = {
 			type = "button",
 			label = "<<",
-			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
+			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 11.8},
+			size = {5, 0.5},
 			func = function()
 				show_catalog(pname, current_map - 1)
 			end,
@@ -116,7 +117,8 @@ local function show_catalog(pname, current_map)
 		formspec.elements.next = {
 			type = "button",
 			label = ">>",
-			pos = {5, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
+			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 3.3},
+			size = {5, 0.5},
 			func = function()
 				show_catalog(pname, current_map + 1)
 			end,
@@ -128,7 +130,8 @@ local function show_catalog(pname, current_map)
 			type = "button",
 			exit = true,
 			label = "Skip to map",
-			pos = {9, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
+			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.2},
+			size = {2.5, 1},
 			func = function()
 				local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
 				minetest.log("action", string.format("[ctf_admin] %s skipped to new map %s", pname, mapname))
@@ -143,7 +146,8 @@ local function show_catalog(pname, current_map)
 		formspec.elements.set_as_next_map = {
 			type = "button",
 			label = "Set as next map",
-			pos = {13, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.5},
+			pos = {3.5, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.2},
+			size = {2.5, 1},
 			func = function()
 				local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
 				minetest.log("action", string.format("[ctf_admin] %s set new map %s", pname, mapname))
