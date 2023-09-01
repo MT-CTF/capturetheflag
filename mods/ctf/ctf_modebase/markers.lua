@@ -216,6 +216,10 @@ local function marker_func(name, param, specific_player, hpmarker)
 		-- If the player places a marker upon death, it will resort to the below
 		if player:get_hp() == 0 then
 			message = string.format("m <%s> died here", name)
+			if param ~= "Look here!" then message = string.format(
+				"m [%s]: %s", name, param
+			)
+			end
 		end
 	else
 		if not pointed then
