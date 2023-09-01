@@ -1,7 +1,7 @@
 local CURRENT_MAP_VERSION = "3"
-local BARRIER_Y_SIZE = 16 * 2
+local BARRIER_Y_SIZE = 16
 
-local modname = minetest.get_current_modname();
+local modname = minetest.get_current_modname()
 
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
@@ -160,7 +160,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
 		if tonumber(meta:get("map_version")) > 2 then
-			local f = assert(io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "r"))
+			local f = assert(io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "rb"))
 
 			local barriers = f:read("*all")
 
@@ -170,20 +170,28 @@ function ctf_map.load_map_meta(idx, dirname)
 
 			barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
 
-			for _, barrier_area in pairs(barriers) do
-				barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
-				barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
+			if barriers then
+				for _, barrier_area in pairs(barriers) do
+					barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
+					barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
 
-				for i = 1, barrier_area.max do
-					if not barrier_area.reps[i] then
-						barrier_area.reps[i] = minetest.CONTENT_IGNORE
-					else
-						barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
+					for i = 1, barrier_area.max do
+						if not barrier_area.reps[i] then
+							barrier_area.reps[i] = minetest.CONTENT_IGNORE
+						else
+							barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
+						end
 					end
 				end
-			end
 
-			map.barriers = barriers
+				map.barriers = barriers
+			else
+				if ctf_core.settings.server_mode ~= "mapedit" then
+					assert(false, "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
+				end
+
+				minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
+			end
 		else
 			map.barrier_area = minetest.deserialize(meta:get("barrier_area"))
 		end
@@ -351,7 +359,7 @@ function ctf_map.save_map(mapmeta)
 		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
 	end
 
-	local f = assert(io.open(path .. "barriers.data", "w"))
-	f:write(minetest.compress(minetest.serialize(barriers), "deflate", 9))
+	local f = assert(io.open(path .. "barriers.data", "wb"))
+	f:write(minetest.serialize(barriers))
 	f:close()
 end
