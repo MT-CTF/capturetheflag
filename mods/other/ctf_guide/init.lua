@@ -40,14 +40,6 @@ local function ctf_guide(name, guide_content)
     return true
 end
 
-sfinv.register_page("ctf_guide:guide", {
-    title = "Guide",
-    get = function(self, player, context)
-        local formspec_guide = md2f.md2f(0.3, 0, 8, 10, markdown_guide)
-        return sfinv.make_formspec(player, context, formspec_guide, false)
-    end
-})
-
 minetest.register_on_newplayer(function(player)
     local player_name = player:get_player_name()
     local background_hud = player:hud_add({
