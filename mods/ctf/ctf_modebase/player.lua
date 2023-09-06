@@ -139,9 +139,9 @@ minetest.register_on_joinplayer(function(player)
 	local inv = player:get_inventory()
 
 	if ctf_core.settings.server_mode == "play" then
-		inv:set_list("main",  {})
+		inv:set_list("main", {})
 	end
-	
+
 	inv:set_list("craft", {})
 
 	inv:set_size("craft", 1)
