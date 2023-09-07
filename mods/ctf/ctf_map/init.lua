@@ -16,7 +16,7 @@ ctf_map = {
 	current_map = false,
 	barrier_nodes = {}, -- populated in nodes.lua,
 	start_time = false,
-	get_duration = function ()
+	get_duration = function()
 		if not ctf_map.start_time then
 			return "-"
 		end
