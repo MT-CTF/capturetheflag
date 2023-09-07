@@ -69,9 +69,8 @@ ctf_core.include_files(
 	"ctf_traps.lua"
 )
 
+local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
 minetest.register_on_mods_loaded(function()
-	local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
-
 	for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
 		for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
 			if filename == "init.lua" then
