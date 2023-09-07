@@ -84,11 +84,11 @@ ctf_core.include_files(
 local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
 
 for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
-    for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
-        if filename == "init.lua" then
-            dofile(directory .. "/" .. entry .. "/"..filename)
-        end
-    end
+	for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
+		if filename == "init.lua" then
+			dofile(directory .. "/" .. entry .. "/"..filename)
+		end
+	end
 end
 
 
@@ -133,20 +133,20 @@ minetest.register_chatcommand("ctf_map", {
 })
 
 minetest.register_chatcommand("map", {
-    description = "Prints the current map name and map author",
-    func = function()
-        local map = ctf_map.current_map
+	description = "Prints the current map name and map author",
+	func = function()
+		local map = ctf_map.current_map
 
-        if not map then
-            return false, "There is no map currently in play"
-        end
+		if not map then
+			return false, "There is no map currently in play"
+		end
 
-        local mapName = map.name or "Unknown"
-        local mapAuthor = map.author or "Unknown Author"
-        local mapDuration =  ctf_map.get_duration()
+		local mapName = map.name or "Unknown"
+		local mapAuthor = map.author or "Unknown Author"
+		local mapDuration =  ctf_map.get_duration()
 
-        return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
-    end
+		return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
+	end
 })
 
 -- Attempt to restore user's time speed after server close
