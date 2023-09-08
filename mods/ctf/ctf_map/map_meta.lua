@@ -360,6 +360,6 @@ function ctf_map.save_map(mapmeta)
 	end
 
 	local f = assert(io.open(path .. "barriers.data", "wb"))
-	f:write(minetest.serialize(barriers))
+	f:write(minetest.compress(minetest.serialize(barriers)))
 	f:close()
 end
