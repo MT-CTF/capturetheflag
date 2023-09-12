@@ -191,7 +191,7 @@ function ctf_map.load_map_meta(idx, dirname)
 					if ctf_core.settings.server_mode ~= "mapedit" then
 						assert(false, "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
 					end
-					
+
 					minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
 				end
 			else
