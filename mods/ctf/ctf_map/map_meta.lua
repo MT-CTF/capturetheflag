@@ -162,7 +162,7 @@ function ctf_map.load_map_meta(idx, dirname)
 		if tonumber(meta:get("map_version")) > 2 then
 			local filename = ctf_map.maps_dir .. dirname .. "/barriers.data"
 			local f = io.open(filename, "rb")
-		
+			
 			if f ~= nil then
 				local barriers = f:read("*all")
 				
