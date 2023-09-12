@@ -162,21 +162,21 @@ function ctf_map.load_map_meta(idx, dirname)
 		if tonumber(meta:get("map_version")) > 2 then
 			local filename = ctf_map.maps_dir .. dirname .. "/barriers.data"
 			local f = io.open(filename, "rb")
-			
+
 			if f ~= nil then
 				local barriers = f:read("*all")
-				
+
 				f:close()
-		
+
 				assert(barriers and barriers ~= "")
-		
+
 				barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
-		
+
 				if barriers then
 					for _, barrier_area in pairs(barriers) do
 						barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
 						barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
-		
+
 						for i = 1, barrier_area.max do
 							if not barrier_area.reps[i] then
 								barrier_area.reps[i] = minetest.CONTENT_IGNORE
@@ -185,13 +185,13 @@ function ctf_map.load_map_meta(idx, dirname)
 							end
 						end
 					end
-		
+
 					map.barriers = barriers
 				else
 					if ctf_core.settings.server_mode ~= "mapedit" then
 						assert(false, "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
 					end
-		
+					
 					minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
 				end
 			else
