@@ -17,7 +17,7 @@ It's helpful to read the description of the items your class is given.
 
 ### Tips & Tricks
 * Sneak while jumping to jump up two blocks.
-* Start your messages with /t to send a message only visible to teamates.
+* Start your messages with `/t` to send a message only visible to teamates.
 * Sprint by pressing the fast key (`E` by default).
 * Use `/r` to check your rank.
 * Use `/m` to add a team marker at pointed location.
