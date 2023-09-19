@@ -156,44 +156,47 @@ function ctf_map.load_map_meta(idx, dirname)
 			phys_gravity   = tonumber(meta:get("phys_gravity")),
 			chests         = minetest.deserialize(meta:get("chests")),
 			teams          = minetest.deserialize(meta:get("teams")),
+			barrier_area   = minetest.deserialize(meta:get("barrier_area")),
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
 		if tonumber(meta:get("map_version")) > 2 then
-			local f = assert(io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "rb"))
+			local f, err = io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "rb")
 
-			local barriers = f:read("*all")
+			if (ctf_core.settings.server_mode ~= "mapedit" and assert(f, err)) or f then
+				local barriers = f:read("*all")
 
-			f:close()
+				f:close()
 
-			assert(barriers and barriers ~= "")
+				assert(barriers and barriers ~= "")
 
-			barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
+				barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
 
-			if barriers then
-				for _, barrier_area in pairs(barriers) do
-					barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
-					barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
+				if barriers then
+					for _, barrier_area in pairs(barriers) do
+						barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
+						barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
 
-					for i = 1, barrier_area.max do
-						if not barrier_area.reps[i] then
-							barrier_area.reps[i] = minetest.CONTENT_IGNORE
-						else
-							barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
+						for i = 1, barrier_area.max do
+							if not barrier_area.reps[i] then
+								barrier_area.reps[i] = minetest.CONTENT_IGNORE
+							else
+								barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
+							end
 						end
 					end
-				end
 
-				map.barriers = barriers
+					map.barriers = barriers
+				else
+					if ctf_core.settings.server_mode ~= "mapedit" then
+						assert(false, "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
+					end
+
+					minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
+				end
 			else
-				if ctf_core.settings.server_mode ~= "mapedit" then
-					assert(false, "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
-				end
-
-				minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
+				minetest.log("error", "Map "..dirname.." is missing its barriers file. Re-save map to fix")
 			end
-		else
-			map.barrier_area = minetest.deserialize(meta:get("barrier_area"))
 		end
 
 		for id, def in pairs(map.chests) do
@@ -287,6 +290,7 @@ function ctf_map.save_map(mapmeta)
 		pos2.y = pos1.y + BARRIER_Y_SIZE
 	end
 
+	local barrier_area = {pos1 = pos1:subtract(mapmeta.offset), pos2 = pos2:subtract(mapmeta.offset)}
 	local queue_break = false
 	while true do
 		local tmp = {
@@ -310,6 +314,10 @@ function ctf_map.save_map(mapmeta)
 
 		tmp.max = #data
 
+		local _
+		_, barrier_area.pos1 = vector.sort(barrier_area.pos1, tmp.pos1)
+		barrier_area.pos2 = vector.sort(barrier_area.pos2, tmp.pos2)
+
 		table.insert(barriers, tmp)
 
 		if queue_break then
@@ -325,6 +333,8 @@ function ctf_map.save_map(mapmeta)
 			queue_break = true
 		end
 	end
+
+	barrier_area.pos1 = vector.subtract(barrier_area.pos1, mapmeta.offset)
 
 	meta:set("map_version"   , CURRENT_MAP_VERSION)
 	meta:set("size"          , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))
@@ -344,6 +354,7 @@ function ctf_map.save_map(mapmeta)
 	meta:set("phys_gravity"  , mapmeta.phys_gravity)
 	meta:set("chests"        , minetest.serialize(mapmeta.chests))
 	meta:set("teams"         , minetest.serialize(mapmeta.teams))
+	meta:set("barrier_area"  , minetest.serialize(barrier_area))
 	meta:set("game_modes"    , minetest.serialize(mapmeta.game_modes))
 	meta:set("enable_shadows", mapmeta.enable_shadows)
 
@@ -360,6 +371,6 @@ function ctf_map.save_map(mapmeta)
 	end
 
 	local f = assert(io.open(path .. "barriers.data", "wb"))
-	f:write(minetest.serialize(barriers))
+	f:write(minetest.compress(minetest.serialize(barriers), "deflate"))
 	f:close()
 end
