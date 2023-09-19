@@ -188,10 +188,6 @@ function ctf_map.load_map_meta(idx, dirname)
 
 					map.barriers = barriers
 				else
-					if ctf_core.settings.server_mode ~= "mapedit" then
-						assert(false, "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
-					end
-
 					minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
 				end
 			else
@@ -333,8 +329,6 @@ function ctf_map.save_map(mapmeta)
 			queue_break = true
 		end
 	end
-
-	barrier_area.pos1 = vector.subtract(barrier_area.pos1, mapmeta.offset)
 
 	meta:set("map_version"   , CURRENT_MAP_VERSION)
 	meta:set("size"          , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))

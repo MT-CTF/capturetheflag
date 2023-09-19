@@ -61,9 +61,11 @@ local ID_WATER = minetest.get_content_id("default:water_source")
 ---@param mapmeta table Map meta table
 ---@param callback function
 function ctf_map.remove_barrier(mapmeta, callback)
-	local pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
-
 	if not mapmeta.barriers then
+		minetest.log("action", "Clearing barriers using mapmeta.barrier_area")
+
+		local pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
+
 		local vm = VoxelManip(pos1, pos2)
 		local data = vm:get_data()
 
@@ -112,7 +114,7 @@ function ctf_map.remove_barrier(mapmeta, callback)
 		end
 
 		minetest.after(i - 0.04, function()
-			local vm = VoxelManip(pos1, pos2)
+			local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
 			vm:update_liquids()
 
 			callback()
