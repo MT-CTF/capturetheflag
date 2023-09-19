@@ -11,6 +11,8 @@ local new_mode
 ctf_modebase.mode_vote = {}
 
 local function player_vote(name, length)
+	if not voted then return end
+
 	if not voted[name] then
 		voters_count = voters_count - 1
 	end
