@@ -160,7 +160,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
-		if tonumber(meta:get("map_version")) > 2 then
+		if tonumber(meta:get("map_version")) > 2 and not ctf_core.settings.low_ram_mode then
 			local f, err = io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "rb")
 
 			if (ctf_core.settings.server_mode ~= "mapedit" and assert(f, err)) or f then
