@@ -31,12 +31,12 @@ It's helpful to read the description of the items your class is given.
 ****
 ]]
 
-local function ctf_guide(name, guide_content)
+local function ctf_help(name, guide_content)
     local formspec_guide = md2f.md2f(0.3, 0, 8, 10, guide_content)
     local formspec = "size[8,9.5]" ..
                     formspec_guide ..
                     "button_exit[3,8.75;2,1;exit;Close]"
-    minetest.show_formspec(name, "ctf_guide", formspec)
+    minetest.show_formspec(name, "ctf_help", formspec)
     return true
 end
 
@@ -63,7 +63,7 @@ minetest.register_on_newplayer(function(player)
         hud_elem_type = "text",
         position = {x = 1, y = 0.15},
         offset = {x = -180, y = 40},
-        text = "Run /ctf_guide in chat for instructions\non how to play.",
+        text = "Run /ctf_help in chat for instructions\non how to play.",
         alignment = 0,
         scale = {x = 100, y = 30},
         number = 0xFFFFFF,
@@ -75,20 +75,20 @@ minetest.register_on_newplayer(function(player)
         player:hud_remove(background_hud)
     end)
 
-    minetest.register_chatcommand("ctf_guide", {
+    minetest.register_chatcommand("ctf_help", {
         func = function(name, param)
             if name == player_name then
                 player:hud_remove(welcome_hud)
                 player:hud_remove(text_hud)
                 player:hud_remove(background_hud)
             end
-            ctf_guide(name, markdown_guide)
+            ctf_help(name, markdown_guide)
         end
     })
 end)
 
-minetest.register_chatcommand("ctf_guide", {
+minetest.register_chatcommand("ctf_help", {
     func = function(name, param)
-        ctf_guide(name, markdown_guide)
+        ctf_help(name, markdown_guide)
     end
 })
