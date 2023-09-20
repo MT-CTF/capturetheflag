@@ -40,7 +40,9 @@ ctf_modebase = {
 
 ctf_gui.old_init()
 
+-- Can be added to by other mods, like irc
 function ctf_modebase.announce(msg)
+	minetest.log("action", msg)
 end
 
 ctf_core.include_files(

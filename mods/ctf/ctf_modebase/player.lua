@@ -137,7 +137,11 @@ minetest.register_on_joinplayer(function(player)
 	player:set_hp(player:get_properties().hp_max)
 
 	local inv = player:get_inventory()
-	inv:set_list("main",  {})
+
+	if ctf_core.settings.server_mode == "play" then
+		inv:set_list("main", {})
+	end
+
 	inv:set_list("craft", {})
 
 	inv:set_size("craft", 1)

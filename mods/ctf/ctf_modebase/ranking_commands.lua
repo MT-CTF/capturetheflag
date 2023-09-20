@@ -176,7 +176,7 @@ minetest.register_chatcommand("reset_rankings", {
 	params = "[mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
