@@ -159,10 +159,10 @@ minetest.register_chatcommand("donate", {
 		current_mode.recent_rankings.add(name, {score=-score}, true)
 
 		donate_timer[name] = os.time()
+		local donate_text = string.format("%s donated %s score to %s for their hard work", name, score, pname)
+		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
+		ctf_modebase.announce(donate_text)
 
-		minetest.chat_send_all(minetest.colorize("#00EEFF",
-			string.format("%s donated %s score to %s for their hard work", name, score, pname)
-		))
 		minetest.log("action", string.format(
 			"Player '%s' donated %s score to player '%s'", name, score, pname
 		))
@@ -373,3 +373,4 @@ minetest.register_chatcommand("transfer_rankings", {
 		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
 	end
 })
+
