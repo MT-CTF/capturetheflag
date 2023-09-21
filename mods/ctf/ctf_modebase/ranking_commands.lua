@@ -373,4 +373,3 @@ minetest.register_chatcommand("transfer_rankings", {
 		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
 	end
 })
-

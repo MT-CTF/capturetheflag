@@ -197,4 +197,3 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 		return true, "Successfully placed a bounty of " .. amount .. " on " .. minetest.colorize(team_colour, player) .. "!"
 	end,
 })
-

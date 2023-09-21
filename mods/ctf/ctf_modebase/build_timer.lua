@@ -60,7 +60,6 @@ function ctf_modebase.build_timer.finish()
 			minetest.chat_send_all(text)
 			ctf_modebase.announce(text)
 
-
 			ctf_modebase.on_match_start()
 
 			minetest.sound_play("ctf_modebase_build_time_over", {
