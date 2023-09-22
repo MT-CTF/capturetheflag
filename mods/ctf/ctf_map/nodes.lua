@@ -102,6 +102,7 @@ local mod_prefixes = {
 	default = "";
 	stairs = "";
 	wool = "wool_";
+	walls = "walls_";
 }
 
 -- See Lua API, section "Node-only groups"
@@ -109,6 +110,7 @@ local preserved_groups = {
 	bouncy = true;
 	fence = true;
 	connect_to_raillike = true;
+	wall = true;
 	disable_jump = true;
 	fall_damage_add_percent = true;
 	slippery = true;
