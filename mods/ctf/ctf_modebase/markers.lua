@@ -176,6 +176,8 @@ local function marker_func(name, param, specific_player, hpmarker)
 	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
 	if param == "" then
 		param = "Look here!"
+	elseif string.len(param) > 40 then
+		param = string.sub(param, 1, 40)
 	end
 
 	local ray = minetest.raycast(
@@ -211,6 +213,10 @@ local function marker_func(name, param, specific_player, hpmarker)
 			if pointed.type == "object" then
 				message, pos = check_pointed_entity(pointed, message, pos)
 			end
+		end
+		if param ~= "Look here!" then
+			message = string.format("[HP: %i/%i] %s", player:get_hp(),
+			player:get_properties().hp_max, param)
 		end
 
 		-- If the player places a marker upon death, it will resort to the below
