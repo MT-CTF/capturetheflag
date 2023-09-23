@@ -204,8 +204,9 @@ end)
 minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
+	voted[pname] = nil
+
 	if votes and not voted[pname] then
-		voted[pname] = nil
 		voters_count = voters_count - 1
 
 		if voters_count == 0 then
