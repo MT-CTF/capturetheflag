@@ -28,7 +28,11 @@ function ctf_modebase.start_match_after_vote()
 		minetest.settings:set("time_speed", map.time_speed * 72)
 
 		ctf_map.announce_map(map)
-		ctf_modebase.announce(string.format("New match: %s map, %s mode", map.name, HumanReadable(ctf_modebase.current_mode)))
+		ctf_modebase.announce(string.format("New match: %s map by %s, %s mode",
+			map.name,
+			map.author,
+			HumanReadable(ctf_modebase.current_mode))
+		)
 
 		ctf_modebase.on_new_match()
 
