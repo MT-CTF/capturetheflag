@@ -302,9 +302,12 @@ return {
 		local worst_kd = nil
 		local best_players = nil
 		local worst_players = nil
+		local total_players = 0
 
 		for _, team in ipairs(team_list) do
 			local players_count = ctf_teams.online_players[team].count
+
+			total_players = total_players + players_count
 
 			local kd = 0.1
 			if team_scores[team] then
@@ -337,12 +340,28 @@ return {
 			return worst_players.t
 		end
 
+		local one_third = math.round(0.334 * total_players)
+		local one_fourth = math.round(0.25 * total_players)
+
 		-- Allocate player to remembered team unless they're desperately needed in the other
-		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and kd_diff <= 0.6 and players_diff < 5 then
+		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and
+		kd_diff <= 0.8 and players_diff <= one_third then
 			return remembered_team
 		end
 
-		if players_diff == 0 or (kd_diff > 0.4 and players_diff < 2) then
+		-- [1]
+		-- Allocate player to the worst team if it's losing by more than 0.8KD difference
+		-- (Makes sure the game isn't a slaughterfest)
+
+		-- [2]
+		-- Otherwise allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
+		-- players on the winning team isn't outnumbered by more than 1/4 the total players online
+		-- (Attempts to prevent you being outnumbered by a horde of players going for your flag, check [1] is higher priority)
+
+		-- [3]
+		-- Otherwise allocates the player to the team with the least amount of players,
+		-- or the worst team if all teams have an equal amount of players
+		if players_diff == 0 or kd_diff >= 0.8 or (kd_diff >= 0.4 and players_diff <= one_fourth) then
 			return worst_kd.t
 		else
 			return worst_players.t
