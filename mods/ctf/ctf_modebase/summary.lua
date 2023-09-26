@@ -58,10 +58,6 @@ ctf_api.register_on_new_match(function()
 	)
 end)
 
-ctf_api.register_on_match_start(function()
-	ctf_map.start_time = os.time()
-end)
-
 ctf_api.register_on_match_end(function()
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -76,7 +72,6 @@ ctf_api.register_on_match_end(function()
 		summary_ranks = current_mode.summary_ranks,
 	}
 
-	ctf_map.start_time = nil
 	winner = nil
 end)
 

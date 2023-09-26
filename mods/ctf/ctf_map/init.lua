@@ -29,6 +29,16 @@ ctf_map = {
 	end,
 }
 
+ctf_api.register_on_match_start(function()
+	ctf_map.start_time = os.time()
+end)
+
+ctf_api.register_on_match_end(function()
+	minetest.after(0, function()
+		ctf_map.start_time = nil
+	end)
+end)
+
 for _, s in ipairs(skybox.get_skies()) do
 	table.insert(ctf_map.skyboxes, s[1])
 end
@@ -82,15 +92,15 @@ ctf_core.include_files(
 )
 
 local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
-minetest.register_on_mods_loaded(function()
-	for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
-		for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
-			if filename == "init.lua" then
-				dofile(directory .. "/" .. entry .. "/"..filename)
-			end
+
+for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
+	for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
+		if filename == "init.lua" then
+			dofile(directory .. "/" .. entry .. "/"..filename)
 		end
 	end
-end)
+end
+
 
 minetest.register_chatcommand("ctf_map", {
 	description = "Run map related commands",
