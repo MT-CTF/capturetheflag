@@ -204,13 +204,15 @@ end)
 minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
-	voted[pname] = nil
-
 	if votes and not voted[pname] then
 		voters_count = voters_count - 1
 
 		if voters_count == 0 then
 			ctf_modebase.mode_vote.end_vote()
 		end
+	end
+
+	if voted then
+		voted[pname] = nil
 	end
 end)

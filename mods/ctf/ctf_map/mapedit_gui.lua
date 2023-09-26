@@ -11,8 +11,8 @@ local function greet_player(player)
 		minetest.chat_send_player(
 			player:get_player_name(),
 			minetest.colorize(ctf_map.CHAT_COLOR,
-					"To start, grant yourself \"ctf_map_editor\""..
-					"using \"/grantme ctf_map_editor\" Then run \"/ctf_map editor\"")
+					"To start, grant yourself \"ctf_map_editor\" "..
+					"using \"/grantme ctf_map_editor\". Then run \"/ctf_map editor\"")
 		)
 	else
 		minetest.chat_send_player(

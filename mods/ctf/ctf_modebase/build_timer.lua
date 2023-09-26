@@ -56,6 +56,9 @@ function ctf_modebase.build_timer.finish()
 			timer:cancel()
 			timer = nil
 			hud:remove_all()
+			local text = "Build time is over!"
+			minetest.chat_send_all(text)
+			ctf_modebase.announce(text)
 
 			ctf_modebase.on_match_start()
 
@@ -116,3 +119,4 @@ minetest.register_chatcommand("ctf_start", {
 		return true, "Build time ended"
 	end,
 })
+
