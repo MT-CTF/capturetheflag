@@ -310,16 +310,19 @@ return {
 			total_players = total_players + players_count
 
 			local kd = 0.1
+			local tk = 0
 			if team_scores[team] then
+				tk = team_scores[team].kills or 0
+
 				kd = math.max(kd, (team_scores[team].kills or 0) / (team_scores[team].deaths or 1))
 			end
 
 			if not best_kd or kd > best_kd.s then
-				best_kd = {s = kd, t = team}
+				best_kd = {s = kd, t = team, kills = tk}
 			end
 
 			if not worst_kd or kd < worst_kd.s then
-				worst_kd = {s = kd, t = team}
+				worst_kd = {s = kd, t = team, kills = tk}
 			end
 
 			if not best_players or players_count > best_players.s then
@@ -340,28 +343,31 @@ return {
 			return worst_players.t
 		end
 
-		local one_third = math.round(0.334 * total_players)
-		local one_fourth = math.round(0.25 * total_players)
+		local one_third = math.round(0.34 * total_players)
+		local one_sixth = math.round(0.17 * total_players)
 
 		-- Allocate player to remembered team unless they're desperately needed in the other
 		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and
-		kd_diff <= 0.8 and players_diff <= one_third then
+		(worst_kd.kills <= total_players or kd_diff <= 1.9) and players_diff <= one_third then
 			return remembered_team
 		end
 
 		-- [1]
-		-- Allocate player to the worst team if it's losing by more than 0.8KD difference
+		-- Once the losing team has gotten more kills than half the total players playing:
+		-- Allocate player to the worst team if it's losing by more than a 1KD difference
 		-- (Makes sure the game isn't a slaughterfest)
 
 		-- [2]
 		-- Otherwise allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
-		-- players on the winning team isn't outnumbered by more than 1/4 the total players online
+		-- players on the winning team isn't outnumbered by more than 1/6 the total players online
 		-- (Attempts to prevent you being outnumbered by a horde of players going for your flag, check [1] is higher priority)
 
 		-- [3]
 		-- Otherwise allocates the player to the team with the least amount of players,
 		-- or the worst team if all teams have an equal amount of players
-		if players_diff == 0 or kd_diff >= 0.8 or (kd_diff >= 0.4 and players_diff <= one_fourth) then
+		if players_diff == 0 or
+		(worst_kd.kills >= total_players/2 and kd_diff >= 1) or
+		(kd_diff >= 0.4 and players_diff <= one_sixth) then
 			return worst_kd.t
 		else
 			return worst_players.t
