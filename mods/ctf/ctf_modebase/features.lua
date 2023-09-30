@@ -334,18 +334,17 @@ return {
 			end
 		end
 
+		if worst_players.s == 0 then
+			return worst_players.t
+		end
+
 		local kd_diff = best_kd.s - worst_kd.s
 		local players_diff = best_players.s - worst_players.s
 
 		local remembered_team = ctf_teams.get(player)
 
-		if worst_players.s == 0 then
-			return worst_players.t
-		end
-
-		local one_third     = math.round(0.34 * total_players)
-		local one_fourth    = math.round(0.25 * total_players)
-		local three_fourths = math.round(0.75 * total_players)
+		local one_third     = math.ceil(0.34 * total_players)
+		local one_fourth    = math.ceil(0.25 * total_players)
 
 		-- Allocate player to remembered team unless they're desperately needed in the other
 		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and
@@ -354,22 +353,17 @@ return {
 		end
 
 		-- [1]
-		-- Once the losing team has gotten more kills than half the total players playing:
-		-- And the winning team isn't outnumbered by more than 3/4 the total players playing
-		-- Allocate player to the worst team if it's losing by more than a 2KD difference
-		-- (Makes sure the game isn't a slaughterfest)
+		-- Allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
+		-- players on the winning team isn't outnumbered by more than 1/4 the total players playing
 
 		-- [2]
-		-- Otherwise allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
-		-- players on the winning team isn't outnumbered by more than 1/4 the total players playing
-		-- (Attempts to prevent you being outnumbered by a horde of players going for your flag, check [1] is higher priority)
-
-		-- [3]
 		-- Otherwise allocates the player to the team with the least amount of players,
 		-- or the worst team if all teams have an equal amount of players
-		if players_diff == 0 or
-		(worst_kd.kills >= total_players and kd_diff >= 2 and players_diff <= three_fourths) or
-		(kd_diff >= 0.4 and players_diff <= one_fourth) then
+		if
+		players_diff == 0
+		or
+		(kd_diff >= 0.4 and players_diff <= one_fourth)
+		then
 			return worst_kd.t
 		else
 			return worst_players.t
