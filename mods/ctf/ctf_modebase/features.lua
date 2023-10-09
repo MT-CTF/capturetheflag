@@ -1,5 +1,4 @@
 ctf_core.testing = {
-	testing = false,
 	test = function(pkd, players_diff, best_kd, worst_kd, total_players, worst_players, best_players)
 		return (pkd >= 1.5 and players_diff <= 0.34)
 	end
@@ -315,14 +314,16 @@ return {
 			local players_count = ctf_teams.online_players[team].count
 			local players = ctf_teams.online_players[team].players
 
-			local bk, bd = 0, 1
+			local bk = 0
+			local bd = 1
 
 			for name in pairs(players) do
 				local rank = rankings:get(name)
 
 				if rank then
 					if bk <= (rank.kills or 0) then
-						bk, bd = rank.kills, (rank.deaths or 0)
+						bk = rank.kills or 0
+						bd = rank.deaths or 0
 					end
 				end
 			end
@@ -385,9 +386,9 @@ return {
 		end
 
 		local pkd = (player_rankings.kills or 0) / (player_rankings.deaths or 1)
-		local success, result = pcall(ctf_core.testing.test(
+		local success, result = pcall(ctf_core.testing.test,
 			pkd, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-		))
+		)
 
 		if not success then
 			minetest.log("error", result)
