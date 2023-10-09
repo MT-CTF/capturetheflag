@@ -318,7 +318,7 @@ return {
 			local bk, bd = 0, 1
 
 			for name in pairs(players) do
-				local rank = rankings.get(name)
+				local rank = rankings:get(name)
 
 				if rank then
 					if bk <= rank.kills or 0 then
