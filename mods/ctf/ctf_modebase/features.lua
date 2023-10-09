@@ -321,8 +321,8 @@ return {
 				local rank = rankings:get(name)
 
 				if rank then
-					if bk <= rank.kills or 0 then
-						bk, bd = rank.kills, rank.deaths or 0
+					if bk <= (rank.kills or 0) then
+						bk, bd = rank.kills, (rank.deaths or 0)
 					end
 				end
 			end
@@ -331,7 +331,7 @@ return {
 
 			local kd = bk / bd
 			local tk = 0
-			if team_scores[team] and team_scores[team].score or 0 >= 50 then
+			if team_scores[team] and (team_scores[team].score or 0) >= 50 then
 				tk = team_scores[team].kills or 0
 
 				kd = math.max(kd, (team_scores[team].kills or bk) / (team_scores[team].deaths or bd))
