@@ -1,6 +1,12 @@
 ctf_core.testing = {
-	test = function(pkd, players_diff, best_kd, worst_kd, total_players, worst_players, best_players)
-		return (pkd >= 1.5 and players_diff <= 0.34)
+	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+	test = function(
+		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+	)
+		local one_third     = math.ceil(0.34 * total_players)
+		local one_fifth     = math.ceil(0.2 * total_players)
+		local avg = (kd_diff + actual_kd_diff) / 2
+		return pkd >= 0.8 and avg >= 0.4 and (players_diff <= one_fifth or (pkd >= 1.5 and players_diff <= one_third))
 	end
 }
 
@@ -331,19 +337,24 @@ return {
 			total_players = total_players + players_count
 
 			local kd = bk / bd
+			local match_kd = 0
 			local tk = 0
-			if team_scores[team] and (team_scores[team].score or 0) >= 50 then
-				tk = team_scores[team].kills or 0
+			if team_scores[team] then
+				if (team_scores[team].score or 0) >= 50 then
+					tk = team_scores[team].kills or 0
 
-				kd = math.max(kd, (team_scores[team].kills or bk) / (team_scores[team].deaths or bd))
+					kd = math.max(kd, (team_scores[team].kills or bk) / (team_scores[team].deaths or bd))
+				end
+
+				match_kd = (team_scores[team].kills or 0) / (team_scores[team].deaths or 1)
 			end
 
-			if not best_kd or kd > best_kd.s then
-				best_kd = {s = kd, t = team, kills = tk}
+			if not best_kd or match_kd > best_kd.a then
+				best_kd = {s = kd, a = match_kd, t = team, kills = tk}
 			end
 
-			if not worst_kd or kd < worst_kd.s then
-				worst_kd = {s = kd, t = team, kills = tk}
+			if not worst_kd or match_kd < worst_kd.a then
+				worst_kd = {s = kd, a = match_kd, t = team, kills = tk}
 			end
 
 			if not best_players or players_count > best_players.s then
@@ -355,11 +366,12 @@ return {
 			end
 		end
 
-		-- if worst_players.s == 0 then
-		-- 	return worst_players.t
-		-- end
+		if worst_players.s == 0 then
+			return worst_players.t
+		end
 
 		local kd_diff = best_kd.s - worst_kd.s
+		local actual_kd_diff = best_kd.a - worst_kd.a
 		local players_diff = best_players.s - worst_players.s
 
 		local rem_team = ctf_teams.get(player)
@@ -377,17 +389,17 @@ return {
 		end
 
 		local one_third     = math.ceil(0.34 * total_players)
-		local one_fifth     = math.ceil(0.2 * total_players)
+		-- local one_fifth     = math.ceil(0.2 * total_players)
 
 		-- Allocate player to remembered team unless teams are imbalanced
 		if rem_team and not ctf_modebase.flag_captured[rem_team] and
-		(worst_kd.kills <= total_players or kd_diff <= 0.8) and players_diff <= one_third then
+		(worst_kd.kills <= total_players or actual_kd_diff <= 0.8) and players_diff <= one_third then
 			return rem_team
 		end
 
 		local pkd = (player_rankings.kills or 0) / (player_rankings.deaths or 1)
 		local success, result = pcall(ctf_core.testing.test,
-			pkd, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+			pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
 		)
 
 		if not success then
@@ -406,7 +418,7 @@ return {
 		if
 		players_diff == 0
 		or
-		(kd_diff >= 0.4 and (players_diff <= one_fifth or result))
+		result
 		then
 			return worst_kd.t
 		else
