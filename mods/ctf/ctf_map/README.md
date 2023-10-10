@@ -61,8 +61,8 @@ Whether or not the map is available for play. You will want to make sure it's en
 #### Map Hint
 Does your map have hidden treasures? You can hint about them with the "Map Hint" field.
 
-#### Treasures
-A list of treasures that could end up in treasure chests
+#### Treasures *(optional)*
+A list of treasures that can be added specifically for your map that don't end up in chests by default.
 
 Format:
 ```
