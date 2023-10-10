@@ -221,7 +221,7 @@ minetest.register_chatcommand("top50", {
 	params = "[mode:technical modename]",
 	func = function(name, param)
 		local mode_name, mode_data = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
@@ -256,7 +256,7 @@ minetest.register_chatcommand("make_pro", {
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 

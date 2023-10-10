@@ -1,3 +1,15 @@
+ctf_core.testing = {
+	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+	test = function(
+		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+	)
+		local one_third     = math.ceil(0.34 * total_players)
+		local one_fifth     = math.ceil(0.2 * total_players)
+		local avg = (kd_diff + actual_kd_diff) / 2
+		return pkd >= 0.8 and avg >= 0.4 and (players_diff <= one_fifth or (pkd >= 1.5 and players_diff <= one_third))
+	end
+}
+
 ctf_modebase.features = function(rankings, recent_rankings)
 
 local FLAG_MESSAGE_COLOR = "#d9b72a"
@@ -306,20 +318,43 @@ return {
 
 		for _, team in ipairs(team_list) do
 			local players_count = ctf_teams.online_players[team].count
+			local players = ctf_teams.online_players[team].players
+
+			local bk = 0
+			local bd = 1
+
+			for name in pairs(players) do
+				local rank = rankings:get(name)
+
+				if rank then
+					if bk <= (rank.kills or 0) then
+						bk = rank.kills or 0
+						bd = rank.deaths or 0
+					end
+				end
+			end
 
 			total_players = total_players + players_count
 
-			local kd = 0.1
+			local kd = bk / bd
+			local match_kd = 0
+			local tk = 0
 			if team_scores[team] then
-				kd = math.max(kd, (team_scores[team].kills or 0) / (team_scores[team].deaths or 1))
+				if (team_scores[team].score or 0) >= 50 then
+					tk = team_scores[team].kills or 0
+
+					kd = math.max(kd, (team_scores[team].kills or bk) / (team_scores[team].deaths or bd))
+				end
+
+				match_kd = (team_scores[team].kills or 0) / (team_scores[team].deaths or 1)
 			end
 
-			if not best_kd or kd > best_kd.s then
-				best_kd = {s = kd, t = team}
+			if not best_kd or match_kd > best_kd.a then
+				best_kd = {s = kd, a = match_kd, t = team, kills = tk}
 			end
 
-			if not worst_kd or kd < worst_kd.s then
-				worst_kd = {s = kd, t = team}
+			if not worst_kd or match_kd < worst_kd.a then
+				worst_kd = {s = kd, a = match_kd, t = team, kills = tk}
 			end
 
 			if not best_players or players_count > best_players.s then
@@ -331,37 +366,60 @@ return {
 			end
 		end
 
-		local kd_diff = best_kd.s - worst_kd.s
-		local players_diff = best_players.s - worst_players.s
-
-		local remembered_team = ctf_teams.get(player)
-
 		if worst_players.s == 0 then
 			return worst_players.t
 		end
 
-		local one_third = math.round(0.334 * total_players)
-		local one_fourth = math.round(0.25 * total_players)
+		local kd_diff = best_kd.s - worst_kd.s
+		local actual_kd_diff = best_kd.a - worst_kd.a
+		local players_diff = best_players.s - worst_players.s
 
-		-- Allocate player to remembered team unless they're desperately needed in the other
-		if remembered_team and not ctf_modebase.flag_captured[remembered_team] and
-		kd_diff <= 0.8 and players_diff <= one_third then
-			return remembered_team
+		local rem_team = ctf_teams.get(player)
+		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
+
+		if ctf_core.testing.testing then
+			if not rem_team or math.max(player_rankings[rem_team.."_kills"], player_rankings[rem_team.."_deaths"]) <= 6 then
+				player_rankings = rankings:get(player) or {}
+			else
+				player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
+				player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
+			end
+		else
+			player_rankings = {}
+		end
+
+		local one_third     = math.ceil(0.34 * total_players)
+		-- local one_fifth     = math.ceil(0.2 * total_players)
+
+		-- Allocate player to remembered team unless teams are imbalanced
+		if rem_team and not ctf_modebase.flag_captured[rem_team] and
+		(worst_kd.kills <= total_players or actual_kd_diff <= 0.8) and players_diff <= one_third then
+			return rem_team
+		end
+
+		local pkd = (player_rankings.kills or 0) / (player_rankings.deaths or 1)
+		local success, result = pcall(ctf_core.testing.test,
+			pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+		)
+
+		if not success then
+			minetest.log("error", result)
+			result = false
 		end
 
 		-- [1]
-		-- Allocate player to the worst team if it's losing by more than 0.8KD difference
-		-- (Makes sure the game isn't a slaughterfest)
+		-- Allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
+		-- players on the winning team isn't outnumbered by more than 1/5 the total players playing
+		-- TODO: extra logic
 
 		-- [2]
-		-- Otherwise allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
-		-- players on the winning team isn't outnumbered by more than 1/4 the total players online
-		-- (Attempts to prevent you being outnumbered by a horde of players going for your flag, check [1] is higher priority)
-
-		-- [3]
 		-- Otherwise allocates the player to the team with the least amount of players,
 		-- or the worst team if all teams have an equal amount of players
-		if players_diff == 0 or kd_diff >= 0.8 or (kd_diff >= 0.4 and players_diff <= one_fourth) then
+		if
+		players_diff == 0
+		or
+		result
+		then
 			return worst_kd.t
 		else
 			return worst_players.t
