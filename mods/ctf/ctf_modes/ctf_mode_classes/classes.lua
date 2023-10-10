@@ -151,7 +151,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 
 		local pname = user:get_player_name()
 
-		if itemstack:get_wear() == 0 then
+		if itemstack:get_wear() == 0 and ctf_modebase.match_started then
 			local step = math.floor(65534 / KNIGHT_USAGE_TIME)
 			ctf_modebase.update_wear.start_update(pname, "ctf_melee:sword_diamond", step, false, function()
 				local player = minetest.get_player_by_name(pname)
@@ -179,7 +179,14 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 			end)
 
 			return "ctf_melee:sword_diamond"
-		end
+		else
+		    hud_events.new(user, {
+			    quick = true,
+			    text = "Can't use during build time",
+			    color = "warning",
+		    })
+		    return
+        end
 	end,
 })
 
@@ -222,7 +229,7 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 			return
 		end
 
-		if itemstack:get_wear() == 0 then
+		if itemstack:get_wear() == 0 and ctf_modebase.match_started then
 			grenades.throw_grenade("grenades:frag", 24, user)
 
 			local step = math.floor(65534 / RANGED_COOLDOWN_TIME)
@@ -230,7 +237,14 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 
 			itemstack:set_wear(65534)
 			return itemstack
-		end
+		else
+			hud_events.new(user, {
+				quick = true,
+				text = "Can't use during build time",
+				color = "warning",
+			})
+		    return
+        end
 	end
 })
 
@@ -314,7 +328,14 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 				})
 				return
 			end
-
+            if not ctf_modebase.match_started then
+				hud_events.new(user, {
+					quick = true,
+					text = "Can't use during build time",
+					color = "warning",
+				})
+				return
+			end
 			ctf_modebase.give_immunity(user)
 
 			local step = math.floor(65534 / IMMUNITY_TIME)
