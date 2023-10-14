@@ -251,8 +251,9 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 
 		for _, v in pairs(minetest.get_objects_inside_radius(pos, KNOCKBACK_RADIUS)) do
 			local vname = v:get_player_name()
+			local player = minetest.get_player_by_name(name)
 
-			if v:is_player() and v:get_hp() > 0 and v:get_properties().pointable and
+			if player and v:is_player() and v:get_hp() > 0 and v:get_properties().pointable and
 			(vname == name or ctf_teams.get(vname) ~= ctf_teams.get(name)) then
 				local footpos = vector.offset(v:get_pos(), 0, 0.1, 0)
 				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
@@ -268,7 +269,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 
 				-- Check the closest distance, but if that fails try targeting the farther one
 				if hit_pos1 or check_hit(pos, target_head and footpos or headpos, v) then
-					v:punch(minetest.get_player_by_name(name), 1, {
+					v:punch(player, 1, {
 						punch_interval = 1,
 						damage_groups = {
 							fleshy = 1,
