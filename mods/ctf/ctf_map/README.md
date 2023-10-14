@@ -38,9 +38,10 @@ Decide where you will build your map. We recommend you don't make your map large
 	- Team chests
 	- Indestructible blocks under the flag. The minimum is 5x5 blocks, with the flag on top of them in the center.
 	- "Indestructible Barrier Glass" (`ctf_map:ind_glass`) around the sides of the world (You don't need it on the ceiling)
-	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins, if the barrier area covers it (More on that later).
-	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone(`default:stone`) once the match begins, if the barrier area covers it (More on that later).
+	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins. (More on that later)
+	- "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone(`default:stone`) once the match begins. (More on that below)
 
+The positions the `Indestructible Red Barrier` and the `Indestructible Red Barrier Stone` are automatically calculated when you save the map. 
 If you wish to save your map for later edits, follow the note in the section about exporting the map.
 
 ### 5. Fill out information about the map
@@ -61,8 +62,8 @@ Whether or not the map is available for play. You will want to make sure it's en
 #### Map Hint
 Does your map have hidden treasures? You can hint about them with the "Map Hint" field.
 
-#### Treasures
-A list of treasures that could end up in treasure chests
+#### Treasures *(optional)*
+A list of treasures that can be added specifically for your map that don't end up in chests by default.
 
 Format:
 ```
@@ -107,9 +108,6 @@ How far the players of a certain team may go during build time. The zone bounds 
 
 #### Chest Zones
 Areas where treasure chests are placed. Some maps have treasure chests placed throughout the entire map, while others only have them placed in certain small areas/rooms. What you choose for your map is up to you.
-
-#### Barrier Area
-Area where the Indestructible "Red Barrier Glass and/or Indestructible Red Barrier Stone" wall is located. Setting this will tell the game where to look for the wall when removing them after the build time ends. You can leave this at its default unless the game is taking a long time to remove your barriers. Most 4 team maps will always have slow barrier removal though.
 
 ### 6. Map Saving
 
