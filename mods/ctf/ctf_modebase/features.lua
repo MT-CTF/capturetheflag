@@ -1,12 +1,20 @@
 ctf_core.testing = {
+	-- This is here temporarily, I'm modifying it with //lua and a code minimizer on the main server-
+	-- -so I don't need to restart for every little change
 	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
+	--ctf_core.testing.
 	test = function(
 		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
 	)
 		local one_third     = math.ceil(0.34 * total_players)
-		local one_fifth     = math.ceil(0.2 * total_players)
+		local one_fourth     = math.ceil(0.25 * total_players)
 		local avg = (kd_diff + actual_kd_diff) / 2
-		return pkd >= 0.8 and avg >= 0.4 and (players_diff <= one_fifth or (pkd >= 1.5 and players_diff <= one_third))
+		if best_kd.kills + worst_kd.kills >= 30 then
+			avg = actual_kd_diff
+		end
+		return (best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+		(pkd >= math.min(1, kd_diff/2) and avg >= 0.4 and (players_diff <= one_fourth or
+		(pkd >= 1.5 and players_diff <= one_third)))
 	end
 }
 
