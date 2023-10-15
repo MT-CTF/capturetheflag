@@ -1,5 +1,4 @@
 local previous = nil
-local start_time = nil
 local game_stat = nil
 local winner = nil
 
@@ -19,18 +18,6 @@ local function team_rankings(total)
 	return ranks
 end
 
-local function get_duration()
-	if not start_time then
-		return "-"
-	end
-
-	local time = os.time() - start_time
-	return string.format("%02d:%02d:%02d",
-		math.floor(time / 3600),        -- hours
-		math.floor((time % 3600) / 60), -- minutes
-		math.floor(time % 60))          -- seconds
-end
-
 ctf_modebase.summary = {}
 
 function ctf_modebase.summary.get(prev)
@@ -45,7 +32,7 @@ function ctf_modebase.summary.get(prev)
 				special_row_title = "Total Team Stats",
 				game_stat = game_stat,
 				winner = winner,
-				duration = get_duration(),
+				duration = ctf_map.get_duration(),
 				buttons = {previous = previous ~= nil},
 				allow_sort = true,
 			}
@@ -71,10 +58,6 @@ ctf_api.register_on_new_match(function()
 	)
 end)
 
-ctf_api.register_on_match_start(function()
-	start_time = os.time()
-end)
-
 ctf_api.register_on_match_end(function()
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -85,11 +68,10 @@ ctf_api.register_on_match_end(function()
 		teams = rankings.teams(),
 		game_stat = game_stat,
 		winner = winner or "NO WINNER",
-		duration = get_duration(),
+		duration = ctf_map.get_duration(),
 		summary_ranks = current_mode.summary_ranks,
 	}
 
-	start_time = nil
 	winner = nil
 end)
 

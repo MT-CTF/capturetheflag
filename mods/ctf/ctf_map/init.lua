@@ -14,8 +14,30 @@ ctf_map = {
 	maps_dir = minetest.get_modpath("ctf_map").."/maps/",
 	skyboxes = {"none"},
 	current_map = false,
-	barrier_nodes = {}, -- populated in nodes.lua
+	barrier_nodes = {}, -- populated in nodes.lua,
+	start_time = false,
+	get_duration = function()
+		if not ctf_map.start_time then
+			return "-"
+		end
+
+		local time = os.time() - ctf_map.start_time
+		return string.format("%02d:%02d:%02d",
+			math.floor(time / 3600),        -- hours
+			math.floor((time % 3600) / 60), -- minutes
+			math.floor(time % 60))          -- seconds
+	end,
 }
+
+ctf_api.register_on_match_start(function()
+	ctf_map.start_time = os.time()
+end)
+
+ctf_api.register_on_match_end(function()
+	minetest.after(0, function()
+		ctf_map.start_time = nil
+	end)
+end)
 
 for _, s in ipairs(skybox.get_skies()) do
 	table.insert(ctf_map.skyboxes, s[1])
@@ -70,15 +92,15 @@ ctf_core.include_files(
 )
 
 local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
-minetest.register_on_mods_loaded(function()
-	for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
-		for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
-			if filename == "init.lua" then
-				dofile(directory .. "/" .. entry .. "/"..filename)
-			end
+
+for _, entry in ipairs(minetest.get_dir_list(directory, true)) do
+	for _, filename in ipairs(minetest.get_dir_list(directory .. "/" .. entry .. "/", false)) do
+		if filename == "init.lua" then
+			dofile(directory .. "/" .. entry .. "/"..filename)
 		end
 	end
-end)
+end
+
 
 minetest.register_chatcommand("ctf_map", {
 	description = "Run map related commands",
@@ -131,8 +153,9 @@ minetest.register_chatcommand("map", {
 
 		local mapName = map.name or "Unknown"
 		local mapAuthor = map.author or "Unknown Author"
+		local mapDuration =  ctf_map.get_duration()
 
-		return true, string.format("The current map is %s by %s.", mapName, mapAuthor)
+		return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
 	end
 })
 
