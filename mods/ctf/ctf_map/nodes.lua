@@ -216,8 +216,10 @@ local chest_def = {
 
 		local inv = minetest.get_inventory({type = "node", pos = pos})
 		if not inv or inv:is_empty("main") then
-			minetest.set_node(pos, {name = "air"})
-			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
+			minetest.close_formspec(player:get_player_name(), "")
+			minetest.after(0, function()
+				minetest.set_node(pos, {name = "air"})
+			end)
 		end
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
