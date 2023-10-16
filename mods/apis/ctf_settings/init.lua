@@ -82,15 +82,15 @@ minetest.register_on_mods_loaded(function()
 			end
 
 			local form = {
-			{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
+			{"box[-0.1,-0.1;%f,9.4;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
 				{"scroll_container[-0.1,0.3;%f,%f;settings_scrollbar;vertical;0.1]",
-					FORMSIZE.x - SCROLLBAR_W,
-					FORMSIZE.y + 0.7
+					FORMSIZE.x - SCROLLBAR_W + 2,
+					FORMSIZE.y + 3
 				},
 				ctf_gui.list_to_formspec_str(setting_list),
 				"scroll_container_end[]",
 				{"scrollbaroptions[max=%d]", math.ceil((lastypos - 3.833) * 11.538)},
-				{"scrollbar[%f,-0.1;%f,%f;vertical;settings_scrollbar;%f]",
+				{"scrollbar[%f,-0.1;%f,9.4;vertical;settings_scrollbar;-0.1]",
 					FORMSIZE.x - SCROLLBAR_W,
 					SCROLLBAR_W,
 					FORMSIZE.y,
@@ -98,7 +98,7 @@ minetest.register_on_mods_loaded(function()
 				},
 			}
 
-			return sfinv.make_formspec(player, context, ctf_gui.list_to_formspec_str(form), true)
+			return sfinv.make_formspec(player, context, ctf_gui.list_to_formspec_str(form), false)
 		end,
 		on_player_receive_fields = function(self, player, context, fields)
 			local refresh = false
