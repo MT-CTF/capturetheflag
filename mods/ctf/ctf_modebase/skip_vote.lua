@@ -41,9 +41,9 @@ function ctf_modebase.skip_vote.start_vote()
 
 	for _, player in ipairs(minetest.get_connected_players()) do
 		add_vote_hud(player)
-		minetest.sound_play("ctf_modebase_build_time_over", {
+		minetest.sound_play("ctf_modebase_notification", {
 			gain = 1.0,
-			pitch = 0.5,
+			pitch = 1.0,
 		}, true)
 		voters_count = voters_count + 1
 	end
