@@ -3,6 +3,7 @@ ctf_core.testing = {
 	-- -so I don't need to restart for every little change
 	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
 	--ctf_core.testing.
+	testing = true,
 	test = function(
 		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
 	)
@@ -386,7 +387,8 @@ return {
 		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
 
 		if ctf_core.testing.testing then
-			if not rem_team or math.max(player_rankings[rem_team.."_kills"], player_rankings[rem_team.."_deaths"]) <= 6 then
+			if not rem_team or
+			math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
 				player_rankings = rankings:get(player) or {}
 			else
 				player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
