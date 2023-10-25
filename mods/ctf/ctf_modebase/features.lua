@@ -690,7 +690,7 @@ return {
 			end
 		end,
 		sword = function(item)
-			local mod, match = item:get_name():match("(%a+):sword_(%a+)")
+			local mod, match = item:get_name():match("([^:]+):sword_(%a+)")
 
 			if mod and (mod == "default" or mod == "ctf_melee") and match then
 				return table.indexof(item_levels, match)
