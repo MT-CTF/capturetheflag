@@ -41,7 +41,7 @@ function ctf_modebase.player.save_initial_stuff_order(player, soft)
 			local k = simplify_for_saved_stuff(s:get_name():match("[^%s]*"))
 
 			if not soft or not ssp[k] then
-				if not done[k] or i < k then
+				if not done[k] or (i < ssp[k]) then
 					ssp[k] = i
 					done[k] = true
 				end
@@ -164,18 +164,22 @@ end
 
 minetest.register_on_item_pickup(function(itemstack, picker)
 	if ctf_modebase.current_mode and ctf_teams.get(picker) then
-		for name, func in pairs(ctf_modebase:get_current_mode().initial_stuff_item_levels) do
+		local mode = ctf_modebase:get_current_mode()
+		for name, func in pairs(mode.initial_stuff_item_levels) do
 			local priority = func(itemstack)
 
 			if priority then
 				local inv = picker:get_inventory()
 				for i=1, 8 do -- loop through the top row of the player's inv
 					local compare = inv:get_stack("main", i)
-					local cprio = func(compare)
 
-					if cprio and cprio < priority then
-						inv:set_stack("main", i, itemstack)
-						return compare
+					if not mode.is_bound_item(picker, compare:get_name()) then
+						local cprio = func(compare)
+
+						if cprio and cprio < priority then
+							inv:set_stack("main", i, itemstack)
+							return compare
+						end
 					end
 				end
 
