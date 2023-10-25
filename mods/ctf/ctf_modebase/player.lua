@@ -162,7 +162,28 @@ function ctf_modebase.player.give_initial_stuff(player)
 	inv:set_list("main", new)
 end
 
-end
+minetest.register_on_item_pickup(function(itemstack, picker)
+	if ctf_modebase.current_mode and ctf_teams.get(picker) then
+		for name, func in pairs(ctf_modebase:get_current_mode().initial_stuff_item_levels) do
+			local priority = func(itemstack)
+
+			if priority then
+				local inv = picker:get_inventory()
+				for i=1, 8 do -- loop through the top row of the player's inv
+					local compare = inv:get_stack("main", i)
+					local cprio = func(compare)
+
+					if cprio and cprio < priority then
+						inv:set_stack("main", i, itemstack)
+						return compare
+					end
+				end
+
+				break -- We already found a place for it, don't check for one held by a different item type
+			end
+		end
+	end
+end)
 
 function ctf_modebase.player.empty_inv(player)
 	player:get_inventory():set_list("main", {})
