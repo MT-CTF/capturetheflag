@@ -1,5 +1,57 @@
 ctf_modebase.player = {}
 
+local simplify_for_saved_stuff = function(iname)
+	if not iname or iname == "" then return iname end
+
+	if iname:match("default:pick_(%a+)") then
+		return "pick"
+	elseif iname:match("default:axe_(%a+)") then
+		return "axe"
+	elseif iname:match("default:shovel_(%a+)") then
+		return "shovel"
+	elseif iname:match("ctf_mode_nade_fight:") then
+		return "nade_fight_grenade"
+	end
+
+	local mod, match = iname:match("(%a+):sword_(%a+)")
+
+	if mod and (mod == "default" or mod == "ctf_melee") and match then
+		return "sword"
+	end
+
+	return iname
+end
+
+function ctf_modebase.player.save_initial_stuff_order(player, soft)
+	if not ctf_modebase.current_mode then return end
+
+	local inv = player:get_inventory()
+	local meta = player:get_meta()
+	local ssp = meta:get_string("ctf_modebase:player:initial_stuff_order:"..ctf_modebase.current_mode)
+
+	if ssp == "" then
+		ssp = {}
+	else
+		ssp = minetest.deserialize(ssp)
+	end
+
+	local done = {}
+	for i, s in pairs(inv:get_list("main")) do
+		if s:get_name() ~= "" then
+			local k = simplify_for_saved_stuff(s:get_name():match("[^%s]*"))
+
+			if not soft or not ssp[k] then
+				if not done[k] or i < k then
+					ssp[k] = i
+					done[k] = true
+				end
+			end
+		end
+	end
+
+	meta:set_string("ctf_modebase:player:initial_stuff_order:"..ctf_modebase.current_mode, minetest.serialize(ssp))
+end
+
 local function get_initial_stuff(player, f)
 	local mode = ctf_modebase:get_current_mode()
 	if mode and mode.stuff_provider then
@@ -19,6 +71,8 @@ function ctf_modebase.player.give_initial_stuff(player)
 	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
 
 	local inv = player:get_inventory()
+	local meta = player:get_meta()
+
 	local item_level = {}
 	get_initial_stuff(player, function(item)
 		local mode = ctf_modebase:get_current_mode()
@@ -57,6 +111,57 @@ function ctf_modebase.player.give_initial_stuff(player)
 		inv:remove_item("main", item)
 		inv:add_item("main", item)
 	end)
+
+	-- Check for new items not yet in the order list
+	ctf_modebase.player.save_initial_stuff_order(player, true)
+
+	local saved_stuff_positions = meta:get_string("ctf_modebase:player:initial_stuff_order:"..ctf_modebase.current_mode)
+
+	if saved_stuff_positions == "" then
+		saved_stuff_positions = {}
+	else
+		saved_stuff_positions = minetest.deserialize(saved_stuff_positions)
+	end
+
+	local new = {}
+	local tmp = {}
+	local current = inv:get_list("main")
+	for search, idx in pairs(saved_stuff_positions) do
+		for sidx, stack in ipairs(current) do
+			if stack then
+				local sname = simplify_for_saved_stuff(stack:get_name())
+
+				if sname ~= "" and sname:match(search) then
+					tmp[stack] = idx
+					current[sidx] = false
+				end
+			end
+		end
+	end
+
+	for stack, idx in pairs(tmp) do
+		for i = 1, #new+1 do
+			if new[i] then
+				if idx < tmp[new[i]] then
+					table.insert(new, i, stack)
+					break
+				end
+			else
+				new[i] = stack
+				break
+			end
+		end
+	end
+
+	for _, stack in ipairs(current) do
+		if stack then
+			table.insert(new, stack)
+		end
+	end
+
+	inv:set_list("main", new)
+end
+
 end
 
 function ctf_modebase.player.empty_inv(player)
