@@ -173,7 +173,7 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 				for i=1, 8 do -- loop through the top row of the player's inv
 					local compare = inv:get_stack("main", i)
 
-					if not mode.is_bound_item(picker, compare:get_name()) then
+					if not mode.is_bound_item or not mode.is_bound_item(picker, compare:get_name()) then
 						local cprio = func(compare)
 
 						if cprio and cprio < priority then
