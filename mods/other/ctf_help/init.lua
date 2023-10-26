@@ -1,5 +1,5 @@
-local markdown_guide = [[
-# Capture the Flag Guide
+local markdown_help = [[
+# Capture the Flag Help
 
 ### Basics
 * Click the opposite team's flag to take it.
@@ -31,10 +31,10 @@ It's helpful to read the description of the items your class is given.
 ****
 ]]
 
-local function ctf_help(name, guide_content)
-    local formspec_guide = md2f.md2f(0.3, 0, 8, 10, guide_content)
+local function ctf_help(name, help_content)
+    local formspec_help = md2f.md2f(0.3, 0, 8, 10, help_content)
     local formspec = "size[8,9.5]" ..
-                    formspec_guide ..
+                    formspec_help ..
                     "button_exit[3,8.75;2,1;exit;Close]"
     minetest.show_formspec(name, "ctf_help", formspec)
     return true
@@ -82,13 +82,13 @@ minetest.register_on_newplayer(function(player)
                 player:hud_remove(text_hud)
                 player:hud_remove(background_hud)
             end
-            ctf_help(name, markdown_guide)
+            ctf_help(name, markdown_help)
         end
     })
 end)
 
 minetest.register_chatcommand("ctf_help", {
     func = function(name, param)
-        ctf_help(name, markdown_guide)
+        ctf_help(name, markdown_help)
     end
 })
