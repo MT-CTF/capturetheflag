@@ -11,6 +11,12 @@ local simplify_for_saved_stuff = function(iname)
 		return "shovel"
 	elseif iname:match("ctf_mode_nade_fight:") then
 		return "nade_fight_grenade"
+	elseif
+		iname == "ctf_mode_classes:knight_sword" or
+		iname == "ctf_mode_classes:support_bandage" or
+		iname == "ctf_mode_classes:ranged_rifle_loaded"
+	then
+		return "class_primary"
 	end
 
 	local mod, match = iname:match("(%a+):sword_(%a+)")
