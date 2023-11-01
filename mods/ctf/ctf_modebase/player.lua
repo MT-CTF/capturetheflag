@@ -170,7 +170,7 @@ function ctf_modebase.player.give_initial_stuff(player)
 	end
 
 	for stack, idx in pairs(tmp) do
-		if not new[idx] == stack then
+		if new[idx] ~= stack then
 			table.insert(new, stack)
 		end
 	end
