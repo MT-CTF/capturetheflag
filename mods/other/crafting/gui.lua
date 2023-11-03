@@ -163,7 +163,6 @@ function crafting.result_select_on_receive_results(player, context, fields)
 		if key:sub(1, 7) == "result_" then
 			local num = string.match(key, "result_([0-9]+)")
 			if num then
-				local inv    = player:get_inventory()
 				local recipe = crafting.get_recipe(tonumber(num))
 				local name   = player:get_player_name()
 				if not crafting.can_craft(name, recipe) then
@@ -215,7 +214,7 @@ if minetest.global_exists("sfinv") then
 			end
 
 			if fields.save_inv_order then
-				ctf_modebase.player.save_initial_stuff_order(player)
+				ctf_modebase.player.save_initial_stuff_positions(player)
 
 				minetest.sound_play("crafting_save_sound", {
 					to_player = player:get_player_name(),

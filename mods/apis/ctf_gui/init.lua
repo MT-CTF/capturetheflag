@@ -144,6 +144,7 @@ do
 			end
 		end
 
+		minetest.log("action", "[ctf_gui] unpacking: "..dump(l))
 		return format(base, unpck(l))
 	end
 
