@@ -104,11 +104,13 @@ minetest.register_chatcommand("donate", {
 			return false, "The match hasn't started yet!"
 		end
 
-		local pname, score, dmessage = string.match(param, "^(%S*) (%S*) (.*)$")
+		local pname, score, dmessage = string.match(param, "^(%S*) (%S*)(.*)$")
 
 		if ctf_core.to_number(pname) then
 			pname, score = score, pname
 		end
+
+		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
 
 		if not pname then
 			return false, "You should provide the player name!"
@@ -159,7 +161,7 @@ minetest.register_chatcommand("donate", {
 		current_mode.recent_rankings.add(name, {score=-score}, true)
 
 		donate_timer[name] = os.time()
-		local donate_text = string.format("%s donated %s score to %s. '%s'", name, score, pname, dmessage)
+		local donate_text = string.format("%s donated %s score to %s%s", name, score, pname, dmessage)
 		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
 		ctf_modebase.announce(donate_text)
 
