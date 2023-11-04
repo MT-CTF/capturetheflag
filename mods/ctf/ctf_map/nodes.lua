@@ -69,7 +69,7 @@ minetest.register_node("ctf_map:ind_water", {
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_water")] = minetest.get_content_id("default:water_source")
 
 minetest.register_node("ctf_map:ind_lava", {
-	description = "Indestructible Lava Barrier Stone",
+	description = "Indestructible Lava Barrier Glass",
 	groups = {immortal = 1},
 	tiles = {"ctf_map_ind_lava.png"},
 	is_ground_content = false
