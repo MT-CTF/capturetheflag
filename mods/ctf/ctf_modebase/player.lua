@@ -223,6 +223,8 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 								if result == 0 then
 									return ItemStack("")
 								else
+									compare:set_count(result)
+
 									return compare
 								end
 							end
