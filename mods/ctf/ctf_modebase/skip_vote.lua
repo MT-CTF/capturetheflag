@@ -14,6 +14,13 @@ local flags_hold = 0
 ctf_modebase.skip_vote = {}
 
 local function add_vote_hud(player)
+	hud:add(player, "skip_vote:background", {
+		hud_elem_type = "image",
+        position = {x = 1, y = 0.5},
+        offset = {x = -100, y = 0},
+        text = "background.png",
+        scale = {x = 1, y = 1}
+	})
 	hud:add(player, "skip_vote:vote", {
 		hud_elem_type = "text",
 		position = {x = 1, y = 0.5},
@@ -34,6 +41,10 @@ function ctf_modebase.skip_vote.start_vote()
 
 	for _, player in ipairs(minetest.get_connected_players()) do
 		add_vote_hud(player)
+		minetest.sound_play("ctf_modebase_notification", {
+			gain = 1.0,
+			pitch = 1.0,
+		}, true)
 		voters_count = voters_count + 1
 	end
 
