@@ -265,6 +265,7 @@ local item_levels = {
 }
 
 local delete_queue = {}
+local team_switch_after_capture = false
 
 return {
 	on_new_match = function()
@@ -553,7 +554,9 @@ return {
 				table.remove(team_list, table.indexof(team_list, lost_team))
 
 				for lost_player in pairs(ctf_teams.online_players[lost_team].players) do
-					ctf_teams.allocate_player(lost_player)
+					team_switch_after_capture = true
+						ctf_teams.allocate_player(lost_player)
+					team_switch_after_capture = false
 				end
 			end
 		end
@@ -561,10 +564,12 @@ return {
 	on_allocplayer = function(player, new_team)
 		player:set_hp(player:get_properties().hp_max)
 
-		ctf_modebase.update_wear.cancel_player_updates(player)
+		if not team_switch_after_capture then
+			ctf_modebase.update_wear.cancel_player_updates(player)
 
-		ctf_modebase.player.remove_bound_items(player)
-		ctf_modebase.player.give_initial_stuff(player)
+			ctf_modebase.player.remove_bound_items(player)
+			ctf_modebase.player.give_initial_stuff(player)
+		end
 
 		local tcolor = ctf_teams.team[new_team].color
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
