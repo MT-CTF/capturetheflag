@@ -1,5 +1,12 @@
 ctf_modebase.player = {}
 
+ctf_settings.register("auto_trash_stone_swords", {
+	type = "bool",
+	label = "Auto-trash stone swords when you pick up a better sword",
+	description = "Only triggers when picking up swords from the ground",
+	default = "false"
+})
+
 local simplify_for_saved_stuff = function(iname)
 	if not iname or iname == "" then return iname end
 
@@ -206,7 +213,19 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 
 						if cprio and cprio < priority then
 							inv:set_stack("main", i, itemstack)
-							return compare
+
+							if compare:get_name() == "ctf_melee:sword_stone" and
+							ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
+								return ItemStack("")
+							else
+								local result = inv:add_item("main", compare):get_count()
+
+								if result == 0 then
+									return ItemStack("")
+								else
+									return compare
+								end
+							end
 						end
 					end
 				end
