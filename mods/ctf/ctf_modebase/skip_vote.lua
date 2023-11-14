@@ -18,15 +18,15 @@ local function add_vote_hud(player)
 		hud_elem_type = "image",
         position = {x = 1, y = 0.5},
         offset = {x = -100, y = 0},
-        text = "background.png",
-        scale = {x = 1, y = 1}
+        text = "gui_formbg.png",
+        scale = {x = 0.4, y = 0.2}
 	})
 	hud:add(player, "skip_vote:vote", {
 		hud_elem_type = "text",
 		position = {x = 1, y = 0.5},
 		offset = {x = -100, y = 0},
-		text = "Skip to next match\n/yes /no or /abstain",
-		color = 0xFFFFFF,
+		text = "Skip to next match?\n/yes /no or /abstain",
+		color = 0xF235FF
 	})
 end
 
