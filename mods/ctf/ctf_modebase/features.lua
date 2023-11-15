@@ -255,6 +255,36 @@ local function can_punchplayer(player, hitter)
 	return true
 end
 
+local function update_playertag(player, t, nametag, team_nametag)
+	local inverse = {}
+	local allowed_players = table.copy(ctf_teams.online_players[t].players)
+	allowed_players[player:get_player_name()] = nil
+
+	for k, v in ipairs(minetest.get_connected_players()) do
+		local n = v:get_player_name()
+		if not allowed_players[n] then
+			inverse[n] = true
+		end
+	end
+
+	team_nametag.object:set_observers(allowed_players)
+	team_nametag.object:set_properties({nametag_color = ctf_teams.team[t].color})
+	nametag.object:set_observers(inverse)
+end
+
+local function update_playertags()
+	for _, p in pairs(minetest.get_connected_players()) do
+		local t = ctf_teams.get(p)
+		local playertag = playertag.get(p)
+		local team_nametag = playertag.nametag_entity
+		local nametag = playertag.entity
+
+		if t and nametag and team_nametag then
+			update_playertag(p, t, nametag, team_nametag)
+		end
+	end
+end
+
 local item_levels = {
 	"wood",
 	"stone",
@@ -486,6 +516,11 @@ return {
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+
+		if player.set_observers then
+			update_playertags()
+		end
+
 		drop_flag(pteam)
 	end,
 	on_flag_capture = function(player, teamnames)
@@ -494,6 +529,11 @@ return {
 		local tcolor = ctf_teams.team[pteam].color
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+
+		if player.set_observers then
+			update_playertags()
+		end
+
 		celebrate_team(pteam)
 
 		local text = " has captured the flag"
@@ -580,6 +620,10 @@ return {
 		recent_rankings.set_team(player, new_team)
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+
+		if player.set_observers then
+			update_playertags()
+		end
 
 		tp_player_near_flag(player)
 	end,
