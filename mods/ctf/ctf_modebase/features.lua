@@ -275,11 +275,14 @@ local function update_playertags()
 	for _, p in pairs(minetest.get_connected_players()) do
 		local t = ctf_teams.get(p)
 		local playertag = playertag.get(p)
-		local team_nametag = playertag.nametag_entity
-		local nametag = playertag.entity
 
-		if t and nametag and team_nametag then
-			update_playertag(p, t, nametag, team_nametag)
+		if playertag then
+			local team_nametag = playertag.nametag_entity
+			local nametag = playertag.entity
+
+			if t and nametag and team_nametag then
+				update_playertag(p, t, nametag, team_nametag)
+			end
 		end
 	end
 end
