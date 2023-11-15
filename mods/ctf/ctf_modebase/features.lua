@@ -268,7 +268,6 @@ local function update_playertag(player, t, nametag, team_nametag)
 	end
 
 	team_nametag.object:set_observers(allowed_players)
-	team_nametag.object:set_properties({nametag_color = ctf_teams.team[t].color})
 	nametag.object:set_observers(inverse)
 end
 
