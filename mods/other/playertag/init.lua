@@ -23,7 +23,8 @@ local function add_entity_tag(player, old_observers)
 		ent2:set_observers(old_observers or {})
 		ent2:set_properties({
 			nametag = player:get_player_name(),
-			nametag_bgcolor = "#00000000"
+			nametag_color = "#DDEEFFCC",
+			nametag_bgcolor = "#0000002D"
 		})
 	end
 
