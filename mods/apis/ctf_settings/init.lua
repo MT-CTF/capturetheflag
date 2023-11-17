@@ -3,7 +3,7 @@ ctf_settings = {
 	settings_list = {},
 }
 
-local FORMSIZE = {x = 8, y = 5}
+local FORMSIZE = {x = 8, y = 9.4}
 local SCROLLBAR_W = 0.4
 
 minetest.after(0, function()
@@ -82,19 +82,19 @@ minetest.register_on_mods_loaded(function()
 			end
 
 			local form = {
-			{"box[-0.1,-0.1;%f,9.4;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
+				{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
 				{"scroll_container[-0.1,0.3;%f,%f;settings_scrollbar;vertical;0.1]",
-					FORMSIZE.x - SCROLLBAR_W + 2,
-					FORMSIZE.y + 3
+				 FORMSIZE.x - SCROLLBAR_W + 2,
+				 FORMSIZE.y + 0.7
 				},
 				ctf_gui.list_to_formspec_str(setting_list),
 				"scroll_container_end[]",
 				{"scrollbaroptions[max=%d]", math.ceil((lastypos - 3.833) * 11.538)},
-				{"scrollbar[%f,-0.1;%f,9.4;vertical;settings_scrollbar;-0.1]",
-					FORMSIZE.x - SCROLLBAR_W,
-					SCROLLBAR_W,
-					FORMSIZE.y,
-					context and context.settings_scrollbar or 0
+				{"scrollbar[%f,-0.1;%f,%f;vertical;settings_scrollbar;%f]",
+				 FORMSIZE.x - SCROLLBAR_W,
+				 SCROLLBAR_W,
+				 FORMSIZE.y,
+				 context and context.settings_scrollbar or 0
 				},
 			}
 
