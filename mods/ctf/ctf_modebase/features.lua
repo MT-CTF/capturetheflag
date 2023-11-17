@@ -3,6 +3,7 @@ ctf_core.testing = {
 	-- -so I don't need to restart for every little change
 	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
 	--ctf_core.testing.
+	testing = true,
 	test = function(
 		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
 	)
@@ -150,13 +151,13 @@ local function drop_flag(teamname)
 			if pteam == teamname then
 				minetest.sound_play("ctf_modebase_drop_flag_negative", {
 					to_player = pname,
-					gain = 0.4,
+					gain = 0.2,
 					pitch = 1.0,
 				}, true)
 			else
 				minetest.sound_play("ctf_modebase_drop_flag_positive", {
 					to_player = pname,
-					gain = 0.4,
+					gain = 0.2,
 					pitch = 1.0,
 				}, true)
 			end
@@ -254,6 +255,38 @@ local function can_punchplayer(player, hitter)
 	return true
 end
 
+local function update_playertag(player, t, nametag, team_nametag)
+	local inverse = {}
+	local allowed_players = table.copy(ctf_teams.online_players[t].players)
+	allowed_players[player:get_player_name()] = nil
+
+	for k, v in ipairs(minetest.get_connected_players()) do
+		local n = v:get_player_name()
+		if not allowed_players[n] then
+			inverse[n] = true
+		end
+	end
+
+	team_nametag.object:set_observers(allowed_players)
+	nametag.object:set_observers(inverse)
+end
+
+local function update_playertags()
+	for _, p in pairs(minetest.get_connected_players()) do
+		local t = ctf_teams.get(p)
+		local playertag = playertag.get(p)
+
+		if playertag then
+			local team_nametag = playertag.nametag_entity
+			local nametag = playertag.entity
+
+			if t and nametag and team_nametag then
+				update_playertag(p, t, nametag, team_nametag)
+			end
+		end
+	end
+end
+
 local item_levels = {
 	"wood",
 	"stone",
@@ -264,6 +297,7 @@ local item_levels = {
 }
 
 local delete_queue = {}
+local team_switch_after_capture = false
 
 return {
 	on_new_match = function()
@@ -386,7 +420,8 @@ return {
 		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
 
 		if ctf_core.testing.testing then
-			if not rem_team or math.max(player_rankings[rem_team.."_kills"], player_rankings[rem_team.."_deaths"]) <= 6 then
+			if not rem_team or
+			math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
 				player_rankings = rankings:get(player) or {}
 			else
 				player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
@@ -483,6 +518,11 @@ return {
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+
+		if player.set_observers then
+			update_playertags()
+		end
+
 		drop_flag(pteam)
 	end,
 	on_flag_capture = function(player, teamnames)
@@ -491,6 +531,11 @@ return {
 		local tcolor = ctf_teams.team[pteam].color
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+
+		if player.set_observers then
+			update_playertags()
+		end
+
 		celebrate_team(pteam)
 
 		local text = " has captured the flag"
@@ -551,7 +596,9 @@ return {
 				table.remove(team_list, table.indexof(team_list, lost_team))
 
 				for lost_player in pairs(ctf_teams.online_players[lost_team].players) do
-					ctf_teams.allocate_player(lost_player)
+					team_switch_after_capture = true
+						ctf_teams.allocate_player(lost_player)
+					team_switch_after_capture = false
 				end
 			end
 		end
@@ -559,10 +606,12 @@ return {
 	on_allocplayer = function(player, new_team)
 		player:set_hp(player:get_properties().hp_max)
 
-		ctf_modebase.update_wear.cancel_player_updates(player)
+		if not team_switch_after_capture then
+			ctf_modebase.update_wear.cancel_player_updates(player)
 
-		ctf_modebase.player.remove_bound_items(player)
-		ctf_modebase.player.give_initial_stuff(player)
+			ctf_modebase.player.remove_bound_items(player)
+			ctf_modebase.player.give_initial_stuff(player)
+		end
 
 		local tcolor = ctf_teams.team[new_team].color
 		player:hud_set_hotbar_image("gui_hotbar.png^[colorize:" .. tcolor .. ":128")
@@ -573,6 +622,10 @@ return {
 		recent_rankings.set_team(player, new_team)
 
 		playertag.set(player, playertag.TYPE_ENTITY)
+
+		if player.set_observers then
+			update_playertags()
+		end
 
 		tp_player_near_flag(player)
 	end,
@@ -688,7 +741,7 @@ return {
 			end
 		end,
 		sword = function(item)
-			local mod, match = item:get_name():match("(%a+):sword_(%a+)")
+			local mod, match = item:get_name():match("([^:]+):sword_(%a+)")
 
 			if mod and (mod == "default" or mod == "ctf_melee") and match then
 				return table.indexof(item_levels, match)

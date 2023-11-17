@@ -9,13 +9,24 @@ playertag = {
 	TYPE_ENTITY  = TYPE_ENTITY,
 }
 
-local function add_entity_tag(player)
+local function add_entity_tag(player, old_observers)
 	-- Hide fixed nametag
 	player:set_nametag_attributes({
 		color = {a = 0, r = 0, g = 0, b = 0}
 	})
 
 	local ent = minetest.add_entity(player:get_pos(), "playertag:tag")
+	local ent2 = false
+
+	if ent.set_observers then
+		ent2 = minetest.add_entity(player:get_pos(), "playertag:tag")
+		ent2:set_observers(old_observers or {})
+		ent2:set_properties({
+			nametag = player:get_player_name(),
+			nametag_color = "#DDEEFFCC",
+			nametag_bgcolor = "#0000002D"
+		})
+	end
 
 	-- Build name from font texture
 	local texture = "npcf_tag_bg.png"
@@ -37,20 +48,41 @@ local function add_entity_tag(player)
 	-- Attach to player
 	ent:set_attach(player, "", ATTACH_POSITION, {x=0, y=0, z=0})
 
+	if ent2 then
+		ent2:set_attach(player, "", ATTACH_POSITION, {x=0, y=0, z=0})
+	end
+
 	-- Store
-	players[player:get_player_name()].entity = ent
+	players[player:get_player_name()].entity = ent:get_luaentity()
+	players[player:get_player_name()].nametag_entity = ent2 and ent2:get_luaentity()
 end
 
 local function remove_entity_tag(player)
 	local tag = players[player:get_player_name()]
 	if tag and tag.entity then
-		tag.entity:remove()
+		tag.entity.object:remove()
+
+		if tag.nametag_entity then
+			tag.nametag_entity.object:remove()
+		end
 	end
 end
 
 local function update(player, settings)
+	local pname = player:get_player_name()
+	local old_observers = {}
+
+	if player.get_observers and players[pname] and players[pname].nametag_entity then
+		old_observers = players[pname].nametag_entity.object:get_observers()
+	end
+
+	if settings.nametag_entity_observers then
+		old_observers = table.copy(settings.nametag_entity_observers)
+		settings.nametag_entity_observers = nil
+	end
+
 	remove_entity_tag(player)
-	players[player:get_player_name()] = settings
+	players[pname] = settings
 
 	if settings.type == TYPE_BUILTIN then
 		player:set_nametag_attributes({
@@ -58,17 +90,23 @@ local function update(player, settings)
 			bgcolor = {a=0, r=0, g=0, b=0},
 		})
 	elseif settings.type == TYPE_ENTITY then
-		add_entity_tag(player)
+		add_entity_tag(player, old_observers)
 	end
 end
 
-function playertag.set(player, type, color)
+function playertag.set(player, type, color, extra)
 	local oldset = players[player:get_player_name()]
 	if not oldset then return end
 
 	if oldset.type ~= type or oldset.color ~= color then
-		update(player, {type = type, color = color})
+		extra = extra or {}
+		extra.type = type
+		extra.color = color
+
+		update(player, extra)
 	end
+
+	return players[player:get_player_name()]
 end
 
 function playertag.get(player)
@@ -83,6 +121,7 @@ minetest.register_entity("playertag:tag", {
 	visual = "sprite",
 	visual_size = {x=2.16, y=0.18, z=2.16}, --{x=1.44, y=0.12, z=1.44},
 	textures = {"blank.png"},
+	collisionbox = { 0, -0.2, 0, 0, -0.2, 0 },
 	physical = false,
 	makes_footstep_sound = false,
 	backface_culling = false,
