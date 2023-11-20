@@ -29,10 +29,12 @@ function ctf_settings.register(name, def)
 	table.insert(ctf_settings.settings_list, name)
 end
 
+---@param player ObjectRef
 function ctf_settings.set(player, setting, value)
 	player:get_meta():set_string("ctf_settings:"..setting, value)
 end
 
+---@param player ObjectRef
 ---@return string Returns the player's chosen setting value, the default given at registration, or if both are unset: ""
 function ctf_settings.get(player, setting)
 	local value = player:get_meta():get_string("ctf_settings:"..setting)

@@ -17,13 +17,23 @@ local function add_entity_tag(player, old_observers)
 
 	local ent = minetest.add_entity(player:get_pos(), "playertag:tag")
 	local ent2 = false
+	local ent3 = false
 
 	if ent.set_observers then
 		ent2 = minetest.add_entity(player:get_pos(), "playertag:tag")
-		ent2:set_observers(old_observers or {})
+		ent2:set_observers(old_observers.nametag_entity or {})
 		ent2:set_properties({
 			nametag = player:get_player_name(),
-			nametag_color = "#DDEEFFCC",
+			nametag_color = "#EEFFFFDD",
+			nametag_bgcolor = "#0000002D"
+		})
+
+		ent3 = minetest.add_entity(player:get_pos(), "playertag:tag")
+		ent3:set_observers(old_observers.symbol_entity or {})
+		ent3:set_properties({
+			collisionbox = { 0, 0, 0, 0, 0, 0 },
+			nametag = "V",
+			nametag_color = "#EEFFFFDD",
 			nametag_bgcolor = "#0000002D"
 		})
 	end
@@ -48,13 +58,15 @@ local function add_entity_tag(player, old_observers)
 	-- Attach to player
 	ent:set_attach(player, "", ATTACH_POSITION, {x=0, y=0, z=0})
 
-	if ent2 then
+	if ent2 and ent3 then
 		ent2:set_attach(player, "", ATTACH_POSITION, {x=0, y=0, z=0})
+		ent3:set_attach(player, "", ATTACH_POSITION, {x=0, y=0, z=0})
 	end
 
 	-- Store
 	players[player:get_player_name()].entity = ent:get_luaentity()
 	players[player:get_player_name()].nametag_entity = ent2 and ent2:get_luaentity()
+	players[player:get_player_name()].symbol_entity = ent3 and ent3:get_luaentity()
 end
 
 local function remove_entity_tag(player)
@@ -65,6 +77,10 @@ local function remove_entity_tag(player)
 		if tag.nametag_entity then
 			tag.nametag_entity.object:remove()
 		end
+
+		if tag.symbol_entity then
+			tag.symbol_entity.object:remove()
+		end
 	end
 end
 
@@ -72,13 +88,24 @@ local function update(player, settings)
 	local pname = player:get_player_name()
 	local old_observers = {}
 
-	if player.get_observers and players[pname] and players[pname].nametag_entity then
-		old_observers = players[pname].nametag_entity.object:get_observers()
+	if player.get_observers and players[pname] then
+		if players[pname].nametag_entity then
+			old_observers.nametag_entity = players[pname].nametag_entity.object:get_observers()
+		end
+
+		if players[pname].symbol_entity then
+			old_observers.symbol_entity = players[pname].symbol_entity.object:get_observers()
+		end
 	end
 
 	if settings.nametag_entity_observers then
-		old_observers = table.copy(settings.nametag_entity_observers)
+		old_observers.nametag_entity = table.copy(settings.nametag_entity_observers)
 		settings.nametag_entity_observers = nil
+	end
+
+	if settings.symbol_entity_observers then
+		old_observers.symbol_entity = table.copy(settings.symbol_entity_observers)
+		settings.symbol_entity_observers = nil
 	end
 
 	remove_entity_tag(player)

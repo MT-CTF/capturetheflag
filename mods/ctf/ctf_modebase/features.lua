@@ -19,6 +19,71 @@ ctf_core.testing = {
 	end
 }
 
+local function update_playertag(player, t, nametag, team_nametag, team_symbol_nametag)
+	local entity_players = {}
+	local nametag_players = table.copy(ctf_teams.online_players[t].players)
+	local symbol_players = {}
+	nametag_players[player:get_player_name()] = nil
+
+	for n in pairs(table.copy(nametag_players)) do
+		local setting = ctf_settings.get(minetest.get_player_by_name(n), "teammate_nametag_style")
+
+		if setting == "3" then
+			nametag_players[n] = nil
+		elseif setting == "2" then
+			symbol_players[n] = true
+			nametag_players[n] = nil
+		end
+	end
+
+	for k, v in ipairs(minetest.get_connected_players()) do
+		local n = v:get_player_name()
+		if not nametag_players[n] then
+			entity_players[n] = true
+		end
+	end
+
+	team_nametag.object:set_observers(nametag_players)
+	team_symbol_nametag.object:set_observers(symbol_players)
+	nametag.object:set_observers(entity_players)
+end
+
+local update_timer = false
+local function update_playertags()
+	if not update_timer then
+		update_timer = true
+		minetest.after(1.2, function()
+			update_timer = false
+			for _, p in pairs(minetest.get_connected_players()) do
+				local t = ctf_teams.get(p)
+				local playertag = playertag.get(p)
+
+				if playertag then
+					local team_nametag = playertag.nametag_entity
+					local nametag = playertag.entity
+					local symbol_entity = playertag.symbol_entity
+
+					if t and nametag and team_nametag and symbol_entity then
+						update_playertag(p, t, nametag, team_nametag, symbol_entity)
+					end
+				end
+			end
+		end)
+	end
+end
+
+
+ctf_settings.register("teammate_nametag_style", {
+	type = "list",
+	description = "Controls what style of nametag to use for teammates.",
+	list = {"Minetest Nametag: Full", "Minetest Nametag: Symbol", "Entity Nametag"},
+	default = "1",
+	on_change = function(player, new_value)
+		minetest.log("action", "Player "..player:get_player_name().." changed their nametag setting")
+		update_playertags()
+	end
+})
+
 ctf_modebase.features = function(rankings, recent_rankings)
 
 local FLAG_MESSAGE_COLOR = "#d9b72a"
@@ -253,38 +318,6 @@ local function can_punchplayer(player, hitter)
 	end
 
 	return true
-end
-
-local function update_playertag(player, t, nametag, team_nametag)
-	local inverse = {}
-	local allowed_players = table.copy(ctf_teams.online_players[t].players)
-	allowed_players[player:get_player_name()] = nil
-
-	for k, v in ipairs(minetest.get_connected_players()) do
-		local n = v:get_player_name()
-		if not allowed_players[n] then
-			inverse[n] = true
-		end
-	end
-
-	team_nametag.object:set_observers(allowed_players)
-	nametag.object:set_observers(inverse)
-end
-
-local function update_playertags()
-	for _, p in pairs(minetest.get_connected_players()) do
-		local t = ctf_teams.get(p)
-		local playertag = playertag.get(p)
-
-		if playertag then
-			local team_nametag = playertag.nametag_entity
-			local nametag = playertag.entity
-
-			if t and nametag and team_nametag then
-				update_playertag(p, t, nametag, team_nametag)
-			end
-		end
-	end
 end
 
 local item_levels = {
