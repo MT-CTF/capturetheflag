@@ -3,7 +3,7 @@ ctf_settings = {
 	settings_list = {},
 }
 
-local FORMSIZE = {x = 8, y = 5}
+local FORMSIZE = {x = 8, y = 9.4}
 local SCROLLBAR_W = 0.4
 
 minetest.after(0, function()
@@ -84,7 +84,7 @@ minetest.register_on_mods_loaded(function()
 			local form = {
 			{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
 				{"scroll_container[-0.1,0.3;%f,%f;settings_scrollbar;vertical;0.1]",
-					FORMSIZE.x - SCROLLBAR_W,
+					FORMSIZE.x - SCROLLBAR_W + 2,
 					FORMSIZE.y + 0.7
 				},
 				ctf_gui.list_to_formspec_str(setting_list),
@@ -98,7 +98,7 @@ minetest.register_on_mods_loaded(function()
 				},
 			}
 
-			return sfinv.make_formspec(player, context, ctf_gui.list_to_formspec_str(form), true)
+			return sfinv.make_formspec(player, context, ctf_gui.list_to_formspec_str(form), false)
 		end,
 		on_player_receive_fields = function(self, player, context, fields)
 			local refresh = false
