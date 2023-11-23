@@ -4,6 +4,8 @@ local healers = {}
 
 ctf_combat_mode = {}
 
+local suffocation_message = ""
+
 local function update(player)
 	local combat = hitters[player]
 
@@ -11,10 +13,6 @@ local function update(player)
 		hud:remove(player, "combat_indicator")
 		hitters[player] = nil
 		return
-	end
-
-	if not suffocation_message then
-		local suffocation_message = ""
 	end
 
 	local hud_message = "You are in combat [%ds left] \n%s"
