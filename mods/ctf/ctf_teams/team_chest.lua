@@ -122,7 +122,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				"label[7,-0.2;" ..
 				minetest.formspec_escape("Pro players only") .. "]"
 		else
-			formspec = formspec .. "label[6.5,3;" ..
+			formspec = formspec .. "label[6.5,2;" ..
 				minetest.formspec_escape(minetest.wrap_text(
 					pro_access or "You aren't allowed to access the pro section",
 					20
