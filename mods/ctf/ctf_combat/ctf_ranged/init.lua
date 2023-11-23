@@ -7,7 +7,6 @@ ctf_ranged = {
 
 local scoped = ctf_ranged.scoped
 local scale_const = 6
-local timer = 1
 
 minetest.register_craftitem("ctf_ranged:ammo", {
 	description = "Ammo\nUsed to reload guns",
@@ -295,7 +294,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	type = "sniper",
 	description = "Sniper rifle\nDmg: 12 | FR: 2s | Mag: 25",
 	texture = "ctf_ranged_sniper_rifle.png",
-	fire_sound = "ctf_ranged_sniper_shot",
+	fire_sound = "ctf_ranged_sniper",
 	rounds = 25,
 	range = 300,
 	damage = 12,
@@ -305,7 +304,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 		if scoped[user:get_player_name()] then
 			ctf_ranged.hide_scope(user:get_player_name())
 		else
-			local item_name = itemstack:get_name():gsub("_loaded", "")
+			local item_name = itemstack:get_name()
 			ctf_ranged.show_scope(user:get_player_name(), item_name, 4)
 		end
 	end
@@ -315,7 +314,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	type = "sniper",
 	description = "Magnum sniper rifle\nDmg: 16 | FR: 2s | Mag: 20",
 	texture = "ctf_ranged_sniper_rifle_magnum.png",
-	fire_sound = "ctf_ranged_sniper_shot",
+	fire_sound = "ctf_ranged_sniper",
 	rounds = 20,
 	range = 400,
 	damage = 16,
@@ -325,7 +324,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 		if scoped[user:get_player_name()] then
 			ctf_ranged.hide_scope(user:get_player_name())
 		else
-			local item_name = itemstack:get_name():gsub("_loaded", "")
+			local item_name = itemstack:get_name()
 			ctf_ranged.show_scope(user:get_player_name(), item_name, 8)
 		end
 	end
@@ -341,14 +340,14 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 local time = 0
 minetest.register_globalstep(function(dtime)
 	time = time + dtime
-	if time < timer then
+	if time < 1 then
 		return
 	end
 
 	time = 0
 	for name, info in pairs(scoped) do
 		local player = minetest.get_player_by_name(name)
-		local wielded_item = player:get_wielded_item():get_name():gsub("_loaded", "")
+		local wielded_item = player:get_wielded_item():get_name()
 		if wielded_item ~= info.item_name then
 			ctf_ranged.hide_scope(name)
 		end

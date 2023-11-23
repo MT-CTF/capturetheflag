@@ -41,6 +41,7 @@ Note that this version may be slightly behind the git version, but it will be a 
 
 ## Development
 
+* ### [WIP CTF API DOCS](docs/ctf-api.md)
 * If you use Visual Studio Code we recommend these extensions:
   * https://marketplace.visualstudio.com/items?itemName=sumneko.lua
   * https://marketplace.visualstudio.com/items?itemName=dwenegar.vscode-luacheck
@@ -51,15 +52,14 @@ Created by [rubenwardy](https://rubenwardy.com/).
 Developed by [LandarVargan](https://github.com/LoneWolfHT).
 Previous Developers: [savilli](https://github.com/savilli).
 
+Check out [mods/](mods/) to see all the installed mods and their respective licenses.
+
 Licenses where not specified:
 Code: LGPLv2.1+
 Textures: CC-BY-SA 3.0
 
 ### Textures
 
-* [Header](menu/header.png): CC BY-SA 4.0 by xenonca
-* [Background Image](menu/background.png): CC0 (where applicable) by Apelta (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed CC-BY-SA 3.0). The player skin used is licensed CC-BY-SA 3.0
-
-### Mods
-
-Check out [mods/](mods/) to see all the installed mods and their respective licenses.
+* [Header](menu/header.png): CC-BY-3.0 by [SuddenSFD](https://github.com/SuddenSFD)
+* [Background Image](menu/background.png): CC BY-SA 4.0 (where applicable) by [GreenBlob](https://github.com/a-blob) (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed CC-BY-SA 3.0). The player skins used are licensed CC-BY-SA 3.0
+* [Icon](menu/icon.png): CC-BY-3.0 by [SuddenSFD](https://github.com/SuddenSFD)

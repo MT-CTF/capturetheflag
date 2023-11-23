@@ -13,7 +13,8 @@ player_api.registered_models["character.b3d"] = nil
 
 player_api.register_model("character.b3d", {
 	animation_speed = 30,
-	textures = {"character.png"},
+	--textures={"character.png", "flagtexture",},
+	textures = {"character.png", "blank.png"  ,},
 	animations = {
 		-- Standard animations.
 		stand     = {x = 0,   y = 79},

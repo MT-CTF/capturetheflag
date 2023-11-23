@@ -1,6 +1,8 @@
 local blacklist = {
 	"default:pine_needles",
 	".*leaves$",
+	"ctf_melee:sword_stone",
+	"default:pick_stone",
 }
 
 local function get_chest_access(name)

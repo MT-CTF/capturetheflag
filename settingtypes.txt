@@ -6,3 +6,7 @@ ctf_rankings_backend (Rankings Backend) enum default default,redis
 # Port the redis server is hosted on.
 # This setting is only used when ctf_rankings_backend = redis
 ctf_rankings_redis_server_port (Rankings Redis Server Port) int 6379
+
+# CTF can sometimes reduce CPU usage by calculating things once and putting them in RAM.
+# Turn on low ram mode if you're getting crashes related to RAM/Memory usage
+ctf_low_ram_mode (Low RAM mode) bool false

@@ -60,19 +60,27 @@ function random_messages.read_messages()
 		"Use /top50 command to see the leaderboard.",
 		"Use /top50 <mode:technical modename> to see the leaderboard on another mode."
 		.. " For example: /top50 mode:nade_fight.",
-		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
+		"To check someone's rank on another mode, use /r <mode:technical modename> <playername>."
 		.. " For example: /r mode:nade_fight randomplayer.",
 		"To check someone's team use /team player <player_name>.",
 		"To check all team members use /team.",
 		"You can capture multiple enemy flags at once!",
 		"Consider joining our Discord server at https://discord.gg/vcZTRPX",
-		"You can press sneak while jumping, to jump up two blocks.",
+		"You can press sneak while jumping to jump up two blocks.",
 		"Use /donate <playername> <score> to reward a team-mate for their work.",
 		"A medic and knight working together can wreak havoc on the enemy team(s)",
 		"Use /lb to see a list of bountied players you can kill for score",
-		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
+		"In the Nade Fight mode, you can team up with someone using the void grenade for easier kills.",
 		"An alternative method to place markers is by (left/right) clicking while holding the zoom key (default: Z)",
 		"Use /mp <player> to send a marker to a specific teammate",
+		"Use /msg <playername> <message> to send a private message (PM) to another player.",
+		"To check someone's league in all modes, use /league <player>",
+		"Use /leagues to list leagues and the placement needed to get to them.",
+		"To place an HP marker, run /mhp or left/right click while holding the zoom key (default: Z) "..
+			"and looking at your feet",
+		"Use /map to print the current map name and its author.",
+		"To check someone's ranking in all modes, use /rank mode:all <player_name>",
+		"Building a base with materials stronger than cobblestone, such as wood or reinforced cobble, keeps your flag safer.",
 	}
 end
 
