@@ -41,7 +41,7 @@ Decide where you will build your map. We recommend you don't make your map large
 	- "Indestructible Red Barrier Glass" (`ctf_map:ind_glass_red`) for the build-time wall. This will disappear once the match begins. (More on that later)
 	- (*If applicable*) "Indestructible Red Barrier Stone" (`ctf_map:ind_stone_red`) for underground build-time wall. This will turn into stone(`default:stone`) once the match begins. (More on that below)
  	- (*If applicable*) "Indestructible Water Barrier Glass" (`ctf_map:ind_water`) for underwater build-time wall. This will turn into water source (`default:water_source`) once the match begins.
-  	- (*If applicable*) "Indestructible Lava Barrier Glass" (`ctf_map:ind_lava`) for build-time walls in lava. This will turn into lava source (`default:lava_source`) once the match begins.
+  	- (*If applicable*) "Indestructible Lava Barrier Glass" (`ctf_map:ind_lava`) for build-time wall in lava. This will turn into lava source (`default:lava_source`) once the match begins.
 
 The positions the `Indestructible Red Barrier` and the `Indestructible Red Barrier Stone` are automatically calculated when you save the map. 
 If you wish to save your map for later edits, follow the note in the section about exporting the map.
