@@ -97,7 +97,7 @@ end)
 
 minetest.register_chatcommand("donate", {
 	description = "Donate your match score to your teammate\nCan be used only once in 10 minutes",
-	params = "<playername> <score> <message>",
+	params = "<playername> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
 		if not current_mode or not ctf_modebase.match_started then
