@@ -696,7 +696,17 @@ return {
 		local pro_chest = player and player:get_meta():get_int("ctf_rankings:pro_chest:"..
 				(ctf_modebase.current_mode or "")) == 1
 		local deny_pro = "You need to have more than 1.4 kills per death, "..
-		                 "5 captures, and at least 8,000 score to access the pro section"
+		                 "5 captures, and at least 8,000 score to access the pro section."
+		if rank then
+			local captures_needed = math.max(0, 5 - (rank.flag_captures or 0))
+			local score_needed = math.max(0, 8000 - (rank.score or 0))
+			local current_kd = math.floor((rank.kills or 0) / (rank.deaths or 1) * 10)
+			current_kd = current_kd / 10
+			deny_pro = deny_pro .. " You still need " .. captures_needed
+					   .. " captures, " .. score_needed ..
+					   " score, and your kills per death is " ..
+					   current_kd .. "."
+		end
 
 		-- Remember to update /make_pro in ranking_commands.lua if you change anything here
 		if pro_chest or rank then
