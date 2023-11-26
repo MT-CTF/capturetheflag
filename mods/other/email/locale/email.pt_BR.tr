@@ -1,0 +1,23 @@
+# textdomain: email
+(@1) You have mail! Type /inbox to recieve=(@1) Você tem correio! Digite /inbox para receber
+Your Inbox=Sua Caixa de Entrada
+Date=Data
+From=De
+Message=Mensagem
+Well done! Your inbox is empty!=Bem feito! Sua caixa de entrada está vazia!
+Delete All=Excluir Tudo
+Close=Fechar
+Exit then type /mail username message to reply=Sair e depois digite /mail nomeusuário mensagem para responder
+Your inbox is empty!=Sua caixa de entrada está vazia!
+@1 items in your inbox:=@1 itens na sua caixa de entrada:
+End of mail (@1 items)=Fim do correio (@1 itens)
+Opened inbox!=Caixa de entrada aberta!
+Inbox=Caixa de Entrada
+Inbox cleared!=Caixa de entrada limpa!
+Player '@1' does not exist=Jogador '@1' não existe
+Message sent to @1=Mensagem enviada para @1
+Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only.=Caixa de entrada: Deixe em branco para ver a caixa de entrada. Use 'clear' para esvaziar a caixa, 'text' para texto apenas.
+Inbox cleared=Caixa de entrada limpa
+<playername> <some message>=<nomejogador> <algumamensagem>
+mail: add a message to a player's inbox=mail: adicionar uma mensagem à caixa de entrada de um jogador
+Usage: mail <playername> <some message>=Uso: mail <nomejogador> <algumamensagem>
