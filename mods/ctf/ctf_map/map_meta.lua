@@ -277,16 +277,18 @@ function ctf_map.save_map(mapmeta)
 	-- Calculate where barriers are
 	local barriers = {}
 	local pos1, pos2 = mapmeta.pos1:copy(), mapmeta.pos2:copy()
+	local barrier_area = {pos1 = pos1:subtract(mapmeta.offset), pos2 = pos2:subtract(mapmeta.offset)}
 
 	if pos1.y > pos2.y then
-		pos1, pos2 = pos2, pos1
+		local t = pos2
+		pos2 = pos1
+		pos1 = t
 	end
 
 	if pos1.y + BARRIER_Y_SIZE < pos2.y then
 		pos2.y = pos1.y + BARRIER_Y_SIZE
 	end
 
-	local barrier_area = {pos1 = pos1:subtract(mapmeta.offset), pos2 = pos2:subtract(mapmeta.offset)}
 	local queue_break = false
 	while true do
 		local tmp = {
@@ -300,9 +302,11 @@ function ctf_map.save_map(mapmeta)
 		tmp.pos1, tmp.pos2 = pos1:subtract(mapmeta.offset), pos2:subtract(mapmeta.offset)
 
 		local data = vm:get_data()
+		local barrier_found = false
 		for i, v in ipairs(data) do
 			for b, rep in pairs(ctf_map.barrier_nodes) do
 				if v == b then
+					barrier_found = true
 					tmp.reps[i] = minetest.get_name_from_content_id(rep)
 				end
 			end
@@ -310,11 +314,9 @@ function ctf_map.save_map(mapmeta)
 
 		tmp.max = #data
 
-		local _
-		_, barrier_area.pos1 = vector.sort(barrier_area.pos1, tmp.pos1)
-		barrier_area.pos2 = vector.sort(barrier_area.pos2, tmp.pos2)
-
-		table.insert(barriers, tmp)
+		if barrier_found then
+			table.insert(barriers, tmp)
+		end
 
 		if queue_break then
 			break
