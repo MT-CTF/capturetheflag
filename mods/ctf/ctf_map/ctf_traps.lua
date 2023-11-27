@@ -173,6 +173,48 @@ minetest.register_node("ctf_map:reinforced_cobble", {
 	description = "Reinforced Cobblestone",
 	tiles = {"ctf_map_reinforced_cobble.png"},
 	is_ground_content = false,
+	groups = {cracky = 3, stone = 2},
+	sounds = default.node_sound_stone_defaults(),
+	on_punch = function(pos, node, digger)
+		local meta = minetest.get_meta(pos)
+		local placer_team = meta:get_string("placer_team")
+		minetest.chat_send_all(meta:get_string("placer_team"))
+		local digger_team = ctf_teams.get(digger)
+		if placer_team ~= digger_team then
+			minetest.set_node(pos, {name = "ctf_map:reinforced_cobble_hardened"})
+		end
+	end,
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("placer_team", ctf_teams.get(placer))
+	end,
+	on_dig = function(pos, node, digger)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("placer_team", "")
+		minetest.node_dig(pos, node, digger)
+	end
+})
+
+minetest.register_node("ctf_map:reinforced_cobble_hardened", {
+	description = "Reinforced Cobblestone Hardened\nYou're not meant to use this",
+	tiles = {"ctf_map_reinforced_cobble.png"},
+	is_ground_content = false,
 	groups = {cracky = 1, stone = 2},
 	sounds = default.node_sound_stone_defaults(),
+	drop = "ctf_map:reinforced_cobble",
+	on_punch = function(pos, node, digger)
+		local meta = minetest.get_meta(pos)
+		local placer_team = meta:get_string("placer_team")
+		minetest.chat_send_all(meta:get_string("placer_team"))
+		local digger_team = ctf_teams.get(digger)
+		if placer_team == digger_team then
+			minetest.set_node(pos, {name = "ctf_map:reinforced_cobble"})
+		end
+	end,
+	on_dig = function(pos, node, digger)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("placer_team", "")
+		minetest.node_dig(pos, node, digger)
+	end
 })
+
