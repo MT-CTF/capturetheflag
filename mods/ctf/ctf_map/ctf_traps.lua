@@ -178,7 +178,6 @@ minetest.register_node("ctf_map:reinforced_cobble", {
 	on_punch = function(pos, node, digger)
 		local meta = minetest.get_meta(pos)
 		local placer_team = meta:get_string("placer_team")
-		minetest.chat_send_all(meta:get_string("placer_team"))
 		local digger_team = ctf_teams.get(digger)
 		if placer_team ~= digger_team then
 			minetest.set_node(pos, {name = "ctf_map:reinforced_cobble_hardened"})
@@ -207,7 +206,6 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 	on_punch = function(pos, node, digger)
 		local meta = minetest.get_meta(pos)
 		local placer_team = meta:get_string("placer_team")
-		minetest.chat_send_all(meta:get_string("placer_team"))
 		local digger_team = ctf_teams.get(digger)
 		if placer_team == digger_team then
 			minetest.set_node(pos, {name = "ctf_map:reinforced_cobble"})
