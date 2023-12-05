@@ -17,26 +17,41 @@ ctf_settings.register("auto_trash_stone_tools", {
 local simplify_for_saved_stuff = function(iname)
 	if not iname or iname == "" then return iname end
 
-	if iname:match("default:pick_(%a+)") then
-		return "pick"
-	elseif iname:match("default:axe_(%a+)") then
-		return "axe"
-	elseif iname:match("default:shovel_(%a+)") then
-		return "shovel"
-	elseif iname:match("ctf_mode_nade_fight:") then
-		return "nade_fight_grenade"
-	elseif
-		iname == "ctf_mode_classes:knight_sword" or
-		iname == "ctf_mode_classes:support_bandage" or
-		iname == "ctf_mode_classes:ranged_rifle_loaded"
+	local match
+
+	match = iname:match("default:pick_(%a+)")
+	if match then
+		return "pick", match
+	end
+
+	match = iname:match("default:axe_(%a+)")
+	if match then
+		return "axe", match
+	end
+
+	match = iname:match("default:shovel_(%a+)")
+	if match then
+		return "shovel", match
+	end
+
+	match = iname:match("ctf_mode_nade_fight:(.*)")
+	if match then
+		return "nade_fight_grenade", match
+	end
+
+	if
+	iname == "ctf_mode_classes:knight_sword" or
+	iname == "ctf_mode_classes:support_bandage" or
+	iname == "ctf_mode_classes:ranged_rifle_loaded"
 	then
 		return "class_primary"
 	end
 
-	local mod, match = iname:match("(%a+):sword_(%a+)")
+	local mod
+	mod, match = iname:match("(%a+):sword_(%a+)")
 
 	if mod and (mod == "default" or mod == "ctf_melee") and match then
-		return "sword"
+		return "sword", match
 	end
 
 	return iname
@@ -223,12 +238,12 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 							inv:set_stack("main", i, itemstack)
 
 							if item == "sword" and type == "stone" and
-							   ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
+							ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
 								return ItemStack("")
 							end
 
 							if item ~= "sword" and type == "stone" and
-							   ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
+							ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
 								return ItemStack("")
 							else
 								local result = inv:add_item("main", compare):get_count()
