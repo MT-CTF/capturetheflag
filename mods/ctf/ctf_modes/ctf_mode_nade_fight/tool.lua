@@ -213,7 +213,7 @@ minetest.register_entity("ctf_mode_nade_fight:black_hole", {
 
 local KNOCKBACK_AMOUNT = 40
 local KNOCKBACK_AMOUNT_WITH_FLAG = 25
-local KNOCKBACK_RADIUS = 3.2
+local KNOCKBACK_RADIUS = 3.3
 grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 	description = "Knockback Grenade, players within a very small area take extreme knockback",
 	image = "ctf_mode_nade_fight_knockback_grenade.png",
@@ -255,7 +255,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 
 			if player and v:is_player() and v:get_hp() > 0 and v:get_properties().pointable and
 			(vname == name or ctf_teams.get(vname) ~= ctf_teams.get(name)) then
-				local footpos = vector.offset(v:get_pos(), 0, 0.1, 0)
+				local footpos = vector.offset(v:get_pos(), 0, 0.2, 0)
 				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
 				local footdist = vector.distance(pos, footpos)
 				local headdist = vector.distance(pos, headpos)
