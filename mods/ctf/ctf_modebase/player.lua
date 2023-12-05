@@ -7,6 +7,13 @@ ctf_settings.register("auto_trash_stone_swords", {
 	default = "false"
 })
 
+ctf_settings.register("auto_trash_stone_tools", {
+	type = "bool",
+	label = "Auto-trash stone tools when you pick up a better one",
+	description = "Only triggers when picking up tools from the ground",
+	default = "false"
+})
+
 local simplify_for_saved_stuff = function(iname)
 	if not iname or iname == "" then return iname end
 
@@ -212,10 +219,16 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 						local cprio = func(compare)
 
 						if cprio and cprio < priority then
+							local item, type = simplify_for_saved_stuff(compare:get_name())
 							inv:set_stack("main", i, itemstack)
 
-							if compare:get_name() == "ctf_melee:sword_stone" and
-							ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
+							if item == "sword" and type == "stone" and
+							   ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
+								return ItemStack("")
+							end
+
+							if item ~= "sword" and type == "stone" and
+							   ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
 								return ItemStack("")
 							else
 								local result = inv:add_item("main", compare):get_count()
@@ -224,14 +237,12 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 									return ItemStack("")
 								else
 									compare:set_count(result)
-
 									return compare
 								end
 							end
 						end
 					end
 				end
-
 				break -- We already found a place for it, don't check for one held by a different item type
 			end
 		end
