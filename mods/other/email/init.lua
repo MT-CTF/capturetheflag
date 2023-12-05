@@ -204,7 +204,9 @@ function email.send_mail(aname, ato, msg)
 
 	email.save()
 
-	minetest.chat_send_player(to, "Mail from " .. name .. ": " .. msg)
+	minetest.chat_send_player(to, minetest.colorize("#00FF00", "Mail from " .. minetest.colorize("#92C5FC", name) .. ": " .. msg))
+
+
 
 	return true, S("Message sent to @1", ato)
 end
