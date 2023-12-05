@@ -7,10 +7,10 @@ ctf_settings.register("auto_trash_stone_swords", {
 	default = "false"
 })
 
-ctf_settings.register("auto_trash_stone_pickaxes", {
+ctf_settings.register("auto_trash_stone_tools", {
 	type = "bool",
-	label = "Auto-trash stone pickaxes when you pick up a better pickaxe",
-	description = "Only triggers when picking up pickaxes from the ground",
+	label = "Auto-trash stone tools when you pick up a better one",
+	description = "Only triggers when picking up tools from the ground",
 	default = "false"
 })
 
@@ -219,15 +219,16 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 						local cprio = func(compare)
 
 						if cprio and cprio < priority then
+							local item, type = simplify_for_saved_stuff(compare:get_name())
 							inv:set_stack("main", i, itemstack)
 
-							if compare:get_name() == "ctf_melee:sword_stone" and
+							if item == "sword" and type == "stone" and
 							   ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
 								return ItemStack("")
 							end
 
-							if compare:get_name() == "default:pick_stone" and
-							   ctf_settings.get(picker, "auto_trash_stone_pickaxes") == "true" then
+							if item ~= "sword" and type == "stone" and
+							   ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
 								return ItemStack("")
 							else
 								local result = inv:add_item("main", compare):get_count()
