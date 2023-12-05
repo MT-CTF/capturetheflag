@@ -149,7 +149,7 @@ function grenades.register_grenade(name, def)
 		if pointed_thing.type ~= "node" then
 			grenades.throw_grenade(name, 17, user)
 
-			if not minetest.settings:get_bool("creative_mode") and def.stack_max > -1 then
+			if not minetest.settings:get_bool("creative_mode") and (def.stack_max or 99) > -1 then
 				itemstack:take_item(1)
 			end
 		end
