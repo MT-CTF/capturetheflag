@@ -159,6 +159,39 @@ minetest.register_chatcommand("map", {
 	end
 })
 
+minetest.register_chatcommand("place_buildtime_barrier", {
+	description = "Replaces air with Indestructible Red Barrier Glass, " ..
+		"stone with Indestructible Red Barrier Stone, " ..
+		"water with Indestructible Water Barrier Glass, " ..
+		"and lava with Indestructible Lava Barrier Glass",
+	privs = {ctf_map_editor = true},
+	func = function(name)
+		ctf_map.get_pos_from_player(name, 2, function(p, positions)
+			local pos1, pos2 = vector.sort(positions[1], positions[2])
+			for x = pos1.x, pos2.x do
+				for y = pos1.y, pos2.y do
+					for z = pos1.z, pos2.z do
+						local current_pos = {x = x, y = y, z = z}
+						local current_node = minetest.get_node_or_nil(current_pos)
+						if current_node then
+							if current_node.name == "air" then
+								minetest.set_node(current_pos, {name = "ctf_map:ind_glass_red"})
+							elseif current_node.name == "default:stone" then
+								minetest.set_node(current_pos, {name = "ctf_map:ind_stone_red"})
+							elseif current_node.name == "default:water_source" then
+								minetest.set_node(current_pos, {name = "ctf_map:ind_water"})
+							elseif current_node.name == "default:lava_source" then
+								minetest.set_node(current_pos, {name = "ctf_map:ind_lava"})
+							end
+						end
+					end
+				end
+			end
+			minetest.chat_send_player(name, "Build-time barrier placed")
+		end)
+	end
+})
+
 -- Attempt to restore user's time speed after server close
 local TIME_SPEED = minetest.settings:get("time_speed")
 
