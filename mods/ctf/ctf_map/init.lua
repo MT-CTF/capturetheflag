@@ -193,7 +193,7 @@ minetest.register_chatcommand("place_barrier", {
 				end
 				minetest.chat_send_player(name, "Build-time barrier placed")
 			end)
-		return true
+			return true
 		end
 		return false
 	end
