@@ -59,7 +59,7 @@ local snowball_def = {
 	}
 }
 
-grenades.register_grenade("throwable_snow:snowball", snowball_def)
+grenades.register_grenade("throwable_snow:snowball", table.copy(snowball_def))
 
 snowball_def.stack_max = -1
 grenades.register_grenade("throwable_snow:infinite_snowball", snowball_def)
