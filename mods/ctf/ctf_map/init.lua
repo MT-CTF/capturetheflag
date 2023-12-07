@@ -204,7 +204,8 @@ minetest.register_chatcommand("place_barrier", {
 								or z == pos1.z or z == pos2.z then
 								local current_node = minetest.get_node_or_nil(current_pos)
 								if current_node then
-									if current_node.name == "air" then
+									if current_node.name == "air" or
+										current_node.name == "ctf_map:ignore" then
 										minetest.set_node(current_pos, {name = "ctf_map:ind_glass"})
 									else
 										minetest.set_node(current_pos, {name = "ctf_map:stone"})
