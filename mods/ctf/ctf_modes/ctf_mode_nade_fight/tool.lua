@@ -213,7 +213,7 @@ minetest.register_entity("ctf_mode_nade_fight:black_hole", {
 
 local KNOCKBACK_AMOUNT = 40
 local KNOCKBACK_AMOUNT_WITH_FLAG = 25
-local KNOCKBACK_RADIUS = 3.3
+local KNOCKBACK_RADIUS = 3
 grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 	description = "Knockback Grenade, players within a very small area take extreme knockback",
 	image = "ctf_mode_nade_fight_knockback_grenade.png",
@@ -255,58 +255,46 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 
 			if player and v:is_player() and v:get_hp() > 0 and v:get_properties().pointable and
 			(vname == name or ctf_teams.get(vname) ~= ctf_teams.get(name)) then
-				local footpos = vector.offset(v:get_pos(), 0, 0.2, 0)
 				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
-				local footdist = vector.distance(pos, footpos)
-				local headdist = vector.distance(pos, headpos)
-				local target_head = false
 
-				if footdist >= headdist then
-					target_head = true
+				v:punch(player, 1, {
+					punch_interval = 1,
+					damage_groups = {
+						fleshy = 1,
+						knockback_grenade = 1,
+					}
+				}, nil)
+
+				minetest.add_particlespawner({
+					attached = v,
+					amount = 10,
+					time = 1,
+					minpos = {x = 0, y = 1, z = 0}, -- Offset to middle of player
+					maxpos = {x = 0, y = 1, z = 0},
+					minvel = {x = 0, y = 0, z = 0},
+					maxvel = v:get_velocity(),
+					minacc = {x = 0, y = -9, z = 0},
+					maxacc = {x = 0, y = -9, z = 0},
+					minexptime = 1,
+					maxexptime = 2.8,
+					minsize = 4,
+					maxsize = 5,
+					collisiondetection = false,
+					collision_removal = false,
+					vertical = false,
+					texture = "grenades_smoke.png",
+				})
+
+				local kb
+				if ctf_modebase.taken_flags[vname] then
+					kb = KNOCKBACK_AMOUNT_WITH_FLAG
+				else
+					kb = KNOCKBACK_AMOUNT
 				end
 
-				local hit_pos1 = check_hit(pos, target_head and headpos or footpos, v)
-
-				-- Check the closest distance, but if that fails try targeting the farther one
-				if hit_pos1 or check_hit(pos, target_head and footpos or headpos, v) then
-					v:punch(player, 1, {
-						punch_interval = 1,
-						damage_groups = {
-							fleshy = 1,
-							knockback_grenade = 1,
-						}
-					}, nil)
-					minetest.add_particlespawner({
-						attached = v,
-						amount = 10,
-						time = 1,
-						minpos = {x = 0, y = 1, z = 0}, -- Offset to middle of player
-						maxpos = {x = 0, y = 1, z = 0},
-						minvel = {x = 0, y = 0, z = 0},
-						maxvel = v:get_velocity(),
-						minacc = {x = 0, y = -9, z = 0},
-						maxacc = {x = 0, y = -9, z = 0},
-						minexptime = 1,
-						maxexptime = 2.8,
-						minsize = 4,
-						maxsize = 5,
-						collisiondetection = false,
-						collision_removal = false,
-						vertical = false,
-						texture = "grenades_smoke.png",
-					})
-
-					local kb
-					if ctf_modebase.taken_flags[vname] then
-						kb = KNOCKBACK_AMOUNT_WITH_FLAG
-					else
-						kb = KNOCKBACK_AMOUNT
-					end
-
-					local dir = vector.direction(pos, headpos)
-					if dir.y < 0 then dir.y = 0 end
-					v:add_velocity(vector.multiply(dir, kb))
-				end
+				local dir = vector.direction(pos, headpos)
+				if dir.y < 0 then dir.y = 0 end
+				v:add_velocity(vector.multiply(dir, kb))
 			end
 		end
 	end,
