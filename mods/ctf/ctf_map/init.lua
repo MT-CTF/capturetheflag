@@ -160,7 +160,10 @@ minetest.register_chatcommand("map", {
 })
 
 minetest.register_chatcommand("place_barrier", {
-	description = "Place build-time barriers or outer barriers",
+	description = "Place build-time barriers or outer barriers\n" ..
+		"buildtime: Within the selected area, replace certain nodes with the " ..
+		"corresponding build-time barrier\nouter: Surrounds the selected area " ..
+		"with an indestructible glass/stone barrier",
 	privs = {ctf_map_editor = true},
 	params = "[buildtime] | [outer]",
 	func = function(name, params)
@@ -168,13 +171,20 @@ minetest.register_chatcommand("place_barrier", {
 			return false, "Run /place_barriers [buildtime] | [outer]"
 		end
 
-		if params == "buildtime" then
-			ctf_map.get_pos_from_player(name, 2, function(p, positions)
-				local pos1, pos2 = vector.sort(positions[1], positions[2])
+		if ctf_core.settings.server_mode ~= "mapedit" then
+			return false, minetest.colorize("red", "You have to be in mapedit mode to run this")
+		end
 
-				for x = pos1.x, pos2.x do
-					for y = pos1.y, pos2.y do
-						for z = pos1.z, pos2.z do
+		if params ~= "buildtime" and params ~= "outer" then
+			return false
+		end
+
+		ctf_map.get_pos_from_player(name, 2, function(p, positions)
+			local pos1, pos2 = vector.sort(positions[1], positions[2])
+			for x = pos1.x, pos2.x do
+				for y = pos1.y, pos2.y do
+					for z = pos1.z, pos2.z do
+						if params == "buildtime" then
 							local current_pos = {x = x, y = y, z = z}
 							local current_node = minetest.get_node_or_nil(current_pos)
 							if current_node then
@@ -188,14 +198,26 @@ minetest.register_chatcommand("place_barrier", {
 									minetest.set_node(current_pos, {name = "ctf_map:ind_lava"})
 								end
 							end
+						elseif params == "outer" then
+							local current_pos = {x = x, y = y, z = z}
+							if x == pos1.x or x == pos2.x or y == pos1.y
+								or z == pos1.z or z == pos2.z then
+								local current_node = minetest.get_node_or_nil(current_pos)
+								if current_node then
+									if current_node.name == "air" then
+										minetest.set_node(current_pos, {name = "ctf_map:ind_glass"})
+									else
+										minetest.set_node(current_pos, {name = "ctf_map:stone"})
+									end
+								end
+							end
 						end
 					end
 				end
-				minetest.chat_send_player(name, "Build-time barrier placed")
-			end)
+			end
+			minetest.chat_send_player(name, params ..  " barrier placed")
 			return true
-		end
-		return false
+		end)
 	end
 })
 
