@@ -217,7 +217,6 @@ minetest.register_chatcommand("place_barrier", {
 				end
 			end
 			minetest.chat_send_player(name, params ..  " barrier placed")
-			return true
 		end)
 	end
 })
