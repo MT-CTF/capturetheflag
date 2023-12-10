@@ -242,7 +242,7 @@ minetest.register_node("ctf_map:chest", chest_def)
 
 minetest.register_chatcommand("indestructify", {
 	description = "Replaces all destructible nodes in a region with their indestructible " ..
-					"variants if they exist.",
+		"variants if they exist.",
 	privs = {ctf_map_editor = true},
 	params = "",
 	func = function(name, params)
