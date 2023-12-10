@@ -239,3 +239,84 @@ ochest_def.on_rightclick = nil
 
 minetest.register_node("ctf_map:chest_opened", ochest_def)
 minetest.register_node("ctf_map:chest", chest_def)
+
+minetest.register_chatcommand("indestructify", {
+	description = "Replaces all destructible nodes in a region with their indestructible " ..
+					"variants if they exist.",
+	privs = {ctf_map_editor = true},
+	params = "",
+	func = function(name, params)
+		if ctf_core.settings.server_mode ~= "mapedit" then
+			return false, minetest.colorize("red", "You need to be in mapedit mode to run this command.")
+		end
+
+		ctf_map.get_pos_from_player(name, 2, function(p, positions)
+			local pos1, pos2 = vector.sort(positions[1], positions[2])
+
+			for x = pos1.x, pos2.x do
+				for y = pos1.y, pos2.y do
+					for z = pos1.z, pos2.z do
+						local pos = vector.new(x, y, z)
+						local node = minetest.get_node(pos)
+						local str = node.name:match("%S+:(%S+)")
+
+						if not node.name:match("ctf_map:") and str then
+							node.name = "ctf_map:" .. str
+							if minetest.registered_nodes[node.name] then
+								minetest.swap_node(pos, node)
+							end
+						end
+					end
+				end
+			end
+			minetest.chat_send_player(name, minetest.colorize(
+				"yellow",
+				"Replaced all destructible nodes in the region with their indestructible variants if they exist."
+			))
+		end)
+	end,
+})
+
+minetest.register_chatcommand("destructify", {
+	description = "Replaces all indestructible nodes in a region with their indestructible " ..
+		"variants if they exist.",
+	privs = {ctf_map_editor = true},
+	params = "",
+	func = function(name, params)
+		if ctf_core.settings.server_mode ~= "mapedit" then
+			return false, minetest.colorize("red", "You need to be in mapedit mode to run this command.")
+		end
+
+		ctf_map.get_pos_from_player(name, 2, function(p, positions)
+			local pos1, pos2 = vector.sort(positions[1], positions[2])
+
+			for x = pos1.x, pos2.x do
+				for y = pos1.y, pos2.y do
+					for z = pos1.z, pos2.z do
+						local pos = vector.new(x, y, z)
+						local node = minetest.get_node(pos)
+						local str = node.name:match("%S+:(%S+)")
+
+						if node.name:match("ctf_map:") and str then
+							local target_node_name
+							for _, rnode in pairs(minetest.registered_nodes) do
+								if rnode.name:match(":" .. str .. "$") and not rnode.name:match("ctf_map:") then
+									target_node_name = rnode.name
+								end
+							end
+							if target_node_name then
+								node.name = target_node_name
+								minetest.swap_node(pos, node)
+							end
+						end
+					end
+				end
+			end
+			minetest.chat_send_player(name, minetest.colorize(
+				"yellow",
+				"Replaced all indestructible nodes with their destructible variants if they exist."
+			))
+		end)
+	end,
+})
+
