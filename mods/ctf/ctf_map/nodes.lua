@@ -261,7 +261,13 @@ minetest.register_chatcommand("indestructify", {
 						local str = node.name:match("%S+:(%S+)")
 
 						if not node.name:match("ctf_map:") and str then
-							node.name = "ctf_map:" .. str
+							-- Edge case: wool:red -> ctf_map:wool_red
+							if node.name:match("wool:") then
+								local wool_color = node.name:match("wool:(%S+)")
+								node.name = "ctf_map:wool_" .. wool_color
+							else
+								node.name = "ctf_map:" .. str
+							end
 							if minetest.registered_nodes[node.name] then
 								minetest.swap_node(pos, node)
 							end
@@ -298,10 +304,16 @@ minetest.register_chatcommand("destructify", {
 						local str = node.name:match("%S+:(%S+)")
 
 						if node.name:match("ctf_map:") and str then
+							-- Edge case: ctf_map:wool_red -> wool:red
 							local target_node_name
-							for _, rnode in pairs(minetest.registered_nodes) do
-								if rnode.name:match(":" .. str .. "$") and not rnode.name:match("ctf_map:") then
-									target_node_name = rnode.name
+							if node.name:match("ctf_map:wool") then
+								local wool_color = node.name:match("ctf_map:wool_(%S+)")
+								target_node_name = "wool:" .. wool_color
+							else
+								for _, rnode in pairs(minetest.registered_nodes) do
+									if rnode.name:match(":" .. str .. "$") and not rnode.name:match("ctf_map:") then
+										target_node_name = rnode.name
+									end
 								end
 							end
 							if target_node_name then
@@ -319,4 +331,3 @@ minetest.register_chatcommand("destructify", {
 		end)
 	end,
 })
-
