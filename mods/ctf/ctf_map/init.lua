@@ -180,8 +180,20 @@ minetest.register_chatcommand("ctf_barrier", {
 			return false
 		end
 
+		if params == "place_outer" then
+			minetest.chat_send_player(name,
+				minetest.colorize("yellow", "Warning: this action can't be undone"))
+		end
+
 		ctf_map.get_pos_from_player(name, 2, function(p, positions)
 			local pos1, pos2 = vector.sort(positions[1], positions[2])
+
+			if params == "place_buildtime" and pos1.x ~= pos2.x and pos1.z ~= pos2.z then
+				minetest.chat_send_player(name, minetest.colorize("yellow",
+					"Warning: your build-time barrier is more than 1 node thick, " ..
+					"use /ctf_barrier remove_buildtime to remove unwanted parts"))
+			end
+
 			for x = pos1.x, pos2.x do
 				for y = pos1.y, pos2.y do
 					for z = pos1.z, pos2.z do
@@ -220,7 +232,8 @@ minetest.register_chatcommand("ctf_barrier", {
 								local current_node = minetest.get_node_or_nil(current_pos)
 								if current_node then
 									if current_node.name == "air" or
-										current_node.name == "ctf_map:ignore" then
+										current_node.name == "ctf_map:ignore" or
+										current_node.name == "ignore" then
 										minetest.set_node(current_pos, {name = "ctf_map:ind_glass"})
 									else
 										minetest.set_node(current_pos, {name = "ctf_map:stone"})
@@ -231,7 +244,11 @@ minetest.register_chatcommand("ctf_barrier", {
 					end
 				end
 			end
-			minetest.chat_send_player(name, params ..  " barrier placed")
+			local message =
+				(params == "place_buildtime" and "Build-time barrier placed") or
+				(params == "remove_buildtime" and "Build-time barrier removed") or
+				(params == "place_outer" and "Outer barrier placed")
+			minetest.chat_send_player(name, message)
 		end)
 	end
 })
