@@ -159,23 +159,24 @@ minetest.register_chatcommand("map", {
 	end
 })
 
-minetest.register_chatcommand("place_barrier", {
-	description = "Place build-time barriers or outer barriers\n" ..
-		"buildtime: Within the selected area, replace certain nodes with the " ..
-		"corresponding build-time barrier\nouter: Surrounds the selected area " ..
+minetest.register_chatcommand("ctf_barrier", {
+	description = "Place or remove map barriers\n" ..
+		"place_buildtime: Within the selected area, replace certain nodes with the " ..
+		"corresponding build-time barrier\nremove_buildtime: Remove build-time " ..
+		"barriers within the selected area\nplace_outer: Surrounds the selected area " ..
 		"with an indestructible glass/stone barrier",
 	privs = {ctf_map_editor = true},
-	params = "[buildtime] | [outer]",
+	params = "[place_buildtime] | [remove_buildtime] | [place_outer]",
 	func = function(name, params)
 		if not params or params == "" then
-			return false, "Run /place_barriers [buildtime] | [outer]"
+			return false, "See /help ctf_barrier for usage instructions"
 		end
 
 		if ctf_core.settings.server_mode ~= "mapedit" then
 			return false, minetest.colorize("red", "You have to be in mapedit mode to run this")
 		end
 
-		if params ~= "buildtime" and params ~= "outer" then
+		if params ~= "place_buildtime" and params ~= "remove_buildtime" and params ~= "place_outer" then
 			return false
 		end
 
@@ -184,7 +185,7 @@ minetest.register_chatcommand("place_barrier", {
 			for x = pos1.x, pos2.x do
 				for y = pos1.y, pos2.y do
 					for z = pos1.z, pos2.z do
-						if params == "buildtime" then
+						if params == "place_buildtime" then
 							local current_pos = {x = x, y = y, z = z}
 							local current_node = minetest.get_node_or_nil(current_pos)
 							if current_node then
@@ -198,7 +199,21 @@ minetest.register_chatcommand("place_barrier", {
 									minetest.set_node(current_pos, {name = "ctf_map:ind_lava"})
 								end
 							end
-						elseif params == "outer" then
+						elseif params == "remove_buildtime" then
+							local current_pos = {x = x, y = y, z = z}
+							local current_node = minetest.get_node_or_nil(current_pos)
+							if current_node then
+								if current_node.name == "ctf_map:ind_glass_red" then
+									minetest.set_node(current_pos, {name = "air"})
+								elseif current_node.name == "ctf_map:ind_stone_red" then
+									minetest.set_node(current_pos, {name = "default:stone"})
+								elseif current_node.name == "ctf_map:ind_water" then
+									minetest.set_node(current_pos, {name = "default:water_source"})
+								elseif current_node.name == "ctf_map:ind_lava" then
+									minetest.set_node(current_pos, {name = "default:lava_source"})
+								end
+							end
+						elseif params == "place_outer" then
 							local current_pos = {x = x, y = y, z = z}
 							if x == pos1.x or x == pos2.x or y == pos1.y
 								or z == pos1.z or z == pos2.z then
