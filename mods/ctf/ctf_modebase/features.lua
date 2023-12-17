@@ -699,7 +699,7 @@ return {
 		                 "5 captures, and at least 8,000 score to access the pro section."
 		if rank then
 			local captures_needed = math.max(0, 5 - (rank.flag_captures or 0))
-			local score_needed = math.max(math.max(0, 8000 - (rank.score or 0)))
+			local score_needed = math.floor(math.max(0, 8000 - (rank.score or 0)))
 			local current_kd = math.floor((rank.kills or 0) / (rank.deaths or 1) * 10)
 			current_kd = current_kd / 10
 			deny_pro = deny_pro .. " You still need " .. captures_needed
