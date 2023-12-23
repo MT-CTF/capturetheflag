@@ -42,7 +42,7 @@ function ctf_modebase.skip_vote.start_vote()
 	for _, player in ipairs(minetest.get_connected_players()) do
 		add_vote_hud(player)
 		minetest.sound_play("ctf_modebase_notification", {
-			gain = 1.0,
+			gain = 0.8,
 			pitch = 1.0,
 		}, true)
 		voters_count = voters_count + 1
@@ -176,6 +176,7 @@ local function player_vote(name, vote)
 	local player = minetest.get_player_by_name(name)
 	if hud:exists(player, "skip_vote:vote") then
 		hud:remove(player, "skip_vote:vote")
+		hud:remove(player, "skip_vote:background")
 	end
 
 	if voters_count == 0 then
