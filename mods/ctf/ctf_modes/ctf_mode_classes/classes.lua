@@ -9,6 +9,7 @@ local class_list = {"knight", "ranged", "support"}
 local class_props = {
 	knight = {
 		name = "Knight",
+		color = "grey",
 		description = "High HP class with a sword capable of short damage bursts",
 		hp_max = 30,
 		visual_size = vector.new(1.1, 1.05, 1.1),
@@ -23,6 +24,7 @@ local class_props = {
 	},
 	support = {
 		name = "Support",
+		color = "cyan",
 		description = "Helper class with healing bandages, an immunity ability, and building gear",
 		physics = {speed = 1.1},
 		items = {
@@ -43,6 +45,7 @@ local class_props = {
 	},
 	ranged = {
 		name = "Scout",
+		color = "orange",
 		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
 		visual_size = vector.new(0.9, 1, 0.9),
 		items = {
@@ -65,37 +68,29 @@ minetest.register_on_mods_loaded(function()
 
 		for _, iname in ipairs(class_prop.items or {}) do
 			local item = ItemStack(iname)
-			local count = item:get_count()
 
-			if count <= 1 then
-				count = nil
-			else
-				count = " x"..count
-			end
 
-			local desc = string.split(item:get_description(), "\n", false, 1)
-			items_markup = string.format("%s%s\n<item name=%s float=left width=48>\n\n\n",
+			items_markup = string.format("%s <item name=%s width=48>",
 				items_markup,
-				minetest.formspec_escape(desc[1]) .. (count and count or ""),
 				item:get_name()
 			)
 		end
 
 		for _, iname in ipairs(class_prop.disallowed_items or {}) do
 			if minetest.registered_items[iname] then
-				disallowed_items_markup = string.format("%s<item name=%s width=48>",
+				disallowed_items_markup = string.format("%s <item name=%s width=48>",
 					disallowed_items_markup,
 					iname
 				)
 			else
-				disallowed_items_markup = string.format("%s<img name=%s width=48>",
+				disallowed_items_markup = string.format("%s <img name=%s width=48>",
 					disallowed_items_markup,
 					class_prop.disallowed_items_markup[iname]
 				)
 			end
 		end
 
-		class_props[k].items_markup = items_markup:sub(1, -2) -- Remove \n at the end of str
+		class_props[k].items_markup = items_markup.."\n"
 		class_props[k].disallowed_items_markup = disallowed_items_markup
 	end
 end)
@@ -432,61 +427,41 @@ function classes.show_class_formspec(player)
 
 		ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", function(context)
 			local form_x, form_y = 12, 10
+			local pad = 0.3
 
-			local bar_h = 2.2
-			local bw = 5
+			local bw = 3
 
 			local class = context.class
-			local class_prop = class_props[class]
+			local class_prop = context.class_props[class]
 
-			local next_class = class_props[class_list[wrap_class(table.indexof(class_list, class) + 1)]].name
-			local prev_class = class_props[class_list[wrap_class(table.indexof(class_list, class) - 1)]].name
-
-			return ctf_gui.list_to_formspec_str({
+			local out = {
 				"formspec_version[4]",
 				{"size[%f,%f]", form_x, form_y+1.1},
 				"real_coordinates[true]",
-				{"hypertext[0,0.2;%f,1.3;title;<bigger><center><b>Class Selection</b></center></bigger>]", form_x},
+				{"hypertext[0,0.2;%f,1.6;title;<big><center><b>Class Info: %s</b></center></big>]", form_x, class_prop.name},
 
-				{"hypertext[0,%f;%f,1;classname;<bigger><center><style color=#0DD>%s</style></center></bigger>]",
-					bar_h-0.9,
-					form_x,
-					class_prop.name
+				{"box[%s,1.2;%f,%f;#00000077]", pad, ((form_x/2)-0.7) - pad, form_y-2.4},
+				{"model[%s,1.4;%f,%f;classpreview;character.b3d;%s,blank.png;{0,160};;;]",
+					pad,
+					((form_x/2)-0.7) - pad,
+					form_y-2.6,
+					ctf_cosmetics.get_colored_skin(context.player, context.pteam and ctf_teams.team[context.pteam].color) ..
+							context.classes.get_skin_overlay(class, true) or ""
 				},
-				{"box[0,%f;%f,0.8;#00000022]", bar_h-0.9, form_x},
-
-				{"image_button[0.1,%f;0.8,0.8;creative_prev_icon.png;prev_class;]", bar_h-0.9},
-				{"hypertext[1,%f;%f,1;classprev;<left><big><style color=#0DD>%s</style></big></left>]",
-					bar_h-0.7,
-					(form_x/2) - 1,
-					prev_class
-				},
-
-				{"image_button[%f,%f;0.8,0.8;creative_next_icon.png;next_class;]", form_x-0.9, bar_h-0.9},
-				{"hypertext[%f,%f;%f,1;classprev;<right><big><style color=#0DD>%s</style></big></right>]",
-					(form_x/2),
-					bar_h-0.7,
-					(form_x/2) - 1,
-					next_class
-				},
-
-				{"box[0.1,2.3;%f,%f;#00000077]", (form_x/2)-0.8, form_y-2.4},
-				{"model[0.1,2.3;%f,%f;classpreview;character.b3d;%s,blank.png;{0,160};;;]",
-					(form_x/2)-0.8,
-					form_y-2.4,
-					ctf_cosmetics.get_colored_skin(player, pteam and ctf_teams.team[pteam].color) ..
-							classes.get_skin_overlay(class, true) or ""
-				},
-				{[[hypertext[%f,2.3;%f,%f;info;<global font=mono background=#00000044>
+				{[[hypertext[%f,1.2;%f,%f;info;<global margin=20 font=mono background=#00000044>
+					</b>
 					<center>%s</center>
+
+
 					<img name=heart.png width=20 float=left> %d HP
 					%s
+					Special items
 					%s
 					Disallowed Items
 					%s
 					] ]],
 					(form_x/2)-0.6,
-					(form_x/2)+0.5,
+					(form_x/2)+0.6 - pad,
 					form_y-2.4,
 					class_prop.description,
 					class_prop.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
@@ -495,45 +470,61 @@ function classes.show_class_formspec(player)
 					class_prop.items_markup,
 					class_prop.disallowed_items_markup
 				},
-				"style[select;font_size=*1.5]",
-				{"button_exit[%f,%f;%f,1;select;Choose Class]", (form_x/2) - (bw/2), form_y, bw},
-			})
+			}
+
+			local tb = #context.class_list -- total buttons
+			for i, c in pairs(context.class_list) do
+				local sect = (i-1)/(tb-1)
+				table.insert(out, {
+					"style[select_%s;font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
+					"style[show_%s;padding=8,8;bgcolor="..context.class_props[c].color.."]",
+					c,
+					20 + 8,
+					c,
+				})
+				table.insert(out,
+					{"button_exit[%f,%f;%f,1;select_%s;%s]", pad + (((form_x-(pad*2 + bw))) * sect), form_y-0.5, bw, c, context.class_props[c].name}
+				)
+				table.insert(out,
+					{"image_button[%f,%f;1,1;settings_info.png;show_%s;]", pad + (((form_x-(pad*2 + bw))) * sect) + bw - 1, form_y-0.5, c}
+				)
+				table.insert(out,
+					{"tooltip[show_%s;Click to show class info]", c}
+				)
+			end
+
+			return ctf_gui.list_to_formspec_str(out)
 		end, {
+			classes = classes,
+			player = player,
+			pteam = pteam,
+			wrap_class = wrap_class,
+			class_list = class_list,
+			class_props = class_props,
 			class = classes.get_name(player) or "knight",
 			_on_formspec_input = function(pname, context, fields)
-				if fields.prev_class then
-					local classidx = table.indexof(class_list, context.class) - 1
+				if ctf_modebase.current_mode ~= "classes" then return end
 
-					if classidx < 1 then
-						classidx = #class_list
+				for _, class in pairs(context.class_list) do
+					if fields["show_"..class] then
+						context.class = class
+
+						return "refresh"
 					end
 
-					context.class = class_list[classidx]
+					if fields["select_"..class] then
+						if dist_from_flag(player) > 5 then
+							hud_events.new(player, {
+								quick = true,
+								text = "You can only change class at your flag!",
+								color = "warning",
+							})
 
-					return "refresh"
-				elseif fields.next_class then
-					local classidx = table.indexof(class_list, context.class) + 1
+							return
+						end
 
-					if classidx > #class_list then
-						classidx = 1
+						select_class(pname, class)
 					end
-
-					context.class = class_list[classidx]
-
-					return "refresh"
-				elseif fields.select and classes.get_name(player) ~= context.class then
-					if ctf_modebase.current_mode ~= "classes" then return end
-
-					if dist_from_flag(player) > 5 then
-						hud_events.new(player, {
-							quick = true,
-							text = "You can only change class at your flag!",
-							color = "warning",
-						})
-						return
-					end
-
-					select_class(pname, context.class)
 				end
 			end,
 		})
@@ -564,8 +555,28 @@ function classes.is_restricted_item(player, name)
 	end
 end
 
+function classes.reset_class_cooldowns(player)
+	if not player then
+		minetest.log("action", "Resetting class cooldowns for all players")
+
+		for _, p in pairs(minetest.get_connected_players()) do
+			if cooldowns:get(p) then
+				cooldowns:set(p)
+			end
+		end
+	else
+		minetest.log("action", "Resetting class cooldowns for player "..dump(PlayerName(player)))
+
+		if cooldowns:get(player) then
+			cooldowns:set(player)
+		end
+	end
+end
+
 function classes.finish()
 	for _, player in pairs(minetest.get_connected_players()) do
+		classes.reset_class_cooldowns()
+
 		player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
 		physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
 	end

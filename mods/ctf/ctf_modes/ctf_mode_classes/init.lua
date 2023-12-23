@@ -117,7 +117,11 @@ ctf_modebase.register_mode("classes", {
 
 		classes.finish()
 	end,
-	on_new_match = features.on_new_match,
+	on_new_match = function()
+		features.on_new_match()
+
+		classes.reset_class_cooldowns()
+	end,
 	on_match_end = features.on_match_end,
 	team_allocator = features.team_allocator,
 	on_allocplayer = function(player, new_team)
@@ -126,7 +130,11 @@ ctf_modebase.register_mode("classes", {
 	end,
 	on_leaveplayer = features.on_leaveplayer,
 	on_dieplayer = features.on_dieplayer,
-	on_respawnplayer = features.on_respawnplayer,
+	on_respawnplayer = function(player, ...)
+		features.on_respawnplayer(player, ...)
+
+		classes.reset_class_cooldowns(player)
+	end,
 	can_take_flag = features.can_take_flag,
 	on_flag_take = features.on_flag_take,
 	on_flag_drop = features.on_flag_drop,
