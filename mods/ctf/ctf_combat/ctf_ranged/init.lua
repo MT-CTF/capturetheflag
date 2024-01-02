@@ -90,6 +90,36 @@ function ctf_ranged.can_use_gun(player, name)
 	return true
 end
 
+--- Play ephemeral sound on the spot of a player.
+-- @param user ObjectRef: The player object.
+-- @param sound_name str: The name of the sound to be played.
+-- @param spec? table: The SimpleSoundSpec of the sound. Some fields are overriden.
+local function play_player_positional_sound(user, sound_name, spec)
+	-- This function handles positional sounds that are
+	-- supposed to be heared equally on both left and right channel
+	-- by the user, while being heared at the position of the player
+	-- by other players.
+	-- Such a mechanism is mainly used on gunshot sounds,
+	-- so the ephemeral flag is set.
+
+	-- The spec table is copied as a base for the SimpleSoundSpec.
+	-- If not supplied, one is created without any customizations.
+
+	local user_name = user:get_player_name()
+
+	-- Two copies of SimpleSoundSpec
+
+	local non_user_spec = spec and table.copy(spec) or {}
+	non_user_spec.pos = user:get_pos()
+	non_user_spec.exclude_player = user_name
+
+	local user_spec = spec and table.copy(spec) or {}
+	user_spec.to_player = user_name
+
+	minetest.sound_play(sound_name, non_user_spec, true)
+	minetest.sound_play(sound_name, user_spec, true)
+end
+
 function ctf_ranged.simple_register_gun(name, def)
 	minetest.register_tool(rawf.also_register_loaded_tool(name, {
 		description = def.description,
@@ -100,17 +130,20 @@ function ctf_ranged.simple_register_gun(name, def)
 		groups = {ranged = 1, [def.type] = 1, tier = def.tier or 1, not_in_creative_inventory = 1},
 		on_use = function(itemstack, user)
 			if not ctf_ranged.can_use_gun(user, name) then
-				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				play_player_positional_sound(user, "ctf_ranged_click")
 				return
 			end
 
 			local result = rawf.load_weapon(itemstack, user:get_inventory())
 
+			local sound_name
 			if result:get_name() == itemstack:get_name() then
-				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				sound_name = "ctf_ranged_click"
 			else
-				minetest.sound_play("ctf_ranged_reload", {pos = user:get_pos()}, true)
+				sound_name = "ctf_ranged_reload"
 			end
+
+			play_player_positional_sound(user, sound_name)
 
 			return result
 		end,
@@ -124,7 +157,7 @@ function ctf_ranged.simple_register_gun(name, def)
 		loaded_def.on_secondary_use = def.on_secondary_use
 		loaded_def.on_use = function(itemstack, user)
 			if not ctf_ranged.can_use_gun(user, name) then
-				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				play_player_positional_sound(user, "ctf_ranged_click")
 				return
 			end
 
@@ -159,7 +192,7 @@ function ctf_ranged.simple_register_gun(name, def)
 				rays = rawf.spread_bulletcast(def.bullet, spawnpos, endpos, true, true)
 			end
 
-			minetest.sound_play(def.fire_sound, {pos = user:get_pos()}, true)
+			play_player_positional_sound(user, def.fire_sound)
 
 			for _, ray in pairs(rays) do
 				process_ray(ray, user, look_dir, def)
