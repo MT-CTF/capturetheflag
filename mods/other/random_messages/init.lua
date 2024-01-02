@@ -4,7 +4,7 @@ arsdragonfly@gmail.com
 6/19/2013
 --]]
 --Time between two subsequent messages.
-local MESSAGE_INTERVAL = 0
+-- local MESSAGE_INTERVAL = 0
 local S = minetest.get_translator(minetest.get_current_modname())
 
 math.randomseed(os.time())
@@ -18,10 +18,10 @@ function random_messages.initialize() --Set the interval in minetest.conf.
 	return 60
 end
 
-function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
-	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval"))
-							or random_messages.initialize()
-end
+-- function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
+-- 	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval"))
+-- 							or random_messages.initialize()
+-- end
 
 function random_messages.check_params(name,func,params)
 	local stat, msg = func(params)
@@ -91,6 +91,10 @@ function random_messages.display_message(message_number)
 	end
 end
 
+function random_messages.get_random_message()
+	return random_messages.messages[math.random(1, #random_messages.messages)]
+end
+
 function random_messages.show_message()
 	local message = random_messages.messages[math.random(1, #random_messages.messages)]
 	random_messages.display_message(message)
@@ -123,14 +127,14 @@ function random_messages.save_messages()
 end
 
 --When server starts:
-random_messages.set_interval()
+-- random_messages.set_interval()
 random_messages.read_messages()
 
-local function step(dtime)
-	random_messages.show_message()
-	minetest.after(MESSAGE_INTERVAL, step)
-end
-minetest.after(MESSAGE_INTERVAL, step)
+-- local function step(dtime)
+-- 	random_messages.show_message()
+-- 	minetest.after(MESSAGE_INTERVAL, step)
+-- end
+-- minetest.after(MESSAGE_INTERVAL, step)
 
 local register_chatcommand_table = {
 	params = "viewmessages | removemessage <number> | addmessage <number>",
