@@ -43,6 +43,15 @@ local function update_playertag(player, t, nametag, team_nametag, team_symbol_na
 		end
 	end
 
+	if not team_nametag.object or not team_symbol_nametag.object or not nametag.object then
+		minetest.log("warning", "update_playertag failed, invalid object: " ..
+			(not team_nametag.object) .. ", " ..
+			(not team_symbol_nametag.object) .. ", " ..
+			(not nametag.object) .. ", "
+		)
+		return
+	end
+
 	team_nametag.object:set_observers(nametag_players)
 	team_symbol_nametag.object:set_observers(symbol_players)
 	nametag.object:set_observers(entity_players)
