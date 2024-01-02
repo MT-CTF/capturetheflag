@@ -4,7 +4,7 @@ local hud = mhud.init()
 
 local HUD_SHOW_TIME = 3
 local HUD_SHOW_QUICK_TIME = 2
-local HUD_SHOW_NEXT_TIME = 1
+local HUD_SHOW_NEXT_TIME = 0.6
 
 local HUD_COLORS = {
 	primary = 0x0D6EFD,
