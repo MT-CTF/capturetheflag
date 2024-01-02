@@ -19,6 +19,11 @@ ctf_core.testing = {
 	end
 }
 
+local hud = mhud.init()
+local LOADING_SCREEN_TARGET_TIME = 7
+local loading_screen_time
+
+
 local function update_playertag(player, t, nametag, team_nametag, team_symbol_nametag)
 	local entity_players = {}
 	local nametag_players = table.copy(ctf_teams.online_players[t].players)
@@ -380,8 +385,49 @@ return {
 			ctf_modebase:get_current_mode().team_chest_items or {},
 			ctf_modebase:get_current_mode().blacklisted_nodes or {}
 		)
+
+		if loading_screen_time then
+			local total_time = (minetest.get_us_time() - loading_screen_time) / 1e6
+
+			minetest.log(dump(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time)))
+			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
+				hud:clear_all()
+			end)
+		end
 	end,
 	on_match_end = function()
+		for _, p in pairs(minetest.get_connected_players()) do
+			if ctf_teams.get(p) then
+				hud:add(p, {
+					hud_elem_type = "image",
+					position = {x = 0.5, y = 0.5},
+					image_scale = -100,
+					z_index = 1000,
+					texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
+				})
+
+				hud:add(p, {
+					hud_elem_type = "text",
+					position = {x = 0.5, y = 0.5},
+					alignment = {x = "center", y = "up"},
+					text_scale = 2,
+					text = "Loading Next Map...",
+					color = 0x5cb6ff,
+					z_index = 1001,
+				})
+				hud:add(p, {
+					hud_elem_type = "text",
+					position = {x = 0.5, y = 0.9},
+					alignment = {x = "center", y = "up"},
+					text = random_messages.get_random_message(),
+					color = 0xdddddd,
+					z_index = 1001,
+				})
+			end
+		end
+
+		loading_screen_time = minetest.get_us_time()
+
 		recent_rankings.on_match_end()
 
 		if ctf_map.current_map then
