@@ -40,7 +40,7 @@ function ctf_map.place_map(mapmeta, callback)
 			end
 		end
 
-		minetest.after(0, minetest.fix_light, mapmeta.pos1, mapmeta.pos2)
+		minetest.fix_light(mapmeta.pos1, mapmeta.pos2)
 
 		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 

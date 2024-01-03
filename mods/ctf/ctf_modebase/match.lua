@@ -4,6 +4,10 @@ local restart_on_next_match = false
 ctf_modebase.map_on_next_match = nil
 ctf_modebase.mode_on_next_match = nil
 
+-- Overridable
+function ctf_modebase.map_chosen(map)
+end
+
 function ctf_modebase.start_match_after_vote()
 	local old_mode = ctf_modebase.current_mode
 
@@ -22,6 +26,9 @@ function ctf_modebase.start_match_after_vote()
 	end
 
 	local map = ctf_modebase.map_catalog.maps[ctf_modebase.map_catalog.current_map]
+
+	ctf_modebase.map_chosen(map)
+
 	ctf_map.place_map(map, function()
 		-- Set time and time_speed
 		minetest.set_timeofday(map.start_time/24000)
