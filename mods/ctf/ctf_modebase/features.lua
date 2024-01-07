@@ -23,37 +23,6 @@ local hud = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
--- tag: map_image
-local old_announce = ctf_modebase.map_chosen
-function ctf_modebase.map_chosen(map, ...)
-	local found = false
-	for _, p in pairs(minetest.get_connected_players()) do
-		if hud:exists(p, "loading_screen") then
-			found = true
-
-			hud:add(p, "map_image", {
-				hud_elem_type = "image",
-				position = {x = 0.5, y = 0.5},
-				image_scale = -100,
-				z_index = 1001,
-				texture = map.dirname.."_screenshot.png^[opacity:30",
-			})
-
-			hud:change(p, "loading_text", {
-				text = "Loading Map: " .. map.name .. "...",
-			})
-		end
-	end
-
-	-- Reset loading screen timer
-	if found then
-		loading_screen_time = minetest.get_us_time()
-	end
-
-	return old_announce(map, ...)
-end
-
-
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
 	local entity_players = {}
 	local nametag_players = table.copy(ctf_teams.online_players[t].players)
@@ -136,6 +105,53 @@ local function set_playertags_state(state)
 			end
 		end
 	end
+end
+
+local old_announce = ctf_modebase.map_chosen
+function ctf_modebase.map_chosen(map, ...)
+	set_playertags_state(PLAYERTAGS_OFF)
+
+	for _, p in pairs(minetest.get_connected_players()) do
+		if ctf_teams.get(p) then
+			hud:add(p, "loading_screen", {
+				hud_elem_type = "image",
+				position = {x = 0.5, y = 0.5},
+				image_scale = -100,
+				z_index = 1000,
+				texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
+			})
+
+			hud:add(p, "map_image", {
+				hud_elem_type = "image",
+				position = {x = 0.5, y = 0.5},
+				image_scale = -100,
+				z_index = 1001,
+				texture = map.dirname.."_screenshot.png^[opacity:30",
+			})
+
+			hud:add(p, "loading_text", {
+				hud_elem_type = "text",
+				position = {x = 0.5, y = 0.5},
+				alignment = {x = "center", y = "up"},
+				text_scale = 2,
+				text = "Loading Map: " .. map.name .. "...",
+				color = 0x7ec5ff,
+				z_index = 1002,
+			})
+			hud:add(p, {
+				hud_elem_type = "text",
+				position = {x = 0.5, y = 0.75},
+				alignment = {x = "center", y = "center"},
+				text = random_messages.get_random_message(),
+				color = 0xffffff,
+				z_index = 1002,
+			})
+		end
+	end
+
+	loading_screen_time = minetest.get_us_time()
+
+	return old_announce(map, ...)
 end
 
 ctf_settings.register("teammate_nametag_style", {
@@ -447,41 +463,6 @@ return {
 		end
 	end,
 	on_match_end = function()
-		set_playertags_state(PLAYERTAGS_OFF)
-		for _, p in pairs(minetest.get_connected_players()) do
-			if ctf_teams.get(p) then
-				hud:add(p, "loading_screen", {
-					hud_elem_type = "image",
-					position = {x = 0.5, y = 0.5},
-					image_scale = -100,
-					z_index = 1000,
-					texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
-				})
-
-				-- z_index 1001 is reserved for the next map's image. Search file for `tag: map_image`
-
-				hud:add(p, "loading_text", {
-					hud_elem_type = "text",
-					position = {x = 0.5, y = 0.5},
-					alignment = {x = "center", y = "up"},
-					text_scale = 2,
-					text = "Loading Next Map...",
-					color = 0x7ec5ff,
-					z_index = 1002,
-				})
-				hud:add(p, {
-					hud_elem_type = "text",
-					position = {x = 0.5, y = 0.75},
-					alignment = {x = "center", y = "center"},
-					text = random_messages.get_random_message(),
-					color = 0xffffff,
-					z_index = 1002,
-				})
-			end
-		end
-
-		loading_screen_time = minetest.get_us_time()
-
 		recent_rankings.on_match_end()
 
 		if ctf_map.current_map then
