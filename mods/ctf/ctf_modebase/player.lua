@@ -19,22 +19,22 @@ local simplify_for_saved_stuff = function(iname)
 
 	local match
 
-	match = iname:match("default:pick_(%a+)")
+	match = iname:match("default:pick_(%S+)")
 	if match then
 		return "pick", match
 	end
 
-	match = iname:match("default:axe_(%a+)")
+	match = iname:match("default:axe_(%S+)")
 	if match then
 		return "axe", match
 	end
 
-	match = iname:match("default:shovel_(%a+)")
+	match = iname:match("default:shovel_(%S+)")
 	if match then
 		return "shovel", match
 	end
 
-	match = iname:match("ctf_mode_nade_fight:(.*)")
+	match = iname:match("ctf_mode_nade_fight:(%S+)")
 	if match then
 		return "nade_fight_grenade", match
 	end
@@ -48,7 +48,7 @@ local simplify_for_saved_stuff = function(iname)
 	end
 
 	local mod
-	mod, match = iname:match("(%a+):sword_(%a+)")
+	mod, match = iname:match("(%S+):sword_(%S+)")
 
 	if mod and (mod == "default" or mod == "ctf_melee") and match then
 		return "sword", match
@@ -234,15 +234,16 @@ minetest.register_on_item_pickup(function(itemstack, picker)
 						local cprio = func(compare)
 
 						if cprio and cprio < priority then
-							local item, type = simplify_for_saved_stuff(compare:get_name())
+							local item, typ = simplify_for_saved_stuff(compare:get_name())
+							minetest.log(dump(item)..dump(typ))
 							inv:set_stack("main", i, itemstack)
 
-							if item == "sword" and type == "stone" and
+							if item == "sword" and typ == "stone" and
 							ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
 								return ItemStack("")
 							end
 
-							if item ~= "sword" and type == "stone" and
+							if item ~= "sword" and typ == "stone" and
 							ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
 								return ItemStack("")
 							else
