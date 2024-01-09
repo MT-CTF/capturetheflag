@@ -110,7 +110,7 @@ minetest.register_chatcommand("donate", {
 			pname, score = score, pname
 		end
 
-		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
+		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or " for their hard work"
 
 		if not pname then
 			return false, "You should provide the player name!"
