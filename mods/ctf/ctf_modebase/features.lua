@@ -14,8 +14,13 @@ ctf_core.testing = {
 			avg = actual_kd_diff
 		end
 		return (best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-		(pkd >= math.min(1, kd_diff/2) and avg >= 0.4 and (players_diff <= one_fourth or
-		(pkd >= 1.5 and players_diff <= one_third)))
+		(
+			pkd >= math.min(1, kd_diff/2) and avg >= 0.4 and
+			(
+				players_diff <= math.min(one_fourth, 3) or
+				(pkd >= 1.5 and players_diff <= math.min(one_third, 6))
+			)
+		)
 	end
 }
 
