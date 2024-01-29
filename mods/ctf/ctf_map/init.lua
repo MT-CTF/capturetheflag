@@ -194,56 +194,70 @@ minetest.register_chatcommand("ctf_barrier", {
 					"use /ctf_barrier remove_buildtime to remove unwanted parts"))
 			end
 
+			local air_node = minetest.get_content_id("air")
+			local ignore_node = minetest.get_content_id("ignore")
+			local ctf_map_ignore = minetest.get_content_id("ctf_map:ignore")
+			local default_stone = minetest.get_content_id("default:stone")
+			local default_water_source = minetest.get_content_id("default:water_source")
+			local default_lava_source = minetest.get_content_id("default:lava_source")
+			local ctf_map_ind_glass_red = minetest.get_content_id("ctf_map:ind_glass_red")
+			local ctf_map_ind_stone_red = minetest.get_content_id("ctf_map:ind_stone_red")
+			local ctf_map_ind_water = minetest.get_content_id("ctf_map:ind_water")
+			local ctf_map_ind_lava = minetest.get_content_id("ctf_map:ind_lava")
+			local ctf_map_ind_glass = minetest.get_content_id("ctf_map:ind_glass")
+			local ctf_map_stone = minetest.get_content_id("ctf_map:stone")
+
+			local vm = minetest.get_voxel_manip()
+			local emin, emax = vm:read_from_map(pos1, pos2)
+			local a = VoxelArea:new{
+				MinEdge = emin,
+				MaxEdge = emax
+			}
+			local data = vm:get_data()
+
 			for x = pos1.x, pos2.x do
 				for y = pos1.y, pos2.y do
 					for z = pos1.z, pos2.z do
+						local vi = a:index(x, y, z)
 						if params == "place_buildtime" then
-							local current_pos = {x = x, y = y, z = z}
-							local current_node = minetest.get_node_or_nil(current_pos)
-							if current_node then
-								if current_node.name == "air" then
-									minetest.set_node(current_pos, {name = "ctf_map:ind_glass_red"})
-								elseif current_node.name == "default:stone" then
-									minetest.set_node(current_pos, {name = "ctf_map:ind_stone_red"})
-								elseif current_node.name == "default:water_source" then
-									minetest.set_node(current_pos, {name = "ctf_map:ind_water"})
-								elseif current_node.name == "default:lava_source" then
-									minetest.set_node(current_pos, {name = "ctf_map:ind_lava"})
-								end
+							if data[vi] == air_node then
+								data[vi] = ctf_map_ind_glass_red
+							elseif data[vi] == default_stone then
+								data[vi] = ctf_map_ind_stone_red
+							elseif data[vi] == default_water_source then
+								data[vi] = ctf_map_ind_water
+							elseif data[vi] == default_lava_source then
+								data[vi] = ctf_map_ind_lava
 							end
 						elseif params == "remove_buildtime" then
-							local current_pos = {x = x, y = y, z = z}
-							local current_node = minetest.get_node_or_nil(current_pos)
-							if current_node then
-								if current_node.name == "ctf_map:ind_glass_red" then
-									minetest.set_node(current_pos, {name = "air"})
-								elseif current_node.name == "ctf_map:ind_stone_red" then
-									minetest.set_node(current_pos, {name = "default:stone"})
-								elseif current_node.name == "ctf_map:ind_water" then
-									minetest.set_node(current_pos, {name = "default:water_source"})
-								elseif current_node.name == "ctf_map:ind_lava" then
-									minetest.set_node(current_pos, {name = "default:lava_source"})
-								end
+							if data[vi] == ctf_map_ind_glass_red then
+								data[vi] = air_node
+							elseif data[vi] == ctf_map_ind_stone_red then
+								data[vi] = default_stone
+							elseif data[vi] == ctf_map_ind_water then
+								data[vi] = default_water_source
+							elseif data[vi] == ctf_map_ind_lava then
+								data[vi] = default_lava_source
 							end
 						elseif params == "place_outer" then
-							local current_pos = {x = x, y = y, z = z}
 							if x == pos1.x or x == pos2.x or y == pos1.y
 								or z == pos1.z or z == pos2.z then
-								local current_node = minetest.get_node_or_nil(current_pos)
-								if current_node then
-									if current_node.name == "air" or
-										current_node.name == "ctf_map:ignore" or
-										current_node.name == "ignore" then
-										minetest.set_node(current_pos, {name = "ctf_map:ind_glass"})
-									else
-										minetest.set_node(current_pos, {name = "ctf_map:stone"})
-									end
+								if data[vi] == air_node or
+									data[vi] == ctf_map_ignore or
+									data[vi] == ignore_node then
+									data[vi] = ctf_map_ind_glass
+								else
+									data[vi] = ctf_map_stone
 								end
 							end
 						end
 					end
 				end
 			end
+
+			vm:set_data(data)
+			vm:write_to_map(true)
+
 			local message =
 				(params == "place_buildtime" and "Build-time barrier placed") or
 				(params == "remove_buildtime" and "Build-time barrier removed") or
