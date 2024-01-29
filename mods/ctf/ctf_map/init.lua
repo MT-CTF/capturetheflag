@@ -194,19 +194,6 @@ minetest.register_chatcommand("ctf_barrier", {
 					"use /ctf_barrier remove_buildtime to remove unwanted parts"))
 			end
 
-			local air_node = minetest.get_content_id("air")
-			local ignore_node = minetest.get_content_id("ignore")
-			local ctf_map_ignore = minetest.get_content_id("ctf_map:ignore")
-			local default_stone = minetest.get_content_id("default:stone")
-			local default_water_source = minetest.get_content_id("default:water_source")
-			local default_lava_source = minetest.get_content_id("default:lava_source")
-			local ctf_map_ind_glass_red = minetest.get_content_id("ctf_map:ind_glass_red")
-			local ctf_map_ind_stone_red = minetest.get_content_id("ctf_map:ind_stone_red")
-			local ctf_map_ind_water = minetest.get_content_id("ctf_map:ind_water")
-			local ctf_map_ind_lava = minetest.get_content_id("ctf_map:ind_lava")
-			local ctf_map_ind_glass = minetest.get_content_id("ctf_map:ind_glass")
-			local ctf_map_stone = minetest.get_content_id("ctf_map:stone")
-
 			local vm = minetest.get_voxel_manip()
 			local emin, emax = vm:read_from_map(pos1, pos2)
 			local a = VoxelArea:new{
@@ -220,34 +207,34 @@ minetest.register_chatcommand("ctf_barrier", {
 					for z = pos1.z, pos2.z do
 						local vi = a:index(x, y, z)
 						if params == "place_buildtime" then
-							if data[vi] == air_node then
-								data[vi] = ctf_map_ind_glass_red
-							elseif data[vi] == default_stone then
-								data[vi] = ctf_map_ind_stone_red
-							elseif data[vi] == default_water_source then
-								data[vi] = ctf_map_ind_water
-							elseif data[vi] == default_lava_source then
-								data[vi] = ctf_map_ind_lava
+							if data[vi] == minetest.get_content_id("air") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_glass_red")
+							elseif data[vi] == minetest.get_content_id("default:stone") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_stone_red")
+							elseif data[vi] == minetest.get_content_id("default:water_source") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_water")
+							elseif data[vi] == minetest.get_content_id("default:lava_source") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_lava")
 							end
 						elseif params == "remove_buildtime" then
-							if data[vi] == ctf_map_ind_glass_red then
-								data[vi] = air_node
-							elseif data[vi] == ctf_map_ind_stone_red then
-								data[vi] = default_stone
-							elseif data[vi] == ctf_map_ind_water then
-								data[vi] = default_water_source
-							elseif data[vi] == ctf_map_ind_lava then
-								data[vi] = default_lava_source
+							if data[vi] == minetest.get_content_id("ctf_map:ind_glass_red") then
+								data[vi] = minetest.get_content_id("air")
+							elseif data[vi] == minetest.get_content_id("ctf_map:ind_stone_red") then
+								data[vi] = minetest.get_content_id("default:stone")
+							elseif data[vi] == minetest.get_content_id("ctf_map:ind_water") then
+								data[vi] = minetest.get_content_id("default:water_source")
+							elseif data[vi] == minetest.get_content_id("ctf_map:ind_lava") then
+								data[vi] = minetest.get_content_id("default:lava_source")
 							end
 						elseif params == "place_outer" then
 							if x == pos1.x or x == pos2.x or y == pos1.y
 								or z == pos1.z or z == pos2.z then
-								if data[vi] == air_node or
-									data[vi] == ctf_map_ignore or
-									data[vi] == ignore_node then
-									data[vi] = ctf_map_ind_glass
+								if data[vi] == minetest.get_content_id("air") or
+									data[vi] == minetest.get_content_id("ignore") or
+									data[vi] == minetest.get_content_id("ctf_map:ignore") then
+									data[vi] = minetest.get_content_id("ctf_map:ind_glass")
 								else
-									data[vi] = ctf_map_stone
+									data[vi] = minetest.get_content_id("ctf_map:stone")
 								end
 							end
 						end
