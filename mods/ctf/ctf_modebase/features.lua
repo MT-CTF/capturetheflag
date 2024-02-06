@@ -469,6 +469,8 @@ return {
 			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
 				hud:clear_all()
 				set_playertags_state(PLAYERTAGS_ON)
+
+				ctf_modebase.build_timer.start()
 			end)
 		end
 	end,
