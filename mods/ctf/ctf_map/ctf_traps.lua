@@ -68,29 +68,31 @@ minetest.register_node("ctf_map:spike", {
 })
 
 for _, team in ipairs(ctf_teams.teamlist) do
-	local spikecolor = ctf_teams.team[team].color
+	if not ctf_teams.team[team].not_playing then
+		local spikecolor = ctf_teams.team[team].color
 
-	minetest.register_node("ctf_map:spike_"..team, {
-		description = HumanReadable(team).." Team Spike",
-		drawtype = "plantlike",
-		tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
-		inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",
-		use_texture_alpha = "clip",
-		paramtype = "light",
-		paramtype2 = "meshoptions",
-		sunlight_propagates = true,
-		walkable = false,
-		damage_per_second = 7,
-		groups = {cracky=1, level=2},
-		drop = "ctf_map:spike",
-		selection_box = {
-			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-		},
-		on_place = function(itemstack, placer, pointed_thing)
-			return minetest.item_place(itemstack, placer, pointed_thing, 34)
-		end
-	})
+		minetest.register_node("ctf_map:spike_"..team, {
+			description = HumanReadable(team).." Team Spike",
+			drawtype = "plantlike",
+			tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
+			inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",
+			use_texture_alpha = "clip",
+			paramtype = "light",
+			paramtype2 = "meshoptions",
+			sunlight_propagates = true,
+			walkable = false,
+			damage_per_second = 7,
+			groups = {cracky=1, level=2},
+			drop = "ctf_map:spike",
+			selection_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			},
+			on_place = function(itemstack, placer, pointed_thing)
+				return minetest.item_place(itemstack, placer, pointed_thing, 34)
+			end
+		})
+	end
 end
 
 minetest.register_on_player_hpchange(function(player, hp_change, reason)

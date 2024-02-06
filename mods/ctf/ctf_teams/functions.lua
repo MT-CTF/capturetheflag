@@ -118,7 +118,7 @@ end
 --- Example usage: `pos1, pos2 = ctf_teams.get_team_territory("red")`
 function ctf_teams.get_team_territory(teamname)
 	local current_map = ctf_map.current_map
-	if not current_map then return false end
+	if not current_map or not current_map.teams[teamname] then return false end
 
 	return current_map.teams[teamname].pos1, current_map.teams[teamname].pos2
 end

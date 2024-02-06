@@ -29,7 +29,8 @@ local function timer_func(time_left)
 		end
 
 		local pteam = ctf_teams.get(player)
-		if pteam and not ctf_core.pos_inside(player:get_pos(), ctf_teams.get_team_territory(pteam)) then
+		local tpos1, tpos2 = ctf_teams.get_team_territory(pteam)
+		if pteam and tpos1 and not ctf_core.pos_inside(player:get_pos(), tpos1, tpos2) then
 			hud_events.new(player, {
 				quick = true,
 				text = "You can't cross the barrier until build time is over!",
