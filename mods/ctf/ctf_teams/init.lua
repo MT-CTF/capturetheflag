@@ -1,5 +1,13 @@
 ctf_teams = {
 	team = {
+		--[[
+		tname = {
+			color = "#ffffff",
+			color_hex = 0x000, -- Generated from 'color' above
+			irc_color = 16, -- optional, default: 16
+			not_playing = false, --optional, default: false
+		}
+		]]
 		red = {
 			color = "#dc0f0f",
 			color_hex = 0x000,
