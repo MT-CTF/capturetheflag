@@ -47,6 +47,13 @@ local function timer_func(time_left)
 	timer = minetest.after(1, timer_func, time_left - 1)
 end
 
+function ctf_modebase.build_timer.start(build_time)
+	local time = build_time or ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME
+
+	if time > 0 then
+		timer = timer_func(time)
+	end
+end
 
 function ctf_modebase.build_timer.finish()
 	if timer == nil then return end
@@ -75,10 +82,6 @@ function ctf_modebase.build_timer.finish()
 		ctf_modebase.on_match_start()
 	end
 end
-
-ctf_api.register_on_new_match(function()
-	timer = minetest.after(1, timer_func, ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME)
-end)
 
 ctf_api.register_on_match_end(function()
 	if timer == nil then return end
@@ -119,4 +122,3 @@ minetest.register_chatcommand("ctf_start", {
 		return true, "Build time ended"
 	end,
 })
-
