@@ -39,9 +39,10 @@ Note that this version may be slightly behind the git version, but it will be a 
 
 Mobs have been suggested from very early days of CTF by several. The question has always been no. The short answer is that mobs use a lot of resources without adding much gameplay. The longer answer is that smart mobs usually require a lot of CPU, the network usage is high. The same resource could be allocated to more players who add much more to the gameplay comparing to mobs. However, there are many unofficial servers which might have mods, you can play there if you like them. Or, since CTF is FOSS, free open source software, you can fork it and do whatever you like. Maybe you could prove the developers they are wrong by adding efficient *and* smart mobs :)
 
-### 2. I'm trying to run a CTF server but it crashes soon after it gets started.
+### 2. I'm trying to run a CTF server but it crashes soon after starting.
 
-If you are having a small VPS, like with 2GB of RAM, it is likely that the crash is because of lack of memory. You can turn `ctf_low_ram_mode` on my setting it to `true` in your `minetest.conf` file(or whatever your config file name is) to solve the issue.
+It's probably crashing due to limited memory (RAM), and/or you didn't compile Minetest with LuaJIT.
+Setting `ctf_low_ram_mode` to `true` in your `minetest.conf` may fix the issue
 
 ### 3. I want to host a CTF public server with X players. How much resources do I need?
 
