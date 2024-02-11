@@ -50,6 +50,32 @@ minetest.register_node("ctf_map:ind_glass_red", {
 })
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_glass_red")] = minetest.CONTENT_AIR
 
+minetest.register_node("ctf_map:ind_water", {
+	description = "Indestructible Water Barrier Glass",
+	drawtype = "glasslike",
+	tiles = {"ctf_map_ind_water.png"},
+	inventory_image = minetest.inventorycube("ctf_map_ind_water.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = ctf_core.settings.server_mode == "mapedit",
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_water")] = minetest.get_content_id("default:water_source")
+
+minetest.register_node("ctf_map:ind_lava", {
+	description = "Indestructible Lava Barrier Glass",
+	groups = {immortal = 1},
+	tiles = {"ctf_map_ind_lava.png"},
+	is_ground_content = false
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_lava")] = minetest.get_content_id("default:lava_source")
+
 minetest.register_node("ctf_map:ind_stone_red", {
 	description = "Indestructible Red Barrier Stone",
 	groups = {immortal = 1},
@@ -76,6 +102,7 @@ local mod_prefixes = {
 	default = "";
 	stairs = "";
 	wool = "wool_";
+	walls = "walls_";
 }
 
 -- See Lua API, section "Node-only groups"
@@ -83,6 +110,7 @@ local preserved_groups = {
 	bouncy = true;
 	fence = true;
 	connect_to_raillike = true;
+	wall = true;
 	disable_jump = true;
 	fall_damage_add_percent = true;
 	slippery = true;
@@ -188,8 +216,10 @@ local chest_def = {
 
 		local inv = minetest.get_inventory({type = "node", pos = pos})
 		if not inv or inv:is_empty("main") then
-			minetest.set_node(pos, {name = "air"})
-			minetest.show_formspec(player:get_player_name(), "", player:get_inventory_formspec())
+			minetest.close_formspec(player:get_player_name(), "")
+			minetest.after(0, function()
+				minetest.set_node(pos, {name = "air"})
+			end)
 		end
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)

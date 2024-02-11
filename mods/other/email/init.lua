@@ -130,7 +130,7 @@ function email.get_formspec(name)
 	return fs
 end
 
-function email.show_inbox(name, text_mode)
+function email.show_inbox(name, text_mode, custom_gui)
 	if text_mode then
 		local inbox = email.get_inbox(name)
 		if #inbox == 0 then
@@ -145,8 +145,14 @@ function email.show_inbox(name, text_mode)
 			return true, S("End of mail (@1 items)", #inbox)
 		end
 	else
-		local fs = "size[12,8]" .. email.get_formspec(name)
-		minetest.show_formspec(name, "email:inbox", fs)
+		if custom_gui then
+			local fs = "size[12,8]" .. email.get_formspec(name)
+			minetest.show_formspec(name, "email:inbox", fs)
+		else
+			local player = minetest.get_player_by_name(name)
+
+			sfinv.set_page(player, sfinv.get_page(player))
+		end
 
 		return true, S("Opened inbox!")
 	end
@@ -166,6 +172,7 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 	if fields.clear then
 		local name = player:get_player_name()
 		email.clear_inbox(name)
+
 		minetest.chat_send_player(name, S("Inbox cleared!"))
 		email.show_inbox(name)
 	end
@@ -204,7 +211,9 @@ function email.send_mail(aname, ato, msg)
 
 	email.save()
 
-	minetest.chat_send_player(to, "Mail from " .. name .. ": " .. msg)
+	minetest.chat_send_player(to, minetest.colorize("#00FF00", "Mail from " .. minetest.colorize("#92C5FC", name) .. ": " .. msg))
+
+
 
 	return true, S("Message sent to @1", ato)
 end
@@ -220,7 +229,7 @@ minetest.register_chatcommand("inbox", {
 		elseif param == "text" or param == "txt" or param == "t" or not minetest.get_player_by_name(name) then
 			return email.show_inbox(name, true)
 		else
-			return email.show_inbox(name, false)
+			return email.show_inbox(name, false, true)
 		end
 	end
 })

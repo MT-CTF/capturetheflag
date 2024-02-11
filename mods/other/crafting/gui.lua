@@ -163,7 +163,6 @@ function crafting.result_select_on_receive_results(player, context, fields)
 		if key:sub(1, 7) == "result_" then
 			local num = string.match(key, "result_([0-9]+)")
 			if num then
-				local inv    = player:get_inventory()
 				local recipe = crafting.get_recipe(tonumber(num))
 				local name   = player:get_player_name()
 				if not crafting.can_craft(name, recipe) then
@@ -202,7 +201,10 @@ if minetest.global_exists("sfinv") then
 
 			local formspec = crafting.make_result_selector(player, { x = 8, y = 3 }, context)
 			formspec = formspec .. "list[detached:crafting_trash;main;0,3.4;1,1;]" ..
-				"image[0.05,3.5;0.8,0.8;crafting_trash_icon.png]"
+				"image[0.05,3.5;0.8,0.8;crafting_trash_icon.png]" ..
+				"image_button[1,3.4;1,1;crafting_save_icon.png;save_inv_order;]" ..
+				"tooltip[save_inv_order;Saves the order of the items in your inventory" ..
+					"\n(Your saved order is used when you respawn, and is per-mode)]"
 
 			return sfinv.make_formspec(player, context, formspec, true)
 		end,
@@ -210,6 +212,15 @@ if minetest.global_exists("sfinv") then
 			if crafting.result_select_on_receive_results(player, context, fields) then
 				sfinv.set_player_inventory_formspec(player)
 			end
+
+			if fields.save_inv_order then
+				ctf_modebase.player.save_initial_stuff_positions(player)
+
+				minetest.sound_play("crafting_save_sound", {
+					to_player = player:get_player_name(),
+				}, true)
+			end
+
 			return true
 		end
 	})

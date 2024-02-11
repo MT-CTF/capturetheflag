@@ -2,20 +2,23 @@ Sounds were taken from the shooter mod. Relevant section from its license.txt:
 
 License Sounds: freesound.org
 
-	flobert1_20070728.wav by Nonoo - Attribution 3.0 Unported (CC BY 3.0)
+- flobert1_20070728.wav by Nonoo - Attribution 3.0 Unported (CC BY 3.0)
 	
-	shot.wav by Sergenious - Attribution 3.0 Unported (CC BY 3.0)
+- shot.wav by Sergenious - Attribution 3.0 Unported (CC BY 3.0)
 
-	GUNSHOT.WAV by erkanozan - CC0 1.0 Universal (CC0 1.0)
+- GUNSHOT.WAV by erkanozan - CC0 1.0 Universal (CC0 1.0)
 
-	winchester-rifle-cock-reload.wav by MentalSanityOff - CC0 1.0 Universal (CC0 1.0)
+- winchester-rifle-cock-reload.wav by MentalSanityOff - CC0 1.0 Universal (CC0 1.0)
 
-	trigger-with-hammer-fall.wav by Nanashi - CC0 1.0 Universal (CC0 1.0)
+- trigger-with-hammer-fall.wav by Nanashi - CC0 1.0 Universal (CC0 1.0)
 
-	woosh.wav by ReadeOnly - CC0 1.0 Universal (CC0 1.0)
+- woosh.wav by ReadeOnly - CC0 1.0 Universal (CC0 1.0)
 
-	AGM-114 Hellfire Rocket Missile Launch.flac by qubodup - CC0 1.0 Universal (CC0 1.0)
+- AGM-114 Hellfire Rocket Missile Launch.flac by qubodup - CC0 1.0 Universal (CC0 1.0)
 
-	Sparkler.aif by Ned Bouhalassa - CC0 1.0 Universal (CC0 1.0)
+- Sparkler.aif by Ned Bouhalassa - CC0 1.0 Universal (CC0 1.0)
 
-	explosion10.wav by V-ktor - CC0 1.0 Universal (CC0 1.0)
+- explosion10.wav by V-ktor - CC0 1.0 Universal (CC0 1.0)
+
+- `sniper_rifles_rifle.ogg` (`CC0 1.0`)
+  - Converted from [Battle Rifle.wav](https://freesound.org/people/morganpurkis/sounds/391725/) by [morganpurkis](https://freesound.org/people/morganpurkishttps://freesound.org/people/morganpurkis/sounds/391725/).

@@ -76,6 +76,6 @@ function ctf_cosmetics.get_extra_clothing(player)
 	if meta == "" then
 		return {_unset = true}
 	else
-		return minetest.deserialize(meta)
+		return minetest.deserialize(meta) or {_unset = true}
 	end
 end

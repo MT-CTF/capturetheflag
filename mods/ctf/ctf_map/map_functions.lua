@@ -40,7 +40,7 @@ function ctf_map.place_map(mapmeta, callback)
 			end
 		end
 
-		minetest.after(0, minetest.fix_light, mapmeta.pos1, mapmeta.pos2)
+		minetest.fix_light(mapmeta.pos1, mapmeta.pos2)
 
 		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 
@@ -54,87 +54,80 @@ end
 --- VOXELMANIP FUNCTIONS
 --
 
--- Takes [mapmeta] or [pos1, pos2] arguments
-function ctf_map.remove_barrier(mapmeta, pos2, callback)
-	local pos1 = mapmeta
+local ID_IGNORE = minetest.CONTENT_IGNORE
+local ID_AIR = minetest.CONTENT_AIR
+local ID_WATER = minetest.get_content_id("default:water_source")
 
-	if type(pos2) == "function" then
-		callback = pos2
-		pos2 = nil
-	end
+---@param mapmeta table Map meta table
+---@param callback function
+function ctf_map.remove_barrier(mapmeta, callback)
+	if not mapmeta.barriers then
+		minetest.log("action", "Clearing barriers using mapmeta.barrier_area")
 
-	if not pos2 then
-		pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
-	end
+		local pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
 
-	local vm = VoxelManip()
-	pos1, pos2 = vm:read_from_map(pos1, pos2)
+		local vm = VoxelManip(pos1, pos2)
+		local data = vm:get_data()
 
-	local data = vm:get_data()
+		for i, id in pairs(data) do
+			local done = false
 
-	-- Shave off ~0.1 seconds from the main loop
-	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
-		local Nx = p2.x - p1.x + 1
-		local Ny = p2.y - p1.y + 1
-		local ID_IGNORE = minetest.CONTENT_IGNORE
-		local ID_AIR = minetest.CONTENT_AIR
-		local ID_WATER = minetest.get_content_id("default:water_source")
+			for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
+				if id == barriernode_id then
 
-		for z = p1.z, p2.z do
-			for y = p1.y, p2.y do
-				for x = p1.x, p2.x do
-					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
-					local done = false
-
-					for barriernode_id, replacement_id in pairs(barrier_nodes) do
-						if d[vi] == barriernode_id then
-							local replacement_this = replacement_id
-							if replacement_id == ID_AIR then -- water flow check (for whatever reason vm:update_liquids() failed to work)
-								local check_pos = {
-									((z + 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
-									((z - 1) - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1,
-									(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x + 1) - p1.x) + 1,
-									(z - p1.z) * Ny * Nx + (y - p1.y) * Nx + ((x - 1) - p1.x) + 1,
-								}
-								local water_count = 0
-								for _,check_vi in ipairs(check_pos) do
-									if d[check_vi] == ID_WATER then
-										water_count = water_count + 1
-										if water_count >= 2 then
-											replacement_this = ID_WATER
-											break
-										end
-									end
-								end
-							end
-							d[vi] = replacement_this
-							done = true
-							break
-						end
-					end
-
-					-- Avoid changing nodes players placed during async
-					if not done then
-						d[vi] = ID_IGNORE
-					end
+					data[i] = replacement_id
+					done = true
+					break
 				end
+			end
+
+			if not done then
+				data[i] = ID_IGNORE
 			end
 		end
 
-		return d
-	end, function(d)
-		vm:set_data(d)
-		vm:update_liquids()
+		vm:set_data(data)
 		vm:write_to_map(false)
-		callback()
-	end, data, pos1, pos2, ctf_map.barrier_nodes)
+
+		minetest.after(0.1, function()
+			local vm2 = VoxelManip(pos1, pos2)
+			vm2:update_liquids()
+		end)
+	else
+		local i = 0
+		for _, barrier_area in pairs(mapmeta.barriers) do
+			minetest.after(i, function()
+				local vm = VoxelManip()
+				vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
+
+				local data = vm:get_data()
+				assert(#data == barrier_area.max)
+				for idx in pairs(data) do
+					data[idx] = barrier_area.reps[idx] or ID_IGNORE
+				end
+
+				vm:set_data(data)
+				vm:write_to_map(false)
+			end)
+
+			i = i + 0.04
+		end
+
+		minetest.after(i - 0.04, function()
+			local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+			vm:update_liquids()
+
+			callback()
+		end)
+
+		return
+	end
+
+	callback()
 end
 
-local ID_AIR = minetest.CONTENT_AIR
-local ID_IGNORE = minetest.CONTENT_IGNORE
-local ID_CHEST = minetest.get_content_id("ctf_map:chest")
-local ID_WATER = minetest.get_content_id("default:water_source")
 
+local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local function get_place_positions(a, data, pos1, pos2)
 	if a.amount <= 0 then return {} end
 

@@ -4,7 +4,7 @@ arsdragonfly@gmail.com
 6/19/2013
 --]]
 --Time between two subsequent messages.
-local MESSAGE_INTERVAL = 0
+-- local MESSAGE_INTERVAL = 0
 local S = minetest.get_translator(minetest.get_current_modname())
 
 math.randomseed(os.time())
@@ -18,10 +18,10 @@ function random_messages.initialize() --Set the interval in minetest.conf.
 	return 60
 end
 
-function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
-	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval"))
-							or random_messages.initialize()
-end
+-- function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
+-- 	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval"))
+-- 							or random_messages.initialize()
+-- end
 
 function random_messages.check_params(name,func,params)
 	local stat, msg = func(params)
@@ -60,19 +60,27 @@ function random_messages.read_messages()
 		"Use /top50 command to see the leaderboard.",
 		"Use /top50 <mode:technical modename> to see the leaderboard on another mode."
 		.. " For example: /top50 mode:nade_fight.",
-		"To check someone's rank on another mode use /r <mode:technical modename> <playername>."
+		"To check someone's rank on another mode, use /r <mode:technical modename> <playername>."
 		.. " For example: /r mode:nade_fight randomplayer.",
 		"To check someone's team use /team player <player_name>.",
 		"To check all team members use /team.",
 		"You can capture multiple enemy flags at once!",
 		"Consider joining our Discord server at https://discord.gg/vcZTRPX",
-		"You can press sneak while jumping, to jump up two blocks.",
-		"Use /donate <playername> <score> to reward a team-mate for their work.",
+		"You can press sneak while jumping to jump up two blocks.",
+		"Use /donate <playername> <score> [message] (message optional) to reward a team-mate for their work.",
 		"A medic and knight working together can wreak havoc on the enemy team(s)",
 		"Use /lb to see a list of bountied players you can kill for score",
-		"In the Nade Fight mode you can team up with someone using the void grenade for easier kills.",
+		"In the Nade Fight mode, you can team up with someone using the void grenade for easier kills.",
 		"An alternative method to place markers is by (left/right) clicking while holding the zoom key (default: Z)",
 		"Use /mp <player> to send a marker to a specific teammate",
+		"Use /msg <playername> <message> to send a private message (PM) to another player.",
+		"To check someone's league in all modes, use /league <player>",
+		"Use /leagues to list leagues and the placement needed to get to them.",
+		"To place an HP marker, run /mhp or left/right click while holding the zoom key (default: Z) "..
+			"and looking at your feet",
+		"Use /map to print the current map name and its author.",
+		"To check someone's ranking in all modes, use /rank mode:all <player_name>",
+		"Building a base with materials stronger than cobblestone, such as wood or reinforced cobble, keeps your flag safer.",
 	}
 end
 
@@ -81,6 +89,10 @@ function random_messages.display_message(message_number)
 	if msg then
 		minetest.chat_send_all(minetest.colorize("#808080", S(msg)))
 	end
+end
+
+function random_messages.get_random_message()
+	return random_messages.messages[math.random(1, #random_messages.messages)]
 end
 
 function random_messages.show_message()
@@ -115,14 +127,14 @@ function random_messages.save_messages()
 end
 
 --When server starts:
-random_messages.set_interval()
+-- random_messages.set_interval()
 random_messages.read_messages()
 
-local function step(dtime)
-	random_messages.show_message()
-	minetest.after(MESSAGE_INTERVAL, step)
-end
-minetest.after(MESSAGE_INTERVAL, step)
+-- local function step(dtime)
+-- 	random_messages.show_message()
+-- 	minetest.after(MESSAGE_INTERVAL, step)
+-- end
+-- minetest.after(MESSAGE_INTERVAL, step)
 
 local register_chatcommand_table = {
 	params = "viewmessages | removemessage <number> | addmessage <number>",

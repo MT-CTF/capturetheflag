@@ -11,7 +11,7 @@ function email.update_hud(player)
 			email.hud:add(player, "email:icon", {
 				hud_elem_type = "image",
 				name = "MailIcon",
-				position = {x=0.52, y=0.52},
+				position = {x=0.06, y=0.96},
 				text="email_mail.png",
 				scale = {x=1,y=1},
 				alignment = {x=0.5, y=0.5},
@@ -20,7 +20,7 @@ function email.update_hud(player)
 			email.hud:add(player, "email:text", {
 				hud_elem_type = "text",
 				name = "MailText",
-				position = {x=0.55, y=0.52},
+				position = {x=0.08, y=0.96},
 				text= #inbox .. " /inbox",
 				scale = {x=1,y=1},
 				alignment = {x=0.5, y=0.5},

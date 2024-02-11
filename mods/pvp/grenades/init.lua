@@ -143,13 +143,13 @@ function grenades.register_grenade(name, def)
 	local newdef = {grenade = def}
 
 	newdef.description = def.description
-	newdef.stack_max = def.stack_max or 1
+	newdef.stack_max = math.max(1, def.stack_max or 1)
 	newdef.inventory_image = def.image
 	local on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
 			grenades.throw_grenade(name, 17, user)
 
-			if not minetest.settings:get_bool("creative_mode") then
+			if not minetest.settings:get_bool("creative_mode") and (def.stack_max or 99) > -1 then
 				itemstack:take_item(1)
 			end
 		end
