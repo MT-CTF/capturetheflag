@@ -29,6 +29,13 @@ local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
+	if not      nametag.object.set_observers or
+	   not team_nametag.object.set_observers or
+	   not symbol_nametag.object.set_observers
+	then
+		return
+	end
+
 	local entity_players = {}
 	local nametag_players = table.copy(ctf_teams.online_players[t].players)
 	local symbol_players = {}
@@ -53,9 +60,9 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 	end
 
 	-- Occasionally crashes in singleplayer, so call it safely
-	pcall(  team_nametag.object.set_observers,   team_nametag.object, nametag_players)
-	pcall(symbol_nametag.object.set_observers, symbol_nametag.object, symbol_players )
-	pcall(       nametag.object.set_observers,        nametag.object, entity_players )
+	       nametag.object:set_observers(entity_players )
+	  team_nametag.object:set_observers(nametag_players)
+	symbol_nametag.object:set_observers(symbol_players )
 end
 
 local tags_hidden = false
@@ -101,11 +108,11 @@ local function set_playertags_state(state)
 				local nametag = playertag.entity
 				local symbol_entity = playertag.symbol_entity
 
-				if nametag and team_nametag and symbol_entity then
-					-- Occasionally crashes in singleplayer, so call it safely
-					pcall( team_nametag.object.set_observers,  team_nametag.object, {})
-					pcall(symbol_entity.object.set_observers, symbol_entity.object, {})
-					pcall(      nametag.object.set_observers,       nametag.object, {})
+				if nametag and team_nametag and symbol_entity and
+				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
+					 team_nametag.object:set_observers({})
+					symbol_entity.object:set_observers({})
+					      nametag.object:set_observers({})
 				end
 			end
 		end
