@@ -40,7 +40,9 @@ ctf_modebase = {
 
 ctf_gui.old_init()
 
+-- Can be added to by other mods, like irc
 function ctf_modebase.announce(msg)
+	minetest.log("action", msg)
 end
 
 ctf_core.include_files(
@@ -72,8 +74,33 @@ ctf_core.include_files(
 
 minetest.register_on_mods_loaded(function()
 	table.sort(ctf_modebase.modelist)
-	if ctf_core.settings.server_mode == "play" then
-		minetest.after(1, ctf_modebase.start_new_match)
+
+	if ctf_rankings.do_reset then
+		minetest.register_on_joinplayer(function(player)
+			skybox.clear(player)
+
+			player:set_moon({
+				visible = false
+			})
+			player:set_sun({
+				visible = false
+			})
+			player:set_clouds({
+				density = 0
+			})
+
+			player:hud_set_flags({
+				crosshair = false,
+				wielditem = false,
+			})
+
+			player:override_day_night_ratio(0)
+
+			player:set_hp(20)
+			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text = ""})
+		end)
+	elseif ctf_core.settings.server_mode == "play" then
+		minetest.after(3, ctf_modebase.start_new_match)
 	end
 
 	for _, name in pairs(ctf_modebase.modelist) do
@@ -89,4 +116,21 @@ end)
 
 minetest.override_chatcommand("pulverize", {
 	privs = {creative = true},
+})
+
+minetest.register_chatcommand("mode", {
+	description = "Prints the current mode and matches played",
+	func = function()
+		local mode = ctf_modebase.current_mode
+
+		if not mode then
+			return false, "The game isn't running"
+		end
+
+		return true, string.format("The current mode is %s. Matches finished: %d/%d",
+			HumanReadable(ctf_modebase.current_mode),
+			ctf_modebase.current_mode_matches_played-1,
+			ctf_modebase.current_mode_matches
+		)
+	end
 })

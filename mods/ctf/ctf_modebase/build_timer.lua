@@ -7,13 +7,12 @@ local timer = nil
 ctf_modebase.build_timer = {}
 
 local function timer_func(time_left)
-	if time_left <= 0 then
-		ctf_modebase.build_timer.finish()
-		return
-	end
-
 	for _, player in pairs(minetest.get_connected_players()) do
-		local time_str = string.format("%dm %ds until match begins!", math.floor(time_left / 60), math.floor(time_left % 60))
+		local time_str = "Removing Barrier..."
+
+		if time_left > 0 then
+			time_str = string.format("%dm %ds until match begins!", math.floor(time_left / 60), math.floor(time_left % 60))
+		end
 
 		if not hud:exists(player, "build_timer") then
 			hud:add(player, "build_timer", {
@@ -40,26 +39,41 @@ local function timer_func(time_left)
 		end
 	end
 
+	if time_left <= 0 then
+		ctf_modebase.build_timer.finish()
+		return
+	end
+
 	timer = minetest.after(1, timer_func, time_left - 1)
 end
 
 
 function ctf_modebase.build_timer.finish()
 	if timer == nil then return end
-	timer:cancel()
-	timer = nil
-	hud:remove_all()
 
 	if ctf_map.current_map then
-		minetest.sound_play("ctf_modebase_build_time_over", {
-			gain = 1.0,
-			pitch = 1.0,
-		}, true)
+		ctf_map.remove_barrier(ctf_map.current_map, function()
+			timer:cancel()
+			timer = nil
+			hud:remove_all()
+			local text = "Build time is over!"
+			minetest.chat_send_all(text)
+			ctf_modebase.announce(text)
 
-		ctf_map.remove_barrier(ctf_map.current_map)
+			ctf_modebase.on_match_start()
+
+			minetest.sound_play("ctf_modebase_build_time_over", {
+				gain = 1.0,
+				pitch = 1.0,
+			}, true)
+		end)
+	else
+		timer:cancel()
+		timer = nil
+		hud:remove_all()
+
+		ctf_modebase.on_match_start()
 	end
-
-	ctf_modebase.on_match_start()
 end
 
 ctf_api.register_on_new_match(function()
@@ -105,3 +119,4 @@ minetest.register_chatcommand("ctf_start", {
 		return true, "Build time ended"
 	end,
 })
+

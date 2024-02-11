@@ -3,7 +3,9 @@ local function get_gamemode(param)
 
 	if mode_param then
 		local mode = ctf_modebase.modes[mode_param]
-		if not mode then
+		if mode_param == "all" then
+			return "all", nil, opt_param
+		elseif not mode then
 			return false, "No such game mode: " .. mode_param
 		end
 
@@ -18,54 +20,72 @@ local function get_gamemode(param)
 	end
 end
 
+local function rank(name, mode_name, mode_data, pname)
+	if not mode_name then
+		return false, mode_data
+	end
+
+	if not pname then
+		pname = name
+	end
+	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
+
+	if not prank then
+		return false, string.format("Player %s has no rankings in mode %s\n", pname, mode_name)
+	end
+
+	local return_str = string.format(
+		"\tRankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
+	)
+
+	for _, irank in ipairs(mode_data.summary_ranks) do
+		return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", HumanReadable(irank)),
+			minetest.colorize("#ffea00", math.round(prank[irank] or 0))
+		)
+	end
+
+	for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
+		return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
+			minetest.colorize("#ffea00", 0.1 * math.round(10 * (
+						(prank[pair[1]] or 0   ) /
+				math.max(prank[pair[2]] or 0, 1)
+			)))
+		)
+	end
+
+	return_str = string.format("%s%s: %s\n",
+		return_str,
+		minetest.colorize("#63d437", "Place"),
+		minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
+	)
+
+	return true, return_str
+end
+
 ctf_core.register_chatcommand_alias("rank", "r", {
 	description = "Get the rank of yourself or a player",
-	params = "[mode:technical modename] <playername>",
+	params = "[ mode:all | mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
-			return false, mode_data
-		end
-
-		if not pname then
-			pname = name
-		end
-		local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
-
-		if not prank then
-			return false, string.format("Player %s has no rankings in mode %s!", pname, mode_name)
-		end
-
-		local return_str = string.format(
-			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
-		)
-
-		for _, rank in ipairs(mode_data.summary_ranks) do
-			return_str = string.format("%s%s: %s,\n\t",
-				return_str,
-				minetest.colorize("#63d437", HumanReadable(rank)),
-				minetest.colorize("#ffea00", math.round(prank[rank] or 0))
+		if mode_name == "all" then
+			local return_str = string.format(
+				"Rankings for player %s in all modes:\n",
+				minetest.colorize("#ffea00", pname or name),
+				mode_name
 			)
+
+			for _, mode in ipairs(ctf_modebase.modelist) do
+				mode_data = ctf_modebase.modes[mode]
+				return_str = return_str .. select(2, rank(name, mode, mode_data, pname))
+			end
+			return true, return_str
+		else
+			return rank(name, mode_name, mode_data, pname)
 		end
-
-		for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
-			return_str = string.format("%s%s: %s,\n\t",
-				return_str,
-				minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
-				minetest.colorize("#ffea00", 0.1 * math.round(10 * (
-					        (prank[pair[1]] or 0   ) /
-					math.max(prank[pair[2]] or 0, 1)
-				)))
-			)
-		end
-
-		return_str = string.format("%s%s: %s",
-			return_str,
-			minetest.colorize("#63d437", "Place"),
-			minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
-		)
-
-		return true, return_str
 	end
 })
 
@@ -77,14 +97,20 @@ end)
 
 minetest.register_chatcommand("donate", {
 	description = "Donate your match score to your teammate\nCan be used only once in 10 minutes",
-	params = "<playername> <score>",
+	params = "<playername> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
 		if not current_mode or not ctf_modebase.match_started then
 			return false, "The match hasn't started yet!"
 		end
 
-		local pname, score = string.match(param, "^(.*) (.*)$")
+		local pname, score, dmessage = string.match(param, "^(%S*) (%S*)(.*)$")
+
+		if ctf_core.to_number(pname) then
+			pname, score = score, pname
+		end
+
+		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
 
 		if not pname then
 			return false, "You should provide the player name!"
@@ -101,8 +127,8 @@ minetest.register_chatcommand("donate", {
 			return false, "You should donate at least 5 score!"
 		end
 
-		if score > 100 then
-			return false, "You can donate no more than 100 score!"
+		if score > 400 then
+			return false, "You can donate no more than 400 score!"
 		end
 
 		if pname == name then
@@ -127,18 +153,22 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate only half of your match score!"
 		end
 
-		if donate_timer[name] and donate_timer[name] + 600 > os.time() then
-			return false, "You can donate only once in 10 minutes!"
+		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
+			local time_diff = donate_timer[name] + 300 - os.time()
+			return false, string.format(
+				"You can donate only once in 5 minutes! You can donate again in %dm %ds.",
+				math.floor(time_diff / 60),
+				time_diff % 60)
 		end
 
 		current_mode.recent_rankings.add(pname, {score=score}, true)
 		current_mode.recent_rankings.add(name, {score=-score}, true)
 
 		donate_timer[name] = os.time()
+		local donate_text = string.format("%s donated %s score to %s%s", name, score, pname, dmessage)
+		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
+		ctf_modebase.announce(donate_text)
 
-		minetest.chat_send_all(minetest.colorize("#00EEFF",
-			string.format("%s donated %s score to %s for their hard work", name, score, pname)
-		))
 		minetest.log("action", string.format(
 			"Player '%s' donated %s score to player '%s'", name, score, pname
 		))
@@ -152,7 +182,7 @@ minetest.register_chatcommand("reset_rankings", {
 	params = "[mode:technical modename] <playername>",
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
@@ -197,7 +227,7 @@ minetest.register_chatcommand("top50", {
 	params = "[mode:technical modename]",
 	func = function(name, param)
 		local mode_name, mode_data = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
@@ -217,6 +247,7 @@ minetest.register_chatcommand("top50", {
 			table.insert(top50, t)
 		end
 
+		mode_data.summary_ranks._sort = "score"
 		ctf_modebase.summary.show_gui_sorted(name, top50, {}, mode_data.summary_ranks, {
 			title = "Top 50 Players",
 			gamemode = mode_name,
@@ -231,7 +262,7 @@ minetest.register_chatcommand("make_pro", {
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 

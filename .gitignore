@@ -14,3 +14,5 @@ debug.txt
 /mods/ctf/ctf_map/textures/*Left.*
 /mods/ctf/ctf_map/textures/*Right.*
 /mods/ctf/ctf_map/textures/*_screenshot.png
+
+*.blend1

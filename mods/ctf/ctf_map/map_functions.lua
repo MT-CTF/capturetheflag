@@ -1,7 +1,7 @@
 function ctf_map.announce_map(map)
 	local msg = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", map.name) ..
 	minetest.colorize("#fcdb05", " by ") .. minetest.colorize("#f49200", map.author))
-	if map.hint then
+	if map.hint and map.hint ~= "" then
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
@@ -13,7 +13,7 @@ function ctf_map.place_map(mapmeta, callback)
 
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
-		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
+		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation, {["ctf_map:chest"] = "air"})
 
 		minetest.log("action", string.format(
 			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - ctx.start_time) / 1000000
@@ -40,7 +40,7 @@ function ctf_map.place_map(mapmeta, callback)
 			end
 		end
 
-		minetest.after(0, minetest.fix_light, mapmeta.pos1, mapmeta.pos2)
+		minetest.fix_light(mapmeta.pos1, mapmeta.pos2)
 
 		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 
@@ -54,61 +54,80 @@ end
 --- VOXELMANIP FUNCTIONS
 --
 
--- Takes [mapmeta] or [pos1, pos2] arguments
-function ctf_map.remove_barrier(mapmeta, pos2)
-	local pos1 = mapmeta
+local ID_IGNORE = minetest.CONTENT_IGNORE
+local ID_AIR = minetest.CONTENT_AIR
+local ID_WATER = minetest.get_content_id("default:water_source")
 
-	if not pos2 then
-		pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
-	end
+---@param mapmeta table Map meta table
+---@param callback function
+function ctf_map.remove_barrier(mapmeta, callback)
+	if not mapmeta.barriers then
+		minetest.log("action", "Clearing barriers using mapmeta.barrier_area")
 
-	local vm = VoxelManip()
-	pos1, pos2 = vm:read_from_map(pos1, pos2)
+		local pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
 
-	local data = vm:get_data()
+		local vm = VoxelManip(pos1, pos2)
+		local data = vm:get_data()
 
-	-- Shave off ~0.1 seconds from the main loop
-	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
-		local Nx = p2.x - p1.x + 1
-		local Ny = p2.y - p1.y + 1
-		local ID_IGNORE = minetest.CONTENT_IGNORE
-		local ID_AIR = minetest.CONTENT_AIR
+		for i, id in pairs(data) do
+			local done = false
 
-		for z = p1.z, p2.z do
-			for y = p1.y, p2.y do
-				for x = p1.x, p2.x do
-					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
-					local done = false
+			for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
+				if id == barriernode_id then
 
-					for barriernode_id, replacement_id in pairs(barrier_nodes) do
-						if d[vi] == barriernode_id then
-							d[vi] = replacement_id
-							done = true
-							break
-						end
-					end
-
-					-- Liquid updates fail if I turn everything but changes into ignore
-					if not done and d[vi] == ID_AIR then
-						d[vi] = ID_IGNORE
-					end
+					data[i] = replacement_id
+					done = true
+					break
 				end
+			end
+
+			if not done then
+				data[i] = ID_IGNORE
 			end
 		end
 
-		return d
-	end, function(d)
-		vm:set_data(d)
-		vm:update_liquids()
+		vm:set_data(data)
 		vm:write_to_map(false)
-	end, data, pos1, pos2, ctf_map.barrier_nodes)
+
+		minetest.after(0.1, function()
+			local vm2 = VoxelManip(pos1, pos2)
+			vm2:update_liquids()
+		end)
+	else
+		local i = 0
+		for _, barrier_area in pairs(mapmeta.barriers) do
+			minetest.after(i, function()
+				local vm = VoxelManip()
+				vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
+
+				local data = vm:get_data()
+				assert(#data == barrier_area.max)
+				for idx in pairs(data) do
+					data[idx] = barrier_area.reps[idx] or ID_IGNORE
+				end
+
+				vm:set_data(data)
+				vm:write_to_map(false)
+			end)
+
+			i = i + 0.04
+		end
+
+		minetest.after(i - 0.04, function()
+			local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+			vm:update_liquids()
+
+			callback()
+		end)
+
+		return
+	end
+
+	callback()
 end
 
-local ID_AIR = minetest.CONTENT_AIR
-local ID_IGNORE = minetest.CONTENT_IGNORE
-local ID_CHEST = minetest.get_content_id("ctf_map:chest")
-local ID_WATER = minetest.get_content_id("default:water_source")
 
+local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local function get_place_positions(a, data, pos1, pos2)
 	if a.amount <= 0 then return {} end
 
@@ -219,7 +238,11 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 
 		if #place_positions < a.amount then
 			minetest.log("error",
-				string.format("[MAP] Couldn't place %d from %d chests from pos %d", a.amount - #place_positions, a.amount, i)
+				string.format("[MAP] Couldn't place %d of the %d chests needed to place in zone %d",
+					a.amount - #place_positions,
+					a.amount,
+					i
+				)
 			)
 		end
 	end

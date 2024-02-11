@@ -1,5 +1,7 @@
-local CURRENT_MAP_VERSION = "2"
-local modname = minetest.get_current_modname();
+local CURRENT_MAP_VERSION = "3"
+local BARRIER_Y_SIZE = 16
+
+local modname = minetest.get_current_modname()
 
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
@@ -32,7 +34,7 @@ function ctf_map.load_map_meta(idx, dirname)
 	minetest.log("info", "load_map_meta: Loading map meta from '" .. dirname .. "/map.conf'")
 
 	local map
-	local offset = vector.new(600 * idx, 0, 0)
+	local offset = vector.new(608 * idx, 0, 0) -- 608 is a multiple of 16, the size of a mapblock
 
 	if not meta:get("map_version") then
 		if not meta:get("r") then
@@ -76,7 +78,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			phys_gravity  = tonumber(meta:get("phys_gravity")),
 			chests        = {},
 			teams         = {},
-			barrier_area  = {pos1 = pos1, pos2 = pos2}
+			barrier_area  = {pos1 = pos1, pos2 = pos2},
+			barriers = false,
 		}
 
 		-- Read teams from config
@@ -123,7 +126,7 @@ function ctf_map.load_map_meta(idx, dirname)
 				amount = ctf_map.DEFAULT_CHEST_AMOUNT,
 			}
 		end
-	elseif meta:get("map_version") == CURRENT_MAP_VERSION then
+	else
 		-- If new items are added also remember to change the table in mapedit_gui.lua
 		-- The version number should be updated if you change an item
 		local size = minetest.deserialize(meta:get("size"))
@@ -157,6 +160,40 @@ function ctf_map.load_map_meta(idx, dirname)
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
+		if tonumber(meta:get("map_version")) > 2 and not ctf_core.settings.low_ram_mode then
+			local f, err = io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "rb")
+
+			if (ctf_core.settings.server_mode ~= "mapedit" and assert(f, err)) or f then
+				local barriers = f:read("*all")
+
+				f:close()
+
+				assert(barriers and barriers ~= "")
+
+				barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
+
+				if barriers then
+					for _, barrier_area in pairs(barriers) do
+						barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
+						barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
+
+						for i = 1, barrier_area.max do
+							if not barrier_area.reps[i] then
+								barrier_area.reps[i] = minetest.CONTENT_IGNORE
+							else
+								barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
+							end
+						end
+					end
+
+					map.barriers = barriers
+				else
+					minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
+				end
+			else
+				minetest.log("error", "Map "..dirname.." is missing its barriers file. Re-save map to fix")
+			end
+		end
 
 		for id, def in pairs(map.chests) do
 			map.chests[id].pos1 = vector.add(offset, def.pos1)
@@ -237,8 +274,63 @@ function ctf_map.save_map(mapmeta)
 		end
 	end
 
-	mapmeta.barrier_area.pos1 = vector.subtract(mapmeta.barrier_area.pos1, mapmeta.offset)
-	mapmeta.barrier_area.pos2 = vector.subtract(mapmeta.barrier_area.pos2, mapmeta.offset)
+	-- Calculate where barriers are
+	local barriers = {}
+	local pos1, pos2 = mapmeta.pos1:copy(), mapmeta.pos2:copy()
+	local barrier_area = {pos1 = pos1:subtract(mapmeta.offset), pos2 = pos2:subtract(mapmeta.offset)}
+
+	if pos1.y > pos2.y then
+		local t = pos2
+		pos2 = pos1
+		pos1 = t
+	end
+
+	if pos1.y + BARRIER_Y_SIZE < pos2.y then
+		pos2.y = pos1.y + BARRIER_Y_SIZE
+	end
+
+	local queue_break = false
+	while true do
+		local tmp = {
+			-- pos1 = pos1
+			-- pos2 = pos2
+			-- max = #data
+			reps = {}
+		}
+		local vm = VoxelManip()
+		pos1, pos2 = vm:read_from_map(pos1, pos2)
+		tmp.pos1, tmp.pos2 = pos1:subtract(mapmeta.offset), pos2:subtract(mapmeta.offset)
+
+		local data = vm:get_data()
+		local barrier_found = false
+		for i, v in ipairs(data) do
+			for b, rep in pairs(ctf_map.barrier_nodes) do
+				if v == b then
+					barrier_found = true
+					tmp.reps[i] = minetest.get_name_from_content_id(rep)
+				end
+			end
+		end
+
+		tmp.max = #data
+
+		if barrier_found then
+			table.insert(barriers, tmp)
+		end
+
+		if queue_break then
+			break
+		end
+
+		if pos2.y + BARRIER_Y_SIZE < mapmeta.pos2.y then
+			pos1.y = pos2.y + 1
+			pos2.y = pos2.y + BARRIER_Y_SIZE
+		else
+			pos1.y = pos2.y + 1
+			pos2.y = mapmeta.pos2.y
+			queue_break = true
+		end
+	end
 
 	meta:set("map_version"   , CURRENT_MAP_VERSION)
 	meta:set("size"          , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))
@@ -258,21 +350,23 @@ function ctf_map.save_map(mapmeta)
 	meta:set("phys_gravity"  , mapmeta.phys_gravity)
 	meta:set("chests"        , minetest.serialize(mapmeta.chests))
 	meta:set("teams"         , minetest.serialize(mapmeta.teams))
-	meta:set("barrier_area"  , minetest.serialize(mapmeta.barrier_area))
+	meta:set("barrier_area"  , minetest.serialize(barrier_area))
 	meta:set("game_modes"    , minetest.serialize(mapmeta.game_modes))
 	meta:set("enable_shadows", mapmeta.enable_shadows)
 
 	meta:write()
 
-	minetest.after(0.1, function()
-		local filepath = path .. "map.mts"
-		if minetest.create_schematic(mapmeta.pos1, mapmeta.pos2, nil, filepath) then
-			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
-			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
-									"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
-									"start a normal ctf game, and run \"/ctf_next "..mapmeta.dirname.."\" then \"/ctf_skip\""));
-		else
-			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
-		end
-	end)
+	local filepath = path .. "map.mts"
+	if minetest.create_schematic(mapmeta.pos1, mapmeta.pos2, nil, filepath) then
+		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
+		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
+								"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
+								"start a normal ctf game, and run \"/ctf_next -f "..mapmeta.dirname.."\""));
+	else
+		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
+	end
+
+	local f = assert(io.open(path .. "barriers.data", "wb"))
+	f:write(minetest.compress(minetest.serialize(barriers), "deflate"))
+	f:close()
 end

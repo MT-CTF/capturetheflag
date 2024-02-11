@@ -14,12 +14,19 @@ local flags_hold = 0
 ctf_modebase.skip_vote = {}
 
 local function add_vote_hud(player)
+	hud:add(player, "skip_vote:background", {
+		hud_elem_type = "image",
+        position = {x = 1, y = 0.5},
+        offset = {x = -100, y = 0},
+        text = "gui_formbg.png",
+        scale = {x = 0.4, y = 0.2}
+	})
 	hud:add(player, "skip_vote:vote", {
 		hud_elem_type = "text",
 		position = {x = 1, y = 0.5},
 		offset = {x = -100, y = 0},
-		text = "Skip to next match\n/yes /no or /abstain",
-		color = 0xFFFFFF,
+		text = "Skip to next match?\n/yes /no or /abstain",
+		color = 0xF235FF
 	})
 end
 
@@ -34,6 +41,10 @@ function ctf_modebase.skip_vote.start_vote()
 
 	for _, player in ipairs(minetest.get_connected_players()) do
 		add_vote_hud(player)
+		minetest.sound_play("ctf_modebase_notification", {
+			gain = 0.8,
+			pitch = 1.0,
+		}, true)
 		voters_count = voters_count + 1
 	end
 
@@ -165,6 +176,7 @@ local function player_vote(name, vote)
 	local player = minetest.get_player_by_name(name)
 	if hud:exists(player, "skip_vote:vote") then
 		hud:remove(player, "skip_vote:vote")
+		hud:remove(player, "skip_vote:background")
 	end
 
 	if voters_count == 0 then

@@ -39,6 +39,7 @@ function ctf_gui.init()
 				local action = ctx._on_formspec_input(pname, ctx, fields, ...)
 
 				if action == "refresh" then
+					minetest.log("action", "Refreshing formspec "..dump(ctx._formname).." to "..dump(pname))
 					minetest.show_formspec(pname, ctx._formname, ctx._formspec(ctx))
 				end
 			end
@@ -115,6 +116,7 @@ function ctf_gui.show_formspec(player, formname, formspec, formcontext)
 	context[player]._formname = formname
 	context[player]._formspec = formspec
 
+	minetest.log("action", "Showing new_formspec "..dump(formname).." to "..dump(player))
 	if type(formspec) == "function" then
 		minetest.show_formspec(player, formname, formspec(formcontext))
 	else
@@ -144,6 +146,7 @@ do
 			end
 		end
 
+		-- minetest.log("action", "[ctf_gui] unpacking: "..dump(l))
 		return format(base, unpck(l))
 	end
 
@@ -457,6 +460,7 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 		formdef._info = formdef
 		context[player] = formdef
 
+		minetest.log("action", "Showing formspec "..dump(formname).." to "..dump(player))
 		minetest.show_formspec(player, formname, formspec)
 	end,
 	formdef, ctf_gui.ELEM_SIZE, ctf_gui.SCROLLBAR_WIDTH)

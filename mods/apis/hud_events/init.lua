@@ -4,7 +4,7 @@ local hud = mhud.init()
 
 local HUD_SHOW_TIME = 3
 local HUD_SHOW_QUICK_TIME = 2
-local HUD_SHOW_NEXT_TIME = 1
+local HUD_SHOW_NEXT_TIME = 0.6
 
 local HUD_COLORS = {
 	primary = 0x0D6EFD,
@@ -51,7 +51,7 @@ local function show_quick_hud_event(player, huddef)
 	end
 
 	if quick_event_timer[pname] then
-		quick_event_timer[pname].cancel()
+		quick_event_timer[pname]:cancel()
 	end
 	quick_event_timer[pname] = minetest.after(HUD_SHOW_QUICK_TIME, function()
 		if not player:is_player() then return end
@@ -82,16 +82,24 @@ local function handle_hud_events(player)
 	end
 
 	hud_queues[pname].t = minetest.after(HUD_SHOW_TIME, function()
-		hud:change(player, "hud_event", {text = ""})
+		player = minetest.get_player_by_name(pname)
 
-		hud_queues[pname].t = minetest.after(HUD_SHOW_NEXT_TIME, function()
-			if #hud_queues[pname].e >= 1 then
-				handle_hud_events(player)
-			else
-				hud:remove(player, "hud_event")
-				hud_queues[pname] = nil
-			end
-		end)
+		if player then
+			hud:change(player, "hud_event", {text = ""})
+
+			hud_queues[pname].t = minetest.after(HUD_SHOW_NEXT_TIME, function()
+				player = minetest.get_player_by_name(pname)
+
+				if player then
+					if #hud_queues[pname].e >= 1 then
+						handle_hud_events(player)
+					else
+						hud:remove(player, "hud_event")
+						hud_queues[pname] = nil
+					end
+				end
+			end)
+		end
 	end)
 end
 

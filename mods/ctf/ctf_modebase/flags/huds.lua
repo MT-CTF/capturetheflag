@@ -1,12 +1,12 @@
 local hud = mhud.init()
 
-local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flags! Protect your flag!"           }
-local FLAG_STOLEN           = {color = 0xFF0000, text = "Kill %s, they've got your flag!"                     }
-local FLAG_STOLEN_YOU       = {color = 0xFF0000, text = "You've got a flag! Run back and punch your flag!"    }
-local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammates %s! They have the enemy flag!"     }
-local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammates %s to capture the flag!"  }
-local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"     }
-local OTHER_FLAG_STOLEN     = {color = 0xAA00FF, text = "Kill %s, they've got some flags!"                    }
+local FLAG_SAFE             = {color = 0xFFFFFF, text = "Punch the enemy flags! Protect your flag!"         }
+local FLAG_STOLEN           = {color = 0xFF0000, text = "Kill %s, they've got your flag!"                   }
+local FLAG_STOLEN_YOU       = {color = 0x22BB22, text = "You've got a flag! Run back and punch your flag!"  }
+local FLAG_STOLEN_TEAMMATE  = {color = 0x22BB22, text = "Protect teammates %s! They have the enemy flag!"   }
+local BOTH_FLAGS_STOLEN     = {color = 0xFF0000, text = "Kill %s to allow teammates %s to capture the flag!"}
+local BOTH_FLAGS_STOLEN_YOU = {color = 0xFF0000, text = "You can't capture that flag until %s is killed!"   }
+local OTHER_FLAG_STOLEN     = {color = 0xAA00FF, text = "Kill %s, they've got some flags!"                  }
 
 ctf_modebase.flag_huds = {}
 
@@ -80,6 +80,13 @@ function ctf_modebase.flag_huds.update_player(player)
 	local flag_status = get_flag_status(player:get_player_name())
 
 	if hud:exists(player, "flag_status") then
+		if hud:get(player, "flag_status").def.text ~= flag_status.text then
+			hud_events.new(player, {
+				text = flag_status.text,
+				color = flag_status.color,
+			})
+		end
+
 		hud:change(player, "flag_status", flag_status)
 	else
 		hud:add(player, "flag_status", {
@@ -87,6 +94,12 @@ function ctf_modebase.flag_huds.update_player(player)
 			position = {x = 1, y = 0},
 			offset = {x = -6, y = 6},
 			alignment = {x = "left", y = "down"},
+			text = flag_status.text,
+			text_scale = 1,
+			color = flag_status.color,
+		})
+
+		hud_events.new(player, {
 			text = flag_status.text,
 			color = flag_status.color,
 		})

@@ -1,0 +1,23 @@
+# textdomain: email
+(@1) You have mail! Type /inbox to recieve=(@1) У вас новое письмо! Введите /inbox для получения
+Your Inbox=Ваш почтовый ящик
+Date=Дата
+From=От
+Message=Сообщение
+Well done! Your inbox is empty!=Отлично! Ваша почта пуста!
+Delete All=Удалить все
+Close=Закрыть
+Exit then type /mail username message to reply=Выйдите, затем введите /mail имяпользователя сообщение для ответа
+Your inbox is empty!=Ваш почтовый ящик пуст!
+@1 items in your inbox:=@1 элементов в вашем почтовом ящике:
+End of mail (@1 items)=Конец почты (@1 элементов)
+Opened inbox!=Почтовый ящик открыт!
+Inbox=Почтовый ящик
+Inbox cleared!=Почтовый ящик очищен!
+Player '@1' does not exist=Игрок '@1' не существует
+Message sent to @1=Сообщение отправлено @1
+Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only.=Почтовый ящик: Пусто для просмотра почты. Используйте 'clear', чтобы очистить почтовый ящик, 'text' только для текста.
+Inbox cleared=Почтовый ящик очищен
+<playername> <some message>=<имяигрока> <какоесообщение>
+mail: add a message to a player's inbox=mail: добавить сообщение в почтовый ящик игрока
+Usage: mail <playername> <some message>=Использование: mail <имяигрока> <какоесообщение>
