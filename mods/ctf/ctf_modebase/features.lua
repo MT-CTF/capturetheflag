@@ -187,7 +187,7 @@ local function calculate_killscore(player)
     local flag_multiplier = 1
 	for tname, carrier in pairs(ctf_modebase.flag_taken) do
 		if carrier.p == player then
-			flag_multiplier = flagmultiplier + 0.25
+			flag_multiplier = flag_multiplier + 0.25
 		end
 	end
 
