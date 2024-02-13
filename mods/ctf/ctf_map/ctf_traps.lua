@@ -94,7 +94,9 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		on_place = function(itemstack, placer, pointed_thing)
 			local item, pos = minetest.item_place(itemstack, placer, pointed_thing, 34)
 			if item then
-				minetest.get_meta(pointed_thing.above):set_string("placer", placer:get_player_name())
+				local pname = placer:get_player_name()
+				minetest.get_meta(pointed_thing.above):set_string("placer_team", ctf_teams.get(pname))
+				minetest.get_meta(pointed_thing.above):set_string("placer", pname)
 			end
 			return item, pos
 		end
@@ -110,12 +112,16 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		end
 		if reason.node_pos then
 			local meta = minetest.get_meta(reason.node_pos)
+			local pteam = meta:get_string("placer_team")
 			local pname = meta:get_string("placer")
-			if pname ~= "" then
+			if pteam ~= team then
 				local placer = minetest.get_player_by_name(pname)
-				if placer then
+				if ctf_teams.get(pname) == team then
+					player:set_hp(player:get_hp() - 7)
+					return -7, false
+				elseif placer then
 					player:punch(placer, 1, { fleshy = 7, spike = 1})
-					return 0
+					return -7, false
 				end
 			end
 		end
