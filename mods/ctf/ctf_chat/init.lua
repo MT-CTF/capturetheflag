@@ -64,18 +64,6 @@ minetest.override_chatcommand("me", {
 	end
 })
 
-minetest.override_chatcommand("donate", {
-	func = function(name, param)
-		local old_func = minetest.registered_chatcommands["donate"].func
-		if filter and not filter.check_message(name, param) then
-			filter.on_violation(name, param)
-			return false, "No swearing"
-		end
-
-		return old_func(name, param)
-	end
-})
-
 minetest.register_chatcommand("t", {
 	params = "msg",
 	description = "Send a message on the team channel",
