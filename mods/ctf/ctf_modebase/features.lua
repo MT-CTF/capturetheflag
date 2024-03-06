@@ -10,17 +10,15 @@ ctf_core.testing = {
 		local one_third     = math.ceil(0.34 * total_players)
 		local one_fourth     = math.ceil(0.25 * total_players)
 		local avg = (kd_diff + actual_kd_diff) / 2
+		local pcount_diff_limit = (
+			(players_diff <= math.min(one_fourth, 2)) or
+			(pkd >= 1.8 and players_diff <= math.min(one_third, 4))
+		)
 		if best_kd.kills + worst_kd.kills >= 30 then
 			avg = actual_kd_diff
 		end
-		return (best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-		(
-			pkd >= math.min(1, kd_diff/2) and avg >= 0.4 and
-			(
-				players_diff <= math.min(one_fourth, 3) or
-				(pkd >= 1.5 and players_diff <= math.min(one_third, 6))
-			)
-		)
+		return pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
 	end
 }
 
