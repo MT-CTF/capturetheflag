@@ -460,10 +460,16 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 		formdef._info = formdef
 		context[player] = formdef
 
-		minetest.log("action", "Showing formspec "..dump(formname).." to "..dump(player))
-		minetest.show_formspec(player, formname, formspec)
+		if minetest.get_player_by_name(player) then
+			minetest.log("action", "Showing formspec "..dump(formname).." to "..dump(player))
+			minetest.show_formspec(player, formname, formspec)
+		end
 	end,
 	formdef, ctf_gui.ELEM_SIZE, ctf_gui.SCROLLBAR_WIDTH)
 end
+
+minetest.register_on_leaveplayer(function(player)
+	context[player:get_player_name()] = nil
+end)
 
 dofile(minetest.get_modpath("ctf_gui").."/dev.lua")
