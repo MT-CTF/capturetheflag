@@ -2,7 +2,8 @@ ctf_modebase = {
 	-- Table containing all registered modes and their definitions
 	modes                = {},    ---@type table
 
-	-- Same as ctf_modebase.modes but in list form
+	-- Same as ctf_modebase.modes but in list form.
+	-- Exception: Disabled modes that show up in ctf_modebase.modes won't show up in the modelist
 	modelist             = {},    ---@type list
 
 	-- Name of the mode currently being played. On server start this will be false
