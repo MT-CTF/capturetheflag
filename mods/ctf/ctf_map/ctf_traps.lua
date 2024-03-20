@@ -131,7 +131,7 @@ local function damage_cobble_dig(pos, node, digger)
 	local placerobj = minetest.get_player_by_name(placer_name)
 
 	if placerobj then
-		digger:punch(placerobj, 10, {
+		digger:punch(placerobj, 1, {
 			damage_groups = {
 				fleshy = 7,
 				damage_cobble = 1,
