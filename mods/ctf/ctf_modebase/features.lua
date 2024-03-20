@@ -432,6 +432,8 @@ local delete_queue = {}
 local team_switch_after_capture = false
 
 return {
+	tp_player_near_flag = tp_player_near_flag,
+
 	on_new_match = function()
 		team_list = {}
 		for tname in pairs(ctf_map.current_map.teams) do
