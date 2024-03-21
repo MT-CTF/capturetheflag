@@ -10,16 +10,30 @@ ctf_core.testing = {
 		local one_third     = math.ceil(0.34 * total_players)
 		local one_fourth     = math.ceil(0.25 * total_players)
 		local avg = (kd_diff + actual_kd_diff) / 2
+		local pcount_diff_limit = (
+			(players_diff <= math.min(one_fourth, 2)) or
+			(pkd >= 1.8 and players_diff <= math.min(one_third, 4))
+		)
 		if best_kd.kills + worst_kd.kills >= 30 then
 			avg = actual_kd_diff
 		end
-		return (best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-		(pkd >= math.min(1, kd_diff/2) and avg >= 0.4 and (players_diff <= one_fourth or
-		(pkd >= 1.5 and players_diff <= one_third)))
+		return pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
 	end
 }
 
-local function update_playertag(player, t, nametag, team_nametag, team_symbol_nametag)
+local hud = mhud.init()
+local LOADING_SCREEN_TARGET_TIME = 7
+local loading_screen_time
+
+local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
+	if not      nametag.object.set_observers or
+	   not team_nametag.object.set_observers or
+	   not symbol_nametag.object.set_observers
+	then
+		return
+	end
+
 	local entity_players = {}
 	local nametag_players = table.copy(ctf_teams.online_players[t].players)
 	local symbol_players = {}
@@ -43,16 +57,18 @@ local function update_playertag(player, t, nametag, team_nametag, team_symbol_na
 		end
 	end
 
-	team_nametag.object:set_observers(nametag_players)
-	team_symbol_nametag.object:set_observers(symbol_players)
-	nametag.object:set_observers(entity_players)
+	-- Occasionally crashes in singleplayer, so call it safely
+	       nametag.object:set_observers(entity_players )
+	  team_nametag.object:set_observers(nametag_players)
+	symbol_nametag.object:set_observers(symbol_players )
 end
 
+local tags_hidden = false
 local update_timer = false
-local function update_playertags()
-	if not update_timer then
+local function update_playertags(time)
+	if not update_timer and not tags_hidden then
 		update_timer = true
-		minetest.after(1.2, function()
+		minetest.after(time or 1.2, function()
 			update_timer = false
 			for _, p in pairs(minetest.get_connected_players()) do
 				local t = ctf_teams.get(p)
@@ -72,6 +88,81 @@ local function update_playertags()
 	end
 end
 
+local PLAYERTAGS_OFF = false
+local PLAYERTAGS_ON = true
+local function set_playertags_state(state)
+	if state == PLAYERTAGS_ON and tags_hidden then
+		tags_hidden = false
+
+		update_playertags(0)
+	elseif state == PLAYERTAGS_OFF and not tags_hidden then
+		tags_hidden = true
+
+		for _, p in pairs(minetest.get_connected_players()) do
+			local playertag = playertag.get(p)
+
+			if ctf_teams.get(p) and playertag then
+				local team_nametag = playertag.nametag_entity
+				local nametag = playertag.entity
+				local symbol_entity = playertag.symbol_entity
+
+				if nametag and team_nametag and symbol_entity and
+				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
+					 team_nametag.object:set_observers({})
+					symbol_entity.object:set_observers({})
+					      nametag.object:set_observers({})
+				end
+			end
+		end
+	end
+end
+
+local old_announce = ctf_modebase.map_chosen
+function ctf_modebase.map_chosen(map, ...)
+	set_playertags_state(PLAYERTAGS_OFF)
+
+	for _, p in pairs(minetest.get_connected_players()) do
+		if ctf_teams.get(p) then
+			hud:add(p, "loading_screen", {
+				hud_elem_type = "image",
+				position = {x = 0.5, y = 0.5},
+				image_scale = -100,
+				z_index = 1000,
+				texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
+			})
+
+			hud:add(p, "map_image", {
+				hud_elem_type = "image",
+				position = {x = 0.5, y = 0.5},
+				image_scale = -100,
+				z_index = 1001,
+				texture = map.dirname.."_screenshot.png^[opacity:30",
+			})
+
+			hud:add(p, "loading_text", {
+				hud_elem_type = "text",
+				position = {x = 0.5, y = 0.5},
+				alignment = {x = "center", y = "up"},
+				text_scale = 2,
+				text = "Loading Map: " .. map.name .. "...",
+				color = 0x7ec5ff,
+				z_index = 1002,
+			})
+			hud:add(p, {
+				hud_elem_type = "text",
+				position = {x = 0.5, y = 0.75},
+				alignment = {x = "center", y = "center"},
+				text = random_messages.get_random_message(),
+				color = 0xffffff,
+				z_index = 1002,
+			})
+		end
+	end
+
+	loading_screen_time = minetest.get_us_time()
+
+	return old_announce(map, ...)
+end
 
 ctf_settings.register("teammate_nametag_style", {
 	type = "list",
@@ -371,6 +462,15 @@ return {
 			ctf_modebase:get_current_mode().team_chest_items or {},
 			ctf_modebase:get_current_mode().blacklisted_nodes or {}
 		)
+
+		if loading_screen_time then
+			local total_time = (minetest.get_us_time() - loading_screen_time) / 1e6
+
+			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
+				hud:clear_all()
+				set_playertags_state(PLAYERTAGS_ON)
+			end)
+		end
 	end,
 	on_match_end = function()
 		recent_rankings.on_match_end()

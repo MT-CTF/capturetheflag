@@ -4,7 +4,7 @@ local function remove_flora(pos, radius)
 	local pos2 = vector.add(pos, radius)
 
 	for _, p in ipairs(minetest.find_nodes_in_area(pos1, pos2, {
-		"group:flora", "group:mushroom", "default:snow"
+		"group:flora", "group:mushroom", "default:snow", "group:grenade_breakable"
 	})) do
 		if vector.distance(pos, p) <= radius then
 			minetest.remove_node(p)

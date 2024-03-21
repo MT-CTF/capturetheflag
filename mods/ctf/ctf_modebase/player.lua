@@ -19,22 +19,22 @@ local simplify_for_saved_stuff = function(iname)
 
 	local match
 
-	match = iname:match("default:pick_(%a+)")
+	match = iname:match("default:pick_(%S+)")
 	if match then
 		return "pick", match
 	end
 
-	match = iname:match("default:axe_(%a+)")
+	match = iname:match("default:axe_(%S+)")
 	if match then
 		return "axe", match
 	end
 
-	match = iname:match("default:shovel_(%a+)")
+	match = iname:match("default:shovel_(%S+)")
 	if match then
 		return "shovel", match
 	end
 
-	match = iname:match("ctf_mode_nade_fight:(.*)")
+	match = iname:match("ctf_mode_nade_fight:(%S+)")
 	if match then
 		return "nade_fight_grenade", match
 	end
@@ -48,7 +48,7 @@ local simplify_for_saved_stuff = function(iname)
 	end
 
 	local mod
-	mod, match = iname:match("(%a+):sword_(%a+)")
+	mod, match = iname:match("(%S+):sword_(%S+)")
 
 	if mod and (mod == "default" or mod == "ctf_melee") and match then
 		return "sword", match
@@ -219,50 +219,55 @@ function ctf_modebase.player.give_initial_stuff(player)
 	inv:set_list("main", new)
 end
 
-minetest.register_on_item_pickup(function(itemstack, picker)
-	if ctf_modebase.current_mode and ctf_teams.get(picker) then
-		local mode = ctf_modebase:get_current_mode()
-		for name, func in pairs(mode.initial_stuff_item_levels) do
-			local priority = func(itemstack)
+if minetest.register_on_item_pickup then
+	minetest.register_on_item_pickup(function(itemstack, picker)
+		if ctf_modebase.current_mode and ctf_teams.get(picker) then
+			local mode = ctf_modebase:get_current_mode()
+			for name, func in pairs(mode.initial_stuff_item_levels) do
+				local priority = func(itemstack)
 
-			if priority then
-				local inv = picker:get_inventory()
-				for i=1, 8 do -- loop through the top row of the player's inv
-					local compare = inv:get_stack("main", i)
+				if priority then
+					local inv = picker:get_inventory()
+					for i=1, 8 do -- loop through the top row of the player's inv
+						local compare = inv:get_stack("main", i)
 
-					if not mode.is_bound_item or not mode.is_bound_item(picker, compare:get_name()) then
-						local cprio = func(compare)
+						if not mode.is_bound_item or not mode.is_bound_item(picker, compare:get_name()) then
+							local cprio = func(compare)
 
-						if cprio and cprio < priority then
-							local item, type = simplify_for_saved_stuff(compare:get_name())
-							inv:set_stack("main", i, itemstack)
+							if cprio and cprio < priority then
+								local item, typ = simplify_for_saved_stuff(compare:get_name())
+								minetest.log(dump(item)..dump(typ))
+								inv:set_stack("main", i, itemstack)
 
-							if item == "sword" and type == "stone" and
-							ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
-								return ItemStack("")
-							end
+								if item == "sword" and typ == "stone" and
+								ctf_settings.get(picker, "auto_trash_stone_swords") == "true" then
+									return ItemStack("")
+								end
 
-							if item ~= "sword" and type == "stone" and
-							ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
-								return ItemStack("")
-							else
-								local result = inv:add_item("main", compare):get_count()
-
-								if result == 0 then
+								if item ~= "sword" and typ == "stone" and
+								ctf_settings.get(picker, "auto_trash_stone_tools") == "true" then
 									return ItemStack("")
 								else
-									compare:set_count(result)
-									return compare
+									local result = inv:add_item("main", compare):get_count()
+
+									if result == 0 then
+										return ItemStack("")
+									else
+										compare:set_count(result)
+										return compare
+									end
 								end
 							end
 						end
 					end
+					break -- We already found a place for it, don't check for one held by a different item type
 				end
-				break -- We already found a place for it, don't check for one held by a different item type
 			end
 		end
-	end
-end)
+	end)
+else
+	minetest.log("error", "You aren't using the latest version of Minetest, auto-trashing and auto-sort won't work")
+end
 
 function ctf_modebase.player.empty_inv(player)
 	player:get_inventory():set_list("main", {})
