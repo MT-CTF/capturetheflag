@@ -28,8 +28,16 @@ function ctf_modebase.bounty_algo.kd.get_next_bounty(team_members)
 end
 
 function ctf_modebase.bounty_algo.kd.bounty_reward_func(pname)
-	local recent = ctf_modebase:get_current_mode().recent_rankings.players()[pname] or {}
-	local kd = (recent.kills or 1) / (recent.deaths or 1)
+	local recent = ctf_modebase:get_current_mode().recent_rankings.players()
+	local sum = 0
+	for _, tname in ipairs(team_members) do
+		local stats = recent[tname]
+		if stats then
+			sum = sum + (stats.kills or 0) / (stats.deaths or 1)
+		end
+	end
+	local pstats = recent[pname] or {}
+	local kd = (pstats.kills or 1) / (pstats.deaths or 1)
 
-	return {bounty_kills = 1, score = math.pow(kd * 1.5, 2.3)}
+	return {bounty_kills = 1, score = math.pow(kd, ))}
 end
