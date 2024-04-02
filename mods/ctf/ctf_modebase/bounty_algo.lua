@@ -6,13 +6,13 @@ function ctf_modebase.bounty_algo.kd.get_next_bounty(team_members)
 	local recent = ctf_modebase:get_current_mode().recent_rankings.players()
 
 	for _, pname in ipairs(team_members) do
-		local kd = 0.1
 		if recent[pname] then
-			kd = math.max(kd, (recent[pname].kills or 0) / (recent[pname].deaths or 1))
+			local kd = (recent[pname].kills or 0) / (recent[pname].deaths or 1)
+			if kd >= 0.8 then
+				table.insert(kd_list, kd)
+				sum = sum + kd
+			end
 		end
-
-		table.insert(kd_list, kd)
-		sum = sum + kd
 	end
 
 	local random = math.random() * sum
