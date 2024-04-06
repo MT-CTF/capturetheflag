@@ -3,10 +3,11 @@ function ctf_modebase.register_mode(name, def)
 	if def.exclusive then
 		ctf_modebase.modes[name] = def
 		ctf_modebase.modelist = {name}
+		registered_exclusive = true
 	else
 		ctf_modebase.modes[name] = def
 
-		if registered_exclusive then
+		if not registered_exclusive then
 			table.insert(ctf_modebase.modelist, name)
 		end
 	end

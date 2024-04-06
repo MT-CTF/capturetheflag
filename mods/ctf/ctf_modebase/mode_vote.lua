@@ -26,9 +26,13 @@ local function player_vote(name, length)
 end
 
 local function show_modechoose_form(player)
-	local vote_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_modebase:default_vote_"..new_mode)
+	local vote_setting = "ask"
 
-	vote_setting = ctf_settings.settings["ctf_modebase:default_vote_"..new_mode]._list_map[tonumber(vote_setting)]
+	if ctf_settings.settings["ctf_modebase:default_vote_"..new_mode] then
+		vote_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_modebase:default_vote_"..new_mode)
+
+		vote_setting = ctf_settings.settings["ctf_modebase:default_vote_"..new_mode]._list_map[tonumber(vote_setting)]
+	end
 
 	if vote_setting ~= "ask" then
 		minetest.after(0, function()
