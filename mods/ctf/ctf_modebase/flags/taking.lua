@@ -21,6 +21,10 @@ local function drop_flags(player, pteam)
 		end
 	end
 
+	if player_api.players[pname] then
+		player_api.set_texture(player, 2, "blank.png")
+	end
+
 	ctf_modebase.taken_flags[pname] = nil
 
 	ctf_modebase.skip_vote.on_flag_drop(#flagteams)
@@ -86,11 +90,11 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			[3] = "three",
 			[4] = "four",
 			[5] = "mega",
-			[6] = "mega",
-			[7] = "giga",
+			[7] = "mega",
 			[8] = "giga",
-			[9] = "tera",
-			[10] = "EXA",
+			[10] = "giga",
+			[12] = "tera",
+			[14] = "EXA",
 		}
 
 		local number_of_attempts = 0
@@ -108,7 +112,6 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 				break
 			end
 		end
-		minetest.chat_send_all(minetest.serialize(ctf_modebase.flag_attempt_history))
 		local streak = streaks[number_of_attempts]
 		if number_of_attempts >= 10 then
 			streak = "EXA"
@@ -117,6 +120,9 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			minetest.chat_send_all(pname .. " is on a " .. streak .. " attempt streak!")
 		end
 
+		player_api.set_texture(puncher, 2,
+			"default_wood.png^([combine:16x16:4,0=wool_white.png^[colorize:"..ctf_teams.team[target_team].color..":200)"
+		)
 
 		ctf_modebase.skip_vote.on_flag_take()
 		ctf_modebase:get_current_mode().on_flag_take(puncher, target_team)
@@ -140,6 +146,8 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 				ctf_modebase.flag_captured[flagteam] = true
 			end
 
+			player_api.set_texture(puncher, 2, "blank.png")
+
 			ctf_modebase.on_flag_capture(puncher, flagteams)
 
 			ctf_modebase.skip_vote.on_flag_capture(#flagteams)
@@ -149,6 +157,10 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 end
 
 ctf_api.register_on_match_end(function()
+	for pname in pairs(ctf_modebase.taken_flags) do
+		player_api.set_texture(minetest.get_player_by_name(pname), 2, "blank.png")
+	end
+
 	ctf_modebase.taken_flags = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}

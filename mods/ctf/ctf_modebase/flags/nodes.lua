@@ -21,7 +21,7 @@ minetest.register_node("ctf_modebase:flag", {
 	paramtype = "light",
 	paramtype2 = "facedir",
 	walkable = false,
-	light_source = 5,
+	light_source = 6,
 	tiles = {
 		"default_wood.png",
 		"default_wood.png",
@@ -33,7 +33,7 @@ minetest.register_node("ctf_modebase:flag", {
 	node_box = {
 		type = "fixed",
 		fixed = {
-			{0.250000,-0.500000,0.000000,0.312500,0.500000,0.062500}
+			{0.25,-0.5000,0.0000,0.3625,0.5000,0.1125}
 		}
 	},
 	groups = {immortal=1,is_flag=1,flag_bottom=1,not_in_creative_inventory=1},
@@ -65,7 +65,7 @@ for name, def in pairs(ctf_teams.team) do
 		paramtype2 = "facedir",
 		walkable = false,
 		buildable_to = false,
-		light_source = 5,
+		light_source = 6,
 		tiles = {
 			"default_wood.png",
 			"default_wood.png",
@@ -77,8 +77,8 @@ for name, def in pairs(ctf_teams.team) do
 		node_box = {
 			type = "fixed",
 			fixed = {
-				{0.250000,-0.500000,0.000000,0.312500,0.500000,0.062500},
-				{-0.5,0,0.000000,0.250000,0.500000,0.062500}
+				{0.25,-0.5000,0.0000,0.3625,0.5000,0.1125},
+				{-0.5,0,0.0500,0.2500,0.5000,0.0625}
 			}
 		},
 		groups = {immortal=1,is_flag=1,flag_top=1,not_in_creative_inventory=1,[name]=1},
@@ -115,7 +115,7 @@ minetest.register_node("ctf_modebase:flag_captured_top",{
 	node_box = {
 		type = "fixed",
 		fixed = {
-			{0.250000,-0.500000,0.000000,0.312500,0.500000,0.062500}
+			{0.25,-0.5000,0.0000,0.3625,0.5000,0.1125}
 		}
 	},
 	groups = {immortal=1,is_flag=1,flag_top=1,not_in_creative_inventory=1},

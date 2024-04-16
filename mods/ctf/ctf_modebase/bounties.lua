@@ -48,9 +48,9 @@ function ctf_modebase.bounties.claim(player, killer)
 	end
 
 	local rewards = bounties[pteam].rewards
-	minetest.chat_send_all(minetest.colorize(CHAT_COLOR,
-		string.format("[Bounty] %s killed %s and got %s", killer, player, get_reward_str(rewards))
-	))
+	local bounty_kill_text = string.format("[Bounty] %s killed %s and got %s", killer, player, get_reward_str(rewards))
+	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, bounty_kill_text))
+	ctf_modebase.announce(bounty_kill_text)
 
 	bounties[pteam] = nil
 	return rewards
@@ -156,7 +156,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 				)
 
 				table.insert(output, label)
-				local model = "model[%d,1;4,6;player;character.b3d;%s;{0,160};;;]"
+				local model = "model[%d,1;4,6;player;character.b3d;%s,blank.png;{0,160};;;]"
 				model = string.format(
 					model,
 					x,

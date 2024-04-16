@@ -17,6 +17,10 @@ for from, to in pairs(disabled_ores) do
 	minetest.register_alias_force(from, to)
 end
 
+minetest.override_chatcommand("clearinv", {
+	privs = {server = true},
+})
+
 minetest.register_on_mods_loaded(function()
 
 	-- Remove Unneeded ABMs

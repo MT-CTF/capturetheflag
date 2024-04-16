@@ -11,6 +11,8 @@ local new_mode
 ctf_modebase.mode_vote = {}
 
 local function player_vote(name, length)
+	if not voted then return end
+
 	if not voted[name] then
 		voters_count = voters_count - 1
 	end
@@ -32,6 +34,9 @@ local function show_modechoose_form(player)
 		minetest.after(0, function()
 			if not minetest.get_player_by_name(player) then return end
 
+			minetest.chat_send_player(player,
+				string.format("Voting for " .. new_mode .. ". Automatic vote: " .. vote_setting .. "\n" ..
+				"To change the automatic vote settings, go to the \"Settings\" tab of your inventory."))
 			player_vote(player, vote_setting)
 		end)
 
@@ -200,11 +205,14 @@ minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
 	if votes and not voted[pname] then
-		voted[pname] = nil
 		voters_count = voters_count - 1
 
 		if voters_count == 0 then
 			ctf_modebase.mode_vote.end_vote()
 		end
+	end
+
+	if voted then
+		voted[pname] = nil
 	end
 end)

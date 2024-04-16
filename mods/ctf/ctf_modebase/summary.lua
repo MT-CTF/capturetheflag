@@ -1,5 +1,4 @@
 local previous = nil
-local start_time = nil
 local game_stat = nil
 local winner = nil
 
@@ -19,18 +18,6 @@ local function team_rankings(total)
 	return ranks
 end
 
-local function get_duration()
-	if not start_time then
-		return "-"
-	end
-
-	local time = os.time() - start_time
-	return string.format("%02d:%02d:%02d",
-		math.floor(time / 3600),        -- hours
-		math.floor((time % 3600) / 60), -- minutes
-		math.floor(time % 60))          -- seconds
-end
-
 ctf_modebase.summary = {}
 
 function ctf_modebase.summary.get(prev)
@@ -45,7 +32,7 @@ function ctf_modebase.summary.get(prev)
 				special_row_title = "Total Team Stats",
 				game_stat = game_stat,
 				winner = winner,
-				duration = get_duration(),
+				duration = ctf_map.get_duration(),
 				buttons = {previous = previous ~= nil},
 				allow_sort = true,
 			}
@@ -71,10 +58,6 @@ ctf_api.register_on_new_match(function()
 	)
 end)
 
-ctf_api.register_on_match_start(function()
-	start_time = os.time()
-end)
-
 ctf_api.register_on_match_end(function()
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
@@ -85,11 +68,10 @@ ctf_api.register_on_match_end(function()
 		teams = rankings.teams(),
 		game_stat = game_stat,
 		winner = winner or "NO WINNER",
-		duration = get_duration(),
+		duration = ctf_map.get_duration(),
 		summary_ranks = current_mode.summary_ranks,
 	}
 
-	start_time = nil
 	winner = nil
 end)
 
@@ -242,7 +224,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 			items = rank_values,
 			default_idx = sort_by_idx,
 			give_idx = false,
-			pos = {x = 0.1, y = 1},
+			pos = {x = 13, y = 1},
 			size = {x = ctf_gui.ELEM_SIZE.x + 1, y = ctf_gui.ELEM_SIZE.y},
 			func = function(playername, fields, field_name)
 				if fields.sorting and sortby ~= fields.sorting and table.indexof(rank_values, fields.sorting) ~= -1 then
@@ -250,6 +232,11 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 					show_for_player(playername, formdef.buttons.next and true or false)
 				end
 			end,
+		}
+		formspec.elements.label = {
+			type = "label",
+			pos = {13, 0.5},
+			label = "Sort players by: "
 		}
 	end
 
@@ -278,7 +265,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.game_stat then
 		formspec.elements.game_stat = {
 			type = "label",
-			pos = {11, 0.5},
+			pos = {1, 0.5},
 			label = formdef.game_stat,
 		}
 	end
@@ -286,7 +273,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.winner then
 		formspec.elements.winner = {
 			type = "label",
-			pos = {4, 0.5},
+			pos = {5, 1.3},
 			label = formdef.winner,
 		}
 	end
@@ -294,7 +281,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.duration then
 		formspec.elements.duration = {
 			type = "label",
-			pos = {1, 0.5},
+			pos = {1, 1.3},
 			label = "Duration: " .. formdef.duration,
 		}
 	end
