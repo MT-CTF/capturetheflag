@@ -51,7 +51,7 @@ local function show_quick_hud_event(player, huddef)
 	end
 
 	if quick_event_timer[pname] then
-		quick_event_timer[pname].cancel()
+		quick_event_timer[pname]:cancel()
 	end
 	quick_event_timer[pname] = minetest.after(HUD_SHOW_QUICK_TIME, function()
 		if not player:is_player() then return end

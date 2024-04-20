@@ -54,12 +54,12 @@ Previous Developers: [savilli](https://github.com/savilli).
 
 Check out [mods/](mods/) to see all the installed mods and their respective licenses.
 
-Licenses where not specified:
-Code: LGPLv2.1+
-Textures: CC-BY-SA 3.0
+Licenses where not specified:\
+Code: [GNU LGPLv2.1+](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)\
+Media: [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
 
 ### Textures
 
-* [Header](menu/header.png): CC-BY-3.0 by [SuddenSFD](https://github.com/SuddenSFD)
-* [Background Image](menu/background.png): CC BY-SA 4.0 (where applicable) by [GreenBlob](https://github.com/a-blob) (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed CC-BY-SA 3.0). The player skins used are licensed CC-BY-SA 3.0
-* [Icon](menu/icon.png): CC-BY-3.0 by [SuddenSFD](https://github.com/SuddenSFD)
+* [Header](menu/header.png): [CC BY 3.0 Unported](https://creativecommons.org/licenses/by/3.0/) by [SuddenSFD](https://github.com/SuddenSFD)
+* [Background Image](menu/background.png): [CC BY-SA 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/) (where applicable) by [GreenBlob](https://github.com/a-blob) (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)). The player skins used are licensed under [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
+* [Icon](menu/icon.png): [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) by [SuddenSFD](https://github.com/SuddenSFD)

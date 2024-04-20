@@ -26,6 +26,43 @@ local function calc_flag_center(map)
 	return flag_center
 end
 
+local function connect_barriers_file(map_name, offset, barriers_filepath)
+	return function()
+		local f, err = io.open(barriers_filepath, "rb")
+
+		if (ctf_core.settings.server_mode ~= "mapedit" and assert(f, err)) or f then
+			local barriers = f:read("*all")
+
+			f:close()
+
+			assert(barriers and barriers ~= "")
+
+			barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
+
+			if barriers then
+				for _, barrier_area in pairs(barriers) do
+					barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
+					barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
+
+					for i = 1, barrier_area.max do
+						if not barrier_area.reps[i] then
+							barrier_area.reps[i] = minetest.CONTENT_IGNORE
+						else
+							barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
+						end
+					end
+				end
+
+				return barriers
+			else
+				minetest.log("error", "Map "..map_name.." has a corrupted barriers file. Re-save map to fix")
+			end
+		else
+			minetest.log("error", "Map "..map_name.." is missing its barriers file. Re-save map to fix")
+		end
+	end
+end
+
 function ctf_map.load_map_meta(idx, dirname)
 	local meta = Settings(ctf_map.maps_dir .. dirname .. "/map.conf")
 
@@ -134,7 +171,7 @@ function ctf_map.load_map_meta(idx, dirname)
 		offset.y = -size.y/2
 
 		map = {
-			map_version    = CURRENT_MAP_VERSION,
+			map_version    = tonumber(meta:get("map_version") or "0"),
 			pos1           = offset,
 			pos2           = vector.add(offset, size),
 			offset         = offset,
@@ -160,39 +197,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
-		if tonumber(meta:get("map_version")) > 2 and not ctf_core.settings.low_ram_mode then
-			local f, err = io.open(ctf_map.maps_dir .. dirname .. "/barriers.data", "rb")
-
-			if (ctf_core.settings.server_mode ~= "mapedit" and assert(f, err)) or f then
-				local barriers = f:read("*all")
-
-				f:close()
-
-				assert(barriers and barriers ~= "")
-
-				barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
-
-				if barriers then
-					for _, barrier_area in pairs(barriers) do
-						barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
-						barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
-
-						for i = 1, barrier_area.max do
-							if not barrier_area.reps[i] then
-								barrier_area.reps[i] = minetest.CONTENT_IGNORE
-							else
-								barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
-							end
-						end
-					end
-
-					map.barriers = barriers
-				else
-					minetest.log("error", "Map "..dirname.." has a corrupted barriers file. Re-save map to fix")
-				end
-			else
-				minetest.log("error", "Map "..dirname.." is missing its barriers file. Re-save map to fix")
-			end
+		if tonumber(meta:get("map_version")) >= 3 and not ctf_core.settings.low_ram_mode then
+			map.barriers = connect_barriers_file(dirname, offset, ctf_map.maps_dir .. dirname .. "/barriers.data")
 		end
 
 		for id, def in pairs(map.chests) do
