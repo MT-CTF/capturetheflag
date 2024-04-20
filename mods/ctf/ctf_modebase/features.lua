@@ -492,7 +492,8 @@ return {
 			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
 		end
 	end,
-	-- allocate_teams = function() -- If you set this in a mode def it will replace the call to ctf_teams.allocate_teams() in match.lua
+	-- If you set this in a mode def it will replace the call to ctf_teams.allocate_teams() in match.lua
+	-- allocate_teams = function()
 	team_allocator = function(player)
 		player = PlayerName(player)
 
