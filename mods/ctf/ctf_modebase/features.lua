@@ -22,7 +22,7 @@ ctf_core.testing = {
 	end
 }
 
-local hud = mhud.init()
+local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
@@ -121,9 +121,11 @@ local old_announce = ctf_modebase.map_chosen
 function ctf_modebase.map_chosen(map, ...)
 	set_playertags_state(PLAYERTAGS_OFF)
 
+	mapload_huds:clear_all()
+
 	for _, p in pairs(minetest.get_connected_players()) do
 		if ctf_teams.get(p) then
-			hud:add(p, "loading_screen", {
+			mapload_huds:add(p, "loading_screen", {
 				hud_elem_type = "image",
 				position = {x = 0.5, y = 0.5},
 				image_scale = -100,
@@ -131,7 +133,7 @@ function ctf_modebase.map_chosen(map, ...)
 				texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
 			})
 
-			hud:add(p, "map_image", {
+			mapload_huds:add(p, "map_image", {
 				hud_elem_type = "image",
 				position = {x = 0.5, y = 0.5},
 				image_scale = -100,
@@ -139,7 +141,7 @@ function ctf_modebase.map_chosen(map, ...)
 				texture = map.dirname.."_screenshot.png^[opacity:30",
 			})
 
-			hud:add(p, "loading_text", {
+			mapload_huds:add(p, "loading_text", {
 				hud_elem_type = "text",
 				position = {x = 0.5, y = 0.5},
 				alignment = {x = "center", y = "up"},
@@ -148,7 +150,7 @@ function ctf_modebase.map_chosen(map, ...)
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
-			hud:add(p, {
+			mapload_huds:add(p, {
 				hud_elem_type = "text",
 				position = {x = 0.5, y = 0.75},
 				alignment = {x = "center", y = "center"},
@@ -477,7 +479,7 @@ return {
 			local total_time = (minetest.get_us_time() - loading_screen_time) / 1e6
 
 			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
-				hud:clear_all()
+				mapload_huds:clear_all()
 				set_playertags_state(PLAYERTAGS_ON)
 
 				ctf_modebase.build_timer.start()
