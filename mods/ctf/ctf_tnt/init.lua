@@ -164,6 +164,8 @@ local function entity_physics(pos, radius, drops)
 	local meta = minetest.get_meta(pos)
 	local owner = meta:get_string("owner")
 	local owner_team = meta:get_string("owner_team")
+	minetest.chat_send_all(owner_team)
+	minetest.chat_send_all("Hello")
 	for _, obj in pairs(objs) do
 		local obj_pos = obj:get_pos()
 		local dist = math.max(1, vector.distance(pos, obj_pos))
@@ -173,7 +175,6 @@ local function entity_physics(pos, radius, drops)
 			local dir = vector.normalize(vector.subtract(obj_pos, pos))
 			local moveoff = vector.multiply(dir, 2 / dist * radius)
 			obj:add_velocity(moveoff)
-			minetest.chat_send_all(tostring(owner_team))
 			if ctf_teams.get(obj:get_player_name()) ~= owner_team then
 				local player_ref = minetest.get_player_by_name(owner)
 				if player_ref then
@@ -471,18 +472,16 @@ minetest.register_craftitem("ctf_tnt:tnt_stick", {
 	groups = {flammable = 5},
 })
 
-if enable_tnt then
-	crafting.register_recipe({
-		output = "ctf_tnt:tnt_stick 2",
-		items = { "default:papyrus", "ctf_ranged:ammo 2" },
-		always_known = false,
-	})
-	crafting.register_recipe({
-		output = "ctf_tnt:tnt",
-		items = { "ctf_tnt:tnt_stick 8" },
-		always_known = false,
-	})
-end
+crafting.register_recipe({
+	output = "ctf_tnt:tnt_stick 2",
+	items = { "default:papyrus", "ctf_ranged:ammo 2" },
+	always_known = false,
+})
+crafting.register_recipe({
+	output = "ctf_tnt:tnt",
+	items = { "ctf_tnt:tnt_stick 8" },
+	always_known = false,
+})
 
 function tnt.register_tnt(def)
 	local name
@@ -523,13 +522,6 @@ function tnt.register_tnt(def)
 				tnt.boom(pos, def)
 			end)
 		end,
-		mesecons = {effector =
-			{action_on =
-				function(pos)
-					tnt.boom(pos, def)
-				end
-			}
-		},
 		on_burn = function(pos)
 			minetest.swap_node(pos, {name = name .. "_burning"})
 			minetest.registered_nodes[name .. "_burning"].on_construct(pos)
@@ -540,9 +532,11 @@ function tnt.register_tnt(def)
 		end,
 		on_place = function(itemstack, placer, pointed_thing) 
 			-- first get enemy flags positions
+			-- TNT can be placed only within a radius of
+			-- an enemy flag
 			if placer:is_player() then	
 				if not ctf_modebase.match_started then
-					hud_event.new(user, {
+					hud_events.new(user, {
 						quick = true,
 						text = "Can't use during build time",
 						color = "warning",
@@ -551,7 +545,8 @@ function tnt.register_tnt(def)
 				end
 				local pteam = ctf_teams.get(placer:get_player_name())
 				for flagteam, team in pairs(ctf_map.current_map.teams) do
-					if pteam ~= flagteam and vector.distance(pointed_thing.above, team.flag_pos) <= 25 then
+					if pteam ~= flagteam and vector.distance(pointed_thing.above, team.flag_pos) <= 24 then
+						local meta = minetest.get_meta(pointed_thing.above)
 						return minetest.item_place(itemstack, placer, pointed_thing)
 					end
 				end
