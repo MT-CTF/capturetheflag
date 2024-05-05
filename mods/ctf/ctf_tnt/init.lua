@@ -90,7 +90,7 @@ local function destroy(drops, npos, cid, c_air, c_fire,
 	if not ignore_protection and minetest.is_protected(npos, owner) then
 		return cid
 	end
-	
+
 	local node = minetest.get_node_or_nil(npos)
 	if node then
 		if node.name == "ctf_map:reinforced_cobble" then
@@ -315,11 +315,7 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local c_tnt_boom = minetest.get_content_id("ctf_tnt:boom")
 	local c_air = minetest.CONTENT_AIR
 	local c_ignore = minetest.CONTENT_IGNORE
-	if enable_tnt then
-		c_tnt = minetest.get_content_id("ctf_tnt:tnt")
-	else
-		c_tnt = c_tnt_burning -- tnt is not registered if disabled
-	end
+	c_tnt = minetest.get_content_id("ctf_tnt:tnt")
 	-- make sure we still have explosion even when centre node isnt tnt related
 	if explode_center then
 		count = 1
@@ -364,7 +360,7 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	for z = -radius, radius do
 	for y = -radius, radius do
 	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
-	local count = 0
+	count = 0
 	for x = -radius, radius do
 		local r = vector.length(vector.new(x, y, z))
 		if (radius * radius) / (r * r) >= (pr:next(80, 125) / 100) then
@@ -495,8 +491,6 @@ function ctf_tnt.register_tnt(def)
 		is_ground_content = false,
 		groups = {dig_immediate = 2, mesecon = 2, tnt = 1, flammable = 5},
 		sounds = default.node_sound_wood_defaults(),
-		after_place_node = function(pos, placer)
-					end,
 		on_punch = function(pos, node, puncher)
 			minetest.swap_node(pos, {name = name .. "_burning"})
 			minetest.registered_nodes[name .. "_burning"].on_construct(pos)
@@ -504,7 +498,7 @@ function ctf_tnt.register_tnt(def)
 		end,
 		on_blast = function(pos, intensity)
 			minetest.after(0.1, function()
-				tnt.boom(pos, def)
+				ctf_tnt.boom(pos, def)
 			end)
 		end,
 		on_burn = function(pos)
@@ -515,7 +509,7 @@ function ctf_tnt.register_tnt(def)
 			minetest.swap_node(pos, {name = name .. "_burning"})
 			minetest.registered_nodes[name .. "_burning"].on_construct(pos)
 		end,
-		after_place_node = function(pos, placer, itemstack, pointed_thing) 
+		after_place_node = function(pos, placer, itemstack, pointed_thing)
 			if placer and placer:is_player() then
 				local meta = minetest.get_meta(pos)
 				local pname = placer:get_player_name()
@@ -523,11 +517,11 @@ function ctf_tnt.register_tnt(def)
 				meta:set_string("owner_team", ctf_teams.get(pname))
 			end
 		end,
-		on_place = function(itemstack, placer, pointed_thing) 
+		on_place = function(itemstack, placer, pointed_thing)
 			-- first get enemy flags positions
 			-- TNT can be placed only within a radius of
 			-- an enemy flag
-			if placer and placer:is_player() then	
+			if placer and placer:is_player() then
 				if not ctf_modebase.match_started then
 					hud_events.new(placer:get_player_name(), {
 						quick = true,
