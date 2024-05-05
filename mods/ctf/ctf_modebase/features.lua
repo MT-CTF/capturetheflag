@@ -10,21 +10,19 @@ ctf_core.testing = {
 		local one_third     = math.ceil(0.34 * total_players)
 		local one_fourth     = math.ceil(0.25 * total_players)
 		local avg = (kd_diff + actual_kd_diff) / 2
+		local pcount_diff_limit = (
+			(players_diff <= math.min(one_fourth, 2)) or
+			(pkd >= 1.8 and players_diff <= math.min(one_third, 4))
+		)
 		if best_kd.kills + worst_kd.kills >= 30 then
 			avg = actual_kd_diff
 		end
-		return (best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-		(
-			pkd >= math.min(1, kd_diff/2) and avg >= 0.4 and
-			(
-				players_diff <= math.min(one_fourth, 3) or
-				(pkd >= 1.5 and players_diff <= math.min(one_third, 6))
-			)
-		)
+		return pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
 	end
 }
 
-local hud = mhud.init()
+local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
@@ -123,9 +121,11 @@ local old_announce = ctf_modebase.map_chosen
 function ctf_modebase.map_chosen(map, ...)
 	set_playertags_state(PLAYERTAGS_OFF)
 
+	mapload_huds:clear_all()
+
 	for _, p in pairs(minetest.get_connected_players()) do
 		if ctf_teams.get(p) then
-			hud:add(p, "loading_screen", {
+			mapload_huds:add(p, "loading_screen", {
 				hud_elem_type = "image",
 				position = {x = 0.5, y = 0.5},
 				image_scale = -100,
@@ -133,7 +133,7 @@ function ctf_modebase.map_chosen(map, ...)
 				texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
 			})
 
-			hud:add(p, "map_image", {
+			mapload_huds:add(p, "map_image", {
 				hud_elem_type = "image",
 				position = {x = 0.5, y = 0.5},
 				image_scale = -100,
@@ -141,7 +141,7 @@ function ctf_modebase.map_chosen(map, ...)
 				texture = map.dirname.."_screenshot.png^[opacity:30",
 			})
 
-			hud:add(p, "loading_text", {
+			mapload_huds:add(p, "loading_text", {
 				hud_elem_type = "text",
 				position = {x = 0.5, y = 0.5},
 				alignment = {x = "center", y = "up"},
@@ -150,7 +150,7 @@ function ctf_modebase.map_chosen(map, ...)
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
-			hud:add(p, {
+			mapload_huds:add(p, {
 				hud_elem_type = "text",
 				position = {x = 0.5, y = 0.75},
 				alignment = {x = "center", y = "center"},
@@ -254,14 +254,22 @@ local function tp_player_near_flag(player)
 	local tname = ctf_teams.get(player)
 	if not tname then return end
 
-	local pos = vector.offset(ctf_map.current_map.teams[tname].flag_pos,
-		math.random(-1, 1),
-		0.5,
-		math.random(-1, 1)
-	)
-	local rotation_y = vector.dir_to_rotation(
-		vector.direction(pos, ctf_map.current_map.teams[tname].look_pos or ctf_map.current_map.flag_center)
-	).y
+	local rotation_y
+	local pos
+
+	if ctf_map.current_map.teams[tname] then
+		pos = vector.offset(ctf_map.current_map.teams[tname].flag_pos,
+			math.random(-1, 1),
+			0.5,
+			math.random(-1, 1)
+		)
+		rotation_y = vector.dir_to_rotation(
+			vector.direction(pos, ctf_map.current_map.teams[tname].look_pos or ctf_map.current_map.flag_center)
+		).y
+	else
+		pos = vector.add(ctf_map.current_map.pos1, vector.divide(ctf_map.current_map.size, 2))
+		rotation_y = player:get_look_horizontal()
+	end
 
 	local function apply()
 		player:set_pos(pos)
@@ -426,6 +434,8 @@ local delete_queue = {}
 local team_switch_after_capture = false
 
 return {
+	tp_player_near_flag = tp_player_near_flag,
+
 	on_new_match = function()
 		team_list = {}
 		for tname in pairs(ctf_map.current_map.teams) do
@@ -469,8 +479,10 @@ return {
 			local total_time = (minetest.get_us_time() - loading_screen_time) / 1e6
 
 			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
-				hud:clear_all()
+				mapload_huds:clear_all()
 				set_playertags_state(PLAYERTAGS_ON)
+
+				ctf_modebase.build_timer.start()
 			end)
 		end
 	end,
@@ -482,6 +494,8 @@ return {
 			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
 		end
 	end,
+	-- If you set this in a mode def it will replace the call to ctf_teams.allocate_teams() in match.lua
+	-- allocate_teams = function()
 	team_allocator = function(player)
 		player = PlayerName(player)
 

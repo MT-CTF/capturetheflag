@@ -148,8 +148,8 @@ ctf_modebase.register_mode("classes", {
 	can_punchplayer = features.can_punchplayer,
 	on_healplayer = features.on_healplayer,
 	calculate_knockback = function(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)
-		if features.can_punchplayer(player, hitter) then
-			return 2 * (tool_capabilities.damage_groups.knockback or 1)
+		if features.can_punchplayer(player, hitter) and not tool_capabilities.damage_groups.ranged then
+			return 2 * (tool_capabilities.damage_groups.knockback or 1) * math.min(1, time_from_last_punch or 0)
 		else
 			return 0
 		end
