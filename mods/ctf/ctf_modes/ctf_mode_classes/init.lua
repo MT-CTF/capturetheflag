@@ -64,6 +64,7 @@ ctf_modebase.register_mode("classes", {
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
 		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
+		["ctf_tnt:tnt_stick"] = {rarity=0.2, max_stacks=2},
 	},
 	crafts = {
 		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",

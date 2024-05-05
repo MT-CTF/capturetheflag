@@ -474,17 +474,6 @@ minetest.register_craftitem("ctf_tnt:tnt_stick", {
 	groups = {flammable = 5},
 })
 
-crafting.register_recipe({
-	output = "ctf_tnt:tnt_stick 2",
-	items = { "default:papyrus", "ctf_ranged:ammo 2" },
-	always_known = false,
-})
-crafting.register_recipe({
-	output = "ctf_tnt:tnt",
-	items = { "ctf_tnt:tnt_stick 8" },
-	always_known = false,
-})
-
 function tnt.register_tnt(def)
 	local name
 	if not def.name:find(':') then

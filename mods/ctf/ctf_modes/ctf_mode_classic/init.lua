@@ -30,6 +30,7 @@ ctf_modebase.register_mode("classic", {
 
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
+		["ctf_tnt:tnt"] = {rarity=0.2, max_stacks=2},
 	},
 	crafts = {"ctf_ranged:ammo", "ctf_melee:sword_steel", "ctf_melee:sword_mese", "ctf_melee:sword_diamond"},
 	physics = {sneak_glitch = true, new_move = false},
