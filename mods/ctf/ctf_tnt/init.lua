@@ -1,6 +1,6 @@
 -- tnt/init.lua
 
-tnt = {}
+ctf_tnt = {}
 
 -- Load support for MT game translation.
 local S = minetest.get_translator("ctf_tnt")
@@ -286,7 +286,7 @@ local function add_effects(pos, radius, drops)
 	})
 end
 
-function tnt.burn(pos, nodename)
+function ctf_tnt.burn(pos, nodename)
 	local name = nodename or minetest.get_node(pos).name
 	local def = minetest.registered_nodes[name]
 	if not def then
@@ -430,7 +430,7 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	return drops, radius
 end
 
-function tnt.boom(pos, def)
+function ctf_tnt.boom(pos, def)
 	def = def or {}
 	def.radius = def.radius or 1
 	def.damage_radius = def.damage_radius or def.radius * 2
@@ -474,7 +474,7 @@ minetest.register_craftitem("ctf_tnt:tnt_stick", {
 	groups = {flammable = 5},
 })
 
-function tnt.register_tnt(def)
+function ctf_tnt.register_tnt(def)
 	local name
 	if not def.name:find(':') then
 		name = "tnt:" .. def.name
@@ -529,7 +529,7 @@ function tnt.register_tnt(def)
 			-- an enemy flag
 			if placer and placer:is_player() then	
 				if not ctf_modebase.match_started then
-					hud_events.new(user, {
+					hud_events.new(placer:get_player_name(), {
 						quick = true,
 						text = "Can't use during build time",
 						color = "warning",
@@ -543,6 +543,11 @@ function tnt.register_tnt(def)
 					end
 				end
 			end
+			hud_events.new(placer:get_player_name(), {
+				quick = true,
+				text = "You can place TNT only near one enemy flag",
+				color = "warning",
+			})
 			return nil
 		end,
 	})
@@ -565,7 +570,7 @@ function tnt.register_tnt(def)
 		sounds = default.node_sound_wood_defaults(),
 		groups = {falling_node = 1, not_in_creative_inventory = 1},
 		on_timer = function(pos, elapsed)
-			tnt.boom(pos, def)
+			ctf_tnt.boom(pos, def)
 		end,
 		-- unaffected by explosions
 		on_blast = function() end,
@@ -577,7 +582,7 @@ function tnt.register_tnt(def)
 	})
 end
 
-tnt.register_tnt({
+ctf_tnt.register_tnt({
 	name = "ctf_tnt:tnt",
 	description = S("TNT"),
 	radius = tnt_radius,
