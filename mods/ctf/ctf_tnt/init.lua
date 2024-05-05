@@ -300,10 +300,7 @@ function tnt.burn(pos, nodename)
 	end
 end
 
-local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner, explode_center)
-	local meta = minetest.get_meta(pos)
-	local owner = meta:get_string("owner")
-	local owner_team = meta:get_string("owner_team")
+local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owner, owner_team, explode_center)
 	pos = vector.round(pos)
 	-- scan for adjacent TNT nodes first, and enlarge the explosion
 	local vm1 = VoxelManip()
@@ -363,6 +360,7 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
 
 	local c_fire = minetest.get_content_id("fire:basic_flame")
+	local removed_blocks = 0
 	for z = -radius, radius do
 	for y = -radius, radius do
 	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
@@ -378,6 +376,8 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 					ignore_protection, ignore_on_blast, owner)
 				if replace ~= c_air then
 					count = count + 1
+				else
+					removed_blocks = removed_blocks + 1
 				end
 				data[vi] = replace
 			end
@@ -424,7 +424,8 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	minetest.log("action", "TNT owned by " .. owner .. " detonated at " ..
 		minetest.pos_to_string(pos) .. " with radius " .. radius)
 	if owner ~= "" then
-		ctf_modebase.recent_rankings.add(owner, { score=count }, true)
+		local current_mode = ctf_modebase:get_current_mode()
+		current_mode.recent_rankings.add(owner, { score=removed_blocks }, false)
 	end
 	return drops, radius
 end
@@ -442,7 +443,7 @@ function tnt.boom(pos, def)
 	minetest.sound_play("ctf_tnt_explode", {pos = pos, gain = 2.5,
 			max_hear_distance = math.min(def.radius * 20, 128)}, true)
 	local drops, radius = tnt_explode(pos, def.radius, def.ignore_protection,
-			def.ignore_on_blast, owner, def.explode_center)
+			def.ignore_on_blast, owner, owner_team, def.explode_center)
 	-- append entity drops
 	local damage_radius = (radius / math.max(1, def.radius)) * def.damage_radius
 	entity_physics(pos, damage_radius, drops, owner, owner_team)
@@ -525,6 +526,14 @@ function tnt.register_tnt(def)
 			minetest.swap_node(pos, {name = name .. "_burning"})
 			minetest.registered_nodes[name .. "_burning"].on_construct(pos)
 		end,
+		after_place_node = function(pos, placer, itemstack, pointed_thing) 
+			if placer and placer:is_player() then
+				local meta = minetest.get_meta(pos)
+				local pname = placer:get_player_name()
+				meta:set_string("owner", pname)
+				meta:set_string("owner_team", ctf_teams.get(pname))
+			end
+		end,
 		on_place = function(itemstack, placer, pointed_thing) 
 			-- first get enemy flags positions
 			-- TNT can be placed only within a radius of
@@ -541,10 +550,6 @@ function tnt.register_tnt(def)
 				local pteam = ctf_teams.get(placer:get_player_name())
 				for flagteam, team in pairs(ctf_map.current_map.teams) do
 					if pteam ~= flagteam and vector.distance(pointed_thing.above, team.flag_pos) <= 24 then
-						local meta = minetest.get_meta(pointed_thing.above)
-						local pname = placer:get_player_name()
-						meta:set_string("owner", pname)
-						meta:set_string("owner_team", ctf_teams.get(pname))
 						return minetest.item_place(itemstack, placer, pointed_thing)
 					end
 				end
