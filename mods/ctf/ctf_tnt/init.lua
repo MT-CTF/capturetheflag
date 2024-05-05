@@ -161,7 +161,6 @@ end
 
 local function entity_physics(pos, radius, drops, owner, owner_team)
 	local objs = minetest.get_objects_inside_radius(pos, radius)
-	local meta = minetest.get_meta(pos)
 	for _, obj in pairs(objs) do
 		local obj_pos = obj:get_pos()
 		local dist = math.max(1, vector.distance(pos, obj_pos))
