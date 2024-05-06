@@ -44,7 +44,13 @@ function ctf_modebase.start_match_after_vote()
 		ctf_modebase.on_new_match()
 
 		ctf_modebase.in_game = true
-		ctf_teams.allocate_teams(ctf_map.current_map.teams)
+		local team_alloc = ctf_modebase:get_current_mode().allocate_teams
+
+		if team_alloc then
+			team_alloc(ctf_map.current_map.teams)
+		else
+			ctf_teams.allocate_teams(ctf_map.current_map.teams)
+		end
 
 		ctf_modebase.current_mode_matches_played = ctf_modebase.current_mode_matches_played + 1
 
