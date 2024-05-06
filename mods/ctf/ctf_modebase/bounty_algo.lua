@@ -37,15 +37,6 @@ end
 
 function ctf_modebase.bounty_algo.kd.bounty_reward_func(pname)
 	local recent = ctf_modebase:get_current_mode().recent_rankings.players()
-	local sum_kd = 0
-	local sum_hd = 0
-	for _, tname in ipairs(team_members) do
-		local stats = recent[tname]
-		if stats then
-			sum_kd = sum_kd + (stats.kills or 0) / (stats.deaths or 1)
-			sum_hd = sum_hd + (stats.hp_healed or 0) / (stats.deaths or 1)
-		end
-	end
 	local pstats = recent[pname] or {}
 	local kd = (pstats.kills or 1) / (pstats.deaths or 1)
 	local hd = (pstats.hp_healed or 1) / (pstats.deaths or 1)
