@@ -687,15 +687,7 @@ return {
 
 		celebrate_team(pteam)
 
-		local text = " has captured the flag"
-		if many_teams then
-			text = " has captured the flag of team(s) " .. HumanReadable(teamnames)
-			minetest.chat_send_all(
-				minetest.colorize(tcolor, pname) ..
-				minetest.colorize(FLAG_MESSAGE_COLOR, text)
-			)
-		end
-		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
+
 
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
@@ -706,7 +698,15 @@ return {
 			score = math.max(75, math.min(500, score))
 			capture_reward = capture_reward + score
 		end
-
+		local text = " has captured the flag"
+		if many_teams then
+			text = " has captured the flag of team(s) " .. HumanReadable(teamnames)
+			minetest.chat_send_all(
+				minetest.colorize(tcolor, pname) ..
+				minetest.colorize(FLAG_MESSAGE_COLOR, text)
+			)
+		end
+		ctf_modebase.announce(string.format("Player %s (team %s)%s and got %d", pname, pteam, text, capture_reward))
 		local team_score = team_scores[pteam].score
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if teammate ~= pname then
