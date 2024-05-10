@@ -700,7 +700,11 @@ return {
 		end
 		local text = " has captured the flag"
 		if many_teams then
-			text = string.format(" has captured the flag of team(s) %s and got %d points", HumanReadable(teamnames), capture_reward)
+			text = string.format(
+				" has captured the flag of team(s) %s and got %d points",
+				HumanReadable(teamnames),
+				capture_reward
+			)
 			minetest.chat_send_all(
 				minetest.colorize(tcolor, pname) ..
 				minetest.colorize(FLAG_MESSAGE_COLOR, text)
