@@ -26,7 +26,7 @@ local quick_event_timer = {}
 
 minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
-	
+
 	for channel=1,3 do
 		if hud_queues[channel][pname] then
 			hud_queues[channel][pname].t:cancel()
@@ -68,7 +68,7 @@ local function show_quick_hud_event(player, huddef)
 	end)
 end
 
-function handle_hud_events(player, channel)
+local function handle_hud_events(player, channel)
 	local pname = player:get_player_name()
 
 	local huddef = table.remove(hud_queues[channel][pname].e, 1)
@@ -146,7 +146,7 @@ function hud_events.new(player, def)
 			hud_queues[channel][pname] = {e = {}}
 		end
 		table.insert(hud_queues[channel][pname].e, {text = def.text, color = def.color, channel = def.channel})
-	
+
 		if not hud_queues[channel][pname].t then
 			handle_hud_events(player, channel)
 		end
