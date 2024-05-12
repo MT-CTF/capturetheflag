@@ -119,9 +119,72 @@ minetest.override_item("default:apple", {
 		end
 	end,
 	after_place_node = nil,
-	stack_max = 60,
-	on_place = function()
-		return nil
+	stack_max = 60, 
+	on_place = function() return nil end,
+	on_secondary_use = function(itemstack, placer, pointed)
+		if placer == nil then return nil end
+		if pointed.type == "node" then return nil end
+		if pointed == nil then return pointed end -- :D
+		local object = pointed.ref
+		if not object:is_player() then return nil end
+		local uname = placer:get_player_name()
+		local pname = object:get_player_name()
+		if pname == uname then return nil end
+		if ctf_teams.get(pname) ~= ctf_teams.get(uname) then
+			hud_events.new(uname, {
+				quick = true,
+				text = pname .. " isn't in your team!",
+				color = "warning",
+			})
+			return
+		end
+		
+		local hp = object:get_hp()
+		local limit = object:get_properties().hp_max -- heal to limit
+
+		if hp <= 0 then
+			hud_events.new(uname, {
+				quick = true,
+				text = pname .. " is dead!",
+				color = "warning",
+			})
+			return
+		end
+		if hp >= limit then
+			hud_events.new(uname, {
+				quick = true,
+				text = pname .. " already has " .. limit .. " HP!",
+				color = "warning",
+			})
+			return
+		end
+		local hp_add = 1
+
+		
+		if hp + hp_add > limit then
+			hp_add = limit - hp
+			hp = limit
+		else
+			hp = hp + hp_add
+		end
+
+		local result = RunCallbacks(ctf_healing.registered_on_heal, placer, object, hp_add)
+
+		if not result then
+			object:set_hp(hp)
+			hud_events.new(pname, {
+				quick = true,
+				text = uname .. " healed you!",
+				color = 0xC1FF44,
+			})
+		elseif type(result) == "string" then
+			hud_events.new(uname, {
+				quick = true,
+				text = result,
+				color = "warning",
+			})
+		end
+		-- and just dont rightclick flags :D
 	end
 })
 
