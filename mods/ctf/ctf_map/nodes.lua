@@ -130,7 +130,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	local pos = player:get_pos()
 	local resulting_hp_change = hp_change
 	if reason.type == 'node_damage' then
-		if minetest.registered_nodes[reason.node].groups.immortal then-- this is the damage dealt from the nodes registed below
+		if minetest.registered_nodes[reason.node].groups.immortal then
 			-- dont know if there is a quick way to get flag distance so ill just attempt it myself
 			for _, flagteam in ipairs(ctf_teams.current_team_list) do
 				if flagteam ~= ctf_teams.get(player) then -- no reason to do it if its your team
