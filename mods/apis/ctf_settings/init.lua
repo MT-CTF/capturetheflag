@@ -40,7 +40,7 @@ function ctf_settings.get(player, setting)
 	local value = player:get_meta():get_string("ctf_settings:"..setting)
 	local info = ctf_settings.settings[setting]
 
-	return value == "" and info.default or value
+	return value == "" and (info and info.default) or value
 end
 
 -- This Function MIT by Rubenwardy

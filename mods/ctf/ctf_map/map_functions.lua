@@ -213,8 +213,10 @@ local function prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nod
 	end
 
 	for _, team in ipairs(ctf_teams.teamlist) do
-		local node = "ctf_teams:chest_" .. team
-		nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+		if not ctf_teams.team[team].not_playing then
+			local node = "ctf_teams:chest_" .. team
+			nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+		end
 	end
 
 	for i, v in ipairs(data) do

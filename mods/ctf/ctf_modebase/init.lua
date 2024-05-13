@@ -2,7 +2,8 @@ ctf_modebase = {
 	-- Table containing all registered modes and their definitions
 	modes                = {},    ---@type table
 
-	-- Same as ctf_modebase.modes but in list form
+	-- Same as ctf_modebase.modes but in list form.
+	-- Exception: Disabled modes that show up in ctf_modebase.modes won't show up in the modelist
 	modelist             = {},    ---@type list
 
 	-- Name of the mode currently being played. On server start this will be false
@@ -104,13 +105,15 @@ minetest.register_on_mods_loaded(function()
 	end
 
 	for _, name in pairs(ctf_modebase.modelist) do
-		ctf_settings.register("ctf_modebase:default_vote_"..name, {
-			type = "list",
-			description = "Match count vote for the mode '"..HumanReadable(name).."'",
-			list = {HumanReadable(name).." - Ask", "0", "1", "2", "3", "4", "5"},
-			_list_map = {"ask", 0, 1, 2, 3, 4, 5},
-			default = "1", -- "Ask"
-		})
+		if not ctf_modebase.modes[name].rounds then
+			ctf_settings.register("ctf_modebase:default_vote_"..name, {
+				type = "list",
+				description = "Match count vote for the mode '"..HumanReadable(name).."'",
+				list = {HumanReadable(name).." - Ask", "0", "1", "2", "3", "4", "5"},
+				_list_map = {"ask", 0, 1, 2, 3, 4, 5},
+				default = "1", -- "Ask"
+			})
+		end
 	end
 end)
 
