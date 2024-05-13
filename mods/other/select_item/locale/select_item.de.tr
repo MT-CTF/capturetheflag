@@ -1,4 +1,5 @@
-# textdomain:select_item
+# textdomain: select_item
+
 Cancel=Abbrechen
 Page @1/@2=Seite @1/@2
 Select an item:=Wählen Sie einen Gegenstand:
