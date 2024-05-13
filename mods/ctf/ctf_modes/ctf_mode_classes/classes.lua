@@ -328,6 +328,14 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		end
 	end
 })
+ctf_healing.register_bandage("ctf_mode_classes:advanced_bandage", {
+	description = "Bandage\nHeals teammates for 3-4 HP until target's HP is equal to 100% of their maximum HP\n",
+	inventory_image = "ctf_healing_bandage_adv.png",
+	wield_image = "ctf_healing_bandage_adv.png",
+	heal_percent = 1,
+	heal_min = 3,
+	heal_max = 4,
+})
 
 function classes.get_name(player)
 	local meta = player:get_meta()
