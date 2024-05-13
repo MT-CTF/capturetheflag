@@ -1,6 +1,16 @@
-function ctf_modebase.register_mode(name, func)
-	ctf_modebase.modes[name] = func
-	table.insert(ctf_modebase.modelist, name)
+local registered_exclusive = false
+function ctf_modebase.register_mode(name, def)
+	if def.exclusive then
+		ctf_modebase.modes[name] = def
+		ctf_modebase.modelist = {name}
+		registered_exclusive = true
+	else
+		ctf_modebase.modes[name] = def
+
+		if not registered_exclusive then
+			table.insert(ctf_modebase.modelist, name)
+		end
+	end
 end
 
 function ctf_modebase.on_mode_end()

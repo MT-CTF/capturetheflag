@@ -77,8 +77,8 @@ local function process_ray(ray, user, look_dir, def)
 				end
 			end
 		elseif hitpoint.type == "object" then
-			hitpoint.ref:punch(user, 1, {
-				full_punch_interval = 1,
+			hitpoint.ref:punch(user, def.fire_interval or 0.1, {
+				full_punch_interval = def.fire_interval or 0.1,
 				damage_groups = {ranged = 1, [def.type] = 1, fleshy = def.damage}
 			}, look_dir)
 		end
