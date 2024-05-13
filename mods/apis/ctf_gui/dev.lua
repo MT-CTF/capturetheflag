@@ -1,4 +1,4 @@
-local unset_function = "[f]\nreturn "
+local unset_function = "return "
 
 function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 	local filepath = minetest.get_worldpath().."/ctf_gui/"
@@ -20,8 +20,8 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 	local function interval()
 		if type(formspec) == "function" then
 			ctf_gui.show_formspec(player, formname, formspec(formcontext))
-		elseif formspec:sub(1, 3) == "[f]" then
-			local result, form = pcall((loadstring(formspec:sub(4)) or function() return function() end end)(), formcontext)
+		elseif formspec:match("^%s*return") then
+			local result, form = pcall((loadstring(formspec) or function() return function() end end)(), formcontext)
 
 			ctf_gui.show_formspec(player, formname,
 				result and form or "size[10,10]hypertext[0,0;10,10;err;"..minetest.formspec_escape(form or "").."]"
