@@ -125,6 +125,31 @@ local function make_immortal(def)
 	def.floodable = false
 	def.description = def.description and ("Indestructible " .. def.description)
 end
+fix_damage = function(player, hp_change, reason)
+	local pos = player:get_pos()
+	local resulting_hp_change = hp_change
+	if reason.type == 'node_damage' then
+		if hp_change == -100 then-- this is the damage dealt from the nodes registed below 
+			-- dont know if there is a quick way to get flag distance so ill just attempt it myself
+			local flagteams = ctf_modebase.taken_flags[pname]
+			if not flagteams then return end
+			for _, flagteam in ipairs(flagteams) do
+				if flagteam ~= ctf_teams.get(player) then
+					local fdist = vector.distance(pos, ctf_map.current_map.teams[flagteam].flag_pos)
+					if fdist <= 6 then 
+						return hp_change
+					else
+						resulting_hp_change = 0
+					end
+				end
+			end
+		end
+	end
+	return resulting_hp_change
+end
+
+
+minetest.register_on_player_hpchange(fix_damage(player, hp_change, reason), true)
 
 local queue = {}
 for name, def in pairs(minetest.registered_nodes) do
