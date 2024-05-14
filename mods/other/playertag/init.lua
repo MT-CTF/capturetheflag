@@ -15,12 +15,14 @@ local function add_entity_tag(player, old_observers)
 		color = {a = 0, r = 0, g = 0, b = 0}
 	})
 
-	local ent = minetest.add_entity(player:get_pos(), "playertag:tag")
+	local ppos = player:get_pos()
+
+	local ent = minetest.add_entity(ppos, "playertag:tag")
 	local ent2 = false
 	local ent3 = false
 
 	if ent.set_observers then
-		ent2 = minetest.add_entity(player:get_pos(), "playertag:tag")
+		ent2 = minetest.add_entity(ppos, "playertag:tag")
 		ent2:set_observers(old_observers.nametag_entity or {})
 		ent2:set_properties({
 			nametag = player:get_player_name(),
@@ -28,7 +30,7 @@ local function add_entity_tag(player, old_observers)
 			nametag_bgcolor = "#0000002D"
 		})
 
-		ent3 = minetest.add_entity(player:get_pos(), "playertag:tag")
+		ent3 = minetest.add_entity(ppos, "playertag:tag")
 		ent3:set_observers(old_observers.symbol_entity or {})
 		ent3:set_properties({
 			collisionbox = { 0, 0, 0, 0, 0, 0 },
@@ -152,9 +154,17 @@ minetest.register_entity("playertag:tag", {
 	physical = false,
 	makes_footstep_sound = false,
 	backface_culling = false,
-	static_save = false,
+	static_save = true,
 	pointable = false,
 	on_punch = function() return true end,
+	on_detach = function(self, parent)
+		self.object:remove()
+	end,
+	on_deactivate = function(self, removal)
+		if not removal then
+			self.object:remove()
+		end
+	end,
 })
 
 minetest.register_on_joinplayer(function(player)
