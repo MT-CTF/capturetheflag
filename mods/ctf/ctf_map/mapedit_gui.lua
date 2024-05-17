@@ -11,8 +11,8 @@ local function greet_player(player)
 		minetest.chat_send_player(
 			player:get_player_name(),
 			minetest.colorize(ctf_map.CHAT_COLOR,
-					"To start, grant yourself \"ctf_map_editor\""..
-					"using \"/grantme ctf_map_editor\" Then run \"/ctf_map editor\"")
+					"To start, grant yourself \"ctf_map_editor\" "..
+					"using \"/grantme ctf_map_editor\". Then run \"/ctf_map editor\"")
 		)
 	else
 		minetest.chat_send_player(
@@ -62,6 +62,54 @@ function ctf_map.set_flag_location(pname, teamname, pos)
 
 	context[pname].teams[teamname].flag_pos = pos
 end
+
+local function dothenext(time, dir, func)
+	minetest.after(time, function()
+		local next = function(dir2)
+			dothenext(time, dir2, func)
+		end
+
+		func(next, dir)
+	end)
+end
+
+ctf_map.register_map_command("resave_all", function(name, params)
+	local dirlist = minetest.get_dir_list(ctf_map.maps_dir, true)
+
+	dothenext(1, 1, function(next, dir)
+		if not dirlist[dir] then
+			minetest.chat_send_player(
+				name,
+				minetest.colorize("green", "\nMap resaving done.\n")
+			)
+			return
+		end
+
+		local map = ctf_map.load_map_meta(dir, dirlist[dir])
+
+
+		if map.enabled then
+			ctf_map.place_map(map, function()
+				edit_map(name, map)
+
+				if context[name].initial_stuff[1] == "none" then
+					table.remove(context[name].initial_stuff, 1)
+				end
+
+				if context[name].treasures == "none" then
+					context[name].treasures = nil
+				end
+
+				ctf_map.save_map(context[name])
+				context[name] = nil
+
+				next(dir + 1)
+			end)
+		else
+			next(dir + 1)
+		end
+	end)
+end)
 
 function ctf_map.show_map_editor(player)
 	if context[player] then
@@ -114,7 +162,6 @@ function ctf_map.show_map_editor(player)
 							--
 							chests        = {},
 							teams         = {},
-							barrier_area  = {pos1 = pos1, pos2 = pos2},
 							--
 							game_modes    = {},
 						}
@@ -597,24 +644,6 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			idx = idx + 1
 		end
 	end
-	idx = idx + 1
-
-	elements.barrier_area = {
-		type = "button", exit = true,
-		label = "Barrier Area - " .. minetest.pos_to_string(context[player].barrier_area.pos1, 0) ..
-				" - " .. minetest.pos_to_string(context[player].barrier_area.pos2, 0),
-		pos = {0, idx},
-		size = {9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
-		func = function(pname, fields)
-			ctf_map.get_pos_from_player(pname, 2, function(p, positions)
-				context[pname].barrier_area.pos1 = positions[1]
-				context[pname].barrier_area.pos2 = positions[2]
-
-				minetest.after(0.1, ctf_map.show_map_save_form, pname,
-						minetest.explode_scrollbar_event(fields.formcontent).value)
-			end)
-		end,
-	}
 	idx = idx + 1.5
 
 	-- FINISH EDITING

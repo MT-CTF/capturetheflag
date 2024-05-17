@@ -36,6 +36,23 @@ local function stop_medkit_heal(playername, interrupt_reason)
 	healing_players[playername] = nil
 end
 
+local prevent_heals_list = {
+	"normal",
+	"glasslike", "glasslike_framed", "glasslike_framed_optional",
+	"allfaces", "allfaces_optional",
+}
+local function prevent_heals(nodedef)
+	if nodedef.walkable then
+		for _, v in pairs(prevent_heals_list) do
+			if nodedef.drawtype == v then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 local function medkit_heal(playername)
 	healing_players[playername].after = minetest.after(1, function()
 		local player = minetest.get_player_by_name(playername)
@@ -51,11 +68,10 @@ local function medkit_heal(playername)
 
 		-- In case teammates manage to place blocks inside the player while they're healing
 		local pos = player:get_pos():offset(0, 0.1, 0)
-		local node_0 = minetest.get_node(pos).name
-		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
+		local node_0 = minetest.registered_nodes[minetest.get_node(pos).name]
+		local node_1 = minetest.registered_nodes[minetest.get_node(pos:offset(0, 1, 0)).name]
 
-		if (not node_0:match("slab") and node_0 ~= "default:snow" and minetest.registered_nodes[node_0].walkable) or
-		minetest.registered_nodes[node_1].walkable then
+		if prevent_heals(node_0) or prevent_heals(node_1) then
 			return stop_medkit_heal(playername, "You can't heal while inside blocks")
 		end
 
@@ -97,11 +113,10 @@ local function start_medkit_heal(playername)
 
 	-- Prevent players from using medkits while inside nodes
 	local pos = player:get_pos():offset(0, 0.1, 0)
-	local node_0 = minetest.get_node(pos).name
-	local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
+	local node_0 = minetest.registered_nodes[minetest.get_node(pos).name]
+	local node_1 = minetest.registered_nodes[minetest.get_node(pos:offset(0, 1, 0)).name]
 
-	if (not node_0:match("slab") and node_0 ~= "default:snow" and minetest.registered_nodes[node_0].walkable) or
-	minetest.registered_nodes[node_1].walkable then
+	if prevent_heals(node_0) or prevent_heals(node_1) then
 		return hud_events.new(playername, {
 			text = "You can't heal inside blocks",
 			color = "danger",

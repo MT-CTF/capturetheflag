@@ -1,18 +1,31 @@
-return function(top)
+return function(prefix, top)
 
 local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at runtime!")
 
-for k, v in pairs(modstorage:to_table()["fields"]) do
-	local rank = minetest.parse_json(v)
-	if rank ~= nil and rank.score then
-		top:set(k, rank.score)
+local function op_all(operation)
+	for k, v in pairs(modstorage:to_table()["fields"]) do
+		operation(k, v)
 	end
 end
+
+local timer = minetest.get_us_time()
+op_all(function(key, value)
+	local rank = minetest.parse_json(value)
+
+	if rank ~= nil and rank.score then
+		top:set(key, rank.score)
+	end
+end)
+minetest.log("action", "Sorted rankings database. Took "..((minetest.get_us_time()-timer) / 1e6))
 
 return {
 	backend = "default",
 	top = top,
 	modstorage = modstorage,
+
+	prefix = "",
+
+	op_all = op_all,
 
 	get = function(self, pname)
 		pname = PlayerName(pname)
@@ -53,7 +66,13 @@ return {
 
 		self.top:set(pname, newrankings.score or 0)
 		self.modstorage:set_string(pname, minetest.write_json(newrankings))
-	end
+	end,
+	del = function(self, pname)
+		pname = PlayerName(pname)
+
+		self.top:set(pname, 0)
+		self.modstorage:set_string(pname)
+	end,
 }
 
 end

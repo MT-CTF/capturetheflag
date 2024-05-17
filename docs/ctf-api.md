@@ -1,6 +1,9 @@
 CaptureTheFlag Lua API Reference
 ==================================
 
+# Code Style
+* Use tabs for indentation.
+
 # mods/apis/
 This folder contains a collection of mods with the main goal of providing an API
 
@@ -21,7 +24,7 @@ ctf_settings.register("my_setting", {
 	on_change = function(player, new_value)
 		<...>
 	end
-}
+})
 ```
 
 ### `ctf_settings.set(player, setting, value)`
@@ -36,7 +39,10 @@ ctf_settings.register("my_setting", {
 
 ---
 # mods/ctf/
-TODO
+TODO, below is a collection of quick notes for later
+
+## ctf_teams
+* https://modern.ircdocs.horse/formatting.html#colors-16-98
 
 ---
 # mods/mtg/

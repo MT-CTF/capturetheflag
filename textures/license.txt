@@ -1,0 +1,5 @@
+BlockMen (CC BY-SA 3.0): (https://github.com/minetest/minetest_game/blob/110c23560edf5ddc7ed3ffd0d0c288a96e0343e8/mods/default/README.txt#L136C1-L136C25)
+	gui_formbg.png (Modified)
+
+Zughy (CC BY-SA 4.0) (https://github.com/minetest/minetest/blob/46c930cf701087d63eb0e23fb403e45f2eb3966a/LICENSE.txt#L14)
+	settings_info.png
