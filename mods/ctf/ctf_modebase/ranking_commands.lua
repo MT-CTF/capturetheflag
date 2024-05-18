@@ -248,7 +248,7 @@ minetest.register_chatcommand("bounty", {
 				time_diff % 60)
 		end
 
-		ctf_modebase.bounties.set_player(pname, team, score)
+		ctf_modebase.bounties.set_player(pname, team, score, name)
 		current_mode.recent_rankings.add(name, {score=-score}, true)
 
 		bounty_timer[name] = os.time()

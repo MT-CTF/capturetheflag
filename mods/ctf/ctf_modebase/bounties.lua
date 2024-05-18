@@ -14,7 +14,7 @@ local function get_reward_str(rewards)
 	return ret:sub(1, -3)
 end
 
-local function set_inner(pname, pteam, rewards, player_set)
+local function set_inner(pname, pteam, rewards, name)
 	-- pname(str) is the player's name
 	-- pteam(str) is the player's team(e.g. "red")
 	-- rewards(table) has two entries:
@@ -32,15 +32,15 @@ local function set_inner(pname, pteam, rewards, player_set)
 		end
 	end
 
-	bounties[pteam] = {name = pname, rewards = rewards, msg = bounty_message, player_set = player_set}
+	bounties[pteam] = {name = pname, rewards = rewards, msg = bounty_message, player = name}
 end
 
 local function set(pname, pteam, rewards)
-	set_inner(pname, pteam, rewards, false)
+	set_inner(pname, pteam, rewards, nil)
 end
 
-function ctf_modebase.bounties.set_player(pname, pteam, rewards)
-	set_inner(pname, pteam, rewards, true)
+function ctf_modebase.bounties.set_player(pname, pteam, rewards, name)
+	set_inner(pname, pteam, rewards, name)
 end
 
 
