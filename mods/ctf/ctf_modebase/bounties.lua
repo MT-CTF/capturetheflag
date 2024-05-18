@@ -14,7 +14,7 @@ local function get_reward_str(rewards)
 	return ret:sub(1, -3)
 end
 
-local function set(pname, pteam, rewards)
+local function set_inner(pname, pteam, rewards, player_set)
 	-- pname(str) is the player's name
 	-- pteam(str) is the player's team(e.g. "red")
 	-- rewards(table) has two entries:
@@ -32,8 +32,18 @@ local function set(pname, pteam, rewards)
 		end
 	end
 
-	bounties[pteam] = {name = pname, rewards = rewards, msg = bounty_message}
+	bounties[pteam] = {name = pname, rewards = rewards, msg = bounty_message, player_set = player_set}
 end
+
+local function set(pname, pteam, rewards)
+	set_inner(pname, pteam, rewards, false)
+end
+
+function ctf_modebase.bounties.set_player(pname, pteam, rewards)
+	set_inner(pname, pteam, rewards, true)
+end
+
+
 
 local function remove(pname, pteam)
 	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, string.format("[Bounty] %s is no longer bountied", pname)))
