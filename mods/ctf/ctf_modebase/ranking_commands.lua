@@ -176,6 +176,93 @@ minetest.register_chatcommand("donate", {
 	end
 })
 
+local bounty_timer = {}
+
+ctf_api.register_on_match_end(function()
+	bounty_timer = {}
+end)
+
+minetest.register_chatcommand("bounty", {
+	description = "Place a bounty on an enemy player\nCan be used only once in 5 minutes",
+	params = "<playername> <score>",
+	func = function(name, param)
+		local current_mode = ctf_modebase:get_current_mode()
+		if not current_mode or not ctf_modebase.match_started then
+			return false, "The match hasn't started yet!"
+		end
+
+		local pname, score, dmessage = string.match(param, "^(%S*) (%S*)(.*)$")
+
+		if ctf_core.to_number(pname) then
+			pname, score = score, pname
+		end
+
+		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
+
+		if not pname then
+			return false, "You should provide the player name!"
+		end
+
+		score = ctf_core.to_number(score)
+		if not score then
+			return false, "You should provide bounty amount!"
+		end
+
+		score = math.floor(score)
+
+		if score < 10 then
+			return false, "You should place a bounty of at least 10 score!"
+		end
+
+		if score > 250 then
+			return false, "You can place a bounty of no more than 250 score!"
+		end
+
+		if pname == name then
+			return false, 'You cannot bounty to yourself!'
+		end
+
+		local team = ctf_teams.get(pname)
+
+		if not team then
+			return false, string.format("Player %s is not online!", pname)
+		end
+
+		if team == ctf_teams.get(name) then
+			return false, string.format("Player %s is on your team!", pname)
+		end
+
+		local cur_score = math.min(
+			current_mode.recent_rankings.get(name).score or 0,
+			(current_mode.rankings:get(name) or {}).score or 0
+		)
+		if score > cur_score / 2 then
+			return false, "You can bounty only half of your match score!"
+		end
+
+		if bounty_timer[name] and bounty_timer[name] + 300 > os.time() then
+			local time_diff = bounty_timer[name] + 300 - os.time()
+			return false, string.format(
+				"You can only place a bounty once in 5 minutes! You can place a bounty again in %dm %ds.",
+				math.floor(time_diff / 60),
+				time_diff % 60)
+		end
+
+		ctf_modebase:place_bounty(pname, team, score)
+		current_mode.recent_rankings.add(name, {score=-score}, true)
+
+		bounty_timer[name] = os.time()
+		local bounty_text = string.format("%s placed a bounty of %s score on %s%s", name, score, pname, dmessage)
+		minetest.chat_send_all(minetest.colorize("#00EEFF", bounty_text)) -- TODO: Make orange
+		ctf_modebase.announce(bounty_text)
+
+		minetest.log("action", string.format(
+			"Player '%s' placed a bounty of %s score on player '%s'", name, score, pname
+		))
+		return true
+	end
+})
+
 local allow_reset = {}
 minetest.register_chatcommand("reset_rankings", {
 	description = minetest.colorize("red", "Resets rankings of you or another player to nothing"),
