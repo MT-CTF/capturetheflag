@@ -93,7 +93,7 @@ function ctf_modebase.bounties.reassign()
 			new = ctf_modebase.bounties.get_next_bounty(team_members)
 		end
 
-		if old and old ~= new then
+		if old and old ~= new and old.player ~= nil then
 			remove(old, tname)
 		end
 
