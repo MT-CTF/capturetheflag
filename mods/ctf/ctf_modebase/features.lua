@@ -27,13 +27,8 @@ local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
-	if not nametag.object or not team_nametag.object or not symbol_nametag.object then
-		return -- TODO: Fix the issue
-	end
-
-	if
-	   not        nametag.object.set_observers or
-	   not   team_nametag.object.set_observers or
+	if not      nametag.object.set_observers or
+	   not team_nametag.object.set_observers or
 	   not symbol_nametag.object.set_observers
 	then
 		return
@@ -63,11 +58,9 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 	end
 
 	-- Occasionally crashes in singleplayer, so call it safely
-	pcall(function()
-		       nametag.object:set_observers(entity_players )
-		  team_nametag.object:set_observers(nametag_players)
-		symbol_nametag.object:set_observers(symbol_players )
-	end)
+	       nametag.object:set_observers(entity_players )
+	  team_nametag.object:set_observers(nametag_players)
+	symbol_nametag.object:set_observers(symbol_players )
 end
 
 local tags_hidden = false
@@ -115,11 +108,9 @@ local function set_playertags_state(state)
 
 				if nametag and team_nametag and symbol_entity and
 				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
-					pcall(function()
-						team_nametag.object:set_observers({})
-						symbol_entity.object:set_observers({})
-							nametag.object:set_observers({})
-					end)
+					 team_nametag.object:set_observers({})
+					symbol_entity.object:set_observers({})
+					      nametag.object:set_observers({})
 				end
 			end
 		end
