@@ -27,8 +27,13 @@ local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
-	if not      nametag.object.set_observers or
-	   not team_nametag.object.set_observers or
+	if not nametag.object or not team_nametag.object or not symbol_nametag.object then
+		return -- TODO: Fix the issue
+	end
+
+	if
+	   not        nametag.object.set_observers or
+	   not   team_nametag.object.set_observers or
 	   not symbol_nametag.object.set_observers
 	then
 		return
