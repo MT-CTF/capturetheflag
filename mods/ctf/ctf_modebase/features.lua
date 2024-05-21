@@ -115,9 +115,11 @@ local function set_playertags_state(state)
 
 				if nametag and team_nametag and symbol_entity and
 				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
-					 team_nametag.object:set_observers({})
-					symbol_entity.object:set_observers({})
-					      nametag.object:set_observers({})
+					pcall(function()
+						team_nametag.object:set_observers({})
+						symbol_entity.object:set_observers({})
+							nametag.object:set_observers({})
+					end)
 				end
 			end
 		end
