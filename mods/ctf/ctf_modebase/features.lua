@@ -63,9 +63,11 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 	end
 
 	-- Occasionally crashes in singleplayer, so call it safely
-	       nametag.object:set_observers(entity_players )
-	  team_nametag.object:set_observers(nametag_players)
-	symbol_nametag.object:set_observers(symbol_players )
+	pcall(function()
+		       nametag.object:set_observers(entity_players )
+		  team_nametag.object:set_observers(nametag_players)
+		symbol_nametag.object:set_observers(symbol_players )
+	end)
 end
 
 local tags_hidden = false
