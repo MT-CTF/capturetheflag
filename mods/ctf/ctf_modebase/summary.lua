@@ -292,7 +292,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.map then
 		formspec.elements.map = {
 			type = "label",
-			pos = {7.5, 0.5},
+			pos = {7, 0.5},
 			label = "Map: " .. formdef.map,
 		}
 	end
