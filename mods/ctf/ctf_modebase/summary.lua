@@ -27,26 +27,28 @@ function ctf_modebase.summary.get(prev)
 		local rankings = current_mode.recent_rankings
 
 		return
-			rankings.players(), team_rankings(rankings.teams()), current_mode.summary_ranks, {
-				title = "Match Summary",
-				special_row_title = "Total Team Stats",
-				game_stat = game_stat,
-				winner = winner,
-				duration = ctf_map.get_duration(),
-				buttons = {previous = previous ~= nil},
-				allow_sort = true,
-			}
+		rankings.players(), team_rankings(rankings.teams()), current_mode.summary_ranks, {
+			title = "Match Summary",
+			special_row_title = "Total Team Stats",
+			game_stat = game_stat,
+			winner = winner,
+			duration = ctf_map.get_duration(),
+			map = ctf_map.current_map.name,
+			buttons = {previous = previous ~= nil},
+			allow_sort = true,
+		}
 	elseif previous ~= nil then
 		return
-			previous.players, team_rankings(previous.teams), previous.summary_ranks, {
-				title = "Previous Match Summary",
-				special_row_title = "Total Team Stats",
-				game_stat = previous.game_stat,
-				winner = previous.winner,
-				duration = previous.duration,
-				buttons = {next = true},
-				allow_sort = true,
-			}
+		previous.players, team_rankings(previous.teams), previous.summary_ranks, {
+			title = "Previous Match Summary",
+			special_row_title = "Total Team Stats",
+			game_stat = previous.game_stat,
+			winner = previous.winner,
+			duration = previous.duration,
+			map = previous.map,
+			buttons = {next = true},
+			allow_sort = true,
+		}
 	end
 end
 
@@ -69,6 +71,7 @@ ctf_api.register_on_match_end(function()
 		game_stat = game_stat,
 		winner = winner or "NO WINNER",
 		duration = ctf_map.get_duration(),
+		map = ctf_map.current_map.name,
 		summary_ranks = current_mode.summary_ranks,
 	}
 
@@ -283,6 +286,14 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 			type = "label",
 			pos = {1, 1.3},
 			label = "Duration: " .. formdef.duration,
+		}
+	end
+
+	if formdef.map then
+		formspec.elements.map = {
+			type = "label",
+			pos = {7, 0.5},
+			label = "Map: " .. formdef.map,
 		}
 	end
 
