@@ -665,9 +665,9 @@ return {
 
 end
 
-ctf_settings.register("send_death_message", {
+ctf_settings.register("send_death_messages", {
     type = "bool",
-    label = "Recieve death message.",
-    description = "When enabled, you will recieve a death message whenever you die stating who killed you.",
-    default = "false",
+    label = "Receive death messages.",
+    description = "When enabled, you will receive a death message whenever you die stating who killed you.",
+    default = "true",
 })
