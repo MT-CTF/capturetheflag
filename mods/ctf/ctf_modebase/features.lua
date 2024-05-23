@@ -6,18 +6,19 @@ local many_teams = false
 local team_list
 local teams_left
 local death_messages = {
-    ["grenades_frag"] = {"blown up", "bombed", "exploded"},
+    ["grenades_frag"] = {"blown up", "fragged"},
     ["knockback_grenade"] = {"sent flying", "doomed to fall"},
     ["black_hole_grenade"] = {"sucked into the void"},
-    ["sword"] = {"killed", "slashed", "stabbed", "murdered"},
-    ["axe"] = {"killed", "slashed", "murdered", "axed a question"},
-    ["shovel"] = {"killed with a gardening mere tool"},
-    ["pick"] = {"pickaxed to death"},
-    ["ctf_ranged"] = {"shot", "sniped"},
-    ["default_water"] = {"suffocated"},
-    ["damage_cobble"] = {"mined something deadly placed"},
-    ["lava"] = {"tried to swim in lava"},
-    ["fire"] = {"burnt to a crisp"}
+    ["sword"] = {"killed", "sliced up"},
+    ["axe"] = {"killed", "chopped up",},
+    ["shovel"] = {"killed with the tool that dug your grave"},
+    ["pick"] = {"killed", "mistaken for mese ore"},
+    ["ctf_ranged"] = {"shot"},
+    ["rifle"] = {"sniped"},
+    ["default_water"] = {"drowned", "over-hydrated"},
+    ["damage_cobble"] = {"mined a little too much damage cobble"},
+    ["lava"] = {"tried to swim in lava", "took a hot bath"},
+    ["fire"] = {"burnt to a crisp"},
 }
 
 local function calculate_killscore(player)
