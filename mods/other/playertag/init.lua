@@ -9,23 +9,51 @@ playertag = {
 	TYPE_ENTITY  = TYPE_ENTITY,
 }
 
+local function remove_entity_tag(player)
+	local tag = players[player:get_player_name()]
+	if tag then
+		if tag.entity then
+			tag.entity.object:remove()
+			tag.entity = nil
+		end
+
+		if tag.nametag_entity then
+			tag.nametag_entity.object:remove()
+			tag.nametag_entity = nil
+		end
+
+		if tag.symbol_entity then
+			tag.symbol_entity.object:remove()
+			tag.symbol_entity = nil
+		end
+	end
+end
+
 local function add_entity_tag(player, old_observers)
+	local pname = player:get_player_name()
+	local ppos = player:get_pos()
+
 	-- Hide fixed nametag
 	player:set_nametag_attributes({
 		color = {a = 0, r = 0, g = 0, b = 0}
 	})
 
-	local ppos = player:get_pos()
+	remove_entity_tag(player)
 
 	local ent = minetest.add_entity(ppos, "playertag:tag")
 	local ent2 = false
 	local ent3 = false
 
+	if not ent then
+		minetest.after(1, add_entity_tag, player, old_observers)
+		return
+	end
+
 	if ent.set_observers then
 		ent2 = minetest.add_entity(ppos, "playertag:tag")
 		ent2:set_observers(old_observers.nametag_entity or {})
 		ent2:set_properties({
-			nametag = player:get_player_name(),
+			nametag = pname,
 			nametag_color = "#EEFFFFDD",
 			nametag_bgcolor = "#0000002D"
 		})
@@ -42,9 +70,9 @@ local function add_entity_tag(player, old_observers)
 
 	-- Build name from font texture
 	local texture = "npcf_tag_bg.png"
-	local x = math.floor(134 - ((player:get_player_name():len() * 11) / 2))
+	local x = math.floor(134 - ((pname:len() * 11) / 2))
 	local i = 0
-	player:get_player_name():gsub(".", function(char)
+	pname:gsub(".", function(char)
 		local n = "_"
 		if char:byte() > 96 and char:byte() < 123 or char:byte() > 47 and char:byte() < 58 or char == "-" then
 			n = char
@@ -66,24 +94,9 @@ local function add_entity_tag(player, old_observers)
 	end
 
 	-- Store
-	players[player:get_player_name()].entity = ent:get_luaentity()
-	players[player:get_player_name()].nametag_entity = ent2 and ent2:get_luaentity()
-	players[player:get_player_name()].symbol_entity = ent3 and ent3:get_luaentity()
-end
-
-local function remove_entity_tag(player)
-	local tag = players[player:get_player_name()]
-	if tag and tag.entity then
-		tag.entity.object:remove()
-
-		if tag.nametag_entity then
-			tag.nametag_entity.object:remove()
-		end
-
-		if tag.symbol_entity then
-			tag.symbol_entity.object:remove()
-		end
-	end
+	players[pname].entity = ent:get_luaentity()
+	players[pname].nametag_entity = ent2 and ent2:get_luaentity()
+	players[pname].symbol_entity = ent3 and ent3:get_luaentity()
 end
 
 local function update(player, settings)
@@ -154,17 +167,9 @@ minetest.register_entity("playertag:tag", {
 	physical = false,
 	makes_footstep_sound = false,
 	backface_culling = false,
-	static_save = true,
+	static_save = false,
 	pointable = false,
 	on_punch = function() return true end,
-	on_detach = function(self, parent)
-		self.object:remove()
-	end,
-	on_deactivate = function(self, removal)
-		if not removal then
-			self.object:remove()
-		end
-	end,
 })
 
 minetest.register_on_joinplayer(function(player)
