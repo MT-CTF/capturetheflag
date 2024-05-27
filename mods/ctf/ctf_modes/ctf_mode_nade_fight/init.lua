@@ -53,6 +53,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
 		"ctf_tnt:tnt_stick",
+		"ctf_tnt:tnt",
 	},
 	physics = {sneak_glitch = true, new_move = false},
 	blacklisted_nodes = {"default:apple"},
