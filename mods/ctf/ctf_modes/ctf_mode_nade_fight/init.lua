@@ -46,7 +46,7 @@ ctf_modebase.register_mode("nade_fight", {
 
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 3},
 		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
-		["ctf_tnt:tnt_stick"] = {rarity=0.25, max_stacks=3},
+		["ctf_tnt:tnt_stick"] = {rarity=0.35, max_stacks=3},
 	},
 	crafts = {
 		"ctf_map:damage_cobble",
