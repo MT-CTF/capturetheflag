@@ -355,7 +355,6 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
 
 	local c_fire = minetest.get_content_id("fire:basic_flame")
-	local removed_blocks = 0
 	for z = -radius, radius do
 	for y = -radius, radius do
 	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
@@ -371,8 +370,6 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 					ignore_protection, ignore_on_blast, owner)
 				if replace ~= c_air then
 					count = count + 1
-				else
-					removed_blocks = removed_blocks + 1
 				end
 				data[vi] = replace
 			end
@@ -418,10 +415,11 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 
 	minetest.log("action", "TNT owned by " .. owner .. " detonated at " ..
 		minetest.pos_to_string(pos) .. " with radius " .. radius)
+	--[[
 	if owner ~= "" then
 		local current_mode = ctf_modebase:get_current_mode()
 		current_mode.recent_rankings.add(owner, { score=removed_blocks }, false)
-	end
+	end--]]
 	return drops, radius
 end
 
@@ -530,18 +528,16 @@ function ctf_tnt.register_tnt(def)
 					return nil
 				end
 				local pteam = ctf_teams.get(placer:get_player_name())
-				for flagteam, team in pairs(ctf_map.current_map.teams) do
-					if pteam ~= flagteam and vector.distance(pointed_thing.above, team.flag_pos) <= 24 then
-						return minetest.item_place(itemstack, placer, pointed_thing)
-					end
+				if vector.distance(pointed_thing.above, ctf_map.current_map.teams[pteam].flag_pos) <= 15 then
+					hud_events.new(placer:get_player_name(), {
+						quick = true,
+						text = "You can't place TNT near your own flag",
+						color = "warning",
+					})
+					return nil
 				end
 			end
-			hud_events.new(placer:get_player_name(), {
-				quick = true,
-				text = "You can place TNT only near one enemy flag",
-				color = "warning",
-			})
-			return nil
+			return minetest.item_place(itemstack, placer, pointed_thing)
 		end,
 	})
 
