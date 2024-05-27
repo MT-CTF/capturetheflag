@@ -177,11 +177,9 @@ crafting.register_recipe({
 crafting.register_recipe({
 	output = "ctf_tnt:tnt_stick 2",
 	items = { "default:papyrus", "ctf_ranged:ammo 2" },
-	always_known = true,
 })
 crafting.register_recipe({
 	output = "ctf_tnt:tnt",
 	items = { "ctf_tnt:tnt_stick 8" },
-	always_known = true,
 })
 
