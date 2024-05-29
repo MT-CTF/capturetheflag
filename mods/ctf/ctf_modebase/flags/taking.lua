@@ -82,7 +82,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		if ctf_modebase.flag_attempt_history[pname] == nil then
 			ctf_modebase.flag_attempt_history[pname] = {}
 		end
-		table.insert(ctf_modebase.flag_attempt_history[pname], minetest.get_gametime())
+		table.insert(ctf_modebase.flag_attempt_history[pname], os.time())
 
 		-- this is table of streaks.
 		-- mega streak means 4 or 5 attempt in less than 10 minutes
@@ -109,6 +109,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 			end
 			number_of_attempts = number_of_attempts + 1
 			if total_time >= 60*10 then
+				-- if total_time was more than 10min...
 				break
 			end
 		end
