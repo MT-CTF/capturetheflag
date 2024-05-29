@@ -159,6 +159,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 							punch_interval = 1,
 							damage_groups = {
 								fleshy = 2,
+								grenade = 1,
 								black_hole_grenade = 1,
 							}
 						}, nil)
@@ -261,6 +262,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 					punch_interval = 1,
 					damage_groups = {
 						fleshy = 1,
+						grenade = 1,
 						knockback_grenade = 1,
 					}
 				}, nil)
