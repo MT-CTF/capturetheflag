@@ -240,7 +240,14 @@ minetest.register_chatcommand("mail", {
 	func = function(name, param)
 		local to, msg = string.match(param, "^([%a%d_-]+) (.+)")
 		if to and msg then
-			return email.send_mail(name, to, msg)
+			if minetest.check_player_privs(name, "shout") then
+				return email.send_mail(name, to, msg)
+			elseif not minetest.check_player_privs(name, "shout") and
+					minetest.check_player_privs(to, "basic_privs") then
+				return email.send_mail(name, to, msg)
+			else
+				return false, S("-!- You don't have the permission to speak, so you can only mail staff members.")
+			end
 		else
 			return false, S("Usage: mail <playername> <some message>")
 		end
