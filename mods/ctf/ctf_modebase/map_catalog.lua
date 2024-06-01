@@ -42,6 +42,11 @@ function ctf_modebase.map_catalog.select_map(filter)
 	end
 
 	local selected = maps[math.random(1, #maps)]
+
+	if not selected then
+		selected = ctf_modebase.map_catalog.map_dirnames["plains"]
+	end
+
 	ctf_modebase.map_catalog.current_map = maps_pool[selected]
 
 	if map_repeat_interval > 0 then
