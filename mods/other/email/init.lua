@@ -246,7 +246,7 @@ minetest.register_chatcommand("mail", {
 					minetest.check_player_privs(to, "basic_privs") then
 				return email.send_mail(name, to, msg)
 			else
-				return false, S("-!- Because you don't have the permission to speak, you can only mail staff members.")
+				return false, S("-!- You don't have the permission to speak, so you can only mail staff members.")
 			end
 		else
 			return false, S("Usage: mail <playername> <some message>")
