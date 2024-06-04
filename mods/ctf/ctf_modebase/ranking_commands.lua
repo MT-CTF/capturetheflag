@@ -96,7 +96,7 @@ ctf_api.register_on_match_end(function()
 end)
 
 minetest.register_chatcommand("donate", {
-	description = "Donate your match score to your teammate\nCan be used only once in 10 minutes",
+	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes",
 	params = "<playername> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
@@ -153,10 +153,10 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate only half of your match score!"
 		end
 
-		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
-			local time_diff = donate_timer[name] + 300 - os.time()
+		if donate_timer[name] and donate_timer[name] + 150 > os.time() then
+			local time_diff = donate_timer[name] + 150 - os.time()
 			return false, string.format(
-				"You can donate only once in 5 minutes! You can donate again in %dm %ds.",
+				"You can donate only once in 2.5 minutes! You can donate again in %dm %ds.",
 				math.floor(time_diff / 60),
 				time_diff % 60)
 		end
