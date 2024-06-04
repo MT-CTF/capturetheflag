@@ -137,9 +137,11 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 				end
 			end
 		end
+
+		return 0
 	end
 
-	return 0
+	return hp_change
 end, true)
 
 local queue = {}
