@@ -206,10 +206,14 @@ minetest.register_chatcommand("reset_rankings", {
 					allow_reset[key] = nil
 				end)
 
-				return true, "This will reset your stats and rankings for " .. mode_name .." mode completely."
-					.. " You will lose access to any special privileges such as the"
-					.. " team chest or userlimit skip. This is irreversable. If you're"
-					.. " sure, re-type /reset_rankings within 30 seconds to reset."
+				return true, minetest.colorize("red", "This will reset your (") ..
+					minetest.colorize("cyan", name) ..
+					minetest.colorize("red", ") stats and rankings for ") ..
+					minetest.colorize("cyan", mode_name) ..
+					minetest.colorize("red", " mode completely.\n") ..
+					"You will lose access to any special privileges such as the "    ..
+					"team chest or userlimit skip. This is irreversable. If you're " ..
+					"sure, re-type /reset_rankings within 30 seconds to reset."
 			end
 			mode_data.rankings:set(name, {}, true)
 			allow_reset[key] = nil
