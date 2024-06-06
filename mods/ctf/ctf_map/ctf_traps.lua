@@ -185,7 +185,8 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 				return 0, true
 			else
 				local pos = reason.node_pos
-				local radius = minetest.registered_nodes[string.format("ctf_map:spike_%s", team)].explosion_radius
+
+				local radius = 10--minetest.registered_nodes[string.format("ctf_map:spike_%s", team)].explosion_radius
 				minetest.add_particlespawner({
 					amount = 20,
 					time = 0.5,
@@ -204,7 +205,6 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 					vertical = false,
 					texture = "grenades_smoke.png",
 				})
-
 				minetest.add_particle({
 					pos = pos,
 					velocity = {x=0, y=0, z=0},
@@ -224,6 +224,22 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 					gain = 1.0,
 					max_hear_distance = 64,
 				})
+				for _, obj in pairs(minetest.get_objects_inside_radius(pos, radius)) do
+					if obj:is_player() then
+						if ctf_teams.get(obj) ~= team then
+							local player_pos = obj:get_pos()
+							local player_distance = vector.distance(pos, player_pos)
+							obj:punch(player, 1, {
+								punch_interval = 1,
+								damage_groups = {
+									grenade = 1,
+									fleshy = 26 - ( (radius/3) *  player_distance) -- explosion_damage (for finding with ctrl+f)
+								}
+							}, nil)
+						end
+					end
+				end
+				minetest.remove_node(pos)
 			end
 		end
 	end
