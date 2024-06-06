@@ -177,16 +177,18 @@ end
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "node_damage" then
 		local team = ctf_teams.get(player)
-
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
+		end
+		if team and reason.node == string.format("ctf_map:landmine_%s", team) then
+			return 0, true
 		else
-			if team and reason.node == string.format("ctf_map:spike_%s", team) then
+			if team and reason.node == string.format("ctf_map:landmine_%s", team) then
 				return 0, true
 			else
 				local pos = reason.node_pos
 
-				local radius = 10--minetest.registered_nodes[string.format("ctf_map:spike_%s", team)].explosion_radius
+				local radius = 10--minetest.registered_nodes[string.format("ctf_map:landmine_%s", team)].explosion_radius
 				minetest.add_particlespawner({
 					amount = 20,
 					time = 0.5,
@@ -226,7 +228,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 				})
 				for _, obj in pairs(minetest.get_objects_inside_radius(pos, radius)) do
 					if obj:is_player() then
-						if ctf_teams.get(obj) ~= team then
+						if ctf_teams.get(obj) and reason.node ~= string.format("ctf_map:landmine_%s", ctf_teams.get(obj)) then
 							local player_pos = obj:get_pos()
 							local player_distance = vector.distance(pos, player_pos)
 							obj:punch(player, 1, {
