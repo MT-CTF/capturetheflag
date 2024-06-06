@@ -167,6 +167,11 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				type = "fixed",
 				fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
 			},
+			after_place_node = function(pos, placer)
+				if placer ~= nil then
+					minetest.get_meta(pos):set_string('placer_name', placer:get_player_name())
+				end
+			end,
 			on_place = function(itemstack, placer, pointed_thing)
 				return minetest.item_place(itemstack, placer, pointed_thing, 34)
 			end
@@ -231,7 +236,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 						if ctf_teams.get(obj) and reason.node ~= string.format("ctf_map:landmine_%s", ctf_teams.get(obj)) then
 							local player_pos = obj:get_pos()
 							local player_distance = vector.distance(pos, player_pos)
-							obj:punch(player, 1, {
+							obj:punch(minetest.get_player_by_name(minetest.get_meta(pos):get('placer_name')), 1, {
 								punch_interval = 1,
 								damage_groups = {
 									grenade = 1,
