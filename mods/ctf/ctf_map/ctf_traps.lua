@@ -95,18 +95,141 @@ for _, team in ipairs(ctf_teams.teamlist) do
 	end
 end
 
+--
+--- Landmine
+--
+
+minetest.register_node("ctf_map:landmine", {
+	description = "Landmine",
+	drawtype = "nodebox",
+	tiles = {"ctf_map_landmine.png", "ctf_map_landmine.png^[transformFY"},
+	inventory_image = "ctf_map_landmine.png",
+	paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+	groups = {cracky=1, level=2},
+	node_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+	},
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+	},
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local pteam = ctf_teams.get(placer)
+
+		if pteam then
+			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
+				minetest.chat_send_player(placer:get_player_name(), "You can only place landmines in your own territory!")
+				return itemstack
+			end
+
+			local newitemstack = ItemStack("ctf_map:landmine_"..pteam)
+			newitemstack:set_count(itemstack:get_count())
+
+			local result = minetest.item_place(newitemstack, placer, pointed_thing, 34)
+
+			if result then
+				itemstack:set_count(result:get_count())
+			end
+
+			return itemstack
+		end
+
+		return minetest.item_place(itemstack, placer, pointed_thing, 34)
+	end
+})
+
+for _, team in ipairs(ctf_teams.teamlist) do
+	if not ctf_teams.team[team].not_playing then
+		local team_color = ctf_teams.team[team].color
+
+		minetest.register_node("ctf_map:landmine_"..team, {
+			description = HumanReadable(team).." Team Landmine",
+			drawtype = "nodebox",
+			tiles = {"ctf_map_landmine.png^(ctf_map_landmine_team.png^[colorize:"..team_color..":150])",
+			"ctf_map_landmine.png^[transformFY"},
+			inventory_image = "ctf_map_landmine.png^(ctf_map_landmine_team.png^[colorize:"..team_color..":150])",
+			use_texture_alpha = "clip",
+			paramtype = "light",
+			sunlight_propagates = true,
+			walkable = false,
+			damage_per_second = 30, -- should kill knights
+			explosion_radius = 10, -- afaik only influences sound
+			groups = {cracky=1, level=2},
+			drop = "ctf_map:landmine",
+			selection_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+			},
+			node_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, -0.4, 0.5},
+			},
+			on_place = function(itemstack, placer, pointed_thing)
+				return minetest.item_place(itemstack, placer, pointed_thing, 34)
+			end
+		})
+	end
+end
+
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "node_damage" then
 		local team = ctf_teams.get(player)
 
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
+		else
+			if team and reason.node == string.format("ctf_map:spike_%s", team) then
+				return 0, true
+			else
+				local pos = reason.node_pos
+				local radius = minetest.registered_nodes[string.format("ctf_map:spike_%s", team)].explosion_radius
+				minetest.add_particlespawner({
+					amount = 20,
+					time = 0.5,
+					minpos = vector.subtract(pos, radius),
+					maxpos = vector.add(pos, radius),
+					minvel = {x = 0, y = 5, z = 0},
+					maxvel = {x = 0, y = 7, z = 0},
+					minacc = {x = 0, y = 1, z = 0},
+					maxacc = {x = 0, y = 1, z = 0},
+					minexptime = 0.3,
+					maxexptime = 0.6,
+					minsize = 7,
+					maxsize = 10,
+					collisiondetection = true,
+					collision_removal = false,
+					vertical = false,
+					texture = "grenades_smoke.png",
+				})
+
+				minetest.add_particle({
+					pos = pos,
+					velocity = {x=0, y=0, z=0},
+					acceleration = {x=0, y=0, z=0},
+					expirationtime = 0.3,
+					size = 15,
+					collisiondetection = false,
+					collision_removal = false,
+					object_collision = false,
+					vertical = false,
+					texture = "grenades_boom.png",
+					glow = 10
+				})
+
+				minetest.sound_play("grenades_explode", {
+					pos = pos,
+					gain = 1.0,
+					max_hear_distance = 64,
+				})
+			end
 		end
 	end
 
 	return hp_change
 end, true)
-
 --
 -- Damage Cobble
 --
