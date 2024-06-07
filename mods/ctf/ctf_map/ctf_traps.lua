@@ -190,7 +190,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		else
 			if team and reason.node == string.format("ctf_map:landmine_%s", team) then
 				return 0, true
-			else
+			else if string.match(str, "^ctf_map:landmine") then
 				local pos = reason.node_pos
 
 				local radius = 10--minetest.registered_nodes[string.format("ctf_map:landmine_%s", team)].explosion_radius
@@ -247,6 +247,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 					end
 				end
 				minetest.remove_node(pos)
+			end
 			end
 		end
 	end
