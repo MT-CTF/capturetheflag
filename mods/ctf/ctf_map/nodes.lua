@@ -239,11 +239,13 @@ local chest_def = {
 				minetest.set_node(pos, {name = "air"})
 			end)
 		end
-	end,
-	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
 		minetest.get_meta(pos):set_string("infotext", chestv)
-	end
+	end,
+	--[[on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
+		minetest.get_meta(pos):set_string("infotext", chestv)
+	end]]
 }
 
 local ochest_def = table.copy(chest_def)
