@@ -37,6 +37,10 @@ ctf_modebase = {
 
 	--flag_captured[Team name] = true if captured, otherwise nil
 	flag_captured        = {},
+
+	flag_attempt_history = {
+		-- ["player"] = {time0, time1, time2, ...}
+	},
 }
 
 ctf_gui.old_init()

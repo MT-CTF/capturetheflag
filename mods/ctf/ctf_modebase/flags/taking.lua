@@ -1,3 +1,16 @@
+-- this is table of streaks.
+-- mega streak means 4 or 5 attempt in less than 10 minutes
+local streaks = {
+	[3] = "three",
+	[4] = "four",
+	[5] = "mega",
+	[7] = "mega",
+	[8] = "giga",
+	[10] = "giga",
+	[12] = "tera",
+	[14] = "EXA",
+}
+
 local function drop_flags(player, pteam)
 	local pname = player:get_player_name()
 	local flagteams = ctf_modebase.taken_flags[pname]
@@ -78,6 +91,48 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		table.insert(ctf_modebase.taken_flags[pname], target_team)
 		ctf_modebase.flag_taken[target_team] = {p=pname, t=pteam}
 
+
+		if ctf_modebase.flag_attempt_history[pname] == nil then
+			ctf_modebase.flag_attempt_history[pname] = {}
+		end
+		table.insert(ctf_modebase.flag_attempt_history[pname], os.time())
+
+		local number_of_attempts = 0
+		local total_time = 0 -- should be less than 60*10 = 10 minutes
+		local prev_time = nil
+		local new = nil
+		for i = #ctf_modebase.flag_attempt_history[pname], 1, -1 do
+			local time = ctf_modebase.flag_attempt_history[i]
+
+			if prev_time then
+				total_time = prev_time - time
+			else
+				prev_time = time
+			end
+
+			if total_time >= 60*10 then
+				if not new then
+					new = table.copy(ctf_modebase.flag_attempt_history[pname])
+				end
+
+				table.remove(new, 1)
+			else
+				number_of_attempts = number_of_attempts + 1
+			end
+		end
+
+		if new then
+			ctf_modebase.flag_attempt_history[pname] = new
+		end
+
+		local streak = streaks[number_of_attempts]
+		if number_of_attempts >= 10 then
+			streak = "EXA"
+		end
+		if streak then
+			minetest.chat_send_all(pname .. " is on a " .. streak .. " attempt streak!")
+		end
+
 		player_api.set_texture(puncher, 2,
 			"default_wood.png^([combine:16x16:4,0=wool_white.png^[colorize:"..ctf_teams.team[target_team].color..":200)"
 		)
@@ -122,6 +177,7 @@ ctf_api.register_on_match_end(function()
 	ctf_modebase.taken_flags = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}
+	ctf_modebase.flag_attempt_history = {}
 end)
 
 ctf_teams.register_on_allocplayer(function(player, new_team, old_team)

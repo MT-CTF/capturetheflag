@@ -687,15 +687,7 @@ return {
 
 		celebrate_team(pteam)
 
-		local text = " has captured the flag"
-		if many_teams then
-			text = " has captured the flag of team(s) " .. HumanReadable(teamnames)
-			minetest.chat_send_all(
-				minetest.colorize(tcolor, pname) ..
-				minetest.colorize(FLAG_MESSAGE_COLOR, text)
-			)
-		end
-		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
+
 
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
@@ -706,7 +698,19 @@ return {
 			score = math.max(75, math.min(500, score))
 			capture_reward = capture_reward + score
 		end
-
+		local text = " has captured the flag"
+		if many_teams then
+			text = string.format(
+				" has captured the flag of team(s) %s and got %d points",
+				HumanReadable(teamnames),
+				capture_reward
+			)
+			minetest.chat_send_all(
+				minetest.colorize(tcolor, pname) ..
+				minetest.colorize(FLAG_MESSAGE_COLOR, text)
+			)
+		end
+		ctf_modebase.announce(string.format("Player %s (team %s)%s and got %d points", pname, pteam, text, capture_reward))
 		local team_score = team_scores[pteam].score
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if teammate ~= pname then
@@ -721,12 +725,12 @@ return {
 		teams_left = teams_left - #teamnames
 
 		if teams_left <= 1 then
-			local capture_text = "Player %s captured"
+			local capture_text = "Player %s captured and got %d points"
 			if many_teams then
-				capture_text = "Player %s captured the last flag"
+				capture_text = "Player %s captured the last flag and got %d points"
 			end
 
-			ctf_modebase.summary.set_winner(string.format(capture_text, minetest.colorize(tcolor, pname)))
+			ctf_modebase.summary.set_winner(string.format(capture_text, minetest.colorize(tcolor, pname), capture_reward))
 
 			local win_text = HumanReadable(pteam) .. " Team Wins!"
 
@@ -746,7 +750,7 @@ return {
 
 				for lost_player in pairs(ctf_teams.online_players[lost_team].players) do
 					team_switch_after_capture = true
-						ctf_teams.allocate_player(lost_player)
+					ctf_teams.allocate_player(lost_player)
 					team_switch_after_capture = false
 				end
 			end

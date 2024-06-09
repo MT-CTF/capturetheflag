@@ -76,7 +76,17 @@ return {
 		rankings_teams = {}
 	end,
 	players = function() return rankings_players end,
-	teams   = function() return rankings_teams   end,
+	teams   = function()
+		local out = {}
+
+		for k, v in pairs(rankings_teams) do
+			if not ctf_teams.team[k].not_playing then
+				out[k] = v
+			end
+		end
+
+		return out
+	end,
 }
 
 end

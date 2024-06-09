@@ -129,9 +129,8 @@ function ctf_modebase.mode_vote.start_vote()
 		timer = minetest.after(VOTING_TIME, ctf_modebase.mode_vote.end_vote)
 		formspec_send_timer = minetest.after(2, send_formspec)
 	else
-		ctf_modebase.current_mode_matches = mode_defined_rounds
-		ctf_modebase.mode_on_next_match = new_mode
-		ctf_modebase.start_match_after_vote()
+		votes = {mode_defined_rounds}
+		ctf_modebase.mode_vote.end_vote()
 	end
 end
 

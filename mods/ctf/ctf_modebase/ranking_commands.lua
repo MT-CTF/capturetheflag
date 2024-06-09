@@ -96,7 +96,7 @@ ctf_api.register_on_match_end(function()
 end)
 
 minetest.register_chatcommand("donate", {
-	description = "Donate your match score to your teammate\nCan be used only once in 10 minutes",
+	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes",
 	params = "<playername> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
@@ -153,10 +153,10 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate only half of your match score!"
 		end
 
-		if donate_timer[name] and donate_timer[name] + 300 > os.time() then
-			local time_diff = donate_timer[name] + 300 - os.time()
+		if donate_timer[name] and donate_timer[name] + 150 > os.time() then
+			local time_diff = donate_timer[name] + 150 - os.time()
 			return false, string.format(
-				"You can donate only once in 5 minutes! You can donate again in %dm %ds.",
+				"You can donate only once in 2.5 minutes! You can donate again in %dm %ds.",
 				math.floor(time_diff / 60),
 				time_diff % 60)
 		end
@@ -206,10 +206,14 @@ minetest.register_chatcommand("reset_rankings", {
 					allow_reset[key] = nil
 				end)
 
-				return true, "This will reset your stats and rankings for " .. mode_name .." mode completely."
-					.. " You will lose access to any special privileges such as the"
-					.. " team chest or userlimit skip. This is irreversable. If you're"
-					.. " sure, re-type /reset_rankings within 30 seconds to reset."
+				return true, minetest.colorize("red", "This will reset your (") ..
+					minetest.colorize("cyan", name) ..
+					minetest.colorize("red", ") stats and rankings for ") ..
+					minetest.colorize("cyan", mode_name) ..
+					minetest.colorize("red", " mode completely.\n") ..
+					"You will lose access to any special privileges such as the "    ..
+					"team chest or userlimit skip. This is irreversable. If you're " ..
+					"sure, re-type /reset_rankings within 30 seconds to reset."
 			end
 			mode_data.rankings:set(name, {}, true)
 			allow_reset[key] = nil
@@ -257,7 +261,7 @@ minetest.register_chatcommand("top50", {
 })
 
 minetest.register_chatcommand("make_pro", {
-	description = "Make yourself or another player a pro",
+	description = "Make yourself or another player a pro (Will break target player's ranks)",
 	params = "[mode:technical modename] <playername>",
 	privs = {ctf_admin = true},
 	func = function(name, param)
@@ -271,16 +275,17 @@ minetest.register_chatcommand("make_pro", {
 		end
 
 		local old_ranks = mode_data.rankings:get(pname)
+		local note = ""
 		if not old_ranks then
-			return false, string.format("Player '%s' has no rankings!", pname)
+			note = string.format(" Note: Player '%s' had no rankings before that.", pname)
 		end
 
-		mode_data.rankings:add(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 5})
+		mode_data.rankings:set(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 5})
 
 		minetest.log("action", string.format(
 			"[ctf_admin] %s made player '%s' a pro in mode %s: %s", name, pname, mode_name, dump(old_ranks)
 		))
-		return true, string.format("Player '%s' is now a pro!", pname)
+		return true, string.format("Player '%s' is now a pro.%s", pname, note)
 	end
 })
 
@@ -306,17 +311,17 @@ minetest.register_chatcommand("add_score", {
 		end
 
 		local old_ranks = mode_data.rankings:get(pname)
+		local note = ""
 		if not old_ranks then
-			return false, string.format("Player '%s' has no rankings!", pname)
+			note = string.format(" Note: Player '%s' had no rankings before that.", pname)
 		end
 
-		local old_score = old_ranks.score or 0
-		mode_data.rankings:set(pname, {score = old_score + score})
+		mode_data.rankings:add(pname, {score = score})
 
 		minetest.log("action", string.format(
 			"[ctf_admin] %s added %s score to player '%s' in mode %s", name, score, pname, mode_name
 		))
-		return true, string.format("Added %s score to player '%s'", score, pname)
+		return true, string.format("Added %s score to player '%s'.%s", score, pname, note)
 	end
 })
 
@@ -353,11 +358,12 @@ minetest.register_chatcommand("transfer_rankings", {
 			end
 		end
 
+		local note = ""
 		if not src_exists then
 			return false, string.format("Source player '%s' has no rankings!", src)
 		end
 		if not dst_exists then
-			return false, string.format("Destination player '%s' has no rankings!", dst)
+			note = string.format(" Note: Destination player '%s' had no rankings.", dst)
 		end
 
 		if src == dst then
@@ -365,7 +371,7 @@ minetest.register_chatcommand("transfer_rankings", {
 		end
 
 		for mode_name, mode in pairs(ctf_modebase.modes) do
-			mode.rankings:add(dst, src_rankings[mode_name])
+			mode.rankings:set(dst, src_rankings[mode_name], true)
 		end
 
 		for _, mode in pairs(ctf_modebase.modes) do
@@ -373,9 +379,9 @@ minetest.register_chatcommand("transfer_rankings", {
 		end
 
 		minetest.log("action", string.format(
-			"[ctf_admin] %s transferred rankings from '%s' to '%s': %s -> %s",
-			name, src, dst, dump(src_rankings), dump(dst_rankings)
+			"[ctf_admin] %s transferred rankings from '%s' to '%s': %s -> %s | %s",
+			name, src, dst, dump(src_rankings), dump(dst_rankings), note
 		))
-		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
+		return true, string.format("Rankings of '%s' have been transferred to '%s'.%s", src, dst, note)
 	end
 })
