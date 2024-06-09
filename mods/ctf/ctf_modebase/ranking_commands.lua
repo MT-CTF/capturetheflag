@@ -104,23 +104,30 @@ minetest.register_chatcommand("donate", {
 			return false, "The match hasn't started yet!"
 		end
 
-		local pname, score, dmessage = string.match(param, "^(%S*) (%S*)(.*)$")
+		local pnames, score, dmessage = {}, 0, ""
 
-		if ctf_core.to_number(pname) then
-			pname, score = score, pname
-		end
+		local receiver = false
 
-		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
-
-		if not pname then
-			return false, "You should provide the player name!"
+		for p in string.gmatch(param, "%S+") do
+			if #dmessage > 0 then
+				dmessage = dmessage .. " "
+			elseif ctf_core.to_number(p) and score == 0 then
+				score = p
+				break
+			end
+			local team = ctf_teams.get(p)
+			if not team and receiver then
+				dmessage = dmessage .. p
+			else
+				pnames[p] = team
+				receiver = true
+			end
 		end
 
 		score = ctf_core.to_number(score)
 		if not score then
 			return false, "You should provide score amount!"
 		end
-
 		score = math.floor(score)
 
 		if score < 5 then
@@ -131,25 +138,16 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate no more than 400 score!"
 		end
 
-		if pname == name then
-			return false, 'You cannot donate to yourself!'
-		end
-
-		local team = ctf_teams.get(pname)
-
-		if not team then
-			return false, string.format("Player %s is not online!", pname)
-		end
-
-		if team ~= ctf_teams.get(name) then
-			return false, string.format("Player %s is not on your team!", pname)
+		local scoretotal = 0
+		for pname, _ in pairs(pnames) do
+			scoretotal = scoretotal + score
 		end
 
 		local cur_score = math.min(
 			current_mode.recent_rankings.get(name).score or 0,
 			(current_mode.rankings:get(name) or {}).score or 0
 		)
-		if score > cur_score / 2 then
+		if scoretotal > cur_score / 2 then
 			return false, "You can donate only half of your match score!"
 		end
 
@@ -161,17 +159,62 @@ minetest.register_chatcommand("donate", {
 				time_diff % 60)
 		end
 
-		current_mode.recent_rankings.add(pname, {score=score}, true)
-		current_mode.recent_rankings.add(name, {score=-score}, true)
+		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
+
+		local receivers = {}
+
+		for pname, team in pairs(pnames) do
+			if not pname then
+				return false, "You should provide the player name!"
+			end
+
+			if pname == name then
+				return false, 'You cannot donate to yourself!'
+			end
+
+			if not ctf_teams.get(pname) then
+				return false, string.format("Player %s is not online!", pname)
+			end
+
+			if team ~= ctf_teams.get(name) then
+				return false, string.format("Player %s is not on your team!", pname)
+			end
+
+			if not receivers[pname] then
+				receivers[pname] = true
+			end
+
+			current_mode.recent_rankings.add(pname, {score=score}, true)
+			current_mode.recent_rankings.add(name, {score=-score}, true)
+
+			minetest.log("action", string.format(
+				"Player '%s' donated %s score to player '%s'", name, score, pname
+			))
+		end
+
+		local r, names, count = next(receivers), "", 0
+		while r do
+			names = names .. r
+			count = count + 1
+
+			n = next(receivers, r)
+
+			if n then
+				names = names .. ", "
+			end
+			r = n
+		end
+		separators = {string.find(names, ", (%S+)$")}
+		if count > 2 then
+			names = string.gsub(names, ", (%S+)$", ", and %1")
+		elseif count > 1 then
+			names = string.gsub(names, ", (%S+)$", " and %1")
+		end
 
 		donate_timer[name] = os.time()
-		local donate_text = string.format("%s donated %s score to %s%s", name, score, pname, dmessage)
+		local donate_text = string.format("%s donated %s score to %s%s", name, score, names, dmessage)
 		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
 		ctf_modebase.announce(donate_text)
-
-		minetest.log("action", string.format(
-			"Player '%s' donated %s score to player '%s'", name, score, pname
-		))
 		return true
 	end
 })
