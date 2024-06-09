@@ -359,6 +359,7 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	for y = -radius, radius do
 	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)
 	count = 0
+	local removed_blocks = 0
 	for x = -radius, radius do
 		local r = vector.length(vector.new(x, y, z))
 		if (radius * radius) / (r * r) >= (pr:next(80, 125) / 100) then
@@ -370,6 +371,12 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 					ignore_protection, ignore_on_blast, owner)
 				if replace ~= c_air then
 					count = count + 1
+				else
+					for flagteam, team in pairs(ctf_map.current_map.teams) do
+						if owner_team ~= flagteam and vector.distance(p, team.flag_pos) <= 15 then
+							removed_blocks = removed_blocks + 1
+						end
+					end
 				end
 				data[vi] = replace
 			end
@@ -415,11 +422,10 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 
 	minetest.log("action", "TNT owned by " .. owner .. " detonated at " ..
 		minetest.pos_to_string(pos) .. " with radius " .. radius)
-	--[[
 	if owner ~= "" then
 		local current_mode = ctf_modebase:get_current_mode()
-		current_mode.recent_rankings.add(owner, { score=removed_blocks }, false)
-	end--]]
+		current_mode.recent_rankings.add(owner, { score=removed_blocks / 5 }, false)
+	end
 	return drops, radius
 end
 
