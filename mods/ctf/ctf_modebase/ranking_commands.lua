@@ -110,17 +110,17 @@ minetest.register_chatcommand("donate", {
 
 		for p in string.gmatch(param, "%S+") do
 			if #dmessage > 0 then
-				dmessage = dmessage .. " "
+				dmessage = dmessage .. " " .. p
 			elseif ctf_core.to_number(p) and score == 0 then
 				score = p
-				break
-			end
-			local team = ctf_teams.get(p)
-			if not team and receiver then
-				dmessage = dmessage .. p
 			else
-				pnames[p] = team
-				receiver = true
+				local team = ctf_teams.get(p)
+				if not team and receiver then
+					dmessage = dmessage .. p
+				else
+					pnames[p] = team
+					receiver = true
+				end
 			end
 		end
 
@@ -180,6 +180,10 @@ minetest.register_chatcommand("donate", {
 				return false, string.format("Player %s is not on your team!", pname)
 			end
 
+			if receivers[pname] then
+				return false, "You cannot donate more than once to the same person."
+			end
+
 			if not receivers[pname] then
 				receivers[pname] = true
 			end
@@ -190,6 +194,8 @@ minetest.register_chatcommand("donate", {
 			minetest.log("action", string.format(
 				"Player '%s' donated %s score to player '%s'", name, score, pname
 			))
+
+			minetest.chat_send_all(pname)
 		end
 
 		local r, names, count = next(receivers), "", 0
