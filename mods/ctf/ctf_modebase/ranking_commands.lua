@@ -182,12 +182,13 @@ minetest.register_chatcommand("donate", {
 
 			if receivers[pname] then
 				return false, "You cannot donate more than once to the same person."
-			end
-
-			if not receivers[pname] then
+			else
 				receivers[pname] = true
 			end
+		end
 
+		local pname, names, count = next(receivers), "", 0
+		while pname do
 			current_mode.recent_rankings.add(pname, {score=score}, true)
 			current_mode.recent_rankings.add(name, {score=-score}, true)
 
@@ -195,22 +196,17 @@ minetest.register_chatcommand("donate", {
 				"Player '%s' donated %s score to player '%s'", name, score, pname
 			))
 
-			minetest.chat_send_all(pname)
-		end
-
-		local r, names, count = next(receivers), "", 0
-		while r do
-			names = names .. r
+			names = names .. pname
 			count = count + 1
 
-			n = next(receivers, r)
+			n = next(receivers, pname)
 
 			if n then
 				names = names .. ", "
 			end
-			r = n
+			pname = n
 		end
-		separators = {string.find(names, ", (%S+)$")}
+
 		if count > 2 then
 			names = string.gsub(names, ", (%S+)$", ", and %1")
 		elseif count > 1 then
