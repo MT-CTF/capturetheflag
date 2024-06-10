@@ -106,7 +106,7 @@ minetest.register_chatcommand("donate", {
 
 		local pnames, score, dmessage = {}, 0, ""
 
-		local receiver = false
+		local pcount = 0
 
 		for p in string.gmatch(param, "%S+") do
 			if #dmessage > 0 then
@@ -115,13 +115,33 @@ minetest.register_chatcommand("donate", {
 				score = p
 			else
 				local team = ctf_teams.get(p)
-				if not team and receiver then
+				if not team and pcount > 0 then
 					dmessage = dmessage .. p
 				else
+					if pnames[p] then
+						return false, "You cannot donate more than once to the same person."
+					end
+
+					if p == name then
+						return false, 'You cannot donate to yourself!'
+					end
+
+					if not ctf_teams.get(p) then
+						return false, string.format("Player %s is not online!", p)
+					end
+
+					if team ~= ctf_teams.get(name) then
+						return false, string.format("Player %s is not on your team!", p)
+					end
+
 					pnames[p] = team
-					receiver = true
+					pcount = pcount + 1
 				end
 			end
+		end
+
+		if pcount == 0 then
+			return false, "You should provide the player name!"
 		end
 
 		score = ctf_core.to_number(score)
@@ -161,33 +181,7 @@ minetest.register_chatcommand("donate", {
 
 		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
 
-		local receivers = {}
-
-		for pname, team in pairs(pnames) do
-			if not pname then
-				return false, "You should provide the player name!"
-			end
-
-			if pname == name then
-				return false, 'You cannot donate to yourself!'
-			end
-
-			if not ctf_teams.get(pname) then
-				return false, string.format("Player %s is not online!", pname)
-			end
-
-			if team ~= ctf_teams.get(name) then
-				return false, string.format("Player %s is not on your team!", pname)
-			end
-
-			if receivers[pname] then
-				return false, "You cannot donate more than once to the same person."
-			else
-				receivers[pname] = true
-			end
-		end
-
-		local pname, names, count = next(receivers), "", 0
+		local pname, names = next(pnames), ""
 		while pname do
 			current_mode.recent_rankings.add(pname, {score=score}, true)
 			current_mode.recent_rankings.add(name, {score=-score}, true)
@@ -197,19 +191,17 @@ minetest.register_chatcommand("donate", {
 			))
 
 			names = names .. pname
-			count = count + 1
 
-			n = next(receivers, pname)
-
+			n = next(pnames, pname)
 			if n then
 				names = names .. ", "
 			end
 			pname = n
 		end
 
-		if count > 2 then
+		if pcount > 2 then
 			names = string.gsub(names, ", (%S+)$", ", and %1")
-		elseif count > 1 then
+		elseif pcount > 1 then
 			names = string.gsub(names, ", (%S+)$", " and %1")
 		end
 
