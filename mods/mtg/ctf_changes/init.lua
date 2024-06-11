@@ -2,6 +2,11 @@ local COOLDOWN = ctf_core.init_cooldowns()
 
 local DISALLOW_MOD_ABMS = {"default", "fire", "flowers", "tnt"}
 
+local node_fall_damage_factors = {
+	["default:snowblock"] = -14, -- From a height of 13 blocks you take 5 damage
+	["default:snow"] = -10, -- From a height of 13 blocks you take 6 damage
+}
+
 local disabled_ores = {
 	["default:stone_with_copper"] = "default:stone"          ,
 	["default:stone_with_gold"  ] = "default:stone"          ,
@@ -11,6 +16,10 @@ local disabled_ores = {
 for from, to in pairs(disabled_ores) do
 	minetest.register_alias_force(from, to)
 end
+
+minetest.override_chatcommand("clearinv", {
+	privs = {server = true},
+})
 
 minetest.register_on_mods_loaded(function()
 
@@ -126,6 +135,48 @@ local function furnace_on_destruct(pos)
 	end
 end
 
+for _, name in pairs({
+	"doors:door_steel",
+	"xpanes:door_steel_bar",
+}) do
+	for _, variant in pairs({"_a", "_b", "_c", "_d"}) do
+		local old_on_construct = minetest.registered_nodes[name..variant].on_construct
+
+		minetest.override_item(name..variant, {
+			on_construct = function(pos, ...)
+				minetest.after(0, function()
+					local meta = minetest.get_meta(pos)
+
+					meta:set_string("owner", "")
+					meta:set_string("infotext", "")
+				end)
+
+				return old_on_construct and old_on_construct(pos, ...)
+			end
+		})
+	end
+end
+
+for _, name in pairs({
+	"doors:trapdoor_steel",
+	"xpanes:trapdoor_steel_bar",
+}) do
+	local old_after_place_node = minetest.registered_nodes[name].after_place_node
+
+	minetest.override_item(name, {
+		after_place_node = function(pos, placer, ...)
+			local meta = minetest.get_meta(pos)
+
+			local ret = old_after_place_node and old_after_place_node(pos, placer, ...)
+
+			meta:set_string("owner", "")
+			meta:set_string("infotext", "")
+
+			return ret or minetest.is_creative_enabled(placer:get_player_name())
+		end
+	})
+end
+
 minetest.override_item("default:furnace", {
 	can_dig = function() return true end,
 	on_destruct = furnace_on_destruct,
@@ -135,3 +186,13 @@ minetest.override_item("default:furnace_active", {
 	can_dig = function() return true end,
 	on_destruct = furnace_on_destruct,
 })
+
+minetest.register_on_mods_loaded(function()
+	for nodename, value in pairs(node_fall_damage_factors) do
+		local groups_temp = minetest.registered_items[nodename].groups
+		groups_temp.fall_damage_add_percent = value
+		minetest.override_item(nodename, {
+			groups = groups_temp,
+		})
+	end
+end)
