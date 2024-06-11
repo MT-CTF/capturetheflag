@@ -192,11 +192,10 @@ minetest.register_chatcommand("donate", {
 
 			names = names .. pname
 
-			n = next(pnames, pname)
-			if n then
+			pname = next(pnames, pname)
+			if pname then
 				names = names .. ", "
 			end
-			pname = n
 		end
 
 		if pcount > 2 then
