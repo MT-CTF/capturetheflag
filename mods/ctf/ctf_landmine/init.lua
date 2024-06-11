@@ -88,8 +88,8 @@ local function landmine_explode(pos)
 		end
 	end
 	minetest.remove_node(pos)
-	for idx, pos in ipairs(landmines) do
-		if pos == pos then
+	for idx, pos_ in ipairs(landmines) do
+		if pos_ == pos then
 			table.remove(landmines, idx)
 			break
 		end
