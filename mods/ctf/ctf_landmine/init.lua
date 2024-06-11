@@ -168,3 +168,7 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
+
+ctf_api.register_on_match_end(function() 
+	landmines = {}
+end)
