@@ -1,3 +1,96 @@
+local landmines = {
+	-- { x = ..., y = ..., z = ...}
+}
+
+local landmine_globalstep_counter = 0.0
+
+local function is_self_landmine(object_ref, pos)
+	local meta = minetest.get_meta(pos)
+	local team = meta:get_string("pteam")
+	local placer = meta:get_string("placer")
+	local pname = object_ref:get_player_name()
+	if not pname then
+		return nil -- the object ref is not a player
+	end
+	if pname == placer then
+		return true -- it's self landmine
+	end
+	if ctf_teams.get(pname) == team then
+		return true -- it's self landmine
+	end
+
+	return false -- it's someone else's landmine
+end
+
+local function landmine_explode(pos)
+	local near_objs = minetest.get_objects_inside_radius(pos, 3)
+	local meta = minetest.get_meta(pos)
+	local placer = meta:get_string("placer")
+	local placerobj = placer and minetest.get_player_by_name(placer)
+
+	minetest.add_particlespawner({
+		amount = 20,
+		time = 0.5,
+		minpos = vector.subtract(pos, 3),
+		maxpos = vector.add(pos, 3),
+		minvel = {x = 0, y = 5, z = 0},
+		maxvel = {x = 0, y = 7, z = 0},
+		minacc = {x = 0, y = 1, z = 0},
+		maxacc = {x = 0, y = 1, z = 0},
+		minexptime = 0.3,
+		maxexptime = 0.6,
+		minsize = 7,
+		maxsize = 10,
+		collisiondetection = true,
+		collision_removal = false,
+		vertical = false,
+		texture = "grenades_smoke.png",
+	})
+
+	minetest.add_particle({
+		pos = pos,
+		velocity = {x=0, y=0, z=0},
+		acceleration = {x=0, y=0, z=0},
+		expirationtime = 0.3,
+		size = 15,
+		collisiondetection = false,
+		collision_removal = false,
+		object_collision = false,
+		vertical = false,
+		texture = "grenades_boom.png",
+		glow = 10
+	})
+
+	minetest.sound_play("grenades_explode", {
+		pos = pos,
+		gain = 1.0,
+		max_hear_distance = 64,
+	})
+
+	for _, obj in pairs(near_objs) do
+		if is_self_landmine(obj, pos) == false then
+			if placerobj then
+				obj:punch(
+					placerobj,
+					1,
+					{
+						damage_groups = {
+							fleshy = 15,
+							landmine = 1
+						}
+					}
+				)
+			else
+				local chp = obj:get_hp()
+				obj:set_hp(chp - 15)
+			end
+		end
+	end
+	minetest.remove_node(pos)
+
+end
+
+
 minetest.register_node("ctf_map:unwalkable_dirt", {
 	description = "Unwalkable Dirt",
 	tiles = {"default_dirt.png^[colorize:#ffff00:19"},
@@ -225,7 +318,10 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 minetest.register_node("ctf_map:landmine", {
 	description = "Landmine",
 	drawtype = "nodebox",
-	tiles = {"ctf_map_landmine.png", "ctf_map_landmine.png^[transformFY"},
+	tiles = {
+		"ctf_map_landmine.png",
+		"ctf_map_landmine.png^[transformFY"
+	},
 	inventory_image = "ctf_map_landmine.png",
 	paramtype = "light",
 	sunlight_propagates = true,
@@ -246,82 +342,44 @@ minetest.register_node("ctf_map:landmine", {
 
 		meta:set_string("placer", name)
 		meta:set_string("pteam", pteam)
-	end
-})
-
-minetest.register_abm({
-	label = "Landmine",
-	nodenames = {"ctf_map:landmine"},
-	interval = 0.5,
-	chance = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		local meta = minetest.get_meta(pos)
-		local placer = meta:get_string("placer")
-		local pteam = meta:get_string("pteam")
-		local is_team = 0
-		local trigger = minetest.get_objects_in_area({x=pos.x-0.5, y=pos.y-0.5, z=pos.z-0.5},
-				{x=pos.x+0.5, y=pos.y-0.3, z=pos.z+0.5})
-		for _, v in pairs(trigger) do
-			if v:is_player() and ctf_teams.get(v:get_player_name()) ~= pteam then
-				is_team = is_team + 1
-			end
-		end
-		if is_team == 0 then
-			return
-		else
-			local plyrs = minetest.get_objects_inside_radius(pos, 3)
-			local placerobj = placer and minetest.get_player_by_name(placer)
-
-			minetest.add_particlespawner({
-				amount = 20,
-				time = 0.5,
-				minpos = vector.subtract(pos, 3),
-				maxpos = vector.add(pos, 3),
-				minvel = {x = 0, y = 5, z = 0},
-				maxvel = {x = 0, y = 7, z = 0},
-				minacc = {x = 0, y = 1, z = 0},
-				maxacc = {x = 0, y = 1, z = 0},
-				minexptime = 0.3,
-				maxexptime = 0.6,
-				minsize = 7,
-				maxsize = 10,
-				collisiondetection = true,
-				collision_removal = false,
-				vertical = false,
-				texture = "grenades_smoke.png",
-			})
-
-			minetest.add_particle({
-				pos = pos,
-				velocity = {x=0, y=0, z=0},
-				acceleration = {x=0, y=0, z=0},
-				expirationtime = 0.3,
-				size = 15,
-				collisiondetection = false,
-				collision_removal = false,
-				object_collision = false,
-				vertical = false,
-				texture = "grenades_boom.png",
-				glow = 10
-			})
-
-			minetest.sound_play("grenades_explode", {
-				pos = pos,
-				gain = 1.0,
-				max_hear_distance = 64,
-			})
-
-			for _, v in pairs(plyrs) do
-				if v:is_player() and ctf_teams.get(v:get_player_name()) ~= pteam then
-					if placerobj then
-						v:punch(placerobj, 1, {damage_groups = {fleshy = 15, landmine = 1}})
-					else
-						local chp = v:get_hp()
-						v:set_hp(chp - 15)
-					end
-				end
-			end
-			minetest.remove_node(pos)
+	end,
+	on_punch = function(pos, _node, puncher, pointed_thing)
+		if is_self_landmine(puncher, pos) == false then
+			landmine_explode(pos)
 		end
 	end
 })
+
+
+
+
+minetest.register_globalstep(function(dtime)
+	landmine_globalstep_counter = landmine_globalstep_counter + dtime
+	if landmine_globalstep_counter < 0.25 then
+		return
+	end
+	landmine_globalstep_counter = 0.0
+	for _idx, pos in pairs(landmines) do
+		local near_objs = minetest.get_objects_in_area(
+		{
+			x = pos.x-0.5,
+			y = pos.y-0.5,
+			z = pos.z-0.5
+		},
+		{
+			x = pos.x+0.5,
+			y = pos.y-0.3,
+			z = pos.z+0.5
+		})
+		local must_explode = false
+		for _, obj in pairs(near_objs) do
+			if is_self_landmine(obj, pos) == false then
+				must_explode = true
+				break
+			end
+		end
+		if must_explode then
+			landmine_explode(pos)
+		end
+	end
+end)
