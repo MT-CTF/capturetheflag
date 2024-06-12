@@ -2,34 +2,44 @@ ctf_modebase.bounty_algo = {kd = {}}
 
 function ctf_modebase.bounty_algo.kd.get_next_bounty(team_members)
 	local sum = 0
-	local kd_list = {}
+	local bounty_worthy_list = {
+		-- pname = bounty_worthy_score
+	}
 	local recent = ctf_modebase:get_current_mode().recent_rankings.players()
 
 	for _, pname in ipairs(team_members) do
-		local kd = 0.1
 		if recent[pname] then
-			kd = math.max(kd, (recent[pname].kills or 0) / (recent[pname].deaths or 1))
+			local kd = (recent[pname].kills or 0) / (recent[pname].deaths or 1)
+			-- Kills/Deaths
+			local hd = (recent[pname].hp_healed or 0) / (recent[pname].deaths or 1) / 5
+			-- HPs Healed/Deaths
+			if kd >= 0.95 then
+				bounty_worthy_list[pname] = (bounty_worthy_list[pname] or 0) + kd
+			end
+			if hd >= 0.8 then
+				bounty_worthy_list[pname] = (bounty_worthy_list[pname] or 0) + hd
+			end
+			sum = sum + (bounty_worthy_list[pname] or 0)
 		end
-
-		table.insert(kd_list, kd)
-		sum = sum + kd
 	end
 
 	local random = math.random() * sum
 
-	for i, kd in ipairs(kd_list) do
-		if random <= kd then
-			return team_members[i]
+	for pname, score in ipairs(bounty_worthy_list) do
+		if random <= score then
+			return pname
 		end
-		random = random - kd
+		random = random - score
 	end
 
 	return team_members[#team_members]
 end
 
 function ctf_modebase.bounty_algo.kd.bounty_reward_func(pname)
-	local recent = ctf_modebase:get_current_mode().recent_rankings.players()[pname] or {}
-	local kd = (recent.kills or 1) / (recent.deaths or 1)
-
-	return {bounty_kills = 1, score = math.max(5, math.min(120, math.ceil(kd * 7)))}
+	local recent = ctf_modebase:get_current_mode().recent_rankings.players()
+	local pstats = recent[pname] or {}
+	local kd = (pstats.kills or 1) / (pstats.deaths or 1)
+	local hd = (pstats.hp_healed or 1) / (pstats.deaths or 1)
+	local score = kd * hd
+	return {bounty_kills = 1, score = math.pow(score * 7, 3.5)}
 end
