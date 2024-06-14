@@ -9,14 +9,15 @@ ctf_modebase.contributed_bounties = {
 	["player_name"] = {
 		total = score,
 		contributors = {["player1"] = amount, ["player2"] = amount, ...}
-	},
+	}, a total bounty of `total` score is on `player_name` player contributed
+	by those in the list(`player1`, `player2`, ...)
 	...
 --]]
 }
 -- ^ This is for player contributed bounties
 
 local function get_contributors(name)
-	local b = ctf_modebase.contributed_bounties[name]
+	local bounty = ctf_modebase.contributed_bounties[name]
 	if not b then
 		return ""
 	else
@@ -265,7 +266,7 @@ ctf_core.register_chatcommand_alias("place_bounty", "pb", {
 
 
 ctf_core.register_chatcommand_alias("bounty", "b", {
-	description = "Place bounty on someone using your match score",
+	description = "Place bounty on someone using your match score. The score is returned to you if the match ends and nobody kills. Use negatve score to revoke a bounty",
 	params = "<player> <score>",
 	func = function(name, params)
 		local bname, amount = string.match(params, "([^%s]*) ([^%s]*)")
@@ -280,11 +281,22 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 		if bteam == ctf_teams.get(name) then
 			return false, "You cannot place a bounty on your teammate!"
 		end
+		local current_mode = ctf_modebase:get_current_mode()
+		if amount <= 0 then
+			local contributors = ctf_modebase.contribued_bounties[bname]
+			local contributed_amount = contributors[bname] or 0
+			if math.abs(amount) > contributed_amount then
+				contributed_amount = math.abs(amount)
+			end
+			ctf_modebase.contributed_bounties[bname][name] = ctf_modebase.contributed_bounties[bname][name] - contributed_amount
+			current_mode.recent_rankings.add(name, { score = contributed_mount }, true)
+			return true, tostring(contributed_amount) .. " points returned to you."
+		end
+
 		if amount < 5 then
 			return false, "Your bounty needs to be of at least 5 points"
 		end
 
-		local current_mode = ctf_modebase:get_current_mode()
 		if not current_mode or not ctf_modebase.match_started then
 			return false, "Match has not started yet."
 		end
@@ -306,9 +318,19 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 			end
 			ctf_modebase.contributed_bounties[bname].total = ctf_modebase.contributed_bounties[bname].total + amount
 		end
+		local total = ctf_modebase.contributed_bounties[bname].total
 		minetest.chat_send_all(
 			minetest.colorize(
 			CHAT_COLOR,
-			string.format("%s placed %d bounty on %s!", get_contributors(bname), amount, bname)))
+			string.format("%s placed %d bounty on %s!", get_contributors(bname), total, bname)))
 	end,
 })
+
+ctf_api.register_on_match_end(function()
+	local current_mode = ctf_modebase:get_current_mode()
+	for pname, bounty in pairs(ctf_modebase.contributed_bounties) do
+	for contributor, amount in pairs(bounty.contributors) do
+		current_mode.recent_rankings.add(contributor, {score=amount}, true)
+	end
+	end
+end)
