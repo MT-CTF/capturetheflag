@@ -278,7 +278,7 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 		amount = math.floor(amount)
 		local bteam = ctf_teams.get(bname)
 		if not bteam then
-			return false, "This player is either not online or isn't in a team"
+			return false, "This player isn't online or isn't in a team"
 		end
 		if bteam == ctf_teams.get(name) then
 			return false, "You cannot place a bounty on your teammate!"
@@ -297,6 +297,9 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 
 		if amount < 5 then
 			return false, "Your bounty needs to be of at least 5 points"
+		end
+		if amount > 100 then
+			return false, "Your bounty cannot be of more than 100 points"
 		end
 
 		if not current_mode or not ctf_modebase.match_started then
