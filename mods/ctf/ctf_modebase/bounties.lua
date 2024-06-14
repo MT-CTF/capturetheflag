@@ -266,7 +266,7 @@ ctf_core.register_chatcommand_alias("place_bounty", "pb", {
 
 
 ctf_core.register_chatcommand_alias("bounty", "b", {
-	description = "Place bounty on someone using your match score.\n" ..
+	description = "Place a bounty on someone using your match score.\n" ..
 	"The score is returned to you if the match ends and nobody kills.\n" ..
 	"Use negative score to revoke a bounty",
 	params = "<player> <score>",
