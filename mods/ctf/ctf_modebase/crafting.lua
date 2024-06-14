@@ -173,3 +173,13 @@ crafting.register_recipe({
 	items  = { "default:cobble 6", "default:steel_ingot" },
 	always_known = false,
 })
+
+crafting.register_recipe({
+	output = "ctf_tnt:tnt_stick 2",
+	items = { "default:papyrus", "ctf_ranged:ammo 2" },
+})
+crafting.register_recipe({
+	output = "ctf_tnt:tnt",
+	items = { "ctf_tnt:tnt_stick 8" },
+})
+
