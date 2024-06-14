@@ -18,12 +18,12 @@ ctf_modebase.contributed_bounties = {
 
 local function get_contributors(name)
 	local bounty = ctf_modebase.contributed_bounties[name]
-	if not b then
+	if not bounty then
 		return ""
 	else
 		local list = ""
 		local first = true
-		for contributor, score in pairs(b.contributors) do
+		for contributor, score in pairs(bounty.contributors) do
 			if first then
 				list = list .. contributor
 				first = false
@@ -266,7 +266,9 @@ ctf_core.register_chatcommand_alias("place_bounty", "pb", {
 
 
 ctf_core.register_chatcommand_alias("bounty", "b", {
-	description = "Place bounty on someone using your match score. The score is returned to you if the match ends and nobody kills. Use negatve score to revoke a bounty",
+	description = "Place bounty on someone using your match score.\n" ..
+	"The score is returned to you if the match ends and nobody kills.\n" ..
+	"Use negative score to revoke a bounty",
 	params = "<player> <score>",
 	func = function(name, params)
 		local bname, amount = string.match(params, "([^%s]*) ([^%s]*)")
@@ -289,7 +291,7 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 				contributed_amount = math.abs(amount)
 			end
 			ctf_modebase.contributed_bounties[bname][name] = ctf_modebase.contributed_bounties[bname][name] - contributed_amount
-			current_mode.recent_rankings.add(name, { score = contributed_mount }, true)
+			current_mode.recent_rankings.add(name, { score = contributed_amount }, true)
 			return true, tostring(contributed_amount) .. " points returned to you."
 		end
 
