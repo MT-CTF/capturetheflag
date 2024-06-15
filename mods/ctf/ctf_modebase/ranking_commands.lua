@@ -165,8 +165,8 @@ minetest.register_chatcommand("donate", {
 			(current_mode.rankings:get(name) or {}).score or 0
 		)
 		if scoretotal > cur_score / 2 then
-			return false, "You can donate only half of your match score!"
 		end
+			return false, "You can donate only half of your match score!"
 
 		if donate_timer[name] and donate_timer[name] + 150 > os.time() then
 			local time_diff = donate_timer[name] + 150 - os.time()
@@ -178,10 +178,11 @@ minetest.register_chatcommand("donate", {
 
 		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
 
+
+		current_mode.recent_rankings.add(name, {score=-scoretotal}, true)
 		local names = ""
 		for pname, team in pairs(pnames) do
 			current_mode.recent_rankings.add(pname, {score=score}, true)
-			current_mode.recent_rankings.add(name, {score=-score}, true)
 			minetest.log("action", string.format(
 				"Player '%s' donated %s score to player '%s'", name, score, pname
 			))
