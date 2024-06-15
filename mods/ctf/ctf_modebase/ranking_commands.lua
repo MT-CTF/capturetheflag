@@ -165,8 +165,8 @@ minetest.register_chatcommand("donate", {
 			(current_mode.rankings:get(name) or {}).score or 0
 		)
 		if scoretotal > cur_score / 2 then
-		end
 			return false, "You can donate only half of your match score!"
+		end
 
 		if donate_timer[name] and donate_timer[name] + 150 > os.time() then
 			local time_diff = donate_timer[name] + 150 - os.time()
