@@ -155,10 +155,6 @@ minetest.register_chatcommand("donate", {
 			return false, "You should donate at least 5 score!"
 		end
 
-		if score > 400 then
-			return false, "You can donate no more than 400 score!"
-		end
-
 		local scoretotal = score * pcount
 		local cur_score = math.min(
 			current_mode.recent_rankings.get(name).score or 0,
