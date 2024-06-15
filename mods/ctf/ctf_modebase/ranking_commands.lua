@@ -97,7 +97,7 @@ end)
 
 minetest.register_chatcommand("donate", {
 	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes",
-	params = "<playername> [playernames] <score> [message]",
+	params = "<name [name2 name3 ...]> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
 		if not current_mode or not ctf_modebase.match_started then
@@ -106,10 +106,10 @@ minetest.register_chatcommand("donate", {
 
 		local pnames, score, dmessage = {}, 0, ""
 
-		local pcount = 0
+		local pcount, ismessage = 0, false
 
 		for p in string.gmatch(param, "%S+") do
-			if #dmessage > 0 then
+			if ismessage then
 				dmessage = dmessage .. " " .. p
 			elseif ctf_core.to_number(p) and score == 0 then
 				score = p
@@ -117,6 +117,7 @@ minetest.register_chatcommand("donate", {
 				local team = ctf_teams.get(p)
 				if not team and pcount > 0 then
 					dmessage = dmessage .. p
+					ismessage = true
 				else
 					if pnames[p] then
 						return false, "You cannot donate more than once to the same person."
@@ -126,7 +127,7 @@ minetest.register_chatcommand("donate", {
 						return false, 'You cannot donate to yourself!'
 					end
 
-					if not ctf_teams.get(p) then
+					if not minetest.get_player_by_name(p) then
 						return false, string.format("Player %s is not online!", p)
 					end
 
@@ -158,11 +159,7 @@ minetest.register_chatcommand("donate", {
 			return false, "You can donate no more than 400 score!"
 		end
 
-		local scoretotal = 0
-		for pname, _ in pairs(pnames) do
-			scoretotal = scoretotal + score
-		end
-
+		local scoretotal = score * pcount
 		local cur_score = math.min(
 			current_mode.recent_rankings.get(name).score or 0,
 			(current_mode.rankings:get(name) or {}).score or 0
@@ -181,23 +178,16 @@ minetest.register_chatcommand("donate", {
 
 		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
 
-		local pname, names = next(pnames), ""
-		while pname do
+		local names = ""
+		for pname, team in pairs(pnames) do
 			current_mode.recent_rankings.add(pname, {score=score}, true)
 			current_mode.recent_rankings.add(name, {score=-score}, true)
-
 			minetest.log("action", string.format(
 				"Player '%s' donated %s score to player '%s'", name, score, pname
 			))
-
-			names = names .. pname
-
-			pname = next(pnames, pname)
-			if pname then
-				names = names .. ", "
-			end
+			names = names .. pname .. ", "
 		end
-
+		names = names:sub(1, -3)
 		if pcount > 2 then
 			names = string.gsub(names, ", (%S+)$", ", and %1")
 		elseif pcount > 1 then
