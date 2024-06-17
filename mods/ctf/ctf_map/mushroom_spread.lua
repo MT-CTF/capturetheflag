@@ -1,5 +1,5 @@
 local mushroom_globalstep_counter = 0.0
-local MUSHROOM_COUNTER_THRESHOLD = 1.0
+local MUSHROOM_COUNTER_THRESHOLD = 5.0
 
 minetest.register_globalstep(function(dtime)
 	if not ctf_map.current_map then
@@ -15,9 +15,9 @@ minetest.register_globalstep(function(dtime)
 	local x = math.random(pos1.x, pos2.x)
 	local y = math.random(pos1.y, pos2.y)
 	local z = math.random(pos1.z, pos2.z)
-	local half_x = math.floor(math.abs(pos1.x - pos2.x) / 5)
-	local half_y = math.floor(math.abs(pos1.y - pos2.y) / 5)
-	local half_z = math.floor(math.abs(pos1.z - pos2.z) / 5)
+	local half_x = math.floor(math.abs(pos1.x - pos2.x) / 4)
+	local half_y = math.floor(math.abs(pos1.y - pos2.y) / 4)
+	local half_z = math.floor(math.abs(pos1.z - pos2.z) / 2)
 	local positions = minetest.find_nodes_in_area_under_air(
 		{ x = x - half_x, y  = y - half_y, z = z - half_z},
 		{ x = x + half_x, y = y + half_y, z = z + half_z},
@@ -31,8 +31,8 @@ minetest.register_globalstep(function(dtime)
 		}
 		if minetest.get_node_light(position) <= 3 then
 			local r = math.random()
-			if r >= 0.3 then
-				if r <= 0.65 then
+			if r >= 0.4 then
+				if r <= 0.6 then
 					minetest.set_node(position, { name = "flowers:mushroom_brown" })
 				else
 					minetest.set_node(position, { name = "flowers:mushroom_red" })
