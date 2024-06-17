@@ -260,14 +260,14 @@ minetest.register_chatcommand("top50", {
 	end,
 })
 minetest.register_chatcommand("top", {
-	description = "Show the top players(value less than 200)",
+	description = "Show the top players [1-200]",
 	params = "[mode:technical modename] <value>",
 	func = function(name, param)
 		local mode_name, mode_data, top_amt = get_gamemode(param)
 		if not mode_name or not mode_data then
 			return false, mode_data
 		end
-		if not top_amt or tonumber(top_amt)>200 then
+		if not top_amt or tonumber(top_amt)>200 or tonumber(top_amt)<1 then
 			return false
 		end
 		top_amt = tonumber(top_amt)
