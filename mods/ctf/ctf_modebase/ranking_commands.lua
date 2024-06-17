@@ -259,6 +259,42 @@ minetest.register_chatcommand("top50", {
 		})
 	end,
 })
+minetest.register_chatcommand("top", {
+	description = "Show the top players(value less than 200)",
+	params = "[mode:technical modename] <value>",
+	func = function(name, param)
+		local mode_name, mode_data, top_amt = get_gamemode(param)
+		if not mode_name or not mode_data then
+			return false, mode_data
+		end
+		if not top_amt or tonumber(top_amt)>200 then
+			return false
+		end
+		top_amt = tonumber(top_amt)
+		local topPlayers = {}
+
+		for i, pname in ipairs(mode_data.rankings.top:get_top(top_amt)) do
+			local t = table.copy(mode_data.rankings:get(pname) or {})
+			t.pname = pname
+			table.insert(topPlayers, t)
+		end
+
+		local own_pos = mode_data.rankings.top:get_place(name)
+		if own_pos > top_amt then
+			local t = table.copy(mode_data.rankings:get(name) or {})
+			t.pname = name
+			t.number = own_pos
+			table.insert(topPlayers, t)
+		end
+
+		mode_data.summary_ranks._sort = "score"
+		ctf_modebase.summary.show_gui_sorted(name, topPlayers, {}, mode_data.summary_ranks, {
+			title = "Top "..top_amt.." Players",
+			gamemode = mode_name,
+			disable_nonuser_colors = true,
+		})
+	end,
+})
 
 minetest.register_chatcommand("make_pro", {
 	description = "Make yourself or another player a pro (Will break target player's ranks)",
