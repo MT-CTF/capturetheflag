@@ -221,3 +221,38 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 		minetest.node_dig(pos, node, digger)
 	end
 })
+
+minetest.register_node(ctf:cobble_wall_generator", {
+    description = "Cobble Wall Generator",
+    tiles = {"default_cobble.png"},
+    is_ground_content = false,
+    groups = {cracky = 3, stone = 2},
+    
+    on_place = function(itemstack, placer, pointed_thing)
+        local pos = pointed_thing.above
+        if pos and placer then
+            local dir = placer:get_look_dir()
+            local dirx = math.floor(dir.x + 0.5)
+            local dirz = math.floor(dir.z + 0.5)
+            
+            -- Calcule des vecteurs perpendiculaires
+            local perp_x = -dirz
+            local perp_z = dirx
+            
+            local start_x = pos.x - perp_x
+            local start_z = pos.z - perp_z
+            
+            for x = 0, 3 do
+                for y = 0, 3 do
+                    local target_pos = {x = start_x + perp_x * x, y = pos.y + y, z = start_z + perp_z * x}
+                    local node = minetest.get_node(target_pos)
+                    if node.name == "air" then
+                        minetest.set_node(target_pos, {name = "default:cobble"})
+                    end
+                end
+            end
+            itemstack:take_item()
+        end
+        return itemstack
+    end,
+})
