@@ -222,7 +222,7 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 	end
 })
 
-minetest.register_node(ctf:cobble_wall_generator", {
+minetest.register_node("ctf_map:cobble_wall_generator", {
     description = "Cobble Wall Generator",
     tiles = {"default_cobble.png"},
     is_ground_content = false,
@@ -256,3 +256,4 @@ minetest.register_node(ctf:cobble_wall_generator", {
         return itemstack
     end,
 })
+
