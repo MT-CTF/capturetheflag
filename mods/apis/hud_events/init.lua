@@ -18,16 +18,17 @@ local HUD_COLORS = {
 }
 
 local hud_queues = {
-	{}, -- channel 0
-	{}, -- channel 1
-	{}, -- channel 2
+	-- {}, -- channel 0
+	-- {}, channel 1
+	-- {}, channel 2
+	-- ...
 }
 local quick_event_timer = {}
 
 minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
-	for channel=1,3 do
+	for channel=1, #hud_queues do
 		if hud_queues[channel][pname] then
 			hud_queues[channel][pname].t:cancel()
 			hud_queues[channel][pname] = nil
@@ -117,14 +118,13 @@ end
 		text = "This is a hud event",
 		color = "info",
 		quick = true,
-		channel = 0,1,2,nil
+		channel = an integer or nil
 	})
 ]]
 function hud_events.new(player, def)
 	player = PlayerObj(player)
 	if not player then return end
 	def.channel = def.channel or 0
-	def.channel = math.min(2, def.channel)
 	def.channel = math.max(0, def.channel)
 	local channel = def.channel + 1
 	if type(def) == "string" then
@@ -141,6 +141,10 @@ function hud_events.new(player, def)
 
 	if not def.quick then
 		local pname = player:get_player_name()
+
+		while not hud_queues[channel] do
+			table.insert(hud_queues, {})
+		end
 
 		if not hud_queues[channel][pname] then
 			hud_queues[channel][pname] = {e = {}}
