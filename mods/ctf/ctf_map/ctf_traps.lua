@@ -231,7 +231,6 @@ minetest.register_node("ctf_map:cobble_wall_generator", {
     on_place = function(itemstack, placer, pointed_thing)
         local pos = pointed_thing.above
         if pos and placer then
-            -- Vérifie s'il y a un drapeau dans un rayon de 8 blocs
             local radius = 8
             local flag_found = false
 
