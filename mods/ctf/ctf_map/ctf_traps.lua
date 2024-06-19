@@ -224,24 +224,48 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 
 minetest.register_node("ctf_map:cobble_wall_generator", {
     description = "Cobble Wall Generator",
-    tiles = {"default_cobble.png"},
+    tiles = {"default_cobble.png^ctf_map_wall.png"},
     is_ground_content = false,
     groups = {cracky = 3, stone = 2},
-    
+
     on_place = function(itemstack, placer, pointed_thing)
         local pos = pointed_thing.above
         if pos and placer then
+            -- Vérifie s'il y a un drapeau dans un rayon de 8 blocs
+            local radius = 8
+            local flag_found = false
+
+            for dx = -radius, radius do
+                for dy = -radius, radius do
+                    for dz = -radius, radius do
+                        local check_pos = {x = pos.x + dx, y = pos.y + dy, z = pos.z + dz}
+                        local node = minetest.get_node(check_pos)
+                        if node.name == "ctf_modebase:flag" then
+                            flag_found = true
+                            break
+                        end
+                    end
+                    if flag_found then break end
+                end
+                if flag_found then break end
+            end
+
+            if flag_found then
+                minetest.chat_send_player(placer:get_player_name(), "You cannot place this block near a flag.")
+                return itemstack
+            end
+
             local dir = placer:get_look_dir()
             local dirx = math.floor(dir.x + 0.5)
             local dirz = math.floor(dir.z + 0.5)
-            
+
             -- Calcule des vecteurs perpendiculaires
             local perp_x = -dirz
             local perp_z = dirx
-            
+
             local start_x = pos.x - perp_x
             local start_z = pos.z - perp_z
-            
+
             for x = 0, 3 do
                 for y = 0, 3 do
                     local target_pos = {x = start_x + perp_x * x, y = pos.y + y, z = start_z + perp_z * x}
