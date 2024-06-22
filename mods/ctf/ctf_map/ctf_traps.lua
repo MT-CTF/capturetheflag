@@ -239,7 +239,7 @@ minetest.register_node("ctf_map:cobble_wall_generator", {
                     for dz = -radius, radius do
                         local check_pos = {x = pos.x + dx, y = pos.y + dy, z = pos.z + dz}
                         local node = minetest.get_node(check_pos)
-                        if node.name == "ctf_modebase:flag" then
+                        if node.name == "ctf_modebase:flag" or node.name == "ctf_map:ind_glass_red" then
                             flag_found = true
                             break
                         end
@@ -250,7 +250,7 @@ minetest.register_node("ctf_map:cobble_wall_generator", {
             end
 
             if flag_found then
-                minetest.chat_send_player(placer:get_player_name(), "You cannot place this block near a flag.")
+                minetest.chat_send_player(placer:get_player_name(), "You cannot place this block near a flag or indestructible red glass.")
                 return itemstack
             end
 
