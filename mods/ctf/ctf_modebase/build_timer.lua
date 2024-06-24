@@ -7,8 +7,6 @@ local timer = nil
 ctf_modebase.build_timer = {}
 
 local function timer_func(time_left)
-	timer = nil
-
 	for _, player in pairs(minetest.get_connected_players()) do
 		local time_str = "Removing Barrier..."
 
