@@ -205,7 +205,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 								local dname = target:get_player_name()
 								local dteam = ctf_teams.get(dname)
 								if dname ~= pname and dteam ~= pteam then
-									target:punch(thrower, 1, {
+									target:punch(thrower, 10, {
 										damage_groups = {
 											fleshy = 1,
 											grenade = 1,
