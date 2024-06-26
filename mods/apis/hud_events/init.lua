@@ -18,7 +18,6 @@ local HUD_COLORS = {
 }
 
 local hud_queues = {
-	-- {}, -- channel 0
 	-- {}, channel 1
 	-- {}, channel 2
 	-- ...
@@ -48,7 +47,7 @@ local function show_quick_hud_event(player, huddef)
 		hud:add(player, "hud_event_quick", {
 			hud_elem_type = "text",
 			position = {x = 0.5, y = 0.5},
-			offset = {x = 0, y = 45 + (huddef.channel or 0) * 15},
+			offset = {x = 0, y = 45 + ((huddef.channel or 1) - 1) * 15},
 			alignment = {x = "center", y = "down"},
 			text = huddef.text,
 			color = huddef.color,
@@ -79,7 +78,7 @@ local function handle_hud_events(player, channel)
 		hud:add(player, event_name, {
 			hud_elem_type = "text",
 			position = {x = 0.5, y = 0.5},
-			offset = {x = 0, y = 20 + (huddef.channel or 0) * 25},
+			offset = {x = 0, y = 20 + ((huddef.channel or 1) - 1) * 25},
 			alignment = {x = "center", y = "down"},
 			text = huddef.text,
 			color = huddef.color,
@@ -124,12 +123,12 @@ end
 function hud_events.new(player, def)
 	player = PlayerObj(player)
 	if not player then return end
-	def.channel = def.channel or 0
-	def.channel = math.max(0, def.channel)
-	local channel = def.channel + 1
+
 	if type(def) == "string" then
 		def = {text = def}
 	end
+
+	def.channel = def.channel or 1
 
 	if def.color then
 		if type(def.color) == "string" then
