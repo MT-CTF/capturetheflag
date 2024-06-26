@@ -141,17 +141,17 @@ function hud_events.new(player, def)
 	if not def.quick then
 		local pname = player:get_player_name()
 
-		while not hud_queues[channel] do
+		while not hud_queues[def.channel] do
 			table.insert(hud_queues, {})
 		end
 
-		if not hud_queues[channel][pname] then
-			hud_queues[channel][pname] = {e = {}}
+		if not hud_queues[def.channel][pname] then
+			hud_queues[def.channel][pname] = {e = {}}
 		end
-		table.insert(hud_queues[channel][pname].e, {text = def.text, color = def.color, channel = def.channel})
+		table.insert(hud_queues[def.channel][pname].e, {text = def.text, color = def.color, channel = def.channel})
 
-		if not hud_queues[channel][pname].t then
-			handle_hud_events(player, channel)
+		if not hud_queues[def.channel][pname].t then
+			handle_hud_events(player, def.channel)
 		end
 	else
 		show_quick_hud_event(player, def)
