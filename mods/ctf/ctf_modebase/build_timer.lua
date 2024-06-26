@@ -124,31 +124,4 @@ minetest.register_chatcommand("ctf_start", {
 	end,
 })
 
-minetest.register_chatcommand("flag", {
-	description = "Teleport to your flag during build time",
-	privs = {},
-	func = function(name, param)
-		local player = minetest.get_player_by_name(name)
-		if not player then
-			return false, "Player not found"
-		end
-
-		if timer == nil then
-			return false, "You can only use this command during build time"
-		end
-
-		local pteam = ctf_teams.get(player)
-		if not pteam then
-			return false, "You are not in any team"
-		end
-
-		local flag_pos = ctf_map.current_map.teams[pteam].flag_pos
-		if not flag_pos then
-			return false, "Flag position not found"
-		end
-
-		player:set_pos(flag_pos)
-		return true, "Teleported to your flag"
-	end,
-})
 
