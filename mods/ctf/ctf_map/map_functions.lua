@@ -98,6 +98,8 @@ function ctf_map.remove_barrier(mapmeta, callback)
 		minetest.after(0.1, function()
 			local vm2 = VoxelManip(pos1, pos2)
 			vm2:update_liquids()
+
+			callback()
 		end)
 	else
 		minetest.log("action", "Clearing barriers using barriers.data")
@@ -105,45 +107,44 @@ function ctf_map.remove_barrier(mapmeta, callback)
 		local i = 0
 		for _, barrier_area in pairs(mapmeta.barrier_data) do
 			minetest.after(i, function()
-				local vm = VoxelManip()
-				vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
+				if mapmeta.barrier_data then
+					local vm = VoxelManip()
+					vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
 
-				local data = vm:get_data()
+					local data = vm:get_data()
 
-				if #data ~= barrier_area.max then
-					-- minetest.log(dump(mapmeta.barrier_data)) -- Used for debugging issues
-					minetest.log("error", "Potential issue with barriers.data. Aborting... | " ..
-							"Debug: "..dump(#data)..", "..dump(barrier_area.max))
+					if #data ~= barrier_area.max then
+						-- minetest.log(dump(mapmeta.barrier_data)) -- Used for debugging issues
+						minetest.log("error", "Potential issue with barriers.data. Aborting... | " ..
+								"Debug: "..dump(#data)..", "..dump(barrier_area.max))
 
-					mapmeta.barrier_data = nil
-					ctf_map.remove_barrier(mapmeta, callback)
-					return
+						mapmeta.barrier_data = nil
+						ctf_map.remove_barrier(mapmeta, callback)
+					end
+
+					for idx in pairs(data) do
+						data[idx] = barrier_area.reps[idx] or ID_IGNORE
+					end
+
+					vm:set_data(data)
+					vm:write_to_map(false)
 				end
-
-				for idx in pairs(data) do
-					data[idx] = barrier_area.reps[idx] or ID_IGNORE
-				end
-
-				vm:set_data(data)
-				vm:write_to_map(false)
 			end)
 
 			i = i + 0.05
 		end
 
 		minetest.after(i - 0.05, function()
-			local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
-			vm:update_liquids()
+			if mapmeta.barrier_data then
+				local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+				vm:update_liquids()
 
-			mapmeta.barrier_data = nil -- Contains a large amount of data, free it up now that it's not needed
+				mapmeta.barrier_data = nil -- Contains a large amount of data, free it up now that it's not needed
 
-			callback()
+				callback()
+			end
 		end)
-
-		return
 	end
-
-	callback()
 end
 
 
