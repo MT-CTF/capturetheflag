@@ -144,6 +144,7 @@ local function update_timer(pname)
 
 		if timeleft <= 1 then
 			ctf_modebase.drop_flags(minetest.get_player_by_name(pname))
+			ctf_modebase:get_current_mode().recent_rankings.add(pname, {score = 30})
 		else
 			player_timers[pname] = timeleft - 1
 
