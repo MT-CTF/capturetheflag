@@ -134,7 +134,7 @@ minetest.register_chatcommand("flag", {
 		end
 
 		if timer == nil then
-			return false, "You can only use this command during build time"
+			return false, "You can only use this command during build time !"
 		end
 
 		local pteam = ctf_teams.get(player)
@@ -151,4 +151,3 @@ minetest.register_chatcommand("flag", {
 		return true, "Teleported to your flag"
 	end,
 })
-
