@@ -47,7 +47,7 @@ local function show_quick_hud_event(player, huddef)
 		hud:add(player, "hud_event_quick", {
 			hud_elem_type = "text",
 			position = {x = 0.5, y = 0.5},
-			offset = {x = 0, y = 45 + ((huddef.channel or 1) - 1) * 15},
+			offset = {x = 0, y = 20},
 			alignment = {x = "center", y = "down"},
 			text = huddef.text,
 			color = huddef.color,
@@ -78,7 +78,7 @@ local function handle_hud_events(player, channel)
 		hud:add(player, event_name, {
 			hud_elem_type = "text",
 			position = {x = 0.5, y = 0.5},
-			offset = {x = 0, y = 20 + ((huddef.channel or 1) - 1) * 25},
+			offset = {x = 0, y = 45 + (channel - 1) * 25},
 			alignment = {x = "center", y = "down"},
 			text = huddef.text,
 			color = huddef.color,
