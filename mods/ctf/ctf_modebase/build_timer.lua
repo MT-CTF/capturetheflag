@@ -52,6 +52,7 @@ function ctf_modebase.build_timer.start(build_time)
 	local time = build_time or ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME
 
 	if time > 0 then
+		if timer then timer:cancel() end
 		timer = timer_func(time)
 	end
 end
@@ -61,8 +62,11 @@ function ctf_modebase.build_timer.finish()
 
 	if ctf_map.current_map then
 		ctf_map.remove_barrier(ctf_map.current_map, function()
-			timer:cancel()
-			timer = nil
+			if timer then
+				timer:cancel()
+				timer = nil
+			end
+
 			hud:remove_all()
 			local text = "Build time is over!"
 			minetest.chat_send_all(text)
