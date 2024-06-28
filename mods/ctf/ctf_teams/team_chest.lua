@@ -62,8 +62,8 @@ for _, team in ipairs(ctf_teams.teamlist) do
         meta:set_string("infotext", string.format("%s Team's Chest", HumanReadable(team)))
 
         local inv = meta:get_inventory()
-        inv:set_size("main", 8 * 7)  -- Augmenté de 6x7 à 8x7
-        inv:set_size("pro", 6 * 7)   -- Augmenté de 4x7 à 6x7
+        inv:set_size("main", 8 * 7)  
+        inv:set_size("pro", 6 * 7)   
         inv:set_size("helper", 1 * 1)
     end
 
