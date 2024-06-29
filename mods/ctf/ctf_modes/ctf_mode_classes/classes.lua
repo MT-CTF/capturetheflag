@@ -487,7 +487,8 @@ function classes.show_class_formspec(player)
 					)
 				end
 				table.insert(out, {
-					"style[select_%s;textcolor="..font_color..";font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
+					"style[select_%s;textcolor=".. font_color ..
+					";font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
 					"style[show_%s;padding=8,8;bgcolor="..context.class_props[c].color.."]",
 					c,
 					20 + 8,
