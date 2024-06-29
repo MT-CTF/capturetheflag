@@ -415,7 +415,6 @@ function classes.show_class_formspec(player)
 	player = PlayerObj(player)
 	if not player then return end
 
-	-- if not cooldowns:get(player) then
 		if ctf_modebase.current_mode ~= "classes" then return end
 
 		if dist_from_flag(player) > 5 then
