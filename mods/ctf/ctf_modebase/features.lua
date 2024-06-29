@@ -372,6 +372,11 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		if ctf_teams.get(killer) then
 			ctf_kill_list.add(killer, player, weapon_image, comment)
+			hud_events.new(player, {
+				quick = false,
+				text = killer.." killed you for ".. rewards.score .." points!",
+				color = "warning",
+			})
 		end
 
 		-- share kill score with other hitters

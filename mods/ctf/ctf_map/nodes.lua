@@ -128,7 +128,9 @@ end
 
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	local pos = player:get_pos()
-	if reason.type == 'node_damage' and minetest.registered_nodes[reason.node].groups.immortal then
+	local def = minetest.registered_nodes[reason.node]
+
+	if reason.type == 'node_damage' and def.groups.immortal and def.drawtype == "normal" and def.walkable ~= false then
 		for _, flagteam in ipairs(ctf_teams.current_team_list) do
 			if flagteam ~= ctf_teams.get(player) then
 				local fdist = vector.distance(pos, ctf_map.current_map.teams[flagteam].flag_pos)
