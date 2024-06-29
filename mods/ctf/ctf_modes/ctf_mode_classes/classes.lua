@@ -147,7 +147,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 			local uname = user:get_player_name()
 			hud_events.new(uname, {
 				quick = true,
-				text = "You cannot activate special ability during build time!",
+				text = "You cannot activate special abilities during build time!",
 				color = "warning",
 			})
 			return
@@ -228,7 +228,7 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 			local uname = user:get_player_name()
 			hud_events.new(uname, {
 				quick = true,
-				text = "You cannot activate special ability during build time!",
+				text = "You cannot activate special abilities during build time!",
 				color = "warning",
 			})
 			return
@@ -317,7 +317,7 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 			local uname = user:get_player_name()
 			hud_events.new(uname, {
 				quick = true,
-				text = "You cannot activate special ability during build time!",
+				text = "You cannot activate special abilities during build time!",
 				color = "warning",
 			})
 			return
