@@ -415,7 +415,7 @@ function classes.show_class_formspec(player)
 	player = PlayerObj(player)
 	if not player then return end
 
-	if not cooldowns:get(player) then
+	-- if not cooldowns:get(player) then
 		if ctf_modebase.current_mode ~= "classes" then return end
 
 		if dist_from_flag(player) > 5 then
@@ -479,13 +479,21 @@ function classes.show_class_formspec(player)
 			local tb = #context.class_list -- total buttons
 			for i, c in pairs(context.class_list) do
 				local sect = (i-1)/(tb-1)
+				local font_color = "#ffffff"
+				if cooldowns:get(player) then
+					font_color = "#ff0000"
+					table.insert(out,
+						{"tooltip[select_%s;You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds, ]", c}
+					)
+				end
 				table.insert(out, {
-					"style[select_%s;font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
+					"style[select_%s;textcolor="..font_color..";font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
 					"style[show_%s;padding=8,8;bgcolor="..context.class_props[c].color.."]",
 					c,
 					20 + 8,
 					c,
 				})
+				if not cooldowns:get(player) then
 				table.insert(out, {
 					"button_exit[%f,%f;%f,1;select_%s;%s]",
 					pad + (((form_x-(pad*2 + bw))) * sect),
@@ -494,6 +502,16 @@ function classes.show_class_formspec(player)
 					c,
 					context.class_props[c].name,
 				})
+				else
+					table.insert(out, {
+						"button[%f,%f;%f,1;select_%s;%s]",
+						pad + (((form_x-(pad*2 + bw))) * sect),
+						form_y-0.5,
+						bw,
+						c,
+						context.class_props[c].name,
+					})
+				end
 				table.insert(out, {
 					"image_button[%f,%f;1,1;settings_info.png;show_%s;]",
 					pad + (((form_x-(pad*2 + bw))) * sect) + bw - 1,
@@ -504,7 +522,6 @@ function classes.show_class_formspec(player)
 					{"tooltip[show_%s;Click to show class info]", c}
 				)
 			end
-
 			return ctf_gui.list_to_formspec_str(out)
 		end, {
 			classes = classes,
@@ -517,10 +534,17 @@ function classes.show_class_formspec(player)
 			_on_formspec_input = function(pname, context, fields)
 				if ctf_modebase.current_mode ~= "classes" then return end
 
+				if cooldowns:get(player) then
+					for _, class in pairs(context.class_list) do
+						if fields["select_"..class] then
+							context.class = class
+							return "refresh"
+						end
+					end
+				end
 				for _, class in pairs(context.class_list) do
 					if fields["show_"..class] then
 						context.class = class
-
 						return "refresh"
 					end
 
@@ -540,13 +564,13 @@ function classes.show_class_formspec(player)
 				end
 			end,
 		})
-	else
-		hud_events.new(player, {
-			quick = true,
-			text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
-			color = "warning",
-		})
-	end
+	-- else
+	-- 	hud_events.new(player, {
+	-- 		quick = true,
+	-- 		text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
+	-- 		color = "warning",
+	-- 	})
+	-- end
 end
 
 function classes.is_restricted_item(player, name)
