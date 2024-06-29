@@ -318,7 +318,9 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		end
 		meta:set_string("dropped_by", "")
 		local inv = minetest.get_inventory({ type="node", pos=pos })
-		inv:set_stack(listname, index, stack)
+		local stack_ = inv:get_stack(listname,index)
+		stack_:get_meta():set_string("dropped_by", "")
+		inv:set_stack(listname, index, stack_)
 	end
 
 		function def.on_metadata_inventory_take(pos, listname, index, stack, player)
