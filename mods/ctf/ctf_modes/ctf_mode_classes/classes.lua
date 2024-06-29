@@ -564,13 +564,6 @@ function classes.show_class_formspec(player)
 				end
 			end,
 		})
-	-- else
-	-- 	hud_events.new(player, {
-	-- 		quick = true,
-	-- 		text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
-	-- 		color = "warning",
-	-- 	})
-	-- end
 end
 
 function classes.is_restricted_item(player, name)
