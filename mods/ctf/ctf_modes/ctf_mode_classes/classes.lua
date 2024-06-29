@@ -481,7 +481,7 @@ function classes.show_class_formspec(player)
 				local sect = (i-1)/(tb-1)
 				local font_color = "#ffffff"
 				if cooldowns:get(player) then
-					font_color = "#ff0000"
+					font_color = "#f23f42"
 					table.insert(out,
 						{"tooltip[select_%s;You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds, ]", c}
 					)
