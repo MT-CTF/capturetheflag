@@ -495,14 +495,14 @@ function classes.show_class_formspec(player)
 					c,
 				})
 				if not cooldowns:get(player) then
-				table.insert(out, {
-					"button_exit[%f,%f;%f,1;select_%s;%s]",
-					pad + (((form_x-(pad*2 + bw))) * sect),
-					form_y-0.5,
-					bw,
-					c,
-					context.class_props[c].name,
-				})
+					table.insert(out, {
+						"button_exit[%f,%f;%f,1;select_%s;%s]",
+						pad + (((form_x-(pad*2 + bw))) * sect),
+						form_y-0.5,
+						bw,
+						c,
+						context.class_props[c].name,
+					})
 				else
 					table.insert(out, {
 						"button[%f,%f;%f,1;select_%s;%s]",
