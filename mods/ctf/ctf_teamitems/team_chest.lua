@@ -61,7 +61,7 @@ local function can_open_teamchest(teamname, pname)
 		return true
 	elseif ctf_modebase.flag_captured[teamname] then
 		return true
-	elseif is_chest_open(teamname) and ctf_modebase:get_current_mode() == "classic" then
+	elseif is_chest_open(teamname) and ctf_modebase.current_mode == "classic" then
 		return true
 	else
 		return false
@@ -91,7 +91,7 @@ function ctf_teams.is_allowed_in_team_chest(listname, stack, player)
 	return true
 end
 
-local TEAMCHEST_FORMSPEC_NAME = "ctf_teams:chest"
+local TEAMCHEST_FORMSPEC_NAME = "ctf_teamitemss:chest"
 
 for _, team in ipairs(ctf_teams.teamlist) do
 	if not ctf_teams.team[team].not_playing then
@@ -102,7 +102,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				"(default_chest_%s.png"
 					.. "^[colorize:%s:130)"
 					.. "^(default_chest_%s.png"
-					.. "^[mask:ctf_teams_chest_%s_mask.png"
+					.. "^[mask:ctf_teamitems_chest_%s_mask.png"
 					.. "^[colorize:%s:60)"
 					.. "%s",
 				chest_side,
@@ -127,7 +127,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				return
 			end
 			local pteam = ctf_teams.get(pname)
-			for idx, name in ipairs(open_chests[pteam]) do
+			for idx, name in ipairs(open_chests[pteam] or {}) do
 				if name == pname then
 					table.remove(open_chests, idx)
 				end
@@ -141,7 +141,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				get_chest_texture("side", chestcolor, "side"),
 				get_chest_texture("side", chestcolor, "side"),
 				get_chest_texture("side", chestcolor, "side"),
-				get_chest_texture("front", chestcolor, "side", "^ctf_teams_lock.png"),
+				get_chest_texture("front", chestcolor, "side", "^ctf_teamitems_lock.png"),
 			},
 			paramtype2 = "facedir",
 			groups = { immortal = 1, team_chest = 1 },
@@ -167,6 +167,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		function def.on_rightclick(pos, node, player)
 			local name = player:get_player_name()
 			local flag_captured = ctf_modebase.flag_captured[team_name]
+			minetest.log("info", "open_chests" .. minetest.serialize(open_chests))
 			if not can_open_teamchest(team_name, name) then
 				hud_events.new(player, {
 					quick = true,
@@ -175,17 +176,19 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				})
 				return
 			end
-			if not open_chests[team_name] then
-				open_chests[team_name] = {}
-			end
-			table.insert(open_chests[team_name], name)
-			minetest.after(30, function()
-				for idx, name2 in ipairs(open_chests[team_name]) do
-					if name2 == name then
-						table.remove(open_chests[team_name], idx)
-					end
+			if ctf_teams.get(name) == team_name then
+				if not open_chests[team_name] then
+					open_chests[team_name] = {}
 				end
-			end)
+				table.insert(open_chests[team_name], name)
+				minetest.after(30, function()
+					for idx, name2 in ipairs(open_chests[team_name]) do
+						if name2 == name then
+							table.remove(open_chests[team_name], idx)
+						end
+					end
+				end)
+			end
 
 			local formspec = table.concat({
 				"size[10,12]",
@@ -212,7 +215,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 					)
 					.. "]"
 
-				minetest.show_formspec(name, "ctf_teams:no_access", formspec)
+				minetest.show_formspec(name, "ctf_teamitems:no_access", formspec)
 				return
 			end
 
@@ -444,9 +447,9 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				)
 			)
 			if ctf_teams.get(player:get_player_name()) ~= team_name then
-				for _i in 1, stack:get_count(), 1 do
+				for _i = 1, stack:get_count(), 0 do
 					minetest.sound_play(
-						{ name = "ctf_teams_teamchest_steal" },
+						{ name = "ctf_teamitems_teamchest_steal" },
 						{ pos = pos, max_hearing_distance = 12 }
 					)
 				end
@@ -463,6 +466,6 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 		end
 
-		minetest.register_node("ctf_teams:chest_" .. team, def)
+		minetest.register_node("ctf_teamitems:chest_" .. team, def)
 	end
 end
