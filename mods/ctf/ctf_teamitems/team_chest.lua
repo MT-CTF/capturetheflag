@@ -129,7 +129,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			local pteam = ctf_teams.get(pname)
 			for idx, name in ipairs(open_chests[pteam] or {}) do
 				if name == pname then
-					table.remove(open_chests, idx)
+					table.remove(open_chests[pteam], idx)
 				end
 			end
 		end)
