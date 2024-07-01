@@ -44,7 +44,7 @@ ctf_teams = {
 for team, def in pairs(ctf_teams.team) do
 	table.insert(ctf_teams.teamlist, team)
 
-	ctf_teams.team[team].color_hex = tonumber("0x"..def.color:sub(2))
+	ctf_teams.team[team].color_hex = tonumber("0x" .. def.color:sub(2))
 end
 
 minetest.register_privilege("ctf_team_admin", {
@@ -53,13 +53,7 @@ minetest.register_privilege("ctf_team_admin", {
 	give_to_admin = false,
 })
 
-ctf_core.include_files(
-	"functions.lua",
-	"commands.lua",
-	"register.lua",
-	"team_chest.lua",
-	"team_door.lua"
-)
+ctf_core.include_files("functions.lua", "commands.lua", "register.lua")
 
 minetest.register_on_mods_loaded(function()
 	local old_join_func = minetest.send_join_message
@@ -90,8 +84,11 @@ minetest.register_on_mods_loaded(function()
 			else
 				local tcolor = ctf_teams.team[pteam].color
 
-				minetest.chat_send_all(string.format("*** %s joined the game.",
-					minetest.colorize(tcolor, name))
+				minetest.chat_send_all(
+					string.format(
+						"*** %s joined the game.",
+						minetest.colorize(tcolor, name)
+					)
 				)
 			end
 		end)
@@ -107,10 +104,23 @@ minetest.register_on_mods_loaded(function()
 
 			local tcolor = ctf_teams.team[pteam].color
 
-			minetest.chat_send_all(string.format("*** %s left the game%s.",
-				minetest.colorize(tcolor, player:get_player_name()),
-				timed_out and " (timed out)" or ""
-			))
+			minetest.chat_send_all(
+				string.format(
+					"*** %s left the game%s.",
+					minetest.colorize(tcolor, player:get_player_name()),
+					timed_out and " (timed out)" or ""
+				)
+			)
 		end
 	end)
 end)
+
+for team, _ in pairs(ctf_teams.team) do
+	local new_chestname = string.format("ctf_teams:chest_%s", team)
+	local new_doorname = string.format("ctf_teams:door_steel_%s", team)
+	local old_chestname = string.format("ctf_teamitems:chest_%s", team)
+	local old_doorname = string.format("ctf_teamitems:door_steel_%s", team)
+	minetest.register_alias(new_chestname, old_chestname)
+	minetest.register_alias(new_doorname, old_doorname)
+	minetest.register_alias("ctf_teams:door_steel", "ctf_teamitems:door_steel")
+end
