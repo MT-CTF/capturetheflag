@@ -143,7 +143,15 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 			local ctl = user:get_player_control()
 			if not ctl.sneak and not ctl.aux1 then return end
 		end
-
+		if not ctf_modebase.match_started then
+			local uname = user:get_player_name()
+			hud_events.new(uname, {
+				quick = true,
+				text = "You cannot activate special abilities during build time!",
+				color = "warning",
+			})
+			return
+		end
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
@@ -216,7 +224,15 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 
 			return
 		end
-
+		if not ctf_modebase.match_started then
+			local uname = user:get_player_name()
+			hud_events.new(uname, {
+				quick = true,
+				text = "You cannot activate special abilities during build time!",
+				color = "warning",
+			})
+			return
+		end
 		if itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
 
@@ -297,7 +313,15 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		    local ctl = user:get_player_control()
 		    if not ctl.sneak and not ctl.aux1 then return end
         end
-
+		if not ctf_modebase.match_started then
+			local uname = user:get_player_name()
+			hud_events.new(uname, {
+				quick = true,
+				text = "You cannot activate special abilities during build time!",
+				color = "warning",
+			})
+			return
+		end
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
