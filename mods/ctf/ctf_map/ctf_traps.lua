@@ -221,3 +221,5 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 		minetest.node_dig(pos, node, digger)
 	end
 })
+
+
