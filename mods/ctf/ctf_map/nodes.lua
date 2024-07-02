@@ -132,7 +132,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
 	if reason.type == 'node_damage' and def.groups.immortal and def.drawtype == "normal" and def.walkable ~= false then
 		for _, flagteam in ipairs(ctf_teams.current_team_list) do
-			if flagteam ~= ctf_teams.get(player) then
+			if flagteam ~= ctf_teams.get(player) and ctf_map.current_map.teams[flagteam] then
 				local fdist = vector.distance(pos, ctf_map.current_map.teams[flagteam].flag_pos)
 				if fdist <= 6 then
 					return hp_change

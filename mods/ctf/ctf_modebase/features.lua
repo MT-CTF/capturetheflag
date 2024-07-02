@@ -26,10 +26,22 @@ local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
+local function supports_observers(x)
+	if x then
+		if x.object then x = x.object end
+
+		if x.get_observers and x:get_pos() then
+			return true
+		end
+	end
+
+	return false
+end
+
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
-	if not      nametag.object.set_observers or
-	   not team_nametag.object.set_observers or
-	   not symbol_nametag.object.set_observers
+	if not      supports_observers(nametag.object) or
+	   not supports_observers(team_nametag.object) or
+	   not supports_observers(symbol_nametag.object)
 	then
 		return
 	end
@@ -57,7 +69,6 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 		end
 	end
 
-	-- Occasionally crashes in singleplayer, so call it safely
 	       nametag.object:set_observers(entity_players )
 	  team_nametag.object:set_observers(nametag_players)
 	symbol_nametag.object:set_observers(symbol_players )
@@ -106,8 +117,7 @@ local function set_playertags_state(state)
 				local nametag = playertag.entity
 				local symbol_entity = playertag.symbol_entity
 
-				if nametag and team_nametag and symbol_entity and
-				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
+				if supports_observers(nametag) and supports_observers(team_nametag) and supports_observers(symbol_entity) then
 					 team_nametag.object:set_observers({})
 					symbol_entity.object:set_observers({})
 					      nametag.object:set_observers({})
@@ -691,8 +701,6 @@ return {
 		end
 
 		celebrate_team(pteam)
-
-
 
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
