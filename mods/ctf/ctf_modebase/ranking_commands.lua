@@ -172,7 +172,7 @@ minetest.register_chatcommand("donate", {
 				time_diff % 60)
 		end
 
-		dmessage = (dmessage and dmessage ~= "") and (":" .. dmessage) or ""
+		dmessage = (dmessage and dmessage ~= "") and (": " .. dmessage) or ""
 
 
 		current_mode.recent_rankings.add(name, {score=-scoretotal}, true)
