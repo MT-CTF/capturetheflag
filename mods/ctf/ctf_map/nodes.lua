@@ -126,6 +126,26 @@ local function make_immortal(def)
 	def.description = def.description and ("Indestructible " .. def.description)
 end
 
+minetest.register_on_player_hpchange(function(player, hp_change, reason)
+	local pos = player:get_pos()
+	local def = minetest.registered_nodes[reason.node]
+
+	if reason.type == 'node_damage' and def.groups.immortal and def.drawtype == "normal" and def.walkable ~= false then
+		for _, flagteam in ipairs(ctf_teams.current_team_list) do
+			if flagteam ~= ctf_teams.get(player) and ctf_map.current_map.teams[flagteam] then
+				local fdist = vector.distance(pos, ctf_map.current_map.teams[flagteam].flag_pos)
+				if fdist <= 6 then
+					return hp_change
+				end
+			end
+		end
+
+		return 0
+	end
+
+	return hp_change
+end, true)
+
 local queue = {}
 for name, def in pairs(minetest.registered_nodes) do
 	local mod, nodename = name:match"(..-):(.+)"

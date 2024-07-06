@@ -77,6 +77,15 @@ function ctf_modebase.skip_vote.end_vote()
 
 		voted_skip = true
 		if flags_hold <= 0 then
+			ctf_modebase.summary.set_winner("NO WINNER")
+
+			local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get()
+			formdef.title = "Match Skipped"
+
+			for _, p in ipairs(minetest.get_connected_players()) do
+				ctf_modebase.summary.show_gui(p:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
+			end
+
 			ctf_modebase.start_new_match(5)
 		end
 	else

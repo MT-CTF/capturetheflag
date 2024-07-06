@@ -26,7 +26,7 @@ function ctf_teams.set(player, new_team, force)
 		return
 	end
 
-	assert(type(new_team) == "string")
+	assert(type(new_team) == "string", "ctf_teams.set(): new_team must be a string! value: "..dump(new_team))
 
 	local old_team = ctf_teams.player_team[player]
 	if not force and old_team == new_team then
