@@ -64,7 +64,7 @@ end
 for team, def in pairs(ctf_teams.team) do
 	local doorname = "ctf_teamitems:door_steel_%s"
 	local modifier =
-		"^[colorize:%s:190)^(ctf_teams_door_steel.png^[mask:ctf_teams_door_steel_mask.png^[colorize:%s:42)"
+		"^[colorize:%s:190)^(ctf_teamitems_door_steel.png^[mask:ctf_teamitems_door_steel_mask.png^[colorize:%s:42)"
 
 	doors.register(doorname:format(team), {
 		tiles = {
