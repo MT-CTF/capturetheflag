@@ -197,14 +197,18 @@ local teams_left
 
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
-	local kd = (match_rank.kills or 1) / (match_rank.deaths or 1)
-	local flag_multiplier = 1
+	local kills = (match_rank.kills or 1) + (match_rank.kill_assists or 0) / 4
+	local deaths = match_rank.deaths or 1
+	local kd = kills / deaths
+	local hd = (match_rank.hp_healed or 1) / deaths
+    local flag_multiplier = 1
 	for tname, carrier in pairs(ctf_modebase.flag_taken) do
 		if carrier.p == player then
 			flag_multiplier = flag_multiplier + 0.25
 		end
 	end
-	return math.max(1, math.round(kd * 7 * flag_multiplier))
+
+	return math.max(1, math.round(kd * 7), math.round(hd * 0.12)) * flag_multiplier
 end
 
 local damage_group_textures = {
