@@ -80,7 +80,8 @@ function random_messages.read_messages()
 			S("and looking at your feet."),
 		S("Use /map to print the current map name and its author."),
 		S("To check someone's ranking in all modes, use /rank mode:all <player_name>"),
-		S("Building a base with materials stronger than cobblestone, such as wood or reinforced cobble, keeps your flag safer."),
+		S("Building a base with materials stronger than cobblestone, such as wood or reinforced cobble, " ..
+			"keeps your flag safer."),
 	}
 end
 
