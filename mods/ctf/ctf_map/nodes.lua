@@ -205,8 +205,17 @@ local chest_def = {
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
+			local meta = player:get_meta()
+			local last_time_warned = meta:get_int("last_chest_time_warned")
+			local current_time = minetest.get_gametime()
+
+			if current_time - last_time_warned > 0.01 then
+				
 			minetest.chat_send_player(player:get_player_name(),
 				"You're not allowed to put things in treasure chests!")
+				meta:set_int("last_chest_time_warned", current_time)
+			end
+			
 			return 0
 		end
 	end,
