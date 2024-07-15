@@ -302,7 +302,7 @@ local function celebrate_team(teamname)
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
 		local volume = tonumber(ctf_settings.get(player, "flag_sound_volume")) / 1000 or 1.0
-		
+
 		if pteam == teamname then
 			minetest.sound_play("ctf_modebase_trumpet_positive", {
 				to_player = pname,
