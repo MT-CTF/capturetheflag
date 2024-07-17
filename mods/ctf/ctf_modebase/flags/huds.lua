@@ -77,6 +77,8 @@ local function get_flag_status(you)
 end
 
 function ctf_modebase.flag_huds.update_player(player)
+	if ctf_teams.team[ctf_teams.get(player)].not_playing then return end
+
 	local flag_status = get_flag_status(player:get_player_name())
 
 	if hud:exists(player, "flag_status") then
