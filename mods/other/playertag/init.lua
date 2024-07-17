@@ -40,6 +40,8 @@ local function add_entity_tag(player, old_observers)
 
 	remove_entity_tag(player)
 
+	if not ppos then return end
+
 	local ent = minetest.add_entity(ppos, "playertag:tag")
 	local ent2 = false
 	local ent3 = false
