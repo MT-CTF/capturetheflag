@@ -138,7 +138,6 @@ minetest.register_on_mods_loaded(function()
 					lastypos = lastypos + 0.5
 				end
 			end
-			end
 
 			local form = {
 			{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
