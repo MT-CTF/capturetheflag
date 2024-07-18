@@ -17,7 +17,10 @@ ctf_settings.register("auto_trash_stone_tools", {
 ctf_settings.register("flag_sound_volume", {
 	type = "bar",
 	description = "Adjust the flag sound volume",
-	default = "900",
+	default = "90",
+	min = 0,
+	max = 100,
+	step = 20,
 })
 
 local simplify_for_saved_stuff = function(iname)
