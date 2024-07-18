@@ -16,6 +16,7 @@ ctf_settings.register("auto_trash_stone_tools", {
 
 ctf_settings.register("flag_sound_volume", {
 	type = "bar",
+	label = "Flag Sound Volume",
 	description = "Adjust the flag sound volume",
 	default = "90",
 	min = 0,
