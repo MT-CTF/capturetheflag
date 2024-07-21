@@ -9,7 +9,8 @@ ctf_player = {
 }
 
 -- Override player_api model
-if ctf_core.settings.custom_player_model == true then
+if ctf_core.settings.use_ctf_model == true then
+	minetest.log('using ctf player')
 	player_api.registered_models["character.b3d"] = nil
 
 	player_api.register_model("character.b3d", {
