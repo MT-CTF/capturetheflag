@@ -74,8 +74,10 @@ local function start_new_match()
 		restart_on_next_match = ""
 	end
 
-	ctf_modebase.in_game = false
-	ctf_modebase.on_match_end()
+	if ctf_modebase.in_game then
+		ctf_modebase.in_game = false
+		ctf_modebase.on_match_end()
+	end
 
 	if restart_on_next_match then
 		minetest.chat_send_all(minetest.colorize("red",

@@ -77,6 +77,10 @@ local function get_flag_status(you)
 end
 
 function ctf_modebase.flag_huds.update_player(player)
+	local team = ctf_teams.get(player)
+
+	if not team or (ctf_teams.team[team] and ctf_teams.team[team].not_playing) then return end
+
 	local flag_status = get_flag_status(player:get_player_name())
 
 	if hud:exists(player, "flag_status") then
@@ -84,6 +88,7 @@ function ctf_modebase.flag_huds.update_player(player)
 			hud_events.new(player, {
 				text = flag_status.text,
 				color = flag_status.color,
+				channel = 2,
 			})
 		end
 
@@ -102,6 +107,7 @@ function ctf_modebase.flag_huds.update_player(player)
 		hud_events.new(player, {
 			text = flag_status.text,
 			color = flag_status.color,
+			channel = 2
 		})
 	end
 
@@ -142,6 +148,7 @@ local function update_timer(pname)
 
 		if timeleft <= 1 then
 			ctf_modebase.drop_flags(minetest.get_player_by_name(pname))
+			ctf_modebase:get_current_mode().recent_rankings.add(pname, {score = 30})
 		else
 			player_timers[pname] = timeleft - 1
 
