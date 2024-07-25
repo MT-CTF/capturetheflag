@@ -115,6 +115,23 @@ minetest.register_on_mods_loaded(function()
 						settingdef.description or HumanReadable(setting),
 					}
 					lastypos = lastypos + 0.6
+				elseif settingdef.type == "bar" then
+					lastypos = lastypos + 0.7
+					setting_list[k] = {
+						"label[0,%f;%s]"..
+						"scrollbaroptions[min=%d;max=%d;smallstep=%d]"..
+						"scrollbar[0,%f;%f,0.4;horizontal;%s;%s]",
+						lastypos - 0.5,
+						settingdef.label or HumanReadable(setting),
+						settingdef.min or 0,
+						settingdef.max or 100,
+						settingdef.step or 20,
+						lastypos,
+						FORMSIZE.x - SCROLLBAR_W -2,
+						setting,
+						context.setting[setting],
+					}
+					lastypos = lastypos + 0.5
 				end
 			end
 
@@ -166,6 +183,19 @@ minetest.register_on_mods_loaded(function()
 
 							if setting.on_change then
 								setting.on_change(player, tostring(idx))
+							end
+
+							refresh = true
+						end
+					elseif setting.type == "bar" then
+						local scrollevent = minetest.explode_scrollbar_event(value)
+
+						if scrollevent.value and context.setting[field] ~= tostring(scrollevent.value) then
+							context.setting[field] = tostring(scrollevent.value)
+							ctf_settings.set(player, field, tostring(scrollevent.value))
+
+							if setting.on_change then
+								setting.on_change(player, tostring(scrollevent.value))
 							end
 
 							refresh = true
