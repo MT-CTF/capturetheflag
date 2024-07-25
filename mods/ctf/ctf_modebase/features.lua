@@ -323,7 +323,7 @@ local function drop_flag(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
-		local drop_volume = tonumber(ctf_settings.get(player, "flag_sound_volume")) / 100 or 0.2
+		local drop_volume = math.max(0.6, tonumber(ctf_settings.get(player, "flag_sound_volume")) or 1.0) - 0.5
 
 		if pteam then
 			if pteam == teamname then
