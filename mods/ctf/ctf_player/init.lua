@@ -9,7 +9,6 @@ ctf_player = {
 }
 
 -- Override player_api model
-
 player_api.registered_models["character.b3d"] = nil
 
 player_api.register_model("character.b3d", {
@@ -33,6 +32,7 @@ player_api.register_model("character.b3d", {
 	stepheight = 0.6,
 	eye_height = 1.47,
 })
+
 minetest.register_on_joinplayer(function(player)
 	player:set_local_animation(nil, nil, nil, nil, 0)
 end)
