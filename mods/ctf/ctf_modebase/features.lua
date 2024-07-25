@@ -301,20 +301,22 @@ local function celebrate_team(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
-		local volume = tonumber(ctf_settings.get(player, "flag_sound_volume")) or 1.0
+		local volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam == teamname then
-			minetest.sound_play("ctf_modebase_trumpet_positive", {
-				to_player = pname,
-				gain = volume,
-				pitch = 1.0,
-			}, true)
-		else
-			minetest.sound_play("ctf_modebase_trumpet_negative", {
-				to_player = pname,
-				gain = volume,
-				pitch = 1.0,
-			}, true)
+		if volume > 0 then
+			if pteam == teamname then
+				minetest.sound_play("ctf_modebase_trumpet_positive", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			else
+				minetest.sound_play("ctf_modebase_trumpet_negative", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			end
 		end
 	end
 end
@@ -323,19 +325,19 @@ local function drop_flag(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
-		local drop_volume = math.max(0.6, tonumber(ctf_settings.get(player, "flag_sound_volume")) or 1.0) - 0.5
+		local drop_volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam then
+		if pteam and drop_volume > 0 then
 			if pteam == teamname then
 				minetest.sound_play("ctf_modebase_drop_flag_negative", {
 					to_player = pname,
-					gain = drop_volume,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			else
 				minetest.sound_play("ctf_modebase_drop_flag_positive", {
 					to_player = pname,
-					gain = drop_volume,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			end

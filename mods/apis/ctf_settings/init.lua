@@ -118,14 +118,19 @@ minetest.register_on_mods_loaded(function()
 				elseif settingdef.type == "bar" then
 					lastypos = lastypos + 0.7
 					setting_list[k] = {
-						"label[0,%f;%s]"..
+						"label[0,%f;%s: %d%%]"..
 						"scrollbaroptions[min=%d;max=%d;smallstep=%d]"..
 						"scrollbar[0,%f;%f,0.4;horizontal;%s;%s]",
 						lastypos - 0.5,
 						settingdef.label or HumanReadable(setting),
+						(
+							tonumber(context.setting[setting])
+							/
+							((settingdef.max - settingdef.min) - tonumber(settingdef.default))
+						) * 100,
 						settingdef.min or 0,
-						settingdef.max or 100,
-						settingdef.step or 20,
+						settingdef.max or 10,
+						settingdef.step or 1,
 						lastypos,
 						FORMSIZE.x - SCROLLBAR_W -2,
 						setting,
@@ -136,7 +141,7 @@ minetest.register_on_mods_loaded(function()
 			end
 
 			local form = {
-			{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
+				{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
 				{"scroll_container[-0.1,0.3;%f,%f;settings_scrollbar;vertical;0.1]",
 					FORMSIZE.x - SCROLLBAR_W + 2,
 					FORMSIZE.y + 0.7
