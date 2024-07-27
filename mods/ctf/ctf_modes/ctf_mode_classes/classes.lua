@@ -47,7 +47,7 @@ local class_props = {
 		name = "Scout",
 		color = "orange",
 		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
-		visual_size =  vector.new(-0.1, 0.0, -0.1),
+		visual_size = vector.new(-0.1, 0.0, -0.1),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
 			"ctf_mode_classes:scaling_ladder"
