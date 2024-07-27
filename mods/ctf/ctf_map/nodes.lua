@@ -242,10 +242,6 @@ local chest_def = {
 		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
 		minetest.get_meta(pos):set_string("infotext", chestv)
 	end,
-	--[[on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
-		minetest.get_meta(pos):set_string("infotext", chestv)
-	end]]
 }
 
 local ochest_def = table.copy(chest_def)
@@ -256,6 +252,20 @@ ochest_def.tiles[6] = "default_chest_inside.png"
 ochest_def.mesh = "chest_open.obj"
 ochest_def.light_source = 1
 ochest_def.on_rightclick = nil
+ochest_def.on_metadata_inventory_take = function(pos, listname, index, stack, player)
+	minetest.log("action", string.format("%s takes %s from treasure chest at %s",
+		player:get_player_name(),
+		stack:to_string(),
+		minetest.pos_to_string(pos)
+	))
+	local inv = minetest.get_inventory({type = "node", pos = pos})
+	if not inv or inv:is_empty("main") then
+		minetest.close_formspec(player:get_player_name(), "")
+		minetest.after(0, function()
+			minetest.set_node(pos, {name = "air"})
+		end)
+	end
+end
 
 minetest.register_node("ctf_map:chest_opened", ochest_def)
 minetest.register_node("ctf_map:chest", chest_def)
