@@ -12,7 +12,7 @@ local class_props = {
 		color = "grey",
 		description = "High HP class with a sword capable of short damage bursts",
 		hp_max = 30,
-		visual_size =  vector.new(0.1, 0.05, 0.1),
+		visual_size = vector.new(0.1, 0.05, 0.1),
 		items = {
 			"ctf_mode_classes:knight_sword",
 		},
