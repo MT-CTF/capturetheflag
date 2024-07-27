@@ -26,10 +26,22 @@ local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
+local function supports_observers(x)
+	if x then
+		if x.object then x = x.object end
+
+		if x.get_observers and x:get_pos() then
+			return true
+		end
+	end
+
+	return false
+end
+
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
-	if not      nametag.object.set_observers or
-	   not team_nametag.object.set_observers or
-	   not symbol_nametag.object.set_observers
+	if not      supports_observers(nametag.object) or
+	   not supports_observers(team_nametag.object) or
+	   not supports_observers(symbol_nametag.object)
 	then
 		return
 	end
@@ -57,7 +69,6 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 		end
 	end
 
-	-- Occasionally crashes in singleplayer, so call it safely
 	       nametag.object:set_observers(entity_players )
 	  team_nametag.object:set_observers(nametag_players)
 	symbol_nametag.object:set_observers(symbol_players )
@@ -106,8 +117,7 @@ local function set_playertags_state(state)
 				local nametag = playertag.entity
 				local symbol_entity = playertag.symbol_entity
 
-				if nametag and team_nametag and symbol_entity and
-				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
+				if supports_observers(nametag) and supports_observers(team_nametag) and supports_observers(symbol_entity) then
 					 team_nametag.object:set_observers({})
 					symbol_entity.object:set_observers({})
 					      nametag.object:set_observers({})
@@ -291,19 +301,22 @@ local function celebrate_team(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
+		local volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam == teamname then
-			minetest.sound_play("ctf_modebase_trumpet_positive", {
-				to_player = pname,
-				gain = 1.0,
-				pitch = 1.0,
-			}, true)
-		else
-			minetest.sound_play("ctf_modebase_trumpet_negative", {
-				to_player = pname,
-				gain = 1.0,
-				pitch = 1.0,
-			}, true)
+		if volume > 0 then
+			if pteam == teamname then
+				minetest.sound_play("ctf_modebase_trumpet_positive", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			else
+				minetest.sound_play("ctf_modebase_trumpet_negative", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			end
 		end
 	end
 end
@@ -312,18 +325,19 @@ local function drop_flag(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
+		local drop_volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam then
+		if pteam and drop_volume > 0 then
 			if pteam == teamname then
 				minetest.sound_play("ctf_modebase_drop_flag_negative", {
 					to_player = pname,
-					gain = 0.2,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			else
 				minetest.sound_play("ctf_modebase_drop_flag_positive", {
 					to_player = pname,
-					gain = 0.2,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			end
@@ -372,6 +386,11 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		if ctf_teams.get(killer) then
 			ctf_kill_list.add(killer, player, weapon_image, comment)
+			hud_events.new(player, {
+				quick = false,
+				text = killer.." killed you for ".. rewards.score .." points!",
+				color = "warning",
+			})
 		end
 
 		-- share kill score with other hitters
@@ -686,8 +705,6 @@ return {
 		end
 
 		celebrate_team(pteam)
-
-
 
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 

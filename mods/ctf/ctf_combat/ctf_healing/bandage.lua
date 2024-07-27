@@ -66,6 +66,11 @@ function ctf_healing.register_bandage(name, def)
 						text = uname .. " healed you!",
 						color = 0xC1FF44,
 					})
+					hud_events.new(uname, {
+						quick = true,
+						text = "You healed "..pname.."!",
+						color = 0xC1FF44,
+					})
 				elseif type(result) == "string" then
 					hud_events.new(uname, {
 						quick = true,
