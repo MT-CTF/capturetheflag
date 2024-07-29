@@ -98,16 +98,14 @@ end
 end)
 partiescmdbuilder:sub("leave", function (name)
     local playerPartyInfo = ctf_teams.getPlayerPartyInfo(name)
-    print (playerPartyInfo)
-    print(type(playerPartyInfo))
     if playerPartyInfo ~= nil then
-        ctf_teams.removeFromParty(playerPartyInfo)
-        minetest.chat_send_player(name, "You have left the party")
-        if ctf_teams.parties[playerPartyInfo.party_index] ~= nil then
-            for index, player_name in ipairs(ctf_teams.parties[playerPartyInfo.party_index]) do
+        for index, player_name in ipairs(ctf_teams.parties[playerPartyInfo.party_index]) do
+            if name ~= player_name then
                 minetest.chat_send_player(player_name, name.." has left your party.")
             end
         end
+        ctf_teams.removeFromParty(playerPartyInfo)
+        minetest.chat_send_player(name, "You have left the party")
     else
         minetest.chat_send_player(name, "You are not in a party")
     end
@@ -167,14 +165,14 @@ ctf_teams.getPlayerInviteInfo = function (player)
             end
         end
         for invite_index, invite in ipairs(ctf_teams.invites) do
-            if infoToReturn.incomingInvites == nil then
-                infoToReturn.incomingInvites = {}
-            end
             if invite.invited == player then
+                if infoToReturn.incomingInvites == nil then
+                    infoToReturn.incomingInvites = {}
+                end
                 table.insert(infoToReturn.incomingInvites, invite)
             end
         end
-        if infoToReturn.outgoingInvites ~= nil or infoToReturn.incomingInvites ~= nil then
+        if (infoToReturn.outgoingInvites ~= nil) or (infoToReturn.incomingInvites ~= nil) then
             return infoToReturn
         else
             return nil
