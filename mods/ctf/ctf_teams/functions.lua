@@ -11,6 +11,11 @@ function ctf_teams.remove_online_player(player)
 		if ctf_teams.online_players[team].players[player] then
 			ctf_teams.online_players[team].players[player] = nil
 			ctf_teams.online_players[team].count = ctf_teams.online_players[team].count - 1
+			
+			local playerPartyInfo = ctf_teams.getPlayerPartyInfo(player)
+			if playerPartyInfo ~= nil then
+				ctf_teams.removeFromParty(playerPartyInfo)
+			end
 		end
 	end
 end
