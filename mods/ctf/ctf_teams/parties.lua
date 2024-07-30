@@ -1,5 +1,7 @@
 ctf_teams.parties = {}
 ctf_teams.invites = {}
+-- If this is not set it will still block parties bigger than the team size of the round
+ctf_teams.MAX_PARTY_SIZE = 4
 
 local partiescmdbuilder = chatcmdbuilder.register("party", {
 	description = "Party management commands",
@@ -50,6 +52,12 @@ partiescmdbuilder:sub("invite :player:username", function (name, player)
             minetest.chat_send_player(name, "You can't invite yourself to a party, silly!")
             return
         end
+        local isTooBig, msg = ctf_teams.isPartyTooBig(name)
+        if isTooBig then
+            minetest.chat_send_player(name, "Could not invite "..player.." to your party.")
+            minetest.chat_send_player(name, msg)
+            return
+        end
 		minetest.chat_send_player(name, "Inviting "..player.." to your party. They must accept to join.")
         minetest.chat_send_player(player, name.." has invited you to their party. Type \"/party accept "..name.."\" to join.")
         table.insert(ctf_teams.invites, {inviter = name, invited = player})
@@ -65,6 +73,12 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
         minetest.chat_send_player(name, "You are currently in a party. You must leave using \"/party leave\" before you can accept new invitations.")
         return
     end
+    local isTooBig, msg = ctf_teams.isPartyTooBig(player)
+    if isTooBig then
+        minetest.chat_send_player(name, "Could not accept the party invitation from"..player)
+        minetest.chat_send_player(name, msg)
+    end
+
     for index, invite in ipairs(ctf_teams.invites) do
         if invite.inviter == player and invite.invited == name then
             -- Create a new party if the inviter is currently not in one
@@ -110,7 +124,7 @@ partiescmdbuilder:sub("leave", function (name)
         minetest.chat_send_player(name, "You are not in a party")
     end
 end)
-
+--- @param player string
 ctf_teams.getPlayerPartyInfo = function (player)
     if minetest.get_player_by_name(player) == nil then
         return nil
@@ -130,6 +144,7 @@ ctf_teams.getPlayerPartyInfo = function (player)
     end
 end
 -- Can pass either a player name or party info
+--- @param arg string | table
 ctf_teams.removeFromParty = function (arg)
     local playerPartyInfo = nil
     if type(arg) == "string" then
@@ -150,7 +165,7 @@ ctf_teams.removeFromParty = function (arg)
         end
     end
 end
-
+--- @param player string
 ctf_teams.getPlayerInviteInfo = function (player)
     if minetest.get_player_by_name(player) == nil then
         return nil
@@ -179,19 +194,78 @@ ctf_teams.getPlayerInviteInfo = function (player)
         end
     end
 end
-
+--- @param player string
 ctf_teams.deleteAllInvitesInvolvingPlayer = function (player)
     local removedAllInvites = false
     while removedAllInvites == false do
         local hasRemovedInviteThisItteration = false
         for index, invite in ipairs(ctf_teams.invites) do
-            if invite.inviter == player or invite.invited == player then
+            if (invite.inviter == player) or (invite.invited == player) then
                 table.remove(ctf_teams.invites, index)
                 hasRemovedInviteThisItteration = true
+                break
             end
         end
         if hasRemovedInviteThisItteration == false then
             removedAllInvites = true
+        end
+    end
+end
+
+-- Remove the player from their party if they were in one, and clear all invites involving them
+ctf_teams.checkAndClearAllPartyInfo = function (player)
+    local playerPartyInfo = ctf_teams.getPlayerPartyInfo(player)
+    if playerPartyInfo ~= nil then
+        ctf_teams.removeFromParty(playerPartyInfo)
+    end
+    local playerInviteInfo = ctf_teams.getPlayerInviteInfo(player)
+    if playerInviteInfo ~= nil then
+        ctf_teams.deleteAllInvitesInvolvingPlayer(player)
+    end
+end
+-- Will let you know if your party is too big, and optionally a message about why
+---comment
+---@param player string
+---@return boolean | nil
+---@return string | nil
+function ctf_teams.isPartyTooBig(player)
+    local player_party_info = ctf_teams.getPlayerPartyInfo(player)
+    if player_party_info ~= nil then
+        local playersPerTeam = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
+        if #player_party_info.player_party >= playersPerTeam then
+            return true, "There are more people in the party than the size of each team."
+        elseif #player_party_info.player_party >= MAX_PARTY_SIZE then
+            return true, "The party is already at the max size of "..tostring(MAX_PARTY_SIZE)
+        end
+        return false
+    end
+    return nil
+end
+
+function ctf_teams.deleteOversizedParties()
+    local removedAllOversizedParties = false
+    while removedAllOversizedParties == false do
+        local hasRemovedInviteThisItteration = false
+        for index, party in ipairs(ctf_teams.parties) do
+            if #party > ctf_teams.MAX_PARTY_SIZE then
+                for _, player in pairs(party) do
+                    minetest.chat_send_player(player, "Your party has been disbanded because it is over the max party size of "..ctf_teams.MAX_PARTY_SIZE)
+                end
+                table.remove(ctf_teams.parties, index)
+                hasRemovedInviteThisItteration = true
+                break
+            end
+            if #party > math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list) then
+                for _, player in pairs(party) do
+                    minetest.chat_send_player(player, "Your party has been disbanded because it is bigger than the team size.")
+                end
+                table.remove(ctf_teams.parties, index)
+                hasRemovedInviteThisItteration = true
+                break
+            end
+        end
+        if hasRemovedInviteThisItteration == false then
+            removedAllOversizedParties = true
         end
     end
 end
