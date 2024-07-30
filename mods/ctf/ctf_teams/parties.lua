@@ -234,8 +234,8 @@ function ctf_teams.isPartyTooBig(player)
         local playersPerTeam = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
         if #player_party_info.player_party >= playersPerTeam then
             return true, "There are more people in the party than the size of each team."
-        elseif #player_party_info.player_party >= MAX_PARTY_SIZE then
-            return true, "The party is already at the max size of "..tostring(MAX_PARTY_SIZE)
+        elseif #player_party_info.player_party >= ctf_teams.MAX_PARTY_SIZE then
+            return true, "The party is already at the max size of "..tostring(ctf_teams.MAX_PARTY_SIZE)
         end
         return false
     end

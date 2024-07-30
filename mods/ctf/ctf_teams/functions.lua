@@ -81,7 +81,7 @@ ctf_teams.team_allocator = ctf_teams.party_adapted_team_allocator
 function ctf_teams.party_adapted_team_allocator(arg)
 	if #ctf_teams.current_team_list <= 0 then return end -- No teams initialized yet
 		if type(arg) == "string" then
-		player = PlayerName(player)
+		local player = PlayerName(player)
 
 		if ctf_teams.player_team[player] then
 			return ctf_teams.player_team[player]
@@ -170,7 +170,6 @@ function ctf_teams.allocate_teams(teams)
 	end
 
 	local unallocatedPlayers = minetest.get_connected_players()
-	table.shuffle(unallocatedPlayers)
 
 	if #ctf_teams.parties ~= 0 then
 		-- Remove any parties that are too big
@@ -178,6 +177,7 @@ function ctf_teams.allocate_teams(teams)
 		-- This function will allocate party players into teams and also remove players in parties who have been allocated from the table
 		ctf_teams.allocate_parties(unallocatedPlayers)
 	end
+	table.shuffle(unallocatedPlayers)
 
 	for _, player in ipairs(unallocatedPlayers) do
 		ctf_teams.allocate_player(player)

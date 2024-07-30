@@ -7,7 +7,8 @@ to this software to the public domain worldwide. This software is
 distributed without any warranty.
 ]]
 
-local MAX_INACTIVE_TIME = 120
+-- local MAX_INACTIVE_TIME = 120
+local MAX_INACTIVE_TIME = 500000
 local CHECK_INTERVAL = 1
 local WARN_TIME = 20
 
