@@ -517,7 +517,6 @@ return {
 	-- allocate_teams = function()
 	team_allocator = function(player)
 		player = PlayerName(player)
-
 		local team_scores = recent_rankings.teams()
 
 		local best_kd = nil

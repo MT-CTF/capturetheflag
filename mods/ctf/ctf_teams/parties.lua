@@ -52,10 +52,32 @@ partiescmdbuilder:sub("invite :player:username", function (name, player)
             minetest.chat_send_player(name, "You can't invite yourself to a party, silly!")
             return
         end
-        local isTooBig, msg = ctf_teams.isPartyTooBig(name)
-        if isTooBig then
+        local inviteInfo = ctf_teams.getPlayerInviteInfo(name)
+        if inviteInfo then
+            for index, invite in ipairs(inviteInfo.outgoingInvites) do
+                if invite.invited == player then
+                    minetest.chat_send_player(name, "You already invited "..player.." to your party.")
+                    return
+                end
+            end
+        end
+        local partyInfo = ctf_teams.getPlayerPartyInfo(name)
+        if partyInfo then
+            for index, playerName in ipairs(partyInfo.player_party) do
+                if playerName == player then
+                    minetest.chat_send_player(name, player.." is already in your party.")
+                    return
+                end
+            end
+        end
+        local response = ctf_teams.isPartyTooBig(name)
+        if response ~= "no" then
             minetest.chat_send_player(name, "Could not invite "..player.." to your party.")
-            minetest.chat_send_player(name, msg)
+            if (response == "over max party size") then
+                minetest.chat_send_player(name, "Your party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE)
+            elseif (response == "over team size") then
+                minetest.chat_send_player(name, "Your party is already at the team size, adding more players would make it unfair.")
+            end
             return
         end
 		minetest.chat_send_player(name, "Inviting "..player.." to your party. They must accept to join.")
@@ -73,11 +95,16 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
         minetest.chat_send_player(name, "You are currently in a party. You must leave using \"/party leave\" before you can accept new invitations.")
         return
     end
-    local isTooBig, msg = ctf_teams.isPartyTooBig(player)
-    if isTooBig then
-        minetest.chat_send_player(name, "Could not accept the party invitation from"..player)
-        minetest.chat_send_player(name, msg)
-    end
+    local response = ctf_teams.isPartyTooBig(player)
+        if response ~= "no" then
+            minetest.chat_send_player(name, "Could not accept party invite from "..player)
+            if (response == "over max party size") then
+                minetest.chat_send_player(name, player.."'s party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE)
+            elseif (response == "over team size") then
+                minetest.chat_send_player(name, player.."'s party is already at the team size, adding more players would make it unfair.")
+            end
+            return
+        end
 
     for index, invite in ipairs(ctf_teams.invites) do
         if invite.inviter == player and invite.invited == name then
@@ -226,20 +253,22 @@ end
 -- Will let you know if your party is too big, and optionally a message about why
 ---comment
 ---@param player string
----@return boolean | nil
----@return string | nil
+---@return "no" | "over max party size" | "over team size"
 function ctf_teams.isPartyTooBig(player)
     local player_party_info = ctf_teams.getPlayerPartyInfo(player)
-    if player_party_info ~= nil then
-        local playersPerTeam = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
-        if #player_party_info.player_party >= playersPerTeam then
-            return true, "There are more people in the party than the size of each team."
-        elseif #player_party_info.player_party >= ctf_teams.MAX_PARTY_SIZE then
-            return true, "The party is already at the max size of "..tostring(ctf_teams.MAX_PARTY_SIZE)
-        end
-        return false
+    local playersPerTeam = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
+    if playersPerTeam == 1 then
+        return "over team size"
     end
-    return nil
+    if player_party_info ~= nil then
+        if (#player_party_info.player_party >= playersPerTeam) then
+            return "over team size"
+        elseif #player_party_info.player_party >= ctf_teams.MAX_PARTY_SIZE then
+            return "over max party size"
+        end
+        return "no"
+    end
+    return "no"
 end
 
 function ctf_teams.deleteOversizedParties()
@@ -249,15 +278,16 @@ function ctf_teams.deleteOversizedParties()
         for index, party in ipairs(ctf_teams.parties) do
             if #party > ctf_teams.MAX_PARTY_SIZE then
                 for _, player in pairs(party) do
-                    minetest.chat_send_player(player, "Your party has been disbanded because it is over the max party size of "..ctf_teams.MAX_PARTY_SIZE)
+                    minetest.chat_send_player(player, "Your party ("..#party.." players) has been disbanded because it is over the max party size of "..ctf_teams.MAX_PARTY_SIZE)
                 end
                 table.remove(ctf_teams.parties, index)
                 hasRemovedInviteThisItteration = true
                 break
             end
-            if #party > math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list) then
+            local teamSize = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
+            if #party > teamSize then
                 for _, player in pairs(party) do
-                    minetest.chat_send_player(player, "Your party has been disbanded because it is bigger than the team size.")
+                    minetest.chat_send_player(player, "Your party ("..#party.." players) has been disbanded because it is bigger than the team size of "..teamSize.." players.")
                 end
                 table.remove(ctf_teams.parties, index)
                 hasRemovedInviteThisItteration = true

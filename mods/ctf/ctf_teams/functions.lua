@@ -56,6 +56,7 @@ end
 
 local tpos = 1
 function ctf_teams.default_team_allocator(player)
+	print("default team allocator ran")
 	if #ctf_teams.current_team_list <= 0 then return end -- No teams initialized yet
 	player = PlayerName(player)
 
@@ -79,14 +80,8 @@ ctf_teams.team_allocator = ctf_teams.party_adapted_team_allocator
 -- If you pass a player name, it will do that. Otherwise, if you pass nil, it will just give you the smallest team
 --- @param arg string | nil
 function ctf_teams.party_adapted_team_allocator(arg)
+	print("PARTY ADAPTED TEAM ALLOCATER RAN")
 	if #ctf_teams.current_team_list <= 0 then return end -- No teams initialized yet
-		if type(arg) == "string" then
-		local player = PlayerName(player)
-
-		if ctf_teams.player_team[player] then
-			return ctf_teams.player_team[player]
-		end
-	end
 
 	-- Will assign the player to the team with the smallest number of players. If there is a tie, it will join a random one
 	local teamCounts = {}
@@ -107,7 +102,15 @@ function ctf_teams.party_adapted_team_allocator(arg)
 			end
 		end
 	end
-
+	if ctf_modebase.match_started then
+		if type(arg) == "string" then
+			local player = PlayerName(arg)
+	
+			if ctf_teams.player_team[player] then
+				return ctf_teams.player_team[player]
+			end
+		end
+	end
 	return smallestTeam
 end
 
@@ -124,6 +127,7 @@ function ctf_teams.allocate_player(player, force)
 end
 
 function ctf_teams.allocate_parties(unallocatedPlayers)
+	local nonPartyPlayers = unallocatedPlayers
 	local partiesToAllocate = {}
 	for _, party in pairs(ctf_teams.parties) do
 		table.insert(partiesToAllocate, party)
@@ -135,17 +139,19 @@ function ctf_teams.allocate_parties(unallocatedPlayers)
 	for _, party in ipairs(partiesToAllocate) do
 		local smallestTeam = ctf_teams.party_adapted_team_allocator(nil)
 		for _, player in pairs(party) do
-			player = PlayerName(player)
-			ctf_teams.set(player, smallestTeam)
+			ctf_teams.set(player, smallestTeam, true)
 			
-			for index, playerName in pairs(unallocatedPlayers) do
-				if playerName == player then
-					table.remove(unallocatedPlayers, index)
+			for index, playerToCheck in pairs(nonPartyPlayers) do
+				local nameToCheck = PlayerName(playerToCheck)
+				if nameToCheck == player then
+					print("removing a party player from allocator pool")
+					table.remove(nonPartyPlayers, index)
 					break
 				end
 			end
 		end
 	end
+	return nonPartyPlayers
 
 end
 
@@ -158,24 +164,26 @@ function ctf_teams.allocate_teams(teams)
 	tpos = 1
 
 	-- If there are no parties present this round, use the default allocator instead of the party adapted one cause its a bit faster
-	if #ctf_teams.parties == 0 then
-		ctf_teams.team_allocator = ctf_teams.default_team_allocator
-	else
-		ctf_teams.team_allocator = ctf_teams.party_adapted_team_allocator
-	end
+	-- if #ctf_teams.parties == 0 then
+	-- 	ctf_teams.team_allocator = ctf_teams.default_team_allocator
+	-- else
+	-- 	ctf_teams.team_allocator = ctf_teams.party_adapted_team_allocator
+	-- end
 
 	for teamname, def in pairs(teams) do
 		ctf_teams.online_players[teamname] = {count = 0, players = {}}
-		table.insert(ctf_teams.current_team_list, teamname)
+		table.insert(ctf_teams.current_team_list, teamname) 
 	end
 
 	local unallocatedPlayers = minetest.get_connected_players()
-
+	print("allocate teams function was run")
 	if #ctf_teams.parties ~= 0 then
 		-- Remove any parties that are too big
 		ctf_teams.deleteOversizedParties()
 		-- This function will allocate party players into teams and also remove players in parties who have been allocated from the table
-		ctf_teams.allocate_parties(unallocatedPlayers)
+		print("before allocating parties, there were "..#unallocatedPlayers.."unallocatedPlayers")
+		unallocatedPlayers = ctf_teams.allocate_parties(unallocatedPlayers)
+		print("after allocating parties, there were "..#unallocatedPlayers.." unallocated players")
 	end
 	table.shuffle(unallocatedPlayers)
 
