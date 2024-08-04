@@ -81,7 +81,8 @@ for team, def in pairs(ctf_teams.team) do
 			end
 
 			door:toggle(clicker)
-			if ctf_settings.get(clicker, "auto_close_doors") == "true" and minetest.get_meta(pos):get_string("ctf_teams.old_door") == node.name then
+			if ctf_settings.get(clicker, "auto_close_doors") == "true" and
+			minetest.get_meta(pos):get_string("ctf_teams.old_door") == node.name then
 				jobs[jobname] = minetest.after(1.5, function()
 					door:toggle(clicker)
 				end)
