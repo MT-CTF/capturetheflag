@@ -20,7 +20,7 @@ partiescmdbuilder:sub("info", function (name)
         minetest.chat_send_player(name, partyMembersString)
     end
 
-    local playerInviteInfo = ctf_teams.getPlayerInviteInfo(name) -- BROKEN
+    local playerInviteInfo = ctf_teams.getPlayerInviteInfo(name)
     if playerInviteInfo == nil then
         minetest.chat_send_player(name, "You have no outcoming or incoming invites")
         return
@@ -113,12 +113,12 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
             if inviterPartyInfo == nil then
                 table.insert(ctf_teams.parties, {player, name})
                 minetest.chat_send_player(name, "You have joined "..player.."'s party.")
-                minetest.chat_send_player(player, name.." has joined your party.")
+                minetest.chat_send_player(player, name.." has joined your party. This will take effect next match.")
             else
                 for index, player_name in ipairs(inviterPartyInfo.player_party) do
-                    minetest.chat_send_player(player_name, name.." has joined your party")
+                    minetest.chat_send_player(player_name, name.." has joined your party. This will take effect next match")
                 end
-                minetest.chat_send_player(name, "You have joined "..player.."'s party.")
+                minetest.chat_send_player(name, "You have joined "..player.."'s party. This will take effect next match.")
                 table.insert(inviterPartyInfo.player_party, name)
             end
             local inviteIndexToDelete = nil
@@ -298,4 +298,84 @@ function ctf_teams.deleteOversizedParties()
             removedAllOversizedParties = true
         end
     end
+end
+
+function ctf_teams.getTeamToAllocatePartyTo()
+    -- A lot of this is adapted from team_allocator in features.lua
+    local team_scores = ctf_modebase:get_current_mode().recent_rankings.teams()
+
+    local best_kd = nil
+    local worst_kd = nil
+    local best_players = nil
+    local worst_players = nil
+    local total_players = 0
+
+    for _, team in ipairs(ctf_teams.current_team_list) do
+        local players_count = ctf_teams.online_players[team].count
+        local players = ctf_teams.online_players[team].players
+
+        local bk = 0
+        local bd = 1
+
+        for name in pairs(players) do
+            local rank = ctf_modebase:get_current_mode().rankings:get(name)
+            --local rank = ctf_rankings:get(name)
+            -- ctf_rankings:
+            -- ctf_modebase.features.
+            -- ctf_rankings.get()
+
+            if rank then
+                if bk <= (rank.kills or 0) then
+                    bk = rank.kills or 0
+                    bd = rank.deaths or 0
+                end
+            end
+        end
+
+        total_players = total_players + players_count
+
+        local kd = bk / bd
+        local match_kd = 0
+        local tk = 0
+        if team_scores[team] then
+            if (team_scores[team].score or 0) >= 50 then
+                tk = team_scores[team].kills or 0
+
+                kd = math.max(kd, (team_scores[team].kills or bk) / (team_scores[team].deaths or bd))
+            end
+
+            match_kd = (team_scores[team].kills or 0) / (team_scores[team].deaths or 1)
+        end
+
+        if not best_kd or match_kd > best_kd.a then
+            best_kd = {s = kd, a = match_kd, t = team, kills = tk}
+        end
+
+        if not worst_kd or match_kd < worst_kd.a then
+            worst_kd = {s = kd, a = match_kd, t = team, kills = tk}
+        end
+
+        if not best_players or players_count > best_players.s then
+            best_players = {s = players_count, t = team}
+        end
+
+        if not worst_players or players_count < worst_players.s then
+            worst_players = {s = players_count, t = team}
+        end
+    end
+
+    if worst_players.s == 0 then
+        return worst_players.t
+    end
+
+    local kd_diff = best_kd.s - worst_kd.s
+    local actual_kd_diff = best_kd.a - worst_kd.a
+    local players_diff = best_players.s - worst_players.s
+
+    if kd_diff > 0.4 then
+        return worst_kd.t
+    else
+        return worst_players.t
+    end
+    
 end

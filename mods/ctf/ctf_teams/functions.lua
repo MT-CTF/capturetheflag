@@ -102,13 +102,18 @@ function ctf_teams.party_adapted_team_allocator(arg)
 			end
 		end
 	end
-	if ctf_modebase.match_started then
-		if type(arg) == "string" then
+	-- Only do by last team if they left and rejoined during a match
+	-- DOES NOT WORK
+	if type(arg) == "string" then
+		if ctf_map.start_time ~= nil then
+			print("I am allowed to join an old team")
 			local player = PlayerName(arg)
-	
+
 			if ctf_teams.player_team[player] then
 				return ctf_teams.player_team[player]
 			end
+		else
+			print("not allowed to join an old team")
 		end
 	end
 	return smallestTeam
@@ -137,9 +142,9 @@ function ctf_teams.allocate_parties(unallocatedPlayers)
 		return #a > #b
 	end)
 	for _, party in ipairs(partiesToAllocate) do
-		local smallestTeam = ctf_teams.party_adapted_team_allocator(nil)
+		local weakestTeam = ctf_teams.getTeamToAllocatePartyTo()
 		for _, player in pairs(party) do
-			ctf_teams.set(player, smallestTeam, true)
+			ctf_teams.set(player, weakestTeam, true)
 			
 			for index, playerToCheck in pairs(nonPartyPlayers) do
 				local nameToCheck = PlayerName(playerToCheck)
@@ -163,7 +168,8 @@ function ctf_teams.allocate_teams(teams)
 	ctf_teams.current_team_list = {}
 	tpos = 1
 
-	-- If there are no parties present this round, use the default allocator instead of the party adapted one cause its a bit faster
+	--If there are no parties present this round, use the default allocator instead of the party adapted one cause its a bit faster
+	-- DELETE THIS FOR FINAL OMG BRO DO IT
 	-- if #ctf_teams.parties == 0 then
 	-- 	ctf_teams.team_allocator = ctf_teams.default_team_allocator
 	-- else

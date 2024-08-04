@@ -582,10 +582,8 @@ return {
 		local kd_diff = best_kd.s - worst_kd.s
 		local actual_kd_diff = best_kd.a - worst_kd.a
 		local players_diff = best_players.s - worst_players.s
-
 		local rem_team = ctf_teams.get(player)
 		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
-
 		if ctf_core.testing.testing then
 			if not rem_team or
 			math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
@@ -597,11 +595,9 @@ return {
 		else
 			player_rankings = {}
 		end
-
 		local one_third     = math.ceil(0.34 * total_players)
 		-- local one_fifth     = math.ceil(0.2 * total_players)
-
-		-- Allocate player to remembered team unless teams are imbalanced
+			-- Allocate player to remembered team unless teams are imbalanced
 		if rem_team and not ctf_modebase.flag_captured[rem_team] and
 		(worst_kd.kills <= total_players or actual_kd_diff <= 0.8) and players_diff <= one_third then
 			return rem_team
