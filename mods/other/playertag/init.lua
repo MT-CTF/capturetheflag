@@ -172,6 +172,16 @@ minetest.register_entity("playertag:tag", {
 	static_save = false,
 	pointable = false,
 	on_punch = function() return true end,
+	on_deactivate = function(self, removal)
+		if not removal then
+			local player = self.object:get_parent()
+
+			if player and player:is_player() then
+				minetest.log("action", "Playertag for player "..player:get_player_name().." unloaded. Re-adding...")
+				update(player, players[player:get_player_name()])
+			end
+		end
+	end
 })
 
 minetest.register_on_joinplayer(function(player)
