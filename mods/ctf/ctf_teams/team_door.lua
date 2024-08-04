@@ -1,3 +1,10 @@
+ctf_settings.register("auto_close_doors", {
+	type = "bool",
+	label = "Auto close doors.",
+	description = "Only triggers when you open your own team's doors.",
+	default = "false",
+})
+
 doors.register("ctf_teams:door_steel", {
 	tiles = {{name = "doors_door_steel.png", backface_culling = true}},
 	description = "Team Door",
@@ -27,6 +34,8 @@ minetest.override_item("ctf_teams:door_steel", {
 			local item = minetest.registered_craftitems["ctf_teams:door_steel_" .. pteam]
 			local result = item.on_place(newitemstack, placer, pointed_thing)
 
+			minetest.get_meta(pointed_thing.above):set_string("ctf_teams.old_door", minetest.get_node(pointed_thing.above).name)
+
 			if result then
 				itemstack:set_count(result:get_count())
 			end
@@ -49,6 +58,7 @@ minetest.handle_node_drops = function(pos, drops, digger)
 	return old_handle(pos, drops, digger)
 end
 
+local jobs = {}
 for team, def in pairs(ctf_teams.team) do
 	local doorname = "ctf_teams:door_steel_%s"
 	local modifier = "^[colorize:%s:190)^(ctf_teams_door_steel.png^[mask:ctf_teams_door_steel_mask.png^[colorize:%s:42)"
@@ -65,8 +75,18 @@ for team, def in pairs(ctf_teams.team) do
 		gain_close = 0.2,
 		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 			local door = doors.get(pos)
+			local jobname = minetest.pos_to_string(pos, 1)
+			if jobs[jobname] then
+				jobs[jobname]:cancel()
+			end
+
 			door:toggle(clicker)
-			return itemstack, minetest.after(2, function() door:toggle(clicker) end)
+			if ctf_settings.get(clicker, "auto_close_doors") == "true" and minetest.get_meta(pos):get_string("ctf_teams.old_door") == node.name then
+				jobs[jobname] = minetest.after(1.5, function()
+					door:toggle(clicker)
+				end)
+			end
+			return itemstack
 		end
 	})
 end
