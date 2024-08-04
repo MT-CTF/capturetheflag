@@ -22,7 +22,7 @@ partiescmdbuilder:sub("info", function (name)
 
     local playerInviteInfo = ctf_teams.getPlayerInviteInfo(name)
     if playerInviteInfo == nil then
-        minetest.chat_send_player(name, "You have no outcoming or incoming invites")
+        minetest.chat_send_player(name, "You have no outgoing or incoming invites")
         return
     end
     if playerInviteInfo.outgoingInvites == nil then
@@ -70,7 +70,7 @@ partiescmdbuilder:sub("invite :player:username", function (name, player)
                 end
             end
         end
-        local response = ctf_teams.isPartyTooBig(name)
+        local response = ctf_teams.canPartyAcceptNewPlayers(name)
         if response ~= "no" then
             minetest.chat_send_player(name, "Could not invite "..player.." to your party.")
             if (response == "over max party size") then
@@ -95,7 +95,7 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
         minetest.chat_send_player(name, "You are currently in a party. You must leave using \"/party leave\" before you can accept new invitations.")
         return
     end
-    local response = ctf_teams.isPartyTooBig(player)
+    local response = ctf_teams.canPartyAcceptNewPlayers(player)
         if response ~= "no" then
             minetest.chat_send_player(name, "Could not accept party invite from "..player)
             if (response == "over max party size") then
@@ -112,7 +112,7 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
             local inviterPartyInfo = ctf_teams.getPlayerPartyInfo(player)
             if inviterPartyInfo == nil then
                 table.insert(ctf_teams.parties, {player, name})
-                minetest.chat_send_player(name, "You have joined "..player.."'s party.")
+                minetest.chat_send_player(name, "You have joined "..player.."'s party. This will take effect next match.")
                 minetest.chat_send_player(player, name.." has joined your party. This will take effect next match.")
             else
                 for index, player_name in ipairs(inviterPartyInfo.player_party) do
@@ -250,14 +250,17 @@ ctf_teams.checkAndClearAllPartyInfo = function (player)
         ctf_teams.deleteAllInvitesInvolvingPlayer(player)
     end
 end
--- Will let you know if your party is too big, and optionally a message about why
----comment
+
 ---@param player string
 ---@return "no" | "over max party size" | "over team size"
-function ctf_teams.isPartyTooBig(player)
+-- Lets you know if a party can accept new players or not. Is not used by deleteOversizedParties which is run on round start.
+function ctf_teams.canPartyAcceptNewPlayers(player)
     local player_party_info = ctf_teams.getPlayerPartyInfo(player)
-    local playersPerTeam = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
-    if playersPerTeam == 1 then
+    -- Assumes it is a two team map next so you can invite a larger number of players to your party even if you are currently on a 4 team map,
+    -- but it still may disband the party next round if it too big for the map.
+    local playersPerTeam =  math.floor(#minetest.get_connected_players() / 2)
+
+    if (playersPerTeam == 1) or (playersPerTeam == 0) then
         return "over team size"
     end
     if player_party_info ~= nil then
@@ -271,6 +274,7 @@ function ctf_teams.isPartyTooBig(player)
     return "no"
 end
 
+-- Deletes any parties that are larger than the MAX_PARTY_SIZE or larger than the team size of that round
 function ctf_teams.deleteOversizedParties()
     local removedAllOversizedParties = false
     while removedAllOversizedParties == false do
@@ -299,7 +303,36 @@ function ctf_teams.deleteOversizedParties()
         end
     end
 end
+-- This puts all party players onto their teams, and returns a table of all the non-party players
+function ctf_teams.allocate_parties(unallocatedPlayers)
+	local nonPartyPlayers = unallocatedPlayers
+	local partiesToAllocate = {}
+	for _, party in pairs(ctf_teams.parties) do
+		table.insert(partiesToAllocate, party)
+	end
+	-- Make partiesToAllocate be in order of largest party to smallest
+	table.sort(partiesToAllocate, function (a, b)
+		return #a > #b
+	end)
+	for _, party in ipairs(partiesToAllocate) do
+		local weakestTeam = ctf_teams.getTeamToAllocatePartyTo()
+		for _, player in pairs(party) do
+			ctf_teams.set(player, weakestTeam, true)
+			
+			for index, playerToCheck in pairs(nonPartyPlayers) do
+				local nameToCheck = PlayerName(playerToCheck)
+				if nameToCheck == player then
+					print("removing a party player from allocator pool")
+					table.remove(nonPartyPlayers, index)
+					break
+				end
+			end
+		end
+	end
+	return nonPartyPlayers
+end
 
+-- This is run to find which team a party should be added to.
 function ctf_teams.getTeamToAllocatePartyTo()
     -- A lot of this is adapted from team_allocator in features.lua
     local team_scores = ctf_modebase:get_current_mode().recent_rankings.teams()
@@ -319,10 +352,6 @@ function ctf_teams.getTeamToAllocatePartyTo()
 
         for name in pairs(players) do
             local rank = ctf_modebase:get_current_mode().rankings:get(name)
-            --local rank = ctf_rankings:get(name)
-            -- ctf_rankings:
-            -- ctf_modebase.features.
-            -- ctf_rankings.get()
 
             if rank then
                 if bk <= (rank.kills or 0) then

@@ -74,50 +74,7 @@ function ctf_teams.default_team_allocator(player)
 
 	return team
 end
-ctf_teams.team_allocator = ctf_teams.party_adapted_team_allocator
-
--- Can be used to return the smallest team or the team the player is on.
--- If you pass a player name, it will do that. Otherwise, if you pass nil, it will just give you the smallest team
---- @param arg string | nil
-function ctf_teams.party_adapted_team_allocator(arg)
-	print("PARTY ADAPTED TEAM ALLOCATER RAN")
-	if #ctf_teams.current_team_list <= 0 then return end -- No teams initialized yet
-
-	-- Will assign the player to the team with the smallest number of players. If there is a tie, it will join a random one
-	local teamCounts = {}
-	for _, currentTeam in pairs(ctf_teams.current_team_list) do
-		table.insert(teamCounts, {team = currentTeam, numPlayers= #ctf_teams.online_players[currentTeam].players})
-	end
-	local smallestTeamCount = 10000
-	local smallestTeam = nil
-	for _, teamCount in pairs(teamCounts) do
-		if teamCount.numPlayers < smallestTeamCount then
-			smallestTeamCount = teamCount.numPlayers
-			smallestTeam = teamCount.team
-		else if teamCount.numPlayers == smallestTeamCount then
-			if math.random(0, 1) == 1 then
-				smallestTeamCount = teamCount.numPlayers
-				smallestTeam = teamCount.team
-				end
-			end
-		end
-	end
-	-- Only do by last team if they left and rejoined during a match
-	-- DOES NOT WORK
-	if type(arg) == "string" then
-		if ctf_map.start_time ~= nil then
-			print("I am allowed to join an old team")
-			local player = PlayerName(arg)
-
-			if ctf_teams.player_team[player] then
-				return ctf_teams.player_team[player]
-			end
-		else
-			print("not allowed to join an old team")
-		end
-	end
-	return smallestTeam
-end
+ctf_teams.team_allocator = ctf_teams.default_team_allocator
 
 ---@param player string | ObjectRef
 ---@param force boolean [optional]
@@ -131,35 +88,6 @@ function ctf_teams.allocate_player(player, force)
 	return team
 end
 
-function ctf_teams.allocate_parties(unallocatedPlayers)
-	local nonPartyPlayers = unallocatedPlayers
-	local partiesToAllocate = {}
-	for _, party in pairs(ctf_teams.parties) do
-		table.insert(partiesToAllocate, party)
-	end
-	-- Make partiesToAllocate be in order of largest party to smallest
-	table.sort(partiesToAllocate, function (a, b)
-		return #a > #b
-	end)
-	for _, party in ipairs(partiesToAllocate) do
-		local weakestTeam = ctf_teams.getTeamToAllocatePartyTo()
-		for _, player in pairs(party) do
-			ctf_teams.set(player, weakestTeam, true)
-			
-			for index, playerToCheck in pairs(nonPartyPlayers) do
-				local nameToCheck = PlayerName(playerToCheck)
-				if nameToCheck == player then
-					print("removing a party player from allocator pool")
-					table.remove(nonPartyPlayers, index)
-					break
-				end
-			end
-		end
-	end
-	return nonPartyPlayers
-
-end
-
 ---@param teams table
 -- Should be called at match start
 function ctf_teams.allocate_teams(teams)
@@ -168,13 +96,8 @@ function ctf_teams.allocate_teams(teams)
 	ctf_teams.current_team_list = {}
 	tpos = 1
 
-	--If there are no parties present this round, use the default allocator instead of the party adapted one cause its a bit faster
-	-- DELETE THIS FOR FINAL OMG BRO DO IT
-	-- if #ctf_teams.parties == 0 then
-	-- 	ctf_teams.team_allocator = ctf_teams.default_team_allocator
-	-- else
-	-- 	ctf_teams.team_allocator = ctf_teams.party_adapted_team_allocator
-	-- end
+	-- REMOVE ME AFTER
+	--ctf_teams.team_allocator = ctf_teams.default_team_allocator
 
 	for teamname, def in pairs(teams) do
 		ctf_teams.online_players[teamname] = {count = 0, players = {}}
