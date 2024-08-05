@@ -1,7 +1,15 @@
 ctf_teams.parties = {}
 ctf_teams.invites = {}
--- If this is not set it will still block parties bigger than the team size of the round
+-- Parties smaller than this will still be blocked if they are larger than the team size of the match
 ctf_teams.MAX_PARTY_SIZE = 4
+-- Change max party size if it is set in minetest.conf
+local settingsMaxPartySize = minetest.settings:get("ctf.max_party_size")
+if settingsMaxPartySize then
+    local numberMaxPartySize = tonumber(settingsMaxPartySize)
+    if numberMaxPartySize then
+        ctf_teams.MAX_PARTY_SIZE = numberMaxPartySize
+    end
+end
 
 local partiescmdbuilder = chatcmdbuilder.register("party", {
 	description = "Party management commands",
@@ -39,7 +47,7 @@ partiescmdbuilder:sub("info", function (name)
         minetest.chat_send_player(name, "You have no incoming invites")
     else
         local incomingInvitesString = "You have pending incoming invites from: "
-        for key, invite in pairs(playerInviteInfo.incomingInvites) do
+        for _, invite in pairs(playerInviteInfo.incomingInvites) do
             incomingInvitesString = incomingInvitesString..invite.inviter.." "
         end
         minetest.chat_send_player(name, incomingInvitesString)
@@ -170,9 +178,9 @@ ctf_teams.getPlayerPartyInfo = function (player)
         return nil
     end
 end
--- Can pass either a player name or party info
+-- Can pass either a player name or party info table from getPlayerPartyInfo
 --- @param arg string | table
-ctf_teams.removeFromParty = function (arg)
+function ctf_teams.removeFromParty(arg)
     local playerPartyInfo = nil
     if type(arg) == "string" then
         playerPartyInfo = ctf_teams.getPlayerPartyInfo(arg)
@@ -193,7 +201,7 @@ ctf_teams.removeFromParty = function (arg)
     end
 end
 --- @param player string
-ctf_teams.getPlayerInviteInfo = function (player)
+function ctf_teams.getPlayerInviteInfo(player)
     if minetest.get_player_by_name(player) == nil then
         return nil
     else
@@ -222,7 +230,7 @@ ctf_teams.getPlayerInviteInfo = function (player)
     end
 end
 --- @param player string
-ctf_teams.deleteAllInvitesInvolvingPlayer = function (player)
+function ctf_teams.deleteAllInvitesInvolvingPlayer(player)
     local removedAllInvites = false
     while removedAllInvites == false do
         local hasRemovedInviteThisItteration = false
@@ -240,7 +248,7 @@ ctf_teams.deleteAllInvitesInvolvingPlayer = function (player)
 end
 
 -- Remove the player from their party if they were in one, and clear all invites involving them
-ctf_teams.checkAndClearAllPartyInfo = function (player)
+function ctf_teams.checkAndClearAllPartyInfo(player)
     local playerPartyInfo = ctf_teams.getPlayerPartyInfo(player)
     if playerPartyInfo ~= nil then
         ctf_teams.removeFromParty(playerPartyInfo)
@@ -303,37 +311,9 @@ function ctf_teams.deleteOversizedParties()
         end
     end
 end
--- This puts all party players onto their teams, and returns a table of all the non-party players
-function ctf_teams.allocate_parties(unallocatedPlayers)
-	local nonPartyPlayers = unallocatedPlayers
-	local partiesToAllocate = {}
-	for _, party in pairs(ctf_teams.parties) do
-		table.insert(partiesToAllocate, party)
-	end
-	-- Make partiesToAllocate be in order of largest party to smallest
-	table.sort(partiesToAllocate, function (a, b)
-		return #a > #b
-	end)
-	for _, party in ipairs(partiesToAllocate) do
-		local weakestTeam = ctf_teams.getTeamToAllocatePartyTo()
-		for _, player in pairs(party) do
-			ctf_teams.set(player, weakestTeam, true)
-			
-			for index, playerToCheck in pairs(nonPartyPlayers) do
-				local nameToCheck = PlayerName(playerToCheck)
-				if nameToCheck == player then
-					print("removing a party player from allocator pool")
-					table.remove(nonPartyPlayers, index)
-					break
-				end
-			end
-		end
-	end
-	return nonPartyPlayers
-end
 
 -- This is run to find which team a party should be added to.
-function ctf_teams.getTeamToAllocatePartyTo()
+local function getTeamToAllocatePartyTo()
     -- A lot of this is adapted from team_allocator in features.lua
     local team_scores = ctf_modebase:get_current_mode().recent_rankings.teams()
 
@@ -407,4 +387,32 @@ function ctf_teams.getTeamToAllocatePartyTo()
         return worst_players.t
     end
     
+end
+
+-- This puts all party players onto their teams, and returns a table of all the non-party players
+function ctf_teams.allocate_parties(unallocatedPlayers)
+	local nonPartyPlayers = unallocatedPlayers
+	local partiesToAllocate = {}
+	for _, party in pairs(ctf_teams.parties) do
+		table.insert(partiesToAllocate, party)
+	end
+	-- Make partiesToAllocate be in order of largest party to smallest
+	table.sort(partiesToAllocate, function (a, b)
+		return #a > #b
+	end)
+	for _, party in ipairs(partiesToAllocate) do
+		local weakestTeam = getTeamToAllocatePartyTo()
+		for _, player in pairs(party) do
+			ctf_teams.set(player, weakestTeam, true)
+			
+			for index, playerToCheck in pairs(nonPartyPlayers) do
+				local nameToCheck = PlayerName(playerToCheck)
+				if nameToCheck == player then
+					table.remove(nonPartyPlayers, index)
+					break
+				end
+			end
+		end
+	end
+	return nonPartyPlayers
 end
