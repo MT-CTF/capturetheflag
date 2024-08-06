@@ -67,8 +67,8 @@ end
 
 minetest.register_tool("ctf_mode_classes:support_paxel", {
 	description = "Paxel\nRightclick bottom of pillar to dig it.\nCan't use during build time",
-	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
-	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
+	inventory_image = "ctf_mode_classes_paxel.png",
+	wield_image = "ctf_mode_classes_paxel.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
