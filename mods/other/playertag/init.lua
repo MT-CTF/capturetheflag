@@ -174,7 +174,11 @@ minetest.register_entity("playertag:tag", {
 	on_punch = function() return true end,
 	on_deactivate = function(self, removal)
 		if not removal then
-			local player = self.object:get_parent()
+			local attachmentInfo = self.object:get_attach()
+			local player = nil
+			if attachmentInfo then
+				player = attachmentInfo.parent
+			end
 
 			if player and player:is_player() then
 				minetest.log("action", "Playertag for player "..player:get_player_name().." unloaded. Re-adding...")
