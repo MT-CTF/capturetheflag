@@ -96,23 +96,18 @@ function ctf_teams.allocate_teams(teams)
 	ctf_teams.current_team_list = {}
 	tpos = 1
 
-	-- REMOVE ME AFTER
-	--ctf_teams.team_allocator = ctf_teams.default_team_allocator
-
 	for teamname, def in pairs(teams) do
 		ctf_teams.online_players[teamname] = {count = 0, players = {}}
-		table.insert(ctf_teams.current_team_list, teamname) 
+		table.insert(ctf_teams.current_team_list, teamname)
 	end
 
 	local unallocatedPlayers = minetest.get_connected_players()
-	print("allocate teams function was run")
 	if #ctf_teams.parties ~= 0 then
 		-- Remove any parties that are too big
 		ctf_teams.deleteOversizedParties()
-		-- This function will allocate party players into teams and also remove players in parties who have been allocated from the table
-		print("before allocating parties, there were "..#unallocatedPlayers.."unallocatedPlayers")
+		-- This function will allocate party players into teams
+		-- and also remove players in parties who have been allocated from the table
 		unallocatedPlayers = ctf_teams.allocate_parties(unallocatedPlayers)
-		print("after allocating parties, there were "..#unallocatedPlayers.." unallocated players")
 	end
 	table.shuffle(unallocatedPlayers)
 
