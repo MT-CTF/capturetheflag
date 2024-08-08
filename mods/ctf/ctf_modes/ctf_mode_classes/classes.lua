@@ -375,7 +375,8 @@ end
 
 function classes.update(player)
 	local class = classes.get(player)
-	local base_size = vector.new(player_api.registered_models['character.b3d'].visual_size)
+	local base_size = player_api.registered_models['character.b3d'].visual_size
+
 	player:set_properties({
 		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
 		visual_size = vector.add(base_size, class.visual_size) or base_size
