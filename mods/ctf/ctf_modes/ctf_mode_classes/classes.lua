@@ -12,7 +12,7 @@ local class_props = {
 		color = "grey",
 		description = "High HP class with a sword capable of short damage bursts",
 		hp_max = 30,
-		visual_size = vector.new(1.1, 1.05, 1.1),
+		visual_size = vector.new(0.1, 0.05, 0.1),
 		items = {
 			"ctf_mode_classes:knight_sword",
 		},
@@ -47,7 +47,7 @@ local class_props = {
 		name = "Scout",
 		color = "orange",
 		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
-		visual_size = vector.new(0.9, 1, 0.9),
+		visual_size = vector.new(-0.1, 0.0, -0.1),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
 			"ctf_mode_classes:scaling_ladder"
@@ -375,10 +375,10 @@ end
 
 function classes.update(player)
 	local class = classes.get(player)
-
+	local base_size = vector.new(player_api.registered_models['character.b3d'].visual_size)
 	player:set_properties({
 		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
-		visual_size = class.visual_size or vector.new(1, 1, 1)
+		visual_size = vector.add(base_size, class.visual_size) or base_size
 	})
 
 	if class.physics then
