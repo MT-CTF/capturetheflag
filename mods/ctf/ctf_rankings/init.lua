@@ -17,8 +17,30 @@ else
 end
 
 ctf_rankings = {
-	init = function()
-		return rankings(minetest.get_current_modname() .. '|', top:new())
+	loaded = {},
+
+	init = function(self)
+		local modname = minetest.get_current_modname()
+
+		if self then
+			self.loaded[modname] = false
+		else
+			minetest.log(
+				"error",
+				"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
+			)
+		end
+
+		return rankings(modname .. '|', top:new(), function()
+			if self then
+				self.loaded[modname] = true
+			else
+				minetest.log(
+					"error",
+					"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
+				)
+			end
+		end)
 	end,
 
 	registered_on_rank_reset = {},
