@@ -24,9 +24,10 @@ function ctf_map.place_map(mapmeta, callback)
 		for name, def in pairs(mapmeta.teams) do
 			local p = def.flag_pos
 
+			minetest.load_area(p)
 			local node = minetest.get_node(p)
 
-			if node.name ~= "ctf_modebase:flag" then
+			if node.name ~= "ignore" and node.name ~= "ctf_modebase:flag" then
 				minetest.log("error", name.."'s flag was set incorrectly, or there is no flag node placed")
 			else
 				minetest.set_node(vector.offset(p, 0, 1, 0), {name="ctf_modebase:flag_top_"..name, param2 = node.param2})

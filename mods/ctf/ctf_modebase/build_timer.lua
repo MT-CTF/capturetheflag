@@ -103,7 +103,9 @@ minetest.is_protected = function(pos, pname, ...)
 
 	local pteam = ctf_teams.get(pname)
 
-	if pteam and not ctf_core.pos_inside(pos, ctf_teams.get_team_territory(pteam)) then
+	if pteam and ctf_teams.get_team_territory(pteam) and
+		not ctf_core.pos_inside(pos, ctf_teams.get_team_territory(pteam))
+	then
 		hud_events.new(pname, {
 			quick = true,
 			text = "You can't interact outside of your team territory during build time!",
