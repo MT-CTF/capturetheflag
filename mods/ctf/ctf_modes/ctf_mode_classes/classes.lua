@@ -380,7 +380,7 @@ function classes.update(player)
 
 	player:set_properties({
 		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
-		visual_size = vector.add(base_size, class.visual_size) or base_size
+		visual_size = vector.add(base_size, class.visual_size or vector.new()) or base_size
 	})
 
 	if class.physics then
