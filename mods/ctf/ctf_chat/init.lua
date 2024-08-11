@@ -37,16 +37,22 @@ minetest.override_chatcommand("msg", {
 	end
 })
 
+---@return boolean
+-- Return true to cancel the normal chat message
 function ctf_chat.send_me(name, param)
+
 end
 
 minetest.override_chatcommand("me", {
 	func = function(name, param)
 		minetest.log("action", string.format("[CHAT] ME from %s: %s", name, param))
 
-		ctf_chat.send_me(name, param)
+		if ctf_chat.send_me(name, param) then
+			return
+		end
 
 		local pteam = ctf_teams.get(name)
+
 		if pteam then
 			local tcolor = ctf_teams.team[pteam].color
 			name = minetest.colorize(tcolor, "* " .. name)
@@ -74,7 +80,7 @@ minetest.register_chatcommand("t", {
 			local tcolor = ctf_teams.team[tname].color
 			for username in pairs(ctf_teams.online_players[tname].players) do
 				minetest.chat_send_player(username,
-						minetest.colorize(tcolor, "<" .. name .. "> ** " .. param .. " **"))
+						minetest.colorize(tcolor, "[TEAM] <" .. name .. "> " .. param ))
 			end
 		else
 			minetest.chat_send_player(name,

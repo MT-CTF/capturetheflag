@@ -11,6 +11,8 @@ local new_mode
 ctf_modebase.mode_vote = {}
 
 local function player_vote(name, length)
+	if not voted then return end
+
 	if not voted[name] then
 		voters_count = voters_count - 1
 	end
@@ -24,14 +26,21 @@ local function player_vote(name, length)
 end
 
 local function show_modechoose_form(player)
-	local vote_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_modebase:default_vote_"..new_mode)
+	local vote_setting = "ask"
 
-	vote_setting = ctf_settings.settings["ctf_modebase:default_vote_"..new_mode]._list_map[tonumber(vote_setting)]
+	if ctf_settings.settings["ctf_modebase:default_vote_"..new_mode] then
+		vote_setting = ctf_settings.get(minetest.get_player_by_name(player), "ctf_modebase:default_vote_"..new_mode)
+
+		vote_setting = ctf_settings.settings["ctf_modebase:default_vote_"..new_mode]._list_map[tonumber(vote_setting)]
+	end
 
 	if vote_setting ~= "ask" then
 		minetest.after(0, function()
 			if not minetest.get_player_by_name(player) then return end
 
+			minetest.chat_send_player(player,
+				string.format("Voting for " .. new_mode .. ". Automatic vote: " .. vote_setting .. "\n" ..
+				"To change the automatic vote settings, go to the \"Settings\" tab of your inventory."))
 			player_vote(player, vote_setting)
 		end)
 
@@ -104,19 +113,25 @@ function ctf_modebase.mode_vote.start_vote()
 		new_mode = ctf_modebase.modelist[mode_index + 1]
 	end
 
-	for _, player in pairs(minetest.get_connected_players()) do
-		if ctf_teams.get(player) ~= nil or not ctf_modebase.current_mode then
-			local pname = player:get_player_name()
+	local mode_defined_rounds = ctf_modebase.modes[new_mode].rounds
+	if not mode_defined_rounds then
+		for _, player in pairs(minetest.get_connected_players()) do
+			if ctf_teams.get(player) ~= nil or not ctf_modebase.current_mode then
+				local pname = player:get_player_name()
 
-			show_modechoose_form(pname)
+				show_modechoose_form(pname)
 
-			voted[pname] = false
-			voters_count = voters_count + 1
+				voted[pname] = false
+				voters_count = voters_count + 1
+			end
 		end
-	end
 
-	timer = minetest.after(VOTING_TIME, ctf_modebase.mode_vote.end_vote)
-	formspec_send_timer = minetest.after(2, send_formspec)
+		timer = minetest.after(VOTING_TIME, ctf_modebase.mode_vote.end_vote)
+		formspec_send_timer = minetest.after(2, send_formspec)
+	else
+		votes = {mode_defined_rounds}
+		ctf_modebase.mode_vote.end_vote()
+	end
 end
 
 function ctf_modebase.mode_vote.end_vote()
@@ -200,11 +215,14 @@ minetest.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
 	if votes and not voted[pname] then
-		voted[pname] = nil
 		voters_count = voters_count - 1
 
 		if voters_count == 0 then
 			ctf_modebase.mode_vote.end_vote()
 		end
+	end
+
+	if voted then
+		voted[pname] = nil
 	end
 end)

@@ -1,3 +1,21 @@
+local blacklist = {
+	"ctf_ranged:smg",
+	"ctf_ranged:smg_loaded",
+	"ctf_ranged:rifle",
+	"ctf_ranged:rifle_loaded",
+	"ctf_ranged:sniper_magnum",
+	"ctf_ranged:sniper_magnum_loaded",
+	"ctf_mode_classes:ranged_rifle",
+	"ctf_mode_classes:ranged_rifle_loaded"
+}
+
+ctf_settings.register("prevent_marker_placement", {
+	type = "bool",
+	label = "Prevent automatic marker placement while sniping",
+	description = "Prevent placement of markers while holding ranged weapons,\nthis exludes the shotgun and pistol.",
+	default = "true"
+})
+
 local hud = mhud.init()
 local marker_cooldown = ctf_core.init_cooldowns()
 local markers = {}
@@ -40,6 +58,31 @@ local function add_marker(pname, pteam, message, pos, owner)
 			text = message
 		})
 	end
+end
+
+local function check_pointed_entity(pointed, message)
+	local concat
+	local obj = pointed.ref
+	local entity = obj:get_luaentity()
+	-- If object is a player, append player name to display text
+	-- Else if obj is item entity, append item description and count to str.
+	if obj:is_player() then
+		concat = obj:get_player_name()
+	elseif entity then
+		if entity.name == "__builtin:item" then
+			local stack = ItemStack(entity.itemstring)
+			local itemdef = minetest.registered_items[stack:get_name()]
+			-- Fallback to itemstring if description doesn't exist
+			-- Only use first line of itemstring
+			concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
+			concat = concat .. " " .. stack:get_count()
+		end
+	end
+	local pos = obj:get_pos()
+	if concat then
+		message = message .. " <" .. concat .. ">"
+	end
+	return message, pos
 end
 
 function ctf_modebase.markers.remove(pname, no_notify)
@@ -116,7 +159,7 @@ ctf_api.register_on_match_end(function()
 	hud:remove_all()
 end)
 
-local function marker_func(name, param, specific_player)
+local function marker_func(name, param, specific_player, hpmarker)
 	local pteam = ctf_teams.get(name)
 
 	if marker_cooldown:get(name) then
@@ -128,10 +171,13 @@ local function marker_func(name, param, specific_player)
 	end
 
 	local player = minetest.get_player_by_name(name)
+	local message
+	local pos
 	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
-
 	if param == "" then
 		param = "Look here!"
+	elseif string.len(param) > 40 then
+		param = string.sub(param, 1, 40)
 	end
 
 	local ray = minetest.raycast(
@@ -144,48 +190,73 @@ local function marker_func(name, param, specific_player)
 		pointed = ray:next()
 	end
 
-	if not pointed then
-		return false, "Can't find anything to mark, too far away!"
+	if pointed and vector.distance(
+		pointed.under or pointed.ref:get_pos(),
+		player:get_pos()
+	) <= 2 then
+		hpmarker = true
 	end
 
-	local message = string.format("m [%s]: %s", name, param)
-	local pos
-
-	if pointed.type == "object" then
-		local concat
-		local obj = pointed.ref
-		local entity = obj:get_luaentity()
-
-		-- If object is a player, append player name to display text
-		-- Else if obj is item entity, append item description and count to str.
-		if obj:is_player() then
-			concat = obj:get_player_name()
-		elseif entity then
-			if entity.name == "__builtin:item" then
-				local stack = ItemStack(entity.itemstring)
-				local itemdef = minetest.registered_items[stack:get_name()]
-
-				-- Fallback to itemstring if description doesn't exist
-				-- Only use first line of itemstring
-				concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
-				concat = concat .. " " .. stack:get_count()
+	if pointed and hpmarker == true then
+		local player_hpr = string.format("HP: %i/%i", player:get_hp(),
+		player:get_properties().hp_max)
+		message = string.format("m [%s]: ", name) .. player_hpr
+		if vector.distance(
+			pointed.under or pointed.ref:get_pos(),
+			player:get_pos()
+		) <= 2 then
+			pos = pointed.under or pointed.ref:get_pos()
+		else
+			pos = player:get_pos()
+		end
+		if pointed then
+			if pointed.type == "object" then
+				message, pos = check_pointed_entity(pointed, message, pos)
 			end
 		end
+		if param ~= "Look here!" then
+			message = string.format("[HP: %i/%i] %s", player:get_hp(),
+			player:get_properties().hp_max, param)
+		end
 
-		pos = obj:get_pos()
-		if concat then
-			message = message .. " <" .. concat .. ">"
+		-- If the player places a marker upon death, it will resort to the below
+		if player:get_hp() == 0 then
+			message = string.format("m <%s> died here", name)
+			if param ~= "Look here!" then message = string.format(
+				"m [%s]: %s", name, param
+			)
+			end
 		end
 	else
-		pos = pointed.under
+		if not pointed then
+			return false, "Can't find anything to mark, too far away!"
+		end
+		message = string.format("m [%s]: %s", name, param)
+		if pointed.type == "object" then
+			message, pos = check_pointed_entity(pointed, message)
+		else
+			pos = pointed.under
+		end
 	end
 
 	ctf_modebase.markers.add(name, message, pos, nil, specific_player)
-
 	marker_cooldown:set(name, MARKER_PLACE_INTERVAL)
-
-	return true, "Marker is placed!"
+	if hpmarker then
+		return true, "HP marker is placed!"
+	else
+		return true, "Marker is placed!"
+	end
 end
+
+
+minetest.register_chatcommand("mhp", {
+	description = "Place a HP marker in your look direction",
+	params = "",
+	privs = {interact = true, shout = true},
+	func = function(name, param)
+		return marker_func(name, param, nil, true)
+	end
+})
 
 minetest.register_chatcommand("m", {
 	description = "Place a marker in your look direction",
@@ -245,6 +316,17 @@ minetest.register_globalstep(function(dtime)
 
 		if controls.zoom then
 			local marker_text = false
+			local stackname = player:get_wielded_item():get_name()
+
+			local holding_blacklisted_item = false
+			if ctf_settings.get(player, "prevent_marker_placement") == true then
+				for _, itemstring in ipairs(blacklist) do
+					if stackname:match(itemstring) then
+						holding_blacklisted_item = true
+						break
+					end
+				end
+			end
 
 			if controls.LMB then
 				marker_text = ""
@@ -252,7 +334,7 @@ minetest.register_globalstep(function(dtime)
 				marker_text = "Defend!"
 			end
 
-			if marker_text then
+			if marker_text  and not holding_blacklisted_item then
 				local success, msg = marker_func(player:get_player_name(), marker_text)
 
 				if not success and msg then

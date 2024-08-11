@@ -26,7 +26,7 @@ function ctf_teams.set(player, new_team, force)
 		return
 	end
 
-	assert(type(new_team) == "string")
+	assert(type(new_team) == "string", "ctf_teams.set(): new_team must be a string! value: "..dump(new_team))
 
 	local old_team = ctf_teams.player_team[player]
 	if not force and old_team == new_team then
@@ -118,7 +118,7 @@ end
 --- Example usage: `pos1, pos2 = ctf_teams.get_team_territory("red")`
 function ctf_teams.get_team_territory(teamname)
 	local current_map = ctf_map.current_map
-	if not current_map then return false end
+	if not current_map or not current_map.teams[teamname] then return false end
 
 	return current_map.teams[teamname].pos1, current_map.teams[teamname].pos2
 end

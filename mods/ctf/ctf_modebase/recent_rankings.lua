@@ -27,6 +27,9 @@ return {
 
 			if team then
 				rankings_teams[team][stat] = (rankings_teams[team][stat] or 0) + amount
+				if stat == "score" then
+					rankings_players[player][team.."_"..stat] = (rankings_players[player][team.."_"..stat] or 0) + amount
+				end
 			end
 		end
 
@@ -73,7 +76,17 @@ return {
 		rankings_teams = {}
 	end,
 	players = function() return rankings_players end,
-	teams   = function() return rankings_teams   end,
+	teams   = function()
+		local out = {}
+
+		for k, v in pairs(rankings_teams) do
+			if not ctf_teams.team[k].not_playing then
+				out[k] = v
+			end
+		end
+
+		return out
+	end,
 }
 
 end

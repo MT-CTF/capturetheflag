@@ -1,6 +1,16 @@
-function ctf_modebase.register_mode(name, func)
-	ctf_modebase.modes[name] = func
-	table.insert(ctf_modebase.modelist, name)
+local registered_exclusive = false
+function ctf_modebase.register_mode(name, def)
+	if def.exclusive then
+		ctf_modebase.modes[name] = def
+		ctf_modebase.modelist = {name}
+		registered_exclusive = true
+	else
+		ctf_modebase.modes[name] = def
+
+		if not registered_exclusive then
+			table.insert(ctf_modebase.modelist, name)
+		end
+	end
 end
 
 function ctf_modebase.on_mode_end()
@@ -106,6 +116,10 @@ function ctf_modebase.on_flag_rightclick(...)
 	if ctf_modebase.current_mode then
 		ctf_modebase:get_current_mode().on_flag_rightclick(...)
 	end
+end
+
+function ctf_modebase.on_flag_capture(capturer, flagteams)
+	RunCallbacks(ctf_api.registered_on_flag_capture, capturer, flagteams)
 end
 
 ctf_teams.team_allocator = function(...)
