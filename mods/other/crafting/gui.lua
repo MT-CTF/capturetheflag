@@ -63,7 +63,7 @@ function crafting.make_result_selector(player, size, context)
 
 	table_insert(formspec, "container_end[]")
 
-	table_insert(formspec, "label[0,0;")
+	table_insert(formspec, "label[0,-0.1;")
 	table_insert(formspec, minetest.formspec_escape(
 		"Page: " .. page .. "/" .. max_pages)
 	)
