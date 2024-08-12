@@ -201,7 +201,7 @@ if minetest.global_exists("sfinv") then
 
 			local formspec = crafting.make_result_selector(player, { x = 8, y = 3 }, context)
 			formspec = formspec .. "list[detached:crafting_trash;main;0,3.8;1,1;]" ..
-				"image[0.06,3.9;0.8,0.8;crafting_trash_icon.png]" ..
+				"image[0.07,3.9;0.8,0.8;crafting_trash_icon.png]" ..
 				"image_button[1,3.8;1,1;crafting_save_icon.png;save_inv_order;]" ..
 				"tooltip[save_inv_order;Saves the order of the items in your inventory" ..
 					"\n(Your saved order is used when you respawn, and is per-mode)]"
