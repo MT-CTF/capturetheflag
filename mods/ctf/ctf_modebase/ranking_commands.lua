@@ -278,7 +278,7 @@ minetest.register_chatcommand("top50", {
 		ctf_modebase.summary.show_gui_sorted(name, top50, {}, mode_data.summary_ranks, {
 			title = "Top 50 Players",
 			gamemode = mode_name,
-			disable_nonuser_colors = true,
+			-- disable_nonuser_colors = true,
 		})
 	end,
 })
