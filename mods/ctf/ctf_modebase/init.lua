@@ -103,10 +103,8 @@ minetest.register_on_mods_loaded(function()
 	elseif ctf_core.settings.server_mode == "play" then
 		minetest.chat_send_all("[CTF] Sorting rankings...")
 		local function check()
-			for _, loaded in pairs(ctf_rankings.loaded) do
-				if not loaded then
-					return minetest.after(1, check)
-				end
+			if not ctf_rankings:rankings_sorted() then
+				return minetest.after(1, check)
 			end
 
 			minetest.chat_send_all("[CTF] Rank sorting done. Starting new match...")
