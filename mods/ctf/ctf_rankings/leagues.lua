@@ -49,7 +49,11 @@ minetest.register_on_joinplayer(function(player)
 				end
 
 				if rank._pro_chest then
-					meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+					if rank._pro_chest == true then
+						meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+					else
+						meta:set_int("ctf_rankings:pro_chest:"..mode, rank._pro_chest)
+					end
 				end
 			end
 

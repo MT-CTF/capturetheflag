@@ -50,7 +50,7 @@ local function do_reset()
 				if (rank.score or 0) >= 8000 and
 				(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
 				(rank.flag_captures or 0) >= 5 then
-					rank._pro_chest = true
+					rank._pro_chest = os.time()
 				end
 
 				local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
