@@ -2,12 +2,36 @@ local redis = require("redis")
 local client = redis.connect("127.0.0.1", tonumber(minetest.settings:get("ctf_rankings_redis_server_port")) or 6379)
 assert(client:ping(), "Redis server not found!")
 
-return function(prefix, top)
+return function(prefix, top, sorting_finished)
 
-local function op_all(operation)
-	for _, key in ipairs(client:keys(prefix .. '*')) do
-		operation(string.sub(key, #prefix + 1), client:get(key))
+-- If callback isn't passed then coroutine will never yield
+local function op_all(operation, callback)
+	if not callback then
+		minetest.log("warning", "op_all() called without callback, it will block the server step until it finishes")
 	end
+
+	local time = minetest.get_us_time()
+	local c = coroutine.create(function()
+		for _, key in ipairs(client:keys(prefix .. '*')) do
+			operation(string.sub(key, #prefix + 1), client:get(key))
+
+			if callback and ((minetest.get_us_time()-time) / 1e6) >= 0.08 then
+				coroutine.yield()
+			end
+		end
+	end)
+
+	local function rep()
+		time = minetest.get_us_time()
+
+		if coroutine.resume(c) then
+			minetest.after(0, rep)
+		elseif callback then
+			callback()
+		end
+	end
+
+	rep()
 end
 
 local timer = minetest.get_us_time()
@@ -17,8 +41,14 @@ op_all(function(noprefix_key, value)
 	if rank ~= nil and rank.score then
 		top:set(noprefix_key, rank.score)
 	end
+end,
+function()
+	minetest.log(
+		"action",
+		"Sorted rankings by score '"..prefix:sub(1, -2).."'. Took "..((minetest.get_us_time()-timer) / 1e6)
+	)
+	sorting_finished()
 end)
-minetest.log("action", "Sorted rankings database. Took "..((minetest.get_us_time()-timer) / 1e6))
 
 return {
 	backend = "redis",
