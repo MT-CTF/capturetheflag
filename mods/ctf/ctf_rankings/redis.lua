@@ -10,23 +10,36 @@ local function op_all(operation, callback)
 		minetest.log("warning", "op_all() called without callback, it will block the server step until it finishes")
 	end
 
+	local TARGET_INTERVAL = 0.1
+	local interval = 0.05
 	local time = minetest.get_us_time()
-	local c = coroutine.create(function()
-		for _, key in ipairs(client:keys(prefix .. '*')) do
+	local times = 0
+	local keys = client:keys(prefix .. '*')
+	local c = coroutine.wrap(function()
+		for _, key in ipairs(keys) do
+			times = times + 1
 			operation(string.sub(key, #prefix + 1), client:get(key))
 
-			if callback and ((minetest.get_us_time()-time) / 1e6) >= 0.08 then
+			if callback and ((minetest.get_us_time()-time) / 1e6) >= interval then
 				coroutine.yield()
 			end
 		end
+
+		return "done"
 	end)
 
 	local function rep()
+		if ((minetest.get_us_time()-time) / 1e6) > TARGET_INTERVAL then
+			interval = interval - 0.01
+		else
+			interval = interval + 0.01
+		end
 		time = minetest.get_us_time()
 
-		if coroutine.resume(c) then
+		if c() ~= "done" then
 			minetest.after(0, rep)
 		elseif callback then
+			assert(times == #keys, dump(#keys - times).." | "..dump(times).." | "..dump(#keys))
 			callback()
 		end
 	end
