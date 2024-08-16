@@ -23,72 +23,95 @@ ctf_rankings.do_reset = mods:get_int("_do_reset") == 1
 -- Resets taking place on the same month will overwrite each other
 local PLAYER_RANKING_PREFIX = "rank:"
 
-if ctf_rankings.do_reset then
-	local after_timer = 0
+local function do_reset()
+	local finish_count = 0
+	local function finish()
+		finish_count = finish_count - 1
 
-	minetest.after(5, function()
-		for mode, def in pairs(ctf_modebase.modes) do
-			local top = def.rankings.top
-			local time = minetest.get_us_time()
-			def.rankings.op_all(function(pname, value)
-				if value ~= "null" then
-					local rank = minetest.parse_json(value)
+		if finish_count == 0 then
+			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 5)
+		end
+	end
 
-					rank.place = top:get_place(pname)
+	for mode, def in pairs(ctf_modebase.modes) do
+		local top = def.rankings.top
+		local time = minetest.get_us_time()
 
-					RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, rank)
+		finish_count = finish_count + 1
 
-					if (rank.score or 0) >= 8000 and
-					(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
-					(rank.flag_captures or 0) >= 5 then
-						rank._pro_chest = true
-					end
+		def.rankings.op_all(function(pname, value)
+			if value ~= "null" then
+				local rank = minetest.parse_json(value)
 
-					local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
+				rank.place = top:get_place(pname)
 
-					if current and current ~= "" then
-						current = minetest.parse_json(current)
+				RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, table.copy(rank), mode)
 
-						current._last_reset = os.date("%m/%Y")
-						current[os.date("%m/%Y")][mode] = rank
-
-						mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json(current))
-					else
-						mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json({
-							_last_reset = os.date("%m/%Y"),
-							[os.date("%m/%Y")] = {[mode] = rank},
-						}))
-					end
-
-					minetest.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
+				if (rank.score or 0) >= 8000 and
+				(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
+				(rank.flag_captures or 0) >= 5 then
+					rank._pro_chest = true
 				end
-			end)
 
-			after_timer = after_timer + ((minetest.get_us_time()-time) / 1e6)
+				local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
+
+				if current and current ~= "" then
+					current = minetest.parse_json(current)
+
+					current._last_reset = os.date("%m/%Y")
+					current[os.date("%m/%Y")][mode] = rank
+
+					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json(current))
+				else
+					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json({
+						_last_reset = os.date("%m/%Y"),
+						[os.date("%m/%Y")] = {[mode] = rank},
+					}))
+				end
+
+				minetest.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
+			end
+		end,
+		function()
 			time = ((minetest.get_us_time()-time) / 1e6).."s"
 
 			minetest.chat_send_all("Saved old rankings for mode "..mode..". Took "..time)
 			minetest.log("action", "Saved old rankings for mode "..mode..". Took "..time)
-		end
 
-		for mode, def in pairs(ctf_modebase.modes) do
-			local time = minetest.get_us_time()
-			def.rankings.op_all(function(pname, value)
-				def.rankings:del(pname)
+			local t = minetest.get_us_time()
+			def.rankings.op_all(
+				function(pname, value)
+					def.rankings:del(pname)
 
-				minetest.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
-			end)
+					minetest.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
+				end,
+				function()
+					t = ((minetest.get_us_time()-t) / 1e6).."s"
 
-			after_timer = after_timer + ((minetest.get_us_time()-time) / 1e6)
-			time = ((minetest.get_us_time()-time) / 1e6).."s"
+					minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..t)
+					minetest.log("action", "Reset rankings for mode "..mode..". Took "..t)
 
-			minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..time)
-			minetest.log("action", "Reset rankings for mode "..mode..". Took "..time)
-		end
+					mods:set_int("_do_reset", 0)
+					mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
 
-		mods:set_int("_do_reset", 0)
-		mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
-		minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, after_timer + 5)
+					minetest.after(1, finish) -- wait in case for some reason not all the resets were queued
+				end
+			)
+		end)
+	end
+end
+
+local function check()
+	if ctf_rankings:rankings_sorted() then
+		do_reset()
+	else
+		minetest.after(1, check)
+	end
+end
+
+if ctf_rankings.do_reset then
+	minetest.register_on_mods_loaded(function()
+		check()
 	end)
 end
 
