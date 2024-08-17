@@ -245,7 +245,7 @@ if minetest.register_on_item_pickup then
 
 							if cprio and cprio < priority then
 								local item, typ = simplify_for_saved_stuff(compare:get_name())
-								minetest.log(dump(item)..dump(typ))
+								--minetest.log(dump(item)..dump(typ))
 								inv:set_stack("main", i, itemstack)
 
 								if item == "sword" and typ == "stone" and
