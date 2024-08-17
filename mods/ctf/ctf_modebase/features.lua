@@ -201,7 +201,7 @@ local function calculate_killscore(player)
 	local flag_multiplier = 1
 	for tname, carrier in pairs(ctf_modebase.flag_taken) do
 		if carrier.p == player then
-			flag_multiplier = flag_multiplier + 0.25
+			flag_multiplier = flag_multiplier * 2
 		end
 	end
 	return math.max(1, math.round(kd * 7 * flag_multiplier))
@@ -712,7 +712,7 @@ return {
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
 			local score = ((team_scores[lost_team] or {}).score or 0) / 4
-			score = math.max(75, math.min(500, score))
+			score = math.max(75, score)
 			capture_reward = capture_reward + score
 		end
 		local text = " has captured the flag"
