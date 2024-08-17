@@ -14,6 +14,15 @@ ctf_settings.register("auto_trash_stone_tools", {
 	default = "false"
 })
 
+ctf_settings.register("flag_sound_volume", {
+	type = "bar",
+	label = "Flag Sound Volume",
+	default = "10",
+	min = 0,
+	max = 20,
+	step = 1,
+})
+
 local simplify_for_saved_stuff = function(iname)
 	if not iname or iname == "" then return iname end
 
@@ -236,7 +245,7 @@ if minetest.register_on_item_pickup then
 
 							if cprio and cprio < priority then
 								local item, typ = simplify_for_saved_stuff(compare:get_name())
-								minetest.log(dump(item)..dump(typ))
+								--minetest.log(dump(item)..dump(typ))
 								inv:set_stack("main", i, itemstack)
 
 								if item == "sword" and typ == "stone" and

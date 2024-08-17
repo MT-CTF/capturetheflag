@@ -95,7 +95,7 @@ ctf_api.register_on_match_end(function()
 	donate_timer = {}
 end)
 
-minetest.register_chatcommand("donate", {
+ctf_core.register_chatcommand_alias("donate", "d", {
 	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes",
 	params = "<name [name2 name3 ...]> <score> [message]",
 	func = function(name, param)

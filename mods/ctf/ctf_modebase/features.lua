@@ -301,19 +301,22 @@ local function celebrate_team(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
+		local volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam == teamname then
-			minetest.sound_play("ctf_modebase_trumpet_positive", {
-				to_player = pname,
-				gain = 1.0,
-				pitch = 1.0,
-			}, true)
-		else
-			minetest.sound_play("ctf_modebase_trumpet_negative", {
-				to_player = pname,
-				gain = 1.0,
-				pitch = 1.0,
-			}, true)
+		if volume > 0 then
+			if pteam == teamname then
+				minetest.sound_play("ctf_modebase_trumpet_positive", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			else
+				minetest.sound_play("ctf_modebase_trumpet_negative", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			end
 		end
 	end
 end
@@ -322,18 +325,19 @@ local function drop_flag(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
+		local drop_volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam then
+		if pteam and drop_volume > 0 then
 			if pteam == teamname then
 				minetest.sound_play("ctf_modebase_drop_flag_negative", {
 					to_player = pname,
-					gain = 0.2,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			else
 				minetest.sound_play("ctf_modebase_drop_flag_positive", {
 					to_player = pname,
-					gain = 0.2,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			end
@@ -708,7 +712,7 @@ return {
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
 			local score = ((team_scores[lost_team] or {}).score or 0) / 4
-			score = math.max(75, math.min(500, score))
+			score = math.max(75, score)
 			capture_reward = capture_reward + score
 		end
 		local text = " has captured the flag"
@@ -827,7 +831,7 @@ return {
 		local rank = rankings:get(pname)
 		local player = minetest.get_player_by_name(pname)
 		local pro_chest = player and player:get_meta():get_int("ctf_rankings:pro_chest:"..
-				(ctf_modebase.current_mode or "")) == 1
+				(ctf_modebase.current_mode or "")) >= 1
 		local deny_pro = "You need to have more than 1.4 kills per death, "..
 		                 "5 captures, and at least 8,000 score to access the pro section."
 		if rank then
