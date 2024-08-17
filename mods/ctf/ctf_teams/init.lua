@@ -33,6 +33,11 @@ ctf_teams = {
 			color_hex = 0x000,
 			irc_color = 6,
 		},
+		yellow = {
+			color = "#ffff00",
+			color_hex = 0x000,
+			irc_color = 16,
+		}
 	},
 	teamlist = {},
 
