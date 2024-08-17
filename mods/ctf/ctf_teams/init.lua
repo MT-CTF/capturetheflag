@@ -4,7 +4,7 @@ ctf_teams = {
 		tname = {
 			color = "#ffffff",
 			color_hex = 0x000, -- Generated from 'color' above
-			irc_color = 16, -- optional, default: 16
+			irc_color = 16, -- optional, default: 16 | See https://modern.ircdocs.horse/formatting.html#colors
 			not_playing = false, --optional, default: false
 		}
 		]]
@@ -26,7 +26,7 @@ ctf_teams = {
 		orange = {
 			color = "#ff4e00",
 			color_hex = 0x000,
-			irc_color = 8,
+			irc_color = 7,
 		},
 		purple = {
 			color = "#6f00a7",
@@ -36,7 +36,7 @@ ctf_teams = {
 		yellow = {
 			color = "#ffff00",
 			color_hex = 0x000,
-			irc_color = 16,
+			irc_color = 8,
 		}
 	},
 	teamlist = {},

@@ -741,6 +741,11 @@ return {
 
 		teams_left = teams_left - #teamnames
 
+		local healers = ctf_combat_mode.get_healers(pname)
+		for _, healer in ipairs(healers) do
+			recent_rankings.add(healer, {score = math.min(math.ceil(capture_reward / 3),math.ceil(capture_reward / #healers))})
+		end
+
 		if teams_left <= 1 then
 			local capture_text = "Player %s captured and got %d points"
 			if many_teams then
