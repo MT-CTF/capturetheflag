@@ -1,27 +1,3 @@
-ctf_core.testing = {
-	-- This is here temporarily, I'm modifying it with //lua and a code minimizer on the main server-
-	-- -so I don't need to restart for every little change
-	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-	--ctf_core.testing.
-	testing = true,
-	test = function(
-		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-	)
-		local one_third     = math.ceil(0.34 * total_players)
-		local one_fourth     = math.ceil(0.25 * total_players)
-		local avg = (kd_diff + actual_kd_diff) / 2
-		local pcount_diff_limit = (
-			(players_diff <= math.min(one_fourth, 2)) or
-			(pkd >= 1.8 and players_diff <= math.min(one_third, 4))
-		)
-		if best_kd.kills + worst_kd.kills >= 30 then
-			avg = actual_kd_diff
-		end
-		return pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
-	end
-}
-
 local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
@@ -587,20 +563,15 @@ return {
 		local rem_team = ctf_teams.get(player)
 		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
 
-		if ctf_core.testing.testing then
-			if not rem_team or
-			math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
-				player_rankings = rankings:get(player) or {}
-			else
-				player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
-				player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
-			end
+		if not rem_team or
+		math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
+			player_rankings = rankings:get(player) or {}
 		else
-			player_rankings = {}
+			player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
+			player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
 		end
 
 		local one_third     = math.ceil(0.34 * total_players)
-		-- local one_fifth     = math.ceil(0.2 * total_players)
 
 		-- Allocate player to remembered team unless teams are imbalanced
 		if rem_team and not ctf_modebase.flag_captured[rem_team] and
@@ -609,28 +580,21 @@ return {
 		end
 
 		local pkd = (player_rankings.kills or 0) / (player_rankings.deaths or 1)
-		local success, result = pcall(ctf_core.testing.test,
-			pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-		)
 
-		if not success then
-			minetest.log("error", result)
-			result = false
+		local one_fourth     = math.ceil(0.25 * total_players)
+		local avg = (kd_diff + actual_kd_diff) / 2
+		local pcount_diff_limit = (
+			(players_diff <= math.min(one_fourth, 1)) or
+			(pkd >= 1.8 and players_diff <= math.min(one_third, 2))
+		)
+		if best_kd.kills + worst_kd.kills >= 30 then
+			avg = actual_kd_diff
 		end
 
-		-- [1]
-		-- Allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
-		-- players on the winning team isn't outnumbered by more than 1/5 the total players playing
-		-- TODO: extra logic
+		local result = pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
 
-		-- [2]
-		-- Otherwise allocates the player to the team with the least amount of players,
-		-- or the worst team if all teams have an equal amount of players
-		if
-		players_diff == 0
-		or
-		result
-		then
+		if players_diff == 0 or result then
 			return worst_kd.t
 		else
 			return worst_players.t
