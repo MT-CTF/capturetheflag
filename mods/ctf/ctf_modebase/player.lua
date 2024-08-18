@@ -304,6 +304,14 @@ function ctf_modebase.player.remove_initial_stuff(player)
 	end)
 end
 
+local function nil_to_default(x, default)
+	if x == nil then
+		return default
+	else
+		return x
+	end
+end
+
 function ctf_modebase.player.update(player)
 	-- Set skyboxes, shadows and physics
 
@@ -323,8 +331,8 @@ function ctf_modebase.player.update(player)
 
 		if mode.physics then
 			player:set_physics_override({
-				sneak_glitch = mode.physics.sneak_glitch or false,
-				new_move = mode.physics.new_move or true
+				sneak_glitch = nil_to_default(mode.physics.sneak_glitch, false),
+				new_move = nil_to_default(mode.physics.new_move, true),
 			})
 		end
 	end
