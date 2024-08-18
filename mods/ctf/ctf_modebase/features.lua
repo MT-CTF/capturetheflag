@@ -324,65 +324,65 @@ end
 local function end_combat_mode(player, reason, killer, weapon_image)
 	local comment = nil
 
-	if reason == "combatlog" then
-		killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
-		if killer then
-			comment = " (Combat Log)"
-			recent_rankings.add(player, {deaths = 1}, true)
-		end
-	else
-		if reason ~= "punch" or killer == player then
-			if ctf_teams.get(player) then
+	if ctf_teams.get(player) then
+		if reason == "combatlog" then
+			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+			if killer then
+				comment = " (Combat Log)"
+				recent_rankings.add(player, {deaths = 1}, true)
+			end
+		else
+			if reason ~= "punch" or killer == player then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
 				else
 					ctf_kill_list.add("", player, get_suicide_image(reason))
 				end
+
+				killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+				comment = " (Suicide)"
+			end
+			recent_rankings.add(player, {deaths = 1}, true)
+		end
+
+		if killer then
+			local killscore = calculate_killscore(player)
+
+			local rewards = {kills = 1, score = killscore}
+			local bounty = ctf_modebase.bounties.claim(player, killer)
+
+			if bounty then
+				for name, amount in pairs(bounty) do
+					rewards[name] = (rewards[name] or 0) + amount
+				end
 			end
 
-			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
-			comment = " (Suicide)"
-		end
-		recent_rankings.add(player, {deaths = 1}, true)
-	end
+			recent_rankings.add(killer, rewards)
 
-	if killer then
-		local killscore = calculate_killscore(player)
-
-		local rewards = {kills = 1, score = killscore}
-		local bounty = ctf_modebase.bounties.claim(player, killer)
-
-		if bounty then
-			for name, amount in pairs(bounty) do
-				rewards[name] = (rewards[name] or 0) + amount
+			if ctf_teams.get(killer) then
+				ctf_kill_list.add(killer, player, weapon_image, comment)
+				hud_events.new(player, {
+					quick = false,
+					text = killer.." killed you for ".. rewards.score .." points!",
+					color = "warning",
+				})
 			end
-		end
 
-		recent_rankings.add(killer, rewards)
+			-- share kill score with other hitters
+			local hitters = ctf_combat_mode.get_other_hitters(player, killer)
+			for _, pname in ipairs(hitters) do
+				recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
+			end
 
-		if ctf_teams.get(killer) then
-			ctf_kill_list.add(killer, player, weapon_image, comment)
-			hud_events.new(player, {
-				quick = false,
-				text = killer.." killed you for ".. rewards.score .." points!",
-				color = "warning",
-			})
-		end
+			-- share kill score with healers
+			local healers = ctf_combat_mode.get_healers(killer)
+			for _, pname in ipairs(healers) do
+				recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
+			end
 
-		-- share kill score with other hitters
-		local hitters = ctf_combat_mode.get_other_hitters(player, killer)
-		for _, pname in ipairs(hitters) do
-			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
-		end
-
-		-- share kill score with healers
-		local healers = ctf_combat_mode.get_healers(killer)
-		for _, pname in ipairs(healers) do
-			recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
-		end
-
-		if ctf_combat_mode.is_only_hitter(killer, player) then
-			ctf_combat_mode.set_kill_time(killer, 5)
+			if ctf_combat_mode.is_only_hitter(killer, player) then
+				ctf_combat_mode.set_kill_time(killer, 5)
+			end
 		end
 	end
 
