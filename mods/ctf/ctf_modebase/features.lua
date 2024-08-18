@@ -679,6 +679,7 @@ return {
 			score = math.max(10, score)
 			capture_reward = capture_reward + score
 		end
+
 		local text = " has captured the flag"
 		if many_teams then
 			text = string.format(
@@ -691,7 +692,9 @@ return {
 				minetest.colorize(FLAG_MESSAGE_COLOR, text)
 			)
 		end
-		ctf_modebase.announce(string.format("Player %s (team %s)%s and got %d points", pname, pteam, text, capture_reward))
+
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
+
 		local team_score = team_scores[pteam].score
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if teammate ~= pname then
