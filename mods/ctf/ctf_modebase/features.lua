@@ -696,9 +696,15 @@ return {
 		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
 
 		local team_score = team_scores[pteam].score
+		local healers = ctf_combat_mode.get_healers(pname)
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if teammate ~= pname then
 				local teammate_value = (recent_rankings.get(teammate)[pteam.."_score"] or 0) / (team_score or 1)
+
+				if table.indexof(healers, teammate) ~= -1 then
+					teammate_value = teammate_value + ((#minetest.get_connected_players() / 10) / #healers)
+				end
+
 				local victory_bonus = math.max(5, math.min(capture_reward / 2, capture_reward * teammate_value))
 				recent_rankings.add(teammate, {score = victory_bonus}, true)
 			end
@@ -708,10 +714,6 @@ return {
 
 		teams_left = teams_left - #teamnames
 
-		local healers = ctf_combat_mode.get_healers(pname)
-		for _, healer in ipairs(healers) do
-			recent_rankings.add(healer, {score = math.min(math.ceil(capture_reward / 3),math.ceil(capture_reward / #healers))})
-		end
 
 		if teams_left <= 1 then
 			local capture_text = "Player %s captured and got %d points"
