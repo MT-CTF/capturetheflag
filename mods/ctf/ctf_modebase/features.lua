@@ -695,6 +695,7 @@ return {
 		end
 
 		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
+		minetest.chat_send_all(string.format("Player %s (team %s)%s", pname, pteam, text))
 
 		local team_score = team_scores[pteam].score
 		local healers = ctf_combat_mode.get_healers(pname)
@@ -714,7 +715,6 @@ return {
 		recent_rankings.add(pname, {score = capture_reward, flag_captures = #teamnames})
 
 		teams_left = teams_left - #teamnames
-
 
 		if teams_left <= 1 then
 			local capture_text = "Player %s captured and got %d points"
