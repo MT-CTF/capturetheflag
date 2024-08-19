@@ -675,7 +675,6 @@ return {
 		local team_scores = recent_rankings.teams()
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
-			minetest.log(dump())
 			local score = ((team_scores[lost_team] or {}).score or 0) / math.max(1, ctf_teams.online_players[lost_team].count)
 			score = math.max(10, score)
 			capture_reward = capture_reward + (score * 2)
