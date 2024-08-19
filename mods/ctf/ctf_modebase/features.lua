@@ -628,7 +628,10 @@ return {
 
 		celebrate_team(ctf_teams.get(pname))
 
-		recent_rankings.add(pname, {score = 30, flag_attempts = 1})
+		recent_rankings.add(pname, {
+			score = ctf_teams.online_players[teamname].count * 3 * #ctf_modebase.taken_flags[pname],
+			flag_attempts = 1
+		})
 
 		ctf_modebase.flag_huds.track_capturer(pname, FLAG_CAPTURE_TIMER)
 	end,
@@ -673,11 +676,26 @@ return {
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		local team_scores = recent_rankings.teams()
+		local player_scores = recent_rankings.players()
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
-			local score = ((team_scores[lost_team] or {}).score or 0) / math.max(1, ctf_teams.online_players[lost_team].count)
-			score = math.max(10, score)
-			capture_reward = capture_reward + (score * 2)
+			local team_score = 0
+
+			for n in pairs(ctf_teams.online_players[lost_team].players) do
+				team_score = team_score + (player_scores[n].score or 0)
+			end
+
+			local score = team_score / math.max(1, ctf_teams.online_players[lost_team].count)
+
+			capture_reward = capture_reward + math.max(10, score * #ctf_teams.get_connected_players() / 8)
+
+			minetest.log("action", string.format(
+				"[CAPDEBUG] team_score: %d | capture_score: %d | connected_players: %d | lost_team_count: %d",
+				team_score,
+				math.max(10, score * #ctf_teams.get_connected_players() / 8),
+				#ctf_teams.get_connected_players(),
+				ctf_teams.online_players[lost_team].count
+			))
 		end
 
 		local text = string.format(" has captured the flag and got %d points", capture_reward)
