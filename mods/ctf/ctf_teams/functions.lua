@@ -133,3 +133,16 @@ function ctf_teams.chat_send_team(teamname, message)
 		minetest.chat_send_player(player, message)
 	end
 end
+
+--- Like `minetest.get_connected_players()` but leaves out players that aren't in a team
+function ctf_teams.get_connected_players()
+	local out = minetest.get_connected_players()
+
+	for k, v in ipairs(table.copy(out)) do
+		if not ctf_teams.get(v) then
+			table.remove(out, table.indexof(out, v))
+		end
+	end
+
+	return out
+end
