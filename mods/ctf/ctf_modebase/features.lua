@@ -720,7 +720,7 @@ return {
 				local teammate_value = (recent_rankings.get(teammate)[pteam.."_score"] or 0) / (team_score or 1)
 
 				if table.indexof(healers, teammate) ~= -1 then
-					teammate_value = teammate_value + ((#minetest.get_connected_players() / 10) / #healers)
+					teammate_value = teammate_value + ((#ctf_teams.get_connected_players() / 10) / #healers)
 				end
 
 				local victory_bonus = math.max(5, math.min(capture_reward / 2, capture_reward * teammate_value))
