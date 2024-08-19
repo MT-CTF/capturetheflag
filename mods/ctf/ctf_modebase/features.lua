@@ -600,7 +600,6 @@ return {
 		end
 
 		local one_third     = math.ceil(0.34 * total_players)
-		-- local one_fifth     = math.ceil(0.2 * total_players)
 		
 		-- Allocate player to remembered team unless teams are imbalanced
 		if rem_team and not ctf_modebase.flag_captured[rem_team] and
