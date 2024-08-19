@@ -118,6 +118,12 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
     end
     local response = ctf_teams.canPartyAcceptNewPlayers(player)
         if response ~= "yes" then
+            for index, invite in ipairs(ctf_teams.invites) do
+                if (invite.inviter == player) and (invite.invited == name) then
+                    table.remove(ctf_teams.invites, index)
+                    break
+                end
+            end
             minetest.chat_send_player(name, "Could not accept party invite from "..player)
             minetest.chat_send_player(player, name.." could not accept a party invite from you.")
             if (response == "over max party size") then
