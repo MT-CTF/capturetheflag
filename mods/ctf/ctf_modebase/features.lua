@@ -681,21 +681,20 @@ return {
 			capture_reward = capture_reward + (score * 2)
 		end
 
-		local text = " has captured the flag"
+		local text = string.format(" has captured the flag and got %d points", capture_reward)
 		if many_teams then
 			text = string.format(
 				" has captured the flag of team(s) %s and got %d points",
 				HumanReadable(teamnames),
 				capture_reward
 			)
-			minetest.chat_send_all(
-				minetest.colorize(tcolor, pname) ..
-				minetest.colorize(FLAG_MESSAGE_COLOR, text)
-			)
 		end
 
+		minetest.chat_send_all(
+			minetest.colorize(tcolor, pname) .. minetest.colorize(FLAG_MESSAGE_COLOR, text)
+		)
+
 		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
-		minetest.chat_send_all(string.format("Player %s (team %s)%s", pname, pteam, text))
 
 		local team_score = team_scores[pteam].score
 		local healers = ctf_combat_mode.get_healers(pname)
