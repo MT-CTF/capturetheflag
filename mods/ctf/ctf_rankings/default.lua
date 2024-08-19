@@ -22,6 +22,8 @@ local function op_all(operation, callback)
 				coroutine.yield()
 			end
 		end
+
+		return "done"
 	end)
 
 	local function rep()
@@ -35,7 +37,6 @@ local function op_all(operation, callback)
 		if c() ~= "done" then
 			minetest.after(0, rep)
 		elseif callback then
-			assert(times == #keys, dump(#keys - times).." | "..dump(times).." | "..dump(#keys))
 			callback()
 		end
 	end
