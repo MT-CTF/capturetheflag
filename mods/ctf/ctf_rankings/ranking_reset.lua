@@ -29,6 +29,9 @@ local function do_reset()
 		finish_count = finish_count - 1
 
 		if finish_count == 0 then
+			mods:set_int("_do_reset", 0)
+			mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
+
 			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 5)
 		end
 	end
@@ -40,9 +43,9 @@ local function do_reset()
 		finish_count = finish_count + 1
 
 		def.rankings.op_all(function(pname, value)
-			if value ~= "null" then
-				local rank = minetest.parse_json(value)
+			local rank = minetest.parse_json(value)
 
+			if rank then
 				rank.place = top:get_place(pname)
 
 				RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, table.copy(rank), mode)
@@ -59,6 +62,11 @@ local function do_reset()
 					current = minetest.parse_json(current)
 
 					current._last_reset = os.date("%m/%Y")
+
+					if not current[os.date("%m/%Y")] then
+						current[os.date("%m/%Y")] = {}
+					end
+
 					current[os.date("%m/%Y")][mode] = rank
 
 					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json(current))
@@ -91,9 +99,6 @@ local function do_reset()
 					minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..t)
 					minetest.log("action", "Reset rankings for mode "..mode..". Took "..t)
 
-					mods:set_int("_do_reset", 0)
-					mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
-
 					minetest.after(1, finish) -- wait in case for some reason not all the resets were queued
 				end
 			)
@@ -116,7 +121,7 @@ if ctf_rankings.do_reset then
 end
 
 if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date")).month == os.date("*t").month then
-	local CHECK_INTERVAL = 60 * 50 -- 50 minutes
+	local CHECK_INTERVAL = 60 * 30 -- 30 minutes
 	local timer = CHECK_INTERVAL
 	minetest.register_globalstep(function(dtime)
 		timer = timer + dtime
@@ -133,8 +138,10 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 				if hours_left > 0 then
 					if hours_left == 6 then
 						ctf_report.send_report("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
+						minetest.chat_send_all("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
 					elseif hours_left == 1 then
 						ctf_report.send_report("[RANKING RESET] The queued ranking reset will happen in 1 hour")
+						minetest.chat_send_all("[RANKING RESET] The queued ranking reset will happen in 1 hour")
 
 						CHECK_INTERVAL = (61 - current.min) * 60
 
@@ -149,7 +156,7 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 					ctf_rankings.do_reset = true
 
 					minetest.registered_chatcommands["queue_restart"].func("[RANKING RESET]",
-						"There will be another restart once the ranking reset is done."
+						"Ranking Reset"
 					)
 				end
 			end
