@@ -119,12 +119,21 @@ partiescmdbuilder:sub("accept :player:username", function (name, player)
     local response = ctf_teams.canPartyAcceptNewPlayers(player)
         if response ~= "yes" then
             minetest.chat_send_player(name, "Could not accept party invite from "..player)
+            minetest.chat_send_player(player, name.." could not accept a party invite from you.")
             if (response == "over max party size") then
+                -- Send to person who tried to accept
                 local overMaxSizeMsg = player.."'s party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE
                 minetest.chat_send_player(name, overMaxSizeMsg)
+                -- Send to person who invited the player who couldn't join
+                overMaxSizeMsg = "Your party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE
+                minetest.chat_send_player(player, overMaxSizeMsg)
             elseif (response == "over team size") then
+                -- Send to person who tried to join a too big party
                 minetest.chat_send_player(name, player.."'s party is already at the team size.")
                 minetest.chat_send_player(name, "Adding more players would make it unfair.")
+                -- Send to party inviter
+                minetest.chat_send_player(player, "Your party is already at the team size.")
+                minetest.chat_send_player(player, "Adding more players would make it unfair.")
             end
             return
         end
