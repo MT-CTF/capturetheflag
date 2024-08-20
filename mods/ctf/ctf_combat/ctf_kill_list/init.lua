@@ -36,6 +36,11 @@ local kill_list = {}
 
 local image_scale_map = ctf_settings.settings["ctf_kill_list:tp_size"].image_scale_map
 local function update_hud_line(player, idx, new)
+	if not ctf_teams.get(player) then
+		hud:clear(player)
+		return
+	end
+
 	idx = HUD_LINES - (idx-1)
 
 	local image_scale = tonumber(ctf_settings.get(player, "ctf_kill_list:tp_size"))
