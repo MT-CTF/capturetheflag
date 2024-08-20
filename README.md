@@ -45,6 +45,7 @@ Note that this version may be slightly behind the git version, but it will be a 
 * If you use Visual Studio Code we recommend these extensions:
   * https://marketplace.visualstudio.com/items?itemName=sumneko.lua
   * https://marketplace.visualstudio.com/items?itemName=dwenegar.vscode-luacheck
+  * https://marketplace.visualstudio.com/items?itemName=GreenXenith.minetest-tools
 
 ## License
 

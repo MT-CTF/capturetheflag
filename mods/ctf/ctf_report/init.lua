@@ -1,6 +1,14 @@
-ctf_report = {staff = {}}
+ctf_report = {
+	registered_on_report = {},
+	staff = {},
+}
 
 local S = minetest.get_translator(minetest.get_current_modname())
+
+---@param func function (name, message)
+function ctf_report.register_on_report(func)
+	table.insert(ctf_report.registered_on_report, func)
+end
 
 function ctf_report.default_send_report(msg)
 	for name in pairs(ctf_report.staff) do
@@ -65,13 +73,15 @@ minetest.register_chatcommand("report", {
 		local msg = name .. " reported: " .. param
 
 		-- Append player team for every player
-		msg = msg:gsub("[^ ]+", function(pname)
+		msg = msg:gsub("%S+", function(pname)
 			local team = ctf_teams.get(pname)
 			if team then
 				pname = string.format("%s (team %s)", pname, team)
 			end
 			return pname
 		end)
+
+		RunCallbacks(ctf_report.registered_on_report, name, msg)
 
 		-- Append list of staff in-game
 		local staff = ""

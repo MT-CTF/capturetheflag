@@ -48,8 +48,16 @@ minetest.register_on_joinplayer(function(player)
 					end
 				end
 
+				if not rank.place or not leagues[mode] then
+					mods:set_string("rank:"..pname, "")
+				end
+
 				if rank._pro_chest then
-					meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+					if rank._pro_chest == true then
+						meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+					else
+						meta:set_int("ctf_rankings:pro_chest:"..mode, rank._pro_chest)
+					end
 				end
 			end
 

@@ -24,9 +24,10 @@ function ctf_map.place_map(mapmeta, callback)
 		for name, def in pairs(mapmeta.teams) do
 			local p = def.flag_pos
 
+			minetest.load_area(p)
 			local node = minetest.get_node(p)
 
-			if node.name ~= "ctf_modebase:flag" then
+			if node.name ~= "ignore" and node.name ~= "ctf_modebase:flag" then
 				minetest.log("error", name.."'s flag was set incorrectly, or there is no flag node placed")
 			else
 				minetest.set_node(vector.offset(p, 0, 1, 0), {name="ctf_modebase:flag_top_"..name, param2 = node.param2})
@@ -98,6 +99,8 @@ function ctf_map.remove_barrier(mapmeta, callback)
 		minetest.after(0.1, function()
 			local vm2 = VoxelManip(pos1, pos2)
 			vm2:update_liquids()
+
+			callback()
 		end)
 	else
 		minetest.log("action", "Clearing barriers using barriers.data")
@@ -105,45 +108,44 @@ function ctf_map.remove_barrier(mapmeta, callback)
 		local i = 0
 		for _, barrier_area in pairs(mapmeta.barrier_data) do
 			minetest.after(i, function()
-				local vm = VoxelManip()
-				vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
+				if mapmeta.barrier_data then
+					local vm = VoxelManip()
+					vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
 
-				local data = vm:get_data()
+					local data = vm:get_data()
 
-				if #data ~= barrier_area.max then
-					-- minetest.log(dump(mapmeta.barrier_data)) -- Used for debugging issues
-					minetest.log("error", "Potential issue with barriers.data. Aborting... | " ..
-							"Debug: "..dump(#data)..", "..dump(barrier_area.max))
+					if #data ~= barrier_area.max then
+						-- minetest.log(dump(mapmeta.barrier_data)) -- Used for debugging issues
+						minetest.log("error", "Potential issue with barriers.data. Aborting... | " ..
+								"Debug: "..dump(#data)..", "..dump(barrier_area.max))
 
-					mapmeta.barrier_data = nil
-					ctf_map.remove_barrier(mapmeta, callback)
-					return
+						mapmeta.barrier_data = nil
+						ctf_map.remove_barrier(mapmeta, callback)
+					end
+
+					for idx in pairs(data) do
+						data[idx] = barrier_area.reps[idx] or ID_IGNORE
+					end
+
+					vm:set_data(data)
+					vm:write_to_map(false)
 				end
-
-				for idx in pairs(data) do
-					data[idx] = barrier_area.reps[idx] or ID_IGNORE
-				end
-
-				vm:set_data(data)
-				vm:write_to_map(false)
 			end)
 
 			i = i + 0.05
 		end
 
 		minetest.after(i - 0.05, function()
-			local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
-			vm:update_liquids()
+			if mapmeta.barrier_data then
+				local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+				vm:update_liquids()
 
-			mapmeta.barrier_data = nil -- Contains a large amount of data, free it up now that it's not needed
+				mapmeta.barrier_data = nil -- Contains a large amount of data, free it up now that it's not needed
 
-			callback()
+				callback()
+			end
 		end)
-
-		return
 	end
-
-	callback()
 end
 
 
@@ -213,8 +215,10 @@ local function prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nod
 	end
 
 	for _, team in ipairs(ctf_teams.teamlist) do
-		local node = "ctf_teams:chest_" .. team
-		nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+		if not ctf_teams.team[team].not_playing then
+			local node = "ctf_teams:chest_" .. team
+			nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+		end
 	end
 
 	for i, v in ipairs(data) do

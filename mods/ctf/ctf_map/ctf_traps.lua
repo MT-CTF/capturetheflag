@@ -68,35 +68,40 @@ minetest.register_node("ctf_map:spike", {
 })
 
 for _, team in ipairs(ctf_teams.teamlist) do
-	local spikecolor = ctf_teams.team[team].color
+	if not ctf_teams.team[team].not_playing then
+		local spikecolor = ctf_teams.team[team].color
 
-	minetest.register_node("ctf_map:spike_"..team, {
-		description = HumanReadable(team).." Team Spike",
-		drawtype = "plantlike",
-		tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
-		inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",
-		use_texture_alpha = "clip",
-		paramtype = "light",
-		paramtype2 = "meshoptions",
-		sunlight_propagates = true,
-		walkable = false,
-		damage_per_second = 7,
-		groups = {cracky=1, level=2},
-		drop = "ctf_map:spike",
-		selection_box = {
-			type = "fixed",
-			fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
-		},
-		on_place = function(itemstack, placer, pointed_thing)
-			return minetest.item_place(itemstack, placer, pointed_thing, 34)
-		end
-	})
+		minetest.register_node("ctf_map:spike_"..team, {
+			description = HumanReadable(team).." Team Spike",
+			drawtype = "plantlike",
+			tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
+			inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",
+			use_texture_alpha = "clip",
+			paramtype = "light",
+			paramtype2 = "meshoptions",
+			sunlight_propagates = true,
+			walkable = false,
+			damage_per_second = 7,
+			groups = {cracky=1, level=2},
+			drop = "ctf_map:spike",
+			selection_box = {
+				type = "fixed",
+				fixed = {-0.5, -0.5, -0.5, 0.5, 0, 0.5},
+			},
+			on_place = function(itemstack, placer, pointed_thing)
+				return minetest.item_place(itemstack, placer, pointed_thing, 34)
+			end
+		})
+	end
 end
 
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "node_damage" then
 		local team = ctf_teams.get(player)
-
+		local spike_team = string.match(reason.node, "ctf_map:spike_(%S+)")
+		if spike_team and ctf_modebase.flag_captured[spike_team] then
+			return 0, true
+		end
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
 		end
@@ -129,7 +134,7 @@ local function damage_cobble_dig(pos, node, digger)
 	local placerobj = minetest.get_player_by_name(placer_name)
 
 	if placerobj then
-		digger:punch(placerobj, 10, {
+		digger:punch(placerobj, 1, {
 			damage_groups = {
 				fleshy = 7,
 				damage_cobble = 1,

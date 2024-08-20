@@ -39,7 +39,10 @@ ctf_settings.register("my_setting", {
 
 ---
 # mods/ctf/
-TODO
+TODO, below is a collection of quick notes for later
+
+## ctf_teams
+* https://modern.ircdocs.horse/formatting.html#colors-16-98
 
 ---
 # mods/mtg/

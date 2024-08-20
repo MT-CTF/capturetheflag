@@ -29,7 +29,8 @@ local function timer_func(time_left)
 		end
 
 		local pteam = ctf_teams.get(player)
-		if pteam and not ctf_core.pos_inside(player:get_pos(), ctf_teams.get_team_territory(pteam)) then
+		local tpos1, tpos2 = ctf_teams.get_team_territory(pteam)
+		if pteam and tpos1 and not ctf_core.pos_inside(player:get_pos(), tpos1, tpos2) then
 			hud_events.new(player, {
 				quick = true,
 				text = "You can't cross the barrier until build time is over!",
@@ -47,14 +48,25 @@ local function timer_func(time_left)
 	timer = minetest.after(1, timer_func, time_left - 1)
 end
 
+function ctf_modebase.build_timer.start(build_time)
+	local time = build_time or ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME
+
+	if time > 0 then
+		if timer then timer:cancel() end
+		timer = timer_func(time)
+	end
+end
 
 function ctf_modebase.build_timer.finish()
 	if timer == nil then return end
 
 	if ctf_map.current_map then
 		ctf_map.remove_barrier(ctf_map.current_map, function()
-			timer:cancel()
-			timer = nil
+			if timer then
+				timer:cancel()
+				timer = nil
+			end
+
 			hud:remove_all()
 			local text = "Build time is over!"
 			minetest.chat_send_all(text)
@@ -76,10 +88,6 @@ function ctf_modebase.build_timer.finish()
 	end
 end
 
-ctf_api.register_on_new_match(function()
-	timer = minetest.after(1, timer_func, ctf_modebase:get_current_mode().build_timer or DEFAULT_BUILD_TIME)
-end)
-
 ctf_api.register_on_match_end(function()
 	if timer == nil then return end
 	timer:cancel()
@@ -95,7 +103,9 @@ minetest.is_protected = function(pos, pname, ...)
 
 	local pteam = ctf_teams.get(pname)
 
-	if pteam and not ctf_core.pos_inside(pos, ctf_teams.get_team_territory(pteam)) then
+	if pteam and ctf_teams.get_team_territory(pteam) and
+		not ctf_core.pos_inside(pos, ctf_teams.get_team_territory(pteam))
+	then
 		hud_events.new(pname, {
 			quick = true,
 			text = "You can't interact outside of your team territory during build time!",
@@ -119,4 +129,3 @@ minetest.register_chatcommand("ctf_start", {
 		return true, "Build time ended"
 	end,
 })
-
