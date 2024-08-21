@@ -686,17 +686,18 @@ return {
 			end
 
 			local score = team_score / math.max(1, ctf_teams.online_players[lost_team].count)
-			score = math.max(10, score * (2 + ctf_teams.online_players[lost_team].count/10))
+			score = math.max(10, score * (2.6 + ctf_teams.online_players[lost_team].count/20))
 
 			capture_reward = capture_reward + score
 
 			minetest.log("action", string.format(
-				"[CAPDEBUG] div: %.1d {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d,},",
+				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, \"%s\"},",
 				team_score / score,
 				team_score,
 				score,
 				#ctf_teams.get_connected_players(),
-				ctf_teams.online_players[lost_team].count
+				ctf_teams.online_players[lost_team].count,
+				many_teams and "many teams" or "2 teams"
 			))
 		end
 
