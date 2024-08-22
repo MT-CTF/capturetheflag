@@ -180,6 +180,18 @@ local function calculate_killscore(player)
 			flag_multiplier = flag_multiplier * 2
 		end
 	end
+
+	minetest.log("ACTION", string.format(
+		"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, },",
+		math.max(1, math.round(kd * 7 * flag_multiplier)),
+		match_rank.kills or 1,
+		match_rank.kill_assists or 0,
+		match_rank.deaths or 1,
+		match_rank.score or 0,
+		match_rank.hp_healed or 0,
+		match_rank.flag_attempts or 0
+	))
+
 	return math.max(1, math.round(kd * 7 * flag_multiplier))
 end
 
@@ -691,12 +703,16 @@ return {
 			capture_reward = capture_reward + score
 
 			minetest.log("action", string.format(
-				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, \"%s\"},",
+				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, "..
+				"player_attempts = %d, time = %d, winteam_score = %d, \"%s\"},",
 				team_score / score,
 				team_score,
 				score,
 				#ctf_teams.get_connected_players(),
 				ctf_teams.online_players[lost_team].count,
+				player_scores[pname].flag_attempts or 0,
+				os.time() - ctf_map.start_time,
+				team_scores[pteam].score or 0,
 				many_teams and "many teams" or "2 teams"
 			))
 		end
