@@ -1,3 +1,5 @@
+local cooldown = ctf_core.init_cooldowns()
+
 local function get_item_description(name)
 	if name:sub(1, 6) == "group:" then
 		local group = name:sub(7, #name):gsub("%_", " ")
@@ -213,7 +215,8 @@ if minetest.global_exists("sfinv") then
 				sfinv.set_player_inventory_formspec(player)
 			end
 
-			if fields.save_inv_order then
+			if fields.save_inv_order and not cooldown:get(player) then
+				cooldown:set(player, 0.5)
 				ctf_modebase.player.save_initial_stuff_positions(player)
 
 				minetest.sound_play("crafting_save_sound", {
