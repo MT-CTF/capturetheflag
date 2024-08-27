@@ -698,7 +698,15 @@ return {
 			end
 
 			local score = team_score / math.max(1, ctf_teams.online_players[lost_team].count)
-			score = math.max(10, score * (2.6 + ctf_teams.online_players[lost_team].count/20))
+			score = math.max(
+				8 * ((player_scores[pname].flag_attempts or 0) + math.min(
+					(os.time() - ctf_map.start_time) / 60,
+					10
+				)),
+				score * (2.4 + ctf_teams.online_players[lost_team].count/30)
+			)
+
+			score = math.max(score, #ctf_teams.get_connected_players() * 1.4)
 
 			capture_reward = capture_reward + score
 
