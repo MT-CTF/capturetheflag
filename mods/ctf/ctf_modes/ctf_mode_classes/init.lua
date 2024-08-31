@@ -83,7 +83,8 @@ ctf_modebase.register_mode("classes", {
 		"flag_captures", "flag_attempts",
 		"kills", "kill_assists", "bounty_kills",
 		"deaths",
-		"hp_healed"
+		"hp_healed",
+		"reward_given_to_enemy"
 	},
 	build_timer = 90,
 	is_bound_item = function(_, name)
