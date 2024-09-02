@@ -708,7 +708,7 @@ return {
 
 			score = math.max(score, #ctf_teams.get_connected_players() * 1.4)
 
-			capture_reward = capture_reward + score
+			capture_reward = capture_reward + math.min(score, 800)
 
 			minetest.log("action", string.format(
 				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, "..
