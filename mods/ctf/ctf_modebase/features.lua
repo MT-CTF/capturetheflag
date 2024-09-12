@@ -182,14 +182,16 @@ local function calculate_killscore(player)
 	end
 
 	minetest.log("ACTION", string.format(
-		"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, },",
+		"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, " ..
+				"reward_given_to_enemy = %f },",
 		math.max(1, math.round(kd * 7 * flag_multiplier)),
 		match_rank.kills or 1,
 		match_rank.kill_assists or 0,
 		match_rank.deaths or 1,
 		match_rank.score or 0,
 		match_rank.hp_healed or 0,
-		match_rank.flag_attempts or 0
+		match_rank.flag_attempts or 0,
+		match_rank.reward_given_to_enemy or 0
 	))
 
 	return math.max(1, math.round(kd * 7 * flag_multiplier))
@@ -359,6 +361,7 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 
 		if killer then
 			local killscore = calculate_killscore(player)
+			local total_enemy_reward = 0
 
 			local rewards = {kills = 1, score = killscore}
 			local bounty = ctf_modebase.bounties.claim(player, killer)
@@ -370,6 +373,7 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			end
 
 			recent_rankings.add(killer, rewards)
+			total_enemy_reward = total_enemy_reward + rewards.score
 
 			if ctf_teams.get(killer) then
 				ctf_kill_list.add(killer, player, weapon_image, comment)
@@ -384,13 +388,17 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			local hitters = ctf_combat_mode.get_other_hitters(player, killer)
 			for _, pname in ipairs(hitters) do
 				recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
+				total_enemy_reward = total_enemy_reward + math.ceil(killscore / #hitters)
 			end
 
 			-- share kill score with healers
 			local healers = ctf_combat_mode.get_healers(killer)
 			for _, pname in ipairs(healers) do
 				recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
+				total_enemy_reward = total_enemy_reward + math.ceil(killscore / #healers)
 			end
+
+			recent_rankings.add(player, {reward_given_to_enemy = total_enemy_reward}, true)
 
 			if ctf_combat_mode.is_only_hitter(killer, player) then
 				ctf_combat_mode.set_kill_time(killer, 5)

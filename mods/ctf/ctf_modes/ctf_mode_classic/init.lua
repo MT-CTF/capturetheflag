@@ -42,7 +42,8 @@ ctf_modebase.register_mode("classic", {
 		"flag_captures", "flag_attempts",
 		"kills", "kill_assists", "bounty_kills",
 		"deaths",
-		"hp_healed"
+		"hp_healed",
+		"reward_given_to_enemy"
 	},
 
 	stuff_provider = function()
