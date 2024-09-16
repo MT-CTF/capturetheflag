@@ -52,7 +52,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
 	},
-	physics = {sneak_glitch = true, new_move = false},
+	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
 	team_chest_items = {
 		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",

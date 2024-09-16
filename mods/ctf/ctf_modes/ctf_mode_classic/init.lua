@@ -32,7 +32,7 @@ ctf_modebase.register_mode("classic", {
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
 	},
 	crafts = {"ctf_ranged:ammo", "ctf_melee:sword_steel", "ctf_melee:sword_mese", "ctf_melee:sword_diamond"},
-	physics = {sneak_glitch = true, new_move = false},
+	physics = {sneak_glitch = true, new_move = true},
 	team_chest_items = {"default:cobble 99", "default:wood 99", "default:torch 30", "ctf_teams:door_steel 2"},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
