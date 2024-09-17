@@ -114,6 +114,7 @@ local preserved_groups = {
 	disable_jump = true;
 	fall_damage_add_percent = true;
 	slippery = true;
+	tree = true;
 }
 
 local function make_immortal(def)

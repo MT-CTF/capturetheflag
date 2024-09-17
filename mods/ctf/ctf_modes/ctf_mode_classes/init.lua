@@ -69,7 +69,7 @@ ctf_modebase.register_mode("classes", {
 		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
 		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
 	},
-	physics = {sneak_glitch = true, new_move = false},
+	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
 	team_chest_items = {
 		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",
@@ -83,7 +83,8 @@ ctf_modebase.register_mode("classes", {
 		"flag_captures", "flag_attempts",
 		"kills", "kill_assists", "bounty_kills",
 		"deaths",
-		"hp_healed"
+		"hp_healed",
+		"reward_given_to_enemy"
 	},
 	build_timer = 90,
 	is_bound_item = function(_, name)
