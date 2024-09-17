@@ -287,8 +287,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		))
 		local meta = stack:get_meta()
 		local dropped_by = meta:get_string("dropped_by")
+		local dropteam = ctf_teams.get(dropped_by)
 		local pname = player:get_player_name()
-		if dropped_by ~= pname and dropped_by ~= "" then
+		if dropped_by ~= pname and dropped_by ~= "" and
+		dropteam and ctf_teams.get(pname) ~= dropteam then
 			local cur_mode = ctf_modebase:get_current_mode()
 			if pname and cur_mode then
 				local score = item_value[stack:get_name()] or 1
