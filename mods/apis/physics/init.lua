@@ -3,7 +3,8 @@ physics = {}
 local players = {}
 local default_overrides = {
 	speed   = 1,
-	jump    = 1,
+	speed_crouch = 1,
+	jump    = 1.2,
 	gravity = 1
 }
 
