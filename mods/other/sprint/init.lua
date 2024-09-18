@@ -14,7 +14,8 @@ local function setSprinting(player, sprinting)
 	if sprinting then
 		physics.set(player:get_player_name(), "sprint:sprint", {
 			speed = MOD_WALK,
-			jump  = MOD_JUMP
+			jump  = MOD_JUMP,
+			speed_crouch = 1.1,
 		})
 	else
 		physics.remove(player:get_player_name(), "sprint:sprint")
