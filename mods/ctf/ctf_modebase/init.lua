@@ -3,6 +3,7 @@ ctf_modebase = {
 	modes                = {},    ---@type table
 
 	-- Same as ctf_modebase.modes but in list form.
+	--
 	-- Exception: Disabled modes that show up in ctf_modebase.modes won't show up in the modelist
 	modelist             = {},    ---@type list
 
@@ -37,6 +38,17 @@ ctf_modebase = {
 
 	--flag_captured[Team name] = true if captured, otherwise nil
 	flag_captured        = {},
+
+	-- Choose who can see a player's nametag, defaults to their teammates
+	--
+	-- return {playername = <x>, playername2 = <x>, ...}
+	--
+	-- x: `"1"` for full nametag, `"2"` for symbol, or `true` to use the player setting for it
+	get_allowed_nametag_observers = function(player)
+		local pteam = ctf_teams.get(player)
+
+		return table.copy(ctf_teams.online_players[pteam].players)
+	end
 }
 
 ctf_gui.old_init()

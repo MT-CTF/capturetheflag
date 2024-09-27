@@ -23,12 +23,16 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 	end
 
 	local entity_players = {}
-	local nametag_players = table.copy(ctf_teams.online_players[t].players)
+	local nametag_players = ctf_modebase.get_allowed_nametag_observers(player)
 	local symbol_players = {}
 	nametag_players[player:get_player_name()] = nil
 
-	for n in pairs(table.copy(nametag_players)) do
-		local setting = ctf_settings.get(minetest.get_player_by_name(n), "teammate_nametag_style")
+	for n, extra in pairs(table.copy(nametag_players)) do
+		local setting = extra
+
+		if setting == true then
+			setting = ctf_settings.get(minetest.get_player_by_name(n), "teammate_nametag_style")
+		end
 
 		if setting == "3" then
 			nametag_players[n] = nil
@@ -52,7 +56,7 @@ end
 
 local tags_hidden = false
 local update_timer = false
-local function update_playertags(time)
+function ctf_modebase.update_playertags(time)
 	if not update_timer and not tags_hidden then
 		update_timer = true
 		minetest.after(time or 1.2, function()
@@ -81,7 +85,7 @@ local function set_playertags_state(state)
 	if state == PLAYERTAGS_ON and tags_hidden then
 		tags_hidden = false
 
-		update_playertags(0)
+		ctf_modebase.update_playertags(0)
 	elseif state == PLAYERTAGS_OFF and not tags_hidden then
 		tags_hidden = true
 
@@ -159,7 +163,7 @@ ctf_settings.register("teammate_nametag_style", {
 	default = "1",
 	on_change = function(player, new_value)
 		minetest.log("action", "Player "..player:get_player_name().." changed their nametag setting")
-		update_playertags()
+		ctf_modebase.update_playertags()
 	end
 })
 
@@ -675,7 +679,7 @@ return {
 		playertag.set(player, playertag.TYPE_ENTITY)
 
 		if player.set_observers then
-			update_playertags()
+			ctf_modebase.update_playertags()
 		end
 
 		drop_flag(pteam)
@@ -688,7 +692,7 @@ return {
 		playertag.set(player, playertag.TYPE_ENTITY)
 
 		if player.set_observers then
-			update_playertags()
+			ctf_modebase.update_playertags()
 		end
 
 		celebrate_team(pteam)
@@ -820,7 +824,7 @@ return {
 		playertag.set(player, playertag.TYPE_ENTITY)
 
 		if player.set_observers then
-			update_playertags()
+			ctf_modebase.update_playertags()
 		end
 
 		tp_player_near_flag(player)
