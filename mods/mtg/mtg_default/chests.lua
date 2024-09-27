@@ -163,12 +163,12 @@ function default.chest.register_chest(prefixed_name, d)
 			local itemstack = player:get_wielded_item()
 			local key_meta = itemstack:get_meta()
 
-			if itemstack:get_metadata() == "" then
+			if itemstack:get_meta():get_string("") == "" then
 				return
 			end
 
 			if key_meta:get_string("secret") == "" then
-				key_meta:set_string("secret", minetest.parse_json(itemstack:get_metadata()).secret)
+				key_meta:set_string("secret", minetest.parse_json(itemstack:get_meta():get_string("")).secret)
 				itemstack:set_metadata("")
 			end
 
@@ -284,7 +284,7 @@ function default.chest.register_chest(prefixed_name, d)
 			nodenames = {name},
 			action = function(pos, node)
 				local meta = minetest.get_meta(pos)
-				meta:set_string("formspec", nil)
+				meta:set_string("formspec", "")
 				local inv = meta:get_inventory()
 				local list = inv:get_list("default:chest")
 				if list then
@@ -297,9 +297,10 @@ function default.chest.register_chest(prefixed_name, d)
 	end
 
 	-- close opened chests on load
+	local modname, chestname = prefixed_name:match("^(:?.-):(.*)$")
 	minetest.register_lbm({
 		label = "close opened chests on load",
-		name = "default:close_" .. prefixed_name:gsub(":", "_") .. "_open",
+		name = modname .. ":close_" .. chestname .. "_open",
 		nodenames = {prefixed_name .. "_open"},
 		run_at_every_load = true,
 		action = function(pos, node)
