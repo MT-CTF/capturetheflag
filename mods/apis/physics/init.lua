@@ -2,10 +2,10 @@ physics = {}
 
 local players = {}
 local default_overrides = {
-	speed   = 1,
-	speed_crouch = 1,
-	jump    = 1.2,
-	gravity = 1
+	speed        = 1.1,
+	speed_crouch = 1.0,
+	jump         = 1.0,
+	gravity      = 1.0,
 }
 
 minetest.register_on_joinplayer(function(player)
@@ -24,6 +24,10 @@ local function update(name)
 		for attr, val in pairs(layer) do
 			override[attr] = override[attr] * val
 		end
+	end
+
+	if (override.jump or 0) <= 1.1 then
+		override.jump = 1.1
 	end
 
 	player:set_physics_override(override)
