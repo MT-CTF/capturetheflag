@@ -2,7 +2,7 @@ physics = {}
 
 local players = {}
 local default_overrides = {
-	speed        = 1.1,
+	speed        = 1.0,
 	speed_crouch = 1.0,
 	jump         = 1.0,
 	gravity      = 1.0,
@@ -28,6 +28,10 @@ local function update(name)
 
 	if (override.jump or 0) <= 1.1 then
 		override.jump = 1.1
+	end
+
+	if (override.speed or 0) <= 1.1 then
+		override.speed = 1.1
 	end
 
 	player:set_physics_override(override)
