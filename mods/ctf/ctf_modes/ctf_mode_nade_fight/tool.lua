@@ -373,7 +373,8 @@ for idx, info in ipairs(grenade_list) do
 				return swap_next_grenade(itemstack, user, pointed)
 			end
 		end,
-		on_secondary_use = swap_next_grenade
+		on_secondary_use = swap_next_grenade,
+		touch_interaction = "short_dig_long_place", -- throw with short tap
 	})
 end
 

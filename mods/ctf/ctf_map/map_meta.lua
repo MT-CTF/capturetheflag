@@ -260,11 +260,12 @@ function ctf_map.save_map(mapmeta)
 		if not def.enabled then
 			mapmeta.teams[id] = nil
 		else
+			minetest.load_area(def.flag_pos)
 			local flagpos = minetest.find_node_near(def.flag_pos, 3, {"group:flag_bottom"}, true)
 
 			if not flagpos then
 				flagpos = def.flag_pos
-				minetest.chat_send_all(minetest.colorize("red",
+				minetest.chat_send_all(minetest.colorize((minetest.get_node(flagpos).name == "ignore") and "orange" or "red",
 					"Failed to find flag for team " .. id ..
 					". Node at given position: " .. dump(minetest.get_node(flagpos).name)
 				))

@@ -14,7 +14,8 @@ local function setSprinting(player, sprinting)
 	if sprinting then
 		physics.set(player:get_player_name(), "sprint:sprint", {
 			speed = MOD_WALK,
-			jump  = MOD_JUMP
+			jump  = MOD_JUMP,
+			speed_crouch = 1.1,
 		})
 	else
 		physics.remove(player:get_player_name(), "sprint:sprint")
@@ -34,7 +35,7 @@ minetest.register_globalstep(function(dtime)
 		local player = minetest.get_player_by_name(name)
 		--Check if the player should be sprinting
 		local controls = player:get_player_control()
-		local sprintRequested = controls.aux1 and controls.up
+		local sprintRequested = controls.aux1 and (controls.up or controls.jump or (controls.sneak and controls.down))
 
 		if sprintRequested and info.stamina > MIN_SPRINT then
 			if not info.sprinting then
