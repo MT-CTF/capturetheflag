@@ -509,6 +509,11 @@ return {
 		recent_rankings.on_match_end()
 
 		if ctf_map.current_map then
+			minetest.log("action",
+				"matchend: Match ended for map "..ctf_map.current_map.name..
+				" in mode "..(ctf_modebase.current_mode or "<nil>")..
+				". Duration: "..ctf_map.get_duration()
+			)
 			-- Queue deletion for after the players have left
 			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
 		end
