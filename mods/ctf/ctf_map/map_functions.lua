@@ -9,7 +9,7 @@ end
 
 function ctf_map.place_map(mapmeta, callback)
 	local dirname = mapmeta.dirname
-	local schempath = ctf_map.maps_dir .. dirname .. "/map.mts"
+	local schempath = ctf_map.map_path[dirname] .. "/map.mts"
 
 	local barrier_data = mapmeta.barriers and mapmeta.barriers()
 

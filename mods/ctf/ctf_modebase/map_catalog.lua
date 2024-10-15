@@ -11,10 +11,9 @@ local used_maps_idx = 1
 local map_repeat_interval
 
 local function init()
-	local maps = minetest.get_dir_list(ctf_map.maps_dir, true)
-	table.sort(maps)
+	table.sort(ctf_map.registered_maps)
 
-	for i, dirname in ipairs(maps) do
+	for i, dirname in ipairs(ctf_map.registered_maps) do
 		local map = ctf_map.load_map_meta(i, dirname)
 		if map.map_version and map.enabled then
 			table.insert(ctf_modebase.map_catalog.maps, map)
@@ -30,8 +29,10 @@ local function init()
 	map_repeat_interval = math.floor(#ctf_modebase.map_catalog.maps / 2)
 end
 
-init()
-assert(#ctf_modebase.map_catalog.maps > 0 or ctf_core.settings.server_mode == "mapedit")
+minetest.register_on_mods_loaded(function()
+	init()
+	assert(#ctf_modebase.map_catalog.maps > 0 or ctf_core.settings.server_mode == "mapedit")
+end)
 
 function ctf_modebase.map_catalog.select_map(filter)
 	local maps = {}
