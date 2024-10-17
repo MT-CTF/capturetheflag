@@ -198,6 +198,14 @@ minetest.override_item("default:furnace_active", {
 	on_destruct = furnace_on_destruct,
 })
 
+minetest.override_item("beds:bed_bottom", {
+      on_rightclick = function() return end,
+})
+
+minetest.override_item("beds:fancy_bed_bottom", {
+      on_rightclick = function() return end,
+})
+
 minetest.register_on_mods_loaded(function()
 	for nodename, value in pairs(node_fall_damage_factors) do
 		local groups_temp = minetest.registered_items[nodename].groups
