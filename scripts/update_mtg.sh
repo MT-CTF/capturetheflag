@@ -1,7 +1,7 @@
 #!/bin/bash
 
 MOD_PREFIX=mtg_
-MODS_TO_KEEP=(binoculars bucket butterflies creative default doors dye fire fireflies flowers map player_api screwdriver sfinv stairs tnt vessels walls wool xpanes)
+MODS_TO_KEEP=(beds binoculars bucket butterflies creative default doors dye fire fireflies flowers map player_api screwdriver sfinv stairs tnt vessels walls wool xpanes)
 
 cd ../mods/mtg/ # Will work if we run from inside the scripts folder
 cd mods/mtg/    # Will work if we run from inside the capturetheflag folder
