@@ -26,11 +26,11 @@ local function update(name)
 		end
 	end
 
-	if (override.jump or 0) == 0 then
+	if (override.jump or -1) < 0 then
 		override.jump = 1.1
 	end
 
-	if (override.speed or 0) == 0 then
+	if (override.speed or -1) < 0 then
 		override.speed = 1.1
 	end
 
