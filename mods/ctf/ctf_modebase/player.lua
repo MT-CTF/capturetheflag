@@ -278,6 +278,47 @@ else
 	minetest.log("error", "You aren't using the latest version of Minetest, auto-trashing and auto-sort won't work")
 end
 
+minetest.register_on_player_inventory_action(function(player, action, inv, inv_info)
+	if action == "put" and inv_info.listname == "main" then
+		if ctf_modebase.current_mode and ctf_teams.get(player) then
+			local mode = ctf_modebase:get_current_mode()
+			for name, func in pairs(mode.initial_stuff_item_levels) do
+				local priority = func(inv_info.stack)
+
+				if priority then
+					for i=1, 8 do -- loop through the top row of the player's inv
+						local compare = inv:get_stack("main", i)
+
+						local cprio = func(compare)
+
+						if cprio and cprio < priority then
+							local item, typ = simplify_for_saved_stuff(compare:get_name())
+							--minetest.log(dump(item)..dump(typ))
+							inv:set_stack("main", i, inv_info.stack)
+
+							if item == "sword" and typ == "stone" and
+							ctf_settings.get(player, "auto_trash_stone_swords") == "true" then
+								inv:set_stack("main", inv_info.index, ItemStack(""))
+								break
+							end
+
+							if item ~= "sword" and typ == "stone" and
+							ctf_settings.get(player, "auto_trash_stone_tools") == "true" then
+								inv:set_stack("main", inv_info.index, ItemStack(""))
+								break
+							end
+
+							inv:set_stack("main", inv_info.index, compare)
+							break
+						end
+					end
+					break -- We already found a place for it, don't check for one held by a different item type
+				end
+			end
+		end
+	end
+end)
+
 function ctf_modebase.player.empty_inv(player)
 	player:get_inventory():set_list("main", {})
 end
