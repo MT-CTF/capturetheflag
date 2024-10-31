@@ -51,15 +51,12 @@ minetest.register_globalstep(function(dtime)
 
 		if sprintRequested then
 			if info.stamina > 0 then
-				info.stamina = info.stamina - dtime
-				if info.stamina < 0 then
-					info.stamina = 0
-				end
+				info.stamina = math.max(0, info.stamina - dtime)
 				updateHud(player, info)
 			end
 		else
 			if info.stamina < STAMINA_MAX then
-				info.stamina = info.stamina + dtime * HEAL_RATE
+				info.stamina = math.min(STAMINA_MAX, info.stamina + dtime * HEAL_RATE)
 				updateHud(player, info)
 			end
 		end
