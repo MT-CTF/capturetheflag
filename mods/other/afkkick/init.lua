@@ -73,7 +73,6 @@ minetest.register_globalstep(function(dtime)
 	for playerName,_ in pairs(players) do
 		local player = minetest.get_player_by_name(playerName)
 		if player then
-			minetest.log("checking")
 			--Check if this player has moved
 			local pos = player:get_pos()
 			if vector.distance(pos, players[playerName]["lastPos"]) >= 1 then
