@@ -151,15 +151,21 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 		end
 		score = math.floor(score)
 
+		local cur_score = math.min(
+			current_mode.recent_rankings.get(name).score or 0,
+			(current_mode.rankings:get(name) or {}).score or 0
+		)
+
+		if score <= 0 then
+			score = math.floor(cur_score / 2 / pcount)
+		end
+
 		if score < 5 then
 			return false, "You should donate at least 5 score!"
 		end
 
 		local scoretotal = score * pcount
-		local cur_score = math.min(
-			current_mode.recent_rankings.get(name).score or 0,
-			(current_mode.rankings:get(name) or {}).score or 0
-		)
+
 		if scoretotal > cur_score / 2 then
 			return false, "You can donate only half of your match score!"
 		end
