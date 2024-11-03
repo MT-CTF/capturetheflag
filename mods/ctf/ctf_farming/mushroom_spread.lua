@@ -10,7 +10,6 @@ minetest.register_globalstep(function(dtime)
 		return
 	end
 	mushroom_globalstep_counter = 0.0
-	local t = minetest.get_us_time()
 	local pos1 = ctf_map.current_map.pos1
 	local pos2 = ctf_map.current_map.pos2
 	local x = math.random(pos1.x, pos2.x)
@@ -50,5 +49,4 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 	end
-	minetest.chat_send_all(tostring((t - minetest.get_us_time()) / 1e3))
 end)
