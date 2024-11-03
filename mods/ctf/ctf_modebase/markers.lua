@@ -107,7 +107,7 @@ function ctf_modebase.markers.add(pname, msg, pos, no_notify, specific_player)
 	if not ctf_modebase.in_game then return end
 
 	local pteam = ctf_teams.get(pname)
-	if not pteam then return end
+	if not pteam or ctf_teams.team[pteam].not_playing then return end
 
 	if markers[pname] then
 		markers[pname].timer:cancel()

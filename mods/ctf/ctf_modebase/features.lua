@@ -1,46 +1,38 @@
-ctf_core.testing = {
-	-- This is here temporarily, I'm modifying it with //lua and a code minimizer on the main server-
-	-- -so I don't need to restart for every little change
-	-- pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-	--ctf_core.testing.
-	testing = true,
-	test = function(
-		pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-	)
-		local one_third     = math.ceil(0.34 * total_players)
-		local one_fourth     = math.ceil(0.25 * total_players)
-		local avg = (kd_diff + actual_kd_diff) / 2
-		local pcount_diff_limit = (
-			(players_diff <= math.min(one_fourth, 2)) or
-			(pkd >= 1.8 and players_diff <= math.min(one_third, 4))
-		)
-		if best_kd.kills + worst_kd.kills >= 30 then
-			avg = actual_kd_diff
-		end
-		return pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
-	end
-}
-
 local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
+local function supports_observers(x)
+	if x then
+		if x.object then x = x.object end
+
+		if x.get_observers and x:get_pos() then
+			return true
+		end
+	end
+
+	return false
+end
+
 local function update_playertag(player, t, nametag, team_nametag, symbol_nametag)
-	if not      nametag.object.set_observers or
-	   not team_nametag.object.set_observers or
-	   not symbol_nametag.object.set_observers
+	if not      supports_observers(nametag.object) or
+	   not supports_observers(team_nametag.object) or
+	   not supports_observers(symbol_nametag.object)
 	then
 		return
 	end
 
 	local entity_players = {}
-	local nametag_players = table.copy(ctf_teams.online_players[t].players)
+	local nametag_players = ctf_modebase.get_allowed_nametag_observers(player)
 	local symbol_players = {}
 	nametag_players[player:get_player_name()] = nil
 
-	for n in pairs(table.copy(nametag_players)) do
-		local setting = ctf_settings.get(minetest.get_player_by_name(n), "teammate_nametag_style")
+	for n, extra in pairs(table.copy(nametag_players)) do
+		local setting = extra
+
+		if setting == true then
+			setting = ctf_settings.get(minetest.get_player_by_name(n), "teammate_nametag_style")
+		end
 
 		if setting == "3" then
 			nametag_players[n] = nil
@@ -57,7 +49,6 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 		end
 	end
 
-	-- Occasionally crashes in singleplayer, so call it safely
 	       nametag.object:set_observers(entity_players )
 	  team_nametag.object:set_observers(nametag_players)
 	symbol_nametag.object:set_observers(symbol_players )
@@ -65,7 +56,7 @@ end
 
 local tags_hidden = false
 local update_timer = false
-local function update_playertags(time)
+function ctf_modebase.update_playertags(time)
 	if not update_timer and not tags_hidden then
 		update_timer = true
 		minetest.after(time or 1.2, function()
@@ -94,7 +85,7 @@ local function set_playertags_state(state)
 	if state == PLAYERTAGS_ON and tags_hidden then
 		tags_hidden = false
 
-		update_playertags(0)
+		ctf_modebase.update_playertags(0)
 	elseif state == PLAYERTAGS_OFF and not tags_hidden then
 		tags_hidden = true
 
@@ -106,8 +97,7 @@ local function set_playertags_state(state)
 				local nametag = playertag.entity
 				local symbol_entity = playertag.symbol_entity
 
-				if nametag and team_nametag and symbol_entity and
-				nametag.object.set_observers and team_nametag.object.set_observers and symbol_entity.object.set_observers then
+				if supports_observers(nametag) and supports_observers(team_nametag) and supports_observers(symbol_entity) then
 					 team_nametag.object:set_observers({})
 					symbol_entity.object:set_observers({})
 					      nametag.object:set_observers({})
@@ -173,7 +163,7 @@ ctf_settings.register("teammate_nametag_style", {
 	default = "1",
 	on_change = function(player, new_value)
 		minetest.log("action", "Player "..player:get_player_name().." changed their nametag setting")
-		update_playertags()
+		ctf_modebase.update_playertags()
 	end
 })
 
@@ -191,9 +181,23 @@ local function calculate_killscore(player)
 	local flag_multiplier = 1
 	for tname, carrier in pairs(ctf_modebase.flag_taken) do
 		if carrier.p == player then
-			flag_multiplier = flag_multiplier + 0.25
+			flag_multiplier = flag_multiplier * 2
 		end
 	end
+
+	minetest.log("ACTION", string.format(
+		"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, " ..
+				"reward_given_to_enemy = %f },",
+		math.max(1, math.round(kd * 7 * flag_multiplier)),
+		match_rank.kills or 1,
+		match_rank.kill_assists or 0,
+		match_rank.deaths or 1,
+		match_rank.score or 0,
+		match_rank.hp_healed or 0,
+		match_rank.flag_attempts or 0,
+		match_rank.reward_given_to_enemy or 0
+	))
+
 	return math.max(1, math.round(kd * 7 * flag_multiplier))
 end
 
@@ -291,19 +295,22 @@ local function celebrate_team(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
+		local volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam == teamname then
-			minetest.sound_play("ctf_modebase_trumpet_positive", {
-				to_player = pname,
-				gain = 1.0,
-				pitch = 1.0,
-			}, true)
-		else
-			minetest.sound_play("ctf_modebase_trumpet_negative", {
-				to_player = pname,
-				gain = 1.0,
-				pitch = 1.0,
-			}, true)
+		if volume > 0 then
+			if pteam == teamname then
+				minetest.sound_play("ctf_modebase_trumpet_positive", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			else
+				minetest.sound_play("ctf_modebase_trumpet_negative", {
+					to_player = pname,
+					gain = volume,
+					pitch = 1.0,
+				}, true)
+			end
 		end
 	end
 end
@@ -312,18 +319,19 @@ local function drop_flag(teamname)
 	for _, player in ipairs(minetest.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
+		local drop_volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
-		if pteam then
+		if pteam and drop_volume > 0 then
 			if pteam == teamname then
 				minetest.sound_play("ctf_modebase_drop_flag_negative", {
 					to_player = pname,
-					gain = 0.2,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			else
 				minetest.sound_play("ctf_modebase_drop_flag_positive", {
 					to_player = pname,
-					gain = 0.2,
+					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			end
@@ -334,60 +342,71 @@ end
 local function end_combat_mode(player, reason, killer, weapon_image)
 	local comment = nil
 
-	if reason == "combatlog" then
-		killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
-		if killer then
-			comment = " (Combat Log)"
-			recent_rankings.add(player, {deaths = 1}, true)
-		end
-	else
-		if reason ~= "punch" or killer == player then
-			if ctf_teams.get(player) then
+	if ctf_teams.get(player) then
+		if reason == "combatlog" then
+			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+			if killer then
+				comment = " (Combat Log)"
+				recent_rankings.add(player, {deaths = 1}, true)
+			end
+		else
+			if reason ~= "punch" or killer == player then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
 				else
 					ctf_kill_list.add("", player, get_suicide_image(reason))
 				end
+
+				killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+				comment = " (Suicide)"
+			end
+			recent_rankings.add(player, {deaths = 1}, true)
+		end
+
+		if killer then
+			local killscore = calculate_killscore(player)
+			local total_enemy_reward = 0
+
+			local rewards = {kills = 1, score = killscore}
+			local bounty = ctf_modebase.bounties.claim(player, killer)
+
+			if bounty then
+				for name, amount in pairs(bounty) do
+					rewards[name] = (rewards[name] or 0) + amount
+				end
 			end
 
-			killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
-			comment = " (Suicide)"
-		end
-		recent_rankings.add(player, {deaths = 1}, true)
-	end
+			recent_rankings.add(killer, rewards)
+			total_enemy_reward = total_enemy_reward + rewards.score
 
-	if killer then
-		local killscore = calculate_killscore(player)
-
-		local rewards = {kills = 1, score = killscore}
-		local bounty = ctf_modebase.bounties.claim(player, killer)
-
-		if bounty then
-			for name, amount in pairs(bounty) do
-				rewards[name] = (rewards[name] or 0) + amount
+			if ctf_teams.get(killer) then
+				ctf_kill_list.add(killer, player, weapon_image, comment)
+				hud_events.new(player, {
+					quick = false,
+					text = killer.." killed you for ".. rewards.score .." points!",
+					color = "warning",
+				})
 			end
-		end
 
-		recent_rankings.add(killer, rewards)
+			-- share kill score with other hitters
+			local hitters = ctf_combat_mode.get_other_hitters(player, killer)
+			for _, pname in ipairs(hitters) do
+				recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
+				total_enemy_reward = total_enemy_reward + math.ceil(killscore / #hitters)
+			end
 
-		if ctf_teams.get(killer) then
-			ctf_kill_list.add(killer, player, weapon_image, comment)
-		end
+			-- share kill score with healers
+			local healers = ctf_combat_mode.get_healers(killer)
+			for _, pname in ipairs(healers) do
+				recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
+				total_enemy_reward = total_enemy_reward + math.ceil(killscore / #healers)
+			end
 
-		-- share kill score with other hitters
-		local hitters = ctf_combat_mode.get_other_hitters(player, killer)
-		for _, pname in ipairs(hitters) do
-			recent_rankings.add(pname, {kill_assists = 1, score = math.ceil(killscore / #hitters)})
-		end
+			recent_rankings.add(player, {reward_given_to_enemy = total_enemy_reward}, true)
 
-		-- share kill score with healers
-		local healers = ctf_combat_mode.get_healers(killer)
-		for _, pname in ipairs(healers) do
-			recent_rankings.add(pname, {score = math.ceil(killscore / #healers)})
-		end
-
-		if ctf_combat_mode.is_only_hitter(killer, player) then
-			ctf_combat_mode.set_kill_time(killer, 5)
+			if ctf_combat_mode.is_only_hitter(killer, player) then
+				ctf_combat_mode.set_kill_time(killer, 5)
+			end
 		end
 	end
 
@@ -450,7 +469,7 @@ return {
 			map_treasures[k] = v
 		end
 
-		if #delete_queue > 0 then
+		if #delete_queue > 0 and delete_queue._map ~= ctf_map.current_map.dirname then
 			local p1, p2 = unpack(delete_queue)
 
 			for _, object_drop in pairs(minetest.get_objects_in_area(p1, p2)) do
@@ -490,8 +509,13 @@ return {
 		recent_rankings.on_match_end()
 
 		if ctf_map.current_map then
+			minetest.log("action",
+				"matchend: Match ended for map "..ctf_map.current_map.name..
+				" in mode "..(ctf_modebase.current_mode or "<nil>")..
+				". Duration: "..ctf_map.get_duration()
+			)
 			-- Queue deletion for after the players have left
-			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
+			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2, _map = ctf_map.current_map.dirname}
 		end
 	end,
 	-- If you set this in a mode def it will replace the call to ctf_teams.allocate_teams() in match.lua
@@ -568,20 +592,15 @@ return {
 		local rem_team = ctf_teams.get(player)
 		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
 
-		if ctf_core.testing.testing then
-			if not rem_team or
-			math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
-				player_rankings = rankings:get(player) or {}
-			else
-				player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
-				player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
-			end
+		if not rem_team or
+		math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
+			player_rankings = rankings:get(player) or {}
 		else
-			player_rankings = {}
+			player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
+			player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
 		end
 
 		local one_third     = math.ceil(0.34 * total_players)
-		-- local one_fifth     = math.ceil(0.2 * total_players)
 
 		-- Allocate player to remembered team unless teams are imbalanced
 		if rem_team and not ctf_modebase.flag_captured[rem_team] and
@@ -590,28 +609,21 @@ return {
 		end
 
 		local pkd = (player_rankings.kills or 0) / (player_rankings.deaths or 1)
-		local success, result = pcall(ctf_core.testing.test,
-			pkd, kd_diff, actual_kd_diff, players_diff, best_kd, worst_kd, total_players, worst_players, best_players
-		)
 
-		if not success then
-			minetest.log("error", result)
-			result = false
+		local one_fourth     = math.ceil(0.25 * total_players)
+		local avg = (kd_diff + actual_kd_diff) / 2
+		local pcount_diff_limit = (
+			(players_diff <= math.min(one_fourth, 1)) or
+			(pkd >= 1.8 and players_diff <= math.min(one_third, 2))
+		)
+		if best_kd.kills + worst_kd.kills >= 30 then
+			avg = actual_kd_diff
 		end
 
-		-- [1]
-		-- Allocate player to the worst team if it's losing by more than 0.4KD, as long as the amount of-
-		-- players on the winning team isn't outnumbered by more than 1/5 the total players playing
-		-- TODO: extra logic
+		local result = pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
 
-		-- [2]
-		-- Otherwise allocates the player to the team with the least amount of players,
-		-- or the worst team if all teams have an equal amount of players
-		if
-		players_diff == 0
-		or
-		result
-		then
+		if players_diff == 0 or result then
 			return worst_kd.t
 		else
 			return worst_players.t
@@ -645,7 +657,10 @@ return {
 
 		celebrate_team(ctf_teams.get(pname))
 
-		recent_rankings.add(pname, {score = 30, flag_attempts = 1})
+		recent_rankings.add(pname, {
+			score = ctf_teams.online_players[teamname].count * 3 * #ctf_modebase.taken_flags[pname],
+			flag_attempts = 1
+		})
 
 		ctf_modebase.flag_huds.track_capturer(pname, FLAG_CAPTURE_TIMER)
 	end,
@@ -669,7 +684,7 @@ return {
 		playertag.set(player, playertag.TYPE_ENTITY)
 
 		if player.set_observers then
-			update_playertags()
+			ctf_modebase.update_playertags()
 		end
 
 		drop_flag(pteam)
@@ -682,39 +697,76 @@ return {
 		playertag.set(player, playertag.TYPE_ENTITY)
 
 		if player.set_observers then
-			update_playertags()
+			ctf_modebase.update_playertags()
 		end
 
 		celebrate_team(pteam)
 
-
-
 		ctf_modebase.flag_huds.untrack_capturer(pname)
 
 		local team_scores = recent_rankings.teams()
+		local player_scores = recent_rankings.players()
 		local capture_reward = 0
 		for _, lost_team in ipairs(teamnames) do
-			local score = ((team_scores[lost_team] or {}).score or 0) / 4
-			score = math.max(75, math.min(500, score))
-			capture_reward = capture_reward + score
+			local team_score = 0
+
+			for n in pairs(ctf_teams.online_players[lost_team].players) do
+				team_score = team_score + (player_scores[n].score or 0)
+			end
+
+			local score = team_score / math.max(1, ctf_teams.online_players[lost_team].count)
+			score = math.max(
+				8 * ((player_scores[pname].flag_attempts or 0) + math.min(
+					(os.time() - ctf_map.start_time) / 60,
+					10
+				)),
+				score * (2.4 + ctf_teams.online_players[lost_team].count/30)
+			)
+
+			score = math.max(score, #ctf_teams.get_connected_players() * 1.4)
+
+			capture_reward = capture_reward + math.min(score, 800)
+
+			minetest.log("action", string.format(
+				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, "..
+				"player_attempts = %d, time = %d, winteam_score = %d, \"%s\"},",
+				team_score / score,
+				team_score,
+				score,
+				#ctf_teams.get_connected_players(),
+				ctf_teams.online_players[lost_team].count,
+				player_scores[pname].flag_attempts or 0,
+				os.time() - ctf_map.start_time,
+				team_scores[pteam].score or 0,
+				many_teams and "many teams" or "2 teams"
+			))
 		end
-		local text = " has captured the flag"
+
+		local text = string.format(" has captured the flag and got %d points", capture_reward)
 		if many_teams then
 			text = string.format(
 				" has captured the flag of team(s) %s and got %d points",
 				HumanReadable(teamnames),
 				capture_reward
 			)
-			minetest.chat_send_all(
-				minetest.colorize(tcolor, pname) ..
-				minetest.colorize(FLAG_MESSAGE_COLOR, text)
-			)
 		end
-		ctf_modebase.announce(string.format("Player %s (team %s)%s and got %d points", pname, pteam, text, capture_reward))
+
+		minetest.chat_send_all(
+			minetest.colorize(tcolor, pname) .. minetest.colorize(FLAG_MESSAGE_COLOR, text)
+		)
+
+		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
+
 		local team_score = team_scores[pteam].score
+		local healers = ctf_combat_mode.get_healers(pname)
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if teammate ~= pname then
 				local teammate_value = (recent_rankings.get(teammate)[pteam.."_score"] or 0) / (team_score or 1)
+
+				if table.indexof(healers, teammate) ~= -1 then
+					teammate_value = teammate_value + ((#ctf_teams.get_connected_players() / 10) / #healers)
+				end
+
 				local victory_bonus = math.max(5, math.min(capture_reward / 2, capture_reward * teammate_value))
 				recent_rankings.add(teammate, {score = victory_bonus}, true)
 			end
@@ -777,7 +829,7 @@ return {
 		playertag.set(player, playertag.TYPE_ENTITY)
 
 		if player.set_observers then
-			update_playertags()
+			ctf_modebase.update_playertags()
 		end
 
 		tp_player_near_flag(player)
@@ -814,7 +866,7 @@ return {
 		local rank = rankings:get(pname)
 		local player = minetest.get_player_by_name(pname)
 		local pro_chest = player and player:get_meta():get_int("ctf_rankings:pro_chest:"..
-				(ctf_modebase.current_mode or "")) == 1
+				(ctf_modebase.current_mode or "")) >= 1
 		local deny_pro = "You need to have more than 1.4 kills per death, "..
 		                 "5 captures, and at least 8,000 score to access the pro section."
 		if rank then

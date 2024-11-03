@@ -183,17 +183,28 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 	privs = { ctf_admin = true },
 	func = function(name, param)
 		local player, amount = string.match(param, "(.*) (.*)")
-		local pteam = ctf_teams.get(player)
-		local team_colour = ctf_teams.team[pteam].color
-		if not (player and pteam and amount) then
+
+		if not (player and amount) then
 			return false, "Incorrect parameters"
 		end
+
+		local pteam = ctf_teams.get(player)
+		if not pteam then
+			return false, "You can only put a bounty on a player in a team!"
+		end
+
+		local team_colour = ctf_teams.team[pteam].color
+
 		amount = ctf_core.to_number(amount)
-		set(
-			player,
-			pteam,
-			{ bounty_kills=1, score=amount }
-		)
-		return true, "Successfully placed a bounty of " .. amount .. " on " .. minetest.colorize(team_colour, player) .. "!"
+		if amount then
+			set(
+				player,
+				pteam,
+				{ bounty_kills=1, score=amount }
+			)
+			return true, "Successfully placed a bounty of " .. amount .. " on " .. minetest.colorize(team_colour, player) .. "!"
+		else
+			return false, "Invalid Amount"
+		end
 	end,
 })

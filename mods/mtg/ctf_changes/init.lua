@@ -125,6 +125,17 @@ minetest.override_item("default:apple", {
 	end
 })
 
+minetest.override_item("default:blueberries", {
+	on_use = function(itemstack, user, ...)
+		if not COOLDOWN:get(user) then
+			COOLDOWN:set(user, 0.3)
+
+			return minetest.item_eat(3)(itemstack, user, ...)
+		end
+	end,
+	stack_max = 60,
+})
+
 local function furnace_on_destruct(pos)
 	local inv = minetest.get_inventory({ type = "node", pos = pos })
 	if not inv then return end

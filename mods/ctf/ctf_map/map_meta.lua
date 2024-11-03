@@ -64,7 +64,9 @@ local function connect_barriers_file(map_name, offset, barriers_filepath)
 end
 
 function ctf_map.load_map_meta(idx, dirname)
-	local meta = Settings(ctf_map.maps_dir .. dirname .. "/map.conf")
+	assert(ctf_map.map_path[dirname], "Map "..dirname.." not found")
+
+	local meta = Settings(ctf_map.map_path[dirname] .. "/map.conf")
 
 	if not meta then error("Map '"..dump(dirname).."' not found") end
 
@@ -75,7 +77,7 @@ function ctf_map.load_map_meta(idx, dirname)
 
 	if not meta:get("map_version") then
 		if not meta:get("r") then
-			error("Map was not properly configured: " .. ctf_map.maps_dir .. dirname .. "/map.conf")
+			error("Map was not properly configured: " .. ctf_map.map_path[dirname] .. "/map.conf")
 		end
 
 		local mapr = meta:get("r")
@@ -198,7 +200,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
 		if tonumber(meta:get("map_version")) >= 3 and not ctf_core.settings.low_ram_mode then
-			map.barriers = connect_barriers_file(dirname, offset, ctf_map.maps_dir .. dirname .. "/barriers.data")
+			map.barriers = connect_barriers_file(dirname, offset, ctf_map.map_path[dirname] .. "/barriers.data")
 		end
 
 		for id, def in pairs(map.chests) do
@@ -223,7 +225,7 @@ function ctf_map.load_map_meta(idx, dirname)
 
 	map.flag_center = calc_flag_center(map)
 
-	if ctf_map.skybox_exists(ctf_map.maps_dir .. dirname) then
+	if ctf_map.skybox_exists(ctf_map.map_path[dirname]) then
 		skybox.add({dirname, "#ffffff", [5] = "png"})
 
 		map.skybox = dirname
@@ -260,11 +262,12 @@ function ctf_map.save_map(mapmeta)
 		if not def.enabled then
 			mapmeta.teams[id] = nil
 		else
+			minetest.load_area(def.flag_pos)
 			local flagpos = minetest.find_node_near(def.flag_pos, 3, {"group:flag_bottom"}, true)
 
 			if not flagpos then
 				flagpos = def.flag_pos
-				minetest.chat_send_all(minetest.colorize("red",
+				minetest.chat_send_all(minetest.colorize((minetest.get_node(flagpos).name == "ignore") and "orange" or "red",
 					"Failed to find flag for team " .. id ..
 					". Node at given position: " .. dump(minetest.get_node(flagpos).name)
 				))

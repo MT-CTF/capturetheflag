@@ -1,3 +1,5 @@
+local cooldown = ctf_core.init_cooldowns()
+
 local function get_item_description(name)
 	if name:sub(1, 6) == "group:" then
 		local group = name:sub(7, #name):gsub("%_", " ")
@@ -55,22 +57,22 @@ function crafting.make_result_selector(player, size, context)
 	table_insert(formspec, "style_type[item_image_button;border=false]")
 
 	table_insert(formspec, "field_close_on_enter[query;false]")
-	table_insert(formspec, "field[-4.75,0.81;3,0.8;query;;")
+	table_insert(formspec, "field[-4.75,1.21;3,0.8;query;;")
 	table_insert(formspec, context.crafting_query)
-	table_insert(formspec, "]button[-2.2,0.5;0.8,0.8;search;?]")
-	table_insert(formspec, "button[-1.4,0.5;0.8,0.8;prev;<]")
-	table_insert(formspec, "button[-0.8,0.5;0.8,0.8;next;>]")
+	table_insert(formspec, "]image_button[-2.2,0.9;0.8,0.8;crafting_search_icon.png;search;]")
+	table_insert(formspec, "image_button[-1.4,0.9;0.8,0.8;crafting_prev_icon.png;prev;]")
+	table_insert(formspec, "image_button[-0.8,0.9;0.8,0.8;crafting_next_icon.png;next;]")
 
 	table_insert(formspec, "container_end[]")
 
-	table_insert(formspec, "label[0,-0.25;")
+	table_insert(formspec, "label[0,-0.1;")
 	table_insert(formspec, minetest.formspec_escape(
 		"Page: " .. page .. "/" .. max_pages)
 	)
 	table_insert(formspec, "]")
 
 	local x = 0
-	local y = 0
+	local y = 0.3
 	local y_offset = 0.2
 	for i = start_i, math.min(#recipes, start_i * num_per_page)  do
 		local result = recipes[i]
@@ -200,9 +202,9 @@ if minetest.global_exists("sfinv") then
 				crafting.calc_inventory_list_hash(player:get_inventory(), "main")
 
 			local formspec = crafting.make_result_selector(player, { x = 8, y = 3 }, context)
-			formspec = formspec .. "list[detached:crafting_trash;main;0,3.4;1,1;]" ..
-				"image[0.05,3.5;0.8,0.8;crafting_trash_icon.png]" ..
-				"image_button[1,3.4;1,1;crafting_save_icon.png;save_inv_order;]" ..
+			formspec = formspec .. "list[detached:crafting_trash;main;0,3.8;1,1;]" ..
+				"image[0.07,3.9;0.8,0.8;crafting_trash_icon.png]" ..
+				"image_button[1,3.8;1,1;crafting_save_icon.png;save_inv_order;]" ..
 				"tooltip[save_inv_order;Saves the order of the items in your inventory" ..
 					"\n(Your saved order is used when you respawn, and is per-mode)]"
 
@@ -213,7 +215,8 @@ if minetest.global_exists("sfinv") then
 				sfinv.set_player_inventory_formspec(player)
 			end
 
-			if fields.save_inv_order then
+			if fields.save_inv_order and not cooldown:get(player) then
+				cooldown:set(player, 0.5)
 				ctf_modebase.player.save_initial_stuff_positions(player)
 
 				minetest.sound_play("crafting_save_sound", {

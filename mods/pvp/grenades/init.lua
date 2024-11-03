@@ -145,6 +145,7 @@ function grenades.register_grenade(name, def)
 	newdef.description = def.description
 	newdef.stack_max = math.max(1, def.stack_max or 1)
 	newdef.inventory_image = def.image
+	newdef.touch_interaction = "short_dig_long_place" -- throw with short tap
 	local on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
 			grenades.throw_grenade(name, 17, user)
