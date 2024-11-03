@@ -2,7 +2,7 @@ local mushroom_globalstep_counter = 0.0
 local MUSHROOM_COUNTER_THRESHOLD = 4.0
 
 minetest.register_globalstep(function(dtime)
-	if not ctf_map.current_map then
+	if not ctf_map.current_map or ctf_modebase.current_mode ~= "classic" then
 		return
 	end
 	mushroom_globalstep_counter = mushroom_globalstep_counter + dtime
