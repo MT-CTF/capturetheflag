@@ -51,6 +51,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"ctf_map:damage_cobble",
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
+		"ctf_ranged:ammo",
 	},
 	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
