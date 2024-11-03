@@ -88,8 +88,7 @@ ctf_core.include_files(
 	"map_functions.lua",
 	"editor_functions.lua",
 	"mapedit_gui.lua",
-	"ctf_traps.lua",
-	"mushroom_spread.lua"
+	"ctf_traps.lua"
 )
 
 local directory = minetest.get_modpath(minetest.get_current_modname()) .. "/maps/"
