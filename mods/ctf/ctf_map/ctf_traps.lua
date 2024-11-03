@@ -98,7 +98,10 @@ end
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "node_damage" then
 		local team = ctf_teams.get(player)
-
+		local spike_team = string.match(reason.node, "ctf_map:spike_(%S+)")
+		if spike_team and ctf_modebase.flag_captured[spike_team] then
+			return 0, true
+		end
 		if team and reason.node == string.format("ctf_map:spike_%s", team) then
 			return 0, true
 		end

@@ -26,7 +26,7 @@ function ctf_teams.set(player, new_team, force)
 		return
 	end
 
-	assert(type(new_team) == "string")
+	assert(type(new_team) == "string", "ctf_teams.set(): new_team must be a string! value: "..dump(new_team))
 
 	local old_team = ctf_teams.player_team[player]
 	if not force and old_team == new_team then
@@ -132,4 +132,17 @@ function ctf_teams.chat_send_team(teamname, message)
 	for player in pairs(ctf_teams.online_players[teamname].players) do
 		minetest.chat_send_player(player, message)
 	end
+end
+
+--- Like `minetest.get_connected_players()` but leaves out players that aren't in a team
+function ctf_teams.get_connected_players()
+	local out = minetest.get_connected_players()
+
+	for k, v in ipairs(table.copy(out)) do
+		if not ctf_teams.get(v) then
+			table.remove(out, table.indexof(out, v))
+		end
+	end
+
+	return out
 end

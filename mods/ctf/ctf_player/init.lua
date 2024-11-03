@@ -28,7 +28,7 @@ player_api.register_model("character.b3d", {
 		stab      = {x = 221, y = 241, frame_loop = false},
 		slash     = {x = 242, y = 262, frame_loop = false},
 	},
-	collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+	collisionbox = {-0.3, 0.01, -0.3, 0.3, 1.71, 0.3},
 	stepheight = 0.6,
 	eye_height = 1.47,
 })

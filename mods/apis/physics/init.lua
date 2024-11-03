@@ -2,9 +2,10 @@ physics = {}
 
 local players = {}
 local default_overrides = {
-	speed   = 1,
-	jump    = 1,
-	gravity = 1
+	speed        = false, -- default set in update()
+	speed_crouch = 1.0,
+	jump         = false, -- default set in update()
+	gravity      = 1.0,
 }
 
 minetest.register_on_joinplayer(function(player)
@@ -21,8 +22,16 @@ local function update(name)
 
 	for _, layer in pairs(players[name]) do
 		for attr, val in pairs(layer) do
-			override[attr] = override[attr] * val
+			override[attr] = (override[attr] or 1) * val
 		end
+	end
+
+	if (override.jump or -1) < 0 then
+		override.jump = 1.1
+	end
+
+	if (override.speed or -1) < 0 then
+		override.speed = 1.1
 	end
 
 	player:set_physics_override(override)
@@ -37,7 +46,7 @@ function physics.set(name, layer, modifiers)
 
 	for attr, val in pairs(modifiers) do
 		-- Throw error if an unsupported attribute is encountered
-		assert(default_overrides[attr], "physics: Unsupported attribute!")
+		assert(default_overrides[attr] ~= nil, "physics: Unsupported attribute!")
 
 		-- Remove an attribute if its value is 1
 		if val == 1 then

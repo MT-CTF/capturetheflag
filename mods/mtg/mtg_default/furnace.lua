@@ -134,6 +134,7 @@ local function furnace_node_timer(pos, elapsed)
 	local fuel
 
 	local update = true
+	local items_smelt = 0
 	while elapsed > 0 and update do
 		update = false
 
@@ -171,9 +172,7 @@ local function furnace_node_timer(pos, elapsed)
 					else
 						dst_full = true
 					end
-					-- Play cooling sound
-					minetest.sound_play("default_cool_lava",
-						{pos = pos, max_hear_distance = 16, gain = 0.07}, true)
+					items_smelt = items_smelt + 1
 				else
 					-- Item could not be cooked: probably missing fuel
 					update = true
@@ -224,6 +223,11 @@ local function furnace_node_timer(pos, elapsed)
 		elapsed = elapsed - el
 	end
 
+	if items_smelt > 0 then
+		-- Play cooling sound
+		minetest.sound_play("default_cool_lava",
+			{ pos = pos, max_hear_distance = 16, gain = 0.07 * math.min(items_smelt, 7) }, true)
+	end
 	if fuel and fuel_totaltime > fuel.time then
 		fuel_totaltime = fuel.time
 	end
@@ -329,7 +333,12 @@ end
 -- Node definitions
 --
 
-minetest.register_node("default:furnace", {
+local function apply_logger(def)
+	default.set_inventory_action_loggers(def, "furnace")
+	return def
+end
+
+minetest.register_node("default:furnace", apply_logger({
 	description = S("Furnace"),
 	tiles = {
 		"default_furnace_top.png", "default_furnace_bottom.png",
@@ -379,9 +388,9 @@ minetest.register_node("default:furnace", {
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
-})
+}))
 
-minetest.register_node("default:furnace_active", {
+minetest.register_node("default:furnace_active", apply_logger({
 	description = S("Furnace"),
 	tiles = {
 		"default_furnace_top.png", "default_furnace_bottom.png",
@@ -415,7 +424,7 @@ minetest.register_node("default:furnace_active", {
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
-})
+}))
 
 minetest.register_craft({
 	output = "default:furnace",
