@@ -96,7 +96,7 @@ ctf_api.register_on_match_end(function()
 end)
 
 ctf_core.register_chatcommand_alias("donate", "d", {
-	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes",
+	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes\nReplace <score> with :max or any negative number to donate the maximum amount",
 	params = "<name [name2 name3 ...]> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
@@ -113,6 +113,8 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 				dmessage = dmessage .. " " .. p
 			elseif ctf_core.to_number(p) and score == 0 then
 				score = p
+			elseif p == ":max" and score == 0 then
+				score = -1
 			else
 				local team = ctf_teams.get(p)
 				if not team and pcount > 0 then
@@ -156,7 +158,7 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 			(current_mode.rankings:get(name) or {}).score or 0
 		)
 
-		if score <= 0 then
+		if score < 0 then
 			score = math.floor(cur_score / 2 / pcount)
 		end
 
