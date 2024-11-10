@@ -96,9 +96,8 @@ ctf_api.register_on_match_end(function()
 end)
 
 ctf_core.register_chatcommand_alias("donate", "d", {
-	description = [[Donate your match score to your teammate
-Can be used only once in 2.5 minutes
-Replace <score> with :max or any negative number to donate the maximum amount]],
+	description = "Donate your match score to your teammate\nCan be used only once in 2.5 minutes"..
+			"\nReplace <score> with :max or any negative number to donate the maximum amount",
 	params = "<name [name2 name3 ...]> <score> [message]",
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
