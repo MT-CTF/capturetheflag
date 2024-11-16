@@ -274,9 +274,9 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	fire_sound = "ctf_ranged_pistol",
 	rounds = 75,
 	range = 75,
-	damage = 2,
+	damage = 2.5,
 	automatic = true,
-	fire_interval = 0.6,
+	fire_interval = 0.4,
 	liquid_travel_dist = 2
 })
 
