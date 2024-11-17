@@ -7,8 +7,8 @@ local blacklist = {
 
 
 local item_value = {
-	["default:sword_diamond"          ] = 16,
-	["default:sword_mese"             ] = 13,
+	["ctf_melee:sword_diamond"        ] = 16,
+	["ctf_melee:sword_mese"             ] = 13,
 	["ctf_ranged:shotgun_loaded"      ] = 12,
 	["ctf_ranged:shotgun"             ] = 10,
 	["ctf_ranged:sniper_magnum_loaded"] = 10,
