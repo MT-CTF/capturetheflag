@@ -314,7 +314,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	texture = "ctf_ranged_smgun.png",
 	fire_sound = "ctf_ranged_pistol",
 	bullet = {
-		spread = 2,
+		spread = 1.3,
 	},
 	automatic = true,
 	rounds = 36,
