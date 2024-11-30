@@ -15,3 +15,6 @@
 	path = mods/apis/mhud
 	url = https://github.com/LoneWolfHT/mhud.git
 	branch = main
+[submodule "mods/other/nextgen_fungi"]
+	path = mods/other/nextgen_fungi
+	url = https://github.com/starninjas/nextgen_fungi
