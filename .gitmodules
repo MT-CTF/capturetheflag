@@ -18,3 +18,6 @@
 [submodule "mods/other/nextgen_fungi"]
 	path = mods/other/nextgen_fungi
 	url = https://github.com/starninjas/nextgen_fungi
+[submodule "mods/other/redef"]
+	path = mods/other/redef
+	url = https://git.0x7be.net/dirk/redef
