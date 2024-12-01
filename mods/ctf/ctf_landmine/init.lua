@@ -175,30 +175,28 @@ core.register_globalstep(function(dtime)
 			vector.add(pos, { x = 0, y = 1, z = 0}),
 		}
 		local landmine_positions = {}
-		for pos in ipairs(positions_to_check) do
-			if landmines[core.hash_node_position(pos)] then
-				table.insert(landmine_positions, pos)
-			end
-		en1
-		-- explode them!
-		for pos in ipairs(landmine_positions) do
-			if not is_self_landmine(obj, pos) then
-				landmine_explode(pos)
+		for pos2 in ipairs(positions_to_check) do
+			if landmines[core.hash_node_position(pos2)] then
+				table.insert(landmine_positions, pos2)
 			end
 		end
-		core.debug(
-			string.format(
-				"[CTF Landmine] Used %f of server time for %d landmines and %d players",
-				core.get_gametime() - start_time,
-				landmines_n,
-				players_n
-			)
-		)
-
-))
+		-- explode them!
+		for pos2 in ipairs(landmine_positions) do
+			if not is_self_landmine(obj, pos2) then
+				landmine_explode(pos2)
+			end
+		end
 	end
+	core.debug(
+		string.format(
+			"[CTF Landmine] Used %f of server time for %d landmines and %d players",
+			core.get_gametime() - start_time,
+			landmines_n,
+			players_n
+		)
+	)
 end)
 
-ctf_api.register_on	_match_end(function()
+ctf_api.register_on_match_end(function()
 	clear_landmines()
 end)
