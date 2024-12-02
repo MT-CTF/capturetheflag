@@ -73,7 +73,6 @@ minetest.register_globalstep(function(dtime)
 	for playerName,_ in pairs(players) do
 		local player = minetest.get_player_by_name(playerName)
 		if player then
-			minetest.log("checking")
 			--Check if this player has moved
 			local pos = player:get_pos()
 			if vector.distance(pos, players[playerName]["lastPos"]) >= 1 then
@@ -95,7 +94,7 @@ minetest.register_globalstep(function(dtime)
 			if players[playerName]["lastAction"] + MAX_INACTIVE_TIME - WARN_TIME < currGameTime then
 				minetest.chat_send_player(playerName, minetest.colorize("#FF8C00",
 					S("Warning, you have @1 seconds to move or be kicked",
-				tostring(players[playerName]["lastAction"] + MAX_INACTIVE_TIME - currGameTime + 1))))
+				tostring(math.floor(players[playerName]["lastAction"] + MAX_INACTIVE_TIME - currGameTime + 1)))))
 			end
 		end
 	end
