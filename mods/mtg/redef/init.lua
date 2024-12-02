@@ -27,7 +27,7 @@ core.register_on_mods_loaded(function()
     local redefinitions = {
         ['3D Ladders'] = core.is_yes(g('3d_ladders', true)),
         ['Aligned Textures'] = core.is_yes(g('aligned_textures', true)),
-        ['Grass Box Height'] = tonumber(g('grass_box_height', 2)) >= 1,
+        --['Grass Box Height'] = tonumber(g('grass_box_height', 2)) >= 1,
         --['Maximum Stack Size'] = tonumber(g('stack_max', 100)) >= 1,
         ['Proper Rotation'] = core.is_yes(g('proper_rotation', true)),
         ['Show Steps'] = core.is_yes(g('show_steps', true))
