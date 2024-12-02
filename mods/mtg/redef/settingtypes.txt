@@ -1,0 +1,62 @@
+# This will render ladders in 3D using a nodebox.
+#
+# Please note that this will only work properly when
+# using the default textures or when the texture pack
+# uses the same shape of ladders than the default
+# texture pack!
+#
+# Fixes https://github.com/minetest/minetest/issues/2423
+redef_3d_ladders (Render ladders in 3D) bool true
+
+# Alter the maximum stack size.
+#
+# By default Minetest Game uses an arbitrary set max
+# stack size of 99. When setting this value to any
+# value the STACK_MAX size will be changed to that
+# value in most places.
+#
+# Please note that 99 is hardcoded on some places and
+# still will be 99 even if set different here.
+#
+# Fixes https://forum.minetest.net/viewtopic.php?t=16817
+redef_stack_max (Maximum stack size) int 100
+
+# Set the grass selection box to a lower height.
+#
+# Grass nodeboxes might be too high. This can disturb
+# Building or punching mobs or other players. This
+# Setting allows to reduce the selection boxes of
+# all grass types to the given value. Set to 0 to
+# leave the selection box unaltered.
+#
+# If a selection box is smaller than the given value
+# it remains unaltered.
+#
+# Fixes https://github.com/minetest/minetest_game/issues/1980
+redef_grass_box_height (Grass selection box height x/16) int 2
+
+# World-aligned textures for stairs, slabs, etc.
+#
+# By default the most critical nodes are not
+# properly aligned. This fixes it.
+#
+# Fixes:
+#
+# https://github.com/minetest/minetest_game/issues/2287
+# https://github.com/minetest/minetest_game/issues/1931
+# https://github.com/minetest/minetest/issues/5222
+redef_aligned_textures (Use world-aligned textures) bool true
+
+
+# Proper rotation of shaped nodes
+#
+# Grass nodeboxes might be too high. This can disturb
+# The moreblocks (for example) introduces a custom, not
+# properly working rotation mechanism. This redefinition
+# fixes that and replaces it with a mechanism that is
+# derived from the one that is used by “Minetest Game”.
+#
+# Fixes:
+#
+# https://github.com/minetest-mods/moreblocks/issues/138
+redef_proper_rotation (Properly rotate shaped nodes) bool true
