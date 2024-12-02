@@ -225,6 +225,12 @@ function ctf_ranged.simple_register_gun(name, def)
 	end))
 end
 
+minetest.register_on_joinplayer(function(player)
+	if shoot_cooldown:get(player) then
+		minetest.log("error", "Player is rejoining with a cooldown: "..dump(shoot_cooldown:get(player)))
+	end
+end)
+
 minetest.register_on_leaveplayer(function(player)
 	scoped[player:get_player_name()] = nil
 end)

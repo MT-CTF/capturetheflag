@@ -508,7 +508,7 @@ function classes.show_class_formspec(player)
 			if cooldowns:get(player) then
 				font_color = "#f23f42"
 				table.insert(out,
-					{"tooltip[select_%s;You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds, ]", c}
+					{"tooltip[select_%s;You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds. ]", c}
 				)
 			end
 			table.insert(out, {
