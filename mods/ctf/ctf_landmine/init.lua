@@ -26,14 +26,11 @@ local LANDMINE_COUNTER_THRESHOLD = 0.025
 local function is_self_landmine(object_ref, pos)
 	local meta = core.get_meta(pos)
 	local team = meta:get_string("pteam")
-	local placer = meta:get_string("placer")
 	local pname = object_ref:get_player_name()
 	if pname == "" then
 		return nil -- the object ref is not a player
 	end
-	if pname == placer then
-		return true -- it's self landmine
-	end
+
 	if ctf_teams.get(object_ref) == team then
 		return true -- it's self landmine
 	end
@@ -42,7 +39,7 @@ local function is_self_landmine(object_ref, pos)
 end
 
 local function landmine_explode(pos)
-	local near_objs = core.get_objects_inside_radius(pos, 3)
+	local near_objs = ctf_core.get_players_inside_radius(pos, 3)
 	local meta = core.get_meta(pos)
 	local placer = meta:get_string("placer")
 	local placerobj = placer and core.get_player_by_name(placer)
@@ -145,21 +142,15 @@ core.register_node("ctf_landmine:landmine", {
 	end
 })
 
-
-
-
 core.register_globalstep(function(dtime)
+	if number_of_landmines == 0 then return end
+
 	landmine_globalstep_counter = landmine_globalstep_counter + dtime
 	if landmine_globalstep_counter < LANDMINE_COUNTER_THRESHOLD then
 		return
 	end
 	landmine_globalstep_counter = 0.0
-	if number_of_landmines == 0 then
-		return
-	end
-	local start_time = core.get_gametime()
-	local players_n = #core.get_connected_players()
-	local landmines_n = number_of_landmines
+
 	for _idx, obj in ipairs(core.get_connected_players()) do
 		local pos = {
 			x = math.ceil(obj:get_pos().x),
@@ -174,27 +165,15 @@ core.register_globalstep(function(dtime)
 			vector.add(pos, { x = -1, y = 0, z = 0}),
 			vector.add(pos, { x = 0, y = 1, z = 0}),
 		}
-		local landmine_positions = {}
+
 		for _idx2, pos2 in ipairs(positions_to_check) do
 			if landmines[core.hash_node_position(pos2)] then
-				table.insert(landmine_positions, pos2)
-			end
-		end
-		-- explode them!
-		for _idx2, pos2 in ipairs(landmine_positions) do
-			if not is_self_landmine(obj, pos2) then
-				landmine_explode(pos2)
+				if not is_self_landmine(obj, pos2) then
+					landmine_explode(pos2)
+				end
 			end
 		end
 	end
-	core.debug(
-		string.format(
-			"[CTF Landmine] Used %f of server time for %d landmines and %d players",
-			core.get_gametime() - start_time,
-			landmines_n,
-			players_n
-		)
-	)
 end)
 
 ctf_api.register_on_match_end(function()
