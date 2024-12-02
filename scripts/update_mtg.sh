@@ -42,5 +42,6 @@ echo ""
 rm -rf ./redef/.git
 
 sed -i -e "s/\['Maximum Stack Size'\]/--\['Maximum Stack Size'\]/g" ./redef/init.lua # Comment out the stack size change
+sed -i -e "s/\['Grass Box Height'\]/--\['Grass Box Height'\]/g" ./redef/init.lua # Comment out the stack size change
 
 echo "Done. redef applied!"
