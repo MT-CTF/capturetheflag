@@ -26,12 +26,12 @@ do
 end
 
 function ctf_core.get_players_inside_radius(pos, radius, teamless)
-	local out = minetest.get_connected_players()
+	local out = {}
 
-	for k, p in pairs(minetest.get_connected_players()) do
+	for _, p in pairs(minetest.get_connected_players()) do
 		if teamless or ctf_teams.get(p) then
-			if p:get_pos():distance(pos) > radius then
-				table.remove(out, k)
+			if p:get_pos():distance(pos) <= radius then
+				table.insert(out, p)
 			end
 		end
 	end
