@@ -160,7 +160,7 @@ core.register_globalstep(function(dtime)
 	local start_time = core.get_gametime()
 	local players_n = #core.get_connected_players()
 	local landmines_n = number_of_landmines
-	for obj in core.get_connected_players() do
+	for _idx, obj in ipairs(core.get_connected_players()) do
 		local pos = {
 			x = math.ceil(obj:get_pos().x),
 			y = math.ceil(obj:get_pos().y),
@@ -175,13 +175,13 @@ core.register_globalstep(function(dtime)
 			vector.add(pos, { x = 0, y = 1, z = 0}),
 		}
 		local landmine_positions = {}
-		for pos2 in ipairs(positions_to_check) do
+		for _idx2, pos2 in ipairs(positions_to_check) do
 			if landmines[core.hash_node_position(pos2)] then
 				table.insert(landmine_positions, pos2)
 			end
 		end
 		-- explode them!
-		for pos2 in ipairs(landmine_positions) do
+		for _idx2, pos2 in ipairs(landmine_positions) do
 			if not is_self_landmine(obj, pos2) then
 				landmine_explode(pos2)
 			end
