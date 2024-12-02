@@ -17,8 +17,34 @@ else
 end
 
 ctf_rankings = {
-	init = function()
-		return rankings(minetest.get_current_modname() .. '|', top:new())
+	sorted = {},
+
+	rankings_sorted = function(self)
+		return false -- Returning false, since not all rankings are sorted yet. See below for full func
+	end,
+
+	init = function(self)
+		local modname = minetest.get_current_modname()
+
+		if self then
+			self.sorted[modname] = false
+		else
+			minetest.log(
+				"error",
+				"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
+			)
+		end
+
+		return rankings(modname .. '|', top:new(), function()
+			if self then
+				self.sorted[modname] = true
+			else
+				minetest.log(
+					"error",
+					"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
+				)
+			end
+		end)
 	end,
 
 	registered_on_rank_reset = {},
@@ -64,8 +90,21 @@ end
 ---@param func function
 --- * pname
 --- * rank
+--- * mode name
 function ctf_rankings.register_on_rank_reset(func)
 	table.insert(ctf_rankings.registered_on_rank_reset, func)
 end
+
+minetest.register_on_mods_loaded(function()
+	ctf_rankings.rankings_sorted = function(self)
+		for _, sorted in pairs(self.sorted) do
+			if not sorted then
+				return false
+			end
+		end
+
+		return true
+	end
+end)
 
 ctf_core.include_files("leagues.lua", "ranking_reset.lua")

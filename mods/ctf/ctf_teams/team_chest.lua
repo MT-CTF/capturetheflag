@@ -5,58 +5,37 @@ local blacklist = {
 	"default:pick_stone",
 }
 
---[[
+
 local item_value = {
-	["grenades:poison"] = 5,
-	["grenades:frag"] = 6,
-	["grenades:smoke"] = 2,
-	["ctf_ranged:pistol_loaded"] = 2,
-	["ctf_ranged:pistol"] = 1,
-	["ctf_ranged:rifle"] = 4,
-	["ctf_ranged:rifle_loaded"] = 5,
-	["ctf_ranged:smg"] = 4,
-	["ctf_ranged:smg_loaded"] = 5,
-	["ctf_ranged:sniper_magnum"] = 8,
+	["ctf_melee:sword_diamond"        ] = 16,
+	["ctf_melee:sword_mese"             ] = 13,
+	["ctf_ranged:shotgun_loaded"      ] = 12,
+	["ctf_ranged:shotgun"             ] = 10,
 	["ctf_ranged:sniper_magnum_loaded"] = 10,
-	["ctf_ranged:ammo"] = 4,
-	["default:diamond"] = 2.5,
-	["default:mese_crystal"] = 2,
-	["default:mese"] = 18,
-	["default:steel_ingot"] = 1,
-	["default:iron_lump"] = 1,
-	["default:sword_diamond"] = 16,
-	["default:sword_steel"] = 7,
-	["default:sword_mese"] = 13,
-	["default:pick_steel"] = 3,
-	["default:pick_mese"] = 6,
-	["default:pick_diamond"] = 7,
-	["default:axe_steel"] = 3,
-	["default:axe_mese"] = 6,
-	["default:axe_diamond"] = 7,
-	["default:shovel_steel"] = 2,
-	["default:shovel_mese"] = 3,
-	["default:shovel_diamond"] = 4,
-	["default:stick"] = 0.5,
-	["default:wood"] = 1,
-	["default:cobble"] = 1,
-	["ctf_map:reinforced_cobble"] = 3,
-	["ctf_map:damage_cobble"] = 3,
-	["ctf_map:unwalkable_cobble"] = 1,
-	["ctf_map:unwalkable_stone"] = 1,
-	["ctf_map:unwalkable_dirt"] = 1,
-	["default:steelblock"] = 2.5,
-	["default:bronzeblock"] = 2.5,
-	["default:obsidian_block"] = 3.5,
-	["ctf_map:spike"] = 2.5,
-	["default:apple"] = 1.5,
-	["ctf_healing:medkit"] = 6,
-	["ctf_healing:bandage"] = 6,
+	["ctf_ranged:sniper_magnum"       ] = 8,
+	["default:sword_steel"            ] = 7,
+	["default:pick_diamond"           ] = 7,
+	["default:axe_diamond"            ] = 7,
+	["grenades:frag"                  ] = 6,
+	["default:pick_mese"              ] = 6,
+	["ctf_healing:medkit"             ] = 6,
+	["default:axe_mese"               ] = 6,
+	["grenades:poison"                ] = 5,
+	["ctf_ranged:rifle_loaded"        ] = 5,
+	["ctf_ranged:smg_loaded"          ] = 5,
+	["ctf_ranged:rifle"               ] = 4,
+	["ctf_ranged:smg"                 ] = 4,
+	["ctf_healing:bandage"            ] = 4,
+	["default:shovel_diamond"         ] = 4,
+	["default:pick_steel"             ] = 3,
+	["default:axe_steel"              ] = 3,
+	["default:shovel_mese"            ] = 3,
+	["grenades:smoke"                 ] = 2,
+	["ctf_ranged:pistol_loaded"       ] = 2,
+	["default:mese_crystal"           ] = 2,
+	["default:shovel_steel"           ] = 2,
+	["ctf_ranged:pistol"              ] = 1,
 }
---]]
-
-
-
-
 
 local function get_chest_access(name)
 	local current_mode = ctf_modebase:get_current_mode()
@@ -308,17 +287,22 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		))
 		local meta = stack:get_meta()
 		local dropped_by = meta:get_string("dropped_by")
+		local dropteam = ctf_teams.get(dropped_by)
 		local pname = player:get_player_name()
-		if dropped_by ~= pname and dropped_by ~= "" then
+		if dropped_by ~= pname and dropped_by ~= "" and
+		dropteam and ctf_teams.get(pname) ~= dropteam then
 			local cur_mode = ctf_modebase:get_current_mode()
 			if pname and cur_mode then
-				--local score = (item_value[stack:get_name()] or 0) * stack:get_count()
-				cur_mode.recent_rankings.add(pname, { score = 1 }, false)
+				local score = item_value[stack:get_name()] or 1
+
+				cur_mode.recent_rankings.add(pname, { score = score }, false)
 			end
 		end
 		meta:set_string("dropped_by", "")
 		local inv = minetest.get_inventory({ type="node", pos=pos })
-		inv:set_stack(listname, index, stack)
+		local stack_ = inv:get_stack(listname,index)
+		stack_:get_meta():set_string("dropped_by", "")
+		inv:set_stack(listname, index, stack_)
 	end
 
 		function def.on_metadata_inventory_take(pos, listname, index, stack, player)

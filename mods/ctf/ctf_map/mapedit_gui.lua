@@ -74,10 +74,10 @@ local function dothenext(time, dir, func)
 end
 
 ctf_map.register_map_command("resave_all", function(name, params)
-	local dirlist = minetest.get_dir_list(ctf_map.maps_dir, true)
+	local maplist = table.copy(ctf_map.registered_maps)
 
 	dothenext(1, 1, function(next, dir)
-		if not dirlist[dir] then
+		if not maplist[dir] then
 			minetest.chat_send_player(
 				name,
 				minetest.colorize("green", "\nMap resaving done.\n")
@@ -85,7 +85,7 @@ ctf_map.register_map_command("resave_all", function(name, params)
 			return
 		end
 
-		local map = ctf_map.load_map_meta(dir, dirlist[dir])
+		local map = ctf_map.load_map_meta(dir, maplist[dir])
 
 
 		if map.enabled then
@@ -117,9 +117,9 @@ function ctf_map.show_map_editor(player)
 		return
 	end
 
-	local dirlist = minetest.get_dir_list(ctf_map.maps_dir, true)
-	local dirlist_sorted = dirlist
-	table.sort(dirlist_sorted)
+	local maplist = table.copy(ctf_map.registered_maps)
+	local maplist_sorted = maplist
+	table.sort(maplist_sorted)
 
 	local selected_map = 1
 	ctf_gui.old_show_formspec(player, "ctf_map:start", {
@@ -175,7 +175,7 @@ function ctf_map.show_map_editor(player)
 				type = "textlist",
 				pos = {"center", 1.7},
 				size = {6, 6},
-				items = dirlist_sorted,
+				items = maplist_sorted,
 				func = function(pname, fields)
 					local event = minetest.explode_textlist_event(fields.currentmaps)
 
@@ -192,13 +192,13 @@ function ctf_map.show_map_editor(player)
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = "Capture The Flag Map Editor",
-							description = "Placing map '"..dirlist_sorted[selected_map].."'. This will take a few seconds..."
+							description = "Placing map '"..maplist_sorted[selected_map].."'. This will take a few seconds..."
 						})
 					end)
 
 					minetest.after(0.5, function()
-						local idx = table.indexof(dirlist, dirlist_sorted[selected_map])
-						local map = ctf_map.load_map_meta(idx, dirlist_sorted[selected_map])
+						local idx = table.indexof(maplist, maplist_sorted[selected_map])
+						local map = ctf_map.load_map_meta(idx, maplist_sorted[selected_map])
 
 						ctf_map.place_map(map, function()
 								minetest.after(2, edit_map, pname, map)
@@ -214,14 +214,14 @@ function ctf_map.show_map_editor(player)
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = "Capture The Flag Map Editor",
-							description = "Resuming map '"..dirlist_sorted[selected_map]..
+							description = "Resuming map '"..maplist_sorted[selected_map]..
 									"'.\n(Remember that this doesn't recall setting changes)"
 						})
 					end)
 
 					minetest.after(0.5, function()
-						local idx = table.indexof(dirlist, dirlist_sorted[selected_map])
-						local map = ctf_map.load_map_meta(idx, dirlist_sorted[selected_map])
+						local idx = table.indexof(maplist, maplist_sorted[selected_map])
+						local map = ctf_map.load_map_meta(idx, maplist_sorted[selected_map])
 
 						minetest.after(2, edit_map, pname, map)
 					end)

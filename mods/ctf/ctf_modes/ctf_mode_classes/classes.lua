@@ -12,7 +12,7 @@ local class_props = {
 		color = "grey",
 		description = "High HP class with a sword capable of short damage bursts",
 		hp_max = 30,
-		visual_size = vector.new(1.1, 1.05, 1.1),
+		visual_size = vector.new(0.1, 0.05, 0.1),
 		items = {
 			"ctf_mode_classes:knight_sword",
 		},
@@ -47,7 +47,7 @@ local class_props = {
 		name = "Scout",
 		color = "orange",
 		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
-		visual_size = vector.new(0.9, 1, 0.9),
+		visual_size = vector.new(-0.1, 0.0, -0.1),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
 			"ctf_mode_classes:scaling_ladder"
@@ -143,7 +143,15 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 			local ctl = user:get_player_control()
 			if not ctl.sneak and not ctl.aux1 then return end
 		end
-
+		if ctf_teams.get(user) and not ctf_modebase.match_started then
+			local uname = user:get_player_name()
+			hud_events.new(uname, {
+				quick = true,
+				text = "You cannot activate special abilities during build time!",
+				color = "warning",
+			})
+			return
+		end
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
@@ -216,7 +224,15 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 
 			return
 		end
-
+		if ctf_teams.get(user) and not ctf_modebase.match_started then
+			local uname = user:get_player_name()
+			hud_events.new(uname, {
+				quick = true,
+				text = "You cannot activate special abilities during build time!",
+				color = "warning",
+			})
+			return
+		end
 		if itemstack:get_wear() == 0 then
 			grenades.throw_grenade("grenades:frag", 24, user)
 
@@ -297,7 +313,15 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 		    local ctl = user:get_player_control()
 		    if not ctl.sneak and not ctl.aux1 then return end
         end
-
+		if ctf_teams.get(user) and not ctf_modebase.match_started then
+			local uname = user:get_player_name()
+			hud_events.new(uname, {
+				quick = true,
+				text = "You cannot activate special abilities during build time!",
+				color = "warning",
+			})
+			return
+		end
 		local pname = user:get_player_name()
 
 		if itemstack:get_wear() == 0 then
@@ -351,10 +375,12 @@ end
 
 function classes.update(player)
 	local class = classes.get(player)
+	local base_size = player_api.registered_models['character.b3d'].visual_size
+	base_size = vector.new(base_size.x, base_size.y, base_size.z or base_size.x)
 
 	player:set_properties({
 		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
-		visual_size = class.visual_size or vector.new(1, 1, 1)
+		visual_size = vector.add(base_size, class.visual_size or vector.new()) or base_size
 	})
 
 	if class.physics then
@@ -415,77 +441,85 @@ function classes.show_class_formspec(player)
 	player = PlayerObj(player)
 	if not player then return end
 
-	if not cooldowns:get(player) then
-		if ctf_modebase.current_mode ~= "classes" then return end
+	if ctf_modebase.current_mode ~= "classes" then return end
 
-		if dist_from_flag(player) > 5 then
-			hud_events.new(player, {
-				quick = true,
-				text = "You can only change class at your flag!",
-				color = "warning",
+	if dist_from_flag(player) > 5 then
+		hud_events.new(player, {
+			quick = true,
+			text = "You can only change class at your flag!",
+			color = "warning",
+		})
+		return
+	end
+
+	local pteam = ctf_teams.get(player)
+
+	ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", function(context)
+		local form_x, form_y = 12, 10
+		local pad = 0.3
+
+		local bw = 3
+
+		local class = context.class
+		local class_prop = context.class_props[class]
+
+		local out = {
+			"formspec_version[4]",
+			{"size[%f,%f]", form_x, form_y+1.1},
+			"real_coordinates[true]",
+			{"hypertext[0,0.2;%f,1.6;title;<big><center><b>Class Info: %s</b></center></big>]", form_x, class_prop.name},
+
+			{"box[%s,1.2;%f,%f;#00000077]", pad, ((form_x/2)-0.7) - pad, form_y-2.4},
+			{"model[%s,1.4;%f,%f;classpreview;character.b3d;%s,blank.png;{0,160};;;]",
+				pad,
+				((form_x/2)-0.7) - pad,
+				form_y-2.6,
+				ctf_cosmetics.get_colored_skin(context.player, context.pteam and ctf_teams.team[context.pteam].color) ..
+						context.classes.get_skin_overlay(class, true) or ""
+			},
+			{[[hypertext[%f,1.2;%f,%f;info;<global margin=20 font=mono background=#00000044>
+				</b>
+				<center>%s</center>
+
+
+				<img name=heart.png width=20 float=left> %d HP
+				%s
+				Special items
+				%s
+				Disallowed Items
+				%s
+				] ]],
+				(form_x/2)-0.6,
+				(form_x/2)+0.6 - pad,
+				form_y-2.4,
+				class_prop.description,
+				class_prop.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+				class_prop.physics and class_prop.physics.speed and
+						"<img name=sprint_stamina_icon.png width=20 float=left> "..class_prop.physics.speed.."x Speed\n" or "",
+				class_prop.items_markup,
+				class_prop.disallowed_items_markup
+			},
+		}
+
+		local tb = #context.class_list -- total buttons
+		for i, c in pairs(context.class_list) do
+			local sect = (i-1)/(tb-1)
+			local font_color = "#ffffff"
+			if cooldowns:get(player) then
+				font_color = "#f23f42"
+				table.insert(out,
+					{"tooltip[select_%s;You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds. ]", c}
+				)
+			end
+			table.insert(out, {
+				"style[select_%s;textcolor=".. font_color ..
+				";font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
+				"style[show_%s;padding=8,8;bgcolor="..context.class_props[c].color.."]",
+				c,
+				20 + 8,
+				c,
 			})
-			return
-		end
-
-		local pteam = ctf_teams.get(player)
-
-		ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", function(context)
-			local form_x, form_y = 12, 10
-			local pad = 0.3
-
-			local bw = 3
-
-			local class = context.class
-			local class_prop = context.class_props[class]
-
-			local out = {
-				"formspec_version[4]",
-				{"size[%f,%f]", form_x, form_y+1.1},
-				"real_coordinates[true]",
-				{"hypertext[0,0.2;%f,1.6;title;<big><center><b>Class Info: %s</b></center></big>]", form_x, class_prop.name},
-
-				{"box[%s,1.2;%f,%f;#00000077]", pad, ((form_x/2)-0.7) - pad, form_y-2.4},
-				{"model[%s,1.4;%f,%f;classpreview;character.b3d;%s,blank.png;{0,160};;;]",
-					pad,
-					((form_x/2)-0.7) - pad,
-					form_y-2.6,
-					ctf_cosmetics.get_colored_skin(context.player, context.pteam and ctf_teams.team[context.pteam].color) ..
-							context.classes.get_skin_overlay(class, true) or ""
-				},
-				{[[hypertext[%f,1.2;%f,%f;info;<global margin=20 font=mono background=#00000044>
-					</b>
-					<center>%s</center>
-
-
-					<img name=heart.png width=20 float=left> %d HP
-					%s
-					Special items
-					%s
-					Disallowed Items
-					%s
-					] ]],
-					(form_x/2)-0.6,
-					(form_x/2)+0.6 - pad,
-					form_y-2.4,
-					class_prop.description,
-					class_prop.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
-					class_prop.physics and class_prop.physics.speed and
-							"<img name=sprint_stamina_icon.png width=20 float=left> "..class_prop.physics.speed.."x Speed\n" or "",
-					class_prop.items_markup,
-					class_prop.disallowed_items_markup
-				},
-			}
-
-			local tb = #context.class_list -- total buttons
-			for i, c in pairs(context.class_list) do
-				local sect = (i-1)/(tb-1)
-				table.insert(out, {
-					"style[select_%s;font_size=*1.4;content_offset=-%f,0;bgcolor="..context.class_props[c].color.."]" ..
-					"style[show_%s;padding=8,8;bgcolor="..context.class_props[c].color.."]",
-					c,
-					20 + 8,
-					c,
-				})
+			if not cooldowns:get(player) then
 				table.insert(out, {
 					"button_exit[%f,%f;%f,1;select_%s;%s]",
 					pad + (((form_x-(pad*2 + bw))) * sect),
@@ -494,59 +528,68 @@ function classes.show_class_formspec(player)
 					c,
 					context.class_props[c].name,
 				})
+			else
 				table.insert(out, {
-					"image_button[%f,%f;1,1;settings_info.png;show_%s;]",
-					pad + (((form_x-(pad*2 + bw))) * sect) + bw - 1,
+					"button[%f,%f;%f,1;select_%s;%s]",
+					pad + (((form_x-(pad*2 + bw))) * sect),
 					form_y-0.5,
+					bw,
 					c,
+					context.class_props[c].name,
 				})
-				table.insert(out,
-					{"tooltip[show_%s;Click to show class info]", c}
-				)
 			end
+			table.insert(out, {
+				"image_button[%f,%f;1,1;settings_info.png;show_%s;]",
+				pad + (((form_x-(pad*2 + bw))) * sect) + bw - 1,
+				form_y-0.5,
+				c,
+			})
+			table.insert(out,
+				{"tooltip[show_%s;Click to show class info]", c}
+			)
+		end
+		return ctf_gui.list_to_formspec_str(out)
+	end, {
+		classes = classes,
+		player = player,
+		pteam = pteam,
+		wrap_class = wrap_class,
+		class_list = class_list,
+		class_props = class_props,
+		class = classes.get_name(player) or "knight",
+		_on_formspec_input = function(pname, context, fields)
+			if ctf_modebase.current_mode ~= "classes" then return end
 
-			return ctf_gui.list_to_formspec_str(out)
-		end, {
-			classes = classes,
-			player = player,
-			pteam = pteam,
-			wrap_class = wrap_class,
-			class_list = class_list,
-			class_props = class_props,
-			class = classes.get_name(player) or "knight",
-			_on_formspec_input = function(pname, context, fields)
-				if ctf_modebase.current_mode ~= "classes" then return end
-
+			if cooldowns:get(player) then
 				for _, class in pairs(context.class_list) do
-					if fields["show_"..class] then
+					if fields["select_"..class] then
 						context.class = class
-
 						return "refresh"
 					end
-
-					if fields["select_"..class] then
-						if dist_from_flag(player) > 5 then
-							hud_events.new(player, {
-								quick = true,
-								text = "You can only change class at your flag!",
-								color = "warning",
-							})
-
-							return
-						end
-
-						select_class(pname, class)
-					end
 				end
-			end,
-		})
-	else
-		hud_events.new(player, {
-			quick = true,
-			text = "You can only change your class every "..CLASS_SWITCH_COOLDOWN.." seconds",
-			color = "warning",
-		})
-	end
+			end
+			for _, class in pairs(context.class_list) do
+				if fields["show_"..class] then
+					context.class = class
+					return "refresh"
+				end
+
+				if fields["select_"..class] then
+					if dist_from_flag(player) > 5 then
+						hud_events.new(player, {
+							quick = true,
+							text = "You can only change class at your flag!",
+							color = "warning",
+						})
+
+						return
+					end
+
+					select_class(pname, class)
+				end
+			end
+		end,
+	})
 end
 
 function classes.is_restricted_item(player, name)

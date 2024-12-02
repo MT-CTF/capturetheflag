@@ -23,77 +23,105 @@ ctf_rankings.do_reset = mods:get_int("_do_reset") == 1
 -- Resets taking place on the same month will overwrite each other
 local PLAYER_RANKING_PREFIX = "rank:"
 
-if ctf_rankings.do_reset then
-	local after_timer = 0
+local function do_reset()
+	local finish_count = 0
+	local function finish()
+		finish_count = finish_count - 1
 
-	minetest.after(5, function()
-		for mode, def in pairs(ctf_modebase.modes) do
-			local top = def.rankings.top
-			local time = minetest.get_us_time()
-			def.rankings.op_all(function(pname, value)
-				if value ~= "null" then
-					local rank = minetest.parse_json(value)
+		if finish_count == 0 then
+			mods:set_int("_do_reset", 0)
+			mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
 
-					rank.place = top:get_place(pname)
+			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 5)
+		end
+	end
 
-					RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, rank)
+	for mode, def in pairs(ctf_modebase.modes) do
+		local top = def.rankings.top
+		local time = minetest.get_us_time()
 
-					if (rank.score or 0) >= 8000 and
-					(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
-					(rank.flag_captures or 0) >= 5 then
-						rank._pro_chest = true
-					end
+		finish_count = finish_count + 1
 
-					local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
+		def.rankings.op_all(function(pname, value)
+			local rank = minetest.parse_json(value)
 
-					if current and current ~= "" then
-						current = minetest.parse_json(current)
+			if rank then
+				rank.place = top:get_place(pname)
 
-						current._last_reset = os.date("%m/%Y")
-						current[os.date("%m/%Y")][mode] = rank
+				RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, table.copy(rank), mode)
 
-						mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json(current))
-					else
-						mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json({
-							_last_reset = os.date("%m/%Y"),
-							[os.date("%m/%Y")] = {[mode] = rank},
-						}))
-					end
-
-					minetest.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
+				if (rank.score or 0) >= 8000 and
+				(rank.kills or 0) / (rank.deaths or 1) >= 1.4 and
+				(rank.flag_captures or 0) >= 5 then
+					rank._pro_chest = os.time()
 				end
-			end)
 
-			after_timer = after_timer + ((minetest.get_us_time()-time) / 1e6)
+				local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
+
+				if current and current ~= "" then
+					current = minetest.parse_json(current)
+
+					current._last_reset = os.date("%m/%Y")
+
+					if not current[os.date("%m/%Y")] then
+						current[os.date("%m/%Y")] = {}
+					end
+
+					current[os.date("%m/%Y")][mode] = rank
+
+					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json(current))
+				else
+					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json({
+						_last_reset = os.date("%m/%Y"),
+						[os.date("%m/%Y")] = {[mode] = rank},
+					}))
+				end
+
+				minetest.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
+			end
+		end,
+		function()
 			time = ((minetest.get_us_time()-time) / 1e6).."s"
 
 			minetest.chat_send_all("Saved old rankings for mode "..mode..". Took "..time)
 			minetest.log("action", "Saved old rankings for mode "..mode..". Took "..time)
-		end
 
-		for mode, def in pairs(ctf_modebase.modes) do
-			local time = minetest.get_us_time()
-			def.rankings.op_all(function(pname, value)
-				def.rankings:del(pname)
+			local t = minetest.get_us_time()
+			def.rankings.op_all(
+				function(pname, value)
+					def.rankings:del(pname)
 
-				minetest.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
-			end)
+					minetest.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
+				end,
+				function()
+					t = ((minetest.get_us_time()-t) / 1e6).."s"
 
-			after_timer = after_timer + ((minetest.get_us_time()-time) / 1e6)
-			time = ((minetest.get_us_time()-time) / 1e6).."s"
+					minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..t)
+					minetest.log("action", "Reset rankings for mode "..mode..". Took "..t)
 
-			minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..time)
-			minetest.log("action", "Reset rankings for mode "..mode..". Took "..time)
-		end
+					minetest.after(1, finish) -- wait in case for some reason not all the resets were queued
+				end
+			)
+		end)
+	end
+end
 
-		mods:set_int("_do_reset", 0)
-		mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
-		minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, after_timer + 5)
+local function check()
+	if ctf_rankings:rankings_sorted() then
+		do_reset()
+	else
+		minetest.after(1, check)
+	end
+end
+
+if ctf_rankings.do_reset then
+	minetest.register_on_mods_loaded(function()
+		check()
 	end)
 end
 
 if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date")).month == os.date("*t").month then
-	local CHECK_INTERVAL = 60 * 50 -- 50 minutes
+	local CHECK_INTERVAL = 60 * 30 -- 30 minutes
 	local timer = CHECK_INTERVAL
 	minetest.register_globalstep(function(dtime)
 		timer = timer + dtime
@@ -110,8 +138,10 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 				if hours_left > 0 then
 					if hours_left == 6 then
 						ctf_report.send_report("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
+						minetest.chat_send_all("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
 					elseif hours_left == 1 then
 						ctf_report.send_report("[RANKING RESET] The queued ranking reset will happen in 1 hour")
+						minetest.chat_send_all("[RANKING RESET] The queued ranking reset will happen in 1 hour")
 
 						CHECK_INTERVAL = (61 - current.min) * 60
 
@@ -126,7 +156,7 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 					ctf_rankings.do_reset = true
 
 					minetest.registered_chatcommands["queue_restart"].func("[RANKING RESET]",
-						"There will be another restart once the ranking reset is done."
+						"Ranking Reset"
 					)
 				end
 			end

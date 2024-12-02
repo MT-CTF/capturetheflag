@@ -40,6 +40,8 @@ local function add_entity_tag(player, old_observers)
 
 	remove_entity_tag(player)
 
+	if not ppos then return end
+
 	local ent = minetest.add_entity(ppos, "playertag:tag")
 	local ent2 = false
 	local ent3 = false
@@ -104,11 +106,11 @@ local function update(player, settings)
 	local old_observers = {}
 
 	if player.get_observers and players[pname] then
-		if players[pname].nametag_entity then
+		if players[pname].nametag_entity and players[pname].nametag_entity.object:get_pos() then
 			old_observers.nametag_entity = players[pname].nametag_entity.object:get_observers()
 		end
 
-		if players[pname].symbol_entity then
+		if players[pname].symbol_entity and players[pname].nametag_entity.object:get_pos() then
 			old_observers.symbol_entity = players[pname].symbol_entity.object:get_observers()
 		end
 	end
@@ -170,6 +172,20 @@ minetest.register_entity("playertag:tag", {
 	static_save = false,
 	pointable = false,
 	on_punch = function() return true end,
+	on_deactivate = function(self, removal)
+		if not removal then
+			local attachmentInfo = self.object:get_attach()
+			local player = nil
+			if attachmentInfo then
+				player = attachmentInfo.parent
+			end
+
+			if player and player:is_player() then
+				minetest.log("action", "Playertag for player "..player:get_player_name().." unloaded. Re-adding...")
+				update(player, players[player:get_player_name()])
+			end
+		end
+	end
 })
 
 minetest.register_on_joinplayer(function(player)

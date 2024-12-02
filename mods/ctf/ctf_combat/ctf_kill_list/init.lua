@@ -34,8 +34,17 @@ local HUD_DEFINITIONS = {
 
 local kill_list = {}
 
+function ctf_kill_list.show_to_player(player)
+	return true
+end
+
 local image_scale_map = ctf_settings.settings["ctf_kill_list:tp_size"].image_scale_map
 local function update_hud_line(player, idx, new)
+	if not ctf_kill_list.show_to_player(player) then
+		hud:clear(player)
+		return
+	end
+
 	idx = HUD_LINES - (idx-1)
 
 	local image_scale = tonumber(ctf_settings.get(player, "ctf_kill_list:tp_size"))

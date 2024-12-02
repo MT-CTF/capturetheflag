@@ -207,7 +207,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 								if dname ~= pname and dteam ~= pteam then
 									target:punch(thrower, 1, {
 										damage_groups = {
-											fleshy = 1,
+											fleshy = 2,
 											grenade = 1,
 											poison_grenade = 1,
 										}

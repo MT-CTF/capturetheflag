@@ -3,6 +3,7 @@ ctf_modebase = {
 	modes                = {},    ---@type table
 
 	-- Same as ctf_modebase.modes but in list form.
+	--
 	-- Exception: Disabled modes that show up in ctf_modebase.modes won't show up in the modelist
 	modelist             = {},    ---@type list
 
@@ -38,9 +39,16 @@ ctf_modebase = {
 	--flag_captured[Team name] = true if captured, otherwise nil
 	flag_captured        = {},
 
-	flag_attempt_history = {
-		-- ["player"] = {time0, time1, time2, ...}
-	},
+	-- Choose who can see a player's nametag, defaults to their teammates
+	--
+	-- return {playername = <x>, playername2 = <x>, ...}
+	--
+	-- x: `"1"` for full nametag, `"2"` for symbol, or `true` to use the player setting for it
+	get_allowed_nametag_observers = function(player)
+		local pteam = ctf_teams.get(player)
+
+		return table.copy(ctf_teams.online_players[pteam].players)
+	end
 }
 
 ctf_gui.old_init()
@@ -105,7 +113,17 @@ minetest.register_on_mods_loaded(function()
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text = ""})
 		end)
 	elseif ctf_core.settings.server_mode == "play" then
-		minetest.after(3, ctf_modebase.start_new_match)
+		minetest.chat_send_all("[CTF] Sorting rankings...")
+		local function check()
+			if not ctf_rankings:rankings_sorted() then
+				return minetest.after(1, check)
+			end
+
+			minetest.chat_send_all("[CTF] Rank sorting done. Starting new match...")
+			ctf_modebase.start_new_match()
+		end
+
+		check()
 	end
 
 	for _, name in pairs(ctf_modebase.modelist) do
