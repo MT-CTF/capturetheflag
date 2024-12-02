@@ -37,6 +37,7 @@ exclude_files = {
 	"mods/other/lib_chatcmdbuilder",
 	"mods/other/email",
 	"mods/other/select_item",
+	"mods/ctf/ctf_beds",
 }
 
 read_globals = {
