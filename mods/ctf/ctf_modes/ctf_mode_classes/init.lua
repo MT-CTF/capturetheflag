@@ -57,6 +57,7 @@ ctf_modebase.register_mode("classes", {
 		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 2, rarity = 0.2},
 		["ctf_map:damage_cobble"    ] = {min_count = 5, max_count = 20, max_stacks = 2, rarity = 0.2},
 		["ctf_map:reinforced_cobble"] = {min_count = 5, max_count = 25, max_stacks = 2, rarity = 0.2},
+		["ctf_map:landmine"         ] = {min_count = 1, max_count =  5, max_stacks = 1, rarity = 0.2},
 
 		["ctf_ranged:ammo"    ] = {min_count = 3, max_count = 10, rarity = 0.3  , max_stacks = 2},
 		["ctf_healing:medkit" ] = {                               rarity = 0.08 , max_stacks = 2},
@@ -67,7 +68,7 @@ ctf_modebase.register_mode("classes", {
 	},
 	crafts = {
 		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
-		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2", "ctf_map:landmine",
 	},
 	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
