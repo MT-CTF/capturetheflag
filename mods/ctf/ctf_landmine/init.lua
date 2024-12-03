@@ -140,6 +140,10 @@ core.register_node("ctf_landmine:landmine", {
 			landmine_explode(pos)
 		end
 	end
+	on_dig = function(pos, node, digger)
+        remove_landmine(pos)
+        minetest.node_dig(pos, node, digger)
+    end,
 })
 
 core.register_globalstep(function(dtime)
