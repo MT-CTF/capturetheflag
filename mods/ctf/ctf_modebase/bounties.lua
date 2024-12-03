@@ -80,12 +80,7 @@ function ctf_modebase.bounties.claim(player, killer)
 	end
 
 	local rewards = bounties[pteam].rewards
-	local bounty_kill_text = string.format("[Bounty] %s killed %s and got %s", killer, player, get_reward_str(rewards))
-	core.chat_send_all(core.colorize(CHAT_COLOR, bounty_kill_text))
-	ctf_modebase.announce(bounty_kill_text)
-	local rewards = { bounty_kills = 0, score = 0 }
 	if bounties[pteam] and bounties[pteam].rewards then
-		rewards = bounties[pteam].rewards
 		local bounty_kill_text =
 			string.format(
 				"[Bounty] %s killed %s and got %s from the game!",
@@ -101,6 +96,9 @@ function ctf_modebase.bounties.claim(player, killer)
 	if ctf_modebase.contributed_bounties[player] then
 		local score = ctf_modebase.contributed_bounties[player].total
 		rewards.score = rewards.score + score
+		rewards.bounty_kills =
+			#ctf_modebase.contributed_bounties[player].contributors
+			+ rewards.bounty_kills
 		local bounty_kill_text =
 				string.format(
 					"[Player bounty] %s killed %s and got %d from %s!",
