@@ -163,8 +163,8 @@ crafting.register_recipe({
 })
 
 crafting.register_recipe({
-	output = "ctf_map:damage_cobble",
-	items = { "ctf_map:unwalkable_cobble", "ctf_map:spike" },
+	output = "ctf_map:damage_cobble 5",
+	items = { "default:cobble 5", "ctf_map:spike" },
 	always_known = false,
 })
 
