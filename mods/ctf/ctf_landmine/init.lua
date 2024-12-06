@@ -4,9 +4,10 @@ local landmines = {
 }
 
 local number_of_landmines = 0
+local ARMING_TIME = 3
 
 local add_landmine = function(pos)
-	landmines[core.hash_node_position(pos)] = true
+	landmines[core.hash_node_position(pos)] = os.clock()
 	number_of_landmines = number_of_landmines + 1
 end
 
@@ -16,7 +17,7 @@ local clear_landmines = function()
 end
 
 local remove_landmine = function(pos)
-	landmines[core.hash_node_position(pos)] = false
+	landmines[core.hash_node_position(pos)] = nil
 	number_of_landmines = number_of_landmines - 1
 end
 
@@ -107,7 +108,7 @@ local function landmine_explode(pos)
 end
 
 core.register_node("ctf_landmine:landmine", {
-	description = "Landmine",
+	description = string.format("Landmine (%ds arming time)", ARMING_TIME),
 	drawtype = "nodebox",
 	tiles = {
 		"ctf_landmine_landmine.png",
@@ -141,9 +142,9 @@ core.register_node("ctf_landmine:landmine", {
 		end
 	end,
 	on_dig = function(pos, node, digger)
-        remove_landmine(pos)
-        minetest.node_dig(pos, node, digger)
-    end
+		remove_landmine(pos)
+		minetest.node_dig(pos, node, digger)
+	end
 })
 
 core.register_globalstep(function(dtime)
@@ -170,8 +171,9 @@ core.register_globalstep(function(dtime)
 			vector.add(pos, { x = 0, y = 1, z = 0}),
 		}
 
+		local current = os.clock()
 		for _idx2, pos2 in ipairs(positions_to_check) do
-			if landmines[core.hash_node_position(pos2)] then
+			if current - (landmines[core.hash_node_position(pos2)] or current) >= ARMING_TIME then
 				if not is_self_landmine(obj, pos2) then
 					landmine_explode(pos2)
 				end
