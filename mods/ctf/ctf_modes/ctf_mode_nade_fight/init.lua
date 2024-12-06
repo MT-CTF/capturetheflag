@@ -49,11 +49,11 @@ ctf_modebase.register_mode("nade_fight", {
 		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
 	},
 	crafts = {
-		"ctf_map:damage_cobble",
+		"ctf_map:damage_cobble 5",
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
 		"ctf_ranged:ammo",
-		"ctf_landmine:landmine",
+		"ctf_landmine:landmine 3",
 	},
 	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
