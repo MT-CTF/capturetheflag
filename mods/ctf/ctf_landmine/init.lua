@@ -1,13 +1,13 @@
 local landmines = {
-	-- core.hash_node_position(pos) -> true/false
-	-- like landmines[core.hash_node_position(pos)] = true
+	-- core.hash_node_position(vector.round(pos)) -> placement time
+	-- like landmines[core.hash_node_position(vector.round(pos))] = os.clock()
 }
 
 local number_of_landmines = 0
 local ARMING_TIME = 3
 
 local add_landmine = function(pos)
-	landmines[core.hash_node_position(pos)] = os.clock()
+	landmines[core.hash_node_position(vector.round(pos))] = os.clock()
 	number_of_landmines = number_of_landmines + 1
 end
 
@@ -17,7 +17,7 @@ local clear_landmines = function()
 end
 
 local remove_landmine = function(pos)
-	landmines[core.hash_node_position(pos)] = nil
+	landmines[core.hash_node_position(vector.round(pos))] = nil
 	number_of_landmines = number_of_landmines - 1
 end
 
@@ -115,6 +115,7 @@ core.register_node("ctf_landmine:landmine", {
 		"ctf_landmine_landmine.png^[transformFY"
 	},
 	inventory_image = "ctf_landmine_landmine.png",
+	wield_image = "ctf_landmine_landmine.png",
 	paramtype = "light",
 	sunlight_propagates = true,
 	walkable = true,
@@ -173,7 +174,7 @@ core.register_globalstep(function(dtime)
 
 		local current = os.clock()
 		for _idx2, pos2 in ipairs(positions_to_check) do
-			if current - (landmines[core.hash_node_position(pos2)] or current) >= ARMING_TIME then
+			if current - (landmines[core.hash_node_position(vector.round(pos2))] or current) >= ARMING_TIME then
 				if not is_self_landmine(obj, pos2) then
 					landmine_explode(pos2)
 				end
