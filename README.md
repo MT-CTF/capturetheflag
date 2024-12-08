@@ -33,6 +33,23 @@ Note that this version may be slightly behind the git version, but it will be a 
   * Run something like this when starting your server: `(cd minetest/worlds/yourworld && redis-server) | <command to launch your minetest server>`
     * If you run your Minetest server using a system service it is recommended to run redis-server on a seperate service, with the Minetest service depending upon it
 
+## FAQ
+
+### 1. Why mobs aren't added?
+
+Mobs have been suggested from very early days of CTF by several. The question has always been no. The short answer is that mobs use a lot of resources without adding much gameplay. The longer answer is that smart mobs usually require a lot of CPU, the network usage is high. The same resource could be allocated to more players who add much more to the gameplay comparing to mobs. However, there are many unofficial servers which might have mods, you can play there if you like them. Or, since CTF is FOSS, free open source software, you can fork it and do whatever you like. Maybe you could prove the developers they are wrong by adding efficient *and* smart mobs :)
+
+TL;DR The devs don't know of a way to add mobs to the game which is worth the lags they add.
+
+### 2. I'm trying to run a CTF server but it crashes soon after starting.
+
+It's probably crashing due to limited memory (RAM), and/or you didn't compile Minetest with LuaJIT.
+Setting `ctf_low_ram_mode` to `true` in your `minetest.conf` may fix the issue
+
+### 3. I want to host a CTF public server with X players. How much resources do I need?
+
+TBD
+
 ## Starting a game (GUI instructions)
 * Create a new `singlenode` world
 * Turn on `Enable Damage` and `Host Server`, turn off `Creative Mode`, *memorize* your port
