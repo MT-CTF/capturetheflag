@@ -5,7 +5,7 @@ local function get_item_description(name)
 		local group = name:sub(7, #name):gsub("%_", " ")
 		return "Any " .. group
 	else
-		local def = minetest.registered_items[name] or {}
+		local def = core.registered_items[name] or {}
 		return def.description or name
 	end
 end
@@ -66,7 +66,7 @@ function crafting.make_result_selector(player, size, context)
 	table_insert(formspec, "container_end[]")
 
 	table_insert(formspec, "label[0,-0.1;")
-	table_insert(formspec, minetest.formspec_escape(
+	table_insert(formspec, core.formspec_escape(
 		"Page: " .. page .. "/" .. max_pages)
 	)
 	table_insert(formspec, "]")
@@ -94,18 +94,18 @@ function crafting.make_result_selector(player, size, context)
 		table_insert(formspec, "tooltip[result_")
 		table_insert(formspec, tostring(recipe.id))
 		table_insert(formspec, ";")
-		table_insert(formspec, minetest.formspec_escape(item_description .. "\n"))
+		table_insert(formspec, core.formspec_escape(item_description .. "\n"))
 		for _, item in ipairs(result.items) do
 			local color = item.have >= item.need and "#6f6" or "#f66"
 			local itemtab = {
 				"\n",
-				minetest.get_color_escape_sequence(color),
+				core.get_color_escape_sequence(color),
 				get_item_description(item.name), ": ",
 				item.have, "/", item.need
 			}
-			table_insert(formspec, minetest.formspec_escape(table.concat(itemtab, "")))
+			table_insert(formspec, core.formspec_escape(table.concat(itemtab, "")))
 		end
-		table_insert(formspec, minetest.get_color_escape_sequence("#ffffff"))
+		table_insert(formspec, core.get_color_escape_sequence("#ffffff"))
 		table_insert(formspec, "]")
 
 		table_insert(formspec, "image[")
@@ -168,12 +168,12 @@ function crafting.result_select_on_receive_results(player, context, fields)
 				local recipe = crafting.get_recipe(tonumber(num))
 				local name   = player:get_player_name()
 				if not crafting.can_craft(name, recipe) then
-					minetest.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
+					core.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
 					return true
 				elseif crafting.perform_craft(player, "main", "main", recipe) then
 					return true -- crafted
 				else
-					minetest.chat_send_player(name, "Missing required items!")
+					core.chat_send_player(name, "Missing required items!")
 					return false
 				end
 			end
@@ -181,10 +181,10 @@ function crafting.result_select_on_receive_results(player, context, fields)
 	end
 end
 
-if minetest.global_exists("sfinv") then
+if core.global_exists("sfinv") then
 	local player_inv_hashes = {}
 
-	local trash = minetest.create_detached_inventory("crafting_trash", {
+	local trash = core.create_detached_inventory("crafting_trash", {
 		-- Allow the stack to be placed and remove it in on_put()
 		-- This allows the creative inventory to restore the stack
 		allow_put = function(inv, listname, index, stack, player)
@@ -219,7 +219,7 @@ if minetest.global_exists("sfinv") then
 				cooldown:set(player, 0.5)
 				ctf_modebase.player.save_initial_stuff_positions(player)
 
-				minetest.sound_play("crafting_save_sound", {
+				core.sound_play("crafting_save_sound", {
 					to_player = player:get_player_name(),
 				}, true)
 			end
@@ -229,13 +229,13 @@ if minetest.global_exists("sfinv") then
 	})
 
 	local globalstep_timer = 0
-	minetest.register_globalstep(function(dtime)
+	core.register_globalstep(function(dtime)
 		globalstep_timer = globalstep_timer + dtime
 		if globalstep_timer < 1 then return end
 
 		globalstep_timer = 0
 
-		for _, player in pairs(minetest.get_connected_players() or {}) do
+		for _, player in pairs(core.get_connected_players() or {}) do
 			if sfinv.get_or_create_context(player).page == "sfinv:crafting" then
 				local hash = crafting.calc_inventory_list_hash(player:get_inventory(), "main")
 				local old_hash = player_inv_hashes[player:get_player_name()]
