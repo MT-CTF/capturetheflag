@@ -1,11 +1,14 @@
 local ladders = {
-    {'ladder_wood', 'default_ladder_wood.png', 'default_wood.png'},
-    {'ladder_steel', 'default_ladder_steel.png', 'default_steel_block.png'}
+    {'default:ladder_wood', 'default_ladder_wood.png', 'default_wood.png'},
+    {'default:ladder_steel', 'default_ladder_steel.png', 'default_steel_block.png'},
+    {'ctf_map:ladder_wood', 'default_ladder_wood.png', 'default_wood.png'},
+    {'ctf_map:ladder_steel', 'default_ladder_steel.png', 'default_steel_block.png'},
+    {'ctf_mode_classes:scaling_ladder', 'default_ladder_steel.png', 'default_steel_block.png'},
 }
 
 
 for l,def in pairs(ladders) do
-    core.override_item('default:'..def[1], {
+    core.override_item(def[1], {
         tiles = { def[2], def[2], def[3], def[3], def[3], def[3] },
         use_texture_alpha = 'clip',
         drawtype = 'nodebox',
