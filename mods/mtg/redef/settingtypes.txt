@@ -19,7 +19,7 @@ redef_3d_ladders (Render ladders in 3D) bool true
 # still will be 99 even if set different here.
 #
 # Fixes https://forum.minetest.net/viewtopic.php?t=16817
-redef_stack_max (Maximum stack size) int 99
+redef_stack_max (Maximum stack size) int 100
 
 # Set the grass selection box to a lower height.
 #
