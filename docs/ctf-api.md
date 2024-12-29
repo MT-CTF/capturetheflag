@@ -242,21 +242,21 @@ This mod provides a simple dialog for players to select an item from. The API Re
 
 ## skybox
 Provides a basic API for modifying a player sky box in a coherent fashion.
-### `skybox.clear(player)`
+#### `skybox.clear(player)`
 * Reverts the player skybox setting to the default.
 * `player` *PlayerObj*: Player the skybox will be shown to.
 
-### `skybox.set(player, number)`
+#### `skybox.set(player, number)`
 * Sets the skybox to the `number` in the list of current skyboxes.
 * `player` *PlayerObj*: Player the skybox will be shown to.
 * `number` *number*: Choose the skybox from the list of skyboxes. 
 
-### `skybox.restore(player)`
+#### `skybox.restore(player)`
 * Reverts the player skybox to the last `skybox.set()` value.
 * Other skybox mods can properly restore the player's custom skybox.
 * `player` *PlayerObj*: Player the skybox will be reverted for.
 
-### `skybox.add(skyboxdef)`
+#### `skybox.add(skyboxdef)`
 * Add a new skybox with skyboxdef to the list of available skyboxes.
 * `skyboxdef` *SkyBoxDef* : New Skybox definition. 
 ```
@@ -273,7 +273,7 @@ Example SkyboxDef
     {"DarkStormy", "#1f2226", 0.5, { density = 0.5, color = "#aaaaaae0", ambient = "#000000",
     	height = 64, thickness = 32, speed = {x = 6, y = -6},}},
 ```
-### `skybox.get_skies()`
+#### `skybox.get_skies()`
 * Get a list of availiable skyboxes
 
 ## sprint
@@ -282,7 +282,7 @@ No API's are exposed by this mod.
 
 ## throwable_snow
 This mod, allows snow balls to be thrown at other players as projectiles. 
-### `throwable_snow.on_hit_player(thrower, player)`
+#### `throwable_snow.on_hit_player(thrower, player)`
 * `thrower` *PlayerObj*: Player who threw the snow. 
 *  `player` *PlayerObj*: Player on whom it hit.
 Override this function, if you want to change what happens on snow hit.  
@@ -290,8 +290,197 @@ Override this function, if you want to change what happens on snow hit.
 ## wield3d
 This mod makes hand wielded items visible to other players. No API's are exposed by this mod. 
 
-# mods/ctf/
-TODO, below is a collection of quick notes for later
+# ctf
+The main engine of Capture The Flag game. The following folder consists of the collection of mods, which powers the entire game. 
+
+## ctf_api
+This mod registers the functions to be executed when certain key events happen. The following functions exist, all of which take a `func` *Function* as its parameter. 
+
+1. `ctf_api.registered_on_mode_start(func)`
+2. `ctf_api.registered_on_new_match(func)`
+3. `ctf_api.registered_on_match_start(func)`
+4. `ctf_api.registered_on_match_end(func)` 
+5. `ctf_api.registered_on_respawnplayer(func)` - Requires a return type of *PlayerObj*
+6. `ctf_api.registered_on_flag_take(func)` - Requires a return type of  a tuple having `taker`*PlayerObj* and `flag_team` *string* 
+7. `ctf_api.registered_on_flag_capture(func)` - Requires a return type of  a tuple having `capturer`*PlayerObj* and `flagteams` *list(string)* (list of the teams of the flags taken) 
+
+## ctf_chat
+This mod overrides the build in chat commands, and introduces a few new chat commands. No API's are exposed by this mod. 
+
+## ctf_combat
+This modpack consists of multiple mods. 
+### ctf_combat_mode
+#### `ctf_combat_mode.add_hitter(player, hitter, weapon_image, time)`
+* `player` *PlayerObj*: Player who was killed. 
+* `hitter` *PlayerObj*: Player killed the `player`
+* `weapon_image` *string*: Path to weapon_image.
+* `time`: *number*: Amount of time(in sec) to show for. 
+#### `ctf_combat_mode.add_healer(player, healer, time)`
+* `player` *PlayerObj*: Player who was healed.. 
+* `healer` *PlayerObj*: Player who healed the `player`
+* `time`: *number*: Amount of time(in sec) to show for. 
+#### `ctf_combat_mode.get_last_hitter(player)`
+* `player` *PlayerObj*: Player.
+* returns a tuple of `last_hitter` *PlayerObj*, and `weapon_image` *string*
+#### `ctf_combat_mode.get_other_hitters(player, last_hitter)`
+* `player` *PlayerObj*: Player. 
+* `last_hitter` *PlayerObj*: Player who hit the `player` last.
+* returns a table/list of *players* *list(PlayerObj)* 
+#### `ctf_combat_mode.get_healers(player)`
+* `player` *PlayerObj*: Player.
+* returns a table/list of *healers* *list(PlayerObj)* 
+#### `ctf_combat_mode.is_only_hitter(player, hitter)`
+* `player` *PlayerObj*: Player who was killed. 
+* `hitter` *PlayerObj*: Player killed the `player`
+* returns *boolean*
+#### `ctf_combat_mode.set_kill_time(player, time)`
+* `player` *PlayerObj*: Player
+* `time` *integer*: Time. ???
+#### `ctf_combat_mode.in_combat(player)`
+* `player` *PlayerObj*: Player
+* returns *boolean*
+#### `ctf_combat_mode.end_combat(player)`
+* `player` *PlayerObj*: Player
+
+### ctf_healing
+#### `ctf_healing.register_on_heal(func, load_first)`
+* `func` *Function*: function to execute on healing.
+* `load_first` *boolean*: true if function has to be loaded first, before all other functions.
+#### `ctf_healing.register_bandage(name, def)`
+* `name` *string*: Item name of the bandage.
+* `def` *ItemDef*: Item definition. (Needed: `description`, `inventory_image`, `inventory_overlay`, `wield_image`)
+
+### ctf_kill_list
+#### `ctf_kill_list.show_to_player(player)`
+* `player` *PlayerObj*: Player
+* returns `boolean`
+
+#### `ctf_kill_list.add(killer, victim, weapon_image, comment)`
+* `killer` *PlayerObj*: Player who killed. 
+* `victim` *PlayerObj*: Player killed by `killer`
+* `weapon_image` *string*: Path to image of weapon used to kill.
+* `comment` *string*: comment. (such as "Combat Log")
+
+### ctf_melee
+#### `ctf_melee.simple_register_sword(name, def)`
+* `name` *string*: Item name of the sword.
+* `def` *ItemDef*: Item definition. (Needed: `description`, `inventory_image`, `inventory_overlay`, `wield_image`, `full_punch_interval`, `damage_groups` )
+
+#### `ctf_melee.register_sword(name, def)`
+* `name` *string*: Item name of the sword.
+* `def` *ItemDef*: Item definition. (Needed: `description`, `inventory_image`, `inventory_overlay`, `wield_image`, `full_punch_interval`, `damage_groups`,`tool_capabilities`,`damage_groups` )
+* ??? Difference between the two?
+
+### ctf_ranged
+#### `ctf_ranged.can_use_gun(player, name)`
+* `player` *PlayerObj*: Player
+* `name` *string*: Player name
+* returns *boolean*
+* can be overriden for custom behavior. 
+
+#### `ctf_ranged.simple_register_gun(name, def)`
+* `name` *string*: Item name of the gun.
+* `def` *ItemDef*: Item definition. (Needed: `description`, `texture`, `rounds`, `type`, `inventory_image`, `inventory_overlay`, `wield_image`, `full_punch_interval`, `damage_groups`, `rightclick_func` )
+
+#### `ctf_ranged.show_scope(name, item_name, fov_mult)`
+* `name` *string*: Player name
+* `item_name` *string*: Item name
+* `fov_mult` *integer*: FOV Multiplier.
+
+#### `ctf_ranged.hide_scope(name)`
+* `name` *string*: Player name
+
+## ctf_core
+#### `ctf_core.init_cooldowns()`
+* returns a table of `players`(table) and functions `set`, `get`.
+
+#### `ctf_core.get_players_inside_radius(pos,radius,teamless)`
+* `pos` *Position*: position.
+* `radius` *integer*: Radius to check from the position.
+* `teamless` *boolean*: If true then returns the players in your team, and if `false` gives an empty table.
+
+#### ` ctf_core.register_on_formspec_input(formname, func)`
+???
+
+#### `HumanReadable(input)`
+* `input` *any*: Converts any input into proper readable string format.
+
+#### `RunCallbacks(funclist,...)`
+???
+
+#### `ctf_core.pos_inside(pos, pos1, pos2)`
+* `pos` *position*: Position to check
+* `pos1` *position*: One corner to check in
+* `pos2` *position*: Other corner
+* returns *boolean*
+
+#### `ctf_core.register_chatcommand_alias(name, alias, def)`
+* `name` *string*: Original command.
+* `alias` *string*: Alias name for command
+* `def` *FuncDef*: Command Definition.
+
+#### `ctf_core.file_exists(path)`
+* `path` *string*: Path to file
+* returns *boolean*
+
+#### `ctf_core.to_number(s)`
+* `number` *any*: data to be converted to number.
+
+#### `ctf_core.error(area, msg)`
+* `area` *string*: Category where error occured.
+* `msg` *string*: Error message
+
+#### `ctf_core.log(area, msg)`
+* `area` *string*: Category where log originated.
+* `msg` *string*: Log message
+
+#### `ctf_core.action(area, msg)`
+* `area` *string*: Category where action occured.
+* `msg` *string*: Action message
+
+#### `ctf_core.warning(area, msg)`
+* `area` *string*: Category where warning originated.
+* `msg` *string*: Warning message
+
+#### `ctf_core.include_files(...)`
+* `...` *multiple_params*: List of files to be included/ executed along with the `init.lua`. Runs `dofile` on the same. For example,
+```lua
+ctf_core.include_files(
+	"helpers.lua",
+	"privileges.lua",
+	"cooldowns.lua"
+)
+```
+## ctf_cosmetics
+#### `ctf_cosmetics.get_colored_skin(player, color)`
+* `player` *PlayerObj*: Player
+* `color` *string*: Color of the skin. (Default: white)
+
+#### `ctf_cosmetics.get_skin(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_cosmetics.get_clothing_texture(player, clothing)`
+* `player` *PlayerObj*: Player
+* `clothing` *string*: Type of clothing
+
+#### `ctf_cosmetics.set_extra_clothing(player, extra_clothing)`
+* `player` *PlayerObj*: Player
+* `extra_clothing` ???
+
+#### `ctf_cosmetics.get_extra_clothing(player)`
+* `player` *PlayerObj*: Player
+
+## ctf_landmine
+No API's exposed in this mod. 
+
+
+
 
 ## ctf_teams
 * https://modern.ircdocs.horse/formatting.html#colors-16-98
+
+
+<!--
+API Docs for CTF by mrtechtroid. 
+Released under CC BY-SA 4.0
+-->
