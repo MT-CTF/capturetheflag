@@ -4,7 +4,11 @@ local default_strength = tonumber(core.settings:get("volumetric_lighting_default
 
 -- Set a player's volumetric lighting strength in mod storage
 local function set_player_strength(player, strength)
-    storage:set_string("strength_" .. player:get_player_name(), tostring(strength))
+    if player and player:get_player_name() then
+        storage:set_string("strength_" .. player:get_player_name(), tostring(strength))
+    else
+        minetest.log("Invalid player object when setting strength.")
+    end
 end
 
 core.register_on_joinplayer(function(player)
