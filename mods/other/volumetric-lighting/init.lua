@@ -1,19 +1,19 @@
 local S = core.get_translator('volumetric_lighting')
-local storage = core.get_mod_storage()
 local default_strength = tonumber(core.settings:get("volumetric_lighting_default_strength") or 0.1)
 
--- Set a player's volumetric lighting strength in mod storage
-local function set_player_strength(player, strength)
-    if player and player:get_player_name() then
-        storage:set_string("strength_" .. player:get_player_name(), tostring(strength))
+local function apply_light_strength(player)
+    local new_strength = tonumber(ctf_settings.get(player, "volumetric_lighting:light_strength"))
+    if new_strength then
+        new_strength = new_strength / 100
     else
-        minetest.log("Invalid player object when setting strength.")
+        new_strength = default_strength
     end
+
+    player:set_lighting({ volumetric_light = { strength = new_strength } })
 end
 
 core.register_on_joinplayer(function(player)
-    local strength = tonumber(storage:get_string("strength_" .. player:get_player_name())) or default_strength
-    player:set_lighting({ volumetric_light = { strength = strength } })
+    apply_light_strength(player)
 end)
 
 core.register_chatcommand("light_strength", {
@@ -34,7 +34,7 @@ core.register_chatcommand("light_strength", {
             return true
         end
 
-        set_player_strength(player, new_strength)
+        ctf_settings.set(player, "volumetric_lighting:light_strength", new_strength * 100)
         player:set_lighting({ volumetric_light = { strength = new_strength } })
 
         if new_strength == default_strength then
@@ -44,5 +44,17 @@ core.register_chatcommand("light_strength", {
         end
 
         return true
+    end
+})
+
+ctf_settings.register("volumetric_lighting:light_strength", {
+    type = "bar",
+    label = "Volumetric lighting strength",
+    default = "0",
+    min = 0,
+    max = 100,
+    step = 0.1,
+    on_change = function(player)
+        apply_light_strength(player)
     end
 })
