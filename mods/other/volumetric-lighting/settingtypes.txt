@@ -1,0 +1,2 @@
+#    Default volumetric lighting strength when no other has been set.
+volumetric_lighting_default_strength (Default volumetric lighting strength) float 0.1 0 1
