@@ -2,7 +2,7 @@ CaptureTheFlag Lua API Reference
 ==================================
 # Introduction
 Capture the Flag is a Luanati(formerly Minetest) based game. The following API docs covers the various mods which make up the game. If you have any difficulty in understanding this, please read [Programming in Lua](http://www.lua.org/pil/).    
-If you see a deficiency in the API, feel free to attempt to add the functionality in the engine and API, and to document it here. All mods are contained in the `/mods/` folder. 
+If you see a deficiency in the API, feel free to attempt to add the functionality in the engine and API, and to document it here. All mods are contained in the `/mods/` folder. If you are unsure of the implementation of the function, please search for the function in the repository. 
 
 # List of all Mods. 
 - api
@@ -473,11 +473,413 @@ ctf_core.include_files(
 ## ctf_landmine
 No API's exposed in this mod. 
 
+## ctf_map
+#### `ctf_map.set_flag_location(pname, teamname, pos)`
+* `pname` *string*: Player name
+* `teamname` *string*: Team name
+* `pos` *position*: Position of flag
 
+#### `ctf_map.show_map_editor(player)`
+* `player` *PlayerObj*: Player to show the editor.
 
+#### `ctf_map.show_map_save_form(player, scroll_pos)`
+* `player` *PlayerObj*: Player to show the editor.
+* `scroll_pos` ???
+
+#### `ctf_map.skybox_exists(subdir)`
+* `subdir` *string*: Folder to check if skybox exists.
+
+#### `ctf_map.load_map_meta(idx, dirname)`
+* `idx` *integer*: Index of the map
+* `dirname` *string*: Path to map folder.
+
+#### `ctf_map.save_map(mapmeta)`
+* `mapmeta` *MapMeta*: Map metadata to be saved on computer.
+
+#### `ctf_map.announce_map(map)`
+* `map` *MapMeta*: Map to be announced
+
+#### `ctf_map.place_map(mapmeta, callback)`
+* `mapmeta` *MapMeta*: Map to be placed.
+* `callback` *Function*: Function to be executed after map is placed.
+
+#### `ctf_map.remove_barrier(mapmeta, callback)`
+* `mapmeta` *MapMeta*: Map to be removed barrier of.
+* `callback` *Function*: Function to be executed after map barrier is removed.
+
+#### `ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest_items, blacklisted_nodes)`
+???
+
+#### `ctf_map.getduration()`
+* returns `string` representing time elapsed after map start_time.
+
+#### `ctf_map.register_map(dirname, path_to_map)`
+* `dirname` *string*: directory name
+* `path_to_map` *string*: By default "/". `<path_to_map>/<dirname>`
+
+#### `ctf_map.register_maps_dir(path_to_folder)`
+* `path_to_map` *string*: By default "/". `<path_to_map>/<dirname>`
+
+#### `ctf_map.register_map_command(match, func)`
+* `match` *string*: Map command
+* `func` *Function*: function to be executed.
+
+#### `ctf_map.emerge_with_callbacks(name, pos1, pos2, callback, progress)`
+* `name` *string*: Name of map.
+* `pos1` *Position*: Position 1
+* `pos2` *Position*: Position 2
+* `callback` *Function*: Callback function
+* `progress` ???
+
+#### `ctf_map.get_pos_from_player(name, amount, donefunc)`
+* `name` *string*: Player name
+* `amount` ???
+* `donefunc`: Function to execute after function executes.
+
+## ctf_report
+#### `ctf_report.register_on_report(func)`
+* `func` *Function* function to be executed on report. The function `func` needs to have arguments of `name`, `message`.
+
+#### `ctf_report.default_send_report(msg)`
+* `msg` *string* Display message to all staff.
+
+## ctf_player
+#### `ctf_player.set_stab_slash_anim(anim_type, player, extra_time)`
+* `anim_type` *string*: Animation type
+* `player` *PlayerObj*: Player
+* `extra_time` *integer*: Extra time for animation.
 
 ## ctf_teams
-* https://modern.ircdocs.horse/formatting.html#colors-16-98
+#### `ctf_teams.remove_online_player(player)`
+* `player` *string|PlayerObj*: Player Name|Player
+
+#### `ctf_teams.set(player, new_team, force)`
+* `player` *string|PlayerObj*: Player Name|Player
+* `new_team` *string*: New team color
+* `force` *boolean*: Force allocate into new team.
+* 
+#### `ctf_teams.get(player)`
+* `player` *string|PlayerObj*: Player Name|Player
+* returns `nil|string` representing player's team.
+
+#### `ctf_teams.default_team_allocator(player)`
+* `player` *string|PlayerObj*: Player Name|Player
+* returns `nil|string` representing player's team.
+
+#### `ctf_teams.team_allocator(player)`
+* `player` *string|PlayerObj*: Player Name|Player
+* returns `nil|string` representing player's team.
+* (just gets the team that player should be joined to, and doesnt set the team)
+
+#### `ctf_teams.allocate_player(player, force)`
+* `player` *string|PlayerObj*: Player Name|Player
+* `force` *boolean*: Force allocate into new team.
+*  returns `nil|string` representing player's team.
+
+#### `ctf_teams.allocate_teams(teams)`
+* `teams` *table*: Table of teams.
+* (should be called at match start)
+
+#### `ctf_teams.get_team_territory(teamname)`
+* `teamname` *string*: Team name
+* returns `boolean| pos1,pos2* false or positions representing the region of the team.  
+
+#### `ctf_teams.chat_send_team(teamname, message)`
+* `teamname` *string*: Team name - All players in that team will recieve the message. 
+* `message` *message*: Message
+
+#### `ctf_teams.get_connected_players()`
+* returns a `table` of connected players but leaves players which arent in a team,
+
+#### `ctf_teams.is_allowed_in_team_chest(listname, stack, player)`
+* `listname` ???
+* `stack` *table(ItemDef)*: Item to be put into chest. 
+* `player` *PlayerObj*: Player
+
+#### `ctf_teams.register_on_allocplayer(func)`
+* `func` *Function*: function to be executed after allocating a team to player.
+
+## ctf_rankings
+
+#### `ctf_rankings:rankings_sorted()`
+* returns `boolean`
+
+#### `ctf_rankings:init()`
+* returns `rankings()`
+
+#### `ctf_rankings.register_on_rank_reset(func)`
+* `func` *Function*: function to be executed after ranking reset. 
+
+#### `ctf_rankings.update_league(player)`
+* `player` *PlayerObj*: Player
+
+### Rankings() object.
+Depending on the database used, such as `redis` or `modstorage/default` defines common interface to handle with database. 
+
+#### `rankings:get(pname)`
+* `pname` *string*: Player name
+* returns `rank_str` *string*
+
+#### `rankings:set(pname,newrankings, erase_unset)`
+* `pname` *string*: Player name
+* `newrankings` *string* New rankings of player
+* `erase_unset` *boolean* ???
+* returns `rank_str` *string*
+
+#### `rankings:add(pname,score)
+* `pname` *string*: Player name
+* `score` *number*: Score
+
+#### `rankings:del(pname)`
+* `pname` *string*: Player name
+
+#### `rankings.top:new()`
+* returns ???
+
+#### `rankings.top:set(player,score)`
+* `player` *string*: Player name
+* `score` *number*: Score
+
+#### `rankings.top:get_place(player)`
+* `player` *string*: Player name
+* returns `place` *integer*
+
+#### `rankings.top:get_top(count)`
+* `count` *integer*: Count of no of players.
+* returns `list(string)` of players whose rank is less than `count`
+
+## ctf_modebase
+
+#### `ctf_modebase.bounties.claim(player, killer)`
+* `player` *string*: Player name
+* `killer` *string*: Killer player name
+* returns `rewards` *integer* (bonus score to be given to killer)
+
+#### `ctf_modebase.bounties.reassign()`
+* reassigns the bounties.
+
+#### `ctf_modebase.bounties.reassign_timer()`
+* reassigns the timer, after which the bounties should be re-assigned.
+
+#### `ctf_modebase.bounties.bounty_reward_func()`
+* returns `table` of `{bounty_kills = 1, score = x}`
+
+#### `ctf_modebase.bounties.get_next_bounty(team_members)`
+* `team_members` *table* : Team members.
+* returns *string* with playername of random team member in table.
+
+#### `ctf_modebase.bounty_algo.kd.get_next_bounty(team_members)`
+* `team_members` *table* : Team members.
+* returns *table* of team members with highest kd's. 
+
+#### `ctf_modebase.bounty_algo.kd.bounty_reward_func(pname)`
+* `pname` *string*: Player bounty put over.
+* returns `table` of `{bounty_kills = 1, score = x}`
+
+#### `ctf_modebase.build_timer.start(build_time)`
+* `build_time` *integer*: Build time in seconds.
+
+#### `ctf_modebase.build_timer.finish()`
+* called after build_time elapses.
+
+#### `ctf_modebase.update_crafts(name)`
+* `name` *string*: Name of mode.
+* locks all crafts not supported by the mode.
+
+#### `ctf_modebase.is_immune(player)`
+* `player` *PlayerObj*: Player
+* returns *boolean*
+
+#### `ctf_modebase.give_immunity(player, respawn_timer)`
+* `player` *PlayerObj*: Player
+* `respawn_timer` *integer*: Amount of time to give immunity to player
+
+#### `ctf_modebase.remove_immunity(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.remove_respawn_immunity(player)`
+*  Remove immunity and return true if it's respawn immunity, return false otherwise.
+* `player` *PlayerObj*: Player
+* returns *boolean*
+
+#### `ctf_modebase.update_playertags(time)`
+???
+
+#### `ctf_modebase.map_chosen(map, ...)`
+* `map` *MapDef*: Map
+* `...` ???
+
+#### `ctf_modebase.map_catalog.select_map(filter, full_pool)`
+???
+
+#### `ctf_modebase.map_catalog.select_map_for_mode(mode)`
+* `mode` *string*: Game mode (classic/nade_fight/classes)
+
+#### `ctf_modebase.features.on_new_match()`
+#### `ctf_modebase.features.on_match_end()`
+
+#### `ctf_modebase.features.team_allocator(player)`
+* `player` *PlayerObj*: Player
+* returns the `team` *string* which player has to join.
+
+#### `ctf_modebase.features.can_take_flag(player,teamname)`
+* `player` *PlayerObj*: Player
+* `teamname` *string*: Team whose flag is being taken.
+* returns *boolean*
+
+#### `ctf_modebase.features.on_flag_take(player,teamname)`
+* `player` *PlayerObj*: Player
+* `teamname` *string*: Team whose flag is being taken.
+
+#### `ctf_modebase.features.on_flag_drop(player,teamnames,pteam)`
+* `player` *PlayerObj*: Player
+* `teamnames` *list(string)*: Team whose flag is being taken.
+* `pteam` *string*: Player's team
+
+#### `ctf_modebase.features.on_flag_capture(player,teamnames)`
+* `player` *PlayerObj*: Player
+* `teamnames` *list(string)*: Team whose flag is being taken.
+
+#### `ctf_modebase.features.on_allocplayer(player, new_team)`
+* `player` *PlayerObj*: Player
+* `teamname` *string*: Team where player is being joined to. 
+
+#### `ctf_modebase.features.on_leaveplayer(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.features.on_dieplayer(player,reason)`
+* `player` *PlayerObj*: Player
+* `reason` *string*: Reason for death.
+
+#### `ctf_modebase.features.on_respawnplayer(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.features.get_chest_access(pname)`
+* `pname` *string*: Player name
+
+#### `ctf_modebase.features.on_punchplayer = function(player, hitter, damage, _, tool_capabilities)`
+* `player` *PlayerObj*: Player
+* `hitter` *PlayerObj*: Hitter
+* `damage` *integer*: Damage recieved
+* `_` * ???
+* `tool_capabilities` ???
+
+#### `ctf_modebase.features.on_healplayer(player,patient,amount)`
+* `player` *PlayerObj*: Player(Healer)
+* `patient` *PlayerObj*: Patient
+
+#### `ctf_modebase.markers.add(pname, msg, pos, no_notify, specific_player)`
+* `pname` *string*: Player name
+* `msg` *string*: Message
+* `pos` *Position*: Position to put marker at
+* `no_notify` *boolean*: If `false`, informs teammates about placed marker in chat.
+* `specific_player` *string*: Marker placed for a  specific player. 
+
+#### `ctf_modebase.markers.remove(pname, no_notify)`
+* `pname` *string*: Player name
+* `no_notify` *boolean*: If `false`, informs teammates about removed marker in chat.
+
+#### `ctf_modebase.map_chosen(map)`
+* `map` *MapDef*: Map chosen to be played.
+
+#### `ctf_modebase.start_match_after_vote()`
+* Starts the next match after map vote. 
+
+#### `ctf_modebase.start_new_match(delay)`
+* `delay` *integer*: Delay of x seconds before match start. 
+
+#### `ctf_modebase.mode_vote.start_vote()`
+* starts vote, to select how matches to play. 
+
+#### `ctf_modebase.mode_vote.end_vote()`
+* ends vote, queue's a mode change. 
+
+#### `ctf_modebase.player.save_initial_stuff_positions(player, soft)`
+* `player` *PlayerObj*: Player
+* `soft` ???
+
+#### `ctf_modebase.player.give_initial_stuff(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.player.empty_inv(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.player.remove_bound_items(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.player.remove_initial_stuff(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.player.update(player)`
+* `player` *PlayerObj*: Player
+* this is used to update skyboxes, shadows and physics. 
+
+#### `ctf_modebase.player.is_playing(player)`
+* `player` *PlayerObj*: Player
+* returns *boolean*
+
+#### `ctf_modebase.recent_rankings.add(player,amounts,no_hud)`
+* `player` *PlayerObj*: Player
+* `amounts` *list(table(string,integer))*:
+* `no_hud` *boolean*: If *true* then no hud will be shown. 
+
+#### `ctf_modebase.recent_rankings.get(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.recent_rankings.on_leaveplayer(player)`
+* `player` *PlayerObj*: Player
+
+#### `ctf_modebase.recent_rankings.on_match_end()`
+
+#### `ctf_modebase.recent_rankings.players()`
+* returns `rankings_player` *table*
+
+#### `ctf_modebase.recent_rankings.teams()`
+* returns `teams` *table*
+
+#### `ctf_modebase.prepare_respawn_delay(player)`
+* `player` *PlayerObj*: Player
+* prepare player for respawn and start respawn delay. 
+
+#### `ctf_map.treasure.treasurefy_node(inv, map_treasures)`
+* `inv` *InventoryTable*: Chest Inventory
+* `map_treasures` *table*: Allowed map treasures. 
+
+#### `ctf_map.treasure.treasure_from_string(str)`
+* `str` *string*: String of form: `name ; min_count ; max_count ; max_stacks ; rarity ;;`
+
+#### `ctf_map.treasure.treasure_to_string(treasures)`
+* `treasures` *table*: treasures to string form. 
+
+#### `ctf_modebase.update_wear.find_item(pinv, item)`
+* `pinv` *InventoryTable*: Player inventory
+* `item` `Item`: item
+
+#### `ctf_modebase.update_wear.start_update(pname, item, step, down, finish_callback, cancel_callback)`
+???
+
+#### `ctf_modebase.update_wear.cancel_player_updates(pname)`
+* `pname` *string* : Player name
+
+#### `ctf_modebase.flag_huds.update_player(player)`
+* `player` *PlayerObj* : Player
+* handles team huds showing flag status.
+
+#### ` ctf_modebase.flag_huds.track_capturer(player, time)`
+* `player` *PlayerObj* : Player
+* `time`  *integer*: Amount of time in seconds to track flag for. 
+
+#### ` ctf_modebase.flag_huds.untrack_capturer(player)`
+* `player` *PlayerObj* : Player
+
+#### `ctf_modebase.drop_flags(player)`
+* `player` *PlayerObj* : Player
+
+#### `ctf_modebase.flag_on_punch(puncher, nodepos, node)`
+* `puncher` *PlayerObj* : Player
+* `nodepos` *Position*: Position of node. 
+* `node` *NodeDef*: Node clicked on. 
+
 
 
 <!--
