@@ -1,0 +1,5 @@
+# textdomain: ctf_settings
+
+Settings=
+Your texturepack's texture size.=
+Used to scale things like kill feed images.=
