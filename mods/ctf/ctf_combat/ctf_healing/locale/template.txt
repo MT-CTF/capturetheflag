@@ -1,0 +1,20 @@
+# textdomain: ctf_healing
+
+ isn't in your team!=
+ is dead!=
+ already has =
+ HP!=
+ healed you!=
+You healed =
+Bandage=
+Heals teammates for 3-4 HP until target's HP is equal to =
+% of their maximum HP=
+Your healing was interrupted: =
+You stopped holding the medkit=
+You can't heal while inside blocks=
+You're already at full health=
+You can't heal inside blocks=
+Someone is attacking you=
+You can't attack while healing=
+Medkit=
+You stopped the healing=
