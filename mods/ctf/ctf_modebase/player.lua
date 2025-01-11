@@ -23,6 +23,19 @@ ctf_settings.register("flag_sound_volume", {
 	step = 1,
 })
 
+local DEFAULT_VOLUMETRIC_LIGHTING = 10
+ctf_settings.register("volumetric_lighting", {
+	type = "bar",
+	label = "Volumetric Lighting Strength",
+	default = tostring(DEFAULT_VOLUMETRIC_LIGHTING),
+	min = 0,
+	max = 50,
+	step = 1,
+	on_change = function(player)
+		ctf_modebase.player.update(player)
+	end
+})
+
 local simplify_for_saved_stuff = function(iname)
 	if not iname or iname == "" then return iname end
 
@@ -278,6 +291,47 @@ else
 	minetest.log("error", "You aren't using the latest version of Minetest, auto-trashing and auto-sort won't work")
 end
 
+minetest.register_on_player_inventory_action(function(player, action, inv, inv_info)
+	if action == "put" and inv_info.listname == "main" then
+		if ctf_modebase.current_mode and ctf_teams.get(player) then
+			local mode = ctf_modebase:get_current_mode()
+			for name, func in pairs(mode.initial_stuff_item_levels) do
+				local priority = func(inv_info.stack)
+
+				if priority then
+					for i=1, 8 do -- loop through the top row of the player's inv
+						local compare = inv:get_stack("main", i)
+
+						local cprio = func(compare)
+
+						if cprio and cprio < priority then
+							local item, typ = simplify_for_saved_stuff(compare:get_name())
+							--minetest.log(dump(item)..dump(typ))
+							inv:set_stack("main", i, inv_info.stack)
+
+							if item == "sword" and typ == "stone" and
+							ctf_settings.get(player, "auto_trash_stone_swords") == "true" then
+								inv:set_stack("main", inv_info.index, ItemStack(""))
+								break
+							end
+
+							if item ~= "sword" and typ == "stone" and
+							ctf_settings.get(player, "auto_trash_stone_tools") == "true" then
+								inv:set_stack("main", inv_info.index, ItemStack(""))
+								break
+							end
+
+							inv:set_stack("main", inv_info.index, compare)
+							break
+						end
+					end
+					break -- We already found a place for it, don't check for one held by a different item type
+				end
+			end
+		end
+	end
+end)
+
 function ctf_modebase.player.empty_inv(player)
 	player:get_inventory():set_list("main", {})
 end
@@ -321,7 +375,14 @@ function ctf_modebase.player.update(player)
 
 		skybox.set(player, table.indexof(ctf_map.skyboxes, map.skybox)-1)
 
-		player:set_lighting({shadows = {intensity = map.enable_shadows}})
+		player:set_lighting({
+			shadows = {
+				intensity = map.enable_shadows,
+			},
+			volumetric_light = {
+				strength = (tonumber(ctf_settings.get(player, "volumetric_lighting")) or DEFAULT_VOLUMETRIC_LIGHTING)/100,
+			},
+		})
 
 		physics.set(player:get_player_name(), "ctf_modebase:map_physics", {
 			speed = map.phys_speed,

@@ -1,2 +1,2 @@
-dofile(minetest.get_modpath("crafting") .. "/api.lua")
-dofile(minetest.get_modpath("crafting") .. "/gui.lua")
+dofile(core.get_modpath("crafting") .. "/api.lua")
+dofile(core.get_modpath("crafting") .. "/gui.lua")

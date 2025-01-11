@@ -27,7 +27,37 @@ ctf_map = {
 			math.floor((time % 3600) / 60), -- minutes
 			math.floor(time % 60))          -- seconds
 	end,
+
+	-- List of registered map folder names. Use `ctf_map.map_path` to get the path
+	registered_maps = {},
+
+	-- Table of map paths. Indexed by map's folder name
+	-- Doesn't include trailing '/'
+	map_path = {},
 }
+
+function ctf_map.register_map(dirname, path_to_map)
+	if path_to_map:sub(-1) ~= "/" then
+		path_to_map = path_to_map .. "/"
+	end
+
+	assert(table.indexof(ctf_map.registered_maps, dirname) == -1, "Duplicate map detected: "..path_to_map)
+
+	table.insert(ctf_map.registered_maps, dirname)
+	ctf_map.map_path[dirname] = path_to_map .. dirname
+end
+
+function ctf_map.register_maps_dir(path_to_folder)
+	if path_to_folder:sub(-1) ~= "/" then
+		path_to_folder = path_to_folder .. "/"
+	end
+
+	for _, mapdir in pairs(minetest.get_dir_list(path_to_folder, true)) do
+		ctf_map.register_map(mapdir, path_to_folder)
+	end
+end
+
+ctf_map.register_maps_dir(ctf_map.maps_dir)
 
 ctf_api.register_on_match_start(function()
 	ctf_map.start_time = os.time()

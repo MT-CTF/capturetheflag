@@ -206,6 +206,7 @@ local damage_group_textures = {
 	knockback_grenade = "ctf_mode_nade_fight_knockback_grenade.png",
 	black_hole_grenade = "ctf_mode_nade_fight_black_hole_grenade.png",
 	damage_cobble = "ctf_map_damage_cobble.png",
+	landmine = "ctf_landmine_landmine.png",
 }
 
 local function get_weapon_image(hitter, tool_capabilities)
@@ -469,7 +470,7 @@ return {
 			map_treasures[k] = v
 		end
 
-		if #delete_queue > 0 then
+		if #delete_queue > 0 and delete_queue._map ~= ctf_map.current_map.dirname then
 			local p1, p2 = unpack(delete_queue)
 
 			for _, object_drop in pairs(minetest.get_objects_in_area(p1, p2)) do
@@ -509,8 +510,13 @@ return {
 		recent_rankings.on_match_end()
 
 		if ctf_map.current_map then
+			minetest.log("action",
+				"matchend: Match ended for map "..ctf_map.current_map.name..
+				" in mode "..(ctf_modebase.current_mode or "<nil>")..
+				". Duration: "..ctf_map.get_duration()
+			)
 			-- Queue deletion for after the players have left
-			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2}
+			delete_queue = {ctf_map.current_map.pos1, ctf_map.current_map.pos2, _map = ctf_map.current_map.dirname}
 		end
 	end,
 	-- If you set this in a mode def it will replace the call to ctf_teams.allocate_teams() in match.lua
