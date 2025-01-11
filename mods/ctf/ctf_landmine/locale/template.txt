@@ -1,0 +1,3 @@
+# textdomain: ctf_landmine
+
+Landmine (@1s arming time)=Mine terrestre (@1s pour l'activation)=
