@@ -23,6 +23,19 @@ ctf_settings.register("flag_sound_volume", {
 	step = 1,
 })
 
+local DEFAULT_VOLUMETRIC_LIGHTING = 10
+ctf_settings.register("volumetric_lighting", {
+	type = "bar",
+	label = "Volumetric Lighting Strength",
+	default = tostring(DEFAULT_VOLUMETRIC_LIGHTING),
+	min = 0,
+	max = 50,
+	step = 1,
+	on_change = function(player)
+		ctf_modebase.player.update(player)
+	end
+})
+
 local simplify_for_saved_stuff = function(iname)
 	if not iname or iname == "" then return iname end
 
@@ -362,7 +375,14 @@ function ctf_modebase.player.update(player)
 
 		skybox.set(player, table.indexof(ctf_map.skyboxes, map.skybox)-1)
 
-		player:set_lighting({shadows = {intensity = map.enable_shadows}})
+		player:set_lighting({
+			shadows = {
+				intensity = map.enable_shadows,
+			},
+			volumetric_light = {
+				strength = (tonumber(ctf_settings.get(player, "volumetric_lighting")) or DEFAULT_VOLUMETRIC_LIGHTING)/100,
+			},
+		})
 
 		physics.set(player:get_player_name(), "ctf_modebase:map_physics", {
 			speed = map.phys_speed,
