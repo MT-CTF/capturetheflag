@@ -182,6 +182,10 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 
 		dmessage = (dmessage and dmessage ~= "") and (": " .. dmessage) or ""
 
+		if #dmessage > 50 then
+			return false, "The donation message is " .. (#dmessage - 50) .. " chars too long!"
+		end
+
 		current_mode.recent_rankings.add(name, {score=-scoretotal}, true)
 		local names = ""
 		for pname, team in pairs(pnames) do
@@ -200,11 +204,6 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 
 		donate_timer[name] = os.time()
 		local donate_text = string.format("%s donated %s score to %s%s", name, score, names, dmessage)
-
-		if #donate_text > 50 then
-			minetest.chat_send_player(name, minetest.colorize("#FF0000", "Error: Your message is too long!"))
-			return false
-		end
 
 		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
 		ctf_modebase.announce(donate_text)
