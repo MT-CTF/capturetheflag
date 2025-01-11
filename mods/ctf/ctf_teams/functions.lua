@@ -56,7 +56,6 @@ end
 
 local tpos = 1
 function ctf_teams.default_team_allocator(player)
-	print("default team allocator ran")
 	if #ctf_teams.current_team_list <= 0 then return end -- No teams initialized yet
 	player = PlayerName(player)
 
