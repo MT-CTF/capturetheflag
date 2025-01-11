@@ -6,6 +6,8 @@ ctf_settings = {
 local FORMSIZE = {x = 8, y = 9.4}
 local SCROLLBAR_W = 0.4
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.after(0, function()
 	table.sort(ctf_settings.settings_list, function(a, b) return a < b end)
 end)
@@ -62,7 +64,7 @@ end
 
 minetest.register_on_mods_loaded(function()
 	sfinv.register_page("ctf_settings:settings", {
-		title = "Settings",
+		title = S("Settings"),
 		get = function(self, player, context)
 			local setting_list = {}
 			local lastypos = -0.5
