@@ -106,7 +106,6 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 		end
 
 		local pnames, score, dmessage = {}, 0, ""
-
 		local pcount, ismessage = 0, false
 
 		for p in string.gmatch(param, "%S+") do
@@ -183,6 +182,9 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 
 		dmessage = (dmessage and dmessage ~= "") and (": " .. dmessage) or ""
 
+		if #dmessage > 50 then
+			return false, "The donation message is " .. (#dmessage - 50) .. " chars too long!"
+		end
 
 		current_mode.recent_rankings.add(name, {score=-scoretotal}, true)
 		local names = ""
@@ -202,11 +204,14 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 
 		donate_timer[name] = os.time()
 		local donate_text = string.format("%s donated %s score to %s%s", name, score, names, dmessage)
+
 		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
 		ctf_modebase.announce(donate_text)
 		return true
 	end
 })
+
+
 
 local allow_reset = {}
 minetest.register_chatcommand("reset_rankings", {
