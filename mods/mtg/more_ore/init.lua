@@ -12,6 +12,7 @@ for k, orenametech in pairs(orenamestech) do
             tiles = {"default_" .. stonenametech .. ".png^default_mineral_" .. orenametech .. ".png"},
             groups = {cracky = crackylevels[k]},
             drop = "default:" .. dropnames[k],
+			sounds = default.node_sound_stone_defaults(),
         })
     end
 end
