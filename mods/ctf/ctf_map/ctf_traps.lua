@@ -1,5 +1,7 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_node("ctf_map:unwalkable_dirt", {
-	description = "Unwalkable Dirt",
+	description = S("Unwalkable Dirt"),
 	tiles = {"default_dirt.png^[colorize:#ffff00:19"},
 	is_ground_content = false,
 	walkable = false,
@@ -7,7 +9,7 @@ minetest.register_node("ctf_map:unwalkable_dirt", {
 })
 
 minetest.register_node("ctf_map:unwalkable_stone", {
-	description = "Unwalkable Stone",
+	description = S("Unwalkable Stone"),
 	tiles = {"default_stone.png^[colorize:#ffff00:17"},
 	is_ground_content = false,
 	walkable = false,
@@ -15,7 +17,7 @@ minetest.register_node("ctf_map:unwalkable_stone", {
 })
 
 minetest.register_node("ctf_map:unwalkable_cobble", {
-	description = "Unwalkable Cobblestone",
+	description = S("Unwalkable Cobblestone"),
 	tiles = {"default_cobble.png^[colorize:#ffff00:15"},
 	is_ground_content = false,
 	walkable = false,
@@ -27,7 +29,7 @@ minetest.register_node("ctf_map:unwalkable_cobble", {
 --
 
 minetest.register_node("ctf_map:spike", {
-	description = "Spike\n7 DPS",
+	description = S("Spike").."\n".."7 DPS",
 	drawtype = "plantlike",
 	tiles = {"ctf_map_spike.png"},
 	inventory_image = "ctf_map_spike.png",
@@ -47,7 +49,7 @@ minetest.register_node("ctf_map:spike", {
 
 		if pteam then
 			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
-				minetest.chat_send_player(placer:get_player_name(), "You can only place spikes in your own territory!")
+				minetest.chat_send_player(placer:get_player_name(), S("You can only place spikes in your own territory!"))
 				return itemstack
 			end
 
@@ -72,7 +74,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		local spikecolor = ctf_teams.team[team].color
 
 		minetest.register_node("ctf_map:spike_"..team, {
-			description = HumanReadable(team).." Team Spike",
+			description = HumanReadable(team)..S(" Team Spike"),
 			drawtype = "plantlike",
 			tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
 			inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",
@@ -149,7 +151,7 @@ local function damage_cobble_dig(pos, node, digger)
 end
 
 minetest.register_node("ctf_map:damage_cobble", {
-	description = "Damage Cobble\n(Damages any enemy that breaks it)",
+	description = S("Damage Cobble").."\n"..S("(Damages any enemy that breaks it)"),
 	tiles = {"ctf_map_damage_cobble.png"},
 	is_ground_content = false,
 	walkable = true,
@@ -175,7 +177,7 @@ minetest.register_node("ctf_map:damage_cobble", {
 })
 
 minetest.register_node("ctf_map:reinforced_cobble", {
-	description = "Reinforced Cobblestone",
+	description = S("Reinforced Cobblestone"),
 	tiles = {"ctf_map_reinforced_cobble.png"},
 	is_ground_content = false,
 	groups = {cracky = 3, stone = 2},

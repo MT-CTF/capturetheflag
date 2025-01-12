@@ -2,22 +2,24 @@ ctf_gui.old_init()
 
 local context = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function greet_player(player)
 	minetest.chat_send_player(
 		player:get_player_name(),
-		minetest.colorize(ctf_map.CHAT_COLOR, "Welcome! This server is in mapedit mode.\n")
+		minetest.colorize(ctf_map.CHAT_COLOR, S("Welcome! This server is in mapedit mode.").."\n")
 	)
 	if not minetest.check_player_privs(player, "ctf_map_editor") then
 		minetest.chat_send_player(
 			player:get_player_name(),
 			minetest.colorize(ctf_map.CHAT_COLOR,
-					"To start, grant yourself \"ctf_map_editor\" "..
-					"using \"/grantme ctf_map_editor\". Then run \"/ctf_map editor\"")
+					S("To start, grant yourself \"ctf_map_editor\" "..
+					"using \"/grantme ctf_map_editor\". Then run \"/ctf_map editor\""))
 		)
 	else
 		minetest.chat_send_player(
 			player:get_player_name(),
-			minetest.colorize(ctf_map.CHAT_COLOR, "To start, run \"/ctf_map editor\"")
+			minetest.colorize(ctf_map.CHAT_COLOR, S("To start, run \"/ctf_map editor\""))
 		)
 	end
 end
@@ -80,7 +82,7 @@ ctf_map.register_map_command("resave_all", function(name, params)
 		if not maplist[dir] then
 			minetest.chat_send_player(
 				name,
-				minetest.colorize("green", "\nMap resaving done.\n")
+				"\n"..minetest.colorize("green", S("Map resaving done.")).."\n"
 			)
 			return
 		end
@@ -124,18 +126,18 @@ function ctf_map.show_map_editor(player)
 	local selected_map = 1
 	ctf_gui.old_show_formspec(player, "ctf_map:start", {
 		size = {x = 8, y = 10.2},
-		title = "Capture The Flag Map Editor",
-		description = "Would you like to edit an existing map or create a new one?",
+		title = S("Capture The Flag Map Editor"),
+		description = S("Would you like to edit an existing map or create a new one?"),
 		privs = {ctf_map_editor = true},
 		elements = {
 			newmap = {
-				type = "button", exit = true, label = "Create New Map",
+				type = "button", exit = true, label = S("Create New Map"),
 				pos = {"center", 0},
 				func = function(pname)
 					minetest.chat_send_player(pname,
 							minetest.colorize(ctf_map.CHAT_COLOR,
-									"Please decide what the size of your map will be "..
-									"and punch nodes on two opposite corners of it"))
+									S("Please decide what the size of your map will be ")..
+									S("and punch nodes on two opposite corners of it")))
 					ctf_map.get_pos_from_player(pname, 2, function(p, positions)
 						local pos1, pos2 = vector.sort(positions[1], positions[2])
 
@@ -167,7 +169,7 @@ function ctf_map.show_map_editor(player)
 						}
 
 						minetest.chat_send_player(pname, minetest.colorize(ctf_map.CHAT_COLOR,
-								"Build away! When you are done, run \"/ctf_map editor\""))
+								S("Build away! When you are done, run \"/ctf_map editor\"")))
 					end)
 				end,
 			},
@@ -185,14 +187,14 @@ function ctf_map.show_map_editor(player)
 				end,
 			},
 			editexisting = {
-				type = "button", exit = true, label = "Start Editing",
+				type = "button", exit = true, label = S("Start Editing"),
 				pos = {0.1, 7.8},
 				func = function(pname, fields)
 					minetest.after(0.1, function()
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
-							title = "Capture The Flag Map Editor",
-							description = "Placing map '"..maplist_sorted[selected_map].."'. This will take a few seconds..."
+							title = S("Capture The Flag Map Editor"),
+							description = S("Placing map '")..maplist_sorted[selected_map]..S("'. This will take a few seconds...")
 						})
 					end)
 
@@ -207,15 +209,15 @@ function ctf_map.show_map_editor(player)
 				end,
 			},
 			resume_edit = {
-				type = "button", exit = true, label = "Resume Editing",
+				type = "button", exit = true, label = S("Resume Editing"),
 				pos = {(8-ctf_gui.ELEM_SIZE.x) - 0.3, 7.8},
 				func = function(pname, fields)
 					minetest.after(0.1, function()
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
-							title = "Capture The Flag Map Editor",
-							description = "Resuming map '"..maplist_sorted[selected_map]..
-									"'.\n(Remember that this doesn't recall setting changes)"
+							title = S("Capture The Flag Map Editor"),
+							description = S("Resuming map '")..maplist_sorted[selected_map].."'.\n"..
+									S("(Remember that this doesn't recall setting changes)")
 						})
 					end)
 
@@ -257,7 +259,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	-- MAP CORNERS
 	elements.positions = {
 		type = "button", exit = true,
-		label = "Corners - " .. minetest.pos_to_string(context[player].pos1, 0) ..
+		label = S("Corners - ") .. minetest.pos_to_string(context[player].pos1, 0) ..
 				" - " .. minetest.pos_to_string(context[player].pos2, 0),
 		pos = {0, 0.5},
 		size = {10 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
@@ -271,15 +273,15 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP ENABLED
 	elements.enabled = {
-		type = "checkbox", label = "Map Enabled", pos = {0, 2}, default = context[player].enabled,
+		type = "checkbox", label = S("Map Enabled"), pos = {0, 2}, default = context[player].enabled,
 		func = function(pname, fields) context[pname].enabled = fields.enabled == "true" or false end,
 	}
 
 	-- FOLDER NAME, MAP NAME, MAP AUTHOR(S), MAP HINT, MAP LICENSE, OTHER INFO
 	local ypos = 3
 	for name, label in pairs({
-			dirname = "Folder Name", name = "Map Name"   , author = "Map Author(s)",
-			hint    = "Map Hint"   , license = "Map License", others = "Other Info"
+			dirname = S("Folder Name"), name = S("Map Name")   , author = S("Map Author(s)"),
+			hint    = S("Map Hint")   , license = S("Map License"), others = S("Other Info")
 		}) do
 		elements[name] = {
 			type = "field", label = label,
@@ -295,7 +297,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP INITIAL STUFF
 	elements.initial_stuff = {
-		type = "field", label = "Map Initial Stuff", pos = {0, ypos}, size = {6, 0.7},
+		type = "field", label = S("Map Initial Stuff"), pos = {0, ypos}, size = {6, 0.7},
 		default = table.concat(context[player].initial_stuff or {"none"}, ","),
 		func = function(pname, fields)
 			context[pname].initial_stuff = string.split(fields.initial_stuff:gsub("%s?,%s?", ","), ",")
@@ -305,7 +307,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP TREASURES
 	elements.treasures = {
-		type = "textarea", label = "Map Treasures", pos = {0, ypos}, size = {ctf_gui.FORM_SIZE.x-3.6, 2.1},
+		type = "textarea", label = S("Map Treasures"), pos = {0, ypos}, size = {ctf_gui.FORM_SIZE.x-3.6, 2.1},
 		default = context[player].treasures,
 		func = function(pname, fields)
 			context[pname].treasures = fields.treasures
@@ -317,7 +319,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.skybox_label = {
 		type = "label",
 		pos = {0, ypos},
-		label = (context[player].skybox_forced and "Skybox: Using the one provided in map folder") or "Skybox:",
+		label = (context[player].skybox_forced and S("Skybox: Using the one provided in map folder")) or "Skybox:",
 	}
 
 	if not context[player].skybox_forced then
@@ -341,7 +343,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP shadows
 	elements.enable_shadows = {
-		type = "field", label = "Map Shadow intensity (0.0-1.0)", pos = {0, ypos},
+		type = "field", label = S("Map Shadow intensity (0.0-1.0)"), pos = {0, ypos},
 		size = {4, 0.7}, default = context[player].enable_shadows or "0.26",
 		func = function(pname, fields)
 			local oldval = context[pname].enable_shadows
@@ -365,12 +367,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.game_modeslabel = {
 		type = "label",
 		pos = {0, ypos},
-		label = "Map Modes"
+		label = S("Map Modes")
 	}
 	elements.available_game_modeslabel = {
 		type = "label",
 		pos = {ctf_gui.FORM_SIZE.x/2 - 0.2, ypos},
-		label = "Available Modes"
+		label = S("Available Modes")
 	}
 	ypos = ypos + 0.3
 	elements["game_modes"] = {
@@ -406,7 +408,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	ypos = ypos + 3
 
 	-- MAP PHYSICS
-	for name, label in pairs({speed = "Map Movement Speed", jump = "Map Jump Height", gravity = "Map Gravity"}) do
+	for name, label in pairs({speed = S("Map Movement Speed"), jump = S("Map Jump Height"), gravity = S("Map Gravity")}) do
 		elements[name] = {
 			type = "field", label = label,
 			pos = {0, ypos}, size = {4, 0.7},
@@ -426,7 +428,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP START TIME
 	elements.start_time = {
-		type = "field", label = "Map start_time", pos = {0, ypos}, size = {4, 0.7},
+		type = "field", label = S("Map start_time"), pos = {0, ypos}, size = {4, 0.7},
 		default = context[player].start_time or ctf_map.DEFAULT_START_TIME,
 		func = function(pname, fields)
 			local oldval = context[pname].start_time
@@ -441,7 +443,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- MAP time_speed
 	elements.time_speed = {
-		type = "field", label = "Map time_speed (Multiplier)", pos = {0, ypos},
+		type = "field", label = S("Map time_speed (Multiplier)"), pos = {0, ypos},
 		size = {4, 0.7}, default = context[player].time_speed or "1",
 		func = function(pname, fields)
 			local oldval = context[pname].time_speed
@@ -459,7 +461,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	for teamname, def in pairs(context[player].teams) do
 		elements[teamname.."_checkbox"] = {
 			type = "checkbox",
-			label = HumanReadable(teamname) .. " Team",
+			label = HumanReadable(teamname) .. S(" Team"),
 			pos = {0, idx},
 			default = def.enabled,
 			func = function(pname, fields)
@@ -471,7 +473,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		elements[teamname.."_button"] = {
 			type = "button",
 			exit = true,
-			label = "Set Flag Pos: " .. minetest.pos_to_string(def.flag_pos),
+			label = S("Set Flag Pos: ") .. minetest.pos_to_string(def.flag_pos),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {5, ctf_gui.ELEM_SIZE.y},
 			func = function(pname, fields)
@@ -500,7 +502,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		elements[teamname.."_teleport"] = {
 			type = "button",
 			exit = true,
-			label = "Go to pos",
+			label = S("Go to pos"),
 			pos = {0.2 + 5 + 0.1, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {2, ctf_gui.ELEM_SIZE.y},
 			func = function(pname)
@@ -512,7 +514,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname.."_positions"] = {
 			type = "button", exit = true,
-			label = "Zone Bounds - " .. minetest.pos_to_string(context[player].teams[teamname].pos1, 0) ..
+			label = S("Zone Bounds - ") .. minetest.pos_to_string(context[player].teams[teamname].pos1, 0) ..
 					" - " .. minetest.pos_to_string(context[player].teams[teamname].pos2, 0),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
@@ -532,7 +534,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname .. "_look_pos"] = {
 			type = "label",
-			label = "Look position: " .. (look_pos and vector.to_string(look_pos) or "auto"),
+			label = S("Look position: ") .. (look_pos and vector.to_string(look_pos) or "auto"),
 			pos = {0.2, idx},
 			-- "The first line of text is now positioned centered exactly at the position specified."
 			-- https://github.com/minetest/minetest/blob/480d5f2d51ca8f7c4400b0918bb53b776e4ff440/doc/lua_api.txt#L2929
@@ -543,7 +545,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname.."_look_pos_auto"] = {
 			type = "button",
-			label = "Auto",
+			label = S("Auto"),
 			pos = {0.2, idx - (ctf_gui.ELEM_SIZE.y / 2)},
 			size = {btn_width, ctf_gui.ELEM_SIZE.y},
 
@@ -557,7 +559,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname.."_look_pos_choose"] = {
 			type = "button",
-			label = "Choose",
+			label = S("Choose"),
 			pos = {0.2 + btn_width + 0.1, idx - (ctf_gui.ELEM_SIZE.y / 2)},
 			size = {btn_width, ctf_gui.ELEM_SIZE.y},
 
@@ -579,7 +581,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	elements.addchestzone = {
 		type = "button",
 		exit = true,
-		label = "Add Chest Zone",
+		label = S("Add Chest Zone"),
 		pos = {(5 - 0.2) - (ctf_gui.ELEM_SIZE.x / 2), idx},
 		func = function(pname, fields)
 			table.insert(context[pname].chests, {
@@ -598,7 +600,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			elements["chestzone_"..id] = {
 				type = "button",
 				exit = true,
-				label = "Chest Zone "..id.." - "..minetest.pos_to_string(def.pos1, 0) ..
+				label = S("Chest Zone ")..id.." - "..minetest.pos_to_string(def.pos1, 0) ..
 						" - "..minetest.pos_to_string(def.pos2, 0),
 				pos = {0, idx},
 				size = {7, ctf_gui.ELEM_SIZE.y},
@@ -616,7 +618,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			}
 			elements["chestzone_chests_"..id] = {
 				type = "field",
-				label = "Amount",
+				label = S("Amount"),
 				pos = {7.2, idx},
 				size = {1, ctf_gui.ELEM_SIZE.y},
 				default = context[player].chests[id].amount,
@@ -651,7 +653,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		type = "button",
 		exit = true,
 		pos = {(5 - 0.2) - (ctf_gui.ELEM_SIZE.x / 2), idx},
-		label = "Finish Editing",
+		label = S("Finish Editing"),
 		func = function(pname)
 			minetest.after(0.1, function()
 				if context[pname].initial_stuff[1] == "none" then
@@ -673,7 +675,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		type = "button",
 		exit = true,
 		pos = {ctf_gui.FORM_SIZE.x - ctf_gui.SCROLLBAR_WIDTH - ctf_gui.ELEM_SIZE.x - 1, idx},
-		label = "Cancel Editing",
+		label = S("Cancel Editing"),
 		func = function(pname)
 			minetest.after(0.1, function()
 				context[pname] = nil
@@ -684,8 +686,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 	-- Show formspec
 	ctf_gui.old_show_formspec(player, "ctf_map:save", {
-		title = "Capture The Flag Map Editor",
-		description = "Save your map or edit the config.\nRemember to press ENTER after writing to a field",
+		title = S("Capture The Flag Map Editor"),
+		description = S("Save your map or edit the config.").."\n"..S("Remember to press ENTER after writing to a field"),
 		privs = {ctf_map_editor = true},
 		elements = elements,
 		scroll_pos = {y = scroll_pos or 0},
