@@ -63,7 +63,8 @@ ctf_core.include_files(
 	"commands.lua",
 	"register.lua",
 	"team_chest.lua",
-	"team_door.lua"
+	"team_door.lua",
+	"parties.lua"
 )
 
 minetest.register_on_mods_loaded(function()
@@ -103,6 +104,9 @@ minetest.register_on_mods_loaded(function()
 	end)
 
 	minetest.register_on_leaveplayer(function(player, timed_out, ...)
+
+		ctf_teams.checkAndClearAllPartyInfo(player:get_player_name())
+
 		local pteam = ctf_teams.get(player)
 
 		if not pteam then
