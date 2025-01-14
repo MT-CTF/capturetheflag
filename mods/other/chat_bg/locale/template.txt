@@ -1,0 +1,8 @@
+# textdomain: chat_bg
+
+Manage the chat background=
+toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>=
+Hud Toggled to=
+Unable to find your player object=
+Set @1 to @2=
+Invalid setting '@1'. Avaliable settings: opacity, width, height=

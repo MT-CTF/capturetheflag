@@ -1,0 +1,8 @@
+# textdomain: chat_bg
+
+Manage the chat background=Gère l'arrière plan du chatre
+toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>=toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>
+Hud Toggled to=Hud basculé à
+Unable to find your player object=Impossible de trouver votre objet de joueur
+Set @1 to @2=Définit @1 à @2
+Invalid setting '@1'. Avaliable settings: opacity, width, height=Paramètre incorrect '@1'. Paramètres disponibles: opacity (opacité), width (largeur), height (hauteur)
