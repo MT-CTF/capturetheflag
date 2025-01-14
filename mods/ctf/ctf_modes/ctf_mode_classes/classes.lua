@@ -5,12 +5,14 @@ local CLASS_SWITCH_COOLDOWN = 30
 
 local classes = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local class_list = {"knight", "ranged", "support"}
 local class_props = {
 	knight = {
 		name = "Knight",
 		color = "grey",
-		description = "High HP class with a sword capable of short damage bursts",
+		description = S("High HP class with a sword capable of short damage bursts"),
 		hp_max = 30,
 		visual_size = vector.new(0.1, 0.05, 0.1),
 		items = {
@@ -25,7 +27,7 @@ local class_props = {
 	support = {
 		name = "Support",
 		color = "cyan",
-		description = "Helper class with healing bandages, an immunity ability, and building gear",
+		description = S("Helper class with healing bandages, an immunity ability, and building gear"),
 		physics = {speed = 1.1},
 		items = {
 			"ctf_mode_classes:support_bandage",
@@ -46,7 +48,7 @@ local class_props = {
 	ranged = {
 		name = "Scout",
 		color = "orange",
-		description = "Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places",
+		description = S("Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places"),
 		visual_size = vector.new(-0.1, 0.0, -0.1),
 		items = {
 			"ctf_mode_classes:ranged_rifle_loaded",
@@ -117,22 +119,23 @@ local KNIGHT_USAGE_TIME = 8
 
 ctf_settings.register("ctf_mode_classes:simple_knight_activate", {
 	type = "bool",
-	label = "[Classes] Simple Knight sword activation",
-	description = "If enabled you don't need to hold Sneak/Run to activate the rage ability",
+	label = S("[Classes] Simple Knight sword activation"),
+	description = S("If enabled you don't need to hold Sneak/Run to activate the rage ability"),
 	default = "false",
 })
 
 ctf_settings.register("ctf_mode_classes:simple_support_activate", {
 	type = "bool",
-	label = "[Classes] Simple Support bandage immunity activation",
-	description = "If enabled you don't need to hold Sneak/Run to activate the immunity ability",
+	label = S("[Classes] Simple Support bandage immunity activation"),
+	description = S("If enabled you don't need to hold Sneak/Run to activate the immunity ability"),
 	default = "false",
 })
 
 ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
-	description = "Knight Sword\n" .. minetest.colorize("gold",
-			"(Sneak/Run) + Rightclick to use Rage ability (Lasts "..
-			KNIGHT_USAGE_TIME.."s, "..KNIGHT_COOLDOWN_TIME.."s cooldown)"),
+	description = S("Knight Sword") .. "\n" .. minetest.colorize("gold",
+		S("(Sneak/Run) + Rightclick to use Rage ability (Lasts @1s, @2s cooldown)",
+		KNIGHT_USAGE_TIME, KNIGHT_COOLDOWN_TIME)
+	),
 	inventory_image = "default_tool_bronzesword.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
 	wield_image = "default_tool_bronzesword.png",
@@ -147,7 +150,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 			local uname = user:get_player_name()
 			hud_events.new(uname, {
 				quick = true,
-				text = "You cannot activate special abilities during build time!",
+				text = S("You cannot activate special abilities during build time!"),
 				color = "warning",
 			})
 			return
@@ -197,8 +200,9 @@ local RANGED_ZOOM_MULT = 3
 local scoped = ctf_ranged.scoped
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "classes_rifle",
-	description = "Scout Rifle\n" .. minetest.colorize("gold",
-			"(Sneak/Run) + Rightclick to launch grenade ("..RANGED_COOLDOWN_TIME.."s cooldown), otherwise will toggle scope"),
+	description = S("Scout Rifle") .. "\n" .. minetest.colorize("gold",
+		S("(Sneak/Run) + Rightclick to launch grenade (@1s cooldown), otherwise will toggle scope", RANGED_COOLDOWN_TIME)
+	),
 	texture = "ctf_mode_classes_ranged_rifle.png",
 	texture_overlay = "ctf_modebase_special_item.png^[transformFX",
 	wield_texture = "ctf_mode_classes_ranged_rifle.png",
@@ -228,7 +232,7 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 			local uname = user:get_player_name()
 			hud_events.new(uname, {
 				quick = true,
-				text = "You cannot activate special abilities during build time!",
+				text = S("You cannot activate special abilities during build time!"),
 				color = "warning",
 			})
 			return
@@ -253,8 +257,10 @@ local SCALING_TIMEOUT = 4
 
 -- Code borrowed from minetest_game default/nodes.lua -> default:ladder_steel
 local scaling_def = {
-	description = "Scaling Ladder\n"..
-			minetest.colorize("gold", "(Infinite usage, self-removes after "..SCALING_TIMEOUT.."s)"),
+	description = S("Scaling Ladder") .. "\n" ..
+		minetest.colorize("gold", S("(Infinite usage, self-removes after @1s)",
+		SCALING_TIMEOUT)
+	),
 	tiles = {"default_ladder_steel.png"},
 	drawtype = "signlike",
 	inventory_image = "default_ladder_steel.png",
@@ -296,12 +302,11 @@ local IMMUNITY_COOLDOWN = 46
 local HEAL_PERCENT = 0.8
 
 ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
-	description = string.format(
-		"Bandage\nHeals teammates for 4-5 HP until target's HP is equal to %d%% of their maximum HP\n" ..
-		minetest.colorize("gold", "(Sneak/Run) + Rightclick to become immune to damage for %ds (%ds cooldown)"),
-		HEAL_PERCENT * 100,
-		IMMUNITY_TIME, IMMUNITY_COOLDOWN
-	),
+	description = S("Bandage") .. "\n" ..
+		S("Heals teammates for 4-5 HP until target's HP is equal to @1% of their maximum HP", HEAL_PERCENT * 100) .. "\n" ..
+		minetest.colorize("gold",
+		S("(Sneak/Run) + Rightclick to become immune to damage for @1s (@2s cooldown)", IMMUNITY_TIME, IMMUNITY_COOLDOWN)
+    ),
 	inventory_image = "ctf_healing_bandage.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
 	wield_image = "ctf_healing_bandage.png",
@@ -317,7 +322,7 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 			local uname = user:get_player_name()
 			hud_events.new(uname, {
 				quick = true,
-				text = "You cannot activate special abilities during build time!",
+				text = S("You cannot activate special abilities during build time!"),
 				color = "warning",
 			})
 			return
@@ -328,7 +333,7 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 			if ctf_modebase.taken_flags[pname] then
 				hud_events.new(user, {
 					quick = true,
-					text = "You can't become immune while holding the flag",
+					text = S("You can't become immune while holding the flag"),
 					color = "warning",
 				})
 				return
@@ -446,7 +451,7 @@ function classes.show_class_formspec(player)
 	if dist_from_flag(player) > 5 then
 		hud_events.new(player, {
 			quick = true,
-			text = "You can only change class at your flag!",
+			text = S("You can only change class at your flag!"),
 			color = "warning",
 		})
 		return
@@ -602,7 +607,7 @@ function classes.is_restricted_item(player, name)
 		if name:match(disallowed) then
 			hud_events.new(player, {
 				quick = true,
-				text = "Your class can't use that item!",
+				text = S("Your class can't use that item!"),
 				color = "warning",
 			})
 			return true
