@@ -82,7 +82,8 @@ skybox.add = function(def, ...)
 end
 
 minetest.register_tool("ctf_map:adminpick", {
-	description = S("Admin pickaxe used to break indestructible nodes.").."\n"..S("Rightclick to remove non-indestructible nodes"),
+	description = S("Admin pickaxe used to break indestructible nodes.")..
+		"\n"..S("Rightclick to remove non-indestructible nodes"),
 	inventory_image = "default_tool_diamondpick.png^default_obsidian_shard.png",
 	range = 16,
 	tool_capabilities = {
