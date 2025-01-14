@@ -40,9 +40,9 @@ local function show_modechoose_form(player)
 		minetest.after(0, function()
 			if not minetest.get_player_by_name(player) then return end
 
-			minetest.chat_send_player(player, S("Voting for @1. Automatic vote: @2.") ..
-				"\n" .. S("To change the automatic vote settings, go to the \"Settings\" tab of your inventory."),
-				HumanReadable(new_mode), vote_setting)
+			minetest.chat_send_player(player, S("Voting for @1. Automatic vote: @2.",
+				HumanReadable(new_mode), vote_setting) ..
+				"\n" .. S("To change the automatic vote settings, go to the \"Settings\" tab of your inventory."))
 			player_vote(player, vote_setting)
 		end)
 
