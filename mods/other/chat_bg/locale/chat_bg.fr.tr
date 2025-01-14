@@ -1,6 +1,6 @@
 # textdomain: chat_bg
 
-Manage the chat background=Gère l'arrière plan du chatre
+Manage the chat background=Gère l'arrière plan du chat
 toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>=toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>
 Hud Toggled to=Hud basculé à
 Unable to find your player object=Impossible de trouver votre objet de joueur
