@@ -53,6 +53,8 @@ ctf_modebase = {
 
 ctf_gui.old_init()
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 -- Can be added to by other mods, like irc
 function ctf_modebase.announce(msg)
 	minetest.log("action", msg)
@@ -113,13 +115,13 @@ minetest.register_on_mods_loaded(function()
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text = ""})
 		end)
 	elseif ctf_core.settings.server_mode == "play" then
-		minetest.chat_send_all("[CTF] Sorting rankings...")
+		minetest.chat_send_all(S("[CTF] Sorting rankings..."))
 		local function check()
 			if not ctf_rankings:rankings_sorted() then
 				return minetest.after(1, check)
 			end
 
-			minetest.chat_send_all("[CTF] Rank sorting done. Starting new match...")
+			minetest.chat_send_all(S("[CTF] Rank sorting done. Starting new match..."))
 			ctf_modebase.start_new_match()
 		end
 
@@ -130,7 +132,7 @@ minetest.register_on_mods_loaded(function()
 		if not ctf_modebase.modes[name].rounds then
 			ctf_settings.register("ctf_modebase:default_vote_"..name, {
 				type = "list",
-				description = "Match count vote for the mode '"..HumanReadable(name).."'",
+				description = S("Match count vote for the mode").." '"..HumanReadable(name).."'",
 				list = {HumanReadable(name).." - Ask", "0", "1", "2", "3", "4", "5"},
 				_list_map = {"ask", 0, 1, 2, 3, 4, 5},
 				default = "1", -- "Ask"
@@ -144,7 +146,7 @@ minetest.override_chatcommand("pulverize", {
 })
 
 minetest.register_chatcommand("mode", {
-	description = "Prints the current mode and matches played",
+	description = S("Prints the current mode and matches played"),
 	func = function()
 		local mode = ctf_modebase.current_mode
 
@@ -152,7 +154,7 @@ minetest.register_chatcommand("mode", {
 			return false, "The game isn't running"
 		end
 
-		return true, string.format("The current mode is %s. Matches finished: %d/%d",
+		return true, S("The current mode is @1. Matches finished: @2/@3",
 			HumanReadable(ctf_modebase.current_mode),
 			ctf_modebase.current_mode_matches_played-1,
 			ctf_modebase.current_mode_matches
