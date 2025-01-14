@@ -28,8 +28,10 @@ local function check_hit(pos1, pos2, obj)
 	end
 end
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local fragdef_small = table.copy(minetest.registered_craftitems["grenades:frag"].grenade)
-fragdef_small.description = "Firecracker (Hurts anyone near blast)"
+fragdef_small.description = S("Firecracker (Hurts anyone near blast)")
 fragdef_small.image = "ctf_mode_nade_fight_firecracker_grenade.png"
 fragdef_small.explode_radius = 4
 fragdef_small.explode_damage = 16
@@ -57,8 +59,8 @@ local sounds = {}
 
 local black_hole_radius = 4.5
 grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
-	description = "Void Present, sucks players in and freezes them temporarily."..
-			"\nGrenades thrown while sucked in will instantly explode. All damage recieved is doubled",
+	description = S("Void Present, sucks players in and freezes them temporarily.")..
+			"\n".. S("Grenades thrown while sucked in will instantly explode. All damage recieved is doubled"),
 	image = "ctf_mode_nade_fight_black_hole_grenade.png",
 	clock = 1.8,
 	on_collide = function(def, obj)
@@ -216,7 +218,7 @@ local KNOCKBACK_AMOUNT = 40
 local KNOCKBACK_AMOUNT_WITH_FLAG = 25
 local KNOCKBACK_RADIUS = 3
 grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
-	description = "Knockback Grenade, players within a very small area take extreme knockback",
+	description = S("Knockback Grenade, players within a very small area take extreme knockback"),
 	image = "ctf_mode_nade_fight_knockback_grenade.png",
 	clock = 1.8,
 	on_collide = function()
@@ -332,7 +334,7 @@ for idx, info in ipairs(grenade_list) do
 	local def = minetest.registered_items[info.name]
 
 	minetest.register_tool("ctf_mode_nade_fight:grenade_tool_"..idx, {
-		description = def.description..minetest.colorize("gold", "\nRightclick off cooldown to switch to other grenades"),
+		description = def.description..minetest.colorize("gold", "\n"..S("Rightclick off cooldown to switch to other grenades")),
 		inventory_image = def.inventory_image,
 		wield_image = def.inventory_image,
 		inventory_overlay = "ctf_modebase_special_item.png",
