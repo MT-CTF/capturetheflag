@@ -1,15 +1,15 @@
 # textdomain: ctf_healing
 
- isn't in your team!= n'est pas dans votre équipe!
- is dead!= est mort!
- already has = a déjà 
- HP!= PV!
- healed you!= vous a soigné!
-You healed =Vous avez soigné 
+isn't in your team!=n'est pas dans votre équipe!
+is dead!=est mort!
+already has=a déjà
+HP!=PV!
+healed you!=vous a soigné!
+You healed=Vous avez soigné
 Bandage=Bandage
-Heals teammates for 3-4 HP until target's HP is equal to =Soigne un coéquipier de 3-4 PV jusqu'à ce que ses PV soient à 
+Heals teammates for 3-4 HP until target's HP is equal to=Soigne un coéquipier de 3-4 PV jusqu'à ce que ses PV soient à
 % of their maximum HP=% de ses PV maximum
-Your healing was interrupted: =Vos soins ont été interrompus: 
+Your healing was interrupted=Vos soins ont été interrompus
 You stopped holding the medkit=Le kit de soin n'est plus dans votre main
 You can't heal while inside blocks=Vous ne pouvez pas effectuer cette action lorsque vous êtes à l'intérieur d'un bloc
 You're already at full health=Vous êtes déjà en pleine forme
