@@ -178,7 +178,7 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 		if donate_timer[name] and donate_timer[name] + 150 > os.time() then
 			local time_diff = donate_timer[name] + 150 - os.time()
 			return false, S(
-				"You can donate only once in 2.5 minutes! You can donate again in @1 @2.",
+				"You can donate only once in 2.5 minutes! You can donate again in @1m @2s.",
 				math.floor(time_diff / 60),
 				time_diff % 60)
 		end
