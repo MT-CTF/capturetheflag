@@ -1,0 +1,7 @@
+# textdomain: ctf_mode_nade_fight
+
+Firecracker (Hurts anyone near blast)=Pétard (Blesse toute personne proche de l'explosion)
+Void Present, sucks players in and freezes them temporarily.=Grenade du néant, attire les joueurs et les immobilise temporairement.
+Grenades thrown while sucked in will instantly explode. All damage recieved is doubled=Vos grenades explosent instantanément si vous êtes immobilisé. Les dégâts sont doublés
+Knockback Grenade, players within a very small area take extreme knockback=Grenade de recul, plus un joueur est proche, plus le recul est puissant.
+Rightclick off cooldown to switch to other grenades=Clic-droit (en dehors du temps de chargement) pour passer à une autre grenade
