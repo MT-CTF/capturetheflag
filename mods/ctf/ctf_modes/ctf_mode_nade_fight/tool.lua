@@ -334,7 +334,8 @@ for idx, info in ipairs(grenade_list) do
 	local def = minetest.registered_items[info.name]
 
 	minetest.register_tool("ctf_mode_nade_fight:grenade_tool_"..idx, {
-		description = def.description..minetest.colorize("gold", "\n"..S("Rightclick off cooldown to switch to other grenades")),
+		description = def.description..minetest.colorize("gold", "\n"..
+			S("Rightclick off cooldown to switch to other grenades")),
 		inventory_image = def.inventory_image,
 		wield_image = def.inventory_image,
 		inventory_overlay = "ctf_modebase_special_item.png",
