@@ -1,3 +1,4 @@
+local S = minetest.get_translator(minetest.get_current_modname())
 
 local function remove_flora(pos, radius)
 	local pos1 = vector.subtract(pos, radius)
@@ -43,7 +44,7 @@ local function check_hit(pos1, pos2, obj)
 end
 
 local fragdef = {
-	description = "Frag grenade (Kills anyone near blast)",
+	description = S("Frag grenade (Kills anyone near blast)"),
 	image = "grenades_frag.png",
 	explode_radius = 10,
 	explode_damage = 26,
@@ -132,7 +133,7 @@ local fragdef = {
 grenades.register_grenade("grenades:frag", fragdef)
 
 local fragdef_sticky = table.copy(fragdef)
-fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
+fragdef_sticky.description = S("Sticky Frag grenade (Sticks to surfaces)")
 fragdef_sticky.image = "grenades_frag_sticky.png"
 fragdef_sticky.on_collide = function()
 	return
@@ -164,7 +165,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 					if not ctf_modebase.flag_captured[flagteam] and team.flag_pos then
 						local distance_from_flag = vector.distance(pos, team.flag_pos)
 						if distance_from_flag <= 15 and (damage or pteam == flagteam) then
-							minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
+							minetest.chat_send_player(pname, S("You can't explode smoke grenades so close to a flag!"))
 							if player:get_hp() <= 0 then
 								-- Drop the nade at its explode point if the thrower is dead
 								-- Fixes https://github.com/MT-CTF/capturetheflag/issues/1160
@@ -271,13 +272,13 @@ end
 
 register_smoke_grenade(
 	"smoke",
-	"Smoke grenade (Generates smoke around blast site)",
+	S("Smoke grenade (Generates smoke around blast site)"),
 	"grenades_smoke_grenade.png",
 	false
 )
 register_smoke_grenade(
 	"poison",
-	"Poison grenade (Generates poisonous smoke around blast site)",
+	S("Poison grenade (Generates poisonous smoke around blast site)"),
 	"grenades_smoke_grenade.png^[multiply:#00ff00",
 	true
 )
