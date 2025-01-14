@@ -23,7 +23,7 @@ function ctf_healing.register_bandage(name, def)
 				if ctf_teams.get(pname) ~= ctf_teams.get(uname) then
 					hud_events.new(uname, {
 						quick = true,
-						text = pname .. S(" isn't in your team!"),
+						text = pname .. " " .. S("isn't in your team!"),
 						color = "warning",
 					})
 					return
@@ -35,7 +35,7 @@ function ctf_healing.register_bandage(name, def)
 				if hp <= 0 then
 					hud_events.new(uname, {
 						quick = true,
-						text = pname .. S(" is dead!"),
+						text = pname .. " " .. S("is dead!"),
 						color = "warning",
 					})
 					return
@@ -44,7 +44,7 @@ function ctf_healing.register_bandage(name, def)
 				if hp >= limit then
 					hud_events.new(uname, {
 						quick = true,
-						text = pname .. S(" already has ") .. limit .. S(" HP!"),
+						text = pname .. " " .. S("already has") .. " " .. limit .. " " .. S("HP!"),
 						color = "warning",
 					})
 					return
@@ -65,12 +65,12 @@ function ctf_healing.register_bandage(name, def)
 					object:set_hp(hp)
 					hud_events.new(pname, {
 						quick = true,
-						text = uname .. S(" healed you!"),
+						text = uname .. " " .. S("healed you!"),
 						color = 0xC1FF44,
 					})
 					hud_events.new(uname, {
 						quick = true,
-						text = S("You healed ")..pname.."!",
+						text = S("You healed") .. " " .. pname .. "!",
 						color = 0xC1FF44,
 					})
 				elseif type(result) == "string" then
@@ -120,7 +120,7 @@ end
 
 local HEAL_PERCENT = 0.75
 ctf_healing.register_bandage("ctf_healing:bandage", {
-	description = S("Bandage").."\n"..S("Heals teammates for 3-4 HP until target's HP is equal to ") ..
+	description = S("Bandage").."\n"..S("Heals teammates for 3-4 HP until target's HP is equal to") .. " " ..
 			HEAL_PERCENT * 100 .. S("% of their maximum HP"),
 	inventory_image = "ctf_healing_bandage.png",
 	heal_percent = HEAL_PERCENT,

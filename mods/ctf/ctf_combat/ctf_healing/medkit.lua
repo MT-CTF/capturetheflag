@@ -21,7 +21,7 @@ local function stop_medkit_heal(playername, interrupt_reason)
 			player:set_hp((php + healing_players[playername].hp)/2) -- set hp halfway from the original to the current
 
 			hud_events.new(playername, {
-				text = S("Your healing was interrupted: ") .. interrupt_reason,
+				text = S("Your healing was interrupted") .. ": " .. interrupt_reason,
 				color = "danger",
 				quick = true,
 			})
