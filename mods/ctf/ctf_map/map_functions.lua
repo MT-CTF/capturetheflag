@@ -1,8 +1,8 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 
 function ctf_map.announce_map(map)
-	local msg = (minetest.colorize("#fcdb05", S("Map: ")) .. minetest.colorize("#f49200", map.name) ..
-	minetest.colorize("#fcdb05", S(" by ")) .. minetest.colorize("#f49200", map.author))
+	local msg = (minetest.colorize("#fcdb05", S("Map")) .. ": " .. minetest.colorize("#f49200", map.name) ..
+	minetest.colorize("#fcdb05", " " .. S("by")) .. " " .. minetest.colorize("#f49200", map.author))
 	if map.hint and map.hint ~= "" then
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end

@@ -74,7 +74,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		local spikecolor = ctf_teams.team[team].color
 
 		minetest.register_node("ctf_map:spike_"..team, {
-			description = HumanReadable(team)..S(" Team Spike"),
+			description = HumanReadable(team).." "..S("Team Spike"),
 			drawtype = "plantlike",
 			tiles = {"ctf_map_spike.png^[colorize:"..spikecolor..":150"},
 			inventory_image = "ctf_map_spike.png^[colorize:"..spikecolor..":150",

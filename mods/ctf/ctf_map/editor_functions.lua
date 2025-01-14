@@ -22,7 +22,7 @@ local function add_position(player, pos)
 
 	table.insert(getpos_players[player].positions, pos)
 	minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
-			S("Got pos ")..minetest.pos_to_string(pos, 1)))
+			S("Got pos") .. " " ..minetest.pos_to_string(pos, 1)))
 
 	if getpos_players[player].place_markers then
 		if #getpos_players[player].positions == 1 then

@@ -194,7 +194,8 @@ function ctf_map.show_map_editor(player)
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = S("Capture The Flag Map Editor"),
-							description = S("Placing map '")..maplist_sorted[selected_map]..S("'. This will take a few seconds...")
+							description = S("Placing map") .. " '" ..
+								maplist_sorted[selected_map].. "'. " .. S("This will take a few seconds...")
 						})
 					end)
 
@@ -216,7 +217,7 @@ function ctf_map.show_map_editor(player)
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = S("Capture The Flag Map Editor"),
-							description = S("Resuming map '")..maplist_sorted[selected_map].."'.\n"..
+							description = S("Resuming map") .. " '" ..maplist_sorted[selected_map].."'.\n"..
 									S("(Remember that this doesn't recall setting changes)")
 						})
 					end)
@@ -259,7 +260,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	-- MAP CORNERS
 	elements.positions = {
 		type = "button", exit = true,
-		label = S("Corners - ") .. minetest.pos_to_string(context[player].pos1, 0) ..
+		label = S("Corners") .." - ".. minetest.pos_to_string(context[player].pos1, 0) ..
 				" - " .. minetest.pos_to_string(context[player].pos2, 0),
 		pos = {0, 0.5},
 		size = {10 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
@@ -461,7 +462,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	for teamname, def in pairs(context[player].teams) do
 		elements[teamname.."_checkbox"] = {
 			type = "checkbox",
-			label = HumanReadable(teamname) .. S(" Team"),
+			label = HumanReadable(teamname) .. " " .. S("Team"),
 			pos = {0, idx},
 			default = def.enabled,
 			func = function(pname, fields)
@@ -473,7 +474,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		elements[teamname.."_button"] = {
 			type = "button",
 			exit = true,
-			label = S("Set Flag Pos: ") .. minetest.pos_to_string(def.flag_pos),
+			label = S("Set Flag Pos") .. ": " .. minetest.pos_to_string(def.flag_pos),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {5, ctf_gui.ELEM_SIZE.y},
 			func = function(pname, fields)
@@ -514,7 +515,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname.."_positions"] = {
 			type = "button", exit = true,
-			label = S("Zone Bounds - ") .. minetest.pos_to_string(context[player].teams[teamname].pos1, 0) ..
+			label = S("Zone Bounds") .. " - " .. minetest.pos_to_string(context[player].teams[teamname].pos1, 0) ..
 					" - " .. minetest.pos_to_string(context[player].teams[teamname].pos2, 0),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
@@ -534,7 +535,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname .. "_look_pos"] = {
 			type = "label",
-			label = S("Look position: ") .. (look_pos and vector.to_string(look_pos) or "auto"),
+			label = S("Look position") .. ": " .. (look_pos and vector.to_string(look_pos) or "auto"),
 			pos = {0.2, idx},
 			-- "The first line of text is now positioned centered exactly at the position specified."
 			-- https://github.com/minetest/minetest/blob/480d5f2d51ca8f7c4400b0918bb53b776e4ff440/doc/lua_api.txt#L2929
@@ -600,7 +601,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			elements["chestzone_"..id] = {
 				type = "button",
 				exit = true,
-				label = S("Chest Zone ")..id.." - "..minetest.pos_to_string(def.pos1, 0) ..
+				label = S("Chest Zone").." "..id.." - "..minetest.pos_to_string(def.pos1, 0) ..
 						" - "..minetest.pos_to_string(def.pos2, 0),
 				pos = {0, idx},
 				size = {7, ctf_gui.ELEM_SIZE.y},
