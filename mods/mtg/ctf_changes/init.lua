@@ -202,6 +202,12 @@ minetest.override_item("default:clay", {
 	drop = "default:clay",
 })
 
+minetest.register_craft({
+	type = "cooking",
+	output = "default:brick",
+	recipe = "default:clay",
+})
+
 minetest.register_on_mods_loaded(function()
 	for nodename, value in pairs(node_fall_damage_factors) do
 		local groups_temp = minetest.registered_items[nodename].groups
