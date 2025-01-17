@@ -6,5 +6,5 @@ Pistol=
 Rifle=
 Shotgun=
 Submachinegun=
-Sniper rifle=
-Magnum sniper rifle=
+Sniper Rifle=
+Magnum Sniper Rifle=
