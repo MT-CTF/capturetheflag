@@ -85,6 +85,13 @@ crafting.register_recipe({
 	always_known = true,
 })
 
+-- Stone Brick x4
+crafting.register_recipe({
+	output = "default:stonebrick 4",
+	items  = { "default:stone 4" },
+	always_known = true,
+})
+
 -- Wood x4
 crafting.register_recipe({
 	output = "default:wood 4",
