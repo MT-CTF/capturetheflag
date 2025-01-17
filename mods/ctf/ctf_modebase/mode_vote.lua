@@ -10,6 +10,8 @@ local new_mode
 
 ctf_modebase.mode_vote = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function player_vote(name, length)
 	if not voted then return end
 
@@ -38,9 +40,9 @@ local function show_modechoose_form(player)
 		minetest.after(0, function()
 			if not minetest.get_player_by_name(player) then return end
 
-			minetest.chat_send_player(player,
-				string.format("Voting for " .. HumanReadable(new_mode) .. ". Automatic vote: " .. vote_setting .. "\n" ..
-				"To change the automatic vote settings, go to the \"Settings\" tab of your inventory."))
+			minetest.chat_send_player(player, S("Voting for @1. Automatic vote: @2.",
+				HumanReadable(new_mode), vote_setting) ..
+				"\n" .. S("To change the automatic vote settings, go to the \"Settings\" tab of your inventory."))
 			player_vote(player, vote_setting)
 		end)
 
@@ -74,19 +76,19 @@ local function show_modechoose_form(player)
 	elements["quit_button"] = {
 		type = "button",
 		exit = true,
-		label = "Exit Game",
+		label = S("Exit Game"),
 		pos = {x = "center", y = i},
 		func = function(playername, fields, field_name)
-			minetest.kick_player(playername, "You clicked 'Exit Game' in the mode vote formspec")
+			minetest.kick_player(playername, S("You clicked 'Exit Game' in the mode vote formspec"))
 		end,
 	}
 	i = i + (ctf_gui.ELEM_SIZE.y - 0.2)
 
 	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
 		size = {x = 8, y = i + 3.5},
-		title = "Mode: "..HumanReadable(new_mode),
-		description = "Please vote on how many matches you would like to play.\n" ..
-			"You can change your default vote for this mode via the Settings tab (in your inventory)",
+		title = S("Mode")..": "..HumanReadable(new_mode),
+		description = S("Please vote on how many matches you would like to play.") ..
+			"\n" .. S("You can change your default vote for this mode via the Settings tab (in your inventory)"),
 		header_height = 2.4,
 		elements = elements,
 	})

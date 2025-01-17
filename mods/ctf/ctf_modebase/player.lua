@@ -1,22 +1,24 @@
 ctf_modebase.player = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 ctf_settings.register("auto_trash_stone_swords", {
 	type = "bool",
-	label = "Auto-trash stone swords when you pick up a better sword",
-	description = "Only triggers when picking up swords from the ground",
+	label = S("Auto-trash stone swords when you pick up a better sword"),
+	description = S("Only triggers when picking up swords from the ground"),
 	default = "false"
 })
 
 ctf_settings.register("auto_trash_stone_tools", {
 	type = "bool",
-	label = "Auto-trash stone tools when you pick up a better one",
-	description = "Only triggers when picking up tools from the ground",
+	label = S("Auto-trash stone tools when you pick up a better one"),
+	description = S("Only triggers when picking up tools from the ground"),
 	default = "false"
 })
 
 ctf_settings.register("flag_sound_volume", {
 	type = "bar",
-	label = "Flag Sound Volume",
+	label = S("Flag Sound Volume"),
 	default = "10",
 	min = 0,
 	max = 20,
@@ -26,7 +28,7 @@ ctf_settings.register("flag_sound_volume", {
 local DEFAULT_VOLUMETRIC_LIGHTING = 10
 ctf_settings.register("volumetric_lighting", {
 	type = "bar",
-	label = "Volumetric Lighting Strength",
+	label = S("Volumetric Lighting Strength"),
 	default = tostring(DEFAULT_VOLUMETRIC_LIGHTING),
 	min = 0,
 	max = 50,

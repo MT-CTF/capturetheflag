@@ -1,5 +1,7 @@
 local hud = mhud.init()
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function get_val(val, default)
 	if not val or val == "" then
 		return default
@@ -43,8 +45,8 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 local cmd = chatcmdbuilder.register("chat_bg", {
-	description = "Manage the chat background",
-	params = "toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>"
+	description = S("Manage the chat background"),
+	params = S("toggle | set <opacity | width | height> <1-255 | 1-100 | 1-100>")
 })
 
 cmd:sub("toggle", function(name)
@@ -62,9 +64,9 @@ cmd:sub("toggle", function(name)
 		end
 
 
-		return true, "Hud Toggled to " .. (current and "on state" or "off state")
+		return true, S("Hud Toggled to") .. " " .. (current and "off state" or "on state")
 	else
-		return false, "Unable to find your player object"
+		return false, S("Unable to find your player object")
 	end
 end)
 
@@ -79,11 +81,11 @@ cmd:sub("set :setting :value:int", function(name, setting, value)
 
 			update_hud(player)
 
-			return true, string.format("Set %s to %s", setting, value == 0 and "default" or lim(value, 1, 255))
+			return true, S("Set @1 to @2", setting, value == 0 and "default" or lim(value, 1, 255))
 		else
-			return false, string.format("Invalid setting '%s'. Avaliable settings: opacity, width, height", setting)
+			return false, S("Invalid setting '@1'. Avaliable settings: opacity, width, height", setting)
 		end
 	else
-		return false, "Unable to find your player object"
+		return false, S("Unable to find your player object")
 	end
 end)

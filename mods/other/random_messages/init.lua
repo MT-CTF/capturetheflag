@@ -42,8 +42,8 @@ function random_messages.read_messages()
 		S("Find weapons in chests or mine and use furnaces to make stronger swords."),
 		S("Use team doors (steel) to stop the enemy walking into your base."),
 		S("Sprint by pressing the fast key (E) when you have stamina."),
-		S("Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate"),
-		S("Want to submit your own map? Visit https://github.com/MT-CTF/maps to get involved."),
+		S("Like CTF? Give feedback using /report, and consider donating at").." rubenwardy.com/donate",
+		S("Want to submit your own map? Visit").." https://github.com/MT-CTF/maps "..S("to get involved."),
 		S("Using limited resources for building structures that don't strengthen your base's defences is discouraged."),
 		S("To report misbehaving players to moderators, please use /report <name> <action>"),
 		S("Swearing, trolling and being rude will not be tolerated and strict action will be taken."),
@@ -59,13 +59,13 @@ function random_messages.read_messages()
 		S("Hitting your enemy does more damage than not hitting them."),
 		S("Use /top50 command to see the leaderboard."),
 		S("Use /top50 <mode:technical modename> to see the leaderboard on another mode.")
-		.. S(" For example: /top50 mode:nade_fight."),
+		.. " " .. S("For example: /top50 mode:nade_fight."),
 		S("To check someone's rank on another mode, use /r <mode:technical modename> <playername>.")
-		.. S(" For example: /r mode:nade_fight randomplayer."),
+		.. " " .. S("For example: /r mode:nade_fight randomplayer."),
 		S("To check someone's team use /team player <player_name>."),
 		S("To check all team members use /team."),
 		S("You can capture multiple enemy flags at once!"),
-		S("Consider joining our Discord server at https://discord.gg/vcZTRPX"),
+		S("Consider joining our Discord server at").. " https://discord.gg/vcZTRPX",
 		S("You can press sneak while jumping to jump up two blocks."),
 		S("Use /donate <playername> <score> [message] (message optional) to reward a team-mate for their work."),
 		S("A medic and knight working together can wreak havoc on the enemy team(s)."),
@@ -76,12 +76,12 @@ function random_messages.read_messages()
 		S("Use /msg <playername> <message> to send a private message (PM) to another player."),
 		S("To check someone's league in all modes, use /league <player>"),
 		S("Use /leagues to list leagues and the placement needed to get to them."),
-		S("To place an HP marker, run /mhp or left/right click while holding the zoom key (default: Z) ")..
-			S("and looking at your feet."),
+		S("To place an HP marker, run /mhp or left/right click while holding the zoom key (default: Z)")
+		.. " " .. S("and looking at your feet."),
 		S("Use /map to print the current map name and its author."),
 		S("To check someone's ranking in all modes, use /rank mode:all <player_name>"),
-		S("Building a base with materials stronger than cobblestone, such as wood or reinforced cobble, " ..
-			"keeps your flag safer."),
+		S("Building a base with materials stronger than cobblestone, such as wood or reinforced cobble")
+		.. ", " .. S("keeps your flag safer."),
 	}
 end
 
@@ -104,7 +104,7 @@ end
 function random_messages.list_messages()
 	local str = ""
 	for k,v in pairs(random_messages.messages) do
-		str = str .. k .. " | " .. S(v) .. "\n"
+		str = str .. k .. " | " .. v .. "\n"
 	end
 	return str
 end

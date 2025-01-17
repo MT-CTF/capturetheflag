@@ -8,8 +8,10 @@ ctf_ranged = {
 local scoped = ctf_ranged.scoped
 local scale_const = 6
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_craftitem("ctf_ranged:ammo", {
-	description = "Ammo\nUsed to reload guns",
+	description = S("Ammo").."\n"..S("Used to reload guns"),
 	inventory_image = "ctf_ranged_ammo.png",
 })
 
@@ -286,7 +288,7 @@ end
 
 ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	type = "pistol",
-	description = "Pistol",
+	description = S("Pistol"),
 	texture = "ctf_ranged_pistol.png",
 	fire_sound = "ctf_ranged_pistol",
 	rounds = 75,
@@ -299,7 +301,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	type = "rifle",
-	description = "Rifle",
+	description = S("Rifle"),
 	texture = "ctf_ranged_rifle.png",
 	fire_sound = "ctf_ranged_rifle",
 	rounds = 40,
@@ -312,7 +314,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	type = "shotgun",
-	description = "Shotgun",
+	description = S("Shotgun"),
 	texture = "ctf_ranged_shotgun.png",
 	fire_sound = "ctf_ranged_shotgun",
 	bullet = {
@@ -327,7 +329,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	type = "smg",
-	description = "SubMachineGun",
+	description = S("Submachinegun"),
 	texture = "ctf_ranged_smgun.png",
 	fire_sound = "ctf_ranged_pistol",
 	bullet = {
@@ -343,7 +345,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	type = "sniper",
-	description = "Sniper Rifle",
+	description = S("Sniper Rifle"),
 	texture = "ctf_ranged_sniper_rifle.png",
 	fire_sound = "ctf_ranged_sniper",
 	rounds = 25,
@@ -363,7 +365,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	type = "sniper",
-	description = "Magnum Sniper Rifle",
+	description = S("Magnum Sniper Rifle"),
 	texture = "ctf_ranged_sniper_rifle_magnum.png",
 	fire_sound = "ctf_ranged_sniper",
 	rounds = 20,
