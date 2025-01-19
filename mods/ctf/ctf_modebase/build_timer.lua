@@ -72,7 +72,7 @@ function ctf_modebase.build_timer.finish()
 			hud:remove_all()
 			local text = S("Build time is over!")
 			minetest.chat_send_all(text)
-			ctf_modebase.announce(text)
+			ctf_modebase.announce(minetest.get_translated_string("en", text))
 
 			ctf_modebase.on_match_start()
 

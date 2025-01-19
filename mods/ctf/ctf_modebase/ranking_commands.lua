@@ -209,7 +209,7 @@ ctf_core.register_chatcommand_alias("donate", "d", {
 		local donate_text = S("@1 donated @2 score to @3@4", name, score, names, dmessage)
 
 		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
-		ctf_modebase.announce(donate_text)
+		ctf_modebase.announce(minetest.get_translated_string("en", donate_text))
 		return true
 	end
 })

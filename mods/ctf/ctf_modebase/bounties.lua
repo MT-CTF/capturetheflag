@@ -52,7 +52,7 @@ function ctf_modebase.bounties.claim(player, killer)
 	local rewards = bounties[pteam].rewards
 	local bounty_kill_text = S("[Bounty] @1 killed @2 and got @3", killer, player, get_reward_str(rewards))
 	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, bounty_kill_text))
-	ctf_modebase.announce(bounty_kill_text)
+	ctf_modebase.announce(minetest.get_translated_string("en", bounty_kill_text))
 
 	bounties[pteam] = nil
 	return rewards
