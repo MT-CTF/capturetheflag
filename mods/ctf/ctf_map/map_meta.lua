@@ -170,11 +170,6 @@ function ctf_map.load_map_meta(idx, dirname)
 		-- The version number should be updated if you change an item
 		local size = minetest.deserialize(meta:get("size"))
 
-		if size.x * size.y * size.z < 4096000 then
-			minetest.log("error", "The map " .. dirname ..
-					" is too large. Disabling until a workaround is implemented")
-		end
-
 		offset.y = -size.y/2
 
 		map = {
@@ -184,7 +179,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			offset         = offset,
 			size           = size,
 			dirname        = dirname,
-			enabled        = (size.x * size.y * size.z < 4096000) and (meta:get("enabled") == "true"),
+			enabled        = meta:get("enabled") == "true",
 			name           = meta:get("name"),
 			author         = meta:get("author"),
 			hint           = meta:get("hint"),
