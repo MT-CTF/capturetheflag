@@ -880,9 +880,81 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 * `nodepos` *Position*: Position of node. 
 * `node` *NodeDef*: Node clicked on. 
 
+#### `ctf_modebase.register_mode(name, def)`
+* `name` *string*: Mode Name
+* `def` *modeDef*: Definition of mode. (Check `classes` mode def for example)
+
+#### `ctf_modebase.on_mode_end()`
+* returns *boolean* on wheter the mode has ended or not.
+
+#### `ctf_modebase.on_mode_start()`
+* to be run when a new mode starts. Runs all functions that are scheduled to be called on new mode.
+
+#### `ctf_modebase.on_new_match()`
+* to be run when a new match is supposed to start. Runs all functions that are scheduled to be called on new match.
+
+#### `ctf_modebase.on_match_start()`
+* to be run when a new match starts. Runs all functions that are scheduled to be called on new match.
+
+#### `ctf_modebase.on_match_end()`
+* to be run when a match ends. Runs all functions that are scheduled to be called on match end.
+
+#### `ctf_modebase.on_respawnplayer(player)`
+* `player` *PlayerObj*: Player
+* Runs all functions that are scheduled to be called when a player respawns.
+
+#### `ctf_modebase.on_flag_rightclick(...)`
+* `...` ??? 
+* Defines behavior when the flag is clicked with the right mouse key.
+
+#### `ctf_modebase.on_flag_capture(capturer, flagteams)`
+* `capturer`*PlayerObj* 
+* `flagteams` *list(string)* (list of the teams of the flags taken)
+
+#### `ctf_modebase.match_mode(param)`
+* ???
+
+#### `ctf_modebase.skip_vote.start_vote()`
+* Start the skipping match process. 
+
+#### `ctf_modebase.skip_vote.end_vote()`
+* End the skip match process. Appropriately skip the match or abstain based on the votes. 
+
+#### `ctf_modebase.skip_vote.on_flag_take()`
+* Increment holding flag count.
+
+#### `ctf_modebase.skip_vote.on_flag_drop(count)`
+* `count` *int*: Current flag count
+* If flag count falls to zero, and skip vote has chosen match to skip, then skip the map.
+
+#### `ctf_modebase.skip_vote.on_flag_capture(count)`
+`count` *int*: Current flag count
+* If flag has been captured, then remove the skip vote timer and end the match.
+
+#### `ctf_modebase.summary.get(prev)`
+* `prev` *boolean*: Whether previous rankings to be shown.
+* Returns a `table` with the relevant match summary. 
+
+#### `ctf_modebase.summary.set_winner(i)`
+* `i` *int*: int
+
+#### `ctf_modebase.summary.show_gui(name, rankings, special_rankings, rank_values, formdef)`
+* `name` *string*: Player name
+* `rankings` *table*: Recent rankings to show in the gui
+* `rank_values` *table*: Example: `{_sort = "score", "captures" "kills"}`
+* `formdef` *table*: table for customizing the formspec
+
+#### `ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, rank_values, formdef)`
+* `name` *string*: Player name
+* `rankings` *table*: Recent rankings to show in the gui
+* `rank_values` *table*: Example: `{_sort = "score", "captures" "kills"}`
+* `formdef` *table*: table for customizing the formspec
 
 
+# Footnotes
+And thats the end of the api docs. If anything is missing, or something needs to be updated, feel free to make a PR. 
+Last updated on: 13 Feb 2025 (GMT)
 <!--
-API Docs for CTF by mrtechtroid. 
+Docs for CTF by mrtechtroid. 
 Released under CC BY-SA 4.0
 -->
