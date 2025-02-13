@@ -1,3 +1,5 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function show_catalog(pname, current_map)
 	if not current_map then
 		current_map = ctf_modebase.map_catalog.current_map
@@ -10,7 +12,7 @@ local function show_catalog(pname, current_map)
 	local current_map_meta = ctf_modebase.map_catalog.maps[current_map]
 
 	local formspec = {
-		title = "Maps catalog",
+		title = S("Maps catalog"),
 		elements = {
 			list = {
 				type = "table",
@@ -37,7 +39,7 @@ local function show_catalog(pname, current_map)
 		formspec.elements.author = {
 			type = "label",
 			pos = {7, y},
-			label = "By: " .. minetest.colorize("#cccccc", current_map_meta.author),
+			label = S("By")..": "..minetest.colorize("#cccccc", current_map_meta.author),
 		}
 		y = y + 0.5
 	end
@@ -59,7 +61,7 @@ local function show_catalog(pname, current_map)
 			type = "textarea",
 			pos = {7, y},
 			size = {10, 1},
-			label = minetest.colorize("#ffff00", "HINT:"),
+			label = minetest.colorize("#ffff00", S("HINT")..":"),
 			read_only = true,
 			default = current_map_meta.hint,
 		}
@@ -71,7 +73,7 @@ local function show_catalog(pname, current_map)
 			type = "textarea",
 			pos = {7, y},
 			size = {10, 1},
-			label = minetest.colorize("#ffff00", "LICENSE:"),
+			label = minetest.colorize("#ffff00", S("LICENSE")..":"),
 			read_only = true,
 			default = current_map_meta.license,
 		}
@@ -83,7 +85,7 @@ local function show_catalog(pname, current_map)
 			type = "textarea",
 			pos = {7, y},
 			size = {10, 3},
-			label = minetest.colorize("#ffff00", "GAME MODES"),
+			label = minetest.colorize("#ffff00", S("GAME MODES")),
 			read_only = true,
 			default = HumanReadable(current_map_meta.game_modes),
 		}
@@ -95,7 +97,7 @@ local function show_catalog(pname, current_map)
 			type = "textarea",
 			pos = {7, y},
 			size = {10, 3},
-			label = minetest.colorize("#ffff00", "MORE INFORMATION"),
+			label = minetest.colorize("#ffff00", S("MORE INFORMATION")),
 			read_only = true,
 			default = current_map_meta.others,
 		}
@@ -129,7 +131,7 @@ local function show_catalog(pname, current_map)
 		formspec.elements.skip_to_map = {
 			type = "button",
 			exit = true,
-			label = "Skip to map",
+			label = S("Skip to map"),
 			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.2},
 			size = {2.5, 1},
 			func = function()
@@ -145,7 +147,7 @@ local function show_catalog(pname, current_map)
 	if minetest.check_player_privs(pname, {ctf_admin=true}) then
 		formspec.elements.set_as_next_map = {
 			type = "button",
-			label = "Set as next map",
+			label = S("Set as next map"),
 			pos = {3.5, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.2},
 			size = {2.5, 1},
 			func = function()
@@ -161,7 +163,7 @@ local function show_catalog(pname, current_map)
 end
 
 minetest.register_chatcommand("maps", {
-	description = "Show the map catalog",
+	description = S("Show the map catalog"),
 	func = function(name)
 		show_catalog(name)
 	end

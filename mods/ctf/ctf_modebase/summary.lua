@@ -4,6 +4,8 @@ local winner = nil
 
 local player_sort_by = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_on_leaveplayer(function(player) player_sort_by[player:get_player_name()] = nil end)
 
 local function team_rankings(total)
@@ -12,7 +14,7 @@ local function team_rankings(total)
 	for team, rank_values in pairs(total) do
 		rank_values._row_color = ctf_teams.team[team].color
 
-		ranks[HumanReadable("team " .. team)] = rank_values
+		ranks[HumanReadable(S("team") .." ".. team)] = rank_values
 	end
 
 	return ranks
@@ -28,8 +30,8 @@ function ctf_modebase.summary.get(prev)
 
 		return
 			rankings.players(), team_rankings(rankings.teams()), current_mode.summary_ranks, {
-				title = "Match Summary",
-				special_row_title = "Total Team Stats",
+				title = S("Match Summary"),
+				special_row_title = S("Total Team Stats"),
 				game_stat = game_stat,
 				winner = winner,
 				duration = ctf_map.get_duration(),
@@ -40,8 +42,8 @@ function ctf_modebase.summary.get(prev)
 	elseif previous ~= nil then
 		return
 			previous.players, team_rankings(previous.teams), previous.summary_ranks, {
-				title = "Previous Match Summary",
-				special_row_title = "Total Team Stats",
+				title = S("Previous Match Summary"),
+				special_row_title = S("Total Team Stats"),
 				game_stat = previous.game_stat,
 				winner = previous.winner,
 				duration = previous.duration,
@@ -53,7 +55,7 @@ function ctf_modebase.summary.get(prev)
 end
 
 ctf_api.register_on_new_match(function()
-	game_stat = string.format("%s mode: Round %d of %d",
+	game_stat = S("@1 mode: Round @2 of @3",
 		HumanReadable(ctf_modebase.current_mode),
 		ctf_modebase.current_mode_matches_played + 1,
 		ctf_modebase.current_mode_matches
@@ -69,7 +71,7 @@ ctf_api.register_on_match_end(function()
 		players = rankings.players(),
 		teams = rankings.teams(),
 		game_stat = game_stat,
-		winner = winner or "NO WINNER",
+		winner = winner or S("NO WINNER"),
 		duration = ctf_map.get_duration(),
 		map = ctf_map.current_map.name,
 		summary_ranks = current_mode.summary_ranks,
@@ -186,7 +188,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	end
 
 	local formspec = {
-		title = formdef.title or "Summary",
+		title = formdef.title or S("Summary"),
 		elements = {
 			rankings = {
 				type = "table",
@@ -212,7 +214,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 				},
 				rows = {
 					#special_rankings > 1 and table.concat(special_rankings, ",") or "",
-					"white", "Player Name",
+					"white", S("Player Name"),
 					"cyan", HumanReadable(sortby).."  ", "white",
 					HumanReadable(table.concat(modified_ranks, "  ,")),
 					table.concat(rankings, ",")
@@ -239,14 +241,14 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		formspec.elements.label = {
 			type = "label",
 			pos = {13, 0.5},
-			label = "Sort players by: "
+			label = S("Sort players by")..": "
 		}
 	end
 
 	if formdef.buttons.next then
 		formspec.elements.next = {
 			type = "button",
-			label = "See Current",
+			label = S("See Current"),
 			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
 			func = function()
 				show_for_player(name, false)
@@ -257,7 +259,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	if formdef.buttons.previous then
 		formspec.elements.previous = {
 			type = "button",
-			label = "See Previous",
+			label = S("See Previous"),
 			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
 			func = function()
 				show_for_player(name, true)
@@ -285,7 +287,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		formspec.elements.duration = {
 			type = "label",
 			pos = {1, 1.3},
-			label = "Duration: " .. formdef.duration,
+			label = S("Duration") ..": ".. formdef.duration,
 		}
 	end
 
@@ -293,7 +295,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		formspec.elements.map = {
 			type = "label",
 			pos = {7, 0.5},
-			label = "Map: " .. formdef.map,
+			label = S("Map") ..": ".. formdef.map,
 		}
 	end
 
@@ -301,7 +303,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 end
 
 ctf_core.register_chatcommand_alias("summary", "s", {
-	description = "Show a summary for the current match",
+	description = S("Show a summary for the current match"),
 	func = function(name, param)
 		local prev
 		if not param or param == "" then
@@ -309,11 +311,11 @@ ctf_core.register_chatcommand_alias("summary", "s", {
 		elseif param:match("p") then
 			prev = true
 		else
-			return false, "Can't understand param " .. dump(param)
+			return false, S("Can't understand param") .." ".. dump(param)
 		end
 
 		if not show_for_player(name, prev) then
-			return false, "No match summary!"
+			return false, S("No match summary!")
 		end
 
 		return true

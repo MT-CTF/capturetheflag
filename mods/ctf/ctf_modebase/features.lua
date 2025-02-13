@@ -2,6 +2,8 @@ local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function supports_observers(x)
 	if x then
 		if x.object then x = x.object end
@@ -136,7 +138,7 @@ function ctf_modebase.map_chosen(map, ...)
 				position = {x = 0.5, y = 0.5},
 				alignment = {x = "center", y = "up"},
 				text_scale = 2,
-				text = "Loading Map: " .. map.name .. "...",
+				text = S("Loading Map") .. ": " .. map.name .. "...",
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
@@ -158,7 +160,7 @@ end
 
 ctf_settings.register("teammate_nametag_style", {
 	type = "list",
-	description = "Controls what style of nametag to use for teammates.",
+	description = S("Controls what style of nametag to use for teammates."),
 	list = {"Minetest Nametag: Full", "Minetest Nametag: Symbol", "Entity Nametag"},
 	default = "1",
 	on_change = function(player, new_value)
@@ -384,7 +386,7 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 				ctf_kill_list.add(killer, player, weapon_image, comment)
 				hud_events.new(player, {
 					quick = false,
-					text = killer.." killed you for ".. rewards.score .." points!",
+					text = killer .. " " .. S("killed you for") .. " " .. rewards.score .." " .. S("points!"),
 					color = "warning",
 				})
 			end
@@ -416,26 +418,26 @@ end
 
 local function can_punchplayer(player, hitter)
 	if not ctf_modebase.match_started then
-		return false, "The match hasn't started yet!"
+		return false, S("The match hasn't started yet!")
 	end
 
 	local pname, hname = player:get_player_name(), hitter:get_player_name()
 	local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
 
 	if not ctf_modebase.remove_respawn_immunity(hitter) then
-		return false, "You can't attack while immune"
+		return false, S("You can't attack while immune")
 	end
 
 	if not pteam then
-		return false, pname .. " is not in a team!"
+		return false, pname .. " " .. S("is not in a team!")
 	end
 
 	if not hteam then
-		return false, "You are not in a team!"
+		return false, S("You are not in a team!")
 	end
 
 	if pteam == hteam and pname ~= hname then
-		return false, pname .. " is on your team!"
+		return false, pname .. " " .. S("is on your team!")
 	end
 
 	return true
@@ -634,7 +636,7 @@ return {
 		if not ctf_modebase.match_started then
 			tp_player_near_flag(player)
 
-			return "You can't take the enemy flag during build time!"
+			return S("You can't take the enemy flag during build time!")
 		end
 	end,
 	on_flag_take = function(player, teamname)
@@ -922,7 +924,7 @@ return {
 	end,
 	on_healplayer = function(player, patient, amount)
 		if not ctf_modebase.match_started then
-			return "The match hasn't started yet!"
+			return S("The match hasn't started yet!")
 		end
 
 		local score = nil

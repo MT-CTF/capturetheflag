@@ -8,8 +8,10 @@ ctf_ranged = {
 local scoped = ctf_ranged.scoped
 local scale_const = 6
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_craftitem("ctf_ranged:ammo", {
-	description = "Ammo\nUsed to reload guns",
+	description = S("Ammo").."\n"..S("Used to reload guns"),
 	inventory_image = "ctf_ranged_ammo.png",
 })
 
@@ -122,8 +124,13 @@ end
 
 function ctf_ranged.simple_register_gun(name, def)
 	minetest.register_tool(rawf.also_register_loaded_tool(name, {
-		description = def.description,
-		inventory_image = def.texture.."^[colorize:#F44:42",
+		description = def.description ..
+				("\nDMG: %d | Shots/s: %0.1f | Mag: %d"):format(
+					def.damage * (def.bullet and def.bullet.amount or 1),
+					1 / def.fire_interval,
+					def.rounds
+				),
+		inventory_image = def.texture .. "^[colorize:#F44:42",
 		ammo = def.ammo or "ctf_ranged:ammo",
 		rounds = def.rounds,
 		_g_category = def.type,
@@ -149,7 +156,13 @@ function ctf_ranged.simple_register_gun(name, def)
 		end,
 	},
 	function(loaded_def)
-		loaded_def.description = def.description.." (Loaded)"
+		loaded_def.description = def.description ..
+				("\nDMG: %d | Shots/s: %0.1f | Mag: %d"):format(
+					def.damage * (def.bullet and def.bullet.amount or 1),
+					1 / def.fire_interval,
+					def.rounds
+				) ..
+				" (Loaded)"
 		loaded_def.inventory_image = def.texture
 		loaded_def.inventory_overlay = def.texture_overlay
 		loaded_def.wield_image = def.wield_texture or def.texture
@@ -275,7 +288,7 @@ end
 
 ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	type = "pistol",
-	description = "Pistol\nDmg: 2 | FR: 0.6s | Mag: 75",
+	description = S("Pistol"),
 	texture = "ctf_ranged_pistol.png",
 	fire_sound = "ctf_ranged_pistol",
 	rounds = 75,
@@ -288,7 +301,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	type = "rifle",
-	description = "Rifle\nDmg: 1 | FR: 0.8s | Mag: 40",
+	description = S("Rifle"),
 	texture = "ctf_ranged_rifle.png",
 	fire_sound = "ctf_ranged_rifle",
 	rounds = 40,
@@ -301,7 +314,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	type = "shotgun",
-	description = "Shotgun\nDmg: 1x28 | FR: 2s | Mag: 10",
+	description = S("Shotgun"),
 	texture = "ctf_ranged_shotgun.png",
 	fire_sound = "ctf_ranged_shotgun",
 	bullet = {
@@ -316,7 +329,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	type = "smg",
-	description = "Submachinegun\nDmg: 1 | FR: 0.1s | Mag: 36",
+	description = S("Submachinegun"),
 	texture = "ctf_ranged_smgun.png",
 	fire_sound = "ctf_ranged_pistol",
 	bullet = {
@@ -332,7 +345,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	type = "sniper",
-	description = "Sniper rifle\nDmg: 12 | FR: 2s | Mag: 25",
+	description = S("Sniper Rifle"),
 	texture = "ctf_ranged_sniper_rifle.png",
 	fire_sound = "ctf_ranged_sniper",
 	rounds = 25,
@@ -352,7 +365,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	type = "sniper",
-	description = "Magnum sniper rifle\nDmg: 16 | FR: 2s | Mag: 20",
+	description = S("Magnum Sniper Rifle"),
 	texture = "ctf_ranged_sniper_rifle_magnum.png",
 	fire_sound = "ctf_ranged_sniper",
 	rounds = 20,

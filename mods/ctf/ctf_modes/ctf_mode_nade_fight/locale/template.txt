@@ -1,0 +1,7 @@
+# textdomain: ctf_mode_nade_fight
+
+Firecracker (Hurts anyone near blast)=
+Void Present, sucks players in and freezes them temporarily.=
+Grenades thrown while sucked in will instantly explode. All damage recieved is doubled=
+Knockback Grenade, players within a very small area take extreme knockback=
+Rightclick off cooldown to switch to other grenades=

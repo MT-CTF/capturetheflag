@@ -67,7 +67,7 @@ minetest.register_chatcommand("report", {
 				timers[name] = nil
 			end)
 		else
-			return false, "You are sending reports too fast. You only need to report things once"
+			return false, S("You are sending reports too fast. You only need to report things once")
 		end
 
 		local msg = name .. " reported: " .. param

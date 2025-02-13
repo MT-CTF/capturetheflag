@@ -14,6 +14,8 @@ if ctf_core.settings.server_mode == "play" then
 	end
 end
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 -- The flag
 minetest.register_node("ctf_modebase:flag", {
 	description = "Flag",
@@ -122,7 +124,7 @@ minetest.register_node("ctf_modebase:flag_captured_top",{
 	on_punch = function(pos, node, puncher, pointed_thing)
 		hud_events.new(puncher, {
 			quick = true,
-			text = "This flag was taken!",
+			text = S("This flag was taken!"),
 			color = "warning",
 		})
 	end,

@@ -6,6 +6,8 @@ local landmines = {
 local number_of_landmines = 0
 local ARMING_TIME = 3
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local add_landmine = function(pos)
 	landmines[core.hash_node_position(vector.round(pos))] = os.clock()
 	number_of_landmines = number_of_landmines + 1
@@ -32,8 +34,8 @@ local function is_self_landmine(object_ref, pos)
 		return nil -- the object ref is not a player
 	end
 
-	if ctf_teams.get(object_ref) == team then
-		return true -- it's self landmine
+	if not ctf_teams.get(object_ref) or ctf_teams.get(object_ref) == team then
+		return true -- non-player/their landmine
 	end
 
 	return false -- it's someone else's landmine
@@ -108,7 +110,7 @@ local function landmine_explode(pos)
 end
 
 core.register_node("ctf_landmine:landmine", {
-	description = string.format("Landmine (%ds arming time)", ARMING_TIME),
+	description = S("Landmine (@1s arming time)", ARMING_TIME),
 	drawtype = "nodebox",
 	tiles = {
 		"ctf_landmine_landmine.png",

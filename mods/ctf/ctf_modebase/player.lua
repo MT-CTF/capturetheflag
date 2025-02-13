@@ -1,26 +1,41 @@
 ctf_modebase.player = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 ctf_settings.register("auto_trash_stone_swords", {
 	type = "bool",
-	label = "Auto-trash stone swords when you pick up a better sword",
-	description = "Only triggers when picking up swords from the ground",
+	label = S("Auto-trash stone swords when you pick up a better sword"),
+	description = S("Only triggers when picking up swords from the ground"),
 	default = "false"
 })
 
 ctf_settings.register("auto_trash_stone_tools", {
 	type = "bool",
-	label = "Auto-trash stone tools when you pick up a better one",
-	description = "Only triggers when picking up tools from the ground",
+	label = S("Auto-trash stone tools when you pick up a better one"),
+	description = S("Only triggers when picking up tools from the ground"),
 	default = "false"
 })
 
 ctf_settings.register("flag_sound_volume", {
 	type = "bar",
-	label = "Flag Sound Volume",
+	label = S("Flag Sound Volume"),
 	default = "10",
 	min = 0,
 	max = 20,
 	step = 1,
+})
+
+local DEFAULT_VOLUMETRIC_LIGHTING = 10
+ctf_settings.register("volumetric_lighting", {
+	type = "bar",
+	label = S("Volumetric Lighting Strength"),
+	default = tostring(DEFAULT_VOLUMETRIC_LIGHTING),
+	min = 0,
+	max = 50,
+	step = 1,
+	on_change = function(player)
+		ctf_modebase.player.update(player)
+	end
 })
 
 local simplify_for_saved_stuff = function(iname)
@@ -362,7 +377,14 @@ function ctf_modebase.player.update(player)
 
 		skybox.set(player, table.indexof(ctf_map.skyboxes, map.skybox)-1)
 
-		player:set_lighting({shadows = {intensity = map.enable_shadows}})
+		player:set_lighting({
+			shadows = {
+				intensity = map.enable_shadows,
+			},
+			volumetric_light = {
+				strength = (tonumber(ctf_settings.get(player, "volumetric_lighting")) or DEFAULT_VOLUMETRIC_LIGHTING)/100,
+			},
+		})
 
 		physics.set(player:get_player_name(), "ctf_modebase:map_physics", {
 			speed = map.phys_speed,

@@ -53,7 +53,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
 		"ctf_ranged:ammo",
-		"ctf_landmine:landmine 3",
+		"ctf_landmine:landmine",
 	},
 	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},

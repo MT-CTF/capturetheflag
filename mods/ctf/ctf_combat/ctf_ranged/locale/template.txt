@@ -1,0 +1,10 @@
+# textdomain: ctf_ranged
+
+Ammo=
+Used to reload guns=
+Pistol=
+Rifle=
+Shotgun=
+Submachinegun=
+Sniper Rifle=
+Magnum Sniper Rifle=

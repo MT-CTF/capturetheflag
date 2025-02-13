@@ -1,0 +1,5 @@
+# textdomain: wield3d
+
+Use old wielditem display=Utiliser l'ancien affichage de l'objet en main
+Will use Luanti's default method of showing the wielded item.=Utilisera la méthode par défaut de Luanti pour afficher l'objet en main.
+This won't show custom animations, but might be less jarring=Cela n'affichera pas les animations personnalisées, mais pourrait être moins perturbant

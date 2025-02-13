@@ -52,8 +52,10 @@ for team, def in pairs(ctf_teams.team) do
 	ctf_teams.team[team].color_hex = tonumber("0x"..def.color:sub(2))
 end
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_privilege("ctf_team_admin", {
-	description = "Allows advanced team management.",
+	description = S("Allows advanced team management."),
 	give_to_singleplayer = false,
 	give_to_admin = false,
 })
@@ -63,7 +65,8 @@ ctf_core.include_files(
 	"commands.lua",
 	"register.lua",
 	"team_chest.lua",
-	"team_door.lua"
+	"team_door.lua",
+	"parties.lua"
 )
 
 minetest.register_on_mods_loaded(function()
@@ -95,7 +98,7 @@ minetest.register_on_mods_loaded(function()
 			else
 				local tcolor = ctf_teams.team[pteam].color
 
-				minetest.chat_send_all(string.format("*** %s joined the game.",
+				minetest.chat_send_all("*** " .. S("@1 joined the game.",
 					minetest.colorize(tcolor, name))
 				)
 			end
@@ -103,6 +106,9 @@ minetest.register_on_mods_loaded(function()
 	end)
 
 	minetest.register_on_leaveplayer(function(player, timed_out, ...)
+
+		ctf_teams.checkAndClearAllPartyInfo(player:get_player_name())
+
 		local pteam = ctf_teams.get(player)
 
 		if not pteam then
@@ -112,9 +118,9 @@ minetest.register_on_mods_loaded(function()
 
 			local tcolor = ctf_teams.team[pteam].color
 
-			minetest.chat_send_all(string.format("*** %s left the game%s.",
+			minetest.chat_send_all("*** " .. S("@1 left the game@2.",
 				minetest.colorize(tcolor, player:get_player_name()),
-				timed_out and " (timed out)" or ""
+				timed_out and " " .. S("(timed out)") or ""
 			))
 		end
 	end)
