@@ -1,7 +1,8 @@
 # Options:
-# - default: Store rankings in modstorage, not recommended for servers
+# - default: Store rankings in modstorage, not recommended for servers, can only sort top50 by score
 # - redis: Store rankings in a redis DB, recommended for servers, requires some setup
-ctf_rankings_backend (Rankings Backend) enum default default,redis
+# - dummy: Don't store any rankings at all (Match summaries will still work)
+ctf_rankings_backend (Rankings Backend) enum default default,redis,dummy
 
 # Port the redis server is hosted on.
 # This setting is only used when ctf_rankings_backend = redis

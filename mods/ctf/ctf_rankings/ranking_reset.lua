@@ -24,6 +24,7 @@ ctf_rankings.do_reset = mods:get_int("_do_reset") == 1
 local PLAYER_RANKING_PREFIX = "rank:"
 
 local function do_reset()
+	assert(false, "Ranking resets don't currently work with the new rankings format (op_all not supported)")
 	local finish_count = 0
 	local function finish()
 		finish_count = finish_count - 1
@@ -37,7 +38,6 @@ local function do_reset()
 	end
 
 	for mode, def in pairs(ctf_modebase.modes) do
-		local top = def.rankings.top
 		local time = minetest.get_us_time()
 
 		finish_count = finish_count + 1
@@ -46,7 +46,7 @@ local function do_reset()
 			local rank = minetest.parse_json(value)
 
 			if rank then
-				rank.place = top:get_place(pname)
+				rank.place = def.rankings:get_place(pname, "score")
 
 				RunCallbacks(ctf_rankings.registered_on_rank_reset, pname, table.copy(rank), mode)
 

@@ -1,4 +1,6 @@
-return function(prefix, top, sorting_finished)
+local top = ctf_core.include_files("top.lua"):new()
+
+return function(prefix, sorting_finished)
 
 local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at runtime!")
 
@@ -57,7 +59,6 @@ function()
 		"action",
 		"Sorted rankings by score '"..prefix:sub(1, -2).."'. Took "..((minetest.get_us_time()-timer) / 1e6)
 	)
-	sorting_finished()
 end)
 
 return {
@@ -69,6 +70,27 @@ return {
 
 	op_all = op_all,
 
+	get_top = function(self, rend, sortby, rstart)
+		local t = self.top:get_top(rend)
+
+		if sortby ~= "score" then
+			core.log("error", "Modstorage rankings only support sorting by score")
+		end
+
+		local out = {}
+		for i=(rstart or 1), #t do
+			out[i] = {t[i]}
+		end
+
+		return out
+	end,
+	get_place = function(self, pname, sortby)
+		if sortby ~= "score" then
+			core.log("error", "Modstorage rankings only support sorting by score")
+		end
+
+		return self.top:get_place(pname)
+	end,
 	get = function(self, pname)
 		pname = PlayerName(pname)
 

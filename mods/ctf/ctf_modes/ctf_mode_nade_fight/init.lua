@@ -1,4 +1,14 @@
-local rankings = ctf_rankings:init()
+local RANKLIST = {
+	_sort = "score",
+	"score",
+	"flag_captures", "flag_attempts",
+	"kills", "kill_assists", "bounty_kills",
+	"deaths",
+	"hp_healed",
+	"reward_given_to_enemy"
+}
+
+local rankings = ctf_rankings:init(RANKLIST)
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
@@ -63,15 +73,7 @@ ctf_modebase.register_mode("nade_fight", {
 	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
-	summary_ranks = {
-		_sort = "score",
-		"score",
-		"flag_captures", "flag_attempts",
-		"kills", "kill_assists", "bounty_kills",
-		"deaths",
-		"hp_healed",
-		"reward_given_to_enemy"
-	},
+	summary_ranks = RANKLIST,
 	build_timer = 60 * 2,
 
 	is_bound_item = function(_, name)
