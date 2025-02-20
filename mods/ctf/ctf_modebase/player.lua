@@ -433,8 +433,11 @@ minetest.register_on_joinplayer(function(player)
 	end
 
 	inv:set_list("craft", {})
+	inv:set_list("crafting", {})
+	inv:set_list("craftresult", {})
 
-	inv:set_size("craft", 1)
+	inv:set_size("craft", 0)
+	inv:set_size("crafting", 0)
 	inv:set_size("craftresult", 0)
 	inv:set_size("hand", 0)
 
