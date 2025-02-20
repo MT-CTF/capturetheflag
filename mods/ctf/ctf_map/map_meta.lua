@@ -183,8 +183,30 @@ function ctf_map.load_map_meta(idx, dirname)
 
 	map.flag_center = calc_flag_center(map)
 
+	for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname], false)) do
+		if e:match("%.png") then
+			if core.features.dynamic_add_media_startup then
+				minetest.dynamic_add_media({
+					filename = dirname .. "_" .. e,
+					filepath = ctf_map.map_path[dirname] .. "/" .. e}
+				)
+			end
+		end
+	end
+
 	if ctf_map.skybox_exists(ctf_map.map_path[dirname]) then
 		skybox.add({dirname, "#ffffff", [5] = "png"})
+
+		for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname] .. "/skybox/", false)) do
+			if e:match("%.png") then
+				if core.features.dynamic_add_media_startup then
+					minetest.dynamic_add_media({
+						filename = dirname .. e,
+						filepath = ctf_map.map_path[dirname] .. "/skybox/" .. e}
+					)
+				end
+			end
+		end
 
 		map.skybox = dirname
 		map.skybox_forced = true
