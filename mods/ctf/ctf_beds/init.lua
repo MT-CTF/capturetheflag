@@ -14,11 +14,9 @@ loadfile(minetest.get_modpath(modname) .. "/exported.lua")(function(def)
 			minetest.check_for_falling(pos)
 		end
 
-
 		local function destruct_bed(pos, n)
 			local node = minetest.get_node(pos)
 			local other
-		
 			if n == 2 then
 				local dir = minetest.facedir_to_dir(node.param2)
 				other = vector.subtract(pos, dir)
@@ -37,9 +35,7 @@ loadfile(minetest.get_modpath(modname) .. "/exported.lua")(function(def)
 			def.tiles = {def.inventory_image}
 		end
 
-
-		---------------------------------------CLEAN CODE---------------------------------------------------
-		if string.find(def._raw_name, "bottom") then 
+		if string.find(def._raw_name, "bottom") then
 			def.drawtype = "nodebox"
 			def.paramtype = "light"
 			def.paramtype2 = "facedir"
@@ -95,7 +91,6 @@ loadfile(minetest.get_modpath(modname) .. "/exported.lua")(function(def)
 				minetest.set_node(pos, {name = bedname .. "_bottom", param2 = dir})
 				minetest.set_node(botpos, {name = bedname .. "_top", param2 = dir})
 				
-				local player_name = placer and placer:get_player_name() or ""
 				if not minetest.is_creative_enabled(player_name) then
 					itemstack:take_item()
 				end
