@@ -90,7 +90,7 @@ loadfile(minetest.get_modpath(modname) .. "/exported.lua")(function(def)
 
 				minetest.set_node(pos, {name = bedname .. "_bottom", param2 = dir})
 				minetest.set_node(botpos, {name = bedname .. "_top", param2 = dir})
-				
+
 				if not minetest.is_creative_enabled(player_name) then
 					itemstack:take_item()
 				end
@@ -137,7 +137,7 @@ loadfile(minetest.get_modpath(modname) .. "/exported.lua")(function(def)
 			end
 		end
 
-		if string.find(def._raw_name, "top") then 
+		if string.find(def._raw_name, "top") then
 			def.node_box = def.node_box
 			def.is_ground_content = false
 			def.pointable = false
