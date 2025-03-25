@@ -141,6 +141,13 @@ crafting.register_recipe({
 	always_known = false,
 })
 
+-- Coal Lumps x4
+crafting.register_recipe({
+	output = "default:coal_lump 4",
+	items = { "default:coalblock" },
+	always_known = false,
+})
+
 -- Shovels and Axes
 for ore, ore_item in pairs(full_ores) do
 	local show = true
