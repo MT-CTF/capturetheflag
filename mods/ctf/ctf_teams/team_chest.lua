@@ -132,7 +132,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			}, "")
 
 			local reg_access, pro_access
-			if not flag_captured then
+			if not flag_captured and ctf_rankings.backend ~= "dummy" then
 				reg_access, pro_access = get_chest_access(name)
 			else
 				reg_access, pro_access = true, true
@@ -192,6 +192,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 			local reg_access, pro_access = get_chest_access(name)
 
+			if ctf_rankings.backend == "dummy" then
+				reg_access, pro_access = true, true
+			end
+
 			if reg_access == true and (pro_access == true or from_list ~= "pro" and to_list ~= "pro") then
 				if to_list == "helper" then
 					-- handle move & overflow
@@ -231,6 +235,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 
 			local reg_access, pro_access = get_chest_access(name)
+
+			if ctf_rankings.backend == "dummy" then
+				reg_access, pro_access = true, true
+			end
 
 			if reg_access == true and (pro_access == true or listname ~= "pro") then
 				local chestinv = minetest.get_inventory({type = "node", pos = pos})
@@ -272,6 +280,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 
 			local reg_access, pro_access = get_chest_access(name)
+
+			if ctf_rankings.backend == "dummy" then
+				reg_access, pro_access = true, true
+			end
 
 			if reg_access == true and (pro_access == true or listname ~= "pro") then
 				return stack:get_count()
