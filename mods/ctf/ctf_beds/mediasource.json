@@ -1,11 +1,4 @@
 {
-	"/sounds/default_dig_choppy.1.ogg" : "default",
-	"/sounds/default_dig_choppy.2.ogg" : "default",
-	"/sounds/default_dig_choppy.3.ogg" : "default",
-	"/sounds/default_place_node_hard.1.ogg" : "default",
-	"/sounds/default_place_node_hard.2.ogg" : "default",
-	"/sounds/default_wood_footstep.1.ogg" : "default",
-	"/sounds/default_wood_footstep.2.ogg" : "default",
 	"/textures/beds_bed.png" : "beds",
 	"/textures/beds_bed_fancy.png" : "beds",
 	"/textures/beds_bed_foot.png" : "beds",
