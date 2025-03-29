@@ -264,6 +264,7 @@ minetest.register_chatcommand("ctf_barrier", {
 								or z == pos1.z or z == pos2.z then
 								if data[vi] == minetest.get_content_id("air") or
 									data[vi] == minetest.get_content_id("ignore") or
+                                    data[vi] == minetest.get_content_id("ctf_map:ind_glass") or
 									data[vi] == minetest.get_content_id("ctf_map:ignore") then
 									data[vi] = minetest.get_content_id("ctf_map:ind_glass")
 								else
