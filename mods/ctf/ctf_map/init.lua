@@ -248,6 +248,8 @@ minetest.register_chatcommand("ctf_barrier", {
 								data[vi] = minetest.get_content_id("ctf_map:ind_water")
 							elseif data[vi] == minetest.get_content_id("default:lava_source") then
 								data[vi] = minetest.get_content_id("ctf_map:ind_lava")
+							elseif data[vi] == minetest.get_content_id("poison_water:poisonous_water") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_poison_water")
 							end
 						elseif params == "remove_buildtime" then
 							if data[vi] == minetest.get_content_id("ctf_map:ind_glass_red") then
@@ -258,13 +260,15 @@ minetest.register_chatcommand("ctf_barrier", {
 								data[vi] = minetest.get_content_id("default:water_source")
 							elseif data[vi] == minetest.get_content_id("ctf_map:ind_lava") then
 								data[vi] = minetest.get_content_id("default:lava_source")
+							elseif data[vi] == minetest.get_content_id("ctf_map:ind_poison_water") then
+								data[vi] = minetest.get_content_id("poison_water:poisonous_water")
 							end
 						elseif params == "place_outer" then
 							if x == pos1.x or x == pos2.x or y == pos1.y
 								or z == pos1.z or z == pos2.z then
 								if data[vi] == minetest.get_content_id("air") or
 									data[vi] == minetest.get_content_id("ignore") or
-                                    data[vi] == minetest.get_content_id("ctf_map:ind_glass") or
+                                    					data[vi] == minetest.get_content_id("ctf_map:ind_glass") or
 									data[vi] == minetest.get_content_id("ctf_map:ignore") then
 									data[vi] = minetest.get_content_id("ctf_map:ind_glass")
 								else
