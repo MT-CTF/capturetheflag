@@ -1,4 +1,3 @@
-
 -- Backwards compat
 
 local S = minetest.get_translator(minetest.get_current_modname())
@@ -70,6 +69,42 @@ minetest.register_node("ctf_map:ind_water", {
 	sounds = default.node_sound_glass_defaults()
 })
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_water")] = minetest.get_content_id("default:water_source")
+
+minetest.register_node("ctf_map:ind_river_water", {
+	description = S("Indestructible River Water Barrier Glass"),
+	drawtype = "glasslike",
+	tiles = {"ctf_map_ind_river_water.png"},
+	inventory_image = minetest.inventorycube("ctf_map_ind_river_water.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = ctf_core.settings.server_mode == "mapedit",
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_river_water")] = minetest.get_content_id("default:river_water_source")
+
+minetest.register_node("ctf_map:ind_poison_water", {
+	description = S("Indestructible Poisonous Water Barrier Glass"),
+	drawtype = "glasslike",
+	tiles = {"ctf_map_ind_poison_water.png"},
+	inventory_image = minetest.inventorycube("ctf_map_ind_poison_water.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = ctf_core.settings.server_mode == "mapedit",
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_poison_water")] = minetest.get_content_id("poison_water:poisonous_water")
 
 minetest.register_node("ctf_map:ind_lava", {
 	description = S("Indestructible Lava Barrier Glass"),
