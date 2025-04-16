@@ -71,7 +71,7 @@ function ctf_map.remove_barrier(mapmeta, callback)
 
 	local interval = 0
 	while pos2.y < target do
-		pos1.y = math.min(pos1.y + 10, target-1)
+		pos1.y = math.min(pos1.y, target-1)
 		pos2.y = math.min(pos1.y + 10, target)
 
 		minetest.after(0 + interval, function(p1, p2)
@@ -106,6 +106,7 @@ function ctf_map.remove_barrier(mapmeta, callback)
 		end, pos1:copy(), pos2:copy())
 
 		interval = interval + 0.5
+		pos1.y = pos1.y + 10
 	end
 
 	minetest.log("action", "Clearing barriers using mapmeta.barrier_area, will take around "..(interval).." seconds")

@@ -21,7 +21,7 @@ Note that this version may be slightly behind the git version, but it will be a 
 
 ## Recommended Setup
 
-* Hosting your server using the `dummy` backend.
+* [!] You should host your server using the `dummy` backend if it's not in mapedit mode, this will prevent Luanti from writing the map to disk, which speeds up map operations a lot, especially on HDDs.
 
 ### For public servers:
 * Storing rankings using the `redis` backend, all steps are required:

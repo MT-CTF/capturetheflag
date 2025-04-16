@@ -2,6 +2,11 @@ local CURRENT_MAP_VERSION = "3"
 
 local modname = minetest.get_current_modname()
 
+local IS_RUNTIME = true
+minetest.after(0, function()
+	IS_RUNTIME = false
+end)
+
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
 
@@ -188,8 +193,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			if core.features.dynamic_add_media_startup then
 				minetest.dynamic_add_media({
 					filename = dirname .. "_" .. e,
-					filepath = ctf_map.map_path[dirname] .. "/" .. e}
-				)
+					filepath = ctf_map.map_path[dirname] .. "/" .. e
+				}, not IS_RUNTIME and function() end or nil)
 			end
 		end
 	end
@@ -202,8 +207,8 @@ function ctf_map.load_map_meta(idx, dirname)
 				if core.features.dynamic_add_media_startup then
 					minetest.dynamic_add_media({
 						filename = dirname .. e,
-						filepath = ctf_map.map_path[dirname] .. "/skybox/" .. e}
-					)
+						filepath = ctf_map.map_path[dirname] .. "/skybox/" .. e
+					}, not IS_RUNTIME and function() end or nil)
 				end
 			end
 		end
