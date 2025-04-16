@@ -272,6 +272,7 @@ minetest.register_chatcommand("ctf_barrier", {
 								or z == pos1.z or z == pos2.z then
 									local node = core.get_node({x = x, y = y, z = z})
 									local nodedef = minetest.registered_nodes[node.name]
+									local drawtype
 									if nodedef then
 										drawtype = nodedef.drawtype
 										end
