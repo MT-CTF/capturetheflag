@@ -192,11 +192,13 @@ function ctf_modebase.mode_vote.end_vote()
 	)
 
 	minetest.chat_send_all(votes_result)
-	ctf_modebase.announce(votes_result)
+	if average_vote > 0 then
+		ctf_modebase.announce(votes_result)
+	end
 
 	ctf_modebase.current_mode_matches = average_vote
 	if average_vote <= 0 then
-		ctf_modebase.mode_vote.start_vote()
+		minetest.after(2, ctf_modebase.mode_vote.start_vote)
 	else
 		ctf_modebase.mode_on_next_match = new_mode
 		ctf_modebase.start_match_after_vote()
