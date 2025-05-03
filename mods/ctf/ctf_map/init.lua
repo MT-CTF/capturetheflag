@@ -1,3 +1,4 @@
+
 if not ctf_core.settings.server_mode or ctf_core.settings.server_mode == "play" then
 	assert(
 		minetest.get_mapgen_setting("mg_name") == "singlenode",
