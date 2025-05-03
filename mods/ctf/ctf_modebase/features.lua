@@ -748,7 +748,7 @@ return {
 		local text = string.format(" has captured the flag and got %d points", capture_reward)
 		if many_teams then
 			text = string.format(
-				" has captured the flag of team(s) %s and got %d points",
+				" has captured the flag of team(s) %s",
 				HumanReadable(teamnames),
 				capture_reward
 			)
