@@ -62,7 +62,7 @@ local function rank(name, mode_name, mode_data, pname)
 	return_str = string.format("%s%s: %s\n",
 		return_str,
 		minetest.colorize("#63d437", "Place"),
-		minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
+		minetest.colorize("#ffea00", mode_data.rankings:get_place(pname, "score"))
 	)
 
 	return true, return_str
@@ -228,7 +228,7 @@ minetest.register_chatcommand("reset_rankings", {
 
 		if pname then
 			if minetest.check_player_privs(name, {ctf_admin = true}) then
-				mode_data.rankings:set(pname, {}, true)
+				mode_data.rankings:del(pname)
 
 				minetest.log("action", string.format(
 					"[ctf_admin] %s reset rankings for player '%s' in mode %s", name, pname, mode_name
@@ -255,7 +255,7 @@ minetest.register_chatcommand("reset_rankings", {
 					S("team chest or userlimit skip. This is irreversable. If you're") .." "..
 					S("sure, re-type /reset_rankings within 30 seconds to reset.")
 			end
-			mode_data.rankings:set(name, {}, true)
+			mode_data.rankings:del(name)
 			allow_reset[key] = nil
 
 			minetest.log("action", string.format(
@@ -277,14 +277,15 @@ minetest.register_chatcommand("top50", {
 
 		local top50 = {}
 
-		for i, pname in ipairs(mode_data.rankings.top:get_top(50)) do
-			local t = table.copy(mode_data.rankings:get(pname) or {})
-			t.pname = pname
+		for i, info in ipairs(mode_data.rankings:get_top(50, "score")) do
+			local t = mode_data.rankings:get(info[1]) or {}
+			t.pname = info[1]
+			t.number = i
 			table.insert(top50, t)
 		end
 
-		local own_pos = mode_data.rankings.top:get_place(name)
-		if own_pos > 50 then
+		local own_pos = mode_data.rankings:get_place(name, "score")
+		if own_pos and own_pos > 50 then
 			local t = table.copy(mode_data.rankings:get(name) or {})
 			t.pname = name
 			t.number = own_pos
@@ -415,7 +416,7 @@ minetest.register_chatcommand("transfer_rankings", {
 		end
 
 		for _, mode in pairs(ctf_modebase.modes) do
-			mode.rankings:set(src, {}, true)
+			mode.rankings:del(src)
 		end
 
 		minetest.log("action", string.format(

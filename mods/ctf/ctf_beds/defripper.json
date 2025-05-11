@@ -1,0 +1,14 @@
+{
+	"items" : 
+	{
+		"beds:bed" : true,
+		"beds:bed_bottom" : true,
+		"beds:bed_bottom_red" : true,
+		"beds:bed_top" : true,
+		"beds:bed_top_red" : true,
+		"beds:fancy_bed" : true,
+		"beds:fancy_bed_bottom" : true,
+		"beds:fancy_bed_top" : true
+	},
+	"media" : null
+}

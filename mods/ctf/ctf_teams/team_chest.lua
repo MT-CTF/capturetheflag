@@ -132,7 +132,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			}, "")
 
 			local reg_access, pro_access
-			if not flag_captured then
+			if not flag_captured and ctf_rankings.backend ~= "dummy" then
 				reg_access, pro_access = get_chest_access(name)
 			else
 				reg_access, pro_access = true, true
@@ -192,6 +192,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 			local reg_access, pro_access = get_chest_access(name)
 
+			if ctf_rankings.backend == "dummy" then
+				reg_access, pro_access = true, true
+			end
+
 			if reg_access == true and (pro_access == true or from_list ~= "pro" and to_list ~= "pro") then
 				if to_list == "helper" then
 					-- handle move & overflow
@@ -231,6 +235,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 
 			local reg_access, pro_access = get_chest_access(name)
+
+			if ctf_rankings.backend == "dummy" then
+				reg_access, pro_access = true, true
+			end
 
 			if reg_access == true and (pro_access == true or listname ~= "pro") then
 				local chestinv = minetest.get_inventory({type = "node", pos = pos})
@@ -273,6 +281,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 			local reg_access, pro_access = get_chest_access(name)
 
+			if ctf_rankings.backend == "dummy" then
+				reg_access, pro_access = true, true
+			end
+
 			if reg_access == true and (pro_access == true or listname ~= "pro") then
 				return stack:get_count()
 			else
@@ -290,9 +302,11 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		local meta = stack:get_meta()
 		local dropped_by = meta:get_string("dropped_by")
 		local dropteam = ctf_teams.get(dropped_by)
+		local dropinfo = core.get_player_information(dropped_by)
 		local pname = player:get_player_name()
+		local pinfo = core.get_player_information(pname)
 		if dropped_by ~= pname and dropped_by ~= "" and
-		dropteam and ctf_teams.get(pname) ~= dropteam then
+		dropteam and ctf_teams.get(pname) ~= dropteam and dropinfo and pinfo and dropinfo.address ~= pinfo.address then
 			local cur_mode = ctf_modebase:get_current_mode()
 			if pname and cur_mode then
 				local score = item_value[stack:get_name()] or 1

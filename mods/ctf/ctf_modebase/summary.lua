@@ -300,6 +300,8 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 	end
 
 	ctf_gui.old_show_formspec(name, "ctf_modebase:summary", formspec)
+
+	minetest.log("action", "[ctf_modebase.summary] Showed gui to "..dump(name))
 end
 
 ctf_core.register_chatcommand_alias("summary", "s", {

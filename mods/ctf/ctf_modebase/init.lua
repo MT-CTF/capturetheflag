@@ -115,17 +115,7 @@ minetest.register_on_mods_loaded(function()
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text = ""})
 		end)
 	elseif ctf_core.settings.server_mode == "play" then
-		minetest.chat_send_all(S("[CTF] Sorting rankings..."))
-		local function check()
-			if not ctf_rankings:rankings_sorted() then
-				return minetest.after(1, check)
-			end
-
-			minetest.chat_send_all(S("[CTF] Rank sorting done. Starting new match..."))
-			ctf_modebase.start_new_match()
-		end
-
-		check()
+		ctf_modebase.start_new_match()
 	end
 
 	for _, name in pairs(ctf_modebase.modelist) do

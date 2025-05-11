@@ -13,8 +13,6 @@ function ctf_map.place_map(mapmeta, callback)
 	local dirname = mapmeta.dirname
 	local schempath = ctf_map.map_path[dirname] .. "/map.mts"
 
-	local barrier_data = mapmeta.barriers and mapmeta.barriers()
-
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
 		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation, {["ctf_map:chest"] = "air"})
@@ -51,10 +49,6 @@ function ctf_map.place_map(mapmeta, callback)
 
 		ctf_map.current_map = mapmeta
 
-		if barrier_data then
-			ctf_map.current_map.barrier_data = barrier_data
-		end
-
 		callback()
 	end)
 end
@@ -70,84 +64,53 @@ local ID_WATER = minetest.get_content_id("default:water_source")
 ---@param mapmeta table Map meta table
 ---@param callback function
 function ctf_map.remove_barrier(mapmeta, callback)
-	if not mapmeta.barrier_data then
-		minetest.log("action", "Clearing barriers using mapmeta.barrier_area")
+	local pos1, pos2 = vector.sort(mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2)
 
-		local pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
+	local target = pos2.y
+	pos2.y = pos1.y
 
-		local vm = VoxelManip(pos1, pos2)
-		local data = vm:get_data()
+	local interval = 0
+	while pos2.y < target do
+		pos1.y = math.min(pos1.y, target-1)
+		pos2.y = math.min(pos1.y + 10, target)
 
-		for i, id in pairs(data) do
-			local done = false
+		minetest.after(0 + interval, function(p1, p2)
+			local vm = VoxelManip(p1, p2)
+			local data = vm:get_data()
 
-			for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
-				if id == barriernode_id then
+			for i, id in pairs(data) do
+				local done = false
 
-					data[i] = replacement_id
-					done = true
-					break
+				for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
+					if id == barriernode_id then
+
+						data[i] = replacement_id
+						done = true
+						break
+					end
+				end
+
+				if not done then
+					data[i] = ID_IGNORE
 				end
 			end
 
-			if not done then
-				data[i] = ID_IGNORE
+			vm:set_data(data)
+			vm:write_to_map(false)
+
+			if p2.y == target then
+				local liqvm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+				liqvm:update_liquids()
+				liqvm:update_map()
 			end
-		end
+		end, pos1:copy(), pos2:copy())
 
-		vm:set_data(data)
-		vm:write_to_map(false)
-
-		minetest.after(0.1, function()
-			local vm2 = VoxelManip(pos1, pos2)
-			vm2:update_liquids()
-
-			callback()
-		end)
-	else
-		minetest.log("action", "Clearing barriers using barriers.data")
-
-		local i = 0
-		for _, barrier_area in pairs(mapmeta.barrier_data) do
-			minetest.after(i, function()
-				if mapmeta.barrier_data then
-					local vm = VoxelManip()
-					vm:read_from_map(barrier_area.pos1, barrier_area.pos2)
-
-					local data = vm:get_data()
-
-					if #data ~= barrier_area.max then
-						-- minetest.log(dump(mapmeta.barrier_data)) -- Used for debugging issues
-						minetest.log("error", "Potential issue with barriers.data. Aborting... | " ..
-								"Debug: "..dump(#data)..", "..dump(barrier_area.max))
-
-						mapmeta.barrier_data = nil
-						ctf_map.remove_barrier(mapmeta, callback)
-					end
-
-					for idx in pairs(data) do
-						data[idx] = barrier_area.reps[idx] or ID_IGNORE
-					end
-
-					vm:set_data(data)
-					vm:write_to_map(false)
-				end
-			end)
-
-			i = i + 0.05
-		end
-
-		minetest.after(i - 0.05, function()
-			if mapmeta.barrier_data then
-				local vm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
-				vm:update_liquids()
-
-				mapmeta.barrier_data = nil -- Contains a large amount of data, free it up now that it's not needed
-
-				callback()
-			end
-		end)
+		interval = interval + 0.5
+		pos1.y = pos1.y + 10
 	end
+
+	minetest.log("action", "Clearing barriers using mapmeta.barrier_area, will take around "..(interval).." seconds")
+	minetest.after(interval/2, callback)
 end
 
 
