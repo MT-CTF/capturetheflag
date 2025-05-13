@@ -46,10 +46,11 @@ git clone --recursive https://github.com/MT-CTF/capturetheflag.git
 
 Simply download the game with the ingame content browser.
 Note that this version may be slightly behind the git version, but it will be a little more stable.
+Note that downloading from ContentDB will probably delete any existing CTF folder downloaded via git, unless you move it out of the Luanti `games` directory first.
 
 ## Recommended Setup
 
-* [!] You should host your server using the `dummy` backend if it's not in mapedit mode, this will prevent Luanti from writing the map to disk, which speeds up map operations a lot, especially on HDDs.
+* [!] You should host your server using the `dummy` backend if it's not in mapedit mode, this will prevent Luanti from writing the map to disk, which speeds up map operations (and general server speed as a result) a lot, especially on HDDs.
 
 ### For public servers:
 * Storing rankings using the `redis` backend, all steps are required:
@@ -65,11 +66,11 @@ Note that this version may be slightly behind the git version, but it will be a 
 * Create a new `singlenode` world
 * Turn on `Enable Damage` and `Host Server`, turn off `Creative Mode`, *memorize* your port
 * Click `Host Game`, a round should automatically start as soon as you join in
-* Players on your LAN can join using your local IP and the port you *memorize*d
+* Players on your LAN can join using your local IP and the port you *memorize*d. You will have to port forward for other people on the internet to join
 
 ## Development
 
-* CTF API Docs: Lua API Reference - [Link](docs/ctf-api.md)  
+* CTF API Docs: Lua API Reference - [Link](docs/ctf-api.md)
 * If you use Visual Studio Code we recommend these extensions:
   * https://marketplace.visualstudio.com/items?itemName=sumneko.lua
   * https://marketplace.visualstudio.com/items?itemName=dwenegar.vscode-luacheck
@@ -95,5 +96,3 @@ Media: [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
 * [Header](menu/header.png): [CC BY 3.0 Unported](https://creativecommons.org/licenses/by/3.0/) by [SuddenSFD](https://github.com/SuddenSFD)
 * [Background Image](menu/background.png): [CC BY-SA 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/) (where applicable) by [GreenBlob](https://github.com/a-blob) (Uses [Minetest Game](https://github.com/minetest/minetest_game) textures, the majority of which are licensed [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)). The player skins used are licensed under [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
 * [Icon](menu/icon.png): [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) by [SuddenSFD](https://github.com/SuddenSFD)
-
-

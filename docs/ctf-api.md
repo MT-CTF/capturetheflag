@@ -1,12 +1,13 @@
 CaptureTheFlag Lua API Reference
 ==================================
-# Introduction
-Capture the Flag is a Luanati(formerly Minetest) based game. The following API docs covers the various mods which make up the game. If you have any difficulty in understanding this, please read [Programming in Lua](http://www.lua.org/pil/).    
-If you see a deficiency in the API, feel free to attempt to add the functionality in the engine and API, and to document it here. All mods are contained in the `/mods/` folder. If you are unsure of the implementation of the function, please search for the function in the repository. 
 
-# List of all Mods. 
+# Introduction
+Capture the Flag is a Luanti (formerly Minetest) game. The following API doc covers the various mods which make up the game. If you have any difficulty in understanding this, please read [Programming in Lua](http://www.lua.org/pil/).
+If you see a deficiency in the API, feel free to attempt to add the functionality in the engine and API, and to document it here. All mods are contained in the `/mods/` folder. If you are unsure of the implementation of the function, please search for the function in the repository. If you see that something is undocumented you're more than welcome to make a PR documenting it, try to fit it with the style of the rest of the document though.
+
+# List of all Mods.
 - api
-  - ctf_gui 
+  - ctf_gui
   - ctf_settings
   - hud_events
   - physics
@@ -55,8 +56,8 @@ If you see a deficiency in the API, feel free to attempt to add the functionalit
 This folder contains a collection of mods with the main goal of providing an API
 
 ## ctf_gui
-A tool for easily creating basic CTF-themed GUIs.   
-This mod is depreciated. You can read the old api docs [here](https://github.com/MT-CTF/capturetheflag/blob/master/mods/apis/ctf_gui/api.md)
+A tool for easily creating basic CTF-themed GUIs.
+This mod was reworked at one point, but a few mods still use the old code, so it was left in. You can read the old api docs [here](https://github.com/MT-CTF/capturetheflag/blob/master/mods/apis/ctf_gui/api.md)
 
 ## ctf_settings
 This mod adds a 'Settings' tab to the player's inventory.
@@ -89,7 +90,7 @@ ctf_settings.register("my_setting", {
 - **returns** *(bool | list index) as string*: Returns the player's current setting value, the default given at setting registration, or if both are unset, an empty string: `""`
 
 ## hud_events
-This mod allows for quick hud events to allow for quick popup messages. 
+This mod allows for quick hud events to allow for quick popup messages.
 #### `hud_events.new(player, def)`
 * `player` *PlayerObj*: The player who you want to show the event to.
 * `def` *string|table*: Event properties, see below.
@@ -118,16 +119,16 @@ List of all HUD Colors
 By default, all hud events are shown for 3 seconds, while quick ones are shown for 2 sec, and there is a gap of 0.6 seconds between each event.
 
 ## physics
-A simple wrapper mod for overriding player physics. Only allows overriding of `speed`, `speed_crouch`, `jump`, `gravity`. 
+A simple wrapper mod for overriding player physics. Only allows overriding of `speed`, `speed_crouch`, `jump`, `gravity`.
 #### `physics.set(name, layer, modifiers)`
 * `name` *string*: Player name.
-* `layer` *string*: Layer. ???
+* `layer` *string*: Layer. e.g "sprint:sprint"
 * `modifiers` *table*: A table of modifiers. Eg. `{speed=2,speed_crouch=2,jump=1,gravity=2}`
-By default overrides are as follows: speed=1.1, jump = 1.1, speed_crouch = 1, gravity = 1. Any table entries missing, will take the default values. 
+By default overrides are as follows: speed=1.1, jump = 1.1, speed_crouch = 1, gravity = 1. Any table entries missing, will take the default values.
 
 #### `physics.remove(name, layer)`
 * `name` *string*: Player name.
-* `layer` *string*: Layer. ???
+* `layer` *string*: The name of the layer you want to remove
 
 ## mhud
 A wrapper for more easily managing Minetest HUDs. See the API reference [here](https://github.com/LoneWolfHT/mhud/blob/main/README.md)
@@ -136,20 +137,20 @@ A wrapper for more easily managing Minetest HUDs. See the API reference [here](h
 A ranged weapon framework for Minetest. See the API reference [here](https://github.com/LoneWolfHT/rawf/blob/main/API.md)
 
 # mtg
-This folder contains the Minetest Game, along with redefinitions and overrides for the CTF Game. This folder doesnt expose any new APIs on its own. Please follow the Minetest Game API Reference for the same [here](https://github.com/minetest/minetest_game/blob/master/game_api.txt). 
+This folder contains the Minetest Game, along with redefinitions and overrides for the CTF Game. This folder doesnt expose any new APIs on its own. Please follow the Minetest Game API Reference for the same [here](https://github.com/minetest/minetest_game/blob/master/game_api.txt).
 
 # pvp
-This folder contains parts of game mechanics involving pvp and combat. 
+This folder contains parts of game mechanics involving pvp and combat.
 
 ## dropondie
-This mod drops all items on the ground, once a player dies. It is automatically invoked on a player's death or if a player leaves the game. 
+This mod drops all items on the ground, once a player dies. It is automatically invoked on a player's death or if a player leaves the game.
 
 ### `dropondie.drop_all(player)`
 * `player` *PlayerObj*: The player you want to drop all items of.
 
 
 ## grenades
-Adds an API that allows for easily making grenades. 
+Adds an API that allows for easily making grenades.
 
 ### `grenades.register_grenade(...)`
 ```lua
@@ -186,25 +187,25 @@ grenades.register_grenade("name", { -- Name of the grenade (Like 'smoke' or 'fla
 ```
 
 # others
-This folder contains a collection of lot of small mods, adding smaller functionalities and objects to game. 
+This folder contains a collection of some misc mods, adding smaller functionalities and objects to game.
 
 ## afkkick
-This mod kicks players after they are Afk for an amount of time. By default, players are kicked after five minutes, although this can be configured. No API's are exposed by this mod. 
+This mod kicks players after they are AFK for an amount of time. By default, players are kicked after five minutes, although this can be configured. No APIs are exposed by this mod.
 
 ## chat_bg
-This mod changes the default chat background. No API's are exposed by this mod. 
+This mod changes the default chat background. No APIs are exposed by this mod.
 
 ## crafting
 This mod adds semi-realistic crafting with unlockable recipes to Minetest, and removes the craft grid. It aims to make crafting less of a learning curve by making it as easy as clicking a button, and also by hiding recipes that the player has not learned about yet.  Please refer to API Docs [here](https://github.com/rubenwardy/crafting)
 
 ## darkness_nerf
-This mods fixes darkness, by providing a minimum glow of 3 to players, and 8 to all entities of __builtin:item. No API's are exposed by this mod. 
+This mods fixes darkness, by providing a minimum glow of 3 to players, and 8 to all entities of __builtin:item. No APIs are exposed by this mod.
 
 ## email
-This mod allows players to email each other. No API's are exposed by this mod. 
+This mod allows players to email each other. No APIs are exposed by this mod.
 
 ## hp_bar & hpbar_hud
-This mod shows an HP bar over the players head. 
+This mod shows an HP bar over the players head.
 
 ### `hpbar.set_icon(player, texture)`
 * `player` *PlayerObj*: Player to be shown over.
@@ -219,23 +220,23 @@ This mod hides the existing tags, and adds entity based tags that are only as vi
 * `player` *PlayerObj*: Player the nametag will be associated with.
 * `type` *integer*: By default set it as `playertag.TYPE_ENTITY`
 * `color` *Color*: The color of the text.
-* `extras` *table*: (Optional) field. 
+* `extras` *table*: (Optional) field.
 * returns a table consisting of lua entities, `{entity:, nametag_entity:, symbol_entity:}`
 
 #### `playertag.get(player)`
 * `player` *PlayerObj*: Player the nametag will be associated with.
 * returns a table consisting of lua entities, `{entity:, nametag_entity:, symbol_entity:}`
 #### `playertag.get_all()`
-* returns the entire players table. 
+* returns the entire players table.
 
 ## poison_water
-This mod adds posionous water to the game. Poisonous water is a liquid that causes damage to entities standing in it. No API's are exposed by this mod.
+This mod adds posionous water to the game. Poisonous water is a liquid that causes damage to entities standing in it. No APIs are exposed by this mod.
 
 ## random_messages
-This mod sends random messages from a list of messages, providing insights and tips. No API's are exposed by this mod.
+This mod sends random messages from a list of messages, providing insights and tips. No APIs are exposed by this mod.
 
 ## real_suffocation
-This mod adds suffocation. Suffocation is basically the same as drowning, but it is for being stuck inside solid blocks. No API's are exposed by this mod.
+This mod adds suffocation. Suffocation is basically the same as drowning, but it is for being stuck inside solid blocks. No APIs are exposed by this mod.
 
 ## select_item
 This mod provides a simple dialog for players to select an item from. The API Reference is [here](https://github.com/MT-CTF/capturetheflag/blob/master/mods/other/select_item/API.md)
@@ -249,7 +250,7 @@ Provides a basic API for modifying a player sky box in a coherent fashion.
 #### `skybox.set(player, number)`
 * Sets the skybox to the `number` in the list of current skyboxes.
 * `player` *PlayerObj*: Player the skybox will be shown to.
-* `number` *number*: Choose the skybox from the list of skyboxes. 
+* `number` *number*: Choose the skybox from the list of skyboxes.
 
 #### `skybox.restore(player)`
 * Reverts the player skybox to the last `skybox.set()` value.
@@ -258,7 +259,7 @@ Provides a basic API for modifying a player sky box in a coherent fashion.
 
 #### `skybox.add(skyboxdef)`
 * Add a new skybox with skyboxdef to the list of available skyboxes.
-* `skyboxdef` *SkyBoxDef* : New Skybox definition. 
+* `skyboxdef` *SkyBoxDef* : New Skybox definition.
 ```
 skyboxdef = {
 	[1] -- Base name of texture. The 6 textures you need to
@@ -278,59 +279,59 @@ Example SkyboxDef
 
 ## sprint
 This mod, allows the player to sprint by either double tapping w or pressing e.
-No API's are exposed by this mod. 
+No APIs are exposed by this mod.
 
 ## throwable_snow
-This mod, allows snow balls to be thrown at other players as projectiles. 
+This mod, allows snow balls to be thrown at other players as projectiles.
 #### `throwable_snow.on_hit_player(thrower, player)`
-* `thrower` *PlayerObj*: Player who threw the snow. 
+* `thrower` *PlayerObj*: Player who threw the snow.
 *  `player` *PlayerObj*: Player on whom it hit.
-Override this function, if you want to change what happens on snow hit.  
+Override this function, if you want to change what happens on snow hit.
 
 ## wield3d
-This mod makes hand wielded items visible to other players. No API's are exposed by this mod. 
+This mod makes hand wielded items visible to other players. No APIs are exposed by this mod.
 
 # ctf
-The main engine of Capture The Flag game. The following folder consists of the collection of mods, which powers the entire game. 
+The main engine of Capture The Flag game. The following folder consists of the collection of mods, which powers the entire game.
 
 ## ctf_api
-This mod registers the functions to be executed when certain key events happen. The following functions exist, all of which take a `func` *Function* as its parameter. 
+This mod registers the functions to be executed when certain key events happen. The following functions exist, all of which take a `func` *Function* as its parameter.
 
 1. `ctf_api.registered_on_mode_start(func)`
 2. `ctf_api.registered_on_new_match(func)`
 3. `ctf_api.registered_on_match_start(func)`
-4. `ctf_api.registered_on_match_end(func)` 
+4. `ctf_api.registered_on_match_end(func)`
 5. `ctf_api.registered_on_respawnplayer(func)` - Requires a return type of *PlayerObj*
-6. `ctf_api.registered_on_flag_take(func)` - Requires a return type of  a tuple having `taker`*PlayerObj* and `flag_team` *string* 
-7. `ctf_api.registered_on_flag_capture(func)` - Requires a return type of  a tuple having `capturer`*PlayerObj* and `flagteams` *list(string)* (list of the teams of the flags taken) 
+6. `ctf_api.registered_on_flag_take(func)` - Requires a return type of  a tuple having `taker`*PlayerObj* and `flag_team` *string*
+7. `ctf_api.registered_on_flag_capture(func)` - Requires a return type of  a tuple having `capturer`*PlayerObj* and `flagteams` *list(string)* (list of the teams of the flags taken)
 
 ## ctf_chat
-This mod overrides the build in chat commands, and introduces a few new chat commands. No API's are exposed by this mod. 
+This mod overrides the build in chat commands, and introduces a few new chat commands. No APIs are exposed by this mod.
 
 ## ctf_combat
-This modpack consists of multiple mods. 
+This modpack consists of multiple mods.
 ### ctf_combat_mode
 #### `ctf_combat_mode.add_hitter(player, hitter, weapon_image, time)`
-* `player` *PlayerObj*: Player who was killed. 
+* `player` *PlayerObj*: Player who was killed.
 * `hitter` *PlayerObj*: Player killed the `player`
 * `weapon_image` *string*: Path to weapon_image.
-* `time`: *number*: Amount of time(in sec) to show for. 
+* `time`: *number*: Amount of time(in sec) to show for.
 #### `ctf_combat_mode.add_healer(player, healer, time)`
-* `player` *PlayerObj*: Player who was healed.. 
+* `player` *PlayerObj*: Player who was healed..
 * `healer` *PlayerObj*: Player who healed the `player`
-* `time`: *number*: Amount of time(in sec) to show for. 
+* `time`: *number*: Amount of time(in sec) to show for.
 #### `ctf_combat_mode.get_last_hitter(player)`
 * `player` *PlayerObj*: Player.
 * returns a tuple of `last_hitter` *PlayerObj*, and `weapon_image` *string*
 #### `ctf_combat_mode.get_other_hitters(player, last_hitter)`
-* `player` *PlayerObj*: Player. 
+* `player` *PlayerObj*: Player.
 * `last_hitter` *PlayerObj*: Player who hit the `player` last.
-* returns a table/list of *players* *list(PlayerObj)* 
+* returns a table/list of *players* *list(PlayerObj)*
 #### `ctf_combat_mode.get_healers(player)`
 * `player` *PlayerObj*: Player.
-* returns a table/list of *healers* *list(PlayerObj)* 
+* returns a table/list of *healers* *list(PlayerObj)*
 #### `ctf_combat_mode.is_only_hitter(player, hitter)`
-* `player` *PlayerObj*: Player who was killed. 
+* `player` *PlayerObj*: Player who was killed.
 * `hitter` *PlayerObj*: Player killed the `player`
 * returns *boolean*
 #### `ctf_combat_mode.set_kill_time(player, time)`
@@ -356,7 +357,7 @@ This modpack consists of multiple mods.
 * returns `boolean`
 
 #### `ctf_kill_list.add(killer, victim, weapon_image, comment)`
-* `killer` *PlayerObj*: Player who killed. 
+* `killer` *PlayerObj*: Player who killed.
 * `victim` *PlayerObj*: Player killed by `killer`
 * `weapon_image` *string*: Path to image of weapon used to kill.
 * `comment` *string*: comment. (such as "Combat Log")
@@ -376,7 +377,7 @@ This modpack consists of multiple mods.
 * `player` *PlayerObj*: Player
 * `name` *string*: Player name
 * returns *boolean*
-* can be overriden for custom behavior. 
+* can be overriden for custom behavior.
 
 #### `ctf_ranged.simple_register_gun(name, def)`
 * `name` *string*: Item name of the gun.
@@ -471,7 +472,7 @@ ctf_core.include_files(
 * `player` *PlayerObj*: Player
 
 ## ctf_landmine
-No API's exposed in this mod. 
+No APIs exposed in this mod.
 
 ## ctf_map
 #### `ctf_map.set_flag_location(pname, teamname, pos)`
@@ -557,7 +558,7 @@ No API's exposed in this mod.
 * `player` *string|PlayerObj*: Player Name|Player
 * `new_team` *string*: New team color
 * `force` *boolean*: Force allocate into new team.
-* 
+*
 #### `ctf_teams.get(player)`
 * `player` *string|PlayerObj*: Player Name|Player
 * returns `nil|string` representing player's team.
@@ -582,10 +583,10 @@ No API's exposed in this mod.
 
 #### `ctf_teams.get_team_territory(teamname)`
 * `teamname` *string*: Team name
-* returns `boolean| pos1,pos2* false or positions representing the region of the team.  
+* returns `boolean| pos1,pos2* false or positions representing the region of the team.
 
 #### `ctf_teams.chat_send_team(teamname, message)`
-* `teamname` *string*: Team name - All players in that team will recieve the message. 
+* `teamname` *string*: Team name - All players in that team will recieve the message.
 * `message` *message*: Message
 
 #### `ctf_teams.get_connected_players()`
@@ -593,7 +594,7 @@ No API's exposed in this mod.
 
 #### `ctf_teams.is_allowed_in_team_chest(listname, stack, player)`
 * `listname` ???
-* `stack` *table(ItemDef)*: Item to be put into chest. 
+* `stack` *table(ItemDef)*: Item to be put into chest.
 * `player` *PlayerObj*: Player
 
 #### `ctf_teams.register_on_allocplayer(func)`
@@ -608,13 +609,13 @@ No API's exposed in this mod.
 * returns `rankings()`
 
 #### `ctf_rankings.register_on_rank_reset(func)`
-* `func` *Function*: function to be executed after ranking reset. 
+* `func` *Function*: function to be executed after ranking reset.
 
 #### `ctf_rankings.update_league(player)`
 * `player` *PlayerObj*: Player
 
 ### Rankings() object.
-Depending on the database used, such as `redis` or `modstorage/default` defines common interface to handle with database. 
+Depending on the database used, such as `redis` or `modstorage/default` defines common interface to handle with database.
 
 #### `rankings:get(pname)`
 * `pname` *string*: Player name
@@ -670,7 +671,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### `ctf_modebase.bounty_algo.kd.get_next_bounty(team_members)`
 * `team_members` *table* : Team members.
-* returns *table* of team members with highest kd's. 
+* returns *table* of team members with highest kd's.
 
 #### `ctf_modebase.bounty_algo.kd.bounty_reward_func(pname)`
 * `pname` *string*: Player bounty put over.
@@ -742,7 +743,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### `ctf_modebase.features.on_allocplayer(player, new_team)`
 * `player` *PlayerObj*: Player
-* `teamname` *string*: Team where player is being joined to. 
+* `teamname` *string*: Team where player is being joined to.
 
 #### `ctf_modebase.features.on_leaveplayer(player)`
 * `player` *PlayerObj*: Player
@@ -773,7 +774,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 * `msg` *string*: Message
 * `pos` *Position*: Position to put marker at
 * `no_notify` *boolean*: If `false`, informs teammates about placed marker in chat.
-* `specific_player` *string*: Marker placed for a  specific player. 
+* `specific_player` *string*: Marker placed for a  specific player.
 
 #### `ctf_modebase.markers.remove(pname, no_notify)`
 * `pname` *string*: Player name
@@ -783,16 +784,16 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 * `map` *MapDef*: Map chosen to be played.
 
 #### `ctf_modebase.start_match_after_vote()`
-* Starts the next match after map vote. 
+* Starts the next match after map vote.
 
 #### `ctf_modebase.start_new_match(delay)`
-* `delay` *integer*: Delay of x seconds before match start. 
+* `delay` *integer*: Delay of x seconds before match start.
 
 #### `ctf_modebase.mode_vote.start_vote()`
-* starts vote, to select how matches to play. 
+* starts vote, to select how matches to play.
 
 #### `ctf_modebase.mode_vote.end_vote()`
-* ends vote, queue's a mode change. 
+* ends vote, queue's a mode change.
 
 #### `ctf_modebase.player.save_initial_stuff_positions(player, soft)`
 * `player` *PlayerObj*: Player
@@ -812,7 +813,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### `ctf_modebase.player.update(player)`
 * `player` *PlayerObj*: Player
-* this is used to update skyboxes, shadows and physics. 
+* this is used to update skyboxes, shadows and physics.
 
 #### `ctf_modebase.player.is_playing(player)`
 * `player` *PlayerObj*: Player
@@ -821,7 +822,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 #### `ctf_modebase.recent_rankings.add(player,amounts,no_hud)`
 * `player` *PlayerObj*: Player
 * `amounts` *list(table(string,integer))*:
-* `no_hud` *boolean*: If *true* then no hud will be shown. 
+* `no_hud` *boolean*: If *true* then no hud will be shown.
 
 #### `ctf_modebase.recent_rankings.get(player)`
 * `player` *PlayerObj*: Player
@@ -839,17 +840,17 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### `ctf_modebase.prepare_respawn_delay(player)`
 * `player` *PlayerObj*: Player
-* prepare player for respawn and start respawn delay. 
+* prepare player for respawn and start respawn delay.
 
 #### `ctf_map.treasure.treasurefy_node(inv, map_treasures)`
 * `inv` *InventoryTable*: Chest Inventory
-* `map_treasures` *table*: Allowed map treasures. 
+* `map_treasures` *table*: Allowed map treasures.
 
 #### `ctf_map.treasure.treasure_from_string(str)`
 * `str` *string*: String of form: `name ; min_count ; max_count ; max_stacks ; rarity ;;`
 
 #### `ctf_map.treasure.treasure_to_string(treasures)`
-* `treasures` *table*: treasures to string form. 
+* `treasures` *table*: treasures to string form.
 
 #### `ctf_modebase.update_wear.find_item(pinv, item)`
 * `pinv` *InventoryTable*: Player inventory
@@ -867,7 +868,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### ` ctf_modebase.flag_huds.track_capturer(player, time)`
 * `player` *PlayerObj* : Player
-* `time`  *integer*: Amount of time in seconds to track flag for. 
+* `time`  *integer*: Amount of time in seconds to track flag for.
 
 #### ` ctf_modebase.flag_huds.untrack_capturer(player)`
 * `player` *PlayerObj* : Player
@@ -877,8 +878,8 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### `ctf_modebase.flag_on_punch(puncher, nodepos, node)`
 * `puncher` *PlayerObj* : Player
-* `nodepos` *Position*: Position of node. 
-* `node` *NodeDef*: Node clicked on. 
+* `nodepos` *Position*: Position of node.
+* `node` *NodeDef*: Node clicked on.
 
 #### `ctf_modebase.register_mode(name, def)`
 * `name` *string*: Mode Name
@@ -904,21 +905,21 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 * Runs all functions that are scheduled to be called when a player respawns.
 
 #### `ctf_modebase.on_flag_rightclick(...)`
-* `...` ??? 
+* `...` ???
 * Defines behavior when the flag is clicked with the right mouse key.
 
 #### `ctf_modebase.on_flag_capture(capturer, flagteams)`
-* `capturer`*PlayerObj* 
+* `capturer`*PlayerObj*
 * `flagteams` *list(string)* (list of the teams of the flags taken)
 
 #### `ctf_modebase.match_mode(param)`
 * ???
 
 #### `ctf_modebase.skip_vote.start_vote()`
-* Start the skipping match process. 
+* Start the skipping match process.
 
 #### `ctf_modebase.skip_vote.end_vote()`
-* End the skip match process. Appropriately skip the match or abstain based on the votes. 
+* End the skip match process. Appropriately skip the match or abstain based on the votes.
 
 #### `ctf_modebase.skip_vote.on_flag_take()`
 * Increment holding flag count.
@@ -933,7 +934,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 #### `ctf_modebase.summary.get(prev)`
 * `prev` *boolean*: Whether previous rankings to be shown.
-* Returns a `table` with the relevant match summary. 
+* Returns a `table` with the relevant match summary.
 
 #### `ctf_modebase.summary.set_winner(i)`
 * `i` *int*: int
@@ -952,9 +953,9 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 
 
 # Footnotes
-And thats the end of the api docs. If anything is missing, or something needs to be updated, feel free to make a PR. 
-Last updated on: 13 Feb 2025 (GMT)
+And thats the end of the api docs. If anything is missing, or something needs to be updated, feel free to make a PR.
+
 <!--
-Docs for CTF by mrtechtroid. 
+Docs for CTF by mrtechtroid.
 Released under CC BY-SA 4.0
 -->
