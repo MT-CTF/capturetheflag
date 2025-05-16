@@ -12,8 +12,9 @@ local players = {}
 
 local HUDBAR_REGISTERED
 
+local use_cache = {}
 local function use_hudbars(player)
-	return HUDBAR_REGISTERED and ctf_settings.get(player, "use_hudbars") == "true"
+	return HUDBAR_REGISTERED and use_cache[player:get_player_name()]
 end
 
 -- from https://github.com/rubenwardy/sprint
@@ -94,6 +95,8 @@ minetest.register_on_joinplayer(function(player)
 		stamina         = STAMINA_MAX, -- integer, the stamina we have left
 	}
 
+	use_cache[player:get_player_name()] = ctf_settings.get(player, "use_hudbars") == "true"
+
 	if use_hudbars(player) then
 		hb.init_hudbar(player, "sprint")
 	else
@@ -147,4 +150,5 @@ end)
 
 minetest.register_on_leaveplayer(function(player)
 	players[player:get_player_name()] = nil
+	use_cache[player:get_player_name()] = nil
 end)
