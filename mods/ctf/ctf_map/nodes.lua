@@ -228,6 +228,7 @@ local chest_formspec =
 	default.get_hotbar_bg(0,4.85)
 local chestv = S("Treasure Chest (visited)")
 
+local not_allowed_timer = {}
 local chest_def = {
 	description = S("Treasure Chest"),
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
@@ -247,8 +248,15 @@ local chest_def = {
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
-			minetest.chat_send_player(player:get_player_name(),
-				S("You're not allowed to put things in treasure chests!"))
+			local name = player:get_player_name()
+
+			if not not_allowed_timer[name] then
+				minetest.chat_send_player(name,
+					S("You're not allowed to put things in treasure chests!"))
+
+				not_allowed_timer[name] = true
+				minetest.after(1, function() not_allowed_timer[name] = nil end)
+			end
 			return 0
 		end
 	end,
