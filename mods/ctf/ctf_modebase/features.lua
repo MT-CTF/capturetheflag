@@ -176,6 +176,21 @@ local FLAG_CAPTURE_TIMER = 60 * 3
 local many_teams = false
 local team_list
 local teams_left
+local death_messages = {
+    ["grenades_frag"] = {"blown up", "fragged"},
+    ["knockback_grenade"] = {"sent flying", "doomed to fall"},
+    ["black_hole_grenade"] = {"sucked into the void"},
+    ["sword"] = {"killed", "sliced up"},
+    ["axe"] = {"killed", "chopped up",},
+    ["shovel"] = {"killed with the tool that dug your grave"},
+    ["pick"] = {"killed", "mistaken for mese ore"},
+    ["ctf_ranged"] = {"shot"},
+    ["rifle"] = {"sniped"},
+    ["default_water"] = {"drowned", "over-hydrated"},
+    ["damage_cobble"] = {"mined a little too much damage cobble"},
+    ["lava"] = {"tried to swim in lava", "took a hot bath"},
+    ["fire"] = {"burnt to a crisp"},
+}
 
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
@@ -255,6 +270,59 @@ local function get_suicide_image(reason)
 	end
 
 	return image
+end
+
+local function send_death_message(player, killer, weapon_image)
+    local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
+    local assist_message = ""
+    local weapon_message
+    local hitters = ctf_combat_mode.get_other_hitters(player, killer)
+
+    local k_teamcolor = ctf_teams.get(killer)
+    if k_teamcolor then
+		k_teamcolor = ctf_teams.team[k_teamcolor].color
+	end
+    for key, data in pairs(death_messages) do
+        if weapon_image:find(tostring(key)) then
+            weapon_message = data[math.random(1,#data)]
+        end
+    end
+
+    if #hitters > 0 then
+        assist_message = ", assisted by "
+        for index, pname in ipairs(hitters) do
+            local a_teamcolor = ctf_teams.get(pname)
+            if a_teamcolor then
+		        a_teamcolor = ctf_teams.team[a_teamcolor].color
+	        end
+            if index == 1 then
+                assist_message = assist_message .. minetest.colorize(a_teamcolor, pname)
+            elseif index == #hitters then
+                assist_message = assist_message .. ", and " .. minetest.colorize(a_teamcolor, pname)
+			else
+                assist_message = assist_message .. ", " .. minetest.colorize(a_teamcolor, pname)
+            end
+		end
+    end
+
+    if (death_setting == "true") then
+        if player ~= killer then
+            if weapon_message then
+                local death_message = "You were " .. weapon_message
+                    .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
+                minetest.chat_send_player(player, death_message)
+            else
+                local death_message = "You were killed by "
+                    .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
+                minetest.chat_send_player(player, death_message)
+            end
+        end
+        if player == killer and #hitters == 0 then
+            local suicide_message = weapon_message or "suicided"
+            local death_message = "You " .. suicide_message .. assist_message .. "."
+            minetest.chat_send_player(player, death_message)
+        end
+    end
 end
 
 local function tp_player_near_flag(player)
@@ -356,8 +424,10 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			if reason ~= "punch" or killer == player then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
+                    send_death_message(player, killer, weapon_image)
 				else
 					ctf_kill_list.add("", player, get_suicide_image(reason))
+                    send_death_message(player, player, get_suicide_image(reason))
 				end
 
 				killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
@@ -389,6 +459,7 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 					text = killer .. " " .. S("killed you for") .. " " .. rewards.score .." " .. S("points!"),
 					color = "warning",
 				})
+				send_death_message(player, killer, weapon_image)
 			end
 
 			-- share kill score with other hitters
@@ -969,3 +1040,10 @@ return {
 }
 
 end
+
+ctf_settings.register("send_death_messages", {
+    type = "bool",
+    label = "Receive death messages.",
+    description = "When enabled, you will receive a death message whenever you die stating who killed you.",
+    default = "true",
+})
