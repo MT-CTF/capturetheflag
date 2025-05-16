@@ -28,6 +28,8 @@ globals = {
 	},
 
 	"minetest", "core",
+
+	"hb",
 }
 
 exclude_files = {
