@@ -7,7 +7,7 @@ globals = {
 
 	"ctf_api", "ctf_chat", "ctf_combat_mode", "ctf_core", "ctf_cosmetics",
 	"ctf_healing", "ctf_kill_list", "ctf_map", "ctf_melee", "ctf_modebase",
-	"ctf_ranged", "ctf_rankings", "ctf_report", "ctf_teams", "ctf_player",
+	"ctf_ranged", "ctf_rankings", "ctf_report", "ctf_teams",
 
 	"dropondie", "grenades",
 

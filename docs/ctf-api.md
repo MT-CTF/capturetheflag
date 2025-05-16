@@ -544,12 +544,6 @@ No APIs exposed in this mod.
 #### `ctf_report.default_send_report(msg)`
 * `msg` *string* Display message to all staff.
 
-## ctf_player
-#### `ctf_player.set_stab_slash_anim(anim_type, player, extra_time)`
-* `anim_type` *string*: Animation type
-* `player` *PlayerObj*: Player
-* `extra_time` *integer*: Extra time for animation.
-
 ## ctf_teams
 #### `ctf_teams.remove_online_player(player)`
 * `player` *string|PlayerObj*: Player Name|Player
