@@ -1,0 +1,25 @@
+# textdomain: ctf_teams
+
+Allows advanced team management.=
+@1 joined the game.=
+@1 left the game@2.=
+(timed out)=
+Team management commands=
+set <player> <team> | rset <match pattern> <team>=
+No such team=
+Allocated @1 to team @2=
+No such player=
+Added the following players to team=
+No player names matched the given regex, or all players that matched were locked to a team=
+Team @1 has @2 players: @3=
+Get team members for 'team' or on which team is 'player' in=
+<team> | player <player>=
+Player @1 is in team @2=
+@1 Team's Chest=
+You're not on team=
+You aren't allowed to access the team chest=
+Pro players only=
+You aren't allowed to access the pro section=
+Team Door=
+You can only place team doors in your own territory!=
+Steel Team Door=

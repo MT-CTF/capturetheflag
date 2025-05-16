@@ -1,7 +1,7 @@
 # textdomain: random_messages
 
 To talk to only your team, start your messages with /t. For example, /t Hello team!=Um nur mit deinem Team zu reden, beginne deine Nachricht mit /t. Zum Beispiel, /t Hallo Team!
-Use apples to quickly restore your health.=Benutze Äpfel, um dich schnell zu heilen.
+Use apples and blueberries to quickly restore your health.=Benutze Sie Äpfel oder Heidelbeeren, um dich schnell zu heilen.
 Moving or fighting can avoid an inactivity kick.=Um einen Kick wegen Inaktivität zu vermeiden, bewege dich oder interagiere mit anderen Spielern.
 Gain more score by killing more than you die, by healing teammates with bandages, or by capturing the flag.=Erziele mehr Punkte, indem du öfter tötest als zu sterben, indem du Teammitglieder mit der Bandage heilst oder, indem du die Flagge holst.
 You gain more score the better the opponent you defeat.=Du erhältst mehr Punkte, je besser dein Gegenspieler ist.
@@ -9,7 +9,8 @@ Find weapons in chests or mine and use furnaces to make stronger swords.=Finde W
 Use team doors (steel) to stop the enemy walking into your base.=Benutze Team-Türen (Eisen) um Feinde daran zu hindern, in deine Base zu gelangen.
 Sprint by pressing the fast key (E) when you have stamina.=Sprinte, indem du E drückst während du Stamina hast.
 Like CTF? Give feedback using /report, and consider donating at rubenwardy.com/donate=Gefällt dir CTF? Dann gib uns Feedback, indem du /report nutzt und denke darüber nach unter rubenwardy.com/donate zu spenden.
-Want to submit your own map? Visit ctf.rubenwardy.com to get involved.=Möchtest du deine eigene Map einreichen? Besuche ctf.rubenwardy.com um zu starten.
+Want to submit your own map? Visit=Möchtest du deine eigene Map einreichen? Besuche
+to get involved.=um zu starten.
 Using limited resources for building structures that don't strengthen your base's defences is discouraged.=Benutze keine begrenzten Ressourcen, um Dinge zu bauen, die nicht deine Base stärken.
 To report misbehaving players to moderators, please use /report <name> <action>=Um Spieler zu melden, die sich nicht an die Regeln halten, nutze bitte /report <name> <action>
 Swearing, trolling and being rude will not be tolerated and strict action will be taken.=Fluchen, Trollen und unangemessenes Verhalten wird nicht toleriert und zieht Konsequenzen nach sich.
@@ -24,11 +25,13 @@ Use /summary (or /s) to check scores of the current match and the previous match
 Strengthen your team by capturing enemy flags.=Stärke dein Team, indem du die Flaggen der Gegner holst.
 Hitting your enemy does more damage than not hitting them.=Deine Gegner zu schlagen macht mehr Schaden als sie nicht zu schlagen.
 Use /top50 command to see the leaderboard.=Nutze /top50 um das Leaderboard zu sehen.
-Use /top50 <mode:technical modename> to see the leaderboard on another mode. For example: /top50 mode:nade_fight.=Nutze /top50 <mode:technical modename> um das Leaderboard in einem anderen Modus zu sehen. Zum Beispiel: /top50 mode:nade_fight.
-To check someone's rank on another mode use /r <mode:technical modename> <playername>. For example: /r mode:nade_fight randomplayer.=Um den Platz eines anderen Spielers in einem anderen Mode nachzuschauen nutze /r <mode:technical modename> <playername>. Zum Beispiel: /r mode:nade_fight randomplayer.
+Use /top50 <mode:technical modename> to see the leaderboard on another mode.=Nutze /top50 <mode:technical modename> um das Leaderboard in einem anderen Modus zu sehen.
+For example: /top50 mode:nade_fight.=Zum Beispiel: /top50 mode:nade_fight.
+To check someone's rank on another mode use /r <mode:technical modename> <playername>.=Um den Platz eines anderen Spielers in einem anderen Mode nachzuschauen nutze /r <mode:technical modename> <playername>.
+For example: /r mode:nade_fight randomplayer.=Zum Beispiel: /r mode:nade_fight randomplayer.
 To check someone's team use /team player <player_name>.=Um das Team eines Spielers nachzuschauen, nutze /team player <player_name>
 To check all team members use /team.=Um alle Teammitglieder nachzuschauen, nutze /team.
 You can capture multiple enemy flags at once!=Du kannst mehrere Flaggen zugleich holen!
-Consider joining our Discord server at https://discord.gg/vcZTRPX=Tritt unserem Discord Server bei unter https://discord.gg/vcZTRPX
+Consider joining our Discord server at=Tritt unserem Discord Server bei unter
 You can press sneak while jumping, to jump up two blocks.=Halte Sneak gedrückt während du springst, um zwei Blöcke hochzuspringen.
 Use /donate <playername> <score> to reward a team-mate for their work.=Nutze /donate <playername> <score>, um ein Teammitglied für seine Arbeit zu belohnen.

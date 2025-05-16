@@ -13,8 +13,8 @@ local function update(player)
 		return
 	end
 
-	local hud_message = "You are in combat [%ds left]"
-	hud_message = hud_message:format(combat.time)
+	local hud_message = "You are in combat [%ds left] \n%s"
+	hud_message = hud_message:format(combat.time, combat.suffocation_message)
 
 	if hud:exists(player, "combat_indicator") then
 		hud:change(player, "combat_indicator", {
@@ -36,8 +36,10 @@ local function update(player)
 
 	if node.groups.real_suffocation then -- From real_suffocation mod
 		combat.time = combat.time + 0.5
+		combat.suffocation_message = "You are inside blocks. Move out to stop your combat timer from increasing."
 	else
 		combat.time = combat.time - 1
+		combat.suffocation_message = ""
 	end
 
 	combat.timer = minetest.after(1, update, player)
@@ -56,6 +58,7 @@ function ctf_combat_mode.add_hitter(player, hitter, weapon_image, time)
 	combat.time = time
 	combat.last_hitter = hitter
 	combat.weapon_image = weapon_image
+	combat.suffocation_message = ""
 
 	if not combat.timer then
 		update(player)

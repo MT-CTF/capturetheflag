@@ -1,4 +1,6 @@
-player_api = {}
+player_api = {
+	players = {}
+}
 
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
@@ -50,7 +52,7 @@ end
 
 -- Player stats and animations
 -- model, textures, animation
-local players = {}
+local players = player_api.players
 player_api.player_attached = {}
 
 local function get_player_data(player)
@@ -67,7 +69,11 @@ function player_api.set_model(player, model_name)
 	if player_data.model == model_name then
 		return
 	end
+	-- Update data
 	player_data.model = model_name
+	-- Clear animation data as the model has changed
+	-- (required for setting the `stand` animation not to be a no-op)
+	player_data.animation, player_data.animation_speed, player_data.animation_loop = nil, nil, nil
 
 	local model = models[model_name]
 	if model then
@@ -112,20 +118,27 @@ function player_api.set_texture(player, index, texture)
 	player_api.set_textures(player, textures)
 end
 
-function player_api.set_animation(player, anim_name, speed)
+function player_api.set_animation(player, anim_name, speed, loop)
 	local player_data = get_player_data(player)
 	local model = models[player_data.model]
 	if not (model and model.animations[anim_name]) then
 		return
 	end
 	speed = speed or model.animation_speed
-	if player_data.animation == anim_name and player_data.animation_speed == speed then
+	if loop == nil then
+		loop = true
+	end
+	if player_data.animation == anim_name
+		and player_data.animation_speed == speed
+		and player_data.animation_loop == loop
+	then
 		return
 	end
 	local previous_anim = model.animations[player_data.animation] or {}
 	local anim = model.animations[anim_name]
 	player_data.animation = anim_name
 	player_data.animation_speed = speed
+	player_data.animation_loop = loop
 	-- If necessary change the local animation (only seen by the client of *that* player)
 	-- `override_local` <=> suspend local animations while this one is active
 	-- (this is basically a hack, proper engine feature needed...)
@@ -142,7 +155,7 @@ function player_api.set_animation(player, anim_name, speed)
 		end
 	end
 	-- Set the animation seen by everyone else
-	player:set_animation(anim, speed, animation_blend, anim.frame_loop)
+	player:set_animation(anim, speed, animation_blend, loop)
 	-- Update related properties if they changed
 	if anim._equals ~= previous_anim._equals then
 		player:set_properties({

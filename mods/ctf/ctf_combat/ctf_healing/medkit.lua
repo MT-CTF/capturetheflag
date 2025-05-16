@@ -9,6 +9,8 @@ local MAX_WEAR = 65535
 local MEDKIT_CAPACITY = 50 -- Amount of HP a medkit can heal
 local WEAR_PER_SEC = math.floor(MAX_WEAR / (MEDKIT_CAPACITY / REGEN_PER_SEC))
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function stop_medkit_heal(playername, interrupt_reason)
 	local player = minetest.get_player_by_name(playername)
 
@@ -19,7 +21,7 @@ local function stop_medkit_heal(playername, interrupt_reason)
 			player:set_hp((php + healing_players[playername].hp)/2) -- set hp halfway from the original to the current
 
 			hud_events.new(playername, {
-				text = "Your healing was interrupted: " .. interrupt_reason,
+				text = S("Your healing was interrupted") .. ": " .. interrupt_reason,
 				color = "danger",
 				quick = true,
 			})
@@ -36,6 +38,23 @@ local function stop_medkit_heal(playername, interrupt_reason)
 	healing_players[playername] = nil
 end
 
+local prevent_heals_list = {
+	"normal",
+	"glasslike", "glasslike_framed", "glasslike_framed_optional",
+	"allfaces", "allfaces_optional",
+}
+local function prevent_heals(nodedef)
+	if nodedef.walkable then
+		for _, v in pairs(prevent_heals_list) do
+			if nodedef.drawtype == v then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 local function medkit_heal(playername)
 	healing_players[playername].after = minetest.after(1, function()
 		local player = minetest.get_player_by_name(playername)
@@ -46,17 +65,16 @@ local function medkit_heal(playername)
 
 		local wielded_item = player:get_wielded_item()
 		if not wielded_item or wielded_item:get_name() ~= "ctf_healing:medkit" then
-			return stop_medkit_heal(playername, "You stopped holding the medkit")
+			return stop_medkit_heal(playername, S("You stopped holding the medkit"))
 		end
 
 		-- In case teammates manage to place blocks inside the player while they're healing
 		local pos = player:get_pos():offset(0, 0.1, 0)
-		local node_0 = minetest.get_node(pos).name
-		local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
+		local node_0 = minetest.registered_nodes[minetest.get_node(pos).name]
+		local node_1 = minetest.registered_nodes[minetest.get_node(pos:offset(0, 1, 0)).name]
 
-		if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or
-		minetest.registered_nodes[node_1].walkable then
-			return stop_medkit_heal(playername, "You can't heal while inside blocks")
+		if prevent_heals(node_0) or prevent_heals(node_1) then
+			return stop_medkit_heal(playername, S("You can't heal while inside blocks"))
 		end
 
 		local max_hp = player:get_properties().hp_max
@@ -88,7 +106,7 @@ local function start_medkit_heal(playername)
 
 	if php >= hp_max then
 		hud_events.new(playername, {
-			text = "You're already at full health",
+			text = S("You're already at full health"),
 			color = "warning",
 			quick = true,
 		})
@@ -97,13 +115,12 @@ local function start_medkit_heal(playername)
 
 	-- Prevent players from using medkits while inside nodes
 	local pos = player:get_pos():offset(0, 0.1, 0)
-	local node_0 = minetest.get_node(pos).name
-	local node_1 = minetest.get_node(pos:offset(0, 1, 0)).name
+	local node_0 = minetest.registered_nodes[minetest.get_node(pos).name]
+	local node_1 = minetest.registered_nodes[minetest.get_node(pos:offset(0, 1, 0)).name]
 
-	if (not node_0:match("slab") and minetest.registered_nodes[node_0].walkable) or
-	minetest.registered_nodes[node_1].walkable then
+	if prevent_heals(node_0) or prevent_heals(node_1) then
 		return hud_events.new(playername, {
-			text = "You can't heal inside blocks",
+			text = S("You can't heal inside blocks"),
 			color = "danger",
 			quick = true,
 		})
@@ -128,14 +145,14 @@ minetest.register_on_punchplayer(function(player, hitter, _, _, _, damage)
 		local pname = player:get_player_name()
 		local hname = hitter:is_player() and hitter:get_player_name()
 
-		if hname and ctf_teams.get(pname) == ctf_teams.get(hname) then return end
+		if hname and ctf_teams.get(pname) and ctf_teams.get(pname) == ctf_teams.get(hname) then return end
 
 		if healing_players[pname] then
-			stop_medkit_heal(pname, "Someone is attacking you")
+			stop_medkit_heal(pname, S("Someone is attacking you"))
 		end
 
 		if hname and healing_players[hname] then
-			stop_medkit_heal(hname, "You can't attack while healing")
+			stop_medkit_heal(hname, S("You can't attack while healing"))
 		end
 	end
 end)
@@ -153,7 +170,7 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 minetest.register_tool("ctf_healing:medkit", {
-	description = "Medkit",
+	description = S("Medkit"),
 	inventory_image = "ctf_healing_medkit.png",
 	on_use = function(itemstack, user, pointed_thing)
 		local uname = user:get_player_name()
@@ -161,7 +178,7 @@ minetest.register_tool("ctf_healing:medkit", {
 		if not healing_players[uname] then
 			start_medkit_heal(uname)
 		else
-			stop_medkit_heal(uname, "You stopped the healing")
+			stop_medkit_heal(uname, S("You stopped the healing"))
 		end
 	end,
 })

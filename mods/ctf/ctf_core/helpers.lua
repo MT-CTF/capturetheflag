@@ -25,6 +25,20 @@ do
 	end
 end
 
+function ctf_core.get_players_inside_radius(pos, radius, teamless)
+	local out = {}
+
+	for _, p in pairs(minetest.get_connected_players()) do
+		if teamless or ctf_teams.get(p) then
+			if p:get_pos():distance(pos) <= radius then
+				table.insert(out, p)
+			end
+		end
+	end
+
+	return out
+end
+
 --
 --- FORMSPECS
 --
@@ -124,13 +138,10 @@ end
 --
 
 function ctf_core.register_chatcommand_alias(name, alias, def)
-	minetest.register_chatcommand(name, def)
-	if alias then
-		minetest.register_chatcommand(alias, {
-			description = "An alias for /" .. name,
-			func = def.func,
-		})
-	end
+	minetest.register_chatcommand(name, table.copy(def))
+
+	def.description = "An alias for /" .. name
+	minetest.register_chatcommand(alias, def)
 end
 
 function ctf_core.file_exists(path)

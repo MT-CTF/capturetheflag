@@ -2,7 +2,9 @@ ctf_modebase = {
 	-- Table containing all registered modes and their definitions
 	modes                = {},    ---@type table
 
-	-- Same as ctf_modebase.modes but in list form
+	-- Same as ctf_modebase.modes but in list form.
+	--
+	-- Exception: Disabled modes that show up in ctf_modebase.modes won't show up in the modelist
 	modelist             = {},    ---@type list
 
 	-- Name of the mode currently being played. On server start this will be false
@@ -36,11 +38,26 @@ ctf_modebase = {
 
 	--flag_captured[Team name] = true if captured, otherwise nil
 	flag_captured        = {},
+
+	-- Choose who can see a player's nametag, defaults to their teammates
+	--
+	-- return {playername = <x>, playername2 = <x>, ...}
+	--
+	-- x: `"1"` for full nametag, `"2"` for symbol, or `true` to use the player setting for it
+	get_allowed_nametag_observers = function(player)
+		local pteam = ctf_teams.get(player)
+
+		return table.copy(ctf_teams.online_players[pteam].players)
+	end
 }
 
 ctf_gui.old_init()
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
+-- Can be added to by other mods, like irc
 function ctf_modebase.announce(msg)
+	minetest.log("action", msg)
 end
 
 ctf_core.include_files(
@@ -72,7 +89,65 @@ ctf_core.include_files(
 
 minetest.register_on_mods_loaded(function()
 	table.sort(ctf_modebase.modelist)
-	if ctf_core.settings.server_mode == "play" then
-		minetest.after(1, ctf_modebase.start_new_match)
+
+	if ctf_rankings.do_reset then
+		minetest.register_on_joinplayer(function(player)
+			skybox.clear(player)
+
+			player:set_moon({
+				visible = false
+			})
+			player:set_sun({
+				visible = false
+			})
+			player:set_clouds({
+				density = 0
+			})
+
+			player:hud_set_flags({
+				crosshair = false,
+				wielditem = false,
+			})
+
+			player:override_day_night_ratio(0)
+
+			player:set_hp(20)
+			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text = ""})
+		end)
+	elseif ctf_core.settings.server_mode == "play" then
+		ctf_modebase.start_new_match()
+	end
+
+	for _, name in pairs(ctf_modebase.modelist) do
+		if not ctf_modebase.modes[name].rounds then
+			ctf_settings.register("ctf_modebase:default_vote_"..name, {
+				type = "list",
+				description = S("Match count vote for the mode").." '"..HumanReadable(name).."'",
+				list = {HumanReadable(name).." - Ask", "0", "1", "2", "3", "4", "5"},
+				_list_map = {"ask", 0, 1, 2, 3, 4, 5},
+				default = "1", -- "Ask"
+			})
+		end
 	end
 end)
+
+minetest.override_chatcommand("pulverize", {
+	privs = {creative = true},
+})
+
+minetest.register_chatcommand("mode", {
+	description = S("Prints the current mode and matches played"),
+	func = function()
+		local mode = ctf_modebase.current_mode
+
+		if not mode then
+			return false, "The game isn't running"
+		end
+
+		return true, S("The current mode is @1. Matches finished: @2/@3",
+			HumanReadable(ctf_modebase.current_mode),
+			ctf_modebase.current_mode_matches_played-1,
+			ctf_modebase.current_mode_matches
+		)
+	end
+})

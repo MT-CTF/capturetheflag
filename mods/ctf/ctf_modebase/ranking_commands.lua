@@ -1,60 +1,93 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function get_gamemode(param)
 	local opt_param, mode_param = ctf_modebase.match_mode(param)
 
 	if mode_param then
 		local mode = ctf_modebase.modes[mode_param]
-		if not mode then
-			return false, "No such game mode: " .. mode_param
+		if mode_param == "all" then
+			return "all", nil, opt_param
+		elseif not mode then
+			return false, S("No such game mode").. ": " .. mode_param
 		end
 
 		return mode_param, mode, opt_param
 	else
 		local current_mode = ctf_modebase:get_current_mode()
 		if not current_mode then
-			return false, "The game isn't running"
+			return false, S("The game isn't running")
 		end
 
 		return ctf_modebase.current_mode, current_mode, opt_param
 	end
 end
 
+local function rank(name, mode_name, mode_data, pname)
+	if not mode_name then
+		return false, mode_data
+	end
+
+	if not pname then
+		pname = name
+	end
+	local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
+
+	if not prank then
+		return false, S("Player @1 has no rankings in mode @2".."\n", pname, mode_name)
+	end
+
+	local return_str = string.format(
+		"\tRankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
+	)
+
+	for _, irank in ipairs(mode_data.summary_ranks) do
+		return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", HumanReadable(irank)),
+			minetest.colorize("#ffea00", math.round(prank[irank] or 0))
+		)
+	end
+
+	for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
+		return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
+			minetest.colorize("#ffea00", 0.1 * math.round(10 * (
+						(prank[pair[1]] or 0   ) /
+				math.max(prank[pair[2]] or 0, 1)
+			)))
+		)
+	end
+
+	return_str = string.format("%s%s: %s\n",
+		return_str,
+		minetest.colorize("#63d437", "Place"),
+		minetest.colorize("#ffea00", mode_data.rankings:get_place(pname, "score"))
+	)
+
+	return true, return_str
+end
+
 ctf_core.register_chatcommand_alias("rank", "r", {
-	description = "Get the rank of yourself or a player",
-	params = "[mode:technical modename] <playername>",
+	description = S("Get the rank of yourself or a player"),
+	params = S("[mode:all | mode:technical modename] <playername>"),
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
-			return false, mode_data
-		end
-
-		if not pname then
-			pname = name
-		end
-		local prank = mode_data.rankings:get(pname) -- [p]layer [rank]
-
-		if not prank then
-			return false, string.format("Player %s has no rankings in mode %s!", pname, mode_name)
-		end
-
-		local return_str = string.format(
-			"Rankings for player %s in mode %s:\n\t", minetest.colorize("#ffea00", pname), mode_name
-		)
-
-		for _, rank in ipairs(mode_data.summary_ranks) do
-			return_str = string.format("%s%s: %s,\n\t",
-				return_str,
-				minetest.colorize("#63d437", HumanReadable(rank)),
-				minetest.colorize("#ffea00", math.round(prank[rank] or 0))
+		if mode_name == "all" then
+			local return_str = string.format(
+				"Rankings for player %s in all modes:\n",
+				minetest.colorize("#ffea00", pname or name),
+				mode_name
 			)
+
+			for _, mode in ipairs(ctf_modebase.modelist) do
+				mode_data = ctf_modebase.modes[mode]
+				return_str = return_str .. select(2, rank(name, mode, mode_data, pname))
+			end
+			return true, return_str
+		else
+			return rank(name, mode_name, mode_data, pname)
 		end
-
-		return_str = string.format("%s%s: %s",
-			return_str,
-			minetest.colorize("#63d437", "Place"),
-			minetest.colorize("#ffea00", mode_data.rankings.top:get_place(pname))
-		)
-
-		return true, return_str
 	end
 })
 
@@ -64,97 +97,145 @@ ctf_api.register_on_match_end(function()
 	donate_timer = {}
 end)
 
-minetest.register_chatcommand("donate", {
-	description = "Donate your match score to your teammate\nCan be used only once in 10 minutes",
-	params = "<playername> <score>",
+ctf_core.register_chatcommand_alias("donate", "d", {
+	description = S("Donate your match score to your teammate")..
+			"\n"..S("Can be used only once in 2.5 minutes")..
+			"\n"..S("Replace <score> with :max or any negative number to donate the maximum amount"),
+	params = S("<name [name2 name3 ...]> <score> [message]"),
 	func = function(name, param)
 		local current_mode = ctf_modebase:get_current_mode()
 		if not current_mode or not ctf_modebase.match_started then
-			return false, "The match hasn't started yet!"
+			return false, S("The match hasn't started yet!")
 		end
 
-		local pname, score = string.match(param, "^(.*) (.*)$")
+		local pnames, score, dmessage = {}, 0, ""
+		local pcount, ismessage = 0, false
 
-		if not pname then
-			return false, "You should provide the player name!"
+		for p in string.gmatch(param, "%S+") do
+			if ismessage then
+				dmessage = dmessage .. " " .. p
+			elseif ctf_core.to_number(p) and score == 0 then
+				score = p
+			elseif p == ":max" and score == 0 then
+				score = -1
+			else
+				local team = ctf_teams.get(p)
+				if not team and pcount > 0 then
+					dmessage = dmessage .. p
+					ismessage = true
+				else
+					if pnames[p] then
+						return false, S("You cannot donate more than once to the same person.")
+					end
+
+					if p == name then
+						return false, S('You cannot donate to yourself!')
+					end
+
+					if not minetest.get_player_by_name(p) then
+						return false, S("Player @1 is not online!", p)
+					end
+
+					if team ~= ctf_teams.get(name) then
+						return false, S("Player @1 is not on your team!", p)
+					end
+
+					pnames[p] = team
+					pcount = pcount + 1
+				end
+			end
+		end
+
+		if pcount == 0 then
+			return false, S("You should provide the player name!")
 		end
 
 		score = ctf_core.to_number(score)
 		if not score then
-			return false, "You should provide score amount!"
+			return false, S("You should provide score amount!")
 		end
-
 		score = math.floor(score)
-
-		if score < 5 then
-			return false, "You should donate at least 5 score!"
-		end
-
-		if score > 100 then
-			return false, "You can donate no more than 100 score!"
-		end
-
-		if pname == name then
-			return false, 'You cannot donate to yourself!'
-		end
-
-		local team = ctf_teams.get(pname)
-
-		if not team then
-			return false, string.format("Player %s is not online!", pname)
-		end
-
-		if team ~= ctf_teams.get(name) then
-			return false, string.format("Player %s is not on your team!", pname)
-		end
 
 		local cur_score = math.min(
 			current_mode.recent_rankings.get(name).score or 0,
 			(current_mode.rankings:get(name) or {}).score or 0
 		)
-		if score > cur_score / 2 then
-			return false, "You can donate only half of your match score!"
+
+		if score < 0 then
+			score = math.floor(cur_score / 2 / pcount)
 		end
 
-		if donate_timer[name] and donate_timer[name] + 600 > os.time() then
-			return false, "You can donate only once in 10 minutes!"
+		if score < 5 then
+			return false, S("You should donate at least 5 score!")
 		end
 
-		current_mode.recent_rankings.add(pname, {score=score}, true)
-		current_mode.recent_rankings.add(name, {score=-score}, true)
+		local scoretotal = score * pcount
+
+		if scoretotal > cur_score / 2 then
+			return false, S("You can donate only half of your match score!")
+		end
+
+		if donate_timer[name] and donate_timer[name] + 150 > os.time() then
+			local time_diff = donate_timer[name] + 150 - os.time()
+			return false, S(
+				"You can donate only once in 2.5 minutes! You can donate again in @1m @2s.",
+				math.floor(time_diff / 60),
+				time_diff % 60)
+		end
+
+		dmessage = (dmessage and dmessage ~= "") and (": " .. dmessage) or ""
+
+		if #dmessage > 50 then
+			return false, S("The donation message is") .. " " .. (#dmessage - 50) .." ".. S("chars too long!")
+		end
+
+		current_mode.recent_rankings.add(name, {score=-scoretotal}, true)
+		local names = ""
+		for pname, team in pairs(pnames) do
+			current_mode.recent_rankings.add(pname, {score=score}, true)
+			minetest.log("action", S(
+				"Player '@1' donated @2 score to player '@3'", name, score, pname
+			))
+			names = names .. pname .. ", "
+		end
+		names = names:sub(1, -3)
+		if pcount > 2 then
+			names = string.gsub(names, ", (%S+)$", ", and %1")
+		elseif pcount > 1 then
+			names = string.gsub(names, ", (%S+)$", " and %1")
+		end
 
 		donate_timer[name] = os.time()
+		local donate_text = S("@1 donated @2 score to @3@4", name, score, names, dmessage)
 
-		minetest.chat_send_all(minetest.colorize("#00EEFF",
-			string.format("%s donated %s score to %s for their hard work", name, score, pname)
-		))
-		minetest.log("action", string.format(
-			"Player '%s' donated %s score to player '%s'", name, score, pname
-		))
+		minetest.chat_send_all(minetest.colorize("#00EEFF", donate_text))
+		ctf_modebase.announce(minetest.get_translated_string("en", donate_text))
 		return true
 	end
 })
 
+
+
 local allow_reset = {}
 minetest.register_chatcommand("reset_rankings", {
-	description = minetest.colorize("red", "Resets rankings of you or another player to nothing"),
-	params = "[mode:technical modename] <playername>",
+	description = minetest.colorize("red", S("Resets rankings of you or another player to nothing")),
+	params = S("[mode:technical modename] <playername>"),
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
 		if pname then
 			if minetest.check_player_privs(name, {ctf_admin = true}) then
-				mode_data.rankings:set(pname, {}, true)
+				mode_data.rankings:del(pname)
 
 				minetest.log("action", string.format(
 					"[ctf_admin] %s reset rankings for player '%s' in mode %s", name, pname, mode_name
 				))
-				return true, string.format("Rankings reset for player '%s' in mode %s", pname, mode_name)
+				return true, S("Rankings reset for player '@1' in mode @2", pname, mode_name)
 			else
-				return false, "The ctf_admin priv is required to reset the rankings of other players!"
+				return false, S("The ctf_admin priv is required to reset the rankings of other players!")
 			end
 		else
 			local key = string.format("%s:%s", mode_name, name)
@@ -165,86 +246,93 @@ minetest.register_chatcommand("reset_rankings", {
 					allow_reset[key] = nil
 				end)
 
-				return true, "This will reset your stats and rankings for " .. mode_name .." mode completely."
-					.. " You will lose access to any special privileges such as the"
-					.. " team chest or userlimit skip. This is irreversable. If you're"
-					.. " sure, re-type /reset_rankings within 30 seconds to reset."
+				return true, minetest.colorize("red", S("This will reset your").." (") ..
+					minetest.colorize("cyan", name) ..
+					minetest.colorize("red", ") "..S("stats and rankings for")) .." "..
+					minetest.colorize("cyan", mode_name) ..
+					minetest.colorize("red", " " ..S("mode completely.").."\n") ..
+					S("You will lose access to any special privileges such as the") .." "..
+					S("team chest or userlimit skip. This is irreversable. If you're") .." "..
+					S("sure, re-type /reset_rankings within 30 seconds to reset.")
 			end
-			mode_data.rankings:set(name, {}, true)
+			mode_data.rankings:del(name)
 			allow_reset[key] = nil
 
 			minetest.log("action", string.format(
 				"Player '%s' reset their rankings in mode %s", name, mode_name
 			))
-			return true, "Your rankings have been reset"
+			return true, S("Your rankings have been reset")
 		end
 	end
 })
 
 minetest.register_chatcommand("top50", {
-	description = "Show the top 50 players",
+	description = S("Show the top 50 players"),
 	params = "[mode:technical modename]",
 	func = function(name, param)
 		local mode_name, mode_data = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
 		local top50 = {}
 
-		for i, pname in ipairs(mode_data.rankings.top:get_top(50)) do
-			local t = table.copy(mode_data.rankings:get(pname) or {})
-			t.pname = pname
+		for i, info in ipairs(mode_data.rankings:get_top(50, "score")) do
+			local t = mode_data.rankings:get(info[1]) or {}
+			t.pname = info[1]
+			t.number = i
 			table.insert(top50, t)
 		end
 
-		local own_pos = mode_data.rankings.top:get_place(name)
-		if own_pos > 50 then
+		local own_pos = mode_data.rankings:get_place(name, "score")
+		if own_pos and own_pos > 50 then
 			local t = table.copy(mode_data.rankings:get(name) or {})
 			t.pname = name
 			t.number = own_pos
 			table.insert(top50, t)
 		end
 
+		mode_data.summary_ranks._sort = "score"
 		ctf_modebase.summary.show_gui_sorted(name, top50, {}, mode_data.summary_ranks, {
-			title = "Top 50 Players",
+			title = S("Top 50 Players"),
 			gamemode = mode_name,
-			disable_nonuser_colors = true,
+			-- disable_nonuser_colors = true,
 		})
 	end,
 })
 
 minetest.register_chatcommand("make_pro", {
-	description = "Make yourself or another player a pro",
-	params = "[mode:technical modename] <playername>",
+	description = S("Make yourself or another player a pro (Will break target player's ranks)"),
+	params = S("[mode:technical modename] <playername>"),
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		local mode_name, mode_data, pname = get_gamemode(param)
-		if not mode_name then
+		if not mode_name or not mode_data then
 			return false, mode_data
 		end
 
 		if not pname then
-			return false, "You should provide the player name!"
+			return false, S("You should provide the player name!")
 		end
 
 		local old_ranks = mode_data.rankings:get(pname)
+		local note = ""
 		if not old_ranks then
-			return false, string.format("Player '%s' has no rankings!", pname)
+			note = " "..S("Note: Player '@1' had no rankings before that.", pname)
 		end
 
-		mode_data.rankings:add(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 5})
+		mode_data.rankings:set(pname, {score = 8000, kills = 7, deaths = 5, flag_captures = 5})
 
 		minetest.log("action", string.format(
 			"[ctf_admin] %s made player '%s' a pro in mode %s: %s", name, pname, mode_name, dump(old_ranks)
 		))
-		return true, string.format("Player '%s' is now a pro!", pname)
+		return true, S("Player '@1' is now a pro.@2", pname, note)
 	end
 })
 
 minetest.register_chatcommand("add_score", {
-	description = "Add score to player",
-	params = "[mode:technical modename] <playername> <score>",
+	description = S("Add score to player"),
+	params = S("[mode:technical modename] <playername> <score>"),
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		local mode_name, mode_data, opt_param = get_gamemode(param)
@@ -255,41 +343,41 @@ minetest.register_chatcommand("add_score", {
 		local pname, score = string.match(opt_param or "", "^(.*) (.*)$")
 
 		if not pname then
-			return false, "You should provide the player name!"
+			return false, S("You should provide the player name!")
 		end
 
 		score = ctf_core.to_number(score)
 		if not score then
-			return false, "You should provide score amount!"
+			return false, S("You should provide score amount!")
 		end
 
 		local old_ranks = mode_data.rankings:get(pname)
+		local note = ""
 		if not old_ranks then
-			return false, string.format("Player '%s' has no rankings!", pname)
+			note = " "..S("Note: Player '@1' had no rankings before that.", pname)
 		end
 
-		local old_score = old_ranks.score or 0
-		mode_data.rankings:set(pname, {score = old_score + score})
+		mode_data.rankings:add(pname, {score = score})
 
 		minetest.log("action", string.format(
 			"[ctf_admin] %s added %s score to player '%s' in mode %s", name, score, pname, mode_name
 		))
-		return true, string.format("Added %s score to player '%s'", score, pname)
+		return true, S("Added @1 score to player '@2'.@3", score, pname, note)
 	end
 })
 
 minetest.register_chatcommand("transfer_rankings", {
-	description = "Transfer rankings of one player to another.",
+	description = S("Transfer rankings of one player to another."),
 	params = "<src> <dest>",
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		local src, dst = param:trim():match("^(.*) (.*)$")
 
 		if not src then
-			return false, "You should provide source player name!"
+			return false, S("You should provide source player name!")
 		end
 		if not dst then
-			return false, "You should provide destination player name!"
+			return false, S("You should provide destination player name!")
 		end
 
 		local src_rankings = {}
@@ -311,29 +399,30 @@ minetest.register_chatcommand("transfer_rankings", {
 			end
 		end
 
+		local note = ""
 		if not src_exists then
-			return false, string.format("Source player '%s' has no rankings!", src)
+			return false, S("Source player '@1' has no rankings!", src)
 		end
 		if not dst_exists then
-			return false, string.format("Destination player '%s' has no rankings!", dst)
+			note = " "..S("Note: Destination player '@1' had no rankings.", dst)
 		end
 
 		if src == dst then
-			return false, "Source name and destination name cannot be the same!"
+			return false, S("Source name and destination name cannot be the same!")
 		end
 
 		for mode_name, mode in pairs(ctf_modebase.modes) do
-			mode.rankings:add(dst, src_rankings[mode_name])
+			mode.rankings:set(dst, src_rankings[mode_name], true)
 		end
 
 		for _, mode in pairs(ctf_modebase.modes) do
-			mode.rankings:set(src, {}, true)
+			mode.rankings:del(src)
 		end
 
 		minetest.log("action", string.format(
-			"[ctf_admin] %s transferred rankings from '%s' to '%s': %s -> %s",
-			name, src, dst, dump(src_rankings), dump(dst_rankings)
+			"[ctf_admin] %s transferred rankings from '%s' to '%s': %s -> %s | %s",
+			name, src, dst, dump(src_rankings), dump(dst_rankings), note
 		))
-		return true, string.format("Rankings of '%s' have been transferred to '%s'", src, dst)
+		return true, S("Rankings of '@1' have been transferred to '@2'.@3", src, dst, note)
 	end
 })

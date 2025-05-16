@@ -2,6 +2,8 @@
 --- Medic Paxel
 --
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local DIG_SPEED = 0.1
 local PAXEL_POWER = 50 -- currently just blocks count
 local PAXEL_RETRY = 3
@@ -26,7 +28,7 @@ local function dig(pname, ppos, power, retry)
 	if power <= 1 then
 		hud_events.new(pname, {
 			quick = true,
-			text = "Pillar digging went too far",
+			text = S("Pillar digging went too far"),
 			color = "warning",
 		})
 		dig_timers[pname] = nil
@@ -43,7 +45,7 @@ local function dig(pname, ppos, power, retry)
 			else
 				hud_events.new(pname, {
 					quick = true,
-					text = "Pillar digging stopped on undiggable node",
+					text = S("Pillar digging stopped on undiggable node"),
 					color = "warning",
 				})
 				dig_timers[pname] = nil
@@ -58,7 +60,7 @@ local function dig(pname, ppos, power, retry)
 	else
 		hud_events.new(pname, {
 			quick = true,
-			text = "Pillar digging has nothing more to dig",
+			text = S("Pillar digging has nothing more to dig"),
 			color = "warning",
 		})
 		dig_timers[pname] = nil
@@ -66,7 +68,7 @@ local function dig(pname, ppos, power, retry)
 end
 
 minetest.register_tool("ctf_mode_classes:support_paxel", {
-	description = "Paxel\nRightclick bottom of pillar to dig it.\nCan't use during build time",
+	description = "Paxel\n"..S("Rightclick bottom of pillar to dig it.").."\n"..S("Can't use during build time"),
 	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
@@ -91,7 +93,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 				if not ctf_modebase.match_started then
 					hud_events.new(user, {
 						quick = true,
-						text = "Can't use during build time",
+						text = S("Can't use during build time"),
 						color = "warning",
 					})
 					return

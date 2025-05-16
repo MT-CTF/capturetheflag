@@ -1,7 +1,18 @@
 local RESPAWN_SECONDS = 7
 local AUTO_RESPAWN_TIME = 0.4
-local respawn_delay = {}
+local respawn_delay = {--[[
+	pname = {
+		obj = <freeze object>,
+		timer = <minetest.after job>,
+		timer = <minetest.after job>,
+		hp_max = <Player's max hp before respawn process started>,
+		left = <Time left to respawn>,
+		state = <?>,
+	}
+]]}
 local hud = mhud.init()
+
+local S = minetest.get_translator(minetest.get_current_modname())
 
 minetest.register_entity("ctf_modebase:respawn_movement_freezer", {
 	is_visible = false,
@@ -42,7 +53,7 @@ local function run_respawn_timer(pname)
 
 	if respawn_delay[pname].left > 0 then
 		hud:change(pname, "left", {
-			text = string.format("Respawning in %ds", respawn_delay[pname].left)
+			text = S("Respawning in @1s", respawn_delay[pname].left)
 		})
 
 		respawn_delay[pname].timer = minetest.after(1, run_respawn_timer, pname)
@@ -131,6 +142,9 @@ minetest.register_on_leaveplayer(function(player)
 		end
 		if respawn_delay[pname].timer then
 			respawn_delay[pname].timer:cancel()
+		end
+		if respawn_delay[pname].autorespawn then
+			respawn_delay[pname].autorespawn:cancel()
 		end
 		player:set_properties({hp_max = respawn_delay[pname].hp_max})
 		respawn_delay[pname] = nil

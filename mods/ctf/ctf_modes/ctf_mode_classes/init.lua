@@ -1,4 +1,14 @@
-local rankings = ctf_rankings.init()
+local RANKLIST = {
+	_sort = "score",
+	"score",
+	"flag_captures", "flag_attempts",
+	"kills", "kill_assists", "bounty_kills",
+	"deaths",
+	"hp_healed",
+	"reward_given_to_enemy"
+}
+
+local rankings = ctf_rankings:init(RANKLIST)
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
@@ -36,8 +46,9 @@ ctf_modebase.register_mode("classes", {
 	treasures = {
 		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:torch"       ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
-		["default:cobble"      ] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 5},
-		["default:wood"        ] = {min_count = 10, max_count = 60, rarity = 0.5, max_stacks = 4},
+
+		["default:cobble"      ] = {min_count = 50, max_count = 99, rarity = 0.3, max_stacks = 2},
+		["default:wood"        ] = {min_count = 50, max_count = 99, rarity = 0.2, max_stacks = 2},
 
 		["ctf_teams:door_steel"] = {rarity = 0.2, max_stacks = 3},
 
@@ -53,21 +64,24 @@ ctf_modebase.register_mode("classes", {
 		["ctf_map:unwalkable_dirt"  ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
 		["ctf_map:unwalkable_stone" ] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
 		["ctf_map:unwalkable_cobble"] = {min_count = 5, max_count = 26, max_stacks = 1, rarity = 0.1},
-		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 3, rarity = 0.2},
+		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 2, rarity = 0.2},
 		["ctf_map:damage_cobble"    ] = {min_count = 5, max_count = 20, max_stacks = 2, rarity = 0.2},
 		["ctf_map:reinforced_cobble"] = {min_count = 5, max_count = 25, max_stacks = 2, rarity = 0.2},
+		["ctf_landmine:landmine"         ] = {min_count = 1, max_count =  5, max_stacks = 1, rarity = 0.2},
 
 		["ctf_ranged:ammo"    ] = {min_count = 3, max_count = 10, rarity = 0.3  , max_stacks = 2},
 		["ctf_healing:medkit" ] = {                               rarity = 0.08 , max_stacks = 2},
 
 		["grenades:frag" ] = {rarity = 0.1, max_stacks = 1},
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
+		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
 	},
 	crafts = {
 		"ctf_ranged:ammo", "default:axe_mese", "default:axe_diamond", "default:shovel_mese", "default:shovel_diamond",
-		"ctf_map:damage_cobble", "ctf_map:spike", "ctf_map:reinforced_cobble 2",
+		"ctf_map:damage_cobble 5", "ctf_map:spike", "ctf_map:reinforced_cobble 2", "ctf_landmine:landmine",
+		"default:coal_lump 4",
 	},
-	physics = {sneak_glitch = true, new_move = false},
+	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
 	team_chest_items = {
 		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",
@@ -75,14 +89,7 @@ ctf_modebase.register_mode("classes", {
 	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
-	summary_ranks = {
-		_sort = "score",
-		"score",
-		"flag_captures", "flag_attempts",
-		"kills", "kill_assists", "bounty_kills",
-		"deaths",
-		"hp_healed"
-	},
+	summary_ranks = RANKLIST,
 	build_timer = 90,
 	is_bound_item = function(_, name)
 		if name:match("ctf_mode_classes:") or name:match("ctf_melee:") or name == "ctf_healing:bandage" then
@@ -101,6 +108,10 @@ ctf_modebase.register_mode("classes", {
 		ctf_modebase.bounties.get_next_bounty = ctf_modebase.bounty_algo.kd.get_next_bounty
 
 		ctf_cosmetics.get_skin = function(player)
+			if not ctf_teams.get(player) then
+				return old_get_skin(player)
+			end
+
 			return old_get_skin(player) .. classes.get_skin_overlay(player)
 		end
 	end,
@@ -111,7 +122,11 @@ ctf_modebase.register_mode("classes", {
 
 		classes.finish()
 	end,
-	on_new_match = features.on_new_match,
+	on_new_match = function()
+		features.on_new_match()
+
+		classes.reset_class_cooldowns()
+	end,
 	on_match_end = features.on_match_end,
 	team_allocator = features.team_allocator,
 	on_allocplayer = function(player, new_team)
@@ -120,7 +135,11 @@ ctf_modebase.register_mode("classes", {
 	end,
 	on_leaveplayer = features.on_leaveplayer,
 	on_dieplayer = features.on_dieplayer,
-	on_respawnplayer = features.on_respawnplayer,
+	on_respawnplayer = function(player, ...)
+		features.on_respawnplayer(player, ...)
+
+		classes.reset_class_cooldowns(player)
+	end,
 	can_take_flag = features.can_take_flag,
 	on_flag_take = features.on_flag_take,
 	on_flag_drop = features.on_flag_drop,
@@ -133,8 +152,8 @@ ctf_modebase.register_mode("classes", {
 	can_punchplayer = features.can_punchplayer,
 	on_healplayer = features.on_healplayer,
 	calculate_knockback = function(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)
-		if features.can_punchplayer(player, hitter) then
-			return 2 * (tool_capabilities.damage_groups.knockback or 1)
+		if features.can_punchplayer(player, hitter) and not tool_capabilities.damage_groups.ranged then
+			return 2 * (tool_capabilities.damage_groups.knockback or 1) * math.min(1, time_from_last_punch or 0)
 		else
 			return 0
 		end

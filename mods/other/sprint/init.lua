@@ -31,7 +31,8 @@ local function setSprinting(player, sprinting)
 	if sprinting then
 		physics.set(player:get_player_name(), "sprint:sprint", {
 			speed = MOD_WALK,
-			jump  = MOD_JUMP
+			jump  = MOD_JUMP,
+			speed_crouch = 1.1,
 		})
 	else
 		physics.remove(player:get_player_name(), "sprint:sprint")
@@ -59,7 +60,7 @@ minetest.register_globalstep(function(dtime)
 		local player = minetest.get_player_by_name(name)
 		--Check if the player should be sprinting
 		local controls = player:get_player_control()
-		local sprintRequested = controls.aux1 and controls.up
+		local sprintRequested = controls.aux1 and (controls.up or controls.jump or (controls.sneak and controls.down))
 
 		if sprintRequested and info.stamina > MIN_SPRINT then
 			if not info.sprinting then
@@ -75,15 +76,12 @@ minetest.register_globalstep(function(dtime)
 
 		if sprintRequested then
 			if info.stamina > 0 then
-				info.stamina = info.stamina - dtime
-				if info.stamina < 0 then
-					info.stamina = 0
-				end
+				info.stamina = math.max(0, info.stamina - dtime)
 				updateHud(player, info)
 			end
 		else
 			if info.stamina < STAMINA_MAX then
-				info.stamina = info.stamina + dtime * HEAL_RATE
+				info.stamina = math.min(STAMINA_MAX, info.stamina + dtime * HEAL_RATE)
 				updateHud(player, info)
 			end
 		end
@@ -116,6 +114,14 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 ctf_api.register_on_respawnplayer(function(player)
+	local info = players[player:get_player_name()]
+	if info.stamina < STAMINA_MAX then
+		info.stamina = STAMINA_MAX
+		updateHud(player, info)
+	end
+end)
+
+minetest.register_on_respawnplayer(function(player)
 	local info = players[player:get_player_name()]
 	if info.stamina < STAMINA_MAX then
 		info.stamina = STAMINA_MAX

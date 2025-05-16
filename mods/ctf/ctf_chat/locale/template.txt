@@ -1,0 +1,12 @@
+# textdomain: ctf_chat
+
+Invalid usage, see /help msg.=
+The player=
+is not online.=
+PM from=
+Message sent to=
+Send a message on the team channel=
+-!- Empty team message, see /help t=
+[TEAM]=
+You're not in a team, so you have no team to talk to.=
+-!- You don't have permission to speak.

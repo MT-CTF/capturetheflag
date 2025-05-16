@@ -7,10 +7,11 @@ ctf_ranged = {
 
 local scoped = ctf_ranged.scoped
 local scale_const = 6
-local timer = 1
+
+local S = minetest.get_translator(minetest.get_current_modname())
 
 minetest.register_craftitem("ctf_ranged:ammo", {
-	description = "Ammo\nUsed to reload guns",
+	description = S("Ammo").."\n"..S("Used to reload guns"),
 	inventory_image = "ctf_ranged_ammo.png",
 })
 
@@ -48,6 +49,8 @@ local function process_ray(ray, user, look_dir, def)
 						collisiondetection = false,
 						texture = "ctf_ranged_bullethole.png",
 					})
+
+					minetest.sound_play("ctf_ranged_ricochet", {pos = hitpoint.intersection_point})
 				elseif nodedef.groups.liquid then
 					minetest.add_particlespawner({
 						amount = 10,
@@ -76,8 +79,8 @@ local function process_ray(ray, user, look_dir, def)
 				end
 			end
 		elseif hitpoint.type == "object" then
-			hitpoint.ref:punch(user, 1, {
-				full_punch_interval = 1,
+			hitpoint.ref:punch(user, def.fire_interval or 0.1, {
+				full_punch_interval = def.fire_interval or 0.1,
 				damage_groups = {ranged = 1, [def.type] = 1, fleshy = def.damage}
 			}, look_dir)
 		end
@@ -89,33 +92,77 @@ function ctf_ranged.can_use_gun(player, name)
 	return true
 end
 
+--- Play ephemeral sound on the spot of a player.
+-- @param user ObjectRef: The player object.
+-- @param sound_name str: The name of the sound to be played.
+-- @param spec? table: The SimpleSoundSpec of the sound. Some fields are overriden.
+local function play_player_positional_sound(user, sound_name, spec)
+	-- This function handles positional sounds that are
+	-- supposed to be heared equally on both left and right channel
+	-- by the user, while being heared at the position of the player
+	-- by other players.
+	-- Such a mechanism is mainly used on gunshot sounds,
+	-- so the ephemeral flag is set.
+
+	-- The spec table is copied as a base for the SimpleSoundSpec.
+	-- If not supplied, one is created without any customizations.
+
+	local user_name = user:get_player_name()
+
+	-- Two copies of SimpleSoundSpec
+
+	local non_user_spec = spec and table.copy(spec) or {}
+	non_user_spec.pos = user:get_pos()
+	non_user_spec.exclude_player = user_name
+
+	local user_spec = spec and table.copy(spec) or {}
+	user_spec.to_player = user_name
+
+	minetest.sound_play(sound_name, non_user_spec, true)
+	minetest.sound_play(sound_name, user_spec, true)
+end
+
 function ctf_ranged.simple_register_gun(name, def)
 	minetest.register_tool(rawf.also_register_loaded_tool(name, {
-		description = def.description,
-		inventory_image = def.texture.."^[colorize:#F44:42",
+		description = def.description ..
+				("\nDMG: %d | Shots/s: %0.1f | Mag: %d"):format(
+					def.damage * (def.bullet and def.bullet.amount or 1),
+					1 / def.fire_interval,
+					def.rounds
+				),
+		inventory_image = def.texture .. "^[colorize:#F44:42",
 		ammo = def.ammo or "ctf_ranged:ammo",
 		rounds = def.rounds,
 		_g_category = def.type,
 		groups = {ranged = 1, [def.type] = 1, tier = def.tier or 1, not_in_creative_inventory = 1},
 		on_use = function(itemstack, user)
 			if not ctf_ranged.can_use_gun(user, name) then
-				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				play_player_positional_sound(user, "ctf_ranged_click")
 				return
 			end
 
 			local result = rawf.load_weapon(itemstack, user:get_inventory())
 
+			local sound_name
 			if result:get_name() == itemstack:get_name() then
-				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				sound_name = "ctf_ranged_click"
 			else
-				minetest.sound_play("ctf_ranged_reload", {pos = user:get_pos()}, true)
+				sound_name = "ctf_ranged_reload"
 			end
+
+			play_player_positional_sound(user, sound_name)
 
 			return result
 		end,
 	},
 	function(loaded_def)
-		loaded_def.description = def.description.." (Loaded)"
+		loaded_def.description = def.description ..
+				("\nDMG: %d | Shots/s: %0.1f | Mag: %d"):format(
+					def.damage * (def.bullet and def.bullet.amount or 1),
+					1 / def.fire_interval,
+					def.rounds
+				) ..
+				" (Loaded)"
 		loaded_def.inventory_image = def.texture
 		loaded_def.inventory_overlay = def.texture_overlay
 		loaded_def.wield_image = def.wield_texture or def.texture
@@ -123,7 +170,7 @@ function ctf_ranged.simple_register_gun(name, def)
 		loaded_def.on_secondary_use = def.on_secondary_use
 		loaded_def.on_use = function(itemstack, user)
 			if not ctf_ranged.can_use_gun(user, name) then
-				minetest.sound_play("ctf_ranged_click", {pos = user:get_pos()}, true)
+				play_player_positional_sound(user, "ctf_ranged_click")
 				return
 			end
 
@@ -158,7 +205,7 @@ function ctf_ranged.simple_register_gun(name, def)
 				rays = rawf.spread_bulletcast(def.bullet, spawnpos, endpos, true, true)
 			end
 
-			minetest.sound_play(def.fire_sound, {pos = user:get_pos()}, true)
+			play_player_positional_sound(user, def.fire_sound)
 
 			for _, ray in pairs(rays) do
 				process_ray(ray, user, look_dir, def)
@@ -190,6 +237,12 @@ function ctf_ranged.simple_register_gun(name, def)
 		end
 	end))
 end
+
+minetest.register_on_joinplayer(function(player)
+	if shoot_cooldown:get(player) then
+		minetest.log("error", "Player is rejoining with a cooldown: "..dump(shoot_cooldown:get(player)))
+	end
+end)
 
 minetest.register_on_leaveplayer(function(player)
 	scoped[player:get_player_name()] = nil
@@ -235,7 +288,7 @@ end
 
 ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	type = "pistol",
-	description = "Pistol",
+	description = S("Pistol"),
 	texture = "ctf_ranged_pistol.png",
 	fire_sound = "ctf_ranged_pistol",
 	rounds = 75,
@@ -248,19 +301,20 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	type = "rifle",
-	description = "Rifle",
+	description = S("Rifle"),
 	texture = "ctf_ranged_rifle.png",
 	fire_sound = "ctf_ranged_rifle",
 	rounds = 40,
 	range = 150,
 	damage = 4,
+	automatic = true,
 	fire_interval = 0.8,
 	liquid_travel_dist = 4,
 })
 
 ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	type = "shotgun",
-	description = "Shotgun",
+	description = S("Shotgun"),
 	texture = "ctf_ranged_shotgun.png",
 	fire_sound = "ctf_ranged_shotgun",
 	bullet = {
@@ -275,11 +329,11 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	type = "smg",
-	description = "Submachinegun",
+	description = S("Submachinegun"),
 	texture = "ctf_ranged_smgun.png",
 	fire_sound = "ctf_ranged_pistol",
 	bullet = {
-		spread = 2,
+		spread = 1.5,
 	},
 	automatic = true,
 	rounds = 36,
@@ -291,9 +345,9 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	type = "sniper",
-	description = "Sniper rifle",
+	description = S("Sniper Rifle"),
 	texture = "ctf_ranged_sniper_rifle.png",
-	fire_sound = "ctf_ranged_sniper_shot",
+	fire_sound = "ctf_ranged_sniper",
 	rounds = 25,
 	range = 300,
 	damage = 12,
@@ -303,7 +357,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 		if scoped[user:get_player_name()] then
 			ctf_ranged.hide_scope(user:get_player_name())
 		else
-			local item_name = itemstack:get_name():gsub("_loaded", "")
+			local item_name = itemstack:get_name()
 			ctf_ranged.show_scope(user:get_player_name(), item_name, 4)
 		end
 	end
@@ -311,9 +365,9 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 
 ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	type = "sniper",
-	description = "Magnum sniper rifle",
+	description = S("Magnum Sniper Rifle"),
 	texture = "ctf_ranged_sniper_rifle_magnum.png",
-	fire_sound = "ctf_ranged_sniper_shot",
+	fire_sound = "ctf_ranged_sniper",
 	rounds = 20,
 	range = 400,
 	damage = 16,
@@ -323,7 +377,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 		if scoped[user:get_player_name()] then
 			ctf_ranged.hide_scope(user:get_player_name())
 		else
-			local item_name = itemstack:get_name():gsub("_loaded", "")
+			local item_name = itemstack:get_name()
 			ctf_ranged.show_scope(user:get_player_name(), item_name, 8)
 		end
 	end
@@ -339,14 +393,14 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 local time = 0
 minetest.register_globalstep(function(dtime)
 	time = time + dtime
-	if time < timer then
+	if time < 1 then
 		return
 	end
 
 	time = 0
 	for name, info in pairs(scoped) do
 		local player = minetest.get_player_by_name(name)
-		local wielded_item = player:get_wielded_item():get_name():gsub("_loaded", "")
+		local wielded_item = player:get_wielded_item():get_name()
 		if wielded_item ~= info.item_name then
 			ctf_ranged.hide_scope(name)
 		end

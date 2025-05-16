@@ -4,6 +4,8 @@ local bounties = {}
 
 ctf_modebase.bounties = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function get_reward_str(rewards)
 	local ret = ""
 
@@ -15,8 +17,14 @@ local function get_reward_str(rewards)
 end
 
 local function set(pname, pteam, rewards)
-	local bounty_message = minetest.colorize(CHAT_COLOR, string.format(
-		"[Bounty] %s. Rewards: %s",
+	-- pname(str) is the player's name
+	-- pteam(str) is the player's team(e.g. "red")
+	-- rewards(table) has two entries:
+	-- -- bounty_kills(int) which is usually 1
+	-- -- score(int) which is the amount of score given to the one
+	-- -- -- who claims the bounty
+	local bounty_message = minetest.colorize(CHAT_COLOR,
+		S("[Bounty] @1. Rewards: @2",
 		pname, get_reward_str(rewards)
 	))
 
@@ -30,7 +38,7 @@ local function set(pname, pteam, rewards)
 end
 
 local function remove(pname, pteam)
-	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, string.format("[Bounty] %s is no longer bountied", pname)))
+	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, S("[Bounty] @1 is no longer bountied", pname)))
 	bounties[pteam] = nil
 end
 
@@ -42,9 +50,9 @@ function ctf_modebase.bounties.claim(player, killer)
 	end
 
 	local rewards = bounties[pteam].rewards
-	minetest.chat_send_all(minetest.colorize(CHAT_COLOR,
-		string.format("[Bounty] %s killed %s and got %s", killer, player, get_reward_str(rewards))
-	))
+	local bounty_kill_text = S("[Bounty] @1 killed @2 and got @3", killer, player, get_reward_str(rewards))
+	minetest.chat_send_all(minetest.colorize(CHAT_COLOR, bounty_kill_text))
+	ctf_modebase.announce(minetest.get_translated_string("en", bounty_kill_text))
 
 	bounties[pteam] = nil
 	return rewards
@@ -133,21 +141,73 @@ ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 end)
 
 ctf_core.register_chatcommand_alias("list_bounties", "lb", {
-	description = "List current bounties",
+	description = S("List current bounties"),
 	func = function(name)
 		local pteam = ctf_teams.get(name)
 		local output = {}
-
+		local x = 0
 		for tname, bounty in pairs(bounties) do
-			if pteam ~= tname then
-				table.insert(output, bounty.msg)
+			local player = minetest.get_player_by_name(bounty.name)
+
+			if player and pteam ~= tname then
+				local label = string.format(
+					"label[%d,0.1;%s: %s score]",
+					x,
+					bounty.name,
+					minetest.colorize("cyan", bounty.rewards.score)
+				)
+
+				table.insert(output, label)
+				local model = "model[%d,1;4,6;player;character.b3d;%s,blank.png;{0,160};;;]"
+				model = string.format(
+					model,
+					x,
+					player:get_properties().textures[1]
+				)
+				table.insert(output, model)
+				x = x + 4.5
 			end
 		end
 
 		if #output <= 0 then
-			return false, "There are no bounties you can claim"
+			return false, S("There are no bounties you can claim")
+		end
+		x = x - 1.5
+		local formspec = "size[" .. x .. ",6]\n" .. table.concat(output, "\n")
+		minetest.show_formspec(name, "ctf_modebase:lb", formspec)
+		return true, ""
+	end
+})
+
+ctf_core.register_chatcommand_alias("put_bounty", "pb", {
+	description = S("Put bounty on some player"),
+	params = S("<player> <amount>"),
+	privs = { ctf_admin = true },
+	func = function(name, param)
+		local player, amount = string.match(param, "(.*) (.*)")
+
+		if not (player and amount) then
+			return false, S("Incorrect parameters")
 		end
 
-		return true, table.concat(output, "\n")
-	end
+		local pteam = ctf_teams.get(player)
+		if not pteam then
+			return false, S("You can only put a bounty on a player in a team!")
+		end
+
+		local team_colour = ctf_teams.team[pteam].color
+
+		amount = ctf_core.to_number(amount)
+		if amount then
+			set(
+				player,
+				pteam,
+				{ bounty_kills=1, score=amount }
+			)
+			return true, S("Successfully placed a bounty of") .." ".. amount .." ".. S("on")
+				.." ".. minetest.colorize(team_colour, player) .. "!"
+		else
+			return false, S("Invalid Amount")
+		end
+	end,
 })

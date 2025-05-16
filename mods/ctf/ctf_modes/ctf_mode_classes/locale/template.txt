@@ -1,0 +1,27 @@
+# textdomain: ctf_mode_classes
+
+High HP class with a sword capable of short damage bursts=
+Helper class with healing bandages, an immunity ability, and building gear=
+Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places=
+[Classes] Simple Knight sword activation=
+If enabled you don't need to hold Sneak/Run to activate the rage ability=
+[Classes] Simple Support bandage immunity activation=
+If enabled you don't need to hold Sneak/Run to activate the immunity ability=
+Knight Sword=
+(Sneak/Run) + Rightclick to use Rage ability (Lasts @1s, @2s cooldown)=
+You cannot activate special abilities during build time!=
+Scout Rifle=
+(Sneak/Run) + Rightclick to launch grenade (@1s cooldown), otherwise will toggle scope=
+Scaling Ladder=
+(Infinite usage, self-removes after @1s)=
+Bandage=
+Heals teammates for 4-5 HP until target's HP is equal to @1% of their maximum HP=
+(Sneak/Run) + Rightclick to become immune to damage for @1s (@2s cooldown)=
+You can't become immune while holding the flag=
+You can only change class at your flag!=
+Your class can't use that item!=
+Pillar digging went too far=
+Pillar digging stopped on undiggable node=
+Pillar digging has nothing more to dig=
+Rightclick bottom of pillar to dig it.=
+Can't use during build time=

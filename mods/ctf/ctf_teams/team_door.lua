@@ -1,6 +1,8 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 doors.register("ctf_teams:door_steel", {
 	tiles = {{name = "doors_door_steel.png", backface_culling = true}},
-	description = "Team Door",
+	description = S("Team Door"),
 	inventory_image = "doors_item_steel.png",
 	groups = {node = 1, cracky = 1, level = 2},
 	sounds = default.node_sound_metal_defaults(),
@@ -17,7 +19,7 @@ minetest.override_item("ctf_teams:door_steel", {
 
 		if pteam then
 			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
-				minetest.chat_send_player(placer:get_player_name(), "You can only place team doors in your own territory!")
+				minetest.chat_send_player(placer:get_player_name(), S("You can only place team doors in your own territory!"))
 				return itemstack
 			end
 
@@ -55,7 +57,7 @@ for team, def in pairs(ctf_teams.team) do
 
 	doors.register(doorname:format(team), {
 		tiles = {{name = "(ctf_teams_door_steel.png"..modifier:format(def.color, def.color), backface_culling = true}},
-		description = "Steel Team Door",
+		description = S("Steel Team Door"),
 		inventory_image = "doors_item_steel.png^[multiply:"..def.color,
 		groups = {node = 1, cracky = 1, level = 2},
 		sounds = default.node_sound_metal_defaults(),

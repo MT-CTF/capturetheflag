@@ -23,7 +23,7 @@ function crafting.get_unlocked(name)
 	return players_recipes[name]
 end
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	players_recipes[player:get_player_name()] = nil
 end)
 
@@ -97,7 +97,7 @@ local function fetch_items_from_inv(inv, listname)
 			local itemname = stack:get_name()
 			items[itemname] = (items[itemname] or 0) + stack:get_count()
 
-			local def = minetest.registered_items[itemname]
+			local def = core.registered_items[itemname]
 			if def and def.groups then
 				for groupname, _ in pairs(def.groups) do
 					local group = "group:" .. groupname
@@ -135,7 +135,7 @@ local function find_required_items(inv, listname, recipe)
 			-- Find stacks in group
 			for _, stack in ipairs(inv:get_list(listname)) do
 				-- Is it in group?
-				local def = minetest.registered_items[stack:get_name()]
+				local def = core.registered_items[stack:get_name()]
 				if def and def.groups and def.groups[groupname] then
 					if stack:get_count() > required then
 						stack:set_count(required)
@@ -181,7 +181,7 @@ function crafting.perform_craft(player, listname, outlistname, recipe)
 		local took = inv:remove_item(listname, item)
 		taken[#taken + 1] = took
 		if took:get_count() ~= item:get_count() then
-			minetest.log("error", "Unexpected lack of items in inventory")
+			core.log("error", "Unexpected lack of items in inventory")
 			give_all_to_player(inv, taken)
 			return false
 		end
@@ -192,8 +192,8 @@ function crafting.perform_craft(player, listname, outlistname, recipe)
 		inv:add_item(outlistname, recipe.output)
 	else
 		local pos = player:get_pos()
-		minetest.chat_send_player(player:get_player_name(), "No room in inventory!")
-		minetest.add_item(pos, recipe.output)
+		core.chat_send_player(player:get_player_name(), "No room in inventory!")
+		core.add_item(pos, recipe.output)
 	end
 	return true
 end
@@ -209,5 +209,5 @@ function crafting.calc_inventory_list_hash(inv, listname)
 	for _, stack in pairs(inv:get_list(listname)) do
 		str = str .. stack:get_name() .. stack:get_count()
 	end
-	return minetest.sha1(to_hex(str))
+	return core.sha1(to_hex(str))
 end

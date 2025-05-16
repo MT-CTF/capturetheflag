@@ -1,3 +1,5 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function drop_flags(player, pteam)
 	local pname = player:get_player_name()
 	local flagteams = ctf_modebase.taken_flags[pname]
@@ -21,6 +23,10 @@ local function drop_flags(player, pteam)
 		end
 	end
 
+	if player_api.players[pname] then
+		player_api.set_texture(player, 2, "blank.png")
+	end
+
 	ctf_modebase.taken_flags[pname] = nil
 
 	ctf_modebase.skip_vote.on_flag_drop(#flagteams)
@@ -38,7 +44,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 	if not pteam then
 		hud_events.new(puncher, {
 			quick = true,
-			text = "You're not in a team, you can't take that flag!",
+			text = S("You're not in a team, you can't take that flag!"),
 			color = "warning",
 		})
 		return
@@ -50,7 +56,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		if ctf_modebase.flag_captured[pteam] then
 			hud_events.new(puncher, {
 				quick = true,
-				text = "You can't take that flag. Your team's flag was captured!",
+				text = S("You can't take that flag. Your team's flag was captured!"),
 				color = "warning",
 			})
 			return
@@ -74,6 +80,10 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		table.insert(ctf_modebase.taken_flags[pname], target_team)
 		ctf_modebase.flag_taken[target_team] = {p=pname, t=pteam}
 
+		player_api.set_texture(puncher, 2,
+			"default_wood.png^([combine:16x16:4,0=wool_white.png^[colorize:"..ctf_teams.team[target_team].color..":200)"
+		)
+
 		ctf_modebase.skip_vote.on_flag_take()
 		ctf_modebase:get_current_mode().on_flag_take(puncher, target_team)
 
@@ -85,7 +95,7 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 		if not ctf_modebase.taken_flags[pname] then
 			hud_events.new(puncher, {
 				quick = true,
-				text = "That's your flag!",
+				text = S("That's your flag!"),
 				color = "warning",
 			})
 		else
@@ -96,6 +106,10 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 				ctf_modebase.flag_captured[flagteam] = true
 			end
 
+			player_api.set_texture(puncher, 2, "blank.png")
+
+			ctf_modebase.on_flag_capture(puncher, flagteams)
+
 			ctf_modebase.skip_vote.on_flag_capture(#flagteams)
 			ctf_modebase:get_current_mode().on_flag_capture(puncher, flagteams)
 		end
@@ -103,6 +117,10 @@ function ctf_modebase.flag_on_punch(puncher, nodepos, node)
 end
 
 ctf_api.register_on_match_end(function()
+	for pname in pairs(ctf_modebase.taken_flags) do
+		player_api.set_texture(minetest.get_player_by_name(pname), 2, "blank.png")
+	end
+
 	ctf_modebase.taken_flags = {}
 	ctf_modebase.flag_taken = {}
 	ctf_modebase.flag_captured = {}

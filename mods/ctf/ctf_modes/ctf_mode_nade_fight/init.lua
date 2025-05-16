@@ -1,4 +1,14 @@
-local rankings = ctf_rankings.init()
+local RANKLIST = {
+	_sort = "score",
+	"score",
+	"flag_captures", "flag_attempts",
+	"kills", "kill_assists", "bounty_kills",
+	"deaths",
+	"hp_healed",
+	"reward_given_to_enemy"
+}
+
+local rankings = ctf_rankings:init(RANKLIST)
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
@@ -11,8 +21,9 @@ ctf_modebase.register_mode("nade_fight", {
 	treasures = {
 		["default:ladder_wood" ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
 		["default:torch"       ] = {                max_count = 20, rarity = 0.3, max_stacks = 5},
-		["default:cobble"      ] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 5},
-		["default:wood"        ] = {min_count = 10, max_count = 60, rarity = 0.5, max_stacks = 4},
+
+		["default:cobble"      ] = {min_count = 45, max_count = 99, rarity = 0.4, max_stacks = 4},
+		["default:wood"        ] = {min_count = 10, max_count = 60, rarity = 0.4, max_stacks = 4},
 
 		["ctf_teams:door_steel"] = {rarity = 0.2, max_stacks = 3},
 
@@ -38,19 +49,24 @@ ctf_modebase.register_mode("nade_fight", {
 		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 3, rarity = 0.2},
 		["ctf_map:damage_cobble"    ] = {min_count = 5, max_count = 20, max_stacks = 2, rarity = 0.2},
 		["ctf_map:reinforced_cobble"] = {min_count = 5, max_count = 25, max_stacks = 2, rarity = 0.2},
+		["ctf_landmine:landmine"         ] = {min_count = 1, max_count = 3, max_stacks = 1, rarity = 0.2},
 
 		["ctf_ranged:ammo"     ] = {min_count = 3, max_count = 10, rarity = 0.3  , max_stacks = 2},
 		["ctf_healing:medkit"  ] = {                               rarity = 0.1  , max_stacks = 2},
 		["ctf_healing:bandage" ] = {                               rarity = 0.08 , max_stacks = 2},
 
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 3},
+		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
 	},
 	crafts = {
-		"ctf_map:damage_cobble",
+		"ctf_map:damage_cobble 5",
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
+		"ctf_ranged:ammo",
+		"ctf_landmine:landmine",
+		"default:coal_lump 4",
 	},
-	physics = {sneak_glitch = true, new_move = false},
+	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
 	team_chest_items = {
 		"default:cobble 80", "default:wood 80", "ctf_map:damage_cobble 20", "ctf_map:reinforced_cobble 20",
@@ -58,14 +74,7 @@ ctf_modebase.register_mode("nade_fight", {
 	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
-	summary_ranks = {
-		_sort = "score",
-		"score",
-		"flag_captures", "flag_attempts",
-		"kills", "kill_assists", "bounty_kills",
-		"deaths",
-		"hp_healed"
-	},
+	summary_ranks = RANKLIST,
 	build_timer = 60 * 2,
 
 	is_bound_item = function(_, name)
