@@ -1,13 +1,15 @@
 ctf_chat = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.override_chatcommand("msg", {
 	func = function(name, param)
 		local sendto, message = param:match("^(%S+)%s(.+)$")
 		if not sendto then
-			return false, "Invalid usage, see /help msg."
+			return false, S("Invalid usage, see /help msg.")
 		end
 		if not minetest.get_player_by_name(sendto) then
-			return false, "The player " .. sendto .. " is not online."
+			return false, S("The player") .. " " .. sendto .. " " .. S("is not online.")
 		end
 
 		-- Run the message through filter if it exists
@@ -22,13 +24,13 @@ minetest.override_chatcommand("msg", {
 		local tcolor = pteam and ctf_teams.team[pteam].color or "#FFF"
 
 		-- Colorize the recepient-side message and send it to the recepient
-		local str =  minetest.colorize(color, "PM from ")
+		local str =  minetest.colorize(color, S("PM from") .." ")
 		str = str .. minetest.colorize(tcolor, name)
 		str = str .. minetest.colorize(color, ": " .. message)
 		minetest.chat_send_player(sendto, str)
 
 		-- Make the sender-side message
-		str = "Message sent to " .. sendto .. ": " .. message
+		str = S("Message sent to") .. " " .. sendto .. ": " .. message
 
 		minetest.log("action", string.format("[CHAT] PM from %s to %s: %s", name, sendto, message))
 
@@ -66,11 +68,11 @@ minetest.override_chatcommand("me", {
 
 minetest.register_chatcommand("t", {
 	params = "msg",
-	description = "Send a message on the team channel",
+	description = S("Send a message on the team channel"),
 	privs = { interact = true, shout = true },
 	func = function(name, param)
 		if param == "" then
-			return false, "-!- Empty team message, see /help t"
+			return false, S( "-!- Empty team message, see /help t")
 		end
 
 		local tname = ctf_teams.get(name)
@@ -80,11 +82,11 @@ minetest.register_chatcommand("t", {
 			local tcolor = ctf_teams.team[tname].color
 			for username in pairs(ctf_teams.online_players[tname].players) do
 				minetest.chat_send_player(username,
-						minetest.colorize(tcolor, "<" .. name .. "> ** " .. param .. " **"))
+						minetest.colorize(tcolor, S("[TEAM]") .. " <" .. name .. "> " .. param ))
 			end
 		else
 			minetest.chat_send_player(name,
-					"You're not in a team, so you have no team to talk to.")
+					S("You're not in a team, so you have no team to talk to."))
 		end
 	end
 })
@@ -96,7 +98,7 @@ minetest.register_on_mods_loaded(function()
 		local chat = message:sub(1,1) ~= "/"
 
 		if chat and not minetest.check_player_privs(name, {shout = true}) then
-			minetest.chat_send_player(name, "-!- You don't have permission to speak.")
+			minetest.chat_send_player(name, S("-!- You don't have permission to speak."))
 			return true
 		end
 

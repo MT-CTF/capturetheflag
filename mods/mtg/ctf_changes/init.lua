@@ -17,6 +17,10 @@ for from, to in pairs(disabled_ores) do
 	minetest.register_alias_force(from, to)
 end
 
+minetest.override_chatcommand("clearinv", {
+	privs = {server = true},
+})
+
 minetest.register_on_mods_loaded(function()
 
 	-- Remove Unneeded ABMs
@@ -121,6 +125,17 @@ minetest.override_item("default:apple", {
 	end
 })
 
+minetest.override_item("default:blueberries", {
+	on_use = function(itemstack, user, ...)
+		if not COOLDOWN:get(user) then
+			COOLDOWN:set(user, 0.3)
+
+			return minetest.item_eat(3)(itemstack, user, ...)
+		end
+	end,
+	stack_max = 60,
+})
+
 local function furnace_on_destruct(pos)
 	local inv = minetest.get_inventory({ type = "node", pos = pos })
 	if not inv then return end
@@ -181,6 +196,16 @@ minetest.override_item("default:furnace", {
 minetest.override_item("default:furnace_active", {
 	can_dig = function() return true end,
 	on_destruct = furnace_on_destruct,
+})
+
+minetest.override_item("default:clay", {
+	drop = "default:clay",
+})
+
+minetest.register_craft({
+	type = "cooking",
+	output = "default:brick",
+	recipe = "default:clay",
 })
 
 minetest.register_on_mods_loaded(function()

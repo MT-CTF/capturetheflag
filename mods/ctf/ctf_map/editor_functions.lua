@@ -1,4 +1,7 @@
 local getpos_players = {}
+
+local S = minetest.get_translator(minetest.get_current_modname())
+
 function ctf_map.get_pos_from_player(name, amount, donefunc)
 	getpos_players[name] = {amount = amount, func = donefunc, positions = {}}
 
@@ -11,7 +14,7 @@ function ctf_map.get_pos_from_player(name, amount, donefunc)
 	end
 
 	minetest.chat_send_player(name, minetest.colorize(ctf_map.CHAT_COLOR,
-			"Please punch a node or run `/ctf_map here` to supply coordinates"))
+			S("Please punch a node or run `/ctf_map here` to supply coordinates")))
 end
 
 local function add_position(player, pos)
@@ -19,7 +22,7 @@ local function add_position(player, pos)
 
 	table.insert(getpos_players[player].positions, pos)
 	minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
-			"Got pos "..minetest.pos_to_string(pos, 1)))
+			S("Got pos") .. " " ..minetest.pos_to_string(pos, 1)))
 
 	if getpos_players[player].place_markers then
 		if #getpos_players[player].positions == 1 then
@@ -35,7 +38,7 @@ local function add_position(player, pos)
 		getpos_players[player].amount = getpos_players[player].amount - 1
 	else
 		minetest.chat_send_player(player, minetest.colorize(ctf_map.CHAT_COLOR,
-				"Done getting positions!"))
+				S("Done getting positions!")))
 		getpos_players[player].func(player, getpos_players[player].positions)
 		getpos_players[player] = nil
 	end
@@ -49,7 +52,7 @@ ctf_map.register_map_command("here", function(name, params)
 			add_position(name, player:get_pos())
 			return true
 		else
-			return false, "You aren't doing anything that requires coordinates"
+			return false, S("You aren't doing anything that requires coordinates")
 		end
 	end
 end)

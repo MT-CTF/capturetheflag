@@ -1,9 +1,11 @@
+local cooldown = ctf_core.init_cooldowns()
+
 local function get_item_description(name)
 	if name:sub(1, 6) == "group:" then
 		local group = name:sub(7, #name):gsub("%_", " ")
 		return "Any " .. group
 	else
-		local def = minetest.registered_items[name] or {}
+		local def = core.registered_items[name] or {}
 		return def.description or name
 	end
 end
@@ -55,22 +57,22 @@ function crafting.make_result_selector(player, size, context)
 	table_insert(formspec, "style_type[item_image_button;border=false]")
 
 	table_insert(formspec, "field_close_on_enter[query;false]")
-	table_insert(formspec, "field[-4.75,0.81;3,0.8;query;;")
+	table_insert(formspec, "field[-4.75,1.21;3,0.8;query;;")
 	table_insert(formspec, context.crafting_query)
-	table_insert(formspec, "]button[-2.2,0.5;0.8,0.8;search;?]")
-	table_insert(formspec, "button[-1.4,0.5;0.8,0.8;prev;<]")
-	table_insert(formspec, "button[-0.8,0.5;0.8,0.8;next;>]")
+	table_insert(formspec, "]image_button[-2.2,0.9;0.8,0.8;crafting_search_icon.png;search;]")
+	table_insert(formspec, "image_button[-1.4,0.9;0.8,0.8;crafting_prev_icon.png;prev;]")
+	table_insert(formspec, "image_button[-0.8,0.9;0.8,0.8;crafting_next_icon.png;next;]")
 
 	table_insert(formspec, "container_end[]")
 
-	table_insert(formspec, "label[0,-0.25;")
-	table_insert(formspec, minetest.formspec_escape(
+	table_insert(formspec, "label[0,-0.1;")
+	table_insert(formspec, core.formspec_escape(
 		"Page: " .. page .. "/" .. max_pages)
 	)
 	table_insert(formspec, "]")
 
 	local x = 0
-	local y = 0
+	local y = 0.3
 	local y_offset = 0.2
 	for i = start_i, math.min(#recipes, start_i * num_per_page)  do
 		local result = recipes[i]
@@ -92,18 +94,18 @@ function crafting.make_result_selector(player, size, context)
 		table_insert(formspec, "tooltip[result_")
 		table_insert(formspec, tostring(recipe.id))
 		table_insert(formspec, ";")
-		table_insert(formspec, minetest.formspec_escape(item_description .. "\n"))
+		table_insert(formspec, core.formspec_escape(item_description .. "\n"))
 		for _, item in ipairs(result.items) do
 			local color = item.have >= item.need and "#6f6" or "#f66"
 			local itemtab = {
 				"\n",
-				minetest.get_color_escape_sequence(color),
+				core.get_color_escape_sequence(color),
 				get_item_description(item.name), ": ",
 				item.have, "/", item.need
 			}
-			table_insert(formspec, minetest.formspec_escape(table.concat(itemtab, "")))
+			table_insert(formspec, core.formspec_escape(table.concat(itemtab, "")))
 		end
-		table_insert(formspec, minetest.get_color_escape_sequence("#ffffff"))
+		table_insert(formspec, core.get_color_escape_sequence("#ffffff"))
 		table_insert(formspec, "]")
 
 		table_insert(formspec, "image[")
@@ -150,7 +152,7 @@ function crafting.result_select_on_receive_results(player, context, fields)
 	elseif fields.next then
 		context.crafting_page = (context.crafting_page or 1) + 1
 		return true
-	elseif fields.search or fields.key_enter_field == "query" then
+	elseif fields.search or fields.key_enter_field == "query" and fields.query then
 		context.crafting_query = fields.query:trim():lower()
 		context.crafting_page  = 1
 		if context.crafting_query == "" then
@@ -163,16 +165,15 @@ function crafting.result_select_on_receive_results(player, context, fields)
 		if key:sub(1, 7) == "result_" then
 			local num = string.match(key, "result_([0-9]+)")
 			if num then
-				local inv    = player:get_inventory()
 				local recipe = crafting.get_recipe(tonumber(num))
 				local name   = player:get_player_name()
 				if not crafting.can_craft(name, recipe) then
-					minetest.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
+					core.log("error", "[crafting] Player clicked a button they shouldn't have been able to")
 					return true
 				elseif crafting.perform_craft(player, "main", "main", recipe) then
 					return true -- crafted
 				else
-					minetest.chat_send_player(name, "Missing required items!")
+					core.chat_send_player(name, "Missing required items!")
 					return false
 				end
 			end
@@ -180,10 +181,10 @@ function crafting.result_select_on_receive_results(player, context, fields)
 	end
 end
 
-if minetest.global_exists("sfinv") then
+if core.global_exists("sfinv") then
 	local player_inv_hashes = {}
 
-	local trash = minetest.create_detached_inventory("crafting_trash", {
+	local trash = core.create_detached_inventory("crafting_trash", {
 		-- Allow the stack to be placed and remove it in on_put()
 		-- This allows the creative inventory to restore the stack
 		allow_put = function(inv, listname, index, stack, player)
@@ -201,8 +202,11 @@ if minetest.global_exists("sfinv") then
 				crafting.calc_inventory_list_hash(player:get_inventory(), "main")
 
 			local formspec = crafting.make_result_selector(player, { x = 8, y = 3 }, context)
-			formspec = formspec .. "list[detached:crafting_trash;main;0,3.4;1,1;]" ..
-				"image[0.05,3.5;0.8,0.8;crafting_trash_icon.png]"
+			formspec = formspec .. "list[detached:crafting_trash;main;0,3.8;1,1;]" ..
+				"image[0.07,3.9;0.8,0.8;crafting_trash_icon.png]" ..
+				"image_button[1,3.8;1,1;crafting_save_icon.png;save_inv_order;]" ..
+				"tooltip[save_inv_order;Saves the order of the items in your inventory" ..
+					"\n(Your saved order is used when you respawn, and is per-mode)]"
 
 			return sfinv.make_formspec(player, context, formspec, true)
 		end,
@@ -210,18 +214,28 @@ if minetest.global_exists("sfinv") then
 			if crafting.result_select_on_receive_results(player, context, fields) then
 				sfinv.set_player_inventory_formspec(player)
 			end
+
+			if fields.save_inv_order and not cooldown:get(player) then
+				cooldown:set(player, 0.5)
+				ctf_modebase.player.save_initial_stuff_positions(player)
+
+				core.sound_play("crafting_save_sound", {
+					to_player = player:get_player_name(),
+				}, true)
+			end
+
 			return true
 		end
 	})
 
 	local globalstep_timer = 0
-	minetest.register_globalstep(function(dtime)
+	core.register_globalstep(function(dtime)
 		globalstep_timer = globalstep_timer + dtime
 		if globalstep_timer < 1 then return end
 
 		globalstep_timer = 0
 
-		for _, player in pairs(minetest.get_connected_players() or {}) do
+		for _, player in pairs(core.get_connected_players() or {}) do
 			if sfinv.get_or_create_context(player).page == "sfinv:crafting" then
 				local hash = crafting.calc_inventory_list_hash(player:get_inventory(), "main")
 				local old_hash = player_inv_hashes[player:get_player_name()]

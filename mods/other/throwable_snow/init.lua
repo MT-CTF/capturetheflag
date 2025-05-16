@@ -2,13 +2,20 @@ throwable_snow = {}
 local S = minetest.get_translator(minetest.get_current_modname())
 
 function throwable_snow.on_hit_player(thrower, player)
+	minetest.get_player_by_name(player):punch(
+		minetest.get_player_by_name(thrower),
+		2,
+		{ damage_groups = {snowball = 1, fleshy = 1} },
+		vector.new()
+	)
+
 	hud_events.new(player, {
 		text = S("@1 hit you with a snowball!", thrower),
 		quick = true,
 	})
 end
 
-grenades.register_grenade("throwable_snow:snowball", {
+local snowball_def = {
 	description = S("Snowball"),
 	image = "default_snowball.png",
 	range = 4,
@@ -44,7 +51,7 @@ grenades.register_grenade("throwable_snow:snowball", {
 	end,
 	on_collide = function(def, obj, name, moveresult)
 		for _, collision in ipairs(moveresult.collisions) do
-			if collision.type == "object" and collision.object:is_player() then
+			if collision.type == "object" and collision.object:is_player() and minetest.get_player_by_name(name) then
 				throwable_snow.on_hit_player(name, collision.object:get_player_name())
 			end
 		end
@@ -57,6 +64,11 @@ grenades.register_grenade("throwable_snow:snowball", {
 		glow = 1,
 		interval = 0.5,
 	}
-})
+}
+
+grenades.register_grenade("throwable_snow:snowball", table.copy(snowball_def))
+
+snowball_def.stack_max = -1
+grenades.register_grenade("throwable_snow:infinite_snowball", snowball_def)
 
 minetest.override_item("default:snow", {drop = "throwable_snow:snowball 2"})

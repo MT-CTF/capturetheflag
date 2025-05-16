@@ -1,0 +1,25 @@
+# textdomain: ctf_teams
+
+Allows advanced team management.=Permet de gérer les équipes
+@1 joined the game.=@1 a rejoint la partie.
+@1 left the game@2.=@1 a quitté la partie@2.
+(timed out)=(Session expirée)
+Team management commands=Commande permettant de gérer les équipes
+set <player> <team> | rset <match pattern> <team>=set <joueur> <équipe> | rset <modèle d'équipe> <équipe>
+No such team=Aucune équipe de ce nom
+Allocated @1 to team @2=@1 a été assigné à l'équipe @2
+No such player=Aucun joueur de ce nom
+Added the following players to team=Les joueurs suivants ont été affectés à l'équipe
+No player names matched the given regex, or all players that matched were locked to a team=Aucun nom de joueur ne correspond à l'expression régulière donnée, ou tous les joueurs correspondants sont déjà assignés à une équipe
+Team @1 has @2 players: @3=L'équipe @1 a @2 joueur(s): @3
+Get team members for 'team' or on which team is 'player' in=Affiche les membres de l'équipe 'équipe' ou vérifier l'équipe de 'joueur'
+<team> | player <player>=<équipe> | player <joueur>
+Player @1 is in team @2=Le joueur @1 est dans l'équipe @2
+@1 Team's Chest=Coffre de l'équipe @1
+You're not on team=Vous n'êtes pas dans une équipe
+You aren't allowed to access the team chest=Vous n'êtes pas autoriser à accéder au coffre d'équipe
+Pro players only=Joueurs pro seulement
+You aren't allowed to access the pro section=Vous n'êtes pas autoriser à accéder à la section pro
+Team Door=Porte d'équipe
+You can only place team doors in your own territory!=Les portes d'équipe ne peuvent être placées que dans votre territoire!
+Steel Team Door=Porte d'équipe en acier

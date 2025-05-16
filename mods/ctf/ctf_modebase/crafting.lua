@@ -85,6 +85,13 @@ crafting.register_recipe({
 	always_known = true,
 })
 
+-- Stone Brick x4
+crafting.register_recipe({
+	output = "default:stonebrick 4",
+	items  = { "default:stone 4" },
+	always_known = true,
+})
+
 -- Wood x4
 crafting.register_recipe({
 	output = "default:wood 4",
@@ -134,6 +141,13 @@ crafting.register_recipe({
 	always_known = false,
 })
 
+-- Coal Lumps x4
+crafting.register_recipe({
+	output = "default:coal_lump 4",
+	items = { "default:coalblock" },
+	always_known = false,
+})
+
 -- Shovels and Axes
 for ore, ore_item in pairs(full_ores) do
 	local show = true
@@ -163,13 +177,19 @@ crafting.register_recipe({
 })
 
 crafting.register_recipe({
-	output = "ctf_map:damage_cobble",
-	items = { "ctf_map:unwalkable_cobble", "ctf_map:spike" },
+	output = "ctf_map:damage_cobble 5",
+	items = { "default:cobble 5", "ctf_map:spike" },
 	always_known = false,
 })
 
 crafting.register_recipe({
 	output = "ctf_map:reinforced_cobble 2",
 	items  = { "default:cobble 6", "default:steel_ingot" },
+	always_known = false,
+})
+
+crafting.register_recipe({
+	output = "ctf_landmine:landmine",
+	items  = { "default:steel_ingot 4", "default:coal_lump 6" },
 	always_known = false,
 })

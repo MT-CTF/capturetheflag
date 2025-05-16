@@ -1,4 +1,14 @@
-local rankings = ctf_rankings.init()
+local RANKLIST = {
+	_sort = "score",
+	"score",
+	"flag_captures", "flag_attempts",
+	"kills", "kill_assists", "bounty_kills",
+	"deaths",
+	"hp_healed",
+	"reward_given_to_enemy"
+}
+
+local rankings = ctf_rankings:init(RANKLIST)
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
@@ -32,18 +42,11 @@ ctf_modebase.register_mode("classic", {
 		["grenades:smoke"] = {rarity = 0.2, max_stacks = 2},
 	},
 	crafts = {"ctf_ranged:ammo", "ctf_melee:sword_steel", "ctf_melee:sword_mese", "ctf_melee:sword_diamond"},
-	physics = {sneak_glitch = true, new_move = false},
+	physics = {sneak_glitch = true, new_move = true},
 	team_chest_items = {"default:cobble 99", "default:wood 99", "default:torch 30", "ctf_teams:door_steel 2"},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
-	summary_ranks = {
-		_sort = "score",
-		"score",
-		"flag_captures", "flag_attempts",
-		"kills", "kill_assists", "bounty_kills",
-		"deaths",
-		"hp_healed"
-	},
+	summary_ranks = RANKLIST,
 
 	stuff_provider = function()
 		return {"default:sword_stone", "default:pick_stone", "default:torch 15", "default:stick 5"}

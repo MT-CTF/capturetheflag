@@ -1985,8 +1985,8 @@ minetest.register_node("default:sand_with_kelp", {
 
 	on_place = function(itemstack, placer, pointed_thing)
 		-- Call on_rightclick if the pointed node defines it
-		if pointed_thing.type == "node" and placer and
-				not placer:get_player_control().sneak then
+		if pointed_thing.type == "node" and not (placer and placer:is_player()
+				and placer:get_player_control().sneak) then
 			local node_ptu = minetest.get_node(pointed_thing.under)
 			local def_ptu = minetest.registered_nodes[node_ptu.name]
 			if def_ptu and def_ptu.on_rightclick then
@@ -2024,7 +2024,7 @@ minetest.register_node("default:sand_with_kelp", {
 		return itemstack
 	end,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:sand"})
 	end
 })
@@ -2035,19 +2035,20 @@ minetest.register_node("default:sand_with_kelp", {
 --
 
 local function coral_on_place(itemstack, placer, pointed_thing)
-	if pointed_thing.type ~= "node" or not placer then
+	if pointed_thing.type ~= "node" then
 		return itemstack
 	end
 
-	local player_name = placer:get_player_name()
+	local player_name = placer and placer:get_player_name()
 	local pos_under = pointed_thing.under
 	local pos_above = pointed_thing.above
 	local node_under = minetest.get_node(pos_under)
 	local def_under = minetest.registered_nodes[node_under.name]
 
-	if def_under and def_under.on_rightclick and not placer:get_player_control().sneak then
+	if def_under and def_under.on_rightclick and not (
+		placer and placer:is_player() and placer:get_player_control().sneak) then
 		return def_under.on_rightclick(pos_under, node_under,
-				placer, itemstack, pointed_thing) or itemstack
+				placer, itemstack, pointed_thing)
 	end
 
 	if node_under.name ~= "default:coral_skeleton" or
@@ -2057,9 +2058,6 @@ local function coral_on_place(itemstack, placer, pointed_thing)
 
 	if minetest.is_protected(pos_under, player_name) or
 			minetest.is_protected(pos_above, player_name) then
-		default.log_player_action(placer,
-			"tried to place", itemstack:get_name(),
-			"at protected position", pos_under)
 		minetest.record_protection_violation(pos_under, player_name)
 		return itemstack
 	end
@@ -2099,7 +2097,7 @@ minetest.register_node("default:coral_green", {
 
 	on_place = coral_on_place,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:coral_skeleton"})
 	end,
 })
@@ -2130,7 +2128,7 @@ minetest.register_node("default:coral_pink", {
 
 	on_place = coral_on_place,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:coral_skeleton"})
 	end,
 })
@@ -2161,7 +2159,7 @@ minetest.register_node("default:coral_cyan", {
 
 	on_place = coral_on_place,
 
-	after_destruct  = function(pos, oldnode)
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		minetest.set_node(pos, {name = "default:coral_skeleton"})
 	end,
 })
@@ -2549,6 +2547,15 @@ local default_bookshelf_def = {
 		end
 		return 0
 	end,
+	on_metadata_inventory_put = function(pos)
+		update_bookshelf(pos)
+	end,
+	on_metadata_inventory_take = function(pos)
+		update_bookshelf(pos)
+	end,
+	on_metadata_inventory_move = function(pos)
+		update_bookshelf(pos)
+	end,
 	on_blast = function(pos)
 		local drops = {}
 		default.get_inventory_drops(pos, "books", drops)
@@ -2597,12 +2604,12 @@ local function register_sign(material, desc, def)
 			if not text then
 				return
 			end
-			if string.len(text) > 512 then
+			if #text > 512 then
 				minetest.chat_send_player(player_name, S("Text too long"))
 				return
 			end
-			default.log_player_action(sender, "wrote \"" .. text ..
-				"\" to the sign at", pos)
+			text = text:gsub("[%z-\8\11-\31\127]", "") -- strip naughty control characters (keeps \t and \n)
+			default.log_player_action(sender, ("wrote %q to the sign at"):format(text), pos)
 			local meta = minetest.get_meta(pos)
 			meta:set_string("text", text)
 

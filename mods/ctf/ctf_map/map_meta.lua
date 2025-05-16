@@ -1,5 +1,11 @@
-local CURRENT_MAP_VERSION = "2"
-local modname = minetest.get_current_modname();
+local CURRENT_MAP_VERSION = "3"
+
+local modname = minetest.get_current_modname()
+
+local IS_RUNTIME = true
+minetest.after(0, function()
+	IS_RUNTIME = false
+end)
 
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
@@ -25,18 +31,20 @@ local function calc_flag_center(map)
 end
 
 function ctf_map.load_map_meta(idx, dirname)
-	local meta = Settings(ctf_map.maps_dir .. dirname .. "/map.conf")
+	assert(ctf_map.map_path[dirname], "Map "..dirname.." not found")
+
+	local meta = Settings(ctf_map.map_path[dirname] .. "/map.conf")
 
 	if not meta then error("Map '"..dump(dirname).."' not found") end
 
 	minetest.log("info", "load_map_meta: Loading map meta from '" .. dirname .. "/map.conf'")
 
 	local map
-	local offset = vector.new(600 * idx, 0, 0)
+	local offset = vector.new(608 * idx, 0, 0) -- 608 is a multiple of 16, the size of a mapblock
 
 	if not meta:get("map_version") then
 		if not meta:get("r") then
-			error("Map was not properly configured: " .. ctf_map.maps_dir .. dirname .. "/map.conf")
+			error("Map was not properly configured: " .. ctf_map.map_path[dirname] .. "/map.conf")
 		end
 
 		local mapr = meta:get("r")
@@ -76,7 +84,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			phys_gravity  = tonumber(meta:get("phys_gravity")),
 			chests        = {},
 			teams         = {},
-			barrier_area  = {pos1 = pos1, pos2 = pos2}
+			barrier_area  = {pos1 = pos1, pos2 = pos2},
 		}
 
 		-- Read teams from config
@@ -123,7 +131,7 @@ function ctf_map.load_map_meta(idx, dirname)
 				amount = ctf_map.DEFAULT_CHEST_AMOUNT,
 			}
 		end
-	elseif meta:get("map_version") == CURRENT_MAP_VERSION then
+	else
 		-- If new items are added also remember to change the table in mapedit_gui.lua
 		-- The version number should be updated if you change an item
 		local size = minetest.deserialize(meta:get("size"))
@@ -131,7 +139,7 @@ function ctf_map.load_map_meta(idx, dirname)
 		offset.y = -size.y/2
 
 		map = {
-			map_version    = CURRENT_MAP_VERSION,
+			map_version    = tonumber(meta:get("map_version") or "0"),
 			pos1           = offset,
 			pos2           = vector.add(offset, size),
 			offset         = offset,
@@ -180,8 +188,30 @@ function ctf_map.load_map_meta(idx, dirname)
 
 	map.flag_center = calc_flag_center(map)
 
-	if ctf_map.skybox_exists(ctf_map.maps_dir .. dirname) then
+	for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname], false)) do
+		if e:match("%.png") then
+			if core.features.dynamic_add_media_startup then
+				minetest.dynamic_add_media({
+					filename = dirname .. "_" .. e,
+					filepath = ctf_map.map_path[dirname] .. "/" .. e
+				}, not IS_RUNTIME and function() end or nil)
+			end
+		end
+	end
+
+	if ctf_map.skybox_exists(ctf_map.map_path[dirname]) then
 		skybox.add({dirname, "#ffffff", [5] = "png"})
+
+		for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname] .. "/skybox/", false)) do
+			if e:match("%.png") then
+				if core.features.dynamic_add_media_startup then
+					minetest.dynamic_add_media({
+						filename = dirname .. e,
+						filepath = ctf_map.map_path[dirname] .. "/skybox/" .. e
+					}, not IS_RUNTIME and function() end or nil)
+				end
+			end
+		end
 
 		map.skybox = dirname
 		map.skybox_forced = true
@@ -217,11 +247,12 @@ function ctf_map.save_map(mapmeta)
 		if not def.enabled then
 			mapmeta.teams[id] = nil
 		else
+			minetest.load_area(def.flag_pos)
 			local flagpos = minetest.find_node_near(def.flag_pos, 3, {"group:flag_bottom"}, true)
 
 			if not flagpos then
 				flagpos = def.flag_pos
-				minetest.chat_send_all(minetest.colorize("red",
+				minetest.chat_send_all(minetest.colorize((minetest.get_node(flagpos).name == "ignore") and "orange" or "red",
 					"Failed to find flag for team " .. id ..
 					". Node at given position: " .. dump(minetest.get_node(flagpos).name)
 				))
@@ -237,8 +268,8 @@ function ctf_map.save_map(mapmeta)
 		end
 	end
 
-	mapmeta.barrier_area.pos1 = vector.subtract(mapmeta.barrier_area.pos1, mapmeta.offset)
-	mapmeta.barrier_area.pos2 = vector.subtract(mapmeta.barrier_area.pos2, mapmeta.offset)
+	local pos1, pos2 = mapmeta.pos1:copy(), mapmeta.pos2:copy()
+	local barrier_area = {pos1 = pos1:subtract(mapmeta.offset), pos2 = pos2:subtract(mapmeta.offset)}
 
 	meta:set("map_version"   , CURRENT_MAP_VERSION)
 	meta:set("size"          , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))
@@ -258,21 +289,19 @@ function ctf_map.save_map(mapmeta)
 	meta:set("phys_gravity"  , mapmeta.phys_gravity)
 	meta:set("chests"        , minetest.serialize(mapmeta.chests))
 	meta:set("teams"         , minetest.serialize(mapmeta.teams))
-	meta:set("barrier_area"  , minetest.serialize(mapmeta.barrier_area))
+	meta:set("barrier_area"  , minetest.serialize(barrier_area))
 	meta:set("game_modes"    , minetest.serialize(mapmeta.game_modes))
 	meta:set("enable_shadows", mapmeta.enable_shadows)
 
 	meta:write()
 
-	minetest.after(0.1, function()
-		local filepath = path .. "map.mts"
-		if minetest.create_schematic(mapmeta.pos1, mapmeta.pos2, nil, filepath) then
-			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
-			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
-									"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
-									"start a normal ctf game, and run \"/ctf_next "..mapmeta.dirname.."\" then \"/ctf_skip\""));
-		else
-			minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
-		end
-	end)
+	local filepath = path .. "map.mts"
+	if minetest.create_schematic(mapmeta.pos1, mapmeta.pos2, nil, filepath) then
+		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Saved Map '" .. mapmeta.name .. "' to " .. path))
+		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR,
+								"To play, move it to \""..minetest.get_modpath(modname).."/maps/"..mapmeta.dirname..", "..
+								"start a normal ctf game, and run \"/ctf_next -f "..mapmeta.dirname.."\""));
+	else
+		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
+	end
 end

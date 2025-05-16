@@ -1,10 +1,11 @@
+local S = minetest.get_translator(minetest.get_current_modname())
 
 local function remove_flora(pos, radius)
 	local pos1 = vector.subtract(pos, radius)
 	local pos2 = vector.add(pos, radius)
 
 	for _, p in ipairs(minetest.find_nodes_in_area(pos1, pos2, {
-		"group:flora", "group:mushroom", "default:snow"
+		"group:flora", "group:mushroom", "default:snow", "group:grenade_breakable"
 	})) do
 		if vector.distance(pos, p) <= radius then
 			minetest.remove_node(p)
@@ -43,7 +44,7 @@ local function check_hit(pos1, pos2, obj)
 end
 
 local fragdef = {
-	description = "Frag grenade (Kills anyone near blast)",
+	description = S("Frag grenade (Kills anyone near blast)"),
 	image = "grenades_frag.png",
 	explode_radius = 10,
 	explode_damage = 26,
@@ -132,7 +133,7 @@ local fragdef = {
 grenades.register_grenade("grenades:frag", fragdef)
 
 local fragdef_sticky = table.copy(fragdef)
-fragdef_sticky.description = "Sticky Frag grenade (Sticks to surfaces)"
+fragdef_sticky.description = S("Sticky Frag grenade (Sticks to surfaces)")
 fragdef_sticky.image = "grenades_frag_sticky.png"
 fragdef_sticky.on_collide = function()
 	return
@@ -161,11 +162,18 @@ local register_smoke_grenade = function(name, description, image, damage)
 
 			if pteam then
 				for flagteam, team in pairs(ctf_map.current_map.teams) do
-					if team.flag_pos then
+					if not ctf_modebase.flag_captured[flagteam] and team.flag_pos then
 						local distance_from_flag = vector.distance(pos, team.flag_pos)
 						if distance_from_flag <= 15 and (damage or pteam == flagteam) then
-							minetest.chat_send_player(pname, "You can't explode smoke grenades so close to a flag!")
-							player:get_inventory():add_item("main", "grenades:"..name)
+							minetest.chat_send_player(pname, S("You can't explode smoke grenades so close to a flag!"))
+							if player:get_hp() <= 0 then
+								-- Drop the nade at its explode point if the thrower is dead
+								-- Fixes https://github.com/MT-CTF/capturetheflag/issues/1160
+								minetest.add_item(pos, ItemStack("grenades:"..name))
+							else
+								-- Add the nade back into the thrower's inventory
+								player:get_inventory():add_item("main", "grenades:"..name)
+							end
 							return
 						elseif damage and distance_from_flag <= 26 then
 							duration_multiplier = 0.5
@@ -198,9 +206,10 @@ local register_smoke_grenade = function(name, description, image, damage)
 								local dname = target:get_player_name()
 								local dteam = ctf_teams.get(dname)
 								if dname ~= pname and dteam ~= pteam then
-									target:punch(thrower, 10, {
+									target:punch(thrower, 1, {
 										damage_groups = {
-											fleshy = 1,
+											fleshy = 2,
+											grenade = 1,
 											poison_grenade = 1,
 										}
 									})
@@ -263,13 +272,13 @@ end
 
 register_smoke_grenade(
 	"smoke",
-	"Smoke grenade (Generates smoke around blast site)",
+	S("Smoke grenade (Generates smoke around blast site)"),
 	"grenades_smoke_grenade.png",
 	false
 )
 register_smoke_grenade(
 	"poison",
-	"Poison grenade (Generates poisonous smoke around blast site)",
+	S("Poison grenade (Generates poisonous smoke around blast site)"),
 	"grenades_smoke_grenade.png^[multiply:#00ff00",
 	true
 )

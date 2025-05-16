@@ -1,6 +1,14 @@
+--- @type false | string
 local restart_on_next_match = false
+
 ctf_modebase.map_on_next_match = nil
 ctf_modebase.mode_on_next_match = nil
+
+local S = minetest.get_translator(minetest.get_current_modname())
+
+-- Overridable
+function ctf_modebase.map_chosen(map)
+end
 
 function ctf_modebase.start_match_after_vote()
 	local old_mode = ctf_modebase.current_mode
@@ -20,20 +28,44 @@ function ctf_modebase.start_match_after_vote()
 	end
 
 	local map = ctf_modebase.map_catalog.maps[ctf_modebase.map_catalog.current_map]
+
+	ctf_modebase.map_chosen(map)
+
 	ctf_map.place_map(map, function()
 		-- Set time and time_speed
 		minetest.set_timeofday(map.start_time/24000)
 		minetest.settings:set("time_speed", map.time_speed * 72)
 
 		ctf_map.announce_map(map)
-		ctf_modebase.announce(string.format("New match: %s map, %s mode", map.name, HumanReadable(ctf_modebase.current_mode)))
+		ctf_modebase.announce(("New match: %s map by %s, %s mode"):format(
+			map.name,
+			map.author,
+			HumanReadable(ctf_modebase.current_mode))
+		)
 
 		ctf_modebase.on_new_match()
 
 		ctf_modebase.in_game = true
-		ctf_teams.allocate_teams(ctf_map.current_map.teams)
+		local team_alloc = ctf_modebase:get_current_mode().allocate_teams
+
+		if team_alloc then
+			team_alloc(ctf_map.current_map.teams)
+		else
+			ctf_teams.allocate_teams(ctf_map.current_map.teams)
+		end
 
 		ctf_modebase.current_mode_matches_played = ctf_modebase.current_mode_matches_played + 1
+
+		local current_map = ctf_map.current_map
+		local current_mode = ctf_modebase.current_mode
+
+		if table.indexof(current_map.game_modes, current_mode) == -1 then
+			local concat = "The current mode is not in the list of modes supported by the current map."
+			local cmd_text = string.format("/ctf_next -f [mode:technical modename] %s", current_map.dirname)
+			minetest.chat_send_all(minetest.colorize(
+				"red", string.format("%s\nSupported mode(s): %s. To switch to a mode set for the map, do %s",
+				concat, table.concat(current_map.game_modes, ", "), cmd_text)))
+		end
 	end)
 end
 
@@ -41,16 +73,22 @@ local function start_new_match()
 	local path = minetest.get_worldpath() .. "/queue_restart.txt"
 	if ctf_core.file_exists(path) then
 		os.remove(path)
-		restart_on_next_match = true
+		restart_on_next_match = ""
 	end
 
-	ctf_modebase.in_game = false
-	ctf_modebase.on_match_end()
+	if ctf_modebase.in_game then
+		ctf_modebase.in_game = false
+		ctf_modebase.on_match_end()
+	end
 
 	if restart_on_next_match then
-		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server restarting in 5 seconds..."))
+		minetest.chat_send_all(minetest.colorize("red",
+			S("[NOTICE] Server restarting in 5 seconds")..restart_on_next_match.."..."
+		))
+
 		minetest.request_shutdown(
-			"Restarting server at imperator request.\n\nTip: Count to 15 before clicking reconnect",
+			S("Restarting server at imperator request.") ..
+			"\n\n" .. S("Tip: Count to 15 before clicking reconnect"),
 			true, 5
 		)
 
@@ -81,9 +119,9 @@ function ctf_modebase.start_new_match(delay)
 end
 
 minetest.register_chatcommand("ctf_next", {
-	description = "Set a new map and mode",
+	description = S("Set a new map and mode"),
 	privs = {ctf_admin = true},
-	params = "[-f] [mode:technical modename] [technical mapname]",
+	params = S("[-f] [mode:technical modename] [technical mapname]"),
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_next %s", name, param))
 
@@ -99,20 +137,20 @@ minetest.register_chatcommand("ctf_next", {
 		end
 
 		if force and not ctf_modebase.in_game then
-			return false, "Map switching is in progress"
+			return false, S("Map switching is in progress")
 		end
 
 		local map, mode = ctf_modebase.match_mode(param)
 
 		if mode then
 			if not ctf_modebase.modes[mode] then
-				return false, "No such game mode: " .. mode
+				return false, S("No such game mode")..": ".. mode
 			end
 		end
 
 		if map then
 			if not ctf_modebase.map_catalog.map_dirnames[map] then
-				return false, "No such map: " .. map
+				return false, S("No such map")..": ".. map
 			end
 		end
 
@@ -122,44 +160,47 @@ minetest.register_chatcommand("ctf_next", {
 		if force then
 			ctf_modebase.start_new_match()
 
-			return true, "Skipping match..."
+			return true, S("Skipping match").."..."
 		else
-			return true, "The next map and mode are queued"
+			return true, S("The next map and mode are queued")
 		end
 	end,
 })
 
 minetest.register_chatcommand("ctf_skip", {
-	description = "Skip to a new match",
+	description = S("Skip to a new match"),
 	privs = {ctf_admin = true},
 	func = function(name, param)
 		minetest.log("action", string.format("[ctf_admin] %s ran /ctf_skip", name))
 
 		if not ctf_modebase.in_game then
-			return false, "Map switching is in progress"
+			return false, S("Map switching is in progress")
 		end
 
 		ctf_modebase.start_new_match()
 
-		return true, "Skipping match..."
+		return true, S("Skipping match").."..."
 	end,
 })
 
 minetest.register_chatcommand("queue_restart", {
-	description = "Queue server restart",
+	description = S("Queue server restart"),
 	privs = {server = true},
 	func = function(name, param)
-		if not param then param = "" end
+		if not param or param == "" then param = false end
 
-		restart_on_next_match = true
-		minetest.log("action", string.format("[ctf_admin] %s queued a restart", name))
-		minetest.chat_send_all(minetest.colorize("red", "[NOTICE] Server will restart after this match is over. " .. param))
-		return true, "Restart is queued."
+		restart_on_next_match = param and (" ("..param..")") or ""
+
+		minetest.log("action", string.format("[ctf_admin] %s queued a restart. Reason: %s", name, restart_on_next_match))
+		minetest.chat_send_all(minetest.colorize("red",
+			S("[NOTICE] Server will restart after this match is over.").. restart_on_next_match
+		))
+		return true, S("Restart is queued").."."
 	end
 })
 
 minetest.register_chatcommand("unqueue_restart", {
-	description = "Unqueue server restart",
+	description = S("Unqueue server restart"),
 	privs = {server = true},
 	func = function(name, param)
 		if not param then param = "" end
@@ -168,8 +209,8 @@ minetest.register_chatcommand("unqueue_restart", {
 		minetest.log("action", string.format("[ctf_admin] %s un-queued a restart", name))
 
 		minetest.chat_send_all(minetest.colorize("red",
-			"[NOTICE] Restart cancelled. Server will NOT restart after this match. " .. param
+			S("[NOTICE] Restart cancelled. Server will NOT restart after this match.").." ".. param
 		))
-		return true, "Restart is cancelled."
+		return true, S("Restart is cancelled").."."
 	end
 })

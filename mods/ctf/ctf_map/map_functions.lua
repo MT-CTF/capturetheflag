@@ -1,7 +1,9 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
 function ctf_map.announce_map(map)
-	local msg = (minetest.colorize("#fcdb05", "Map: ") .. minetest.colorize("#f49200", map.name) ..
-	minetest.colorize("#fcdb05", " by ") .. minetest.colorize("#f49200", map.author))
-	if map.hint then
+	local msg = (minetest.colorize("#fcdb05", S("Map")) .. ": " .. minetest.colorize("#f49200", map.name) ..
+	minetest.colorize("#fcdb05", " " .. S("by")) .. " " .. minetest.colorize("#f49200", map.author))
+	if map.hint and map.hint ~= "" then
 		msg = msg .. "\n" .. minetest.colorize("#f49200", map.hint)
 	end
 	minetest.chat_send_all(msg)
@@ -9,22 +11,23 @@ end
 
 function ctf_map.place_map(mapmeta, callback)
 	local dirname = mapmeta.dirname
-	local schempath = ctf_map.maps_dir .. dirname .. "/map.mts"
+	local schempath = ctf_map.map_path[dirname] .. "/map.mts"
 
 	ctf_map.emerge_with_callbacks(nil, mapmeta.pos1, mapmeta.pos2, function(ctx)
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
-		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation)
+		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation, {["ctf_map:chest"] = "air"})
 
 		minetest.log("action", string.format(
-			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - ctx.start_time) / 1000000
+			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - ctx.start_time) / 1e6
 		))
 
 		for name, def in pairs(mapmeta.teams) do
 			local p = def.flag_pos
 
+			minetest.load_area(p)
 			local node = minetest.get_node(p)
 
-			if node.name ~= "ctf_modebase:flag" then
+			if node.name ~= "ignore" and node.name ~= "ctf_modebase:flag" then
 				minetest.log("error", name.."'s flag was set incorrectly, or there is no flag node placed")
 			else
 				minetest.set_node(vector.offset(p, 0, 1, 0), {name="ctf_modebase:flag_top_"..name, param2 = node.param2})
@@ -40,7 +43,7 @@ function ctf_map.place_map(mapmeta, callback)
 			end
 		end
 
-		minetest.after(0, minetest.fix_light, mapmeta.pos1, mapmeta.pos2)
+		minetest.fix_light(mapmeta.pos1, mapmeta.pos2)
 
 		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 
@@ -54,67 +57,64 @@ end
 --- VOXELMANIP FUNCTIONS
 --
 
--- Takes [mapmeta] or [pos1, pos2] arguments
-function ctf_map.remove_barrier(mapmeta, pos2, callback)
-	local pos1 = mapmeta
-
-	if type(pos2) == "function" then
-		callback = pos2
-		pos2 = nil
-	end
-
-	if not pos2 then
-		pos1, pos2 = mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2
-	end
-
-	local vm = VoxelManip()
-	pos1, pos2 = vm:read_from_map(pos1, pos2)
-
-	local data = vm:get_data()
-
-	-- Shave off ~0.1 seconds from the main loop
-	minetest.handle_async(function(d, p1, p2, barrier_nodes, t)
-		local Nx = p2.x - p1.x + 1
-		local Ny = p2.y - p1.y + 1
-		local ID_IGNORE = minetest.CONTENT_IGNORE
-		local ID_AIR = minetest.CONTENT_AIR
-
-		for z = p1.z, p2.z do
-			for y = p1.y, p2.y do
-				for x = p1.x, p2.x do
-					local vi = (z - p1.z) * Ny * Nx + (y - p1.y) * Nx + (x - p1.x) + 1
-					local done = false
-
-					for barriernode_id, replacement_id in pairs(barrier_nodes) do
-						if d[vi] == barriernode_id then
-							d[vi] = replacement_id
-							done = true
-							break
-						end
-					end
-
-					-- Liquid updates fail if I turn everything but changes into ignore
-					if not done and d[vi] == ID_AIR then
-						d[vi] = ID_IGNORE
-					end
-				end
-			end
-		end
-
-		return d
-	end, function(d)
-		vm:set_data(d)
-		vm:update_liquids()
-		vm:write_to_map(false)
-		callback()
-	end, data, pos1, pos2, ctf_map.barrier_nodes)
-end
-
-local ID_AIR = minetest.CONTENT_AIR
 local ID_IGNORE = minetest.CONTENT_IGNORE
-local ID_CHEST = minetest.get_content_id("ctf_map:chest")
+local ID_AIR = minetest.CONTENT_AIR
 local ID_WATER = minetest.get_content_id("default:water_source")
 
+---@param mapmeta table Map meta table
+---@param callback function
+function ctf_map.remove_barrier(mapmeta, callback)
+	local pos1, pos2 = vector.sort(mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2)
+
+	local target = pos2.y
+	pos2.y = pos1.y
+
+	local interval = 0
+	while pos2.y < target do
+		pos1.y = math.min(pos1.y, target-1)
+		pos2.y = math.min(pos1.y + 10, target)
+
+		minetest.after(0 + interval, function(p1, p2)
+			local vm = VoxelManip(p1, p2)
+			local data = vm:get_data()
+
+			for i, id in pairs(data) do
+				local done = false
+
+				for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
+					if id == barriernode_id then
+
+						data[i] = replacement_id
+						done = true
+						break
+					end
+				end
+
+				if not done then
+					data[i] = ID_IGNORE
+				end
+			end
+
+			vm:set_data(data)
+			vm:write_to_map(false)
+
+			if p2.y == target then
+				local liqvm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+				liqvm:update_liquids()
+				liqvm:update_map()
+			end
+		end, pos1:copy(), pos2:copy())
+
+		interval = interval + 0.5
+		pos1.y = pos1.y + 10
+	end
+
+	minetest.log("action", "Clearing barriers using mapmeta.barrier_area, will take around "..(interval).." seconds")
+	minetest.after(interval/2, callback)
+end
+
+
+local ID_CHEST = minetest.get_content_id("ctf_map:chest")
 local function get_place_positions(a, data, pos1, pos2)
 	if a.amount <= 0 then return {} end
 
@@ -180,8 +180,10 @@ local function prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nod
 	end
 
 	for _, team in ipairs(ctf_teams.teamlist) do
-		local node = "ctf_teams:chest_" .. team
-		nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+		if not ctf_teams.team[team].not_playing then
+			local node = "ctf_teams:chest_" .. team
+			nodes[minetest.get_content_id(node)] = minetest.registered_nodes[node]
+		end
 	end
 
 	for i, v in ipairs(data) do
@@ -225,7 +227,11 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 
 		if #place_positions < a.amount then
 			minetest.log("error",
-				string.format("[MAP] Couldn't place %d from %d chests from pos %d", a.amount - #place_positions, a.amount, i)
+				string.format("[MAP] Couldn't place %d of the %d chests needed to place in zone %d",
+					a.amount - #place_positions,
+					a.amount,
+					i
+				)
 			)
 		end
 	end
