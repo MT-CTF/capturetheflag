@@ -1,4 +1,14 @@
-local rankings = ctf_rankings:init()
+local RANKLIST = {
+	_sort = "score",
+	"score",
+	"flag_captures", "flag_attempts",
+	"kills", "kill_assists", "bounty_kills",
+	"deaths",
+	"hp_healed",
+	"reward_given_to_enemy"
+}
+
+local rankings = ctf_rankings:init(RANKLIST)
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
@@ -49,11 +59,12 @@ ctf_modebase.register_mode("nade_fight", {
 		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
 	},
 	crafts = {
-		"ctf_map:damage_cobble",
+		"ctf_map:damage_cobble 5",
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
 		"ctf_ranged:ammo",
 		"ctf_landmine:landmine",
+		"default:coal_lump 4",
 	},
 	physics = {sneak_glitch = true, new_move = true},
 	blacklisted_nodes = {"default:apple"},
@@ -63,15 +74,7 @@ ctf_modebase.register_mode("nade_fight", {
 	},
 	rankings = rankings,
 	recent_rankings = recent_rankings,
-	summary_ranks = {
-		_sort = "score",
-		"score",
-		"flag_captures", "flag_attempts",
-		"kills", "kill_assists", "bounty_kills",
-		"deaths",
-		"hp_healed",
-		"reward_given_to_enemy"
-	},
+	summary_ranks = RANKLIST,
 	build_timer = 60 * 2,
 
 	is_bound_item = function(_, name)

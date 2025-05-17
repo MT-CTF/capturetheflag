@@ -1,0 +1,9 @@
+# textdomain: ctf_report
+<msg>=<message>
+Report misconduct or bugs=Signale une mauvaise conduite ou un bug
+Please add a message to your report.=Veuillez ajouter un message à votre signalement.
+If it's about (a) particular player(s), please also include their name(s).=Si cela concerne un ou plusieurs joueurs en particulier, veuillez également inclure leur(s) nom(s).
+If you're reporting a player,=Si vous signalez un joueur,
+you should also include a reason why (e.g. swearing, griefing, spawnkilling, etc.).=Vous devez également préciser une raison (par exemple : insultes, griefing, spawnkilling, etc.).
+Report has been sent.=Le signalement a été envoyé.
+You are sending reports too fast. You only need to report things once=Vous envoyé des signalements trop rapidement. Veuillez signaler une seule fois

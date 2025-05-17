@@ -5,6 +5,8 @@ if not ctf_core.settings.server_mode or ctf_core.settings.server_mode == "play" 
 	)
 end
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 
 ctf_map = {
@@ -80,7 +82,8 @@ skybox.add = function(def, ...)
 end
 
 minetest.register_tool("ctf_map:adminpick", {
-	description = "Admin pickaxe used to break indestructible nodes.\nRightclick to remove non-indestructible nodes",
+	description = S("Admin pickaxe used to break indestructible nodes.")..
+		"\n"..S("Rightclick to remove non-indestructible nodes"),
 	inventory_image = "default_tool_diamondpick.png^default_obsidian_shard.png",
 	range = 16,
 	tool_capabilities = {
@@ -133,7 +136,7 @@ end
 
 
 minetest.register_chatcommand("ctf_map", {
-	description = "Run map related commands",
+	description = S("Run map related commands"),
 	privs = {ctf_map_editor = true},
 	params = "[editor | e] | "..table.concat(command_params, " | "),
 	func = function(name, params)
@@ -152,8 +155,8 @@ minetest.register_chatcommand("ctf_map", {
 
 			if ctf_core.settings.server_mode ~= "mapedit" then
 				minetest.chat_send_player(name,
-						minetest.colorize("red", "It is not recommended to edit maps unless the server is in mapedit mode\n"..
-							"To enable mapedit mode, enable creative mode."))
+						minetest.colorize("red", S("It is not recommended to edit maps unless the server is in mapedit mode").."\n"..
+							S("To enable mapedit mode, enable creative mode.")))
 			end
 
 			ctf_map.show_map_editor(name)
@@ -173,19 +176,19 @@ minetest.register_chatcommand("ctf_map", {
 })
 
 minetest.register_chatcommand("map", {
-	description = "Prints the current map name and map author",
+	description = S("Prints the current map name and map author"),
 	func = function()
 		local map = ctf_map.current_map
 
 		if not map then
-			return false, "There is no map currently in play"
+			return false, S("There is no map currently in play")
 		end
 
-		local mapName = map.name or "Unknown"
-		local mapAuthor = map.author or "Unknown Author"
+		local mapName = map.name or S("Unknown")
+		local mapAuthor = map.author or S("Unknown Author")
 		local mapDuration =  ctf_map.get_duration()
 
-		return true, string.format("The current map is %s by %s. Map duration: %s", mapName, mapAuthor, mapDuration)
+		return true, S("The current map is @1 by @2. Map duration: @3", mapName, mapAuthor, mapDuration)
 	end
 })
 
@@ -245,6 +248,10 @@ minetest.register_chatcommand("ctf_barrier", {
 								data[vi] = minetest.get_content_id("ctf_map:ind_water")
 							elseif data[vi] == minetest.get_content_id("default:lava_source") then
 								data[vi] = minetest.get_content_id("ctf_map:ind_lava")
+							elseif data[vi] == minetest.get_content_id("poison_water:poisonous_water") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_poison_water")
+							elseif data[vi] == minetest.get_content_id("default:river_water_source") then
+								data[vi] = minetest.get_content_id("ctf_map:ind_river_water")
 							end
 						elseif params == "remove_buildtime" then
 							if data[vi] == minetest.get_content_id("ctf_map:ind_glass_red") then
@@ -255,16 +262,24 @@ minetest.register_chatcommand("ctf_barrier", {
 								data[vi] = minetest.get_content_id("default:water_source")
 							elseif data[vi] == minetest.get_content_id("ctf_map:ind_lava") then
 								data[vi] = minetest.get_content_id("default:lava_source")
+							elseif data[vi] == minetest.get_content_id("ctf_map:ind_poison_water") then
+								data[vi] = minetest.get_content_id("poison_water:poisonous_water")
+							elseif data[vi] == minetest.get_content_id("ctf_map:ind_river_water") then
+								data[vi] = minetest.get_content_id("default:river_water_source")
 							end
 						elseif params == "place_outer" then
 							if x == pos1.x or x == pos2.x or y == pos1.y
 								or z == pos1.z or z == pos2.z then
-								if data[vi] == minetest.get_content_id("air") or
-									data[vi] == minetest.get_content_id("ignore") or
-									data[vi] == minetest.get_content_id("ctf_map:ignore") then
-									data[vi] = minetest.get_content_id("ctf_map:ind_glass")
-								else
-									data[vi] = minetest.get_content_id("ctf_map:stone")
+									local node = core.get_node({x = x, y = y, z = z})
+									local nodedef = minetest.registered_nodes[node.name]
+									local drawtype
+									if nodedef then
+										drawtype = nodedef.drawtype
+										end
+									if drawtype == "normal" or drawtype == "fencelike" or drawtype == "nodebox" then
+										data[vi] = minetest.get_content_id("ctf_map:stone")
+									else
+										data[vi] = minetest.get_content_id("ctf_map:ind_glass")
 								end
 							end
 						end

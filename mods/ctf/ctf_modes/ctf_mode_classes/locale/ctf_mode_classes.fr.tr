@@ -1,0 +1,27 @@
+# textdomain: ctf_mode_classes
+
+High HP class with a sword capable of short damage bursts=Classe avec beaucoup de PV, équipée d'une épée capable de causer des rafales de dégâts rapides.
+Helper class with healing bandages, an immunity ability, and building gear=Classe de soutien équipée de bandages de soin, d'une capacité d'immunité et d'un outil.
+Ranged class with a scoped rifle/grenade launcher and a scaling ladder for reaching high places=Classe à distance équipée d’un fusil à lunette/lance-grenades et d’une échelle extensible pour atteindre des endroits élevés.
+[Classes] Simple Knight sword activation=[Classes] Activation simple de l'épée knight
+If enabled you don't need to hold Sneak/Run to activate the rage ability=Si activé, vous n’avez pas besoin de maintenir Sneak/Courir pour activer la capacité rage
+[Classes] Simple Support bandage immunity activation=[Classes] Activation simple de l'immunité avec les bandages de soutien
+If enabled you don't need to hold Sneak/Run to activate the immunity ability=Si activé, vous n’avez pas besoin de maintenir Sneak/Courir pour activer la capacité d'immunité
+Knight Sword=Épée de knight
+(Sneak/Run) + Rightclick to use Rage ability (Lasts @1s, @2s cooldown)=(Sneak/Courir) + Clic-droit pour utiliser la capacité rage (Dure @1s, @2s de rechargement)
+You cannot activate special abilities during build time!=Vous ne pouvez activer les capacité spéciales lors du temps de construction!
+Scout Rifle=Fusil d'assaut de scout
+(Sneak/Run) + Rightclick to launch grenade (@1s cooldown), otherwise will toggle scope=(Sneak/Courir) + Clic-droit pour lancer une grenade (@1s de rechargement), sinon, cela activera ou désactivera la lunette
+Scaling Ladder=Échelle extensible
+(Infinite usage, self-removes after @1s)=(Utilisation illimitée, disparaît automatiquement après @1s)
+Bandage=Bandage
+Heals teammates for 4-5 HP until target's HP is equal to @1% of their maximum HP=Soigne un coéquipier de 3-4 PV jusqu'à ce que ses PV soient à @1% de ses PV maximum
+(Sneak/Run) + Rightclick to become immune to damage for @1s (@2s cooldown)=(Sneak/Courir) + Clic-droit pour devenir insensible aux dégâts pendant @1s (@2s de rechargement)
+You can't become immune while holding the flag=Vous ne pouvez pas devenir immunisé en tenant le drapeau
+You can only change class at your flag!=Vous ne pouvez changer de classe qu'à votre drapeau!
+Your class can't use that item!=Votre classe ne peut pas utiliser cet objet!
+Pillar digging went too far=Le creusage vertical est allé trop loin
+Pillar digging stopped on undiggable node=Le creusage vertical s'est arrêté sur un nœud impossible à creuser
+Pillar digging has nothing more to dig=Le creusage vertical n'a plus rien à creuser
+Rightclick bottom of pillar to dig it.=Cliquez droit en bas d'un pilier pour le creuser.
+Can't use during build time=Impossible à utiliser lors du temps de construction

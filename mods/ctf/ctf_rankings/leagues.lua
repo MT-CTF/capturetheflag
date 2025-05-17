@@ -71,7 +71,7 @@ minetest.register_on_joinplayer(function(player)
 	-- Maybe up to wood league?
 
 	-- for mode, def in pairs(ctf_modebase.modes) do
-	-- 	local place = def.rankings.top:get_place(pname)
+	-- 	local place = def.rankings:get_place(pname, "score")
 
 	-- 	for _, league in ipairs(ctf_rankings.leagues_list) do
 	-- 		if place <= ctf_rankings.leagues[league] then

@@ -7,6 +7,8 @@ local location = {
 
 local players = {}
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_item("wield3d:hand", {
 	type = "none",
 	wield_image = "blank.png",
@@ -83,11 +85,11 @@ minetest.register_on_leaveplayer(remove_wielditem)
 
 
 ctf_settings.register("use_old_wielditem_display", {
-	label = "Use old wielditem display",
+	label = S("Use old wielditem display"),
 	type = "bool",
 	default = "true",
-	description = "Will use Minetest's default method of showing the wielded item.\n" ..
-		"This won't show custom animations, but might be less jarring",
+	description = S("Will use Luanti's default method of showing the wielded item.") .. "\n" ..
+		S("This won't show custom animations, but might be less jarring"),
 	on_change = function(player, new_value)
 		remove_wielditem(player)
 		add_wielditem(player)

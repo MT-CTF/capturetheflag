@@ -6,6 +6,8 @@ ctf_settings = {
 local FORMSIZE = {x = 8, y = 9.4}
 local SCROLLBAR_W = 0.4
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.after(0, function()
 	table.sort(ctf_settings.settings_list, function(a, b) return a < b end)
 end)
@@ -62,7 +64,7 @@ end
 
 minetest.register_on_mods_loaded(function()
 	sfinv.register_page("ctf_settings:settings", {
-		title = "Settings",
+		title = S("Settings"),
 		get = function(self, player, context)
 			local setting_list = {}
 			local lastypos = -0.5
@@ -83,8 +85,10 @@ minetest.register_on_mods_loaded(function()
 				end
 
 				if settingdef.type == "bool" then
+					lastypos = lastypos + 0.2
+
 					setting_list[k] = {
-						"checkbox[0,%f;%s;%s;%s]tooltip[%s;%s]",
+						"checkbox[0.1,%f;%s;%s;%s]tooltip[%s;%s]",
 						lastypos,
 						setting,
 						settingdef.label or setting,
@@ -101,11 +105,11 @@ minetest.register_on_mods_loaded(function()
 						max_len = math.max(val:len(), max_len)
 					end
 
-					lastypos = lastypos + 0.3
+					lastypos = lastypos + 0.5
 					setting_list[k] = {
-						"dropdown[0,%f;%f;%s;%s;%d]tooltip[0,%f;%f,0.6;%s]",
+						"dropdown[0.1,%f;%f;%s;%s;%d]tooltip[0,%f;%f,0.6;%s]",
 						lastypos,
-						math.max(FORMSIZE.x / 2, math.min(FORMSIZE.x - SCROLLBAR_W + 2, 0.5 + (max_len * 0.23))),
+						math.min(FORMSIZE.x * 2/3, math.max(FORMSIZE.x - SCROLLBAR_W + 2, 0.5 + (max_len * 0.23))),
 						setting,
 						settingdef.list,
 						context.setting[setting],
@@ -114,13 +118,13 @@ minetest.register_on_mods_loaded(function()
 						(FORMSIZE.x/1.7) - 0.3,
 						settingdef.description or HumanReadable(setting),
 					}
-					lastypos = lastypos + 0.6
+					lastypos = lastypos + 0.5
 				elseif settingdef.type == "bar" then
-					lastypos = lastypos + 0.7
+					lastypos = lastypos + 0.9
 					setting_list[k] = {
-						"label[0,%f;%s: %d%%]"..
+						"label[0.1,%f;%s: %d%%]"..
 						"scrollbaroptions[min=%d;max=%d;smallstep=%d]"..
-						"scrollbar[0,%f;%f,0.4;horizontal;%s;%s]",
+						"scrollbar[0.1,%f;%f,0.4;horizontal;%s;%s]",
 						lastypos - 0.5,
 						settingdef.label or HumanReadable(setting),
 						(
@@ -144,11 +148,11 @@ minetest.register_on_mods_loaded(function()
 				{"box[-0.1,-0.1;%f,%f;#00000055]", FORMSIZE.x - SCROLLBAR_W, FORMSIZE.y},
 				{"scroll_container[-0.1,0.3;%f,%f;settings_scrollbar;vertical;0.1]",
 					FORMSIZE.x - SCROLLBAR_W + 2,
-					FORMSIZE.y + 0.7
+					FORMSIZE.y + 1
 				},
 				ctf_gui.list_to_formspec_str(setting_list),
 				"scroll_container_end[]",
-				make_scrollbaroptions_for_scroll_container(FORMSIZE.y + 0.7, math.max(lastypos+1, FORMSIZE.y + 0.7), 0.1),
+				make_scrollbaroptions_for_scroll_container(FORMSIZE.y-2, math.max(lastypos, FORMSIZE.y-2), 0.1),
 				{"scrollbar[%f,-0.1;%f,%f;vertical;settings_scrollbar;%f]",
 					FORMSIZE.x - SCROLLBAR_W,
 					SCROLLBAR_W,

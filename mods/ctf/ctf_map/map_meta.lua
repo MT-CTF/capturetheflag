@@ -1,7 +1,11 @@
 local CURRENT_MAP_VERSION = "3"
-local BARRIER_Y_SIZE = 16
 
 local modname = minetest.get_current_modname()
+
+local IS_RUNTIME = true
+minetest.after(0, function()
+	IS_RUNTIME = false
+end)
 
 function ctf_map.skybox_exists(subdir)
 	local list = minetest.get_dir_list(subdir, true)
@@ -24,43 +28,6 @@ local function calc_flag_center(map)
 	end)
 
 	return flag_center
-end
-
-local function connect_barriers_file(map_name, offset, barriers_filepath)
-	return function()
-		local f, err = io.open(barriers_filepath, "rb")
-
-		if (ctf_core.settings.server_mode ~= "mapedit" and assert(f, err)) or f then
-			local barriers = f:read("*all")
-
-			f:close()
-
-			assert(barriers and barriers ~= "")
-
-			barriers = minetest.deserialize(minetest.decompress(barriers, "deflate"))
-
-			if barriers then
-				for _, barrier_area in pairs(barriers) do
-					barrier_area.pos1 = vector.add(barrier_area.pos1, offset)
-					barrier_area.pos2 = vector.add(barrier_area.pos2, offset)
-
-					for i = 1, barrier_area.max do
-						if not barrier_area.reps[i] then
-							barrier_area.reps[i] = minetest.CONTENT_IGNORE
-						else
-							barrier_area.reps[i] = minetest.get_content_id(barrier_area.reps[i])
-						end
-					end
-				end
-
-				return barriers
-			else
-				minetest.log("error", "Map "..map_name.." has a corrupted barriers file. Re-save map to fix")
-			end
-		else
-			minetest.log("error", "Map "..map_name.." is missing its barriers file. Re-save map to fix")
-		end
-	end
 end
 
 function ctf_map.load_map_meta(idx, dirname)
@@ -118,7 +85,6 @@ function ctf_map.load_map_meta(idx, dirname)
 			chests        = {},
 			teams         = {},
 			barrier_area  = {pos1 = pos1, pos2 = pos2},
-			barriers = false,
 		}
 
 		-- Read teams from config
@@ -199,9 +165,6 @@ function ctf_map.load_map_meta(idx, dirname)
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
 			enable_shadows = tonumber(meta:get("enable_shadows") or "0.26"),
 		}
-		if tonumber(meta:get("map_version")) >= 3 and not ctf_core.settings.low_ram_mode then
-			map.barriers = connect_barriers_file(dirname, offset, ctf_map.map_path[dirname] .. "/barriers.data")
-		end
 
 		for id, def in pairs(map.chests) do
 			map.chests[id].pos1 = vector.add(offset, def.pos1)
@@ -225,8 +188,30 @@ function ctf_map.load_map_meta(idx, dirname)
 
 	map.flag_center = calc_flag_center(map)
 
+	for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname], false)) do
+		if e:match("%.png") then
+			if core.features.dynamic_add_media_startup then
+				minetest.dynamic_add_media({
+					filename = dirname .. "_" .. e,
+					filepath = ctf_map.map_path[dirname] .. "/" .. e
+				}, not IS_RUNTIME and function() end or nil)
+			end
+		end
+	end
+
 	if ctf_map.skybox_exists(ctf_map.map_path[dirname]) then
 		skybox.add({dirname, "#ffffff", [5] = "png"})
+
+		for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname] .. "/skybox/", false)) do
+			if e:match("%.png") then
+				if core.features.dynamic_add_media_startup then
+					minetest.dynamic_add_media({
+						filename = dirname .. e,
+						filepath = ctf_map.map_path[dirname] .. "/skybox/" .. e
+					}, not IS_RUNTIME and function() end or nil)
+				end
+			end
+		end
 
 		map.skybox = dirname
 		map.skybox_forced = true
@@ -283,63 +268,8 @@ function ctf_map.save_map(mapmeta)
 		end
 	end
 
-	-- Calculate where barriers are
-	local barriers = {}
 	local pos1, pos2 = mapmeta.pos1:copy(), mapmeta.pos2:copy()
 	local barrier_area = {pos1 = pos1:subtract(mapmeta.offset), pos2 = pos2:subtract(mapmeta.offset)}
-
-	if pos1.y > pos2.y then
-		local t = pos2
-		pos2 = pos1
-		pos1 = t
-	end
-
-	if pos1.y + BARRIER_Y_SIZE < pos2.y then
-		pos2.y = pos1.y + BARRIER_Y_SIZE
-	end
-
-	local queue_break = false
-	while true do
-		local tmp = {
-			-- pos1 = pos1
-			-- pos2 = pos2
-			-- max = #data
-			reps = {}
-		}
-		local vm = VoxelManip()
-		pos1, pos2 = vm:read_from_map(pos1, pos2)
-		tmp.pos1, tmp.pos2 = pos1:subtract(mapmeta.offset), pos2:subtract(mapmeta.offset)
-
-		local data = vm:get_data()
-		local barrier_found = false
-		for i, v in ipairs(data) do
-			for b, rep in pairs(ctf_map.barrier_nodes) do
-				if v == b then
-					barrier_found = true
-					tmp.reps[i] = minetest.get_name_from_content_id(rep)
-				end
-			end
-		end
-
-		tmp.max = #data
-
-		if barrier_found then
-			table.insert(barriers, tmp)
-		end
-
-		if queue_break then
-			break
-		end
-
-		if pos2.y + BARRIER_Y_SIZE < mapmeta.pos2.y then
-			pos1.y = pos2.y + 1
-			pos2.y = pos2.y + BARRIER_Y_SIZE
-		else
-			pos1.y = pos2.y + 1
-			pos2.y = mapmeta.pos2.y
-			queue_break = true
-		end
-	end
 
 	meta:set("map_version"   , CURRENT_MAP_VERSION)
 	meta:set("size"          , minetest.serialize(vector.subtract(mapmeta.pos2, mapmeta.pos1)))
@@ -374,8 +304,4 @@ function ctf_map.save_map(mapmeta)
 	else
 		minetest.chat_send_all(minetest.colorize(ctf_map.CHAT_COLOR, "Map Saving Failed!"))
 	end
-
-	local f = assert(io.open(path .. "barriers.data", "wb"))
-	f:write(minetest.compress(minetest.serialize(barriers), "deflate"))
-	f:close()
 end

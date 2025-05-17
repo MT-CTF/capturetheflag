@@ -1,7 +1,6 @@
 local backend = minetest.settings:get("ctf_rankings_backend") or "default"
 
 local rankings
-local top = ctf_core.include_files("top.lua")
 
 if backend == "redis" then
 	local env = minetest.request_insecure_environment()
@@ -17,34 +16,17 @@ else
 end
 
 ctf_rankings = {
-	sorted = {},
-
-	rankings_sorted = function(self)
-		return false -- Returning false, since not all rankings are sorted yet. See below for full func
-	end,
-
-	init = function(self)
+	init = function(self, ranklist)
 		local modname = minetest.get_current_modname()
 
-		if self then
-			self.sorted[modname] = false
-		else
+		if not self then
 			minetest.log(
 				"error",
 				"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
 			)
 		end
 
-		return rankings(modname .. '|', top:new(), function()
-			if self then
-				self.sorted[modname] = true
-			else
-				minetest.log(
-					"error",
-					"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
-				)
-			end
-		end)
+		return rankings(modname .. '|', ranklist)
 	end,
 
 	registered_on_rank_reset = {},
@@ -94,17 +76,5 @@ end
 function ctf_rankings.register_on_rank_reset(func)
 	table.insert(ctf_rankings.registered_on_rank_reset, func)
 end
-
-minetest.register_on_mods_loaded(function()
-	ctf_rankings.rankings_sorted = function(self)
-		for _, sorted in pairs(self.sorted) do
-			if not sorted then
-				return false
-			end
-		end
-
-		return true
-	end
-end)
 
 ctf_core.include_files("leagues.lua", "ranking_reset.lua")

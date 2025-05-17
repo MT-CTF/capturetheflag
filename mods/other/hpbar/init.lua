@@ -51,7 +51,7 @@ local function has_entity(player)
 	end
 
 	local entity = minetest.add_entity(player:get_pos(), "hpbar:entity")
-
+	if not entity then return end
 	entity:set_attach(player, "", {x=0, y=18.8, z=0}, {x=0, y=0, z=0})
 
 	if not players[pname] then

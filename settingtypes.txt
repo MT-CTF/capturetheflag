@@ -1,7 +1,8 @@
 # Options:
-# - default: Store rankings in modstorage, not recommended for servers
+# - default: Store rankings in modstorage, not recommended for servers, can only sort top50 by score
 # - redis: Store rankings in a redis DB, recommended for servers, requires some setup
-ctf_rankings_backend (Rankings Backend) enum default default,redis
+# - dummy: Don't store any rankings at all (Match summaries will still work)
+ctf_rankings_backend (Rankings Backend) enum default default,redis,dummy
 
 # Port the redis server is hosted on.
 # This setting is only used when ctf_rankings_backend = redis
@@ -10,3 +11,10 @@ ctf_rankings_redis_server_port (Rankings Redis Server Port) int 6379
 # CTF can sometimes reduce CPU usage by calculating things once and putting them in RAM.
 # Turn on low ram mode if you're getting crashes related to RAM/Memory usage
 ctf_low_ram_mode (Low RAM mode) bool false
+
+# Allow players to create/form parties
+ctf_allow_parties (Allow Player Parties) bool false
+
+# Max party size in players
+# Parties smaller than this will still be blocked if they are larger than the team size of the match
+ctf_max_party_size (Max Party Size) int 4

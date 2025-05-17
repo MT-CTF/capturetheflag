@@ -2,6 +2,8 @@ local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 local function supports_observers(x)
 	if x then
 		if x.object then x = x.object end
@@ -136,7 +138,7 @@ function ctf_modebase.map_chosen(map, ...)
 				position = {x = 0.5, y = 0.5},
 				alignment = {x = "center", y = "up"},
 				text_scale = 2,
-				text = "Loading Map: " .. map.name .. "...",
+				text = S("Loading Map") .. ": " .. map.name .. "...",
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
@@ -158,7 +160,7 @@ end
 
 ctf_settings.register("teammate_nametag_style", {
 	type = "list",
-	description = "Controls what style of nametag to use for teammates.",
+	description = S("Controls what style of nametag to use for teammates."),
 	list = {"Minetest Nametag: Full", "Minetest Nametag: Symbol", "Entity Nametag"},
 	default = "1",
 	on_change = function(player, new_value)
@@ -174,6 +176,21 @@ local FLAG_CAPTURE_TIMER = 60 * 3
 local many_teams = false
 local team_list
 local teams_left
+local death_messages = {
+    ["grenades_frag"] = {"blown up", "fragged"},
+    ["knockback_grenade"] = {"sent flying", "doomed to fall"},
+    ["black_hole_grenade"] = {"sucked into the void"},
+    ["sword"] = {"killed", "sliced up"},
+    ["axe"] = {"killed", "chopped up",},
+    ["shovel"] = {"killed with the tool that dug your grave"},
+    ["pick"] = {"killed", "mistaken for mese ore"},
+    ["ctf_ranged"] = {"shot"},
+    ["rifle"] = {"sniped"},
+    ["default_water"] = {"drowned", "over-hydrated"},
+    ["damage_cobble"] = {"mined a little too much damage cobble"},
+    ["lava"] = {"tried to swim in lava", "took a hot bath"},
+    ["fire"] = {"burnt to a crisp"},
+}
 
 local function calculate_killscore(player)
 	local match_rank = recent_rankings.players()[player] or {}
@@ -253,6 +270,59 @@ local function get_suicide_image(reason)
 	end
 
 	return image
+end
+
+local function send_death_message(player, killer, weapon_image)
+    local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
+    local assist_message = ""
+    local weapon_message
+    local hitters = ctf_combat_mode.get_other_hitters(player, killer)
+
+    local k_teamcolor = ctf_teams.get(killer)
+    if k_teamcolor then
+		k_teamcolor = ctf_teams.team[k_teamcolor].color
+	end
+    for key, data in pairs(death_messages) do
+        if weapon_image:find(tostring(key)) then
+            weapon_message = data[math.random(1,#data)]
+        end
+    end
+
+    if #hitters > 0 then
+        assist_message = ", assisted by "
+        for index, pname in ipairs(hitters) do
+            local a_teamcolor = ctf_teams.get(pname)
+            if a_teamcolor then
+		        a_teamcolor = ctf_teams.team[a_teamcolor].color
+	        end
+            if index == 1 then
+                assist_message = assist_message .. minetest.colorize(a_teamcolor, pname)
+            elseif index == #hitters then
+                assist_message = assist_message .. ", and " .. minetest.colorize(a_teamcolor, pname)
+			else
+                assist_message = assist_message .. ", " .. minetest.colorize(a_teamcolor, pname)
+            end
+		end
+    end
+
+    if (death_setting == "true") then
+        if player ~= killer then
+            if weapon_message then
+                local death_message = "You were " .. weapon_message
+                    .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
+                minetest.chat_send_player(player, death_message)
+            else
+                local death_message = "You were killed by "
+                    .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
+                minetest.chat_send_player(player, death_message)
+            end
+        end
+        if player == killer and #hitters == 0 then
+            local suicide_message = weapon_message or "suicided"
+            local death_message = "You " .. suicide_message .. assist_message .. "."
+            minetest.chat_send_player(player, death_message)
+        end
+    end
 end
 
 local function tp_player_near_flag(player)
@@ -354,8 +424,10 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			if reason ~= "punch" or killer == player then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
+                    send_death_message(player, killer, weapon_image)
 				else
 					ctf_kill_list.add("", player, get_suicide_image(reason))
+                    send_death_message(player, player, get_suicide_image(reason))
 				end
 
 				killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
@@ -384,9 +456,10 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 				ctf_kill_list.add(killer, player, weapon_image, comment)
 				hud_events.new(player, {
 					quick = false,
-					text = killer.." killed you for ".. rewards.score .." points!",
+					text = killer .. " " .. S("killed you for") .. " " .. rewards.score .." " .. S("points!"),
 					color = "warning",
 				})
+				send_death_message(player, killer, weapon_image)
 			end
 
 			-- share kill score with other hitters
@@ -416,26 +489,26 @@ end
 
 local function can_punchplayer(player, hitter)
 	if not ctf_modebase.match_started then
-		return false, "The match hasn't started yet!"
+		return false, S("The match hasn't started yet!")
 	end
 
 	local pname, hname = player:get_player_name(), hitter:get_player_name()
 	local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
 
 	if not ctf_modebase.remove_respawn_immunity(hitter) then
-		return false, "You can't attack while immune"
+		return false, S("You can't attack while immune")
 	end
 
 	if not pteam then
-		return false, pname .. " is not in a team!"
+		return false, pname .. " " .. S("is not in a team!")
 	end
 
 	if not hteam then
-		return false, "You are not in a team!"
+		return false, S("You are not in a team!")
 	end
 
 	if pteam == hteam and pname ~= hname then
-		return false, pname .. " is on your team!"
+		return false, pname .. " " .. S("is on your team!")
 	end
 
 	return true
@@ -634,7 +707,7 @@ return {
 		if not ctf_modebase.match_started then
 			tp_player_near_flag(player)
 
-			return "You can't take the enemy flag during build time!"
+			return S("You can't take the enemy flag during build time!")
 		end
 	end,
 	on_flag_take = function(player, teamname)
@@ -922,7 +995,7 @@ return {
 	end,
 	on_healplayer = function(player, patient, amount)
 		if not ctf_modebase.match_started then
-			return "The match hasn't started yet!"
+			return S("The match hasn't started yet!")
 		end
 
 		local score = nil
@@ -967,3 +1040,10 @@ return {
 }
 
 end
+
+ctf_settings.register("send_death_messages", {
+    type = "bool",
+    label = "Receive death messages.",
+    description = "When enabled, you will receive a death message whenever you die stating who killed you.",
+    default = "true",
+})

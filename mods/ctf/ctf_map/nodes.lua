@@ -1,5 +1,7 @@
 -- Backwards compat
 
+local S = minetest.get_translator(minetest.get_current_modname())
+
 minetest.register_alias("ctf_map:ind_stone", "ctf_map:stone")
 
 -- Special nodes
@@ -18,7 +20,7 @@ minetest.register_node("ctf_map:ignore", {
 })
 
 minetest.register_node("ctf_map:ind_glass", {
-	description = "Indestructible Barrier Glass",
+	description = S("Indestructible Barrier Glass"),
 	drawtype = "glasslike_framed",
 	tiles = {"default_glass.png", "default_glass_detail.png"},
 	inventory_image = minetest.inventorycube("default_glass.png"),
@@ -33,7 +35,7 @@ minetest.register_node("ctf_map:ind_glass", {
 })
 
 minetest.register_node("ctf_map:ind_glass_red", {
-	description = "Indestructible Red Barrier Glass",
+	description = S("Indestructible Red Barrier Glass"),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_glass_red.png"},
 	inventory_image = minetest.inventorycube("ctf_map_glass_red.png"),
@@ -51,7 +53,7 @@ minetest.register_node("ctf_map:ind_glass_red", {
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_glass_red")] = minetest.CONTENT_AIR
 
 minetest.register_node("ctf_map:ind_water", {
-	description = "Indestructible Water Barrier Glass",
+	description = S("Indestructible Water Barrier Glass"),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_ind_water.png"},
 	inventory_image = minetest.inventorycube("ctf_map_ind_water.png"),
@@ -68,8 +70,46 @@ minetest.register_node("ctf_map:ind_water", {
 })
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_water")] = minetest.get_content_id("default:water_source")
 
+minetest.register_node("ctf_map:ind_river_water", {
+	description = S("Indestructible River Water Barrier Glass"),
+	drawtype = "glasslike",
+	tiles = {"ctf_map_ind_river_water.png"},
+	inventory_image = minetest.inventorycube("ctf_map_ind_river_water.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = ctf_core.settings.server_mode == "mapedit",
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_river_water")] =
+		minetest.get_content_id("default:river_water_source")
+
+minetest.register_node("ctf_map:ind_poison_water", {
+	description = S("Indestructible Poisonous Water Barrier Glass"),
+	drawtype = "glasslike",
+	tiles = {"ctf_map_ind_poison_water.png"},
+	inventory_image = minetest.inventorycube("ctf_map_ind_poison_water.png"),
+	paramtype = "light",
+	sunlight_propagates = true,
+	is_ground_content = false,
+	walkable = true,
+	buildable_to = false,
+	use_texture_alpha = false,
+	alpha = 0,
+	pointable = ctf_core.settings.server_mode == "mapedit",
+	groups = {immortal = 1},
+	sounds = default.node_sound_glass_defaults()
+})
+ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_poison_water")] =
+		minetest.get_content_id("poison_water:poisonous_water")
+
 minetest.register_node("ctf_map:ind_lava", {
-	description = "Indestructible Lava Barrier Glass",
+	description = S("Indestructible Lava Barrier Glass"),
 	groups = {immortal = 1},
 	tiles = {"ctf_map_ind_lava.png"},
 	is_ground_content = false
@@ -77,7 +117,7 @@ minetest.register_node("ctf_map:ind_lava", {
 ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_lava")] = minetest.get_content_id("default:lava_source")
 
 minetest.register_node("ctf_map:ind_stone_red", {
-	description = "Indestructible Red Barrier Stone",
+	description = S("Indestructible Red Barrier Stone"),
 	groups = {immortal = 1},
 	tiles = {"ctf_map_stone_red.png"},
 	is_ground_content = false
@@ -186,10 +226,11 @@ local chest_formspec =
 	"listring[current_name;main]" ..
 	"listring[current_player;main]" ..
 	default.get_hotbar_bg(0,4.85)
-local chestv = "Treasure Chest (visited)"
+local chestv = S("Treasure Chest (visited)")
 
+local not_allowed_timer = {}
 local chest_def = {
-	description = "Treasure Chest",
+	description = S("Treasure Chest"),
 	tiles = {"default_chest_top.png", "default_chest_top.png", "default_chest_side.png",
 		"default_chest_side.png", "default_chest_side.png", "default_chest_front.png"},
 	paramtype2 = "facedir",
@@ -199,7 +240,7 @@ local chest_def = {
 	sounds = default.node_sound_wood_defaults(),
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
-		meta:set_string("infotext", "Treasure Chest")
+		meta:set_string("infotext", S("Treasure Chest"))
 		meta:set_string("formspec", chest_formspec)
 
 		local inv = meta:get_inventory()
@@ -207,8 +248,15 @@ local chest_def = {
 	end,
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		if player then
-			minetest.chat_send_player(player:get_player_name(),
-				"You're not allowed to put things in treasure chests!")
+			local name = player:get_player_name()
+
+			if not not_allowed_timer[name] then
+				minetest.chat_send_player(name,
+					S("You're not allowed to put things in treasure chests!"))
+
+				not_allowed_timer[name] = true
+				minetest.after(1, function() not_allowed_timer[name] = nil end)
+			end
 			return 0
 		end
 	end,
