@@ -88,16 +88,25 @@ function ctf_modebase.bounties.claim(player, killer)
 		-- checking if there is bounty on this player
 		return
 	end
-
-	local rewards = bounties[pteam].rewards
+	local rewards = nil
 	if bounties[pteam] and bounties[pteam].rewards then
-		local bounty_kill_text =
-			S("[Bounty] @1 killed @2 and got @3", killer, player, get_reward_str(rewards))
+		rewards = bounties[pteam].rewards
+	end
+	if rewards then
+		local bounty_kill_text = S(
+			"[Bounty] @1 killed @2 and got @3 from the game",
+			killer,
+			player,
+			get_reward_str(rewards)
+		)
 		core.chat_send_all(core.colorize(CHAT_COLOR, bounty_kill_text))
 		bounties[pteam] = nil
 	end
 	if ctf_modebase.contributed_bounties[player] then
 		local score = ctf_modebase.contributed_bounties[player].total
+		if rewards == nil then
+			rewards = { bounty_kills = 0, score = 0 }
+		end
 		rewards.score = rewards.score + score
 		rewards.bounty_kills = #ctf_modebase.contributed_bounties[player].contributors
 			+ rewards.bounty_kills
