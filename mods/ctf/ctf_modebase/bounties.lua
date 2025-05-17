@@ -5,7 +5,7 @@ local bounties = {}
 ctf_modebase.bounties = {}
 -- ^ This is for game's own bounties
 ctf_modebase.contributed_bounties = {
---[[
+	--[[
 	["player_name"] = {
 		total = score,
 		contributors = {["player1"] = amount, ["player2"] = amount, ...}
@@ -41,7 +41,13 @@ local function get_reward_str(rewards)
 	local ret = ""
 
 	for reward, amount in pairs(rewards) do
-		ret = string.format("%s%s%d %s, ", ret, amount >= 0 and "+" or "-", amount, HumanReadable(reward))
+		ret = string.format(
+			"%s%s%d %s, ",
+			ret,
+			amount >= 0 and "+" or "-",
+			amount,
+			HumanReadable(reward)
+		)
 	end
 
 	return ret:sub(1, -3)
@@ -54,10 +60,10 @@ local function set(pname, pteam, rewards)
 	-- -- bounty_kills(int) which is usually 1
 	-- -- score(int) which is the amount of score given to the one
 	-- -- -- who claims the bounty
-	local bounty_message = core.colorize(CHAT_COLOR, string.format(
-		S("[Bounty] %s. Rewards: %s"),
-		pname, get_reward_str(rewards)
-	))
+	local bounty_message = core.colorize(
+		CHAT_COLOR,
+		string.format(S("[Bounty] %s. Rewards: %s"), pname, get_reward_str(rewards))
+	)
 
 	for _, team in ipairs(ctf_teams.current_team_list) do -- show bounty to all but target's team
 		if team ~= pteam then
@@ -65,11 +71,13 @@ local function set(pname, pteam, rewards)
 		end
 	end
 
-	bounties[pteam] = {name = pname, rewards = rewards, msg = bounty_message}
+	bounties[pteam] = { name = pname, rewards = rewards, msg = bounty_message }
 end
 
 local function remove(pname, pteam)
-	core.chat_send_all(minetest.colorize(CHAT_COLOR, S("[Bounty] @1 is no longer bountied", pname)))
+	core.chat_send_all(
+		minetest.colorize(CHAT_COLOR, S("[Bounty] @1 is no longer bountied", pname))
+	)
 	bounties[pteam] = nil
 end
 
@@ -83,24 +91,23 @@ function ctf_modebase.bounties.claim(player, killer)
 
 	local rewards = bounties[pteam].rewards
 	if bounties[pteam] and bounties[pteam].rewards then
-    local bounty_kill_text = S("[Bounty] @1 killed @2 and got @3", killer, player, get_reward_str(rewards))
+		local bounty_kill_text =
+			S("[Bounty] @1 killed @2 and got @3", killer, player, get_reward_str(rewards))
 		core.chat_send_all(core.colorize(CHAT_COLOR, bounty_kill_text))
 		bounties[pteam] = nil
 	end
 	if ctf_modebase.contributed_bounties[player] then
 		local score = ctf_modebase.contributed_bounties[player].total
 		rewards.score = rewards.score + score
-		rewards.bounty_kills =
-			#ctf_modebase.contributed_bounties[player].contributors
+		rewards.bounty_kills = #ctf_modebase.contributed_bounties[player].contributors
 			+ rewards.bounty_kills
-		local bounty_kill_text =
-				string.format(
-					"[Player bounty] %s killed %s and got %d from %s!",
-					killer,
-					player,
-					score,
-					get_contributors(player)
-				)
+		local bounty_kill_text = string.format(
+			"[Player bounty] %s killed %s and got %d from %s!",
+			killer,
+			player,
+			score,
+			get_contributors(player)
+		)
 		core.chat_send_all(core.colorize(CHAT_COLOR, bounty_kill_text))
 		ctf_modebase.announce(bounty_kill_text)
 		ctf_modebase.contributed_bounties[player] = nil
@@ -163,7 +170,7 @@ ctf_api.register_on_match_end(function()
 end)
 
 function ctf_modebase.bounties.bounty_reward_func()
-	return {bounty_kills = 1, score = 500}
+	return { bounty_kills = 1, score = 500 }
 end
 
 function ctf_modebase.bounties.get_next_bounty(team_members)
@@ -173,7 +180,12 @@ end
 ctf_teams.register_on_allocplayer(function(player, new_team, old_team)
 	local pname = player:get_player_name()
 
-	if old_team and old_team ~= new_team and bounties[old_team] and bounties[old_team].name == pname then
+	if
+		old_team
+		and old_team ~= new_team
+		and bounties[old_team]
+		and bounties[old_team].name == pname
+	then
 		remove(pname, old_team)
 	end
 
@@ -208,12 +220,9 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 				)
 
 				table.insert(output, label)
-				local model = "model[%d,1;4,6;player;character.b3d;%s,blank.png;{0,160};;;]"
-				model = string.format(
-					model,
-					x,
-					player:get_properties().textures[1]
-				)
+				local model =
+					"model[%d,1;4,6;player;character.b3d;%s,blank.png;{0,160};;;]"
+				model = string.format(model, x, player:get_properties().textures[1])
 				table.insert(output, model)
 				x = x + 4.5
 			end
@@ -230,11 +239,7 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 				table.insert(output, label)
 
 				local model = "model[%d,1;4,6;player;character.b3d;%s;{0,160};;;]"
-				model = string.format(
-					model,
-					x,
-					player:get_properties().textures[1]
-				)
+				model = string.format(model, x, player:get_properties().textures[1])
 				table.insert(output, model)
 				x = x + 4.5
 			end
@@ -249,7 +254,6 @@ ctf_core.register_chatcommand_alias("list_bounties", "lb", {
 		return true, ""
 	end,
 })
-
 
 ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 	description = S("Put bounty on some player"),
@@ -271,24 +275,23 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 
 		amount = ctf_core.to_number(amount)
 		if amount then
-			set(
-				player,
-				pteam,
-				{ bounty_kills=1, score=amount }
-			)
-			return true, S("Successfully placed a bounty of ") .. amount .. S(" on ") .. core.colorize(team_colour, player) .. "!"
+			set(player, pteam, { bounty_kills = 1, score = amount })
+			return true,
+				S("Successfully placed a bounty of ")
+					.. amount
+					.. S(" on ")
+					.. core.colorize(team_colour, player)
+					.. "!"
 		else
 			return false, S("Invalid Amount")
 		end
 	end,
 })
 
-
-
 ctf_core.register_chatcommand_alias("bounty", "b", {
-	description = "Place a bounty on someone using your match score.\n" ..
-	"The score is returned to you if the match ends and nobody kills.\n" ..
-	"Use negative score to revoke a bounty",
+	description = "Place a bounty on someone using your match score.\n"
+		.. "The score is returned to you if the match ends and nobody kills.\n"
+		.. "Use negative score to revoke a bounty",
 	params = "<player> <score>",
 	func = function(name, params)
 		local bname, amount = string.match(params, "([^%s]*) ([^%s]*)")
@@ -310,7 +313,8 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 			if math.abs(amount) > contributed_amount then
 				contributed_amount = math.abs(amount)
 			end
-			ctf_modebase.contributed_bounties[bname][name] = ctf_modebase.contributed_bounties[bname][name] - contributed_amount
+			ctf_modebase.contributed_bounties[bname][name] = ctf_modebase.contributed_bounties[bname][name]
+				- contributed_amount
 			current_mode.recent_rankings.add(name, { score = contributed_amount }, true)
 			return true, tostring(contributed_amount) .. " points returned to you."
 		end
@@ -329,33 +333,42 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 		if amount > cur_score then
 			return false, "You haven't got enough points"
 		end
-		current_mode.recent_rankings.add(name, {score=-amount}, true)
+		current_mode.recent_rankings.add(name, { score = -amount }, true)
 		if not ctf_modebase.contributed_bounties[bname] then
 			local contributors = {}
 			contributors[name] = amount
-			ctf_modebase.contributed_bounties[bname] = { total = amount, contributors = contributors }
+			ctf_modebase.contributed_bounties[bname] =
+				{ total = amount, contributors = contributors }
 		else
-			if not ctf_modebase.contributed_bounties[bname].contributors[name] then
-				ctf_modebase.contributed_bounties[bname].contributors[name] = amount
+			local contrib = ctf_modebase.contributed_bounties -- this is a variable to for less typing
+			if not contrib[bname].contributors[name] then
+				contrib[bname].contributors[name] = amount
 			else
-				ctf_modebase.contributed_bounties[bname].contributors[name] =
-					ctf_modebase.contributed_bounties[bname].contributors[name] + amount
+				contrib[bname].contributors[name] = contrib[bname].contributors[name]
+					+ amount
 			end
-			ctf_modebase.contributed_bounties[bname].total = ctf_modebase.contributed_bounties[bname].total + amount
+			contrib[bname].total = contrib[bname].total + amount
 		end
 		local total = ctf_modebase.contributed_bounties[bname].total
 		core.chat_send_all(
 			core.colorize(
-			CHAT_COLOR,
-			string.format("%s placed %d bounty on %s!", get_contributors(bname), total, bname)))
+				CHAT_COLOR,
+				string.format(
+					"%s placed %d bounty on %s!",
+					get_contributors(bname),
+					total,
+					bname
+				)
+			)
+		)
 	end,
 })
 
 ctf_api.register_on_match_end(function()
 	local current_mode = ctf_modebase:get_current_mode()
 	for pname, bounty in pairs(ctf_modebase.contributed_bounties) do
-	for contributor, amount in pairs(bounty.contributors) do
-		current_mode.recent_rankings.add(contributor, {score=amount}, true)
-	end
+		for contributor, amount in pairs(bounty.contributors) do
+			current_mode.recent_rankings.add(contributor, { score = amount }, true)
+		end
 	end
 end)
