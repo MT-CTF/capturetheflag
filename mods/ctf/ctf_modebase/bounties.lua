@@ -372,12 +372,3 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 		)
 	end,
 })
-
-ctf_api.register_on_match_end(function()
-	local current_mode = ctf_modebase:get_current_mode()
-	for pname, bounty in pairs(ctf_modebase.contributed_bounties) do
-		for contributor, amount in pairs(bounty.contributors) do
-			current_mode.recent_rankings.add(contributor, { score = amount }, true)
-		end
-	end
-end)
