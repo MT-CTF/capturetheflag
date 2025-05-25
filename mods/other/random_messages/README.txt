@@ -8,7 +8,7 @@ to see all the messages.
 to add the random message blah blah blah.
 /rmessages removemessage 2
 to remove the 2nd random message in /rmessages viewmessages .
-In core.conf, random_messages_interval decides how often a message is sent.
+In minetest.conf, random_messages_interval decides how often a message is sent.
 Released under CC0.
 Special thanks to:
 Michael Rasmussen (michael@jamhome.us)
