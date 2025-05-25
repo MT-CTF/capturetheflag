@@ -62,7 +62,7 @@ local function set(pname, pteam, rewards)
 	-- -- -- who claims the bounty
 	local bounty_message = core.colorize(
 		CHAT_COLOR,
-		string.format(S("[Bounty] %s. Rewards: %s"), pname, get_reward_str(rewards))
+		string.format(S("[Bounty] @1. Rewards: @2", pname, get_reward_str(rewards)))
 	)
 
 	for _, team in ipairs(ctf_teams.current_team_list) do -- show bounty to all but target's team
@@ -286,11 +286,11 @@ ctf_core.register_chatcommand_alias("put_bounty", "pb", {
 		if amount then
 			set(player, pteam, { bounty_kills = 1, score = amount })
 			return true,
-				S("Successfully placed a bounty of ")
-					.. amount
-					.. S(" on ")
-					.. core.colorize(team_colour, player)
-					.. "!"
+				S(
+					"Successfully placed a bounty of @1 on @2",
+					amount,
+					core.colorize(team_colour, player)
+				)
 		else
 			return false, S("Invalid Amount")
 		end
