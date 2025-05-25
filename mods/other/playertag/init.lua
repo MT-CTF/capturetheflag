@@ -1,5 +1,5 @@
 local players = {}
-local ATTACH_POSITION = minetest.rgba and {x=0, y=20, z=0} or {x=0, y=10, z=0}
+local ATTACH_POSITION = core.rgba and {x=0, y=20, z=0} or {x=0, y=10, z=0}
 
 local TYPE_BUILTIN = 0
 local TYPE_ENTITY = 1
@@ -42,17 +42,17 @@ local function add_entity_tag(player, old_observers)
 
 	if not ppos then return end
 
-	local ent = minetest.add_entity(ppos, "playertag:tag")
+	local ent = core.add_entity(ppos, "playertag:tag")
 	local ent2 = false
 	local ent3 = false
 
 	if not ent then
-		minetest.after(1, add_entity_tag, player, old_observers)
+		core.after(1, add_entity_tag, player, old_observers)
 		return
 	end
 
 	if ent.set_observers then
-		ent2 = minetest.add_entity(ppos, "playertag:tag")
+		ent2 = core.add_entity(ppos, "playertag:tag")
 		ent2:set_observers(old_observers.nametag_entity or {})
 		ent2:set_properties({
 			nametag = pname,
@@ -60,7 +60,7 @@ local function add_entity_tag(player, old_observers)
 			nametag_bgcolor = "#0000002D"
 		})
 
-		ent3 = minetest.add_entity(ppos, "playertag:tag")
+		ent3 = core.add_entity(ppos, "playertag:tag")
 		ent3:set_observers(old_observers.symbol_entity or {})
 		ent3:set_properties({
 			collisionbox = { 0, 0, 0, 0, 0, 0 },
@@ -161,7 +161,7 @@ function playertag.get_all()
 	return players
 end
 
-minetest.register_entity("playertag:tag", {
+core.register_entity("playertag:tag", {
 	visual = "sprite",
 	visual_size = {x=2.16, y=0.18, z=2.16}, --{x=1.44, y=0.12, z=1.44},
 	textures = {"blank.png"},
@@ -181,18 +181,18 @@ minetest.register_entity("playertag:tag", {
 			end
 
 			if player and player:is_player() then
-				minetest.log("action", "Playertag for player "..player:get_player_name().." unloaded. Re-adding...")
+				core.log("action", "Playertag for player "..player:get_player_name().." unloaded. Re-adding...")
 				update(player, players[player:get_player_name()])
 			end
 		end
 	end
 })
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	players[player:get_player_name()] = {type = TYPE_BUILTIN, color = {a=255, r=255, g=255, b=255}}
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	remove_entity_tag(player)
 	players[player:get_player_name()] = nil
 end)

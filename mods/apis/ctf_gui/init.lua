@@ -8,7 +8,7 @@ local context = {}
 local gui_users_initialized = {}
 
 function ctf_gui.init()
-	local modname = minetest.get_current_modname()
+	local modname = core.get_current_modname()
 
 	assert(not gui_users_initialized[modname], "Already initialized for mod "..dump(modname))
 
@@ -20,11 +20,11 @@ function ctf_gui.init()
 
 		if ctx._formname == formname and ctx._on_formspec_input then
 			if ctx._privs then
-				local playerprivs = minetest.get_player_privs(pname)
+				local playerprivs = core.get_player_privs(pname)
 
 				for priv, needed in pairs(ctx._privs) do
 					if needed and not playerprivs[priv] then
-						minetest.log("warning", string.format(
+						core.log("warning", string.format(
 							"Player '%q' doesn't have the privs needed to access the formspec '%s'",
 							pname, formname
 						))
@@ -39,8 +39,8 @@ function ctf_gui.init()
 				local action = ctx._on_formspec_input(pname, ctx, fields, ...)
 
 				if action == "refresh" then
-					minetest.log("action", "Refreshing formspec "..dump(ctx._formname).." to "..dump(pname))
-					minetest.show_formspec(pname, ctx._formname, ctx._formspec(ctx))
+					core.log("action", "Refreshing formspec "..dump(ctx._formname).." to "..dump(pname))
+					core.show_formspec(pname, ctx._formname, ctx._formspec(ctx))
 				end
 			end
 		end
@@ -48,7 +48,7 @@ function ctf_gui.init()
 end
 
 function ctf_gui.old_init()
-	local modname = minetest.get_current_modname()
+	local modname = core.get_current_modname()
 
 	assert(not gui_users_initialized[modname], "Already initialized for mod: "..modname)
 
@@ -60,11 +60,11 @@ function ctf_gui.old_init()
 
 		if ctx.formname == formname and ctx.elements then
 			if ctx.privs then
-				local playerprivs = minetest.get_player_privs(pname)
+				local playerprivs = core.get_player_privs(pname)
 
 				for priv, needed in pairs(ctx.privs) do
 					if needed and not playerprivs[priv] then
-						minetest.log("warning", string.format(
+						core.log("warning", string.format(
 							"Player '%q' doesn't have the privs needed to access the formspec '%s'",
 							pname, formname
 						))
@@ -86,7 +86,7 @@ function ctf_gui.old_init()
 					end
 				end
 				if bad then
-					minetest.log("warning", string.format(
+					core.log("warning", string.format(
 						"Player %s sent unallowed values for formspec %s : %s",
 						pname, formname, dump(fields)
 					))
@@ -116,18 +116,18 @@ function ctf_gui.show_formspec(player, formname, formspec, formcontext)
 	context[player]._formname = formname
 	context[player]._formspec = formspec
 
-	minetest.log("action", "Showing new_formspec "..dump(formname).." to "..dump(player))
+	core.log("action", "Showing new_formspec "..dump(formname).." to "..dump(player))
 	if type(formspec) == "function" then
-		minetest.show_formspec(player, formname, formspec(formcontext))
+		core.show_formspec(player, formname, formspec(formcontext))
 	else
-		minetest.show_formspec(player, formname, formspec)
+		core.show_formspec(player, formname, formspec)
 	end
 end
 
 do
 	local remove = table.remove
 	local concat = table.concat
-	local formspec_escape = minetest.formspec_escape
+	local formspec_escape = core.formspec_escape
 	local format = string.format
 	local unpck = unpack
 
@@ -146,7 +146,7 @@ do
 			end
 		end
 
-		-- minetest.log("action", "[ctf_gui] unpacking: "..dump(l))
+		-- core.log("action", "[ctf_gui] unpacking: "..dump(l))
 		return format(base, unpck(l))
 	end
 
@@ -180,7 +180,7 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 		formdef.scroll_pos = {}
 	end
 
-	minetest.handle_async(function(fdef, ELEM_SIZE, SCROLLBAR_WIDTH)
+	core.handle_async(function(fdef, ELEM_SIZE, SCROLLBAR_WIDTH)
 		local maxscroll = {x = 0, y = 0}
 		local formspec = "formspec_version[4]" ..
 				string.format("size[%f,%f]", fdef.size.x + SCROLLBAR_WIDTH, fdef.size.y + SCROLLBAR_WIDTH) ..
@@ -231,7 +231,7 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 			)
 
 			for id, def in pairs(fdef.elements) do
-				id = minetest.formspec_escape(id)
+				id = core.formspec_escape(id)
 
 				if def.type == "label" then
 					if def.centered then
@@ -244,14 +244,14 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 							def.size.x,
 							def.size.y,
 							id,
-							minetest.formspec_escape(def.label)
+							core.formspec_escape(def.label)
 						)
 					else
 						formspec = formspec .. string.format(
 							"label[%f,%f;%s]",
 							def.pos.x,
 							def.pos.y,
-							minetest.formspec_escape(def.label)
+							core.formspec_escape(def.label)
 						)
 					end
 				elseif def.type == "field" then
@@ -265,8 +265,8 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 						def.size.x,
 						def.size.y,
 						id,
-						minetest.formspec_escape(def.label or ""),
-						minetest.formspec_escape(def.default or "")
+						core.formspec_escape(def.label or ""),
+						core.formspec_escape(def.default or "")
 					)
 				elseif def.type == "button" then
 					formspec = formspec .. string.format(
@@ -277,7 +277,7 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 						def.size.x,
 						def.size.y,
 						id,
-						minetest.formspec_escape(def.label)
+						core.formspec_escape(def.label)
 					)
 				elseif def.type == "dropdown" then
 					formspec = formspec .. string.format(
@@ -297,7 +297,7 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 						def.pos.x,
 						def.pos.y,
 						id,
-						minetest.formspec_escape(def.label),
+						core.formspec_escape(def.label),
 						def.default and "true" or "false"
 					)
 				elseif def.type == "textarea" then
@@ -308,8 +308,8 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 						def.size.x,
 						def.size.y,
 						def.read_only and "" or id,
-						minetest.formspec_escape(def.label or ""),
-						minetest.formspec_escape(def.default or "")
+						core.formspec_escape(def.label or ""),
+						core.formspec_escape(def.default or "")
 					)
 				elseif def.type == "image" then
 					formspec = formspec .. string.format(
@@ -318,12 +318,12 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 						def.pos.y,
 						def.size.x,
 						def.size.y,
-						minetest.formspec_escape(def.texture or "")
+						core.formspec_escape(def.texture or "")
 					)
 				elseif def.type == "textlist" then
 					if def.items then
 						for k, v in pairs(def.items) do
-							def.items[k] = minetest.formspec_escape(v)
+							def.items[k] = core.formspec_escape(v)
 						end
 					end
 
@@ -364,7 +364,7 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 							column.type = nil
 
 							for k, v in pairs(column) do
-								tc_out = string.format("%s,%s=%s", tc_out, k, minetest.formspec_escape(v))
+								tc_out = string.format("%s,%s=%s", tc_out, k, core.formspec_escape(v))
 							end
 
 							table.insert(tablecolumns, tc_out)
@@ -460,16 +460,16 @@ function ctf_gui.old_show_formspec(player, formname, formdef)
 		formdef._info = formdef
 		context[player] = formdef
 
-		if minetest.get_player_by_name(player) then
-			minetest.log("action", "Showing formspec "..dump(formname).." to "..dump(player))
-			minetest.show_formspec(player, formname, formspec)
+		if core.get_player_by_name(player) then
+			core.log("action", "Showing formspec "..dump(formname).." to "..dump(player))
+			core.show_formspec(player, formname, formspec)
 		end
 	end,
 	formdef, ctf_gui.ELEM_SIZE, ctf_gui.SCROLLBAR_WIDTH)
 end
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	context[player:get_player_name()] = nil
 end)
 
-dofile(minetest.get_modpath("ctf_gui").."/dev.lua")
+dofile(core.get_modpath("ctf_gui").."/dev.lua")

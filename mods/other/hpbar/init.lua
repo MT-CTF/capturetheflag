@@ -3,7 +3,7 @@ local max = {hp = 20}
 local players = {}
 
 local HPBAR_SCALE = 0.023
-minetest.register_entity("hpbar:entity", {
+core.register_entity("hpbar:entity", {
 	visual = "sprite",
 	visual_size = {x = 58 * HPBAR_SCALE, y = 16 * HPBAR_SCALE}, -- texture is 58 x 16
 	textures = {"blank.png"},
@@ -50,7 +50,7 @@ local function has_entity(player)
 		end
 	end
 
-	local entity = minetest.add_entity(player:get_pos(), "hpbar:entity")
+	local entity = core.add_entity(player:get_pos(), "hpbar:entity")
 	if not entity then return end
 	entity:set_attach(player, "", {x=0, y=18.8, z=0}, {x=0, y=0, z=0})
 
@@ -106,7 +106,7 @@ function hpbar.set_icon(player, texture)
 	update_entity(PlayerObj(player), texture)
 end
 
-minetest.register_playerevent(function(player, eventname)
+core.register_playerevent(function(player, eventname)
 	if eventname == "health_changed" or eventname == "properties_changed" then
 		if players[player:get_player_name()] ~= nil then
 			update_entity(player)
@@ -118,13 +118,13 @@ function hpbar.can_show(player)
 	return true
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	if has_entity(player) then
 		update_entity(player)
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 	if players[pname] ~= nil then
 		players[pname].entity:remove()

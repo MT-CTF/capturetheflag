@@ -14,9 +14,9 @@ function ctf_modebase.update_wear.start_update(pname, item, step, down, finish_c
 	if not wear_timers[pname] then wear_timers[pname] = {} end
 	if wear_timers[pname][item] then return end
 
-	wear_timers[pname][item] = {c=cancel_callback, t=minetest.after(1, function()
+	wear_timers[pname][item] = {c=cancel_callback, t=core.after(1, function()
 		wear_timers[pname][item] = nil
-		local player = minetest.get_player_by_name(pname)
+		local player = core.get_player_by_name(pname)
 
 		if player then
 			local pinv = player:get_inventory()
@@ -72,10 +72,10 @@ function ctf_modebase.update_wear.cancel_player_updates(pname)
 	end
 end
 
-minetest.register_on_dieplayer(function(player)
+core.register_on_dieplayer(function(player)
 	ctf_modebase.update_wear.cancel_player_updates(player)
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	ctf_modebase.update_wear.cancel_player_updates(player)
 end)

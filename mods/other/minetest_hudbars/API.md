@@ -66,9 +66,9 @@ for more information.
 * `default_start_value`: If this HUD bar is added to a player, and no initial value is specified, this value will be used as initial current value
 * `default_max_value`: If this HUD bar is added to a player, and no initial maximum value is specified, this value will be used as initial maximum value
 * `default_start_hidden`: The HUD bar will be initially start hidden by default when added to a player. Use `hb.unhide_hudbar` to unhide it.
-* `format_string`: Optional; You can specify an alternative format string to use for the final text on the HUD bar. The default format string is “`@1: @2/@3`” (The “@” numbers are placeholders that have a meaning in this order: @1 = Label, @2 = current value, @3 = maximum value). Do *not* use minetest.translator on this string, the string will be translated by `hudbars`, but you still must put this string into the translation catalogue file.
+* `format_string`: Optional; You can specify an alternative format string to use for the final text on the HUD bar. The default format string is “`@1: @2/@3`” (The “@” numbers are placeholders that have a meaning in this order: @1 = Label, @2 = current value, @3 = maximum value). Do *not* use core.translator on this string, the string will be translated by `hudbars`, but you still must put this string into the translation catalogue file.
 * `format_string_config`: Required if `format_string` is set. This allows to change which parameters to use in the format string. It's a table with these fields:
- * `textdomain`: Text domain of the format string, used by `minetest.translate`
+ * `textdomain`: Text domain of the format string, used by `core.translate`
  * `order`: Table that contains the order of the placeholders. It's also possible to remove placeholders. Default order: `{ "label", "value", "max_value" }`
  * `format_value`: Format string to apply when displaying `value`. Syntax is same as in `string.format`. Default: `"%d"`
  * `format_max_value`: Same as `format_value` but is applied to `max_value`
@@ -77,7 +77,7 @@ for more information.
 Example (mostly) from `hbarmor` mod:
 
 ```
-hb.register_hudbar("armor", 0xFFFFFF, minetest.translator("hbarmor", "Armor"), { icon = "hbarmor_icon.png", bgicon = "hbarmor_bgicon.png", bar = "hbarmor_bar.png" }, 0, 100, hbarmor.autohide, N("@1: @2%"), { order = { "label", "value" }, textdomain = "hbarmor" } )
+hb.register_hudbar("armor", 0xFFFFFF, core.translator("hbarmor", "Armor"), { icon = "hbarmor_icon.png", bgicon = "hbarmor_bgicon.png", bar = "hbarmor_bar.png" }, 0, 100, hbarmor.autohide, N("@1: @2%"), { order = { "label", "value" }, textdomain = "hbarmor" } )
 ```
 
 Displays an armor HUD bar with a label of the form „Armor: 53%“. (`N` is a dummy function that returns its argument, used to make the string visible for translator scripts.)
@@ -90,7 +90,7 @@ Always `nil`.
 After a HUD bar has been registered, they are not yet displayed yet for any player. HUD bars must be
 explicitly initialized on a per-player basis.
 
-You probably want to do this in the `minetest.register_on_joinplayer`.
+You probably want to do this in the `core.register_on_joinplayer`.
 
 ### `hb.init_hudbar(player, identifier, start_value, start_max, start_hidden)`
 This function initialzes and activates a previously registered HUD bar and assigns it to a

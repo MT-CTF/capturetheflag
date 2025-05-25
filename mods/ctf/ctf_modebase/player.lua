@@ -1,6 +1,6 @@
 ctf_modebase.player = {}
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 ctf_settings.register("auto_trash_stone_swords", {
 	type = "bool",
@@ -110,7 +110,7 @@ function ctf_modebase.player.save_initial_stuff_positions(player, soft)
 	if ssp == "" then
 		ssp = {}
 	else
-		ssp = minetest.deserialize(ssp)
+		ssp = core.deserialize(ssp)
 	end
 
 	local done = {}
@@ -129,7 +129,7 @@ function ctf_modebase.player.save_initial_stuff_positions(player, soft)
 		end
 	end
 
-	meta:set_string("ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode, minetest.serialize(ssp))
+	meta:set_string("ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode, core.serialize(ssp))
 end
 
 -- Changes made to this function should also be made to is_initial_stuff() above
@@ -149,7 +149,7 @@ local function get_initial_stuff(player, f)
 end
 
 function ctf_modebase.player.give_initial_stuff(player)
-	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
+	core.log("action", "Giving initial stuff to player " .. player:get_player_name())
 
 	local inv = player:get_inventory()
 	local meta = player:get_meta()
@@ -168,14 +168,14 @@ function ctf_modebase.player.give_initial_stuff(player)
 						if ilevel > item_level[itype].level then
 							-- remove the other lesser item unless it's a keeper
 							if not item_level[itype].keep then
-								-- minetest.log(dump(item_level[itype].item:get_name()).." r< "..dump(item:get_name()))
+								-- core.log(dump(item_level[itype].item:get_name()).." r< "..dump(item:get_name()))
 
 								inv:remove_item("main", item_level[itype].item)
 							end
 
 							item_level[itype] = {level = ilevel, item = item, keep = keep}
 						elseif not keep then
-							-- minetest.log(dump(item:get_name()).." s< "..dump(item_level[itype].item:get_name()))
+							-- core.log(dump(item:get_name()).." s< "..dump(item_level[itype].item:get_name()))
 
 							return -- skip addition, something better is present
 						end
@@ -203,7 +203,7 @@ function ctf_modebase.player.give_initial_stuff(player)
 	if saved_stuff_positions == "" then
 		saved_stuff_positions = {}
 	else
-		saved_stuff_positions = minetest.deserialize(saved_stuff_positions)
+		saved_stuff_positions = core.deserialize(saved_stuff_positions)
 	end
 
 	local new = {}
@@ -243,8 +243,8 @@ function ctf_modebase.player.give_initial_stuff(player)
 	inv:set_list("main", new)
 end
 
-if minetest.register_on_item_pickup then
-	minetest.register_on_item_pickup(function(itemstack, picker)
+if core.register_on_item_pickup then
+	core.register_on_item_pickup(function(itemstack, picker)
 		if ctf_modebase.current_mode and ctf_teams.get(picker) then
 			local mode = ctf_modebase:get_current_mode()
 			for name, func in pairs(mode.initial_stuff_item_levels) do
@@ -260,7 +260,7 @@ if minetest.register_on_item_pickup then
 
 							if cprio and cprio < priority then
 								local item, typ = simplify_for_saved_stuff(compare:get_name())
-								--minetest.log(dump(item)..dump(typ))
+								--core.log(dump(item)..dump(typ))
 								inv:set_stack("main", i, itemstack)
 
 								if item == "sword" and typ == "stone" and
@@ -290,10 +290,10 @@ if minetest.register_on_item_pickup then
 		end
 	end)
 else
-	minetest.log("error", "You aren't using the latest version of Minetest, auto-trashing and auto-sort won't work")
+	core.log("error", "You aren't using the latest version of Minetest, auto-trashing and auto-sort won't work")
 end
 
-minetest.register_on_player_inventory_action(function(player, action, inv, inv_info)
+core.register_on_player_inventory_action(function(player, action, inv, inv_info)
 	if action == "put" and inv_info.listname == "main" then
 		if ctf_modebase.current_mode and ctf_teams.get(player) then
 			local mode = ctf_modebase:get_current_mode()
@@ -308,7 +308,7 @@ minetest.register_on_player_inventory_action(function(player, action, inv, inv_i
 
 						if cprio and cprio < priority then
 							local item, typ = simplify_for_saved_stuff(compare:get_name())
-							--minetest.log(dump(item)..dump(typ))
+							--core.log(dump(item)..dump(typ))
 							inv:set_stack("main", i, inv_info.stack)
 
 							if item == "sword" and typ == "stone" and
@@ -406,7 +406,7 @@ function ctf_modebase.player.is_playing(player)
 end
 
 ctf_api.register_on_new_match(function()
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in pairs(core.get_connected_players()) do
 		if ctf_modebase.player.is_playing(player) then
 			ctf_modebase.player.empty_inv(player)
 			ctf_modebase.player.update(player)
@@ -423,7 +423,7 @@ if ctf_core.settings.server_mode ~= "mapedit" then
 	end)
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	player:set_hp(player:get_properties().hp_max)
 
 	local inv = player:get_inventory()

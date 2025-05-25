@@ -154,16 +154,16 @@ end
 
 default.cool_lava = function(pos, node)
 	if node.name == "default:lava_source" then
-		minetest.set_node(pos, {name = "default:obsidian"})
+		core.set_node(pos, {name = "default:obsidian"})
 	else -- Lava flowing
-		minetest.set_node(pos, {name = "default:stone"})
+		core.set_node(pos, {name = "default:stone"})
 	end
-	minetest.sound_play("default_cool_lava",
+	core.sound_play("default_cool_lava",
 		{pos = pos, max_hear_distance = 16, gain = 0.2}, true)
 end
 
-if minetest.settings:get_bool("enable_lavacooling") ~= false then
-	minetest.register_abm({
+if core.settings:get_bool("enable_lavacooling") ~= false then
+	core.register_abm({
 		label = "Lava cooling",
 		nodenames = {"default:lava_source", "default:lava_flowing"},
 		neighbors = {"group:cools_lava", "group:water"},
@@ -182,7 +182,7 @@ end
 --
 
 function default.get_inventory_drops(pos, inventory, drops)
-	local inv = minetest.get_meta(pos):get_inventory()
+	local inv = core.get_meta(pos):get_inventory()
 	local n = #drops
 	for i = 1, inv:get_size(inventory) do
 		local stack = inv:get_stack(inventory, i)
@@ -205,7 +205,7 @@ function default.grow_cactus(pos, node)
 		return
 	end
 	pos.y = pos.y - 1
-	if minetest.get_item_group(minetest.get_node(pos).name, "sand") == 0 then
+	if core.get_item_group(core.get_node(pos).name, "sand") == 0 then
 		return
 	end
 	pos.y = pos.y + 1
@@ -213,21 +213,21 @@ function default.grow_cactus(pos, node)
 	while node.name == "default:cactus" and height < 4 do
 		height = height + 1
 		pos.y = pos.y + 1
-		node = minetest.get_node(pos)
+		node = core.get_node(pos)
 	end
 	if height == 4 or node.name ~= "air" then
 		return
 	end
-	if minetest.get_node_light(pos) < 13 then
+	if core.get_node_light(pos) < 13 then
 		return
 	end
-	minetest.set_node(pos, {name = "default:cactus"})
+	core.set_node(pos, {name = "default:cactus"})
 	return true
 end
 
 function default.grow_papyrus(pos, node)
 	pos.y = pos.y - 1
-	local name = minetest.get_node(pos).name
+	local name = core.get_node(pos).name
 	if name ~= "default:dirt" and
 			name ~= "default:dirt_with_grass" and
 			name ~= "default:dirt_with_dry_grass" and
@@ -236,7 +236,7 @@ function default.grow_papyrus(pos, node)
 			name ~= "default:dry_dirt_with_dry_grass" then
 		return
 	end
-	if not minetest.find_node_near(pos, 3, {"group:water"}) then
+	if not core.find_node_near(pos, 3, {"group:water"}) then
 		return
 	end
 	pos.y = pos.y + 1
@@ -244,19 +244,19 @@ function default.grow_papyrus(pos, node)
 	while node.name == "default:papyrus" and height < 4 do
 		height = height + 1
 		pos.y = pos.y + 1
-		node = minetest.get_node(pos)
+		node = core.get_node(pos)
 	end
 	if height == 4 or node.name ~= "air" then
 		return
 	end
-	if minetest.get_node_light(pos) < 13 then
+	if core.get_node_light(pos) < 13 then
 		return
 	end
-	minetest.set_node(pos, {name = "default:papyrus"})
+	core.set_node(pos, {name = "default:papyrus"})
 	return true
 end
 
-minetest.register_abm({
+core.register_abm({
 	label = "Grow cactus",
 	nodenames = {"default:cactus"},
 	neighbors = {"group:sand"},
@@ -267,7 +267,7 @@ minetest.register_abm({
 	end
 })
 
-minetest.register_abm({
+core.register_abm({
 	label = "Grow papyrus",
 	nodenames = {"default:papyrus"},
 	-- Grows on the dirt and surface dirt nodes of the biomes papyrus appears in,
@@ -303,11 +303,11 @@ function default.dig_up(pos, node, digger, max_height)
 	in_dig_up = true
 	for y = 1, max_height do
 		local up_pos  = vector.offset(pos, 0, y, 0)
-		local up_node = minetest.get_node(up_pos)
+		local up_node = core.get_node(up_pos)
 		if up_node.name ~= node.name then
 			break
 		end
-		if not minetest.node_dig(up_pos, up_node, digger) then
+		if not core.node_dig(up_pos, up_node, digger) then
 			break
 		end
 	end
@@ -315,7 +315,7 @@ function default.dig_up(pos, node, digger, max_height)
 end
 
 -- errors are hard to handle, instead we rely on resetting this value the next step
-minetest.register_globalstep(function()
+core.register_globalstep(function()
 	in_dig_up = false
 end)
 
@@ -323,7 +323,7 @@ end)
 --
 -- Fence registration helper
 --
-local fence_collision_extra = minetest.settings:get_bool("enable_fence_tall") and 3/8 or 0
+local fence_collision_extra = core.settings:get_bool("enable_fence_tall") and 3/8 or 0
 
 function default.register_fence(name, def)
 	local fence_texture = "default_fence_overlay.png^" .. def.texture ..
@@ -377,12 +377,12 @@ function default.register_fence(name, def)
 	def.texture = nil
 	def.material = nil
 
-	minetest.register_node(name, def)
+	core.register_node(name, def)
 
 	-- Register crafting recipe, trim away starting colon if any
 	if not material then return end
 	name = string.gsub(name, "^:", "")
-	minetest.register_craft({
+	core.register_craft({
 		output = name .. " 4",
 		recipe = {
 			{ material, 'group:stick', material },
@@ -449,12 +449,12 @@ function default.register_fence_rail(name, def)
 	def.texture = nil
 	def.material = nil
 
-	minetest.register_node(name, def)
+	core.register_node(name, def)
 
 	-- Register crafting recipe, trim away starting colon if any
 	if not material then return end
 	name = string.gsub(name, "^:", "")
-	minetest.register_craft({
+	core.register_craft({
 		output = name .. " 16",
 		recipe = {
 			{ material, material },
@@ -500,12 +500,12 @@ function default.register_mesepost(name, def)
 	def.texture = nil
 	def.material = nil
 
-	minetest.register_node(name, def)
+	core.register_node(name, def)
 
 	-- Register crafting recipe, trim away starting colon if any
 	if not material then return end
 	name = string.gsub(name, "^:", "")
-	minetest.register_craft({
+	core.register_craft({
 		output = name .. " 4",
 		recipe = {
 			{'', 'default:glass', ''},
@@ -523,18 +523,18 @@ end
 
 default.after_place_leaves = function(pos, placer, itemstack, pointed_thing)
 	if placer and placer:is_player() then
-		local node = minetest.get_node(pos)
+		local node = core.get_node(pos)
 		node.param2 = 1
-		minetest.set_node(pos, node)
+		core.set_node(pos, node)
 	end
 end
 
 -- Leafdecay
 local function leafdecay_after_destruct(pos, oldnode, def)
-	for _, v in pairs(minetest.find_nodes_in_area(vector.subtract(pos, def.radius),
+	for _, v in pairs(core.find_nodes_in_area(vector.subtract(pos, def.radius),
 			vector.add(pos, def.radius), def.leaves)) do
-		local node = minetest.get_node(v)
-		local timer = minetest.get_node_timer(v)
+		local node = core.get_node(v)
+		local timer = core.get_node_timer(v)
 		if node.param2 ~= 1 and not timer:is_started() then
 			timer:start(math.random(20, 120) / 10)
 		end
@@ -542,15 +542,15 @@ local function leafdecay_after_destruct(pos, oldnode, def)
 end
 
 local movement_gravity = tonumber(
-	minetest.settings:get("movement_gravity")) or 9.81
+	core.settings:get("movement_gravity")) or 9.81
 
 local function leafdecay_on_timer(pos, def)
-	if minetest.find_node_near(pos, def.radius, def.trunks) then
+	if core.find_node_near(pos, def.radius, def.trunks) then
 		return false
 	end
 
-	local node = minetest.get_node(pos)
-	local drops = minetest.get_node_drops(node.name)
+	local node = core.get_node(pos)
+	local drops = core.get_node_drops(node.name)
 	for _, item in ipairs(drops) do
 		local is_leaf
 		for _, v in pairs(def.leaves) do
@@ -558,9 +558,9 @@ local function leafdecay_on_timer(pos, def)
 				is_leaf = true
 			end
 		end
-		if minetest.get_item_group(item, "leafdecay_drop") ~= 0 or
+		if core.get_item_group(item, "leafdecay_drop") ~= 0 or
 				not is_leaf then
-			minetest.add_item({
+			core.add_item({
 				x = pos.x - 0.5 + math.random(),
 				y = pos.y - 0.5 + math.random(),
 				z = pos.z - 0.5 + math.random(),
@@ -568,11 +568,11 @@ local function leafdecay_on_timer(pos, def)
 		end
 	end
 
-	minetest.remove_node(pos)
-	minetest.check_for_falling(pos)
+	core.remove_node(pos)
+	core.check_for_falling(pos)
 
 	-- spawn a few particles for the removed node
-	minetest.add_particlespawner({
+	core.add_particlespawner({
 		amount = 8,
 		time = 0.001,
 		minpos = vector.subtract(pos, {x=0.5, y=0.5, z=0.5}),
@@ -592,14 +592,14 @@ function default.register_leafdecay(def)
 	assert(def.trunks)
 	assert(def.radius)
 	for _, v in pairs(def.trunks) do
-		minetest.override_item(v, {
+		core.override_item(v, {
 			after_destruct = function(pos, oldnode)
 				leafdecay_after_destruct(pos, oldnode, def)
 			end,
 		})
 	end
 	for _, v in pairs(def.leaves) do
-		minetest.override_item(v, {
+		core.override_item(v, {
 			on_timer = function(pos)
 				leafdecay_on_timer(pos, def)
 			end,
@@ -612,7 +612,7 @@ end
 -- Convert default:dirt to something that fits the environment
 --
 
-minetest.register_abm({
+core.register_abm({
 	label = "Grass spread",
 	nodenames = {"default:dirt"},
 	neighbors = {
@@ -628,27 +628,27 @@ minetest.register_abm({
 		-- Check for darkness: night, shadow or under a light-blocking node
 		-- Returns if ignore above
 		local above = {x = pos.x, y = pos.y + 1, z = pos.z}
-		if (minetest.get_node_light(above) or 0) < 13 then
+		if (core.get_node_light(above) or 0) < 13 then
 			return
 		end
 
 		-- Look for spreading dirt-type neighbours
-		local p2 = minetest.find_node_near(pos, 1, "group:spreading_dirt_type")
+		local p2 = core.find_node_near(pos, 1, "group:spreading_dirt_type")
 		if p2 then
-			local n3 = minetest.get_node(p2)
-			minetest.set_node(pos, {name = n3.name})
+			local n3 = core.get_node(p2)
+			core.set_node(pos, {name = n3.name})
 			return
 		end
 
 		-- Else, any seeding nodes on top?
-		local name = minetest.get_node(above).name
+		local name = core.get_node(above).name
 		-- Snow check is cheapest, so comes first
 		if name == "default:snow" then
-			minetest.set_node(pos, {name = "default:dirt_with_snow"})
-		elseif minetest.get_item_group(name, "grass") ~= 0 then
-			minetest.set_node(pos, {name = "default:dirt_with_grass"})
-		elseif minetest.get_item_group(name, "dry_grass") ~= 0 then
-			minetest.set_node(pos, {name = "default:dirt_with_dry_grass"})
+			core.set_node(pos, {name = "default:dirt_with_snow"})
+		elseif core.get_item_group(name, "grass") ~= 0 then
+			core.set_node(pos, {name = "default:dirt_with_grass"})
+		elseif core.get_item_group(name, "dry_grass") ~= 0 then
+			core.set_node(pos, {name = "default:dirt_with_dry_grass"})
 		end
 	end
 })
@@ -658,7 +658,7 @@ minetest.register_abm({
 -- Grass and dry grass removed in darkness
 --
 
-minetest.register_abm({
+core.register_abm({
 	label = "Grass covered",
 	nodenames = {"group:spreading_dirt_type", "default:dry_dirt_with_dry_grass"},
 	interval = 8,
@@ -666,15 +666,15 @@ minetest.register_abm({
 	catch_up = false,
 	action = function(pos, node)
 		local above = {x = pos.x, y = pos.y + 1, z = pos.z}
-		local name = minetest.get_node(above).name
-		local nodedef = minetest.registered_nodes[name]
+		local name = core.get_node(above).name
+		local nodedef = core.registered_nodes[name]
 		if name ~= "ignore" and nodedef and not ((nodedef.sunlight_propagates or
 				nodedef.paramtype == "light") and
 				nodedef.liquidtype == "none") then
 			if node.name == "default:dry_dirt_with_dry_grass" then
-				minetest.set_node(pos, {name = "default:dry_dirt"})
+				core.set_node(pos, {name = "default:dry_dirt"})
 			else
-				minetest.set_node(pos, {name = "default:dirt"})
+				core.set_node(pos, {name = "default:dirt"})
 			end
 		end
 	end
@@ -693,7 +693,7 @@ local moss_correspondences = {
 	["stairs:stair_outer_cobble"] = "stairs:stair_outer_mossycobble",
 	["walls:cobble"] = "walls:mossycobble",
 }
-minetest.register_abm({
+core.register_abm({
 	label = "Moss growth",
 	nodenames = {"default:cobble", "stairs:slab_cobble", "stairs:stair_cobble",
 		"stairs:stair_inner_cobble", "stairs:stair_outer_cobble",
@@ -705,7 +705,7 @@ minetest.register_abm({
 	action = function(pos, node)
 		node.name = moss_correspondences[node.name]
 		if node.name then
-			minetest.set_node(pos, node)
+			core.set_node(pos, node)
 		end
 	end
 })
@@ -715,13 +715,13 @@ minetest.register_abm({
 --
 
 function default.register_craft_metadata_copy(ingredient, result)
-	minetest.register_craft({
+	core.register_craft({
 		type = "shapeless",
 		output = result,
 		recipe = {ingredient, result}
 	})
 
-	minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv)
+	core.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv)
 		if itemstack:get_name() ~= result then
 			return
 		end
@@ -748,7 +748,7 @@ end
 -- Log API / helpers
 --
 
-local log_non_player_actions = minetest.settings:get_bool("log_non_player_actions", false)
+local log_non_player_actions = core.settings:get_bool("log_non_player_actions", false)
 
 local is_pos = function(v)
 	return type(v) == "table" and
@@ -766,11 +766,11 @@ function default.log_player_action(player, ...)
 	end
 	for _, v in ipairs({...}) do
 		-- translate pos
-		local part = is_pos(v) and minetest.pos_to_string(v) or v
+		local part = is_pos(v) and core.pos_to_string(v) or v
 		-- no leading spaces before punctuation marks
 		msg = msg .. (string.match(part, "^[;,.]") and "" or " ") .. part
 	end
-	minetest.log("action",  msg)
+	core.log("action",  msg)
 end
 
 local nop = function() end
@@ -800,14 +800,14 @@ end
 
 function default.can_interact_with_node(player, pos)
 	if player and player:is_player() then
-		if minetest.check_player_privs(player, "protection_bypass") then
+		if core.check_player_privs(player, "protection_bypass") then
 			return true
 		end
 	else
 		return false
 	end
 
-	local meta = minetest.get_meta(pos)
+	local meta = core.get_meta(pos)
 	local owner = meta:get_string("owner")
 
 	if not owner or owner == "" or owner == player:get_player_name() then
@@ -816,16 +816,16 @@ function default.can_interact_with_node(player, pos)
 
 	-- Is player wielding the right key?
 	local item = player:get_wielded_item()
-	if minetest.get_item_group(item:get_name(), "key") == 1 then
+	if core.get_item_group(item:get_name(), "key") == 1 then
 		local key_meta = item:get_meta()
 
 		if key_meta:get_string("secret") == "" then
 			local key_oldmeta = item:get_meta():get_string("")
-			if key_oldmeta == "" or not minetest.parse_json(key_oldmeta) then
+			if key_oldmeta == "" or not core.parse_json(key_oldmeta) then
 				return false
 			end
 
-			key_meta:set_string("secret", minetest.parse_json(key_oldmeta).secret)
+			key_meta:set_string("secret", core.parse_json(key_oldmeta).secret)
 			item:set_metadata("")
 		end
 

@@ -93,14 +93,14 @@ local function add_kill(x, y, z)
 		table.remove(kill_list)
 	end
 
-	for _, p in pairs(minetest.get_connected_players()) do
+	for _, p in pairs(core.get_connected_players()) do
 		update_kill_list_hud(p)
 	end
 
 	globalstep_timer = 0
 end
 
-minetest.register_globalstep(function(dtime)
+core.register_globalstep(function(dtime)
 	globalstep_timer = globalstep_timer + dtime
 
 	if globalstep_timer >= KILLSTAT_REMOVAL_TIME then
@@ -108,7 +108,7 @@ minetest.register_globalstep(function(dtime)
 
 		table.remove(kill_list)
 
-		for _, p in pairs(minetest.get_connected_players()) do
+		for _, p in pairs(core.get_connected_players()) do
 			update_kill_list_hud(p)
 		end
 	end
@@ -119,7 +119,7 @@ ctf_api.register_on_match_end(function()
 	hud:clear_all()
 end)
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	update_kill_list_hud(player)
 end)
 

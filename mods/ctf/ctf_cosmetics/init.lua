@@ -67,7 +67,7 @@ function ctf_cosmetics.set_extra_clothing(player, extra_clothing)
 		current[clothing] = clothingcolor
 	end
 
-	return PlayerObj(player):get_meta():set_string("ctf_cosmetics:extra_clothing", minetest.serialize(current))
+	return PlayerObj(player):get_meta():set_string("ctf_cosmetics:extra_clothing", core.serialize(current))
 end
 
 function ctf_cosmetics.get_extra_clothing(player)
@@ -76,6 +76,6 @@ function ctf_cosmetics.get_extra_clothing(player)
 	if meta == "" then
 		return {_unset = true}
 	else
-		return minetest.deserialize(meta) or {_unset = true}
+		return core.deserialize(meta) or {_unset = true}
 	end
 end

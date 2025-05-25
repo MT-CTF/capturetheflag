@@ -1,4 +1,4 @@
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 ctf_settings.register("ctf_kill_list:tp_size", {
 	type = "list",
@@ -16,7 +16,7 @@ ctf_settings.register("use_hudbars", {
 		"health, stamina, and breath.\n" ..
 		"Disconnect and reconnect to see effects.",
 	on_change = function(player, new_value)
-		minetest.chat_send_player(player:get_player_name(), minetest.colorize("cyan",
+		core.chat_send_player(player:get_player_name(), core.colorize("cyan",
 			"[Notice]: You need to rejoin for your HUD to change"
 		))
 	end,

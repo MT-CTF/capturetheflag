@@ -4,8 +4,8 @@ ctf_teams.invites = {}
 -- Parties smaller than this will still be blocked if they are larger than the team size of the match
 ctf_teams.MAX_PARTY_SIZE = 4
 
--- Change max party size if it is set in minetest.conf
-local settingsMaxPartySize = minetest.settings:get("ctf_max_party_size")
+-- Change max party size if it is set in core.conf
+local settingsMaxPartySize = core.settings:get("ctf_max_party_size")
 if settingsMaxPartySize then
 	local numberMaxPartySize = tonumber(settingsMaxPartySize)
 	if numberMaxPartySize then
@@ -21,7 +21,7 @@ You must leave using \"/party leave\" before you can accept new invitations.",
 	cantInviteSelf = "You can't invite yourself to a party, silly!"
 }
 
-if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
+if tostring(core.settings:get("ctf_allow_parties")) == "true" then
 	local partiescmdbuilder = chatcmdbuilder.register("party", {
 		description = "Party management commands",
 		params = "invite <player> | accept <player> | leave | info"
@@ -30,45 +30,45 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 	partiescmdbuilder:sub("info", function (name)
 		local playerPartyInfo = ctf_teams.getPlayerPartyInfo(name)
 		if playerPartyInfo == nil then
-			minetest.chat_send_player(name, "You are not in a party")
+			core.chat_send_player(name, "You are not in a party")
 		else
 			local partyMembersString = "Party members: "
 			for index, playerName in ipairs(playerPartyInfo.player_party) do
 				partyMembersString = partyMembersString..playerName.." "
 			end
-			minetest.chat_send_player(name, partyMembersString)
+			core.chat_send_player(name, partyMembersString)
 		end
 
 		local playerInviteInfo = ctf_teams.getPlayerInviteInfo(name)
 		if playerInviteInfo == nil then
-			minetest.chat_send_player(name, "You have no outgoing or incoming invites")
+			core.chat_send_player(name, "You have no outgoing or incoming invites")
 			return
 		end
 		if playerInviteInfo.outgoingInvites == nil then
-			minetest.chat_send_player(name, "You have no outgoing invites")
+			core.chat_send_player(name, "You have no outgoing invites")
 		else
 			local outgoingInvitesString = "You have pending outgoing invites to: "
 			for key, invite in pairs(playerInviteInfo.outgoingInvites) do
 				outgoingInvitesString = outgoingInvitesString..invite.invited.." "
 			end
-			minetest.chat_send_player(name, outgoingInvitesString)
+			core.chat_send_player(name, outgoingInvitesString)
 		end
 
 		if playerInviteInfo.incomingInvites == nil then
-			minetest.chat_send_player(name, "You have no incoming invites")
+			core.chat_send_player(name, "You have no incoming invites")
 		else
 			local incomingInvitesString = "You have pending incoming invites from: "
 			for _, invite in pairs(playerInviteInfo.incomingInvites) do
 				incomingInvitesString = incomingInvitesString..invite.inviter.." "
 			end
-			minetest.chat_send_player(name, incomingInvitesString)
+			core.chat_send_player(name, incomingInvitesString)
 		end
 	end)
 
 	partiescmdbuilder:sub("invite :player:username", function (name, player)
-		if minetest.get_player_by_name(player) then
+		if core.get_player_by_name(player) then
 			if player == name then
-				minetest.chat_send_player(name, staticPartyMessages.cantInviteSelf)
+				core.chat_send_player(name, staticPartyMessages.cantInviteSelf)
 				return
 			end
 			local inviteInfo = ctf_teams.getPlayerInviteInfo(name)
@@ -76,7 +76,7 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 				if inviteInfo.outgoingInvites then
 					for index, invite in ipairs(inviteInfo.outgoingInvites) do
 						if invite.invited == player then
-							minetest.chat_send_player(name, "You already invited "..player.." to your party.")
+							core.chat_send_player(name, "You already invited "..player.." to your party.")
 							return
 						end
 					end
@@ -86,37 +86,37 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 			if partyInfo then
 				for index, playerName in ipairs(partyInfo.player_party) do
 					if playerName == player then
-						minetest.chat_send_player(name, player.." is already in your party.")
+						core.chat_send_player(name, player.." is already in your party.")
 						return
 					end
 				end
 			end
 			local response = ctf_teams.canPartyAcceptNewPlayers(name)
 			if response ~= "yes" then
-				minetest.chat_send_player(name, "Could not invite "..player.." to your party.")
+				core.chat_send_player(name, "Could not invite "..player.." to your party.")
 				if (response == "over max party size") then
-					minetest.chat_send_player(name, "Your party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE)
+					core.chat_send_player(name, "Your party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE)
 				elseif (response == "over team size") then
-					minetest.chat_send_player(name, staticPartyMessages.partyAtTeamSize)
+					core.chat_send_player(name, staticPartyMessages.partyAtTeamSize)
 				end
 				return
 			end
-			minetest.chat_send_player(name, "Inviting "..player.." to your party. They must accept to join.")
+			core.chat_send_player(name, "Inviting "..player.." to your party. They must accept to join.")
 
-			minetest.chat_send_player(player, name.." has invited you to their party.")
-			minetest.chat_send_player(player, "Type \"/party accept "..name.."\" to join.")
+			core.chat_send_player(player, name.." has invited you to their party.")
+			core.chat_send_player(player, "Type \"/party accept "..name.."\" to join.")
 			table.insert(ctf_teams.invites, {inviter = name, invited = player})
 		else
-			minetest.chat_send_player(name, player.." is not online, or isn't a player")
+			core.chat_send_player(name, player.." is not online, or isn't a player")
 		end
 	end)
 
 	partiescmdbuilder:sub("accept :player:username", function (name, player)
-		if minetest.get_player_by_name(player) == nil then
-			minetest.chat_send_player(name, player.." is not online, or isn't a player")
+		if core.get_player_by_name(player) == nil then
+			core.chat_send_player(name, player.." is not online, or isn't a player")
 			return
 		else if ctf_teams.getPlayerPartyInfo(name) ~= nil then
-			minetest.chat_send_player(name, staticPartyMessages.inPartyCantAcceptInvite)
+			core.chat_send_player(name, staticPartyMessages.inPartyCantAcceptInvite)
 			return
 		end
 		local response = ctf_teams.canPartyAcceptNewPlayers(player)
@@ -127,22 +127,22 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 						break
 					end
 				end
-				minetest.chat_send_player(name, "Could not accept party invite from "..player)
-				minetest.chat_send_player(player, name.." could not accept a party invite from you.")
+				core.chat_send_player(name, "Could not accept party invite from "..player)
+				core.chat_send_player(player, name.." could not accept a party invite from you.")
 				if (response == "over max party size") then
 					-- Send to person who tried to accept
 					local overMaxSizeMsg = player.."'s party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE
-					minetest.chat_send_player(name, overMaxSizeMsg)
+					core.chat_send_player(name, overMaxSizeMsg)
 					-- Send to person who invited the player who couldn't join
 					overMaxSizeMsg = "Your party is already at the max size of "..ctf_teams.MAX_PARTY_SIZE
-					minetest.chat_send_player(player, overMaxSizeMsg)
+					core.chat_send_player(player, overMaxSizeMsg)
 				elseif (response == "over team size") then
 					-- Send to person who tried to join a too big party
-					minetest.chat_send_player(name, player.."'s party is already at the team size.")
-					minetest.chat_send_player(name, "Adding more players would make it unfair.")
+					core.chat_send_player(name, player.."'s party is already at the team size.")
+					core.chat_send_player(name, "Adding more players would make it unfair.")
 					-- Send to party inviter
-					minetest.chat_send_player(player, "Your party is already at the team size.")
-					minetest.chat_send_player(player, "Adding more players would make it unfair.")
+					core.chat_send_player(player, "Your party is already at the team size.")
+					core.chat_send_player(player, "Adding more players would make it unfair.")
 				end
 				return
 			end
@@ -155,13 +155,13 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 				-- Create a new party if the inviter is currently not in one
 				if inviterPartyInfo == nil then
 					table.insert(ctf_teams.parties, {player, name})
-					minetest.chat_send_player(name, youJoinPartyMsg)
-					minetest.chat_send_player(player, playerJoinYourPartyMsg)
+					core.chat_send_player(name, youJoinPartyMsg)
+					core.chat_send_player(player, playerJoinYourPartyMsg)
 				else
 					for _, player_name in ipairs(inviterPartyInfo.player_party) do
-						minetest.chat_send_player(player_name, playerJoinYourPartyMsg)
+						core.chat_send_player(player_name, playerJoinYourPartyMsg)
 					end
-					minetest.chat_send_player(name, youJoinPartyMsg)
+					core.chat_send_player(name, youJoinPartyMsg)
 					table.insert(inviterPartyInfo.player_party, name)
 				end
 				-- Remove the invite then return. The removal of an item during a for loop
@@ -170,7 +170,7 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 				return
 			end
 		end
-		minetest.chat_send_player(name, "You currently have no party invites from "..player)
+		core.chat_send_player(name, "You currently have no party invites from "..player)
 	end
 	end)
 
@@ -179,20 +179,20 @@ if tostring(minetest.settings:get("ctf_allow_parties")) == "true" then
 		if playerPartyInfo ~= nil then
 			for index, player_name in ipairs(ctf_teams.parties[playerPartyInfo.party_index]) do
 				if name ~= player_name then
-					minetest.chat_send_player(player_name, name.." has left your party.")
+					core.chat_send_player(player_name, name.." has left your party.")
 				end
 			end
 			ctf_teams.removeFromParty(playerPartyInfo)
-			minetest.chat_send_player(name, "You have left the party")
+			core.chat_send_player(name, "You have left the party")
 		else
-			minetest.chat_send_player(name, "You are not in a party")
+			core.chat_send_player(name, "You are not in a party")
 		end
 	end)
 end
 
 --- @param player string
 function ctf_teams.getPlayerPartyInfo(player)
-	if minetest.get_player_by_name(player) == nil then
+	if core.get_player_by_name(player) == nil then
 		return nil
 	else
 		for party_index, party in ipairs(ctf_teams.parties) do
@@ -225,7 +225,7 @@ function ctf_teams.removeFromParty(arg)
 		if playerPartyLength < 2 then
 			if playerPartyLength == 1 then
 				for index, player_name in ipairs(playerPartyInfo.player_party) do
-					minetest.chat_send_player(player_name, staticPartyMessages.partyDisbanded)
+					core.chat_send_player(player_name, staticPartyMessages.partyDisbanded)
 				end
 			end
 			table.remove(ctf_teams.parties, playerPartyInfo.party_index)
@@ -235,7 +235,7 @@ end
 
 --- @param player string
 function ctf_teams.getPlayerInviteInfo(player)
-	if minetest.get_player_by_name(player) == nil then
+	if core.get_player_by_name(player) == nil then
 		return nil
 	else
 		local infoToReturn = {outgoingInvites = nil, incomingInvites = nil}
@@ -302,7 +302,7 @@ function ctf_teams.canPartyAcceptNewPlayers(player)
 	-- Assumes it is a two team map next so you can invite a larger number of players to your party
 	-- even if you are currently on a 4 team map,
 	-- but it still may disband the party next round if it too big for the map.
-	local playersPerTeam =  math.floor(#minetest.get_connected_players() / 2)
+	local playersPerTeam =  math.floor(#core.get_connected_players() / 2)
 
 	if (playersPerTeam == 1) or (playersPerTeam == 0) then
 		return "over team size"
@@ -328,17 +328,17 @@ function ctf_teams.deleteOversizedParties()
 			if #party > ctf_teams.MAX_PARTY_SIZE then
 				local disbandReason = "it is over the max party size of "..ctf_teams.MAX_PARTY_SIZE
 				for _, player in pairs(party) do
-					minetest.chat_send_player(player, incompleteDisbandMsg..disbandReason)
+					core.chat_send_player(player, incompleteDisbandMsg..disbandReason)
 				end
 				table.remove(ctf_teams.parties, index)
 				hasRemovedInviteThisItteration = true
 				break
 			end
-			local teamSize = math.floor(#minetest.get_connected_players() / #ctf_teams.current_team_list)
+			local teamSize = math.floor(#core.get_connected_players() / #ctf_teams.current_team_list)
 			if #party > teamSize then
 				local disbandReason = "it is bigger than the team size of "..teamSize.." players."
 				for _, player in pairs(party) do
-					minetest.chat_send_player(player, incompleteDisbandMsg..disbandReason)
+					core.chat_send_player(player, incompleteDisbandMsg..disbandReason)
 				end
 				table.remove(ctf_teams.parties, index)
 				hasRemovedInviteThisItteration = true

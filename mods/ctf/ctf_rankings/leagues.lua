@@ -1,4 +1,4 @@
-local mods = minetest.get_mod_storage()
+local mods = core.get_mod_storage()
 
 local cache = {}
 
@@ -11,7 +11,7 @@ function ctf_rankings.update_league(player)
 		league = player:get_meta():get_string("ctf_rankings:leagues")
 
 		if league ~= "" then
-			league = minetest.deserialize(league)
+			league = core.deserialize(league)
 		else
 			hpbar.set_icon(player, "")
 			return
@@ -25,17 +25,17 @@ function ctf_rankings.update_league(player)
 	end
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
 	local pname = player:get_player_name()
 	local leagues = {}
 
 	if meta:get_string("ctf_rankings:leagues") == "" or
 	ctf_rankings.current_reset > meta:get_int("ctf_rankings:last_reset") then
-		minetest.log("action", "[CTF_RANKINGS]: Getting league of player "..pname.." for the first time")
+		core.log("action", "[CTF_RANKINGS]: Getting league of player "..pname.." for the first time")
 
 		local data = mods:get_string("rank:"..pname)
-		data = (data ~= "") and minetest.parse_json(data) or false
+		data = (data ~= "") and core.parse_json(data) or false
 
 		if data and data._last_reset then
 			for mode, rank in pairs(data[data._last_reset]) do
@@ -62,7 +62,7 @@ minetest.register_on_joinplayer(function(player)
 			end
 
 			cache[pname] = leagues
-			meta:set_string("ctf_rankings:leagues", minetest.serialize(leagues))
+			meta:set_string("ctf_rankings:leagues", core.serialize(leagues))
 			meta:set_int("ctf_rankings:last_reset", ctf_rankings.current_reset)
 		end
 	end
@@ -94,7 +94,7 @@ local persisted_cache_count = 0
 local removed_cache_count = 0
 local PERSIST_LIM = 1000
 local CLEAR_CACHE_TRIGGER = PERSIST_LIM
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	if persisted_cache_count <= PERSIST_LIM then
 		persisted_cache_count = persisted_cache_count + 1
 	elseif removed_cache_count >= CLEAR_CACHE_TRIGGER then
@@ -102,7 +102,7 @@ minetest.register_on_leaveplayer(function(player)
 		removed_cache_count = 0
 		persisted_cache_count = 0
 
-		minetest.log("action", "[CTF Leagues]: Reset league cache")
+		core.log("action", "[CTF Leagues]: Reset league cache")
 	else
 		removed_cache_count = removed_cache_count + 1
 		cache[player:get_player_name()] = nil
@@ -110,14 +110,14 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 ctf_api.register_on_new_match(function()
-	minetest.after(1, function()
-		for _, p in pairs(minetest.get_connected_players()) do
+	core.after(1, function()
+		for _, p in pairs(core.get_connected_players()) do
 			ctf_rankings.update_league(p)
 		end
 	end)
 end)
 
-minetest.register_chatcommand("league", {
+core.register_chatcommand("league", {
 	description = "See the past league/ranking placements of yourself or another player",
 	params = "[pname]",
 	func = function(name, params)
@@ -128,7 +128,7 @@ minetest.register_chatcommand("league", {
 		local key = "rank:" .. params
 		local data = mods:get_string(key)
 
-		local oldrank_data = (data ~= "") and minetest.parse_json(data) or false
+		local oldrank_data = (data ~= "") and core.parse_json(data) or false
 
 		if oldrank_data then
 			local out = ""
@@ -168,7 +168,7 @@ minetest.register_chatcommand("league", {
 	end
 })
 
-minetest.register_chatcommand("leagues", {
+core.register_chatcommand("leagues", {
 	description = "Shows a list of leagues and the placement needed to get in each of them",
 	func = function(name)
 		local out = ""

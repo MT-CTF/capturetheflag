@@ -2,36 +2,36 @@ ctf_gui.old_init()
 
 local context = {}
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local function greet_player(player)
-	minetest.chat_send_player(
+	core.chat_send_player(
 		player:get_player_name(),
-		minetest.colorize(ctf_map.CHAT_COLOR, S("Welcome! This server is in mapedit mode.").."\n")
+		core.colorize(ctf_map.CHAT_COLOR, S("Welcome! This server is in mapedit mode.").."\n")
 	)
-	if not minetest.check_player_privs(player, "ctf_map_editor") then
-		minetest.chat_send_player(
+	if not core.check_player_privs(player, "ctf_map_editor") then
+		core.chat_send_player(
 			player:get_player_name(),
-			minetest.colorize(ctf_map.CHAT_COLOR,
+			core.colorize(ctf_map.CHAT_COLOR,
 					S("To start, grant yourself \"ctf_map_editor\" "..
 					"using \"/grantme ctf_map_editor\". Then run \"/ctf_map editor\""))
 		)
 	else
-		minetest.chat_send_player(
+		core.chat_send_player(
 			player:get_player_name(),
-			minetest.colorize(ctf_map.CHAT_COLOR, S("To start, run \"/ctf_map editor\""))
+			core.colorize(ctf_map.CHAT_COLOR, S("To start, run \"/ctf_map editor\""))
 		)
 	end
 end
 
 if ctf_core.settings.server_mode == "mapedit" then
-	minetest.register_on_joinplayer(greet_player)
+	core.register_on_joinplayer(greet_player)
 end
 
 local function edit_map(pname, map)
-	local p = minetest.get_player_by_name(pname)
+	local p = core.get_player_by_name(pname)
 
-	minetest.close_formspec(pname, "ctf_map:loading")
+	core.close_formspec(pname, "ctf_map:loading")
 
 	ctf_map.announce_map(map)
 
@@ -45,10 +45,10 @@ local function edit_map(pname, map)
 		gravity = map.phys_gravity,
 	})
 
-	minetest.settings:set("time_speed", map.time_speed * 72)
-	minetest.registered_chatcommands["time"].func(pname, tostring(map.start_time))
+	core.settings:set("time_speed", map.time_speed * 72)
+	core.registered_chatcommands["time"].func(pname, tostring(map.start_time))
 
-	minetest.after(8, minetest.fix_light, map.pos1, map.pos2)
+	core.after(8, core.fix_light, map.pos1, map.pos2)
 
 	context[pname] = map
 end
@@ -66,7 +66,7 @@ function ctf_map.set_flag_location(pname, teamname, pos)
 end
 
 local function dothenext(time, dir, func)
-	minetest.after(time, function()
+	core.after(time, function()
 		local next = function(dir2)
 			dothenext(time, dir2, func)
 		end
@@ -80,9 +80,9 @@ ctf_map.register_map_command("resave_all", function(name, params)
 
 	dothenext(1, 1, function(next, dir)
 		if not maplist[dir] then
-			minetest.chat_send_player(
+			core.chat_send_player(
 				name,
-				"\n"..minetest.colorize("green", S("Map resaving done.")).."\n"
+				"\n"..core.colorize("green", S("Map resaving done.")).."\n"
 			)
 			return
 		end
@@ -134,8 +134,8 @@ function ctf_map.show_map_editor(player)
 				type = "button", exit = true, label = S("Create New Map"),
 				pos = {"center", 0},
 				func = function(pname)
-					minetest.chat_send_player(pname,
-							minetest.colorize(ctf_map.CHAT_COLOR,
+					core.chat_send_player(pname,
+							core.colorize(ctf_map.CHAT_COLOR,
 									S("Please decide what the size of your map will be ")..
 									S("and punch nodes on two opposite corners of it")))
 					ctf_map.get_pos_from_player(pname, 2, function(p, positions)
@@ -168,7 +168,7 @@ function ctf_map.show_map_editor(player)
 							game_modes    = {},
 						}
 
-						minetest.chat_send_player(pname, minetest.colorize(ctf_map.CHAT_COLOR,
+						core.chat_send_player(pname, core.colorize(ctf_map.CHAT_COLOR,
 								S("Build away! When you are done, run \"/ctf_map editor\"")))
 					end)
 				end,
@@ -179,7 +179,7 @@ function ctf_map.show_map_editor(player)
 				size = {6, 6},
 				items = maplist_sorted,
 				func = function(pname, fields)
-					local event = minetest.explode_textlist_event(fields.currentmaps)
+					local event = core.explode_textlist_event(fields.currentmaps)
 
 					if event.type ~= "INV" then
 						selected_map = event.index
@@ -190,7 +190,7 @@ function ctf_map.show_map_editor(player)
 				type = "button", exit = true, label = S("Start Editing"),
 				pos = {0.1, 7.8},
 				func = function(pname, fields)
-					minetest.after(0.1, function()
+					core.after(0.1, function()
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = S("Capture The Flag Map Editor"),
@@ -199,12 +199,12 @@ function ctf_map.show_map_editor(player)
 						})
 					end)
 
-					minetest.after(0.5, function()
+					core.after(0.5, function()
 						local idx = table.indexof(maplist, maplist_sorted[selected_map])
 						local map = ctf_map.load_map_meta(idx, maplist_sorted[selected_map])
 
 						ctf_map.place_map(map, function()
-								minetest.after(2, edit_map, pname, map)
+								core.after(2, edit_map, pname, map)
 						end)
 					end)
 				end,
@@ -213,7 +213,7 @@ function ctf_map.show_map_editor(player)
 				type = "button", exit = true, label = S("Resume Editing"),
 				pos = {(8-ctf_gui.ELEM_SIZE.x) - 0.3, 7.8},
 				func = function(pname, fields)
-					minetest.after(0.1, function()
+					core.after(0.1, function()
 						ctf_gui.old_show_formspec(pname, "ctf_map:loading", {
 							size = {x = 6, y = 4},
 							title = S("Capture The Flag Map Editor"),
@@ -222,11 +222,11 @@ function ctf_map.show_map_editor(player)
 						})
 					end)
 
-					minetest.after(0.5, function()
+					core.after(0.5, function()
 						local idx = table.indexof(maplist, maplist_sorted[selected_map])
 						local map = ctf_map.load_map_meta(idx, maplist_sorted[selected_map])
 
-						minetest.after(2, edit_map, pname, map)
+						core.after(2, edit_map, pname, map)
 					end)
 				end,
 			},
@@ -236,7 +236,7 @@ end
 
 function ctf_map.show_map_save_form(player, scroll_pos)
 	if not context[player] then
-		minetest.log("error", "Cannot show save form because "..player.." is not editing a map!")
+		core.log("error", "Cannot show save form because "..player.." is not editing a map!")
 		return
 	end
 
@@ -260,8 +260,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	-- MAP CORNERS
 	elements.positions = {
 		type = "button", exit = true,
-		label = S("Corners") .." - ".. minetest.pos_to_string(context[player].pos1, 0) ..
-				" - " .. minetest.pos_to_string(context[player].pos2, 0),
+		label = S("Corners") .." - ".. core.pos_to_string(context[player].pos1, 0) ..
+				" - " .. core.pos_to_string(context[player].pos2, 0),
 		pos = {0, 0.5},
 		size = {10 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
 		func = function(pname)
@@ -382,12 +382,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		size = {ctf_gui.FORM_SIZE.x/2 - 0.4, 2},
 		items = context[player].game_modes,
 		func = function(pname, fields)
-			local event = minetest.explode_textlist_event(fields.game_modes)
+			local event = core.explode_textlist_event(fields.game_modes)
 
 			if event.type == "DCL" then
 				table.remove(context[pname].game_modes, event.index)
 
-				ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+				ctf_map.show_map_save_form(pname, core.explode_scrollbar_event(fields.formcontent).value)
 			end
 		end
 	}
@@ -397,12 +397,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		size = {ctf_gui.FORM_SIZE.x/2 - 0.4, 2},
 		items = available_game_modes,
 		func = function(pname, fields)
-			local event = minetest.explode_textlist_event(fields.available_game_modes)
+			local event = core.explode_textlist_event(fields.available_game_modes)
 
 			if event.type == "DCL" then
 				table.insert(context[pname].game_modes, available_game_modes[event.index])
 
-				ctf_map.show_map_save_form(pname, minetest.explode_scrollbar_event(fields.formcontent).value)
+				ctf_map.show_map_save_form(pname, core.explode_scrollbar_event(fields.formcontent).value)
 			end
 		end
 	}
@@ -436,7 +436,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			context[pname].start_time = tonumber(fields.start_time or ctf_map.DEFAULT_START_TIME)
 
 			if context[pname].start_time ~= oldval then
-				minetest.registered_chatcommands["time"].func(pname, tostring(context[pname].start_time))
+				core.registered_chatcommands["time"].func(pname, tostring(context[pname].start_time))
 			end
 		end,
 	}
@@ -451,7 +451,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			context[pname].time_speed = tonumber(fields.time_speed or "1")
 
 			if context[pname].time_speed ~= oldval then
-				minetest.settings:set("time_speed", context[pname].time_speed * 72)
+				core.settings:set("time_speed", context[pname].time_speed * 72)
 			end
 		end,
 	}
@@ -474,13 +474,13 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		elements[teamname.."_button"] = {
 			type = "button",
 			exit = true,
-			label = S("Set Flag Pos") .. ": " .. minetest.pos_to_string(def.flag_pos),
+			label = S("Set Flag Pos") .. ": " .. core.pos_to_string(def.flag_pos),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {5, ctf_gui.ELEM_SIZE.y},
 			func = function(pname, fields)
 					ctf_map.get_pos_from_player(pname, 1, function(name, positions)
 						local pos = positions[1]
-						local node = minetest.get_node(pos).name
+						local node = core.get_node(pos).name
 
 						if string.match(node, "^ctf_modebase:flag_top_.*$") then
 							pos = vector.offset(pos, 0, -1, 0)
@@ -490,12 +490,12 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 						ctf_map.set_flag_location(pname, teamname, pos)
 
-						local facedir = minetest.dir_to_facedir(minetest.get_player_by_name(pname):get_look_dir())
-						minetest.set_node(pos, {name="ctf_modebase:flag", param2=facedir})
-						minetest.set_node(vector.offset(pos, 0, 1, 0), {name="ctf_modebase:flag_top_"..teamname, param2 = facedir})
+						local facedir = core.dir_to_facedir(core.get_player_by_name(pname):get_look_dir())
+						core.set_node(pos, {name="ctf_modebase:flag", param2=facedir})
+						core.set_node(vector.offset(pos, 0, 1, 0), {name="ctf_modebase:flag_top_"..teamname, param2 = facedir})
 
-						minetest.after(0.1, ctf_map.show_map_save_form, pname,
-								minetest.explode_scrollbar_event(fields.formcontent).value)
+						core.after(0.1, ctf_map.show_map_save_form, pname,
+								core.explode_scrollbar_event(fields.formcontent).value)
 					end)
 			end,
 		}
@@ -515,8 +515,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 
 		elements[teamname.."_positions"] = {
 			type = "button", exit = true,
-			label = S("Zone Bounds") .. " - " .. minetest.pos_to_string(context[player].teams[teamname].pos1, 0) ..
-					" - " .. minetest.pos_to_string(context[player].teams[teamname].pos2, 0),
+			label = S("Zone Bounds") .. " - " .. core.pos_to_string(context[player].teams[teamname].pos1, 0) ..
+					" - " .. core.pos_to_string(context[player].teams[teamname].pos2, 0),
 			pos = {0.2, idx-(ctf_gui.ELEM_SIZE.y/2)},
 			size = {9 - (ctf_gui.SCROLLBAR_WIDTH + 0.1), ctf_gui.ELEM_SIZE.y},
 			func = function(pname, fields)
@@ -524,8 +524,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 					context[pname].teams[teamname].pos1 = positions[1]
 					context[pname].teams[teamname].pos2 = positions[2]
 
-					minetest.after(0.1, ctf_map.show_map_save_form, pname,
-							minetest.explode_scrollbar_event(fields.formcontent).value)
+					core.after(0.1, ctf_map.show_map_save_form, pname,
+							core.explode_scrollbar_event(fields.formcontent).value)
 				end)
 			end,
 		}
@@ -553,8 +553,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			func = function(pname, fields)
 				context[pname].teams[teamname].look_pos = nil
 
-				minetest.after(0.1, ctf_map.show_map_save_form, pname,
-						minetest.explode_scrollbar_event(fields.formcontent).value)
+				core.after(0.1, ctf_map.show_map_save_form, pname,
+						core.explode_scrollbar_event(fields.formcontent).value)
 			end,
 		}
 
@@ -568,8 +568,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				ctf_map.get_pos_from_player(pname, 1, function(_, positions)
 					context[pname].teams[teamname].look_pos = positions[1]
 
-					minetest.after(0.1, ctf_map.show_map_save_form, pname,
-							minetest.explode_scrollbar_event(fields.formcontent).value)
+					core.after(0.1, ctf_map.show_map_save_form, pname,
+							core.explode_scrollbar_event(fields.formcontent).value)
 				end)
 			end,
 			exit = true,
@@ -590,8 +590,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				pos2 = vector.new(),
 				amount = ctf_map.DEFAULT_CHEST_AMOUNT,
 			})
-			minetest.after(0.1, ctf_map.show_map_save_form, pname,
-					minetest.explode_scrollbar_event(fields.formcontent).value)
+			core.after(0.1, ctf_map.show_map_save_form, pname,
+					core.explode_scrollbar_event(fields.formcontent).value)
 		end,
 	}
 	idx = idx + 1
@@ -601,8 +601,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 			elements["chestzone_"..id] = {
 				type = "button",
 				exit = true,
-				label = S("Chest Zone").." "..id.." - "..minetest.pos_to_string(def.pos1, 0) ..
-						" - "..minetest.pos_to_string(def.pos2, 0),
+				label = S("Chest Zone").." "..id.." - "..core.pos_to_string(def.pos1, 0) ..
+						" - "..core.pos_to_string(def.pos2, 0),
 				pos = {0, idx},
 				size = {7, ctf_gui.ELEM_SIZE.y},
 				func = function(pname, fields)
@@ -612,8 +612,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 						context[pname].chests[id].pos1 = new_positions[1]
 						context[pname].chests[id].pos2 = new_positions[2]
 
-						minetest.after(0.1, ctf_map.show_map_save_form, pname,
-								minetest.explode_scrollbar_event(fields.formcontent).value)
+						core.after(0.1, ctf_map.show_map_save_form, pname,
+								core.explode_scrollbar_event(fields.formcontent).value)
 					end)
 				end,
 			}
@@ -640,8 +640,8 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				size = {ctf_gui.ELEM_SIZE.y, ctf_gui.ELEM_SIZE.y},
 				func = function(pname, fields)
 					table.remove(context[pname].chests, id)
-					minetest.after(0.1, ctf_map.show_map_save_form, pname,
-							minetest.explode_scrollbar_event(fields.formcontent).value)
+					core.after(0.1, ctf_map.show_map_save_form, pname,
+							core.explode_scrollbar_event(fields.formcontent).value)
 				end,
 			}
 			idx = idx + 1
@@ -656,7 +656,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		pos = {(5 - 0.2) - (ctf_gui.ELEM_SIZE.x / 2), idx},
 		label = S("Finish Editing"),
 		func = function(pname)
-			minetest.after(0.1, function()
+			core.after(0.1, function()
 				if context[pname].initial_stuff[1] == "none" then
 					table.remove(context[player].initial_stuff, 1)
 				end
@@ -678,7 +678,7 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 		pos = {ctf_gui.FORM_SIZE.x - ctf_gui.SCROLLBAR_WIDTH - ctf_gui.ELEM_SIZE.x - 1, idx},
 		label = S("Cancel Editing"),
 		func = function(pname)
-			minetest.after(0.1, function()
+			core.after(0.1, function()
 				context[pname] = nil
 				ctf_map.show_map_editor(player)
 			end)

@@ -7,14 +7,14 @@ local location = {
 
 local players = {}
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
-minetest.register_item("wield3d:hand", {
+core.register_item("wield3d:hand", {
 	type = "none",
 	wield_image = "blank.png",
 })
 
-minetest.register_entity("wield3d:entity", {
+core.register_entity("wield3d:entity", {
 	visual = "wielditem",
 	wield_item = "wield3d:hand",
 	visual_size = location[4],
@@ -44,13 +44,13 @@ local function update_entity(player)
 end
 
 local globalstep_timer = 0
-minetest.register_globalstep(function(dtime)
+core.register_globalstep(function(dtime)
 	globalstep_timer = globalstep_timer + dtime
 	if globalstep_timer < 0.5 then return end
 
 	globalstep_timer = 0
 
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		if players[player:get_player_name()] ~= nil then
 			update_entity(player)
 		end
@@ -58,7 +58,7 @@ minetest.register_globalstep(function(dtime)
 end)
 
 local function add_wielditem(player)
-	local entity = minetest.add_entity(player:get_pos(), "wield3d:entity")
+	local entity = core.add_entity(player:get_pos(), "wield3d:entity")
 	local setting = ctf_settings.get(player, "use_old_wielditem_display")
 
 	entity:set_attach(
@@ -80,8 +80,8 @@ local function remove_wielditem(player)
 	end
 end
 
-minetest.register_on_joinplayer(add_wielditem)
-minetest.register_on_leaveplayer(remove_wielditem)
+core.register_on_joinplayer(add_wielditem)
+core.register_on_leaveplayer(remove_wielditem)
 
 
 ctf_settings.register("use_old_wielditem_display", {

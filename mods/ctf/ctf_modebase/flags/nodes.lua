@@ -1,7 +1,7 @@
 if ctf_core.settings.server_mode == "play" then
-	local old_protected = minetest.is_protected
-	minetest.is_protected = function(pos, ...)
-		local foundpos = minetest.find_node_near(pos, 2, "ctf_modebase:flag", true)
+	local old_protected = core.is_protected
+	core.is_protected = function(pos, ...)
+		local foundpos = core.find_node_near(pos, 2, "ctf_modebase:flag", true)
 
 		if foundpos and pos.y > foundpos.y-1 then
 			-- Allow placement of blocks in the corners of the 3x3 flag area (at all heights)
@@ -14,10 +14,10 @@ if ctf_core.settings.server_mode == "play" then
 	end
 end
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 -- The flag
-minetest.register_node("ctf_modebase:flag", {
+core.register_node("ctf_modebase:flag", {
 	description = "Flag",
 	drawtype = "nodebox",
 	paramtype = "light",
@@ -41,13 +41,13 @@ minetest.register_node("ctf_modebase:flag", {
 	groups = {immortal=1,is_flag=1,flag_bottom=1,not_in_creative_inventory=1},
 	on_punch = function(pos, node, puncher, pointed_thing, ...)
 		local pos_above = vector.offset(pos, 0, 1, 0)
-		local node_above = minetest.get_node(pos_above)
+		local node_above = core.get_node(pos_above)
 
 		if node_above.name ~= "ctf_modebase:flag_captured_top" then
 			ctf_modebase.flag_on_punch(puncher, pos_above, node_above)
 		end
 
-		minetest.node_punch(pos, node, puncher, pointed_thing, ...)
+		core.node_punch(pos, node, puncher, pointed_thing, ...)
 	end,
 	on_rightclick = function(pos, node, clicker)
 		if ctf_core.settings.server_mode ~= "mapedit" then
@@ -56,11 +56,11 @@ minetest.register_node("ctf_modebase:flag", {
 	end,
 })
 
-minetest.register_alias("ctf_map:flag", "ctf_modebase:flag")
+core.register_alias("ctf_map:flag", "ctf_modebase:flag")
 
 for name, def in pairs(ctf_teams.team) do
 	local color = def.color
-	minetest.register_node("ctf_modebase:flag_top_"..name, {
+	core.register_node("ctf_modebase:flag_top_"..name, {
 		description = "You are not meant to have this! - flag top",
 		drawtype = "nodebox",
 		paramtype = "light",
@@ -89,7 +89,7 @@ for name, def in pairs(ctf_teams.team) do
 				ctf_modebase.flag_on_punch(puncher, pos, node)
 			end
 
-			minetest.node_punch(pos, node, puncher, pointed_thing, ...)
+			core.node_punch(pos, node, puncher, pointed_thing, ...)
 		end,
 		on_rightclick = function(pos, node, clicker)
 			if ctf_core.settings.server_mode ~= "mapedit" then
@@ -99,7 +99,7 @@ for name, def in pairs(ctf_teams.team) do
 	})
 end
 
-minetest.register_node("ctf_modebase:flag_captured_top",{
+core.register_node("ctf_modebase:flag_captured_top",{
 	description = "You are not meant to have this! - flag captured",
 	drawtype = "nodebox",
 	paramtype = "light",

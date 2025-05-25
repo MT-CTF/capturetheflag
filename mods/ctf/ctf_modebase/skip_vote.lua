@@ -13,7 +13,7 @@ local flags_hold = 0
 
 ctf_modebase.skip_vote = {}
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local function add_vote_hud(player)
 	hud:add(player, "skip_vote:background", {
@@ -42,16 +42,16 @@ function ctf_modebase.skip_vote.start_vote()
 	votes = {}
 	voters_count = 0
 
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		add_vote_hud(player)
-		minetest.sound_play("ctf_modebase_notification", {
+		core.sound_play("ctf_modebase_notification", {
 			gain = 0.8,
 			pitch = 1.0,
 		}, true)
 		voters_count = voters_count + 1
 	end
 
-	timer = minetest.after(VOTING_TIME, ctf_modebase.skip_vote.end_vote)
+	timer = core.after(VOTING_TIME, ctf_modebase.skip_vote.end_vote)
 end
 
 function ctf_modebase.skip_vote.end_vote()
@@ -76,7 +76,7 @@ function ctf_modebase.skip_vote.end_vote()
 	votes = nil
 
 	if yes > no then
-		minetest.chat_send_all(S("Vote to skip match passed, @1 to @2", yes, no))
+		core.chat_send_all(S("Vote to skip match passed, @1 to @2", yes, no))
 
 		voted_skip = true
 		if flags_hold <= 0 then
@@ -85,15 +85,15 @@ function ctf_modebase.skip_vote.end_vote()
 			local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get()
 			formdef.title = S("Match Skipped")
 
-			for _, p in ipairs(minetest.get_connected_players()) do
+			for _, p in ipairs(core.get_connected_players()) do
 				ctf_modebase.summary.show_gui(p:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
 			end
 
 			ctf_modebase.start_new_match(5)
 		end
 	else
-		minetest.chat_send_all(S("Vote to skip match failed, @1 to @2", yes, no))
-		timer = minetest.after(SKIP_INTERVAL, ctf_modebase.skip_vote.start_vote)
+		core.chat_send_all(S("Vote to skip match failed, @1 to @2", yes, no))
+		timer = core.after(SKIP_INTERVAL, ctf_modebase.skip_vote.start_vote)
 	end
 end
 
@@ -101,7 +101,7 @@ end
 ctf_api.register_on_match_start(function()
 	if timer then return end -- There was /vote_skip
 
-	timer = minetest.after(SKIP_DELAY, ctf_modebase.skip_vote.start_vote)
+	timer = core.after(SKIP_DELAY, ctf_modebase.skip_vote.start_vote)
 end)
 
 ctf_api.register_on_match_end(function()
@@ -133,18 +133,18 @@ function ctf_modebase.skip_vote.on_flag_capture(count)
 	flags_hold = flags_hold - count
 	if flags_hold <= 0 and voted_skip then
 		voted_skip = false
-		timer = minetest.after(30, ctf_modebase.skip_vote.start_vote)
+		timer = core.after(30, ctf_modebase.skip_vote.start_vote)
 	end
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	if votes and not votes[player:get_player_name()] then
 		add_vote_hud(player)
 		voters_count = voters_count + 1
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	if votes and not votes[player:get_player_name()] then
 		voters_count = voters_count - 1
 
@@ -154,11 +154,11 @@ minetest.register_on_leaveplayer(function(player)
 	end
 end)
 
-minetest.register_chatcommand("vote_skip", {
+core.register_chatcommand("vote_skip", {
 	description = S("Start a match skip vote"),
 	privs = {ctf_admin = true},
 	func = function(name, param)
-		minetest.log("action", string.format("[ctf_admin] %s ran /vote_skip", name))
+		core.log("action", string.format("[ctf_admin] %s ran /vote_skip", name))
 
 		if not ctf_modebase.in_game then
 			return false, S("Map switching is in progress")
@@ -185,7 +185,7 @@ local function player_vote(name, vote)
 
 	votes[name] = vote
 
-	local player = minetest.get_player_by_name(name)
+	local player = core.get_player_by_name(name)
 	if hud:exists(player, "skip_vote:vote") then
 		hud:remove(player, "skip_vote:vote")
 		hud:remove(player, "skip_vote:background")

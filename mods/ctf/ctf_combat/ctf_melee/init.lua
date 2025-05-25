@@ -4,26 +4,26 @@ ctf_melee = {
 
 local sword_mats = {
 	stone = {
-		description = minetest.registered_tools["default:sword_stone"].description,
-		inventory_image = minetest.registered_tools["default:sword_stone"].inventory_image,
+		description = core.registered_tools["default:sword_stone"].description,
+		inventory_image = core.registered_tools["default:sword_stone"].inventory_image,
 		damage_groups = {fleshy = 4},
 		full_punch_interval = 1.0
 	},
 	steel = {
-		description = minetest.registered_tools["default:sword_steel"].description,
-		inventory_image = minetest.registered_tools["default:sword_steel"].inventory_image,
+		description = core.registered_tools["default:sword_steel"].description,
+		inventory_image = core.registered_tools["default:sword_steel"].inventory_image,
 		damage_groups = {fleshy = 6},
 		full_punch_interval = 0.8,
 	},
 	mese = {
-		description = minetest.registered_tools["default:sword_mese"].description,
-		inventory_image = minetest.registered_tools["default:sword_mese"].inventory_image,
+		description = core.registered_tools["default:sword_mese"].description,
+		inventory_image = core.registered_tools["default:sword_mese"].inventory_image,
 		damage_groups = {fleshy = 7},
 		full_punch_interval = 0.7,
 	},
 	diamond = {
-		description = minetest.registered_tools["default:sword_diamond"].description,
-		inventory_image = minetest.registered_tools["default:sword_diamond"].inventory_image,
+		description = core.registered_tools["default:sword_diamond"].description,
+		inventory_image = core.registered_tools["default:sword_diamond"].inventory_image,
 		damage_groups = {fleshy = 8},
 		full_punch_interval = 0.6,
 	}
@@ -56,12 +56,12 @@ function ctf_melee.simple_register_sword(name, def)
 			local node
 
 			if pointed and pointed.under then
-				node = minetest.get_node(pointed.under)
-				pointed_def = minetest.registered_nodes[node.name]
+				node = core.get_node(pointed.under)
+				pointed_def = core.registered_nodes[node.name]
 			end
 
 			if pointed_def and pointed_def.on_rightclick then
-				return minetest.item_place(itemstack, user, pointed)
+				return core.item_place(itemstack, user, pointed)
 			else
 				return def.rightclick_func(itemstack, user, pointed, ...)
 			end
@@ -70,12 +70,12 @@ function ctf_melee.simple_register_sword(name, def)
 		base_def.on_secondary_use = def.rightclick_func
 	end
 
-	minetest.register_tool(name, base_def)
+	core.register_tool(name, base_def)
 	ctf_melee.registered_swords[name] = base_def
 end
 
 for mat, def in pairs(sword_mats) do
 	ctf_melee.simple_register_sword("ctf_melee:sword_"..mat, def)
 
-	minetest.register_alias_force("default:sword_"..mat, "ctf_melee:sword_"..mat)
+	core.register_alias_force("default:sword_"..mat, "ctf_melee:sword_"..mat)
 end

@@ -2,17 +2,17 @@ local top = ctf_core.include_files("top.lua"):new()
 
 return function(prefix, sorting_finished)
 
-local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at runtime!")
+local modstorage = assert(core.get_mod_storage(), "Can only init rankings at runtime!")
 
 -- If callback isn't passed then coroutine will never yield
 local function op_all(operation, callback)
 	if not callback then
-		minetest.log("warning", "op_all() called without callback, it will block the server step until it finishes")
+		core.log("warning", "op_all() called without callback, it will block the server step until it finishes")
 	end
 
 	local TARGET_INTERVAL = 0.1
 	local interval = 0.05
-	local time = minetest.get_us_time()
+	local time = core.get_us_time()
 	local times = 0
 	local keys = modstorage:to_table()["fields"]
 	local c = coroutine.wrap(function()
@@ -20,7 +20,7 @@ local function op_all(operation, callback)
 			times = times + 1
 			operation(k, v)
 
-			if callback and ((minetest.get_us_time()-time) / 1e6) >= interval then
+			if callback and ((core.get_us_time()-time) / 1e6) >= interval then
 				coroutine.yield()
 			end
 		end
@@ -29,15 +29,15 @@ local function op_all(operation, callback)
 	end)
 
 	local function rep()
-		if ((minetest.get_us_time()-time) / 1e6) > TARGET_INTERVAL then
+		if ((core.get_us_time()-time) / 1e6) > TARGET_INTERVAL then
 			interval = interval - 0.01
 		else
 			interval = interval + 0.01
 		end
-		time = minetest.get_us_time()
+		time = core.get_us_time()
 
 		if c() ~= "done" then
-			minetest.after(0, rep)
+			core.after(0, rep)
 		elseif callback then
 			callback()
 		end
@@ -46,18 +46,18 @@ local function op_all(operation, callback)
 	rep()
 end
 
-local timer = minetest.get_us_time()
+local timer = core.get_us_time()
 op_all(function(noprefix_key, value)
-	local rank = minetest.parse_json(value)
+	local rank = core.parse_json(value)
 
 	if rank ~= nil and rank.score then
 		top:set(noprefix_key, rank.score)
 	end
 end,
 function()
-	minetest.log(
+	core.log(
 		"action",
-		"Sorted rankings by score '"..prefix:sub(1, -2).."'. Took "..((minetest.get_us_time()-timer) / 1e6)
+		"Sorted rankings by score '"..prefix:sub(1, -2).."'. Took "..((core.get_us_time()-timer) / 1e6)
 	)
 end)
 
@@ -100,7 +100,7 @@ return {
 			return false
 		end
 
-		return minetest.parse_json(rank_str)
+		return core.parse_json(rank_str)
 	end,
 	set = function(self, pname, newrankings, erase_unset)
 		pname = PlayerName(pname)
@@ -117,7 +117,7 @@ return {
 		end
 
 		self.top:set(pname, newrankings.score or 0)
-		self.modstorage:set_string(pname, minetest.write_json(newrankings))
+		self.modstorage:set_string(pname, core.write_json(newrankings))
 	end,
 	add = function(self, pname, amounts)
 		pname = PlayerName(pname)
@@ -129,7 +129,7 @@ return {
 		end
 
 		self.top:set(pname, newrankings.score or 0)
-		self.modstorage:set_string(pname, minetest.write_json(newrankings))
+		self.modstorage:set_string(pname, core.write_json(newrankings))
 	end,
 	del = function(self, pname)
 		pname = PlayerName(pname)

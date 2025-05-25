@@ -1,6 +1,6 @@
 select_item = {}
 
-local S = minetest.get_translator("select_item")
+local S = core.get_translator("select_item")
 
 -- Cache for result of item filters
 local player_filters = {}
@@ -21,14 +21,14 @@ select_item.filters = {}
 -- Filters out all items not for the Creative Inventory.
 -- This elimininates all items reserved for internal use.
 select_item.filters.creative = function(itemstring)
-	local itemdef = minetest.registered_items[itemstring]
+	local itemdef = core.registered_items[itemstring]
 	if itemstring == "air" then
 		return false
 	end
 	if itemdef.description == nil or itemdef.description == "" then
 		return false
 	end
-	if minetest.get_item_group(itemstring, "not_in_creative_inventory") == 1 then
+	if core.get_item_group(itemstring, "not_in_creative_inventory") == 1 then
 		return false
 	end
 	return true
@@ -40,7 +40,7 @@ select_item.filters.all = function()
 end
 
 local check_item = function(itemstring, filter)
-	local itemdef = minetest.registered_items[itemstring]
+	local itemdef = core.registered_items[itemstring]
 	if itemstring == "" or itemstring == "unknown" or itemstring == "ignore" or itemdef == nil then
 		return
 	end
@@ -55,7 +55,7 @@ end
 
 local get_items = function(filter, compare)
 	local it = {}
-	for itemstring, itemdef in pairs(minetest.registered_items) do
+	for itemstring, itemdef in pairs(core.registered_items) do
 		if check_item(itemstring, filter) then
 			table.insert(it, {itemstring=itemstring, itemdef=itemdef})
 		end
@@ -65,10 +65,10 @@ local get_items = function(filter, compare)
 		-- Default sorting: Move description-less items and
 		-- items not_in_creative_inventory=1 to the end, then sort by itemstring.
 		internal_compare = function(t1, t2)
-			local t1d = minetest.registered_items[t1.itemstring].description
-			local t2d = minetest.registered_items[t2.itemstring].description
-			local t1g = minetest.get_item_group(t1.itemstring, "not_in_creative_inventory")
-			local t2g = minetest.get_item_group(t2.itemstring, "not_in_creative_inventory")
+			local t1d = core.registered_items[t1.itemstring].description
+			local t2d = core.registered_items[t2.itemstring].description
+			local t1g = core.get_item_group(t1.itemstring, "not_in_creative_inventory")
+			local t2g = core.get_item_group(t2.itemstring, "not_in_creative_inventory")
 			if (t1d == "" and t2d ~= "") then
 				return false
 			elseif (t1d ~= "" and t2d == "") then
@@ -117,15 +117,15 @@ local show_dialog_page = function(playername, dialogname, filter, compare, page)
 	end
 	local bg = ""
 	-- Legacy default formspec background (MT<=0.4.17)
-	if minetest.get_modpath("default") and default.gui_bg then
+	if core.get_modpath("default") and default.gui_bg then
 		bg = default.gui_bg .. default.gui_bg_img .. default.gui_slots
 	end
 	if #items == 0 then
 		local form = "size[6,2]"..
 				bg ..
-				"label[0,0;"..minetest.formspec_escape(S("There are no items to choose from.")).."]"..
-				"button_exit[0,1;2,1;cancel;"..minetest.formspec_escape(S("There are no items to choose from.")).."]"
-		minetest.show_formspec(playername, "select_item:page1", form)
+				"label[0,0;"..core.formspec_escape(S("There are no items to choose from.")).."]"..
+				"button_exit[0,1;2,1;cancel;"..core.formspec_escape(S("There are no items to choose from.")).."]"
+		core.show_formspec(playername, "select_item:page1", form)
 		return #items
 	end
 	local form = "size["..xsize..","..(ysize+1).."]" .. bg
@@ -134,7 +134,7 @@ local show_dialog_page = function(playername, dialogname, filter, compare, page)
 	if page == nil then page = 1 end
 	local start = 1 + (page-1) * xsize * ysize
 	player_maxpage[playername] = total_pages
-	form = form .. "label[0,0;"..minetest.formspec_escape(S("Select an item:")).."]"
+	form = form .. "label[0,0;"..core.formspec_escape(S("Select an item:")).."]"
 	for i=start, #items do
 		local itemstring = items[i].itemstring
 		local itemdef = items[i].itemdef
@@ -157,10 +157,10 @@ local show_dialog_page = function(playername, dialogname, filter, compare, page)
 	if total_pages > 1 then
 		form = form .. "button[0,"..ynav..";1,1;previous;<]"
 		form = form .. "button[1,"..ynav..";1,1;next;>]"
-		form = form .. "label[2,"..ynav..";"..minetest.formspec_escape(S("Page @1/@2", page, total_pages)).."]"
+		form = form .. "label[2,"..ynav..";"..core.formspec_escape(S("Page @1/@2", page, total_pages)).."]"
 	end
-	form = form .. "button_exit["..(xsize-2)..","..ynav..";2,1;cancel;"..minetest.formspec_escape(S("Cancel")).."]"
-	minetest.show_formspec(playername, "select_item:page"..page.."%%"..dialogname, form)
+	form = form .. "button_exit["..(xsize-2)..","..ynav..";2,1;cancel;"..core.formspec_escape(S("Cancel")).."]"
+	core.show_formspec(playername, "select_item:page"..page.."%%"..dialogname, form)
 	return #items
 end
 
@@ -173,7 +173,7 @@ select_item.register_on_select_item = function(callback)
 	table.insert(callbacks, callback)
 end
 
-minetest.register_on_player_receive_fields(function(player, formname, fields)
+core.register_on_player_receive_fields(function(player, formname, fields)
 	local playername = player:get_player_name()
 	if string.sub(formname, 1, 16) == "select_item:page" then
 		-- Parse formname
@@ -198,7 +198,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				end
 			end
 			if close then
-				minetest.close_formspec(playername, formname)
+				core.close_formspec(playername, formname)
 			end
 			reset_player_info(playername)
 		end
@@ -214,13 +214,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					show_dialog_page(playername, dialogname, player_filters[playername], player_compares[playername], page + 1)
 				end
 				if not maxpage then
-					minetest.log("warning", "[select_item] Player "..playername.." managed to navigate select_item menu without maxpage set!")
+					core.log("warning", "[select_item] Player "..playername.." managed to navigate select_item menu without maxpage set!")
 				end
 			end
 		end
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	reset_player_info(player:get_player_name())
 end)

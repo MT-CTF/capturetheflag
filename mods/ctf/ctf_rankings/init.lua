@@ -1,9 +1,9 @@
-local backend = minetest.settings:get("ctf_rankings_backend") or "default"
+local backend = core.settings:get("ctf_rankings_backend") or "default"
 
 local rankings
 
 if backend == "redis" then
-	local env = minetest.request_insecure_environment()
+	local env = core.request_insecure_environment()
 	assert(env, "Please add 'ctf_rankings' to secure.trusted_mods if you want to use the redis backend")
 
 	local old_require = require
@@ -17,10 +17,10 @@ end
 
 ctf_rankings = {
 	init = function(self, ranklist)
-		local modname = minetest.get_current_modname()
+		local modname = core.get_current_modname()
 
 		if not self then
-			minetest.log(
+			core.log(
 				"error",
 				"[ctf_rankings] The mode "..modname.." is calling the init() function wrong. Use ':' instead of '.'"
 			)
@@ -62,7 +62,7 @@ ctf_rankings = {
 -- Remember to remove spaces if running with Worldedit's //lua
 --[[
 for i, n in pairs(ctf_rankings.leagues_list) do
-	minetest.after(i, function()
+	core.after(i, function()
 		hpbar.set_icon("LandarVargan", ctf_rankings.league_textures[n])
 	end)
 end

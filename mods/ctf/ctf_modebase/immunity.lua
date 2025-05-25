@@ -25,13 +25,13 @@ function ctf_modebase.give_immunity(player, respawn_timer)
 		end
 
 		if old.particles then
-			minetest.delete_particlespawner(old.particles, pname)
+			core.delete_particlespawner(old.particles, pname)
 		end
 	end
 
 	if respawn_timer then
 		immune_players[pname] = {
-			timer = minetest.after(respawn_timer, ctf_modebase.remove_immunity, player),
+			timer = core.after(respawn_timer, ctf_modebase.remove_immunity, player),
 		}
 	else
 		immune_players[pname] = {
@@ -39,7 +39,7 @@ function ctf_modebase.give_immunity(player, respawn_timer)
 		}
 	end
 
-	immune_players[pname].particles = minetest.add_particlespawner({
+	immune_players[pname].particles = core.add_particlespawner({
 		time = respawn_timer or 0,
 		amount = 8 * (respawn_timer or 1),
 		collisiondetection = false,
@@ -81,7 +81,7 @@ function ctf_modebase.remove_immunity(player)
 	end
 
 	if old.particles then
-		minetest.delete_particlespawner(old.particles)
+		core.delete_particlespawner(old.particles)
 	end
 
 	immune_players[pname] = nil
@@ -106,7 +106,7 @@ function ctf_modebase.remove_respawn_immunity(player)
 
 	old.timer:cancel()
 
-	minetest.delete_particlespawner(old.particles, pname)
+	core.delete_particlespawner(old.particles, pname)
 
 	if player_api.players[pname] then
 		player_api.set_texture(player, 1, ctf_cosmetics.get_skin(player))
@@ -126,11 +126,11 @@ ctf_api.register_on_respawnplayer(function(player)
 	ctf_modebase.give_immunity(player, RESPAWN_IMMUNITY_SECONDS)
 end)
 
-minetest.register_on_dieplayer(function(player)
+core.register_on_dieplayer(function(player)
 	ctf_modebase.remove_immunity(player)
 	player:set_properties({pointable = false})
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	ctf_modebase.remove_immunity(player)
 end)

@@ -1,5 +1,5 @@
 -- Register the Poisonous Water node
-minetest.register_node("poison_water:poisonous_water", {
+core.register_node("poison_water:poisonous_water", {
     description = "Poisonous Water",
     drawtype = "liquid",
     tiles = {
@@ -32,7 +32,7 @@ minetest.register_node("poison_water:poisonous_water", {
 })
 
 -- Register the flowing variant of Poisonous Water
-minetest.register_node("poison_water:poisonous_water_flowing", {
+core.register_node("poison_water:poisonous_water_flowing", {
     description = "Flowing Poisonous Water",
     drawtype = "flowingliquid",
     tiles = {"default_water.png"}, -- Static texture for the inventory
@@ -65,7 +65,7 @@ minetest.register_node("poison_water:poisonous_water_flowing", {
     post_effect_color = {a = 191, r = 0, g = 255, b = 0}, -- Greenish glow
 })
 -- Poisonous Water Bucket (requires the bucket mod)
-if minetest.get_modpath("bucket") then
+if core.get_modpath("bucket") then
     bucket.register_liquid(
         "poison_water:poisonous_water",
         "poison_water:poisonous_water_flowing",
@@ -75,7 +75,7 @@ if minetest.get_modpath("bucket") then
     )
 
     -- Register crafting to empty the bucket
-    minetest.register_craft({
+    core.register_craft({
         type = "shapeless",
         output = "bucket:bucket_empty",
         recipe = {"poison_water:bucket_poisonous_water"},
@@ -86,13 +86,13 @@ end
 
 -- Add ABM to harm players standing in Poisonous Water
 
--- minetest.register_abm({
+-- core.register_abm({
 --     label = "Poisonous Water Damage",
 --     nodenames = {"poison_water:poisonous_water", "poison_water:poisonous_water_flowing"},
 --     interval = 1.0,
 --     chance = 1,
 --     action = function(pos, node, active_object_count, active_object_count_wider)
---         local objects = minetest.get_objects_inside_radius(pos, 1)
+--         local objects = core.get_objects_inside_radius(pos, 1)
 --         for _, obj in ipairs(objects) do
 --             if obj:is_player() then
 --                 obj:set_hp(obj:get_hp() - 2) -- Deals 2 HP damage

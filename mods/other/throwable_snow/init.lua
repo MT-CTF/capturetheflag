@@ -1,9 +1,9 @@
 throwable_snow = {}
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 function throwable_snow.on_hit_player(thrower, player)
-	minetest.get_player_by_name(player):punch(
-		minetest.get_player_by_name(thrower),
+	core.get_player_by_name(player):punch(
+		core.get_player_by_name(thrower),
 		2,
 		{ damage_groups = {snowball = 1, fleshy = 1} },
 		vector.new()
@@ -23,7 +23,7 @@ local snowball_def = {
 	stack_max = 99,
 	throw_cooldown = 0.9,
 	on_explode = function(def, obj, pos, name)
-		minetest.add_particlespawner({
+		core.add_particlespawner({
 			amount = 9,
 			time = 0.01,
 			minpos = pos,
@@ -42,7 +42,7 @@ local snowball_def = {
 			texture = "default_snow.png",
 		})
 
-		minetest.sound_play("default_snow_footstep", {
+		core.sound_play("default_snow_footstep", {
 			pos = pos,
 			gain = 0.8,
 			pitch = 3.0,
@@ -51,7 +51,7 @@ local snowball_def = {
 	end,
 	on_collide = function(def, obj, name, moveresult)
 		for _, collision in ipairs(moveresult.collisions) do
-			if collision.type == "object" and collision.object:is_player() and minetest.get_player_by_name(name) then
+			if collision.type == "object" and collision.object:is_player() and core.get_player_by_name(name) then
 				throwable_snow.on_hit_player(name, collision.object:get_player_name())
 			end
 		end
@@ -71,4 +71,4 @@ grenades.register_grenade("throwable_snow:snowball", table.copy(snowball_def))
 snowball_def.stack_max = -1
 grenades.register_grenade("throwable_snow:infinite_snowball", snowball_def)
 
-minetest.override_item("default:snow", {drop = "throwable_snow:snowball 2"})
+core.override_item("default:snow", {drop = "throwable_snow:snowball 2"})

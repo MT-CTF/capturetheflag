@@ -1,11 +1,11 @@
 -- Backwards compat
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
-minetest.register_alias("ctf_map:ind_stone", "ctf_map:stone")
+core.register_alias("ctf_map:ind_stone", "ctf_map:stone")
 
 -- Special nodes
-minetest.register_node("ctf_map:ignore", {
+core.register_node("ctf_map:ignore", {
 	description = "Artificial Ignore", -- this may need to be given a more appropriate name
 	drawtype = "airlike",
 	paramtype = "light",
@@ -19,11 +19,11 @@ minetest.register_node("ctf_map:ignore", {
 	groups = {immortal = 1, disable_suffocation = 1},
 })
 
-minetest.register_node("ctf_map:ind_glass", {
+core.register_node("ctf_map:ind_glass", {
 	description = S("Indestructible Barrier Glass"),
 	drawtype = "glasslike_framed",
 	tiles = {"default_glass.png", "default_glass_detail.png"},
-	inventory_image = minetest.inventorycube("default_glass.png"),
+	inventory_image = core.inventorycube("default_glass.png"),
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
@@ -34,11 +34,11 @@ minetest.register_node("ctf_map:ind_glass", {
 	sounds = default.node_sound_glass_defaults()
 })
 
-minetest.register_node("ctf_map:ind_glass_red", {
+core.register_node("ctf_map:ind_glass_red", {
 	description = S("Indestructible Red Barrier Glass"),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_glass_red.png"},
-	inventory_image = minetest.inventorycube("ctf_map_glass_red.png"),
+	inventory_image = core.inventorycube("ctf_map_glass_red.png"),
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
@@ -50,13 +50,13 @@ minetest.register_node("ctf_map:ind_glass_red", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
-ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_glass_red")] = minetest.CONTENT_AIR
+ctf_map.barrier_nodes[core.get_content_id("ctf_map:ind_glass_red")] = core.CONTENT_AIR
 
-minetest.register_node("ctf_map:ind_water", {
+core.register_node("ctf_map:ind_water", {
 	description = S("Indestructible Water Barrier Glass"),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_ind_water.png"},
-	inventory_image = minetest.inventorycube("ctf_map_ind_water.png"),
+	inventory_image = core.inventorycube("ctf_map_ind_water.png"),
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
@@ -68,13 +68,13 @@ minetest.register_node("ctf_map:ind_water", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
-ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_water")] = minetest.get_content_id("default:water_source")
+ctf_map.barrier_nodes[core.get_content_id("ctf_map:ind_water")] = core.get_content_id("default:water_source")
 
-minetest.register_node("ctf_map:ind_river_water", {
+core.register_node("ctf_map:ind_river_water", {
 	description = S("Indestructible River Water Barrier Glass"),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_ind_river_water.png"},
-	inventory_image = minetest.inventorycube("ctf_map_ind_river_water.png"),
+	inventory_image = core.inventorycube("ctf_map_ind_river_water.png"),
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
@@ -86,14 +86,14 @@ minetest.register_node("ctf_map:ind_river_water", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
-ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_river_water")] =
-		minetest.get_content_id("default:river_water_source")
+ctf_map.barrier_nodes[core.get_content_id("ctf_map:ind_river_water")] =
+		core.get_content_id("default:river_water_source")
 
-minetest.register_node("ctf_map:ind_poison_water", {
+core.register_node("ctf_map:ind_poison_water", {
 	description = S("Indestructible Poisonous Water Barrier Glass"),
 	drawtype = "glasslike",
 	tiles = {"ctf_map_ind_poison_water.png"},
-	inventory_image = minetest.inventorycube("ctf_map_ind_poison_water.png"),
+	inventory_image = core.inventorycube("ctf_map_ind_poison_water.png"),
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
@@ -105,26 +105,26 @@ minetest.register_node("ctf_map:ind_poison_water", {
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
 })
-ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_poison_water")] =
-		minetest.get_content_id("poison_water:poisonous_water")
+ctf_map.barrier_nodes[core.get_content_id("ctf_map:ind_poison_water")] =
+		core.get_content_id("poison_water:poisonous_water")
 
-minetest.register_node("ctf_map:ind_lava", {
+core.register_node("ctf_map:ind_lava", {
 	description = S("Indestructible Lava Barrier Glass"),
 	groups = {immortal = 1},
 	tiles = {"ctf_map_ind_lava.png"},
 	is_ground_content = false
 })
-ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_lava")] = minetest.get_content_id("default:lava_source")
+ctf_map.barrier_nodes[core.get_content_id("ctf_map:ind_lava")] = core.get_content_id("default:lava_source")
 
-minetest.register_node("ctf_map:ind_stone_red", {
+core.register_node("ctf_map:ind_stone_red", {
 	description = S("Indestructible Red Barrier Stone"),
 	groups = {immortal = 1},
 	tiles = {"ctf_map_stone_red.png"},
 	is_ground_content = false
 })
-ctf_map.barrier_nodes[minetest.get_content_id("ctf_map:ind_stone_red")] = minetest.get_content_id("default:stone")
+ctf_map.barrier_nodes[core.get_content_id("ctf_map:ind_stone_red")] = core.get_content_id("default:stone")
 
-minetest.register_node("ctf_map:killnode", {
+core.register_node("ctf_map:killnode", {
 	description = "Kill Node",
 	drawtype = "glasslike",
 	tiles = {"ctf_map_killnode.png"},
@@ -168,9 +168,9 @@ local function make_immortal(def)
 	def.description = def.description and ("Indestructible " .. def.description)
 end
 
-minetest.register_on_player_hpchange(function(player, hp_change, reason)
+core.register_on_player_hpchange(function(player, hp_change, reason)
 	local pos = player:get_pos()
-	local def = minetest.registered_nodes[reason.node]
+	local def = core.registered_nodes[reason.node]
 
 	if reason.type == 'node_damage' and def.groups.immortal and def.drawtype == "normal" and def.walkable ~= false then
 		for _, flagteam in ipairs(ctf_teams.current_team_list) do
@@ -189,7 +189,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 end, true)
 
 local queue = {}
-for name, def in pairs(minetest.registered_nodes) do
+for name, def in pairs(core.registered_nodes) do
 	local mod, nodename = name:match"(..-):(.+)"
 	local prefix = mod_prefixes[mod]
 	if nodename and prefix and name ~= "default:torch" and
@@ -208,12 +208,12 @@ for name, def in pairs(minetest.registered_nodes) do
 end
 
 for _, node in pairs(queue) do
-	minetest.register_node(node.name, node.def)
+	core.register_node(node.name, node.def)
 end
 
-minetest.register_alias("ctf_map:torch", "default:torch")
-minetest.register_alias("ctf_map:torch_wall", "default:torch_wall")
-minetest.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
+core.register_alias("ctf_map:torch", "default:torch")
+core.register_alias("ctf_map:torch_wall", "default:torch_wall")
+core.register_alias("ctf_map:torch_ceiling", "default:torch_ceiling")
 
 --
 --- credit for most of code goes to tsm_chests mod used by CTF 2.0
@@ -239,7 +239,7 @@ local chest_def = {
 	is_ground_content = false,
 	sounds = default.node_sound_wood_defaults(),
 	on_construct = function(pos)
-		local meta = minetest.get_meta(pos)
+		local meta = core.get_meta(pos)
 		meta:set_string("infotext", S("Treasure Chest"))
 		meta:set_string("formspec", chest_formspec)
 
@@ -251,48 +251,48 @@ local chest_def = {
 			local name = player:get_player_name()
 
 			if not not_allowed_timer[name] then
-				minetest.chat_send_player(name,
+				core.chat_send_player(name,
 					S("You're not allowed to put things in treasure chests!"))
 
 				not_allowed_timer[name] = true
-				minetest.after(1, function() not_allowed_timer[name] = nil end)
+				core.after(1, function() not_allowed_timer[name] = nil end)
 			end
 			return 0
 		end
 	end,
 	can_dig = function(pos,player)
-		local meta = minetest.get_meta(pos);
+		local meta = core.get_meta(pos);
 		local inv = meta:get_inventory()
 		return inv:is_empty("main")
 	end,
 	on_metadata_inventory_move = function(pos, from_list, from_index,
 			to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff in chest at " .. minetest.pos_to_string(pos))
+		core.log("action", player:get_player_name() ..
+			" moves stuff in chest at " .. core.pos_to_string(pos))
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", string.format("%s puts %s to treasure chest at %s",
+		core.log("action", string.format("%s puts %s to treasure chest at %s",
 			player:get_player_name(),
 			stack:to_string(),
-			minetest.pos_to_string(pos)
+			core.pos_to_string(pos)
 		))
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", string.format("%s takes %s from treasure chest at %s",
+		core.log("action", string.format("%s takes %s from treasure chest at %s",
 			player:get_player_name(),
 			stack:to_string(),
-			minetest.pos_to_string(pos)
+			core.pos_to_string(pos)
 		))
 
-		local inv = minetest.get_inventory({type = "node", pos = pos})
+		local inv = core.get_inventory({type = "node", pos = pos})
 		if not inv or inv:is_empty("main") then
-			minetest.close_formspec(player:get_player_name(), "")
-			minetest.after(0, function()
-				minetest.set_node(pos, {name = "air"})
+			core.close_formspec(player:get_player_name(), "")
+			core.after(0, function()
+				core.set_node(pos, {name = "air"})
 			end)
 		end
-		minetest.swap_node(pos, {name = "ctf_map:chest_opened"})
-		minetest.get_meta(pos):set_string("infotext", chestv)
+		core.swap_node(pos, {name = "ctf_map:chest_opened"})
+		core.get_meta(pos):set_string("infotext", chestv)
 	end,
 }
 
@@ -305,19 +305,19 @@ ochest_def.mesh = "chest_open.obj"
 ochest_def.light_source = 1
 ochest_def.on_rightclick = nil
 ochest_def.on_metadata_inventory_take = function(pos, listname, index, stack, player)
-	minetest.log("action", string.format("%s takes %s from treasure chest at %s",
+	core.log("action", string.format("%s takes %s from treasure chest at %s",
 		player:get_player_name(),
 		stack:to_string(),
-		minetest.pos_to_string(pos)
+		core.pos_to_string(pos)
 	))
-	local inv = minetest.get_inventory({type = "node", pos = pos})
+	local inv = core.get_inventory({type = "node", pos = pos})
 	if not inv or inv:is_empty("main") then
-		minetest.close_formspec(player:get_player_name(), "")
-		minetest.after(0, function()
-			minetest.set_node(pos, {name = "air"})
+		core.close_formspec(player:get_player_name(), "")
+		core.after(0, function()
+			core.set_node(pos, {name = "air"})
 		end)
 	end
 end
 
-minetest.register_node("ctf_map:chest_opened", ochest_def)
-minetest.register_node("ctf_map:chest", chest_def)
+core.register_node("ctf_map:chest_opened", ochest_def)
+core.register_node("ctf_map:chest", chest_def)

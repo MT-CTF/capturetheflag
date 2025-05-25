@@ -6,7 +6,7 @@ local landmines = {
 local number_of_landmines = 0
 local ARMING_TIME = 3
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local add_landmine = function(pos)
 	landmines[core.hash_node_position(vector.round(pos))] = os.clock()
@@ -146,7 +146,7 @@ core.register_node("ctf_landmine:landmine", {
 	end,
 	on_dig = function(pos, node, digger)
 		remove_landmine(pos)
-		minetest.node_dig(pos, node, digger)
+		core.node_dig(pos, node, digger)
 	end
 })
 

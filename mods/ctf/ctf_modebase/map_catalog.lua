@@ -29,7 +29,7 @@ local function init()
 	map_repeat_interval = math.floor(#ctf_modebase.map_catalog.maps / 2)
 end
 
-minetest.register_on_mods_loaded(function()
+core.register_on_mods_loaded(function()
 	init()
 	assert(#ctf_modebase.map_catalog.maps > 0 or ctf_core.settings.server_mode == "mapedit")
 end)

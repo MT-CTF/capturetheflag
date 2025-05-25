@@ -2,7 +2,7 @@
 --- Medic Paxel
 --
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local DIG_SPEED = 0.1
 local PAXEL_POWER = 50 -- currently just blocks count
@@ -37,11 +37,11 @@ local function dig(pname, ppos, power, retry)
 
 	for y = 1, 20 do
 		local pos = vector.offset(ppos, 0, y, 0)
-		local node = minetest.get_node(pos)
+		local node = core.get_node(pos)
 		if node.name ~= "air" then
 			if is_diggable(node) then
-				minetest.dig_node(pos)
-				dig_timers[pname] = minetest.after(DIG_SPEED, dig, pname, pos, power - 1, PAXEL_RETRY)
+				core.dig_node(pos)
+				dig_timers[pname] = core.after(DIG_SPEED, dig, pname, pos, power - 1, PAXEL_RETRY)
 			else
 				hud_events.new(pname, {
 					quick = true,
@@ -56,7 +56,7 @@ local function dig(pname, ppos, power, retry)
 	end
 
 	if retry > 0 then
-		dig_timers[pname] = minetest.after(1, dig, pname, ppos, power, retry - 1)
+		dig_timers[pname] = core.after(1, dig, pname, ppos, power, retry - 1)
 	else
 		hud_events.new(pname, {
 			quick = true,
@@ -67,7 +67,7 @@ local function dig(pname, ppos, power, retry)
 	end
 end
 
-minetest.register_tool("ctf_mode_classes:support_paxel", {
+core.register_tool("ctf_mode_classes:support_paxel", {
 	description = "Paxel\n"..S("Rightclick bottom of pillar to dig it.").."\n"..S("Can't use during build time"),
 	inventory_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
@@ -89,7 +89,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing and itemstack:get_wear() == 0 then
 			local pos = pointed_thing.under
-			if is_diggable(minetest.get_node(pos)) then
+			if is_diggable(core.get_node(pos)) then
 				if not ctf_modebase.match_started then
 					hud_events.new(user, {
 						quick = true,
@@ -101,13 +101,13 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 
 				local pname = user:get_player_name()
 
-				minetest.dig_node(pos)
+				core.dig_node(pos)
 
 				if dig_timers[pname] then
 					dig_timers[pname]:cancel()
 				end
 
-				dig_timers[pname] = minetest.after(DIG_SPEED, dig, pname, pos, PAXEL_POWER, PAXEL_RETRY)
+				dig_timers[pname] = core.after(DIG_SPEED, dig, pname, pos, PAXEL_POWER, PAXEL_RETRY)
 
 				local dstep = math.floor(65534 / PAXEL_COOLDOWN_TIME)
 				ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_paxel", dstep, true)
@@ -115,7 +115,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 				itemstack:set_wear(65534)
 				return itemstack
 			else
-				minetest.item_place(itemstack, user, pointed_thing)
+				core.item_place(itemstack, user, pointed_thing)
 			end
 		end
 	end,
@@ -129,7 +129,7 @@ ctf_api.register_on_match_end(function()
 	dig_timers = {}
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
 	if dig_timers[pname] then

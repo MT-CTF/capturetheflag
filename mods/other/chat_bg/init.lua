@@ -1,6 +1,6 @@
 local hud = mhud.init()
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local function get_val(val, default)
 	if not val or val == "" then
@@ -40,7 +40,7 @@ local function update_hud(player)
 	end
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	update_hud(player)
 end)
 
@@ -50,7 +50,7 @@ local cmd = chatcmdbuilder.register("chat_bg", {
 })
 
 cmd:sub("toggle", function(name)
-	local player = minetest.get_player_by_name(name)
+	local player = core.get_player_by_name(name)
 	if player then
 		local meta = player:get_meta()
 		local current = get_val(meta:get_string("chat_bg:enabled"), false)
@@ -71,7 +71,7 @@ cmd:sub("toggle", function(name)
 end)
 
 cmd:sub("set :setting :value:int", function(name, setting, value)
-	local player = minetest.get_player_by_name(name)
+	local player = core.get_player_by_name(name)
 
 	if player then
 		local meta = player:get_meta()

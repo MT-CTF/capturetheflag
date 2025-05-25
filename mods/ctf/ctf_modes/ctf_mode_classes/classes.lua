@@ -5,7 +5,7 @@ local CLASS_SWITCH_COOLDOWN = 30
 
 local classes = {}
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local class_list = {"knight", "ranged", "support"}
 local class_props = {
@@ -63,7 +63,7 @@ local class_props = {
 	}
 }
 
-minetest.register_on_mods_loaded(function()
+core.register_on_mods_loaded(function()
 	for k, class_prop in pairs(class_props) do
 		local items_markup = ""
 		local disallowed_items_markup = ""
@@ -79,7 +79,7 @@ minetest.register_on_mods_loaded(function()
 		end
 
 		for _, iname in ipairs(class_prop.disallowed_items or {}) do
-			if minetest.registered_items[iname] then
+			if core.registered_items[iname] then
 				disallowed_items_markup = string.format("%s <item name=%s width=48>",
 					disallowed_items_markup,
 					iname
@@ -132,7 +132,7 @@ ctf_settings.register("ctf_mode_classes:simple_support_activate", {
 })
 
 ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
-	description = S("Knight Sword") .. "\n" .. minetest.colorize("gold",
+	description = S("Knight Sword") .. "\n" .. core.colorize("gold",
 		S("(Sneak/Run) + Rightclick to use Rage ability (Lasts @1s, @2s cooldown)",
 		KNIGHT_USAGE_TIME, KNIGHT_COOLDOWN_TIME)
 	),
@@ -160,7 +160,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 		if itemstack:get_wear() == 0 then
 			local step = math.floor(65534 / KNIGHT_USAGE_TIME)
 			ctf_modebase.update_wear.start_update(pname, "ctf_melee:sword_diamond", step, false, function()
-				local player = minetest.get_player_by_name(pname)
+				local player = core.get_player_by_name(pname)
 
 				if player then
 					local pinv = player:get_inventory()
@@ -177,7 +177,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 				end
 			end,
 			function()
-				local player = minetest.get_player_by_name(pname)
+				local player = core.get_player_by_name(pname)
 
 				if player then
 					player:get_inventory():remove_item("main", "ctf_melee:sword_diamond")
@@ -200,7 +200,7 @@ local RANGED_ZOOM_MULT = 3
 local scoped = ctf_ranged.scoped
 ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 	type = "classes_rifle",
-	description = S("Scout Rifle") .. "\n" .. minetest.colorize("gold",
+	description = S("Scout Rifle") .. "\n" .. core.colorize("gold",
 		S("(Sneak/Run) + Rightclick to launch grenade (@1s cooldown), otherwise will toggle scope", RANGED_COOLDOWN_TIME)
 	),
 	texture = "ctf_mode_classes_ranged_rifle.png",
@@ -258,7 +258,7 @@ local SCALING_TIMEOUT = 4
 -- Code borrowed from minetest_game default/nodes.lua -> default:ladder_steel
 local scaling_def = {
 	description = S("Scaling Ladder") .. "\n" ..
-		minetest.colorize("gold", S("(Infinite usage, self-removes after @1s)",
+		core.colorize("gold", S("(Infinite usage, self-removes after @1s)",
 		SCALING_TIMEOUT)
 	),
 	tiles = {"default_ladder_steel.png"},
@@ -280,18 +280,18 @@ local scaling_def = {
 	on_place = function(itemstack, placer, pointed_thing, ...)
 		if pointed_thing.type == "node" then
 			itemstack:set_count(2)
-			minetest.item_place(itemstack, placer, pointed_thing, ...)
+			core.item_place(itemstack, placer, pointed_thing, ...)
 		end
 	end,
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(SCALING_TIMEOUT)
+		core.get_node_timer(pos):start(SCALING_TIMEOUT)
 	end,
 	on_timer = function(pos)
-		minetest.remove_node(pos)
+		core.remove_node(pos)
 	end,
 }
 
-minetest.register_node("ctf_mode_classes:scaling_ladder", scaling_def)
+core.register_node("ctf_mode_classes:scaling_ladder", scaling_def)
 
 --
 --- Medic Bandage
@@ -304,7 +304,7 @@ local HEAL_PERCENT = 0.8
 ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	description = S("Bandage") .. "\n" ..
 		S("Heals teammates for 4-5 HP until target's HP is equal to @1% of their maximum HP", HEAL_PERCENT * 100) .. "\n" ..
-		minetest.colorize("gold",
+		core.colorize("gold",
 		S("(Sneak/Run) + Rightclick to become immune to damage for @1s (@2s cooldown)", IMMUNITY_TIME, IMMUNITY_COOLDOWN)
     ),
 	inventory_image = "ctf_healing_bandage.png",
@@ -384,7 +384,7 @@ function classes.update(player)
 	base_size = vector.new(base_size.x, base_size.y, base_size.z or base_size.x)
 
 	player:set_properties({
-		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+		hp_max = class.hp_max or core.PLAYER_MAX_HP_DEFAULT,
 		visual_size = vector.add(base_size, class.visual_size or vector.new()) or base_size
 	})
 
@@ -498,7 +498,7 @@ function classes.show_class_formspec(player)
 				(form_x/2)+0.6 - pad,
 				form_y-2.4,
 				class_prop.description,
-				class_prop.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+				class_prop.hp_max or core.PLAYER_MAX_HP_DEFAULT,
 				class_prop.physics and class_prop.physics.speed and
 						"<img name=sprint_stamina_icon.png width=20 float=left> "..class_prop.physics.speed.."x Speed\n" or "",
 				class_prop.items_markup,
@@ -617,15 +617,15 @@ end
 
 function classes.reset_class_cooldowns(player)
 	if not player then
-		minetest.log("action", "Resetting class cooldowns for all players")
+		core.log("action", "Resetting class cooldowns for all players")
 
-		for _, p in pairs(minetest.get_connected_players()) do
+		for _, p in pairs(core.get_connected_players()) do
 			if cooldowns:get(p) then
 				cooldowns:set(p)
 			end
 		end
 	else
-		minetest.log("action", "Resetting class cooldowns for player "..dump(PlayerName(player)))
+		core.log("action", "Resetting class cooldowns for player "..dump(PlayerName(player)))
 
 		if cooldowns:get(player) then
 			cooldowns:set(player)
@@ -634,10 +634,10 @@ function classes.reset_class_cooldowns(player)
 end
 
 function classes.finish()
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in pairs(core.get_connected_players()) do
 		classes.reset_class_cooldowns()
 
-		player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
+		player:set_properties({hp_max = core.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
 		physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
 	end
 end

@@ -9,7 +9,7 @@ local blacklist = {
 	"ctf_mode_classes:ranged_rifle_loaded"
 }
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 ctf_settings.register("prevent_marker_placement", {
 	type = "bool",
@@ -36,7 +36,7 @@ function binoculars.update_player_property(player)
 	if player:get_inventory():contains_item(
 			"main", "binoculars:binoculars") then
 		new_zoom_fov = 10
-	elseif minetest.is_creative_enabled(player:get_player_name()) then
+	elseif core.is_creative_enabled(player:get_player_name()) then
 		new_zoom_fov = 15
 	end
 
@@ -74,7 +74,7 @@ local function check_pointed_entity(pointed, message)
 	elseif entity then
 		if entity.name == "__builtin:item" then
 			local stack = ItemStack(entity.itemstring)
-			local itemdef = minetest.registered_items[stack:get_name()]
+			local itemdef = core.registered_items[stack:get_name()]
 			-- Fallback to itemstring if description doesn't exist
 			-- Only use first line of itemstring
 			concat = string.match(itemdef.description or entity.itemstring, "^([^\n]+)")
@@ -94,7 +94,7 @@ function ctf_modebase.markers.remove(pname, no_notify)
 
 		for teammate in pairs(ctf_teams.online_players[markers[pname].team].players) do
 			if not no_notify and teammate ~= pname then
-				minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " " .. S("removed a marker!")))
+				core.chat_send_player(teammate, core.colorize("#ABCDEF", "* " .. pname .. " " .. S("removed a marker!")))
 			end
 
 			if hud:exists(teammate, "marker_" .. pname) then
@@ -116,15 +116,15 @@ function ctf_modebase.markers.add(pname, msg, pos, no_notify, specific_player)
 		markers[pname].timer:cancel()
 	end
 
-	minetest.log("action", string.format("%s placed a marker at %s: '%s'", pname, minetest.pos_to_string(pos), msg))
+	core.log("action", string.format("%s placed a marker at %s: '%s'", pname, core.pos_to_string(pos), msg))
 
 	markers[pname] = {
 		msg = msg, pos = pos, team = pteam,
-		timer = minetest.after(MARKER_LIFETIME, ctf_modebase.markers.remove, pname, true),
+		timer = core.after(MARKER_LIFETIME, ctf_modebase.markers.remove, pname, true),
 	}
 
 	if specific_player then
-		minetest.chat_send_player(specific_player, minetest.colorize("#ABCDEF",
+		core.chat_send_player(specific_player, core.colorize("#ABCDEF",
 			"* " .. pname .. " " .. S("placed a marker for you!")))
 
 		add_marker(pname          , pteam, msg, pos, pname)
@@ -132,7 +132,7 @@ function ctf_modebase.markers.add(pname, msg, pos, no_notify, specific_player)
 	else
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if not no_notify and teammate ~= pname then
-				minetest.chat_send_player(teammate, minetest.colorize("#ABCDEF", "* " .. pname .. " " .. S("placed a marker!")))
+				core.chat_send_player(teammate, core.colorize("#ABCDEF", "* " .. pname .. " " .. S("placed a marker!")))
 			end
 
 			add_marker(teammate, pteam, msg, pos, pname)
@@ -174,7 +174,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 		return false, S("You need to be in a team to use markers!")
 	end
 
-	local player = minetest.get_player_by_name(name)
+	local player = core.get_player_by_name(name)
 	local message
 	local pos
 	local pos1 = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
@@ -184,7 +184,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 		param = string.sub(param, 1, 40)
 	end
 
-	local ray = minetest.raycast(
+	local ray = core.raycast(
 		pos1, vector.add(pos1, vector.multiply(player:get_look_dir(), MARKER_RANGE),
 		true, false
 	))
@@ -253,7 +253,7 @@ local function marker_func(name, param, specific_player, hpmarker)
 end
 
 
-minetest.register_chatcommand("mhp", {
+core.register_chatcommand("mhp", {
 	description = S("Place a HP marker in your look direction"),
 	params = "",
 	privs = {interact = true, shout = true},
@@ -262,14 +262,14 @@ minetest.register_chatcommand("mhp", {
 	end
 })
 
-minetest.register_chatcommand("m", {
+core.register_chatcommand("m", {
 	description = S("Place a marker in your look direction"),
 	params = S("[message]"),
 	privs = {interact = true, shout = true},
 	func = marker_func
 })
 
-minetest.register_chatcommand("mp", {
+core.register_chatcommand("mp", {
 	description = S("Place a marker in your look direction, for a specific player"),
 	params = S("<player> [message]"),
 	privs = {interact = true, shout = true},
@@ -282,7 +282,7 @@ minetest.register_chatcommand("mp", {
 
 		params = string.split(params, " ", false, 1)
 
-		if params[1] and minetest.get_player_by_name(params[1]) then
+		if params[1] and core.get_player_by_name(params[1]) then
 			if (ctf_teams.get(params[1]) or "") == pteam then
 				if name ~= params[1] then
 					return marker_func(name, params[2] or "", params[1])
@@ -298,7 +298,7 @@ minetest.register_chatcommand("mp", {
 	end
 })
 
-minetest.register_chatcommand("mr", {
+core.register_chatcommand("mr", {
 	description = S("Remove your own marker"),
 	func = function(name, param)
 		ctf_modebase.markers.remove(name)
@@ -309,13 +309,13 @@ minetest.register_chatcommand("mr", {
 
 local check_interval = 0.3
 local timer = 0
-minetest.register_globalstep(function(dtime)
+core.register_globalstep(function(dtime)
 	timer = timer + dtime
 
 	if timer < check_interval then return end
 	timer = 0
 
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in pairs(core.get_connected_players()) do
 		local controls = player:get_player_control()
 
 		if controls.zoom then

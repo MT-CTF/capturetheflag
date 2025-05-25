@@ -138,7 +138,7 @@ function ctf_modebase.flag_huds.update_player(player)
 end
 
 local function update()
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in pairs(core.get_connected_players()) do
 		ctf_modebase.flag_huds.update_player(player)
 	end
 end
@@ -150,7 +150,7 @@ local function update_timer(pname)
 		local timeleft = player_timers[pname]
 
 		if timeleft <= 1 then
-			ctf_modebase.drop_flags(minetest.get_player_by_name(pname))
+			ctf_modebase.drop_flags(core.get_player_by_name(pname))
 			ctf_modebase:get_current_mode().recent_rankings.add(pname, {score = 30})
 		else
 			player_timers[pname] = timeleft - 1
@@ -159,7 +159,7 @@ local function update_timer(pname)
 				text = string.format("%dm %ds left to capture", math.floor(timeleft / 60), math.floor(timeleft % 60))
 			})
 
-			minetest.after(1, update_timer, pname)
+			core.after(1, update_timer, pname)
 		end
 	end
 end

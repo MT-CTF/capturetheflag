@@ -1,4 +1,4 @@
-local get_us_time = minetest.get_us_time
+local get_us_time = core.get_us_time
 
 local function emergeblocks_callback(pos, action, num_calls_remaining, ctx)
 	if ctx.total_blocks == 0 then
@@ -9,7 +9,7 @@ local function emergeblocks_callback(pos, action, num_calls_remaining, ctx)
 
 	if ctx.current_blocks == ctx.total_blocks then
 		if ctx.name then
-			minetest.chat_send_player(ctx.name,
+			core.chat_send_player(ctx.name,
 				string.format("Finished emerging %d blocks in %.2fs.",
 				ctx.total_blocks, (get_us_time() - ctx.start_time) / 1000000))
 		end
@@ -30,5 +30,5 @@ function ctf_map.emerge_with_callbacks(name, pos1, pos2, callback, progress)
 		progress       = progress
 	}
 
-	minetest.emerge_area(pos1, pos2, emergeblocks_callback, context)
+	core.emerge_area(pos1, pos2, emergeblocks_callback, context)
 end

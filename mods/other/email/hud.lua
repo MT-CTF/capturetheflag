@@ -1,4 +1,4 @@
-local hudkit = dofile(minetest.get_modpath("email") .. "/hudkit.lua")
+local hudkit = dofile(core.get_modpath("email") .. "/hudkit.lua")
 email.hud = hudkit()
 function email.update_hud(player)
 	local name = player:get_player_name()
@@ -31,14 +31,14 @@ function email.update_hud(player)
 		email.hud:remove(player, "email:text")
 	end
 end
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	email.hud.players[player:get_player_name()] = nil
 end)
 function email.update_all_hud()
-	local players = minetest.get_connected_players()
+	local players = core.get_connected_players()
 	for _, player in pairs(players) do
 		email.update_hud(player)
 	end
-	minetest.after(5, email.update_all_hud)
+	core.after(5, email.update_all_hud)
 end
-minetest.after(5, email.update_all_hud)
+core.after(5, email.update_all_hud)

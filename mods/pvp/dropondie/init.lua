@@ -2,14 +2,14 @@ dropondie = {}
 
 local function drop_list(pos, inv, list, player)
 	for _, item in ipairs(inv:get_list(list)) do
-		if minetest.registered_items[item:get_name()].stack_max == 1 then
+		if core.registered_items[item:get_name()].stack_max == 1 then
 			local pname = player:get_player_name()
 			if pname ~= "" then
 				local meta = item:get_meta()
 				meta:set_string("dropped_by", pname)
 			end
 		end
-		local obj = minetest.add_item(pos, item)
+		local obj = core.add_item(pos, item)
 
 		if obj then
 			obj:set_velocity({ x = math.random(-1, 1), y = 5, z = math.random(-1, 1) })
@@ -32,6 +32,6 @@ function dropondie.drop_all(player)
 end
 
 if ctf_core.settings.server_mode ~= "mapedit" then
-	minetest.register_on_dieplayer(dropondie.drop_all)
-	minetest.register_on_leaveplayer(dropondie.drop_all)
+	core.register_on_dieplayer(dropondie.drop_all)
+	core.register_on_leaveplayer(dropondie.drop_all)
 end

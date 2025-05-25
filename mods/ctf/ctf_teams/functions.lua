@@ -100,7 +100,7 @@ function ctf_teams.allocate_teams(teams)
 		table.insert(ctf_teams.current_team_list, teamname)
 	end
 
-	local unallocatedPlayers = minetest.get_connected_players()
+	local unallocatedPlayers = core.get_connected_players()
 	if #ctf_teams.parties ~= 0 then
 		-- Remove any parties that are too big
 		ctf_teams.deleteOversizedParties()
@@ -133,18 +133,18 @@ end
 
 ---@param teamname string Name of team
 ---@param message string message to send
---- Like `minetest.chat_send_player()` but sends to all members of the given team
+--- Like `core.chat_send_player()` but sends to all members of the given team
 function ctf_teams.chat_send_team(teamname, message)
 	assert(teamname and message, "Incorrect usage of chat_send_team()")
 
 	for player in pairs(ctf_teams.online_players[teamname].players) do
-		minetest.chat_send_player(player, message)
+		core.chat_send_player(player, message)
 	end
 end
 
---- Like `minetest.get_connected_players()` but leaves out players that aren't in a team
+--- Like `core.get_connected_players()` but leaves out players that aren't in a team
 function ctf_teams.get_connected_players()
-	local out = minetest.get_connected_players()
+	local out = core.get_connected_players()
 
 	for k, v in ipairs(table.copy(out)) do
 		if not ctf_teams.get(v) then
