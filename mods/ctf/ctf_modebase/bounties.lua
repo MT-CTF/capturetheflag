@@ -16,6 +16,20 @@ ctf_modebase.contributed_bounties = {
 }
 -- ^ This is for player contributed bounties
 
+-- Whenever players change team, e.g. in many team maps or on rejoin
+-- this has to be called
+ctf_teams.register_on_allocplayer(function()
+	local cur_mode = ctf_modebase:get_current_mode()
+	for target_name, bounties2 in pairs(ctf_modebase.contributed_bounties) do
+		for contributor, amount in pairs(bounties2.contributors) do
+			if ctf_teams.get(target_name) == ctf_teams.get(contributor) then
+				cur_mode.recent_rankings.add(contributor, { score = amount }, true)
+				bounties[contributor] = nil
+			end
+		end
+	end
+end)
+
 local function get_contributors(name)
 	local bounty = ctf_modebase.contributed_bounties[name]
 	if not bounty then
