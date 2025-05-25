@@ -1,4 +1,4 @@
-local mods = minetest.get_mod_storage()
+local mods = core.get_mod_storage()
 --[[
 {
 	_reset_date = <os.time() output>, -- 0 if no reset is queued
@@ -33,17 +33,17 @@ local function do_reset()
 			mods:set_int("_do_reset", 0)
 			mods:set_int("_current_reset", mods:get_int("_current_reset") + 1)
 
-			minetest.request_shutdown("Ranking reset done. Thank you for your patience", true, 5)
+			core.request_shutdown("Ranking reset done. Thank you for your patience", true, 5)
 		end
 	end
 
 	for mode, def in pairs(ctf_modebase.modes) do
-		local time = minetest.get_us_time()
+		local time = core.get_us_time()
 
 		finish_count = finish_count + 1
 
 		def.rankings.op_all(function(pname, value)
-			local rank = minetest.parse_json(value)
+			local rank = core.parse_json(value)
 
 			if rank then
 				rank.place = def.rankings:get_place(pname, "score")
@@ -59,7 +59,7 @@ local function do_reset()
 				local current = mods:get_string(PLAYER_RANKING_PREFIX..pname)
 
 				if current and current ~= "" then
-					current = minetest.parse_json(current)
+					current = core.parse_json(current)
 
 					current._last_reset = os.date("%m/%Y")
 
@@ -69,37 +69,37 @@ local function do_reset()
 
 					current[os.date("%m/%Y")][mode] = rank
 
-					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json(current))
+					mods:set_string(PLAYER_RANKING_PREFIX..pname, core.write_json(current))
 				else
-					mods:set_string(PLAYER_RANKING_PREFIX..pname, minetest.write_json({
+					mods:set_string(PLAYER_RANKING_PREFIX..pname, core.write_json({
 						_last_reset = os.date("%m/%Y"),
 						[os.date("%m/%Y")] = {[mode] = rank},
 					}))
 				end
 
-				minetest.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
+				core.chat_send_all(string.format("[%s] %d: %s with %d score", mode, rank.place, pname, rank.score or 0))
 			end
 		end,
 		function()
-			time = ((minetest.get_us_time()-time) / 1e6).."s"
+			time = ((core.get_us_time()-time) / 1e6).."s"
 
-			minetest.chat_send_all("Saved old rankings for mode "..mode..". Took "..time)
-			minetest.log("action", "Saved old rankings for mode "..mode..". Took "..time)
+			core.chat_send_all("Saved old rankings for mode "..mode..". Took "..time)
+			core.log("action", "Saved old rankings for mode "..mode..". Took "..time)
 
-			local t = minetest.get_us_time()
+			local t = core.get_us_time()
 			def.rankings.op_all(
 				function(pname, value)
 					def.rankings:del(pname)
 
-					minetest.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
+					core.chat_send_all(string.format("[%s] Reset rankings of player %s", mode, pname))
 				end,
 				function()
-					t = ((minetest.get_us_time()-t) / 1e6).."s"
+					t = ((core.get_us_time()-t) / 1e6).."s"
 
-					minetest.chat_send_all("Reset rankings for mode "..mode..". Took "..t)
-					minetest.log("action", "Reset rankings for mode "..mode..". Took "..t)
+					core.chat_send_all("Reset rankings for mode "..mode..". Took "..t)
+					core.log("action", "Reset rankings for mode "..mode..". Took "..t)
 
-					minetest.after(1, finish) -- wait in case for some reason not all the resets were queued
+					core.after(1, finish) -- wait in case for some reason not all the resets were queued
 				end
 			)
 		end)
@@ -110,12 +110,12 @@ local function check()
 	if ctf_rankings:rankings_sorted() then
 		do_reset()
 	else
-		minetest.after(1, check)
+		core.after(1, check)
 	end
 end
 
 if ctf_rankings.do_reset then
-	minetest.register_on_mods_loaded(function()
+	core.register_on_mods_loaded(function()
 		check()
 	end)
 end
@@ -123,7 +123,7 @@ end
 if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date")).month == os.date("*t").month then
 	local CHECK_INTERVAL = 60 * 30 -- 30 minutes
 	local timer = CHECK_INTERVAL
-	minetest.register_globalstep(function(dtime)
+	core.register_globalstep(function(dtime)
 		timer = timer + dtime
 
 		if timer >= CHECK_INTERVAL and not ctf_rankings.do_reset then
@@ -138,14 +138,14 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 				if hours_left > 0 then
 					if hours_left == 6 then
 						ctf_report.send_report("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
-						minetest.chat_send_all("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
+						core.chat_send_all("[RANKING RESET] The queued ranking reset will happen in ~6 hours")
 					elseif hours_left == 1 then
 						ctf_report.send_report("[RANKING RESET] The queued ranking reset will happen in 1 hour")
-						minetest.chat_send_all("[RANKING RESET] The queued ranking reset will happen in 1 hour")
+						core.chat_send_all("[RANKING RESET] The queued ranking reset will happen in 1 hour")
 
 						CHECK_INTERVAL = (61 - current.min) * 60
 
-						minetest.chat_send_all(minetest.colorize("red",
+						core.chat_send_all(core.colorize("red",
 							"[RANKING RESET] There will be a ranking reset in " .. CHECK_INTERVAL ..
 							" minutes. The server will restart twice during the reset process"
 						))
@@ -155,7 +155,7 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 					mods:set_int("_reset_date", 0)
 					ctf_rankings.do_reset = true
 
-					minetest.registered_chatcommands["queue_restart"].func("[RANKING RESET]",
+					core.registered_chatcommands["queue_restart"].func("[RANKING RESET]",
 						"Ranking Reset"
 					)
 				end
@@ -165,7 +165,7 @@ if mods:get_int("_reset_date") ~= 0 and os.date("*t", mods:get_int("_reset_date"
 end
 
 local confirm = {}
-minetest.register_chatcommand("queue_ranking_reset", {
+core.register_chatcommand("queue_ranking_reset", {
 	description = "Queue a ranking reset. Will reset all rankings to 0",
 	params = "<day 1-31> <month 1-12> [year e.g 2042] [hour 0-23] | <yes|no|unqueue|status>",
 	privs = {server = true},
@@ -208,7 +208,7 @@ minetest.register_chatcommand("queue_ranking_reset", {
 			confirm[name] = os.time({day = day, month = month, year = year, hour = hour})
 
 			return true, "Please run " ..
-					minetest.colorize("cyan", "/queue_ranking_reset <yes|no>") ..
+					core.colorize("cyan", "/queue_ranking_reset <yes|no>") ..
 					" to confirm/deny the date: " ..
 					os.date("%a %d, %b %Y at %I:%M %p", confirm[name])
 		else

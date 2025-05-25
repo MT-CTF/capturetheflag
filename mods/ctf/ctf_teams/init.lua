@@ -52,9 +52,9 @@ for team, def in pairs(ctf_teams.team) do
 	ctf_teams.team[team].color_hex = tonumber("0x"..def.color:sub(2))
 end
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
-minetest.register_privilege("ctf_team_admin", {
+core.register_privilege("ctf_team_admin", {
 	description = S("Allows advanced team management."),
 	give_to_singleplayer = false,
 	give_to_admin = false,
@@ -69,20 +69,20 @@ ctf_core.include_files(
 	"parties.lua"
 )
 
-minetest.register_on_mods_loaded(function()
-	local old_join_func = minetest.send_join_message
-	local old_leave_func = minetest.send_leave_message
+core.register_on_mods_loaded(function()
+	local old_join_func = core.send_join_message
+	local old_leave_func = core.send_leave_message
 
 	local function empty_func() end
 
-	minetest.send_join_message = empty_func
-	minetest.send_leave_message = empty_func
+	core.send_join_message = empty_func
+	core.send_leave_message = empty_func
 
-	minetest.register_on_joinplayer(function(player, last_login)
+	core.register_on_joinplayer(function(player, last_login)
 		local name = player:get_player_name()
 
-		minetest.after(0.5, function()
-			player = minetest.get_player_by_name(name)
+		core.after(0.5, function()
+			player = core.get_player_by_name(name)
 
 			if not player then
 				old_join_func(name, last_login)
@@ -98,14 +98,14 @@ minetest.register_on_mods_loaded(function()
 			else
 				local tcolor = ctf_teams.team[pteam].color
 
-				minetest.chat_send_all("*** " .. S("@1 joined the game.",
-					minetest.colorize(tcolor, name))
+				core.chat_send_all("*** " .. S("@1 joined the game.",
+					core.colorize(tcolor, name))
 				)
 			end
 		end)
 	end)
 
-	minetest.register_on_leaveplayer(function(player, timed_out, ...)
+	core.register_on_leaveplayer(function(player, timed_out, ...)
 
 		ctf_teams.checkAndClearAllPartyInfo(player:get_player_name())
 
@@ -118,8 +118,8 @@ minetest.register_on_mods_loaded(function()
 
 			local tcolor = ctf_teams.team[pteam].color
 
-			minetest.chat_send_all("*** " .. S("@1 left the game@2.",
-				minetest.colorize(tcolor, player:get_player_name()),
+			core.chat_send_all("*** " .. S("@1 left the game@2.",
+				core.colorize(tcolor, player:get_player_name()),
 				timed_out and " " .. S("(timed out)") or ""
 			))
 		end

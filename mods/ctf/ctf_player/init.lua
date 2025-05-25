@@ -23,6 +23,6 @@ player_api.register_model("character.b3d", {
 	eye_height = 1.47,
 })
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	player:set_local_animation(nil, nil, nil, nil, 0)
 end)

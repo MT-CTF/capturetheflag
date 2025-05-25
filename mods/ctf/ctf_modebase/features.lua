@@ -2,7 +2,7 @@ local mapload_huds = mhud.init()
 local LOADING_SCREEN_TARGET_TIME = 7
 local loading_screen_time
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local function supports_observers(x)
 	if x then
@@ -33,7 +33,7 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 		local setting = extra
 
 		if setting == true then
-			setting = ctf_settings.get(minetest.get_player_by_name(n), "teammate_nametag_style")
+			setting = ctf_settings.get(core.get_player_by_name(n), "teammate_nametag_style")
 		end
 
 		if setting == "3" then
@@ -44,7 +44,7 @@ local function update_playertag(player, t, nametag, team_nametag, symbol_nametag
 		end
 	end
 
-	for k, v in ipairs(minetest.get_connected_players()) do
+	for k, v in ipairs(core.get_connected_players()) do
 		local n = v:get_player_name()
 		if not nametag_players[n] then
 			entity_players[n] = true
@@ -61,9 +61,9 @@ local update_timer = false
 function ctf_modebase.update_playertags(time)
 	if not update_timer and not tags_hidden then
 		update_timer = true
-		minetest.after(time or 1.2, function()
+		core.after(time or 1.2, function()
 			update_timer = false
-			for _, p in pairs(minetest.get_connected_players()) do
+			for _, p in pairs(core.get_connected_players()) do
 				local t = ctf_teams.get(p)
 				local playertag = playertag.get(p)
 
@@ -91,7 +91,7 @@ local function set_playertags_state(state)
 	elseif state == PLAYERTAGS_OFF and not tags_hidden then
 		tags_hidden = true
 
-		for _, p in pairs(minetest.get_connected_players()) do
+		for _, p in pairs(core.get_connected_players()) do
 			local playertag = playertag.get(p)
 
 			if ctf_teams.get(p) and playertag then
@@ -115,7 +115,7 @@ function ctf_modebase.map_chosen(map, ...)
 
 	mapload_huds:clear_all()
 
-	for _, p in pairs(minetest.get_connected_players()) do
+	for _, p in pairs(core.get_connected_players()) do
 		if ctf_teams.get(p) then
 			mapload_huds:add(p, "loading_screen", {
 				hud_elem_type = "image",
@@ -153,7 +153,7 @@ function ctf_modebase.map_chosen(map, ...)
 		end
 	end
 
-	loading_screen_time = minetest.get_us_time()
+	loading_screen_time = core.get_us_time()
 
 	return old_announce(map, ...)
 end
@@ -164,7 +164,7 @@ ctf_settings.register("teammate_nametag_style", {
 	list = {"Minetest Nametag: Full", "Minetest Nametag: Symbol", "Entity Nametag"},
 	default = "1",
 	on_change = function(player, new_value)
-		minetest.log("action", "Player "..player:get_player_name().." changed their nametag setting")
+		core.log("action", "Player "..player:get_player_name().." changed their nametag setting")
 		ctf_modebase.update_playertags()
 	end
 })
@@ -202,7 +202,7 @@ local function calculate_killscore(player)
 		end
 	end
 
-	minetest.log("ACTION", string.format(
+	core.log("ACTION", string.format(
 		"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, " ..
 				"reward_given_to_enemy = %f },",
 		math.max(1, math.round(kd * 7 * flag_multiplier)),
@@ -273,7 +273,7 @@ local function get_suicide_image(reason)
 end
 
 local function send_death_message(player, killer, weapon_image)
-    local death_setting = ctf_settings.get(minetest.get_player_by_name(player), "send_death_message")
+    local death_setting = ctf_settings.get(core.get_player_by_name(player), "send_death_message")
     local assist_message = ""
     local weapon_message
     local hitters = ctf_combat_mode.get_other_hitters(player, killer)
@@ -296,11 +296,11 @@ local function send_death_message(player, killer, weapon_image)
 		        a_teamcolor = ctf_teams.team[a_teamcolor].color
 	        end
             if index == 1 then
-                assist_message = assist_message .. minetest.colorize(a_teamcolor, pname)
+                assist_message = assist_message .. core.colorize(a_teamcolor, pname)
             elseif index == #hitters then
-                assist_message = assist_message .. ", and " .. minetest.colorize(a_teamcolor, pname)
+                assist_message = assist_message .. ", and " .. core.colorize(a_teamcolor, pname)
 			else
-                assist_message = assist_message .. ", " .. minetest.colorize(a_teamcolor, pname)
+                assist_message = assist_message .. ", " .. core.colorize(a_teamcolor, pname)
             end
 		end
     end
@@ -309,18 +309,18 @@ local function send_death_message(player, killer, weapon_image)
         if player ~= killer then
             if weapon_message then
                 local death_message = "You were " .. weapon_message
-                    .. " by " .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
-                minetest.chat_send_player(player, death_message)
+                    .. " by " .. core.colorize(k_teamcolor, killer) .. assist_message .. "."
+                core.chat_send_player(player, death_message)
             else
                 local death_message = "You were killed by "
-                    .. minetest.colorize(k_teamcolor, killer) .. assist_message .. "."
-                minetest.chat_send_player(player, death_message)
+                    .. core.colorize(k_teamcolor, killer) .. assist_message .. "."
+                core.chat_send_player(player, death_message)
             end
         end
         if player == killer and #hitters == 0 then
             local suicide_message = weapon_message or "suicided"
             local death_message = "You " .. suicide_message .. assist_message .. "."
-            minetest.chat_send_player(player, death_message)
+            core.chat_send_player(player, death_message)
         end
     end
 end
@@ -353,7 +353,7 @@ local function tp_player_near_flag(player)
 	end
 
 	apply()
-	minetest.after(0.1, function() -- TODO remove after respawn bug will be fixed
+	core.after(0.1, function() -- TODO remove after respawn bug will be fixed
 		if player:is_player() then
 			apply()
 		end
@@ -363,20 +363,20 @@ local function tp_player_near_flag(player)
 end
 
 local function celebrate_team(teamname)
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
 		local volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
 		if volume > 0 then
 			if pteam == teamname then
-				minetest.sound_play("ctf_modebase_trumpet_positive", {
+				core.sound_play("ctf_modebase_trumpet_positive", {
 					to_player = pname,
 					gain = volume,
 					pitch = 1.0,
 				}, true)
 			else
-				minetest.sound_play("ctf_modebase_trumpet_negative", {
+				core.sound_play("ctf_modebase_trumpet_negative", {
 					to_player = pname,
 					gain = volume,
 					pitch = 1.0,
@@ -387,20 +387,20 @@ local function celebrate_team(teamname)
 end
 
 local function drop_flag(teamname)
-	for _, player in ipairs(minetest.get_connected_players()) do
+	for _, player in ipairs(core.get_connected_players()) do
 		local pname = player:get_player_name()
 		local pteam = ctf_teams.get(pname)
 		local drop_volume = (tonumber(ctf_settings.get(player, "flag_sound_volume")) or 10.0) / 10
 
 		if pteam and drop_volume > 0 then
 			if pteam == teamname then
-				minetest.sound_play("ctf_modebase_drop_flag_negative", {
+				core.sound_play("ctf_modebase_drop_flag_negative", {
 					to_player = pname,
 					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
 				}, true)
 			else
-				minetest.sound_play("ctf_modebase_drop_flag_positive", {
+				core.sound_play("ctf_modebase_drop_flag_positive", {
 					to_player = pname,
 					gain = math.max(0.1, drop_volume - 0.5),
 					pitch = 1.0,
@@ -546,7 +546,7 @@ return {
 		if #delete_queue > 0 and delete_queue._map ~= ctf_map.current_map.dirname then
 			local p1, p2 = unpack(delete_queue)
 
-			for _, object_drop in pairs(minetest.get_objects_in_area(p1, p2)) do
+			for _, object_drop in pairs(core.get_objects_in_area(p1, p2)) do
 				if not object_drop:is_player() then
 					local drop = object_drop:get_luaentity()
 
@@ -556,7 +556,7 @@ return {
 				end
 			end
 
-			minetest.delete_area(p1, p2)
+			core.delete_area(p1, p2)
 
 			delete_queue = {}
 		end
@@ -569,9 +569,9 @@ return {
 		)
 
 		if loading_screen_time then
-			local total_time = (minetest.get_us_time() - loading_screen_time) / 1e6
+			local total_time = (core.get_us_time() - loading_screen_time) / 1e6
 
-			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
+			core.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
 				mapload_huds:clear_all()
 				set_playertags_state(PLAYERTAGS_ON)
 
@@ -583,7 +583,7 @@ return {
 		recent_rankings.on_match_end()
 
 		if ctf_map.current_map then
-			minetest.log("action",
+			core.log("action",
 				"matchend: Match ended for map "..ctf_map.current_map.name..
 				" in mode "..(ctf_modebase.current_mode or "<nil>")..
 				". Duration: "..ctf_map.get_duration()
@@ -723,9 +723,9 @@ return {
 			text = " has taken " .. HumanReadable(teamname) .. "'s flag"
 		end
 
-		minetest.chat_send_all(
-			minetest.colorize(tcolor, pname) ..
-			minetest.colorize(FLAG_MESSAGE_COLOR, text)
+		core.chat_send_all(
+			core.colorize(tcolor, pname) ..
+			core.colorize(FLAG_MESSAGE_COLOR, text)
 		)
 		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
 
@@ -747,9 +747,9 @@ return {
 			text = " has dropped the flag of team(s) " .. HumanReadable(teamnames)
 		end
 
-		minetest.chat_send_all(
-			minetest.colorize(tcolor, pname) ..
-			minetest.colorize(FLAG_MESSAGE_COLOR, text)
+		core.chat_send_all(
+			core.colorize(tcolor, pname) ..
+			core.colorize(FLAG_MESSAGE_COLOR, text)
 		)
 		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
 
@@ -801,7 +801,7 @@ return {
 
 			capture_reward = capture_reward + math.min(score, 800)
 
-			minetest.log("action", string.format(
+			core.log("action", string.format(
 				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, "..
 				"player_attempts = %d, time = %d, winteam_score = %d, \"%s\"},",
 				team_score / score,
@@ -825,8 +825,8 @@ return {
 			)
 		end
 
-		minetest.chat_send_all(
-			minetest.colorize(tcolor, pname) .. minetest.colorize(FLAG_MESSAGE_COLOR, text)
+		core.chat_send_all(
+			core.colorize(tcolor, pname) .. core.colorize(FLAG_MESSAGE_COLOR, text)
 		)
 
 		ctf_modebase.announce(string.format("Player %s (team %s)%s", pname, pteam, text))
@@ -856,14 +856,14 @@ return {
 				capture_text = "Player %s captured the last flag and got %d points"
 			end
 
-			ctf_modebase.summary.set_winner(string.format(capture_text, minetest.colorize(tcolor, pname), capture_reward))
+			ctf_modebase.summary.set_winner(string.format(capture_text, core.colorize(tcolor, pname), capture_reward))
 
 			local win_text = HumanReadable(pteam) .. " Team Wins!"
 
 			local match_rankings, special_rankings, rank_values, formdef = ctf_modebase.summary.get()
 			formdef.title = win_text
 
-			for _, p in ipairs(minetest.get_connected_players()) do
+			for _, p in ipairs(core.get_connected_players()) do
 				ctf_modebase.summary.show_gui(p:get_player_name(), match_rankings, special_rankings, rank_values, formdef)
 			end
 
@@ -938,7 +938,7 @@ return {
 	end,
 	get_chest_access = function(pname)
 		local rank = rankings:get(pname)
-		local player = minetest.get_player_by_name(pname)
+		local player = core.get_player_by_name(pname)
 		local pro_chest = player and player:get_meta():get_int("ctf_rankings:pro_chest:"..
 				(ctf_modebase.current_mode or "")) >= 1
 		local deny_pro = "You need to have more than 1.4 kills per death, "..

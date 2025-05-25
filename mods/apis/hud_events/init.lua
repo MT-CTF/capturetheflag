@@ -24,7 +24,7 @@ local hud_queues = {
 }
 local quick_event_timer = {}
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	local pname = player:get_player_name()
 
 	for channel=1, #hud_queues do
@@ -59,7 +59,7 @@ local function show_quick_hud_event(player, huddef)
 	if quick_event_timer[pname] then
 		quick_event_timer[pname]:cancel()
 	end
-	quick_event_timer[pname] = minetest.after(HUD_SHOW_QUICK_TIME, function()
+	quick_event_timer[pname] = core.after(HUD_SHOW_QUICK_TIME, function()
 		if not player:is_player() then return end
 
 		if hud:exists(player, "hud_event_quick") then
@@ -90,14 +90,14 @@ local function handle_hud_events(player, channel)
 		})
 	end
 
-	hud_queues[channel][pname].t = minetest.after(HUD_SHOW_TIME, function()
-		player = minetest.get_player_by_name(pname)
+	hud_queues[channel][pname].t = core.after(HUD_SHOW_TIME, function()
+		player = core.get_player_by_name(pname)
 
 		if player then
 			hud:change(player, event_name, {text = ""})
 
-			hud_queues[channel][pname].t = minetest.after(HUD_SHOW_NEXT_TIME, function()
-				player = minetest.get_player_by_name(pname)
+			hud_queues[channel][pname].t = core.after(HUD_SHOW_NEXT_TIME, function()
+				player = core.get_player_by_name(pname)
 
 				if player then
 					if #hud_queues[channel][pname].e >= 1 then

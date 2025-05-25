@@ -1,13 +1,13 @@
 local unset_function = "return "
 
 function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
-	local filepath = minetest.get_worldpath().."/ctf_gui/"
+	local filepath = core.get_worldpath().."/ctf_gui/"
 	local filename = filepath.."file_edit.txt"
 	local slower_loop = false
 
-	minetest.chat_send_all("Started formspec editing file at "..filename)
+	core.chat_send_all("Started formspec editing file at "..filename)
 
-	minetest.mkdir(filepath)
+	core.mkdir(filepath)
 
 	local file = assert(io.open(filename, "w"))
 		if type(formspec) ~= "function" then
@@ -24,7 +24,7 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 			local result, form = pcall((loadstring(formspec) or function() return function() end end)(), formcontext)
 
 			ctf_gui.show_formspec(player, formname,
-				result and form or "size[10,10]hypertext[0,0;10,10;err;"..minetest.formspec_escape(form or "").."]"
+				result and form or "size[10,10]hypertext[0,0;10,10;err;"..core.formspec_escape(form or "").."]"
 			)
 
 			slower_loop = not result
@@ -32,7 +32,7 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 			ctf_gui.show_formspec(player, formname, formspec)
 		end
 
-		minetest.after(slower_loop and 3 or 1, function()
+		core.after(slower_loop and 3 or 1, function()
 			local f = assert(io.open(filename, "r"))
 			local new_form = f:read("*a")
 
@@ -45,7 +45,7 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 			if type(formspec) == "function" or not formspec:match("^exit") then
 				interval()
 			else
-				minetest.request_shutdown("Formspec dev requested shutdown", true)
+				core.request_shutdown("Formspec dev requested shutdown", true)
 			end
 		end)
 	end

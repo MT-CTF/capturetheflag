@@ -3,7 +3,7 @@ ctf_report = {
 	staff = {},
 }
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 ---@param func function (name, message)
 function ctf_report.register_on_report(func)
@@ -12,11 +12,11 @@ end
 
 function ctf_report.default_send_report(msg)
 	for name in pairs(ctf_report.staff) do
-		minetest.sound_play("ctf_report_bell", {
+		core.sound_play("ctf_report_bell", {
 			to_player = name,
 			gain = 1.0,
 		}, true)
-		minetest.chat_send_player(name, minetest.colorize("#ffcc00", "[REPORT]: " .. msg))
+		core.chat_send_player(name, core.colorize("#ffcc00", "[REPORT]: " .. msg))
 	end
 end
 
@@ -36,7 +36,7 @@ end
 
 local timers   = {}
 local cooldown = {}
-minetest.register_chatcommand("report", {
+core.register_chatcommand("report", {
 	params = S("<msg>"),
 	description = S("Report misconduct or bugs"),
 	func = function(name, param)
@@ -62,7 +62,7 @@ minetest.register_chatcommand("report", {
 				timers[name]:cancel()
 			end
 
-			timers[name] = minetest.after(30, function()
+			timers[name] = core.after(30, function()
 				cooldown[name] = nil
 				timers[name] = nil
 			end)
@@ -99,12 +99,12 @@ minetest.register_chatcommand("report", {
 	end
 })
 
-minetest.register_on_joinplayer(function(player)
-	if minetest.check_player_privs(player, { kick = true }) then
+core.register_on_joinplayer(function(player)
+	if core.check_player_privs(player, { kick = true }) then
 		ctf_report.staff[player:get_player_name()] = true
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	ctf_report.staff[player:get_player_name()] = nil
 end)

@@ -37,7 +37,7 @@ local item_value = {
 	["ctf_ranged:pistol"              ] = 1,
 }
 
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local function get_chest_access(name)
 	local current_mode = ctf_modebase:get_current_mode()
@@ -98,7 +98,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		}
 
 		function def.on_construct(pos)
-			local meta = minetest.get_meta(pos)
+			local meta = core.get_meta(pos)
 			meta:set_string("infotext", S("@1 Team's Chest", HumanReadable(team)))
 
 			local inv = meta:get_inventory()
@@ -140,13 +140,13 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 			if reg_access ~= true then
 				formspec = formspec .. "label[0.75,3;" ..
-					minetest.formspec_escape(minetest.wrap_text(
+					core.formspec_escape(core.wrap_text(
 						reg_access or S("You aren't allowed to access the team chest"),
 						60
 					)) ..
 				"]"
 
-				minetest.show_formspec(name, "ctf_teams:no_access", formspec)
+				core.show_formspec(name, "ctf_teams:no_access", formspec)
 				return
 			end
 
@@ -160,10 +160,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 					"listring[" .. chestinv ..";pro]" ..
 					"listring[" .. chestinv .. ";helper]" ..
 					"label[7,-0.2;" ..
-					minetest.formspec_escape(S("Pro players only")) .. "]"
+					core.formspec_escape(S("Pro players only")) .. "]"
 			else
 				formspec = formspec .. "label[6.5,2;" ..
-					minetest.formspec_escape(minetest.wrap_text(
+					core.formspec_escape(core.wrap_text(
 						pro_access or S("You aren't allowed to access the pro section"),
 						20
 					)) ..
@@ -174,7 +174,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				"listring[" .. chestinv ..";main]" ..
 				"listring[current_player;main]"
 
-			minetest.show_formspec(name, "ctf_teams:chest",  formspec)
+			core.show_formspec(name, "ctf_teams:chest",  formspec)
 		end
 
 		function def.allow_metadata_inventory_move(pos, from_list, from_index,
@@ -199,7 +199,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			if reg_access == true and (pro_access == true or from_list ~= "pro" and to_list ~= "pro") then
 				if to_list == "helper" then
 					-- handle move & overflow
-					local chestinv = minetest.get_inventory({type = "node", pos = pos})
+					local chestinv = core.get_inventory({type = "node", pos = pos})
 					local playerinv = player:get_inventory()
 					local stack = chestinv:get_stack(from_list, from_index)
 					local leftover = playerinv:add_item("main", stack)
@@ -241,7 +241,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 
 			if reg_access == true and (pro_access == true or listname ~= "pro") then
-				local chestinv = minetest.get_inventory({type = "node", pos = pos})
+				local chestinv = core.get_inventory({type = "node", pos = pos})
 				if chestinv:room_for_item("pro", stack) then
 					return stack:get_count()
 				else
@@ -294,10 +294,10 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 
 	function def.on_metadata_inventory_put(pos, listname, index, stack, player)
-		minetest.log("action", string.format("%s puts %s to team chest at %s",
+		core.log("action", string.format("%s puts %s to team chest at %s",
 			player:get_player_name(),
 			stack:to_string(),
-			minetest.pos_to_string(pos)
+			core.pos_to_string(pos)
 		))
 		local meta = stack:get_meta()
 		local dropped_by = meta:get_string("dropped_by")
@@ -315,20 +315,20 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 		end
 		meta:set_string("dropped_by", "")
-		local inv = minetest.get_inventory({ type="node", pos=pos })
+		local inv = core.get_inventory({ type="node", pos=pos })
 		local stack_ = inv:get_stack(listname,index)
 		stack_:get_meta():set_string("dropped_by", "")
 		inv:set_stack(listname, index, stack_)
 	end
 
 		function def.on_metadata_inventory_take(pos, listname, index, stack, player)
-			minetest.log("action", string.format("%s takes %s from team chest at %s",
+			core.log("action", string.format("%s takes %s from team chest at %s",
 				player:get_player_name(),
 				stack:to_string(),
-				minetest.pos_to_string(pos)
+				core.pos_to_string(pos)
 			))
 		end
 
-		minetest.register_node("ctf_teams:chest_" .. team, def)
+		core.register_node("ctf_teams:chest_" .. team, def)
 	end
 end

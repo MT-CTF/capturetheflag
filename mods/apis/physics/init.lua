@@ -8,16 +8,16 @@ local default_overrides = {
 	gravity      = 1.0,
 }
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	players[player:get_player_name()] = {}
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	players[player:get_player_name()] = nil
 end)
 
 local function update(name)
-	local player = minetest.get_player_by_name(name)
+	local player = core.get_player_by_name(name)
 	local override = table.copy(default_overrides)
 
 	for _, layer in pairs(players[name]) do

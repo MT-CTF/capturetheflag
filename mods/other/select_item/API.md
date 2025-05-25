@@ -3,7 +3,7 @@ With this API you can open the item selection dialog as well as
 catch events when players select an item from this dialog.
 
 You can safely optionally depend on this mod, just make sure
-to check for the mod's existence first (`minetest.get_modpath`
+to check for the mod's existence first (`core.get_modpath`
 returns non-`nil` value).
 
 ## Functions
@@ -76,7 +76,7 @@ Display all flammable to Player 1:
 
 ```
 select_item.show_dialog("Player 1", "example:flammable", function(itemstring)
-	if minetest.get_item_group(itemstring, "flammable") >= 1 then
+	if core.get_item_group(itemstring, "flammable") >= 1 then
 		return true
 	else
 		return false
@@ -94,7 +94,7 @@ select_item.register_on_select_item(function(playername, dialogname, itemstring)
 	--[[ Check for the dialog type you care about. This check should almost always be done
 	to ensure interoperability with other mods. ]]
 	if dialogname == "example:creative" then
-		local inv = minetest.get_inventory({type="player", location=playername})
+		local inv = core.get_inventory({type="player", location=playername})
 		inv:add_item("main", ItemStack(itemstring))
 	end
 end)

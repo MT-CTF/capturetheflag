@@ -5,28 +5,28 @@ arsdragonfly@gmail.com
 --]]
 --Time between two subsequent messages.
 -- local MESSAGE_INTERVAL = 0
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 math.randomseed(os.time())
 
 random_messages = {}
 random_messages.messages = {} --This table contains all messages.
 
-function random_messages.initialize() --Set the interval in minetest.conf.
-	minetest.settings:set("random_messages_interval", 60)
-	minetest.settings:write();
+function random_messages.initialize() --Set the interval in core.conf.
+	core.settings:set("random_messages_interval", 60)
+	core.settings:write();
 	return 60
 end
 
--- function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
--- 	MESSAGE_INTERVAL = tonumber(minetest.settings:get("random_messages_interval"))
+-- function random_messages.set_interval() --Read the interval from core.conf and set it if it doesn't exist
+-- 	MESSAGE_INTERVAL = tonumber(core.settings:get("random_messages_interval"))
 -- 							or random_messages.initialize()
 -- end
 
 function random_messages.check_params(name,func,params)
 	local stat, msg = func(params)
 	if not stat then
-		minetest.chat_send_player(name,msg)
+		core.chat_send_player(name,msg)
 		return false
 	end
 	return true
@@ -88,7 +88,7 @@ end
 function random_messages.display_message(message_number)
 	local msg = random_messages.messages[message_number] or message_number
 	if msg then
-		minetest.chat_send_all(minetest.colorize("#808080", msg))
+		core.chat_send_all(core.colorize("#808080", msg))
 	end
 end
 
@@ -120,7 +120,7 @@ function random_messages.add_message(t)
 end
 
 function random_messages.save_messages()
-	local output = io.open(minetest.get_worldpath().."/random_messages","w")
+	local output = io.open(core.get_worldpath().."/random_messages","w")
 	for k,v in pairs(random_messages.messages) do
 		output:write(v .. "\n")
 	end
@@ -133,9 +133,9 @@ random_messages.read_messages()
 
 -- local function step(dtime)
 -- 	random_messages.show_message()
--- 	minetest.after(MESSAGE_INTERVAL, step)
+-- 	core.after(MESSAGE_INTERVAL, step)
 -- end
--- minetest.after(MESSAGE_INTERVAL, step)
+-- core.after(MESSAGE_INTERVAL, step)
 
 local register_chatcommand_table = {
 	params = "viewmessages | removemessage <number> | addmessage <number>",
@@ -144,7 +144,7 @@ local register_chatcommand_table = {
 	func = function(name,param)
 		local t = string.split(param, " ")
 		if t[1] == "viewmessages" then
-			minetest.chat_send_player(name,random_messages.list_messages())
+			core.chat_send_player(name,random_messages.list_messages())
 		elseif t[1] == "removemessage" then
 			if not random_messages.check_params(
 			name,
@@ -159,15 +159,15 @@ local register_chatcommand_table = {
 			random_messages.remove_message(t[2])
 		elseif t[1] == "addmessage" then
 			if not t[2] then
-				minetest.chat_send_player(name,"ERROR: No message.")
+				core.chat_send_player(name,"ERROR: No message.")
 			else
 				random_messages.add_message(t)
 			end
 		else
-				minetest.chat_send_player(name,"ERROR: Invalid command.")
+				core.chat_send_player(name,"ERROR: Invalid command.")
 		end
 	end
 }
 
-minetest.register_chatcommand("random_messages", register_chatcommand_table)
-minetest.register_chatcommand("rmessages", register_chatcommand_table)
+core.register_chatcommand("random_messages", register_chatcommand_table)
+core.register_chatcommand("rmessages", register_chatcommand_table)

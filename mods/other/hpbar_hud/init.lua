@@ -7,9 +7,9 @@ local function calculate_offset(hearts)
 end
 
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	-- If the hudbars mod is installed, we don't need to change the hp bar
-	if minetest.get_modpath("hudbars") == nil and ctf_settings.get(player, "use_hudbars") == "false" then
+	if core.get_modpath("hudbars") == nil and ctf_settings.get(player, "use_hudbars") == "false" then
 		player:hud_set_flags({healthbar = false}) -- Hide the builtin HP bar
 		-- Add own HP bar with the same visuals as the builtin one
 		ids[player:get_player_name()] = player:hud_add({
@@ -17,8 +17,8 @@ minetest.register_on_joinplayer(function(player)
 			position = {x = 0.5, y = 1},
 			text = "heart.png",
 			text2 = "heart_gone.png",
-			number = minetest.PLAYER_MAX_HP_DEFAULT,
-			item = minetest.PLAYER_MAX_HP_DEFAULT,
+			number = core.PLAYER_MAX_HP_DEFAULT,
+			item = core.PLAYER_MAX_HP_DEFAULT,
 			direction = 0,
 			size = {x = texture_res, y = texture_res},
 			offset = calculate_offset(10),
@@ -26,12 +26,12 @@ minetest.register_on_joinplayer(function(player)
 	end
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	ids[player:get_player_name()] = nil
 end)
 
 -- HACK `register_playerevent` is not documented, but used to implement statbars by MT internally
-minetest.register_playerevent(function(player, eventname)
+core.register_playerevent(function(player, eventname)
 	local id = ids[player:get_player_name()]
 	if not id then return end
 

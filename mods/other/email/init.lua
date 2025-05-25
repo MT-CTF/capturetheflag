@@ -4,10 +4,10 @@ email = {
 local _loading = true
 local send_as = {}
 local forward_to = {}
-local storage = minetest.get_mod_storage()
-local S = minetest.get_translator(minetest.get_current_modname())
+local storage = core.get_mod_storage()
+local S = core.get_translator(core.get_current_modname())
 
-if minetest.global_exists("chatplus") then
+if core.global_exists("chatplus") then
 	email.log = chatplus.log
 
 	function chatplus.on_old_inbox(inbox)
@@ -23,15 +23,15 @@ function email.init()
 	email.inboxes = {}
 	email.load()
 	_loading = false
-	if minetest.global_exists("chatplus") and chatplus.old_inbox then
+	if core.global_exists("chatplus") and chatplus.old_inbox then
 		chatplus.on_old_inbox(chatplus.old_inbox)
 	end
 end
 
 function email.load()
-	local file = io.open(minetest.get_worldpath() .. "/email.txt", "r")
+	local file = io.open(core.get_worldpath() .. "/email.txt", "r")
 	if file then
-		local from_file = minetest.deserialize(file:read("*all"))
+		local from_file = core.deserialize(file:read("*all"))
 		file:close()
 		if type(from_file) == "table" then
 			if from_file.mod == "email" and tonumber(from_file.ver_min) <= 1 then
@@ -46,28 +46,28 @@ function email.load()
 	local send_as = storage:get_string("send_as")
 
 	if forward_to ~= "" then
-		forward_to = minetest.parse_json(forward_to) or {}
+		forward_to = core.parse_json(forward_to) or {}
 	else
 		forward_to = {}
 	end
 
 	if send_as ~= "" then
-		send_as = minetest.parse_json(send_as) or {}
+		send_as = core.parse_json(send_as) or {}
 	else
 		send_as = {}
 	end
 end
 
 function email.save()
-	local file = io.open(minetest.get_worldpath() .. "/email.txt", "w")
+	local file = io.open(core.get_worldpath() .. "/email.txt", "w")
 	if file then
-		file:write(minetest.serialize({
+		file:write(core.serialize({
 			mod = "email", version = 1, ver_min = 1,
 			inboxes = email.inboxes }))
 		file:close()
 	end
 end
-minetest.register_on_shutdown(email.save)
+core.register_on_shutdown(email.save)
 
 function email.get_inbox(name)
 	return email.inboxes[name] or {}
@@ -78,12 +78,12 @@ function email.clear_inbox(name)
 	email.save()
 end
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	local inbox = email.get_inbox(player:get_player_name())
 	if #inbox > 0 then
-		minetest.after(10, function()
-			minetest.chat_send_player(player:get_player_name(),
-				minetest.colorize("#00FF00",
+		core.after(10, function()
+			core.chat_send_player(player:get_player_name(),
+				core.colorize("#00FF00",
 					S("(@1) You have mail! Type /inbox to recieve", #inbox)))
 		end)
 	end
@@ -93,9 +93,9 @@ function email.get_formspec(name)
 	local inbox = email.get_inbox(name)
 
 	local function row(fs, c1, date, from, msg)
-		date = minetest.formspec_escape(date)
-		from = minetest.formspec_escape(from)
-		msg = minetest.formspec_escape(msg)
+		date = core.formspec_escape(date)
+		from = core.formspec_escape(from)
+		msg = core.formspec_escape(msg)
 		return fs .. ",#d0d0d0," .. table.concat({date, c1, from, msg}, ",")
 	end
 
@@ -109,7 +109,7 @@ function email.get_formspec(name)
 	else
 		for i = 1, #inbox do
 			local color = "#ffffff"
-			if minetest.check_player_privs(inbox[i].from, {kick = true, ban = true}) then
+			if core.check_player_privs(inbox[i].from, {kick = true, ban = true}) then
 				color = "#FFD700"
 			end
 			local msg = inbox[i].msg
@@ -136,10 +136,10 @@ function email.show_inbox(name, text_mode, custom_gui)
 		if #inbox == 0 then
 			return true, S("Your inbox is empty!")
 		else
-			minetest.chat_send_player(name, S("@1 items in your inbox:", #inbox))
+			core.chat_send_player(name, S("@1 items in your inbox:", #inbox))
 			for i = 1, #inbox do
 				local item = inbox[i]
-				minetest.chat_send_player(name, i .. ") " ..item.date ..
+				core.chat_send_player(name, i .. ") " ..item.date ..
 					" <" .. item.from .. "> " .. item.msg)
 			end
 			return true, S("End of mail (@1 items)", #inbox)
@@ -147,9 +147,9 @@ function email.show_inbox(name, text_mode, custom_gui)
 	else
 		if custom_gui then
 			local fs = "size[12,8]" .. email.get_formspec(name)
-			minetest.show_formspec(name, "email:inbox", fs)
+			core.show_formspec(name, "email:inbox", fs)
 		else
-			local player = minetest.get_player_by_name(name)
+			local player = core.get_player_by_name(name)
 
 			sfinv.set_page(player, sfinv.get_page(player))
 		end
@@ -158,7 +158,7 @@ function email.show_inbox(name, text_mode, custom_gui)
 	end
 end
 
-if minetest.global_exists("sfinv") then
+if core.global_exists("sfinv") then
 	sfinv.register_page("email:inbox", {
 		title = S("Inbox"),
 		get = function(self, player, context)
@@ -168,12 +168,12 @@ if minetest.global_exists("sfinv") then
 	})
 end
 
-minetest.register_on_player_receive_fields(function(player,formname,fields)
+core.register_on_player_receive_fields(function(player,formname,fields)
 	if fields.clear then
 		local name = player:get_player_name()
 		email.clear_inbox(name)
 
-		minetest.chat_send_player(name, S("Inbox cleared!"))
+		core.chat_send_player(name, S("Inbox cleared!"))
 		email.show_inbox(name)
 	end
 
@@ -182,7 +182,7 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 			for i = 1, #player.inbox do
 				player.inbox[i].read = true
 			end
-			minetest.chat_send_player(name, "Marked all as read!")
+			core.chat_send_player(name, "Marked all as read!")
 			email.show_inbox(name)
 		end
 	end]]--
@@ -192,9 +192,9 @@ function email.send_mail(aname, ato, msg)
 	local name = send_as[aname]  or aname
 	local to   = forward_to[ato] or ato
 
-	minetest.log("action", string.format("[EMAIL] from %s to %s: %s", name, to, msg))
+	core.log("action", string.format("[EMAIL] from %s to %s: %s", name, to, msg))
 	email.log(string.format("Email from %s to %s: %s", name, to, msg))
-	if not minetest.player_exists(to) then
+	if not core.player_exists(to) then
 		return false, S("Player '@1' does not exist", to)
 	end
 
@@ -211,14 +211,14 @@ function email.send_mail(aname, ato, msg)
 
 	email.save()
 
-	minetest.chat_send_player(to, minetest.colorize("#00FF00", "Mail from " .. minetest.colorize("#92C5FC", name) .. ": " .. msg))
+	core.chat_send_player(to, core.colorize("#00FF00", "Mail from " .. core.colorize("#92C5FC", name) .. ": " .. msg))
 
 
 
 	return true, S("Message sent to @1", ato)
 end
 
-minetest.register_chatcommand("inbox", {
+core.register_chatcommand("inbox", {
 	params = "[/clear/text]",
 	description = S("Inbox: Blank to see inbox. Use 'clear' to empty inbox, 'text' for text only."),
 	func = function(name, param)
@@ -226,7 +226,7 @@ minetest.register_chatcommand("inbox", {
 			email.clear_inbox(name)
 
 			return true, S("Inbox cleared")
-		elseif param == "text" or param == "txt" or param == "t" or not minetest.get_player_by_name(name) then
+		elseif param == "text" or param == "txt" or param == "t" or not core.get_player_by_name(name) then
 			return email.show_inbox(name, true)
 		else
 			return email.show_inbox(name, false, true)
@@ -234,16 +234,16 @@ minetest.register_chatcommand("inbox", {
 	end
 })
 
-minetest.register_chatcommand("mail", {
+core.register_chatcommand("mail", {
 	params = S("<playername> <some message>"),
 	description = S("mail: add a message to a player's inbox"),
 	func = function(name, param)
 		local to, msg = string.match(param, "^([%a%d_-]+) (.+)")
 		if to and msg then
-			if minetest.check_player_privs(name, "shout") then
+			if core.check_player_privs(name, "shout") then
 				return email.send_mail(name, to, msg)
-			elseif not minetest.check_player_privs(name, "shout") and
-					minetest.check_player_privs(to, "basic_privs") then
+			elseif not core.check_player_privs(name, "shout") and
+					core.check_player_privs(to, "basic_privs") then
 				return email.send_mail(name, to, msg)
 			else
 				return false, S("-!- You don't have the permission to speak, so you can only mail staff members.")
@@ -255,6 +255,6 @@ minetest.register_chatcommand("mail", {
 	end
 })
 
-dofile(minetest.get_modpath("email") .. "/hud.lua")
+dofile(core.get_modpath("email") .. "/hud.lua")
 
 email.init()
