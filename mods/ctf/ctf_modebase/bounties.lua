@@ -372,3 +372,18 @@ ctf_core.register_chatcommand_alias("bounty", "b", {
 		)
 	end,
 })
+
+ctf_api.register_on_match_end(function()
+	-- there might be some unclaimed player bounties, here we return
+	-- the points to their contributors
+	local current_mode = ctf_modebase:get_current_mode()
+	for _, bounties2 in pairs(ctf_modebase.contributed_bounties) do
+		for bounty_donator, bounty_amount in pairs(bounties2["contributors"]) do
+			current_mode.recent_rankings.add(
+				bounty_donator,
+				{ score = bounty_amount },
+				true
+			)
+		end
+	end
+end)
