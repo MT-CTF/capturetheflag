@@ -37,7 +37,7 @@ ctf_teams = {
 			color = "#ffff00",
 			color_hex = 0x000,
 			irc_color = 8,
-		}
+		},
 	},
 	teamlist = {},
 
@@ -49,7 +49,7 @@ ctf_teams = {
 for team, def in pairs(ctf_teams.team) do
 	table.insert(ctf_teams.teamlist, team)
 
-	ctf_teams.team[team].color_hex = tonumber("0x"..def.color:sub(2))
+	ctf_teams.team[team].color_hex = tonumber("0x" .. def.color:sub(2))
 end
 
 local S = minetest.get_translator(minetest.get_current_modname())
@@ -98,15 +98,14 @@ minetest.register_on_mods_loaded(function()
 			else
 				local tcolor = ctf_teams.team[pteam].color
 
-				minetest.chat_send_all("*** " .. S("@1 joined the game.",
-					minetest.colorize(tcolor, name))
+				minetest.chat_send_all(
+					"*** " .. S("@1 joined the game.", minetest.colorize(tcolor, name))
 				)
 			end
 		end)
 	end)
 
 	minetest.register_on_leaveplayer(function(player, timed_out, ...)
-
 		ctf_teams.checkAndClearAllPartyInfo(player:get_player_name())
 
 		local pteam = ctf_teams.get(player)
@@ -118,10 +117,24 @@ minetest.register_on_mods_loaded(function()
 
 			local tcolor = ctf_teams.team[pteam].color
 
-			minetest.chat_send_all("*** " .. S("@1 left the game@2.",
-				minetest.colorize(tcolor, player:get_player_name()),
-				timed_out and " " .. S("(timed out)") or ""
-			))
+			minetest.chat_send_all(
+				"*** "
+					.. S(
+						"@1 left the game@2.",
+						minetest.colorize(tcolor, player:get_player_name()),
+						timed_out and " " .. S("(timed out)") or ""
+					)
+			)
 		end
 	end)
 end)
+
+for team, _ in pairs(ctf_teams.team) do
+	local new_chestname = string.format("ctf_teams:chest_%s", team)
+	local new_doorname = string.format("ctf_teams:door_steel_%s", team)
+	local old_chestname = string.format("ctf_teamitems:chest_%s", team)
+	local old_doorname = string.format("ctf_teamitems:door_steel_%s", team)
+	minetest.register_alias(new_chestname, old_chestname)
+	minetest.register_alias(new_doorname, old_doorname)
+	minetest.register_alias("ctf_teams:door_steel", "ctf_teamitems:door_steel")
+end

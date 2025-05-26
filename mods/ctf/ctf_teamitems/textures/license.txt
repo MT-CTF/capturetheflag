@@ -1,8 +1,8 @@
 See mods/mtg/mtg_default/license.txt for license of the textures the following were derived from:
-	ctf_teams_chest_side_mask.png
-	ctf_teams_chest_top_mask.png
-	ctf_teams_lock.png
+	ctf_teamitems_chest_side_mask.png
+	ctf_teamitems_chest_top_mask.png
+	ctf_teamitems_lock.png
 
 See mods/mtg/mtg_doors/license.txt for license of the textures the following were derived from:
-	ctf_teams_door_steel_mask.png
-	ctf_teams_door_steel.png
+	ctf_teamitems_door_steel_mask.png
+	ctf_teamitems_door_steel.png
