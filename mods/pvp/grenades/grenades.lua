@@ -1,20 +1,20 @@
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 local function remove_flora(pos, radius)
 	local pos1 = vector.subtract(pos, radius)
 	local pos2 = vector.add(pos, radius)
 
-	for _, p in ipairs(minetest.find_nodes_in_area(pos1, pos2, {
+	for _, p in ipairs(core.find_nodes_in_area(pos1, pos2, {
 		"group:flora", "group:mushroom", "default:snow", "group:grenade_breakable"
 	})) do
 		if vector.distance(pos, p) <= radius then
-			minetest.remove_node(p)
+			core.remove_node(p)
 		end
 	end
 end
 
 local function check_hit(pos1, pos2, obj)
-	local ray = minetest.raycast(pos1, pos2, true, false)
+	local ray = core.raycast(pos1, pos2, true, false)
 	local hit = ray:next()
 
 	-- Skip over non-normal nodes like ladders, water, doors, glass, leaves, etc
@@ -27,7 +27,7 @@ local function check_hit(pos1, pos2, obj)
 		 (
 			hit.intersection_point:distance(pos2) <= 1
 			or
-			not minetest.registered_nodes[minetest.get_node(hit.under).name].walkable
+			not core.registered_nodes[core.get_node(hit.under).name].walkable
 		 )
 		)
 		or
@@ -54,13 +54,13 @@ local fragdef = {
 	on_explode = function(def, obj, pos, name)
 		if not name or not pos then return end
 
-		local player = minetest.get_player_by_name(name)
+		local player = core.get_player_by_name(name)
 		if not player then return end
 
 
 		local radius = def.explode_radius
 
-		minetest.add_particlespawner({
+		core.add_particlespawner({
 			amount = 20,
 			time = 0.5,
 			minpos = vector.subtract(pos, radius),
@@ -79,7 +79,7 @@ local fragdef = {
 			texture = "grenades_smoke.png",
 		})
 
-		minetest.add_particle({
+		core.add_particle({
 			pos = pos,
 			velocity = {x=0, y=0, z=0},
 			acceleration = {x=0, y=0, z=0},
@@ -93,7 +93,7 @@ local fragdef = {
 			glow = 10
 		})
 
-		minetest.sound_play("grenades_explode", {
+		core.sound_play("grenades_explode", {
 			pos = pos,
 			gain = 1.0,
 			max_hear_distance = 64,
@@ -101,7 +101,7 @@ local fragdef = {
 
 		remove_flora(pos, radius/2)
 
-		for _, v in pairs(minetest.get_objects_inside_radius(pos, radius)) do
+		for _, v in pairs(core.get_objects_inside_radius(pos, radius)) do
 			if v:is_player() and v:get_hp() > 0 and v:get_properties().pointable then
 				local footpos = vector.offset(v:get_pos(), 0, 0.1, 0)
 				local headpos = vector.offset(v:get_pos(), 0, v:get_properties().eye_height, 0)
@@ -153,7 +153,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			return true
 		end,
 		on_explode = function(def, obj, pos, pname)
-			local player = minetest.get_player_by_name(pname)
+			local player = core.get_player_by_name(pname)
 			if not player or not pos then return end
 
 			local pteam = ctf_teams.get(pname)
@@ -165,11 +165,11 @@ local register_smoke_grenade = function(name, description, image, damage)
 					if not ctf_modebase.flag_captured[flagteam] and team.flag_pos then
 						local distance_from_flag = vector.distance(pos, team.flag_pos)
 						if distance_from_flag <= 15 and (damage or pteam == flagteam) then
-							minetest.chat_send_player(pname, S("You can't explode smoke grenades so close to a flag!"))
+							core.chat_send_player(pname, S("You can't explode smoke grenades so close to a flag!"))
 							if player:get_hp() <= 0 then
 								-- Drop the nade at its explode point if the thrower is dead
 								-- Fixes https://github.com/MT-CTF/capturetheflag/issues/1160
-								minetest.add_item(pos, ItemStack("grenades:"..name))
+								core.add_item(pos, ItemStack("grenades:"..name))
 							else
 								-- Add the nade back into the thrower's inventory
 								player:get_inventory():add_item("main", "grenades:"..name)
@@ -182,13 +182,13 @@ local register_smoke_grenade = function(name, description, image, damage)
 				end
 			end
 
-			minetest.sound_play("grenades_glasslike_break", {
+			core.sound_play("grenades_glasslike_break", {
 				pos = pos,
 				gain = 1.0,
 				max_hear_distance = 32,
 			})
 
-			local hiss = minetest.sound_play("grenades_hiss", {
+			local hiss = core.sound_play("grenades_hiss", {
 				pos = pos,
 				gain = 1.0,
 				loop = true,
@@ -198,10 +198,10 @@ local register_smoke_grenade = function(name, description, image, damage)
 			local stop = false
 			if damage then
 				local function damage_fn()
-					local thrower = minetest.get_player_by_name(pname)
+					local thrower = core.get_player_by_name(pname)
 
 					if thrower then
-						for _, target in pairs(minetest.get_connected_players()) do
+						for _, target in pairs(core.get_connected_players()) do
 							if vector.distance(target:get_pos(), pos) <= 6 then
 								local dname = target:get_player_name()
 								local dteam = ctf_teams.get(dname)
@@ -219,15 +219,15 @@ local register_smoke_grenade = function(name, description, image, damage)
 					end
 
 					if not stop then
-						minetest.after(1, damage_fn)
+						core.after(1, damage_fn)
 					end
 				end
 				damage_fn()
 			end
 
-			minetest.after(SMOKE_GRENADE_TIME * duration_multiplier, function()
+			core.after(SMOKE_GRENADE_TIME * duration_multiplier, function()
 				sounds[hiss] = nil
-				minetest.sound_stop(hiss)
+				core.sound_stop(hiss)
 				stop = true
 			end)
 
@@ -240,7 +240,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 			end
 
 			for i = 0, 5, 1 do
-				minetest.add_particlespawner({
+				core.add_particlespawner({
 					amount = 40,
 					time = (SMOKE_GRENADE_TIME * duration_multiplier) + (damage and 1 or 3),
 					minpos = vector.subtract(pos, 2),
@@ -292,8 +292,8 @@ grenades.register_grenade("grenades:flashbang", {
 	image = "grenades_flashbang.png",
 	clock = 4,
 	on_explode = function(def, obj, pos)
-		for _, v in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
-			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
+		for _, v in ipairs(core.get_objects_inside_radius(pos, 20)) do
+			local hit = core.raycast(pos, v:get_pos(), true, true):next()
 
 			if hit and v:is_player() and v:get_hp() > 0 and not flash_huds[v:get_player_name()] and hit.type == "object" and
 			hit.ref:is_player() and hit.ref:get_player_name() == v:get_player_name() then
@@ -301,7 +301,7 @@ grenades.register_grenade("grenades:flashbang", {
 				local grenadedir = vector.round(vector.direction(v:get_pos(), pos))
 				local pname = v:get_player_name()
 
-				minetest.sound_play("glasslike_break", {
+				core.sound_play("glasslike_break", {
 					pos = pos,
 					gain = 1.0,
 					max_hear_distance = 32,
@@ -323,9 +323,9 @@ grenades.register_grenade("grenades:flashbang", {
 
 						flash_huds[pname][i+1] = key
 
-						minetest.after(2 * i, function()
-							if minetest.get_player_by_name(pname) then
-								minetest.get_player_by_name(pname):hud_remove(key)
+						core.after(2 * i, function()
+							if core.get_player_by_name(pname) then
+								core.get_player_by_name(pname):hud_remove(key)
 
 								if flash_huds[pname] then
 									table.remove(flash_huds[pname], 1)
@@ -344,7 +344,7 @@ grenades.register_grenade("grenades:flashbang", {
 	end,
 })
 
-minetest.register_on_dieplayer(function(player)
+core.register_on_dieplayer(function(player)
 	local name = player:get_player_name()
 
 	if flash_huds[name] then
@@ -358,7 +358,7 @@ end) ]]
 
 ctf_api.register_on_match_end(function()
 	for sound in pairs(sounds) do
-		minetest.sound_stop(sound)
+		core.sound_stop(sound)
 	end
 	sounds = {}
 end)

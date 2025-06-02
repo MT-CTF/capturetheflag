@@ -1,8 +1,8 @@
 ctf_core = {
 	settings = {
-		-- server_mode = minetest.settings:get("ctf_server_mode") or "play",
-		server_mode = minetest.settings:get_bool("creative_mode", false) and "mapedit" or "play",
-		low_ram_mode = minetest.settings:get("ctf_low_ram_mode") == "true" or false,
+		-- server_mode = core.settings:get("ctf_server_mode") or "play",
+		server_mode = core.settings:get_bool("creative_mode", false) and "mapedit" or "play",
+		low_ram_mode = core.settings:get("ctf_low_ram_mode") == "true" or false,
 	}
 }
 
@@ -11,7 +11,7 @@ ctf_core = {
 --
 -- Example: local f1, f2 = ctf_core.include_files("file1", "file2")
 function ctf_core.include_files(...)
-	local PATH = minetest.get_modpath(minetest.get_current_modname()) .. "/"
+	local PATH = core.get_modpath(core.get_current_modname()) .. "/"
 	local returns = {}
 
 	for _, file in pairs({...}) do

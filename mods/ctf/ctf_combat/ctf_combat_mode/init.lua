@@ -31,8 +31,8 @@ local function update(player)
 		})
 	end
 
-	local pos = vector.offset(minetest.get_player_by_name(player):get_pos(), 0, 0.5, 0)
-	local node = minetest.registered_nodes[minetest.get_node(pos).name]
+	local pos = vector.offset(core.get_player_by_name(player):get_pos(), 0, 0.5, 0)
+	local node = core.registered_nodes[core.get_node(pos).name]
 
 	if node.groups.real_suffocation then -- From real_suffocation mod
 		combat.time = combat.time + 0.5
@@ -42,7 +42,7 @@ local function update(player)
 		combat.suffocation_message = ""
 	end
 
-	combat.timer = minetest.after(1, update, player)
+	combat.timer = core.after(1, update, player)
 end
 
 function ctf_combat_mode.add_hitter(player, hitter, weapon_image, time)
@@ -70,7 +70,7 @@ function ctf_combat_mode.add_healer(player, healer, time)
 	healer = PlayerName(healer)
 
 	if not healers[player] then
-		healers[player] = {healers={}, timer=minetest.after(time, function()
+		healers[player] = {healers={}, timer=core.after(time, function()
 			healers[player] = nil
 		end)}
 	end

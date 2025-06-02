@@ -8,7 +8,7 @@ function grenades.throw_grenade(name, startspeed, player)
 	local dir = player:get_look_dir()
 	local pos = vector.offset(player:get_pos(), 0, player:get_properties().eye_height, 0)
 
-	local obj = minetest.add_entity(pos, name)
+	local obj = core.add_entity(pos, name)
 	if not obj then
 		return
 	end
@@ -61,8 +61,8 @@ function grenades.register_grenade(name, def)
 
 					if c_result == true then
 						if self.thrower_name then
-							minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
-									" explodes at " .. minetest.pos_to_string(vector.round(pos)))
+							core.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
+									" explodes at " .. core.pos_to_string(vector.round(pos)))
 							def:on_explode(obj, pos, self.thrower_name)
 						end
 						obj:remove()
@@ -108,7 +108,7 @@ function grenades.register_grenade(name, def)
 			if def.particle and self.particle >= def.particle.interval then
 				self.particle = 0
 
-				minetest.add_particle({
+				core.add_particle({
 					pos = obj:get_pos(),
 					velocity = vector.divide(vel, 2),
 					acceleration = vector.divide(obj:get_acceleration() or vector.new(1, 1, 1), -5),
@@ -128,8 +128,8 @@ function grenades.register_grenade(name, def)
 
 			if self.timer > def.clock or not self.thrower_name then
 				if self.thrower_name then
-					minetest.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
-					" explodes at " .. minetest.pos_to_string(vector.round(pos)))
+					core.log("action", "[Grenades] A grenade thrown by " .. self.thrower_name ..
+					" explodes at " .. core.pos_to_string(vector.round(pos)))
 					def:on_explode(obj, pos, self.thrower_name)
 				end
 
@@ -138,7 +138,7 @@ function grenades.register_grenade(name, def)
 		end
 	}
 
-	minetest.register_entity(name, grenade_entity)
+	core.register_entity(name, grenade_entity)
 
 	local newdef = {grenade = def}
 
@@ -150,7 +150,7 @@ function grenades.register_grenade(name, def)
 		if pointed_thing.type ~= "node" then
 			grenades.throw_grenade(name, 17, user)
 
-			if not minetest.settings:get_bool("creative_mode") and (def.stack_max or 99) > -1 then
+			if not core.settings:get_bool("creative_mode") and (def.stack_max or 99) > -1 then
 				itemstack:take_item(1)
 			end
 		end
@@ -172,7 +172,7 @@ function grenades.register_grenade(name, def)
 		newdef.on_use = on_use
 	end
 
-	minetest.register_craftitem(name, newdef)
+	core.register_craftitem(name, newdef)
 end
 
-dofile(minetest.get_modpath("grenades") .. "/grenades.lua")
+dofile(core.get_modpath("grenades") .. "/grenades.lua")

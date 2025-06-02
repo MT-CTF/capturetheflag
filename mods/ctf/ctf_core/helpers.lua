@@ -3,7 +3,7 @@
 --
 
 do
-	local get_player_by_name = minetest.get_player_by_name
+	local get_player_by_name = core.get_player_by_name
 	function PlayerObj(player)
 		local type = type(player)
 
@@ -28,7 +28,7 @@ end
 function ctf_core.get_players_inside_radius(pos, radius, teamless)
 	local out = {}
 
-	for _, p in pairs(minetest.get_connected_players()) do
+	for _, p in pairs(core.get_connected_players()) do
 		if teamless or ctf_teams.get(p) then
 			if p:get_pos():distance(pos) <= radius then
 				table.insert(out, p)
@@ -49,7 +49,7 @@ do
 		table.insert(registered_on_formspec_input, {formname = formname, call = func})
 	end
 
-	minetest.register_on_player_receive_fields(function(player, formname, fields, ...)
+	core.register_on_player_receive_fields(function(player, formname, fields, ...)
 		for _, func in ipairs(registered_on_formspec_input) do
 			if formname:match(func.formname) then
 				if func.call(PlayerName(player), formname, fields, ...) then
@@ -138,10 +138,10 @@ end
 --
 
 function ctf_core.register_chatcommand_alias(name, alias, def)
-	minetest.register_chatcommand(name, table.copy(def))
+	core.register_chatcommand(name, table.copy(def))
 
 	def.description = "An alias for /" .. name
-	minetest.register_chatcommand(alias, def)
+	core.register_chatcommand(alias, def)
 end
 
 function ctf_core.file_exists(path)
@@ -170,25 +170,25 @@ end
 --
 
 function ctf_core.error(area, msg)
-	minetest.log("error", "[CTF | " .. area .. "] " .. msg)
+	core.log("error", "[CTF | " .. area .. "] " .. msg)
 end
 
 function ctf_core.log(area, msg)
 	if area and area ~= "" then
-		minetest.log("info", "[CTF | " .. area .. "] " .. msg)
+		core.log("info", "[CTF | " .. area .. "] " .. msg)
 	else
-		minetest.log("info", "[CTF]" .. msg)
+		core.log("info", "[CTF]" .. msg)
 	end
 end
 
 function ctf_core.action(area, msg)
 	if area and area ~= "" then
-		minetest.log("action", "[CaptureTheFlag] (" .. area .. ") " .. msg)
+		core.log("action", "[CaptureTheFlag] (" .. area .. ") " .. msg)
 	else
-		minetest.log("action", "[CaptureTheFlag] " .. msg)
+		core.log("action", "[CaptureTheFlag] " .. msg)
 	end
 end
 
 function ctf_core.warning(area, msg)
-	minetest.log("warning", "[CTF | " .. area .. "] " .. msg)
+	core.log("warning", "[CTF | " .. area .. "] " .. msg)
 end

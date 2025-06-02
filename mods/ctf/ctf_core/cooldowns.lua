@@ -17,7 +17,7 @@ function ctf_core.init_cooldowns()
 				time = {_time = time}
 			end
 
-			time._timer = minetest.after(time._time, function()
+			time._timer = core.after(time._time, function()
 				if time._on_end then
 					local copy = table.copy(self.players[pname])
 

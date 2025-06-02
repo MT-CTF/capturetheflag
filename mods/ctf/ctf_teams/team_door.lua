@@ -1,4 +1,4 @@
-local S = minetest.get_translator(minetest.get_current_modname())
+local S = core.get_translator(core.get_current_modname())
 
 doors.register("ctf_teams:door_steel", {
 	tiles = {{name = "doors_door_steel.png", backface_culling = true}},
@@ -12,21 +12,21 @@ doors.register("ctf_teams:door_steel", {
 	gain_close = 0.2,
 })
 
-local old_on_place = minetest.registered_craftitems["ctf_teams:door_steel"].on_place
-minetest.override_item("ctf_teams:door_steel", {
+local old_on_place = core.registered_craftitems["ctf_teams:door_steel"].on_place
+core.override_item("ctf_teams:door_steel", {
 	on_place = function(itemstack, placer, pointed_thing)
 		local pteam = ctf_teams.get(placer)
 
 		if pteam then
 			if not ctf_core.pos_inside(pointed_thing.above, ctf_teams.get_team_territory(pteam)) then
-				minetest.chat_send_player(placer:get_player_name(), S("You can only place team doors in your own territory!"))
+				core.chat_send_player(placer:get_player_name(), S("You can only place team doors in your own territory!"))
 				return itemstack
 			end
 
 			local newitemstack = ItemStack("ctf_teams:door_steel_"..pteam)
 			newitemstack:set_count(itemstack:get_count())
 
-			local item = minetest.registered_craftitems["ctf_teams:door_steel_" .. pteam]
+			local item = core.registered_craftitems["ctf_teams:door_steel_" .. pteam]
 			local result = item.on_place(newitemstack, placer, pointed_thing)
 
 			if result then
@@ -40,8 +40,8 @@ minetest.override_item("ctf_teams:door_steel", {
 	end
 })
 
-local old_handle = minetest.handle_node_drops
-minetest.handle_node_drops = function(pos, drops, digger)
+local old_handle = core.handle_node_drops
+core.handle_node_drops = function(pos, drops, digger)
 	for i, item in ipairs(drops) do
 		if item:match("ctf_teams:door_steel_") then
 			drops[i] = "ctf_teams:door_steel"
@@ -71,7 +71,7 @@ end
 local old_func = default.can_interact_with_node
 default.can_interact_with_node = function(player, pos)
 	local pteam = ctf_teams.get(player)
-	local name = minetest.get_node(pos).name
+	local name = core.get_node(pos).name
 
 	if name:find("ctf_teams:") and pteam then
 		if pteam == name:match("ctf_teams:door_steel_(.-)[_$]") then

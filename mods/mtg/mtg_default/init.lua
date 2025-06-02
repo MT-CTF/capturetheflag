@@ -4,7 +4,7 @@
 -- The API documentation in here was moved into game_api.txt
 
 -- Load support for MT game translation.
-local S = minetest.get_translator("default")
+local S = core.get_translator("default")
 
 -- Definitions made by this mod that other mods can use too
 default = {}
@@ -24,13 +24,13 @@ if ItemStack("").add_wear_by_uses == nil then
 end
 
 -- GUI related stuff
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	-- Set formspec prepend
 	local formspec = [[
 			bgcolor[#080808BB;true]
 			listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF] ]]
 	local name = player:get_player_name()
-	local info = minetest.get_player_information(name)
+	local info = core.get_player_information(name)
 	if info.formspec_version > 1 then
 		formspec = formspec .. "background9[5,5;1,1;gui_formbg.png;true;10]"
 	else
@@ -62,7 +62,7 @@ default.gui_survival_form = "size[8,8.5]"..
 			default.get_hotbar_bg(0,4.25)
 
 -- Load files
-local default_path = minetest.get_modpath("default")
+local default_path = core.get_modpath("default")
 
 dofile(default_path.."/functions.lua")
 dofile(default_path.."/trees.lua")
@@ -79,16 +79,16 @@ dofile(default_path.."/aliases.lua")
 dofile(default_path.."/legacy.lua")
 
 -- Smoke test that is run via ./util/test/run.sh
-if minetest.settings:get_bool("minetest_game_smoke_test") then
-	minetest.after(0, function()
-		minetest.emerge_area(vector.new(0, 0, 0), vector.new(32, 32, 32))
+if core.settings:get_bool("minetest_game_smoke_test") then
+	core.after(0, function()
+		core.emerge_area(vector.new(0, 0, 0), vector.new(32, 32, 32))
 		local pos = vector.new(9, 9, 9)
 		local function check()
-			if minetest.get_node(pos).name ~= "ignore" then
-				minetest.request_shutdown()
+			if core.get_node(pos).name ~= "ignore" then
+				core.request_shutdown()
 				return
 			end
-			minetest.after(0, check)
+			core.after(0, check)
 		end
 		check()
 	end)

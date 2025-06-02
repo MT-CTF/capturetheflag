@@ -1,5 +1,5 @@
 local redis = require("redis")
-local client = redis.connect("127.0.0.1", tonumber(minetest.settings:get("ctf_rankings_redis_server_port")) or 6379)
+local client = redis.connect("127.0.0.1", tonumber(core.settings:get("ctf_rankings_redis_server_port")) or 6379)
 assert(client:ping(), "Redis server not found!")
 
 local CHUNKING_TIMER = 30
@@ -19,7 +19,7 @@ return function(prefix, ranklist)
 
 		for key, val in pairs(tmp) do
 			local pname = string.sub(key, #prefix + 1)
-			local rankings = minetest.parse_json(val)
+			local rankings = core.parse_json(val)
 
 			if rankings then
 				for k, v in pairs(rankings) do
@@ -53,7 +53,7 @@ return {
 			self.gtcache = client:zrevrange(self.prefix..sortby, rstart or 0, rend-1, {withscores = true})
 
 			if self.gtcache then
-				minetest.after(CHUNKING_TIMER, function()
+				core.after(CHUNKING_TIMER, function()
 					self.gtcache = nil
 				end)
 			end
@@ -76,7 +76,7 @@ return {
 				out = out + 1 -- first place is index 0, correct that
 				self.gpcache[pname] = out
 
-				minetest.after(CHUNKING_TIMER, function()
+				core.after(CHUNKING_TIMER, function()
 					self.gpcache[pname] = nil
 				end)
 			end
@@ -114,7 +114,7 @@ return {
 				rank = false
 			end
 
-			minetest.after(CHUNKING_TIMER, function()
+			core.after(CHUNKING_TIMER, function()
 				self.gcache[pname] = nil
 			end)
 		else
@@ -148,7 +148,7 @@ return {
 		if not self.acache[pname] then
 			self.acache[pname] = {}
 
-			minetest.after(CHUNKING_TIMER, function()
+			core.after(CHUNKING_TIMER, function()
 				for rank, val in pairs(self.acache[pname]) do
 					if type(val) == "number" and val == val then
 						client:zincrby(self.prefix..rank, val, pname)

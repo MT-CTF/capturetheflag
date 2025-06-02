@@ -1,4 +1,4 @@
-dofile(minetest.get_modpath("player_api") .. "/api.lua")
+dofile(core.get_modpath("player_api") .. "/api.lua")
 
 -- Default player appearance
 player_api.register_model("character.b3d", {
@@ -21,6 +21,6 @@ player_api.register_model("character.b3d", {
 })
 
 -- Update appearance when the player joins
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	player_api.set_model(player, "character.b3d")
 end)

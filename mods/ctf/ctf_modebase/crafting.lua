@@ -9,13 +9,13 @@ function ctf_modebase.update_crafts(name)
 end
 
 ctf_api.register_on_mode_start(function()
-	for _, player in pairs(minetest.get_connected_players()) do
+	for _, player in pairs(core.get_connected_players()) do
 		ctf_modebase.update_crafts(player:get_player_name())
 	end
 end)
 
 
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	ctf_modebase.update_crafts(player:get_player_name())
 end)
 
