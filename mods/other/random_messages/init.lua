@@ -18,7 +18,7 @@ function random_messages.initialize() --Set the interval in core.conf.
 	return 60
 end
 
--- function random_messages.set_interval() --Read the interval from core.conf and set it if it doesn't exist
+-- function random_messages.set_interval() --Read the interval from minetest.conf and set it if it doesn't exist
 -- 	MESSAGE_INTERVAL = tonumber(core.settings:get("random_messages_interval"))
 -- 							or random_messages.initialize()
 -- end
