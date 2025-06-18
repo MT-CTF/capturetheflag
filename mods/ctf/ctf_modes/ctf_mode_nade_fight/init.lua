@@ -55,8 +55,8 @@ ctf_modebase.register_mode("nade_fight", {
 		["ctf_healing:medkit"  ] = {                               rarity = 0.1  , max_stacks = 2},
 		["ctf_healing:bandage" ] = {                               rarity = 0.08 , max_stacks = 2},
 
-		["grenades:smoke"] = {rarity = 0.2, max_stacks = 3},
-		["grenades:poison"] = {rarity = 0.1, max_stacks = 2},
+		["ctf_grenades:smoke"] = {rarity = 0.2, max_stacks = 3},
+		["ctf_grenades:poison"] = {rarity = 0.1, max_stacks = 2},
 	},
 	crafts = {
 		"ctf_map:damage_cobble 5",
