@@ -225,9 +225,9 @@ local register_smoke_grenade = function(name, description, image, damage)
 			local p = "grenades_smoke.png^["
 			local particletexture
 			if pteam and damage then
-				particletexture = p .. "colorize:" .. ctf_teams.team[pteam].color .. ":76^[noalpha"
+				particletexture = p .. "colorize:" .. ctf_teams.team[pteam].color .. ":76^[noalpha^[mask:grenades_smoke_mask.png"
 			else
-				particletexture = p .. "noalpha"
+				particletexture = p .. "noalpha^[mask:grenades_smoke_mask.png"
 			end
 
 			for i = 0, 5, 1 do
