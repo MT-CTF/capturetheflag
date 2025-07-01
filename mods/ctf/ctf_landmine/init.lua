@@ -137,6 +137,8 @@ core.register_node("ctf_landmine:landmine", {
 
 		meta:set_string("placer", name)
 		meta:set_string("pteam", pteam)
+		meta:mark_as_private({"placer", "pteam"})
+
 		add_landmine(pos)
 	end,
 	on_punch = function(pos, _node, puncher, pointed_thing)
