@@ -45,6 +45,7 @@ exclude_files = {
 read_globals = {
 	"DIR_DELIM",
 	"dump", "dump2",
+	"AreaStore",
 	"VoxelManip", "VoxelArea",
 	"PseudoRandom", "PcgRandom",
 	"ItemStack",
