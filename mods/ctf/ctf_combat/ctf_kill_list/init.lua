@@ -6,6 +6,7 @@ local KILLSTAT_REMOVAL_TIME = 30
 
 local MAX_NAME_LENGTH = 19
 local HUD_LINES = 6
+local HUD_UPDATE_INTERVAL = 2
 local HUD_LINE_HEIGHT = 36
 local HUDNAME_FORMAT = "kill_list:%d,%d"
 
@@ -79,9 +80,19 @@ local function update_hud_line(player, idx, new)
 	end
 end
 
+local hudupdate_queue = {}
 local function update_kill_list_hud(player)
-	for i=1, HUD_LINES, 1 do
-		update_hud_line(player, i, kill_list[i])
+	local name = player:get_player_name()
+
+	if not hudupdate_queue[name] then
+		hudupdate_queue[name] = minetest.after(HUD_UPDATE_INTERVAL, function()
+			if minetest.get_player_by_name(name) then
+				for i=1, HUD_LINES, 1 do
+					update_hud_line(player, i, kill_list[i])
+				end
+			end
+			hudupdate_queue[name] = nil
+		end)
 	end
 end
 
@@ -108,14 +119,19 @@ minetest.register_globalstep(function(dtime)
 
 		table.remove(kill_list)
 
-		for _, p in pairs(minetest.get_connected_players()) do
-			update_kill_list_hud(p)
+		for i, p in pairs(minetest.get_connected_players()) do
+			minetest.after(i/40, update_kill_list_hud, p) -- spread out update across server steps
 		end
 	end
 end)
 
 ctf_api.register_on_match_end(function()
 	kill_list = {}
+
+	for _, job in pairs(hudupdate_queue) do
+		job:cancel()
+	end
+
 	hud:clear_all()
 end)
 
