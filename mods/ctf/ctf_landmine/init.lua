@@ -53,7 +53,7 @@ local landmine_globalstep_counter = 0.0
 
 local function is_self_landmine(object_ref, landmine)
 	local pname = object_ref:get_player_name()
-	if pname == "" then
+	if pname == "" or not landmine then
 		return nil -- the object ref is not a player
 	end
 
