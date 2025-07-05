@@ -318,7 +318,7 @@ minetest.register_globalstep(function(dtime)
 	for _, player in pairs(minetest.get_connected_players()) do
 		local controls = player:get_player_control()
 
-		if controls.zoom then
+		if controls.zoom and (controls.LMB or controls.RMB) then
 			local marker_text = false
 			local stackname = player:get_wielded_item():get_name()
 
@@ -338,7 +338,7 @@ minetest.register_globalstep(function(dtime)
 				marker_text = "Defend!"
 			end
 
-			if marker_text  and not holding_blacklisted_item then
+			if marker_text and not holding_blacklisted_item then
 				local success, msg = marker_func(player:get_player_name(), marker_text)
 
 				if not success and msg then
