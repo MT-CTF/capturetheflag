@@ -63,54 +63,74 @@ local ID_WATER = minetest.get_content_id("default:water_source")
 
 ---@param mapmeta table Map meta table
 ---@param callback function
+local BARRIER_DATA = {}
 function ctf_map.remove_barrier(mapmeta, callback)
 	local pos1, pos2 = vector.sort(mapmeta.barrier_area.pos1, mapmeta.barrier_area.pos2)
 
-	local target = pos2.y
-	pos2.y = pos1.y
+	if not next(BARRIER_DATA) then
+		if not ctf_core.settings.low_ram_mode then
+			minetest.log("warning", "Barrier data wasn't generated at map placement, falling back on barrier_area method...")
+		end
 
-	local interval = 0
-	while pos2.y < target do
-		pos1.y = math.min(pos1.y, target-1)
-		pos2.y = math.min(pos1.y + 10, target)
+		local target = pos2.y
+		pos2.y = pos1.y
 
-		minetest.after(0 + interval, function(p1, p2)
-			local vm = VoxelManip(p1, p2)
-			local data = vm:get_data()
+		local interval = 0
+		while pos2.y < target do
+			pos1.y = math.min(pos1.y, target-1)
+			pos2.y = math.min(pos1.y + 10, target)
 
-			for i, id in pairs(data) do
-				local done = false
+			minetest.after(0 + interval, function(p1, p2)
+				local vm = VoxelManip(p1, p2)
+				local data = vm:get_data()
 
-				for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
-					if id == barriernode_id then
+				for i, id in pairs(data) do
+					local done = false
 
-						data[i] = replacement_id
-						done = true
-						break
+					for barriernode_id, replacement_id in pairs(ctf_map.barrier_nodes) do
+						if id == barriernode_id then
+
+							data[i] = replacement_id
+							done = true
+							break
+						end
+					end
+
+					if not done then
+						data[i] = ID_IGNORE
 					end
 				end
 
-				if not done then
-					data[i] = ID_IGNORE
+				vm:set_data(data)
+				vm:write_to_map(false)
+
+				if p2.y == target then
+					local liqvm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
+					liqvm:update_liquids()
 				end
-			end
+			end, pos1:copy(), pos2:copy())
 
-			vm:set_data(data)
-			vm:write_to_map(false)
+			interval = interval + 0.5
+			pos1.y = pos1.y + 10
+		end
 
-			if p2.y == target then
-				local liqvm = VoxelManip(mapmeta.pos1, mapmeta.pos2)
-				liqvm:update_liquids()
-				liqvm:update_map()
-			end
-		end, pos1:copy(), pos2:copy())
+		minetest.log("action", "Clearing barriers using mapmeta.barrier_area, will take around "..(interval).." seconds")
+		minetest.after(interval/2, callback)
+	else
+		local vm = VoxelManip(pos1, pos2)
+		local data = vm:get_data()
 
-		interval = interval + 0.5
-		pos1.y = pos1.y + 10
+		for i, cid in pairs(BARRIER_DATA) do
+			data[i] = cid
+		end
+
+		BARRIER_DATA = {} -- no longer needed
+
+		vm:set_data(data)
+		vm:update_liquids()
+		vm:write_to_map(false)
+		minetest.after(0, callback)
 	end
-
-	minetest.log("action", "Clearing barriers using mapmeta.barrier_area, will take around "..(interval).." seconds")
-	minetest.after(interval/2, callback)
 end
 
 
@@ -237,6 +257,19 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 	end
 end
 
+local function generate_barrier_data(pos1, pos2, data)
+	BARRIER_DATA = {}
+
+	local bnodes = ctf_map.barrier_nodes
+	for i, v in ipairs(data) do
+		for b, rep in pairs(bnodes) do
+			if v == b then
+				BARRIER_DATA[i] = rep
+			end
+		end
+	end
+end
+
 function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest_items, blacklisted_nodes)
 	local vm = VoxelManip()
 	local pos1, pos2 = vm:read_from_map(mapmeta.pos1, mapmeta.pos2)
@@ -246,6 +279,10 @@ function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest
 
 	prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nodes)
 	place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, treasurefy_node_callback)
+
+	if not ctf_core.settings.low_ram_mode then
+		generate_barrier_data(pos1, pos2, data)
+	end
 
 	vm:set_data(data)
 	vm:set_param2_data(param2_data)
