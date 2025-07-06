@@ -131,6 +131,7 @@ ctf_api.register_on_match_end(function()
 	for _, job in pairs(hudupdate_queue) do
 		job:cancel()
 	end
+	hudupdate_queue = {}
 
 	hud:clear_all()
 end)
