@@ -159,12 +159,16 @@ core.register_node("ctf_landmine:landmine", {
 
 		add_landmine(pos, name, pteam)
 	end,
-	on_punch = function(pos, _node, puncher, pointed_thing)
+	on_punch = function(pos, node, puncher, pointed_thing)
 		pos = pos:round()
 		local hash = core.hash_node_position(pos)
 
-		if not is_self_landmine(puncher, landmines[hash]) then
-			landmine_explode(pos)
+		if landmines[hash] then
+			if not is_self_landmine(puncher, landmines[hash]) then
+				landmine_explode(pos)
+			end
+		elseif node.name == "ctf_landmine:landmine" then
+			core.remove_node(pos)
 		end
 	end,
 	on_dig = function(pos, node, digger)
