@@ -16,6 +16,8 @@ globals = {
 
 	"default", "doors", "player_api", "sfinv", "binoculars", "bucket",
 
+	"discord",
+
 	"vector",
 	math = {
 		fields = {
