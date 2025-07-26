@@ -188,6 +188,36 @@ minetest.register_entity("playertag:tag", {
 	end
 })
 
+core.register_on_dieplayer(function(player)
+	local name = player:get_player_name()
+
+	if players[name] and players[name].nametag_entity.object and players[name].symbol_entity.object then
+		players[name].nametag_entity.object:set_properties({
+			nametag_color = "#616161dd",
+			nametag_bgcolor = "#00000000"
+		})
+		players[name].symbol_entity.object:set_properties({
+			nametag_color = "#616161dd",
+			nametag_bgcolor = "#00000000"
+		})
+	end
+end)
+
+core.register_on_respawnplayer(function(player)
+	local name = player:get_player_name()
+
+	if players[name] and players[name].nametag_entity.object and players[name].symbol_entity.object then
+		players[name].nametag_entity.object:set_properties({
+			nametag_color = "#EEFFFFDD",
+			nametag_bgcolor = "#0000002D"
+		})
+		players[name].symbol_entity.object:set_properties({
+			nametag_color = "#EEFFFFDD",
+			nametag_bgcolor = "#0000002D"
+		})
+	end
+end)
+
 minetest.register_on_joinplayer(function(player)
 	players[player:get_player_name()] = {type = TYPE_BUILTIN, color = {a=255, r=255, g=255, b=255}}
 end)
