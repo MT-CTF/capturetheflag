@@ -49,6 +49,7 @@ ctf_modebase.register_mode("nade_fight", {
 		["ctf_map:spike"            ] = {min_count = 1, max_count =  5, max_stacks = 3, rarity = 0.2},
 		["ctf_map:damage_cobble"    ] = {min_count = 5, max_count = 20, max_stacks = 2, rarity = 0.2},
 		["ctf_map:reinforced_cobble"] = {min_count = 5, max_count = 25, max_stacks = 2, rarity = 0.2},
+		["ctf_map:reinforced_glass"] = {min_count = 5, max_count = 10, max_stacks = 2, rarity = 0.2},
 		["ctf_landmine:landmine"         ] = {min_count = 1, max_count = 3, max_stacks = 1, rarity = 0.2},
 
 		["ctf_ranged:ammo"     ] = {min_count = 3, max_count = 10, rarity = 0.3  , max_stacks = 2},
@@ -62,6 +63,7 @@ ctf_modebase.register_mode("nade_fight", {
 		"ctf_map:damage_cobble 5",
 		"ctf_map:spike",
 		"ctf_map:reinforced_cobble 2",
+		"ctf_map:reinforced_glass 4",
 		"ctf_ranged:ammo",
 		"ctf_landmine:landmine",
 		"default:coal_lump 4",

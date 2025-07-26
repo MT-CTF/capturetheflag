@@ -203,6 +203,17 @@ minetest.register_node("ctf_map:reinforced_cobble", {
 	end
 })
 
+minetest.register_node("ctf_map:reinforced_glass", {
+	description = S("Reinforced Glass"),
+	tiles = {"default_glass.png^[colorize:#000:140^default_glass_detail.png", "default_glass_detail.png"},
+	groups = {cracky = 2},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	use_texture_alpha = "clip",
+	paramtype = "light",
+	sunlight_propagates = true,
+})
+
 minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 	description = "Reinforced Cobblestone Hardened\nYou're not meant to use this",
 	tiles = {"ctf_map_reinforced_cobble.png"},
