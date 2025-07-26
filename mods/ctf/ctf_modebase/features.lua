@@ -138,7 +138,9 @@ function ctf_modebase.map_chosen(map, ...)
 				position = {x = 0.5, y = 0.5},
 				alignment = {x = "center", y = "up"},
 				text_scale = 2,
-				text = S("Loading Map") .. ": " .. map.name .. "...",
+				text = HumanReadable(ctf_modebase.current_mode) ..
+						" (" .. (ctf_modebase.current_mode_matches_played+1) .. "/" .. ctf_modebase.current_mode_matches .. ")\n\n" ..
+						S("Loading Map") .. ": " .. map.name,
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
