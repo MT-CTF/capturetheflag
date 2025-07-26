@@ -59,6 +59,8 @@ minetest.register_on_chat_message(function(playerName, message)
 end)
 
 minetest.register_globalstep(function(dtime)
+	if not ctf_modebase.match_started then return end
+
 	--Check for inactivity once every CHECK_INTERVAL seconds
 	checkTimer = checkTimer + dtime
 
