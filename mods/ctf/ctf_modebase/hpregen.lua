@@ -1,3 +1,12 @@
+local function dist_to_flag(player)
+	local tname = ctf_teams.get(player)
+	if not tname then return math.huge end
+
+	if ctf_map.current_map.teams[tname] then
+		return player:get_pos():distance(ctf_map.current_map.teams[tname].flag_pos)
+	end
+end
+
 local timer = 0
 minetest.register_globalstep(function(dtime)
 	if not ctf_modebase.current_mode then return end
@@ -7,13 +16,13 @@ minetest.register_globalstep(function(dtime)
 
 	timer = timer + dtime
 
-	if timer >= 2/health_per_sec then
+	if timer >= 2/(health_per_sec) then
 		timer = 0
 
 		for _, player in pairs(minetest.get_connected_players()) do
 			local oldhp = player:get_hp()
 			if not ctf_combat_mode.in_combat(player) and oldhp > 0 then
-				local newhp = oldhp + 2
+				local newhp = oldhp + (2 * (dist_to_flag(player) <= 3 and 2 or 1))
 				if newhp > player:get_properties().hp_max then
 					newhp = player:get_properties().hp_max
 				end
