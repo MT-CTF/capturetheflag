@@ -204,7 +204,7 @@ core.register_on_dieplayer(function(player)
 	end
 end)
 
-core.register_on_respawnplayer(function(player)
+local function restore_nametags(player)
 	local name = player:get_player_name()
 
 	if players[name] and players[name].nametag_entity and players[name].symbol_entity and
@@ -218,6 +218,14 @@ core.register_on_respawnplayer(function(player)
 			nametag_bgcolor = "#0000002D"
 		})
 	end
+end
+
+ctf_api.register_on_respawnplayer(function(player)
+	restore_nametags(player)
+end)
+
+ctf_teams.register_on_allocplayer(function(player)
+	restore_nametags(player)
 end)
 
 minetest.register_on_joinplayer(function(player)
