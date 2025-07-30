@@ -443,3 +443,16 @@ minetest.register_on_joinplayer(function(player)
 
 	ctf_modebase.player.update(player)
 end)
+
+minetest.register_on_item_pickup(function(itemstack, picker)
+	local playerinv = picker:get_inventory()
+	local leftovers = playerinv:add_item("main", itemstack)
+	if leftovers:get_count() > 0 then
+		hud_events.new(picker, {
+			text= "Your inventory is full !",
+			color= "warning",
+			quick=true
+		})
+	end
+	return leftovers
+end)
