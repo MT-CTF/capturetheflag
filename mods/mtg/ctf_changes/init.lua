@@ -214,6 +214,7 @@ minetest.override_item("default:chest", {
 
 minetest.override_item("default:chest_locked", {
 	on_rightclick = function() return end,
+	protected = false,
 })
 
 minetest.register_on_mods_loaded(function()
