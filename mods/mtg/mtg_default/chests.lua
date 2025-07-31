@@ -340,7 +340,7 @@ default.chest.register_chest("default:chest_locked", {
 	sound_open = "default_chest_open",
 	sound_close = "default_chest_close",
 	groups = {choppy = 2, oddly_breakable_by_hand = 2},
-	protected = true,
+	-- protected = true,
 })
 
 minetest.register_craft({
