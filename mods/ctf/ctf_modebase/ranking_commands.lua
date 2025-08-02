@@ -59,6 +59,12 @@ local function rank(name, mode_name, mode_data, pname)
 		)
 	end
 
+	return_str = string.format("%s%s: %s,\n\t",
+			return_str,
+			minetest.colorize("#63d437", "Successful flag attempts %"),
+			minetest.colorize("#ffea00", math.round(prank["flag_captures"] / prank["flag_attempts"] * 100) .. "%")
+	)
+
 	return_str = string.format("%s%s: %s\n",
 		return_str,
 		minetest.colorize("#63d437", "Place"),
