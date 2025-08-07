@@ -169,6 +169,9 @@ return {
 		for _, rankkey in ipairs(ranklist) do
 			client:zrem(self.prefix..rankkey, pname)
 		end
+	end,
+	__flushdb = function()
+		client:flushdb()
 	end
 }
 

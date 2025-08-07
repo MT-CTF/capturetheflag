@@ -596,9 +596,6 @@ No APIs exposed in this mod.
 
 ## ctf_rankings
 
-#### `ctf_rankings:rankings_sorted()`
-* returns `boolean`
-
 #### `ctf_rankings:init()`
 * returns `rankings()`
 
