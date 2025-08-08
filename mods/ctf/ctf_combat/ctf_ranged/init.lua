@@ -242,8 +242,12 @@ function ctf_ranged.simple_register_gun(name, def)
 
 			if type(def.bullet) == "table" then
 				def.bullet.texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255"
+				def.bullet.glow = 14
 			else
-				def.bullet = {texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255"}
+				def.bullet = {
+					texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255",
+					glow = 14
+				}
 			end
 
 			if not def.bullet.spread then
