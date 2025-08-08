@@ -15,6 +15,26 @@ minetest.register_craftitem("ctf_ranged:ammo", {
 	inventory_image = "ctf_ranged_ammo.png",
 })
 
+local function create_impact_particles(pos)
+	minetest.add_particlespawner({
+		amount = 7,
+		time = 0.03,
+		minpos = pos,
+		maxpos = pos,
+		minvel = {x=-4, y=2, z=-4},
+		maxvel = {x=4, y=3, z=4},
+		minacc = {x=0, y=-15, z=0},
+		maxacc = {x=0, y=-15, z=0},
+		minexptime = 0.1,
+		maxexptime = 0.3,
+		minsize = 1,
+		maxsize = 2,
+		texture = "ctf_ranged_bullet.png^[colorize:#FFC752:255",
+		collisiondetection = true,
+		glow = 14
+	})
+end
+
 local function process_ray(ray, user, look_dir, def)
 	local hitpoint = ray:hit_object_or_node({
 		node = function(ndef)
@@ -38,6 +58,7 @@ local function process_ray(ray, user, look_dir, def)
 						minetest.dig_node(hitpoint.under)
 					end
 				end
+				create_impact_particles(hitpoint.intersection_point)
 			else
 				if nodedef.walkable and nodedef.pointable then
 					minetest.add_particle({
@@ -49,7 +70,7 @@ local function process_ray(ray, user, look_dir, def)
 						collisiondetection = false,
 						texture = "ctf_ranged_bullethole.png",
 					})
-
+					create_impact_particles(hitpoint.intersection_point)
 					minetest.sound_play("ctf_ranged_ricochet", {pos = hitpoint.intersection_point})
 				elseif nodedef.groups.liquid then
 					minetest.add_particlespawner({
@@ -79,6 +100,7 @@ local function process_ray(ray, user, look_dir, def)
 				end
 			end
 		elseif hitpoint.type == "object" then
+			create_impact_particles(hitpoint.intersection_point)
 			hitpoint.ref:punch(user, def.fire_interval or 0.1, {
 				full_punch_interval = def.fire_interval or 0.1,
 				damage_groups = {ranged = 1, [def.type] = 1, fleshy = def.damage}
@@ -191,9 +213,9 @@ function ctf_ranged.simple_register_gun(name, def)
 			local rays
 
 			if type(def.bullet) == "table" then
-				def.bullet.texture = "ctf_ranged_bullet.png"
+				def.bullet.texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255"
 			else
-				def.bullet = {texture = "ctf_ranged_bullet.png"}
+				def.bullet = {texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255"}
 			end
 
 			if not def.bullet.spread then
