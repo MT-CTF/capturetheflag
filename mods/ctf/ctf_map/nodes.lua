@@ -141,6 +141,7 @@ minetest.register_node("ctf_map:killnode", {
 local mod_prefixes = {
 	default = "";
 	stairs = "";
+	vessels = "";
 	wool = "wool_";
 	walls = "walls_";
 }
