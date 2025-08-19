@@ -1,3 +1,9 @@
+--- @alias Node { x: number, y: number, n: string, s: number, l: Node?, r: Node?, p: Node? }
+--- @alias TopPlayers { players: { [string]: Node }, root: Node? }
+
+--- @param parent Node
+--- @param child Node?
+--- @return nil
 local function fix(parent, child)
 	if child ~= nil then
 		child.p = parent
@@ -12,6 +18,9 @@ local function fix(parent, child)
 	parent.s = s
 end
 
+--- @param tree Node?
+--- @param key number
+--- @return Node?, Node?
 local function split(tree, key)
 	if not tree then
 		return nil, nil
@@ -29,6 +38,9 @@ local function split(tree, key)
 	end
 end
 
+--- @param tree1 Node?
+--- @param tree2 Node?
+--- @return Node?
 local function merge(tree1, tree2)
 	if not tree2 then
 		return tree1
@@ -47,6 +59,10 @@ local function merge(tree1, tree2)
 	end
 end
 
+--- @param node Node?
+--- @param count integer
+--- @param ret Node[]
+--- @return nil
 local function get_top_rec(node, count, ret)
 	if not node then
 		return
@@ -61,6 +77,8 @@ local function get_top_rec(node, count, ret)
 	end
 end
 
+--- @param node Node
+--- @return nil
 local function insert(self, node)
 	local tmp_node = self.root
 	local parent = nil
@@ -95,8 +113,12 @@ local function insert(self, node)
 	end
 end
 
+--- @param player string
+--- @param score number
+--- @return nil
 local function add(self, player, score)
-	local new = {x=score, y=math.random(), s=1, n=player}
+	--- @type Node
+	local new = { x = score, y = math.random(), s = 1, n = player }
 	self.players[player] = new
 
 	if not self.root then
@@ -107,6 +129,8 @@ local function add(self, player, score)
 	insert(self, new)
 end
 
+--- @param node Node
+--- @return nil
 local function remove(self, node)
 	local tmp_node = node
 	while tmp_node do
@@ -137,10 +161,13 @@ function top:new()
 		players = {},
 		root = nil,
 	}
-	setmetatable(o, {__index=self})
+	setmetatable(o, { __index = self })
 	return o
 end
 
+--- @param player string
+--- @param score number
+--- @return nil
 function top:set(player, score)
 	if score == 0 then
 		local node = self.players[player]
@@ -208,6 +235,8 @@ function top:set(player, score)
 	insert(self, node)
 end
 
+--- @param player string
+--- @return integer
 function top:get_place(player)
 	local node = self.players[player]
 	if not node then
@@ -234,6 +263,8 @@ function top:get_place(player)
 	return s
 end
 
+--- @param count integer
+--- @return Node[]
 function top:get_top(count)
 	local ret = {}
 	if count > 0 then
