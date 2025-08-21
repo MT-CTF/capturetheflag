@@ -27,7 +27,9 @@ local function do_reset()
 			if player then
 				local rankings = def.rankings:get(player)
 
-				RunCallbacks(ctf_rankings.registered_on_rank_reset, player, table.copy(rankings), mode)
+				rankings.place = place
+				rankings._place = place
+				rankings._playername = player
 
 				if (rankings.score or 0) >= 8000 and
 				(rankings.kills or 0) / (rankings.deaths or 1) >= 1.4 and
@@ -39,9 +41,8 @@ local function do_reset()
 					mods:set_string("pro_chest:"..player, os.time())
 				end
 
-				rankings.place = place
-				rankings._place = place
-				rankings._playername = player
+				RunCallbacks(ctf_rankings.registered_on_rank_reset, player, table.copy(rankings), mode)
+
 				output[place] = rankings
 			end
 		end
