@@ -1,5 +1,0 @@
-# textdomain: wield3d
-
-Use old wielditem display=
-Will use Luanti's default method of showing the wielded item.=
-This won't show custom animations, but might be less jarring=

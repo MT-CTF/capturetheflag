@@ -15,3 +15,9 @@
 	path = mods/apis/mhud
 	url = https://github.com/LoneWolfHT/mhud.git
 	branch = main
+[submodule "mods/pvp/grenades"]
+	path = mods/pvp/grenades
+	url = https://github.com/LoneWolfHT/grenades.git
+[submodule "mods/other/wield3d"]
+	path = mods/other/wield3d
+	url = https://github.com/MT-CTF/wield3d.git

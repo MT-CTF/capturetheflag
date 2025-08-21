@@ -110,10 +110,21 @@ minetest.register_on_mods_loaded(function()
 
 		if chat then
 			local pteam = ctf_teams.get(name)
+
+			local od
+			if discord then
+				od = discord.send
+				discord.send = function() end
+			end
+
 			if pteam then
 				minetest.chat_send_all(minetest.colorize(ctf_teams.team[pteam].color, "<" .. name .. "> ") .. message)
 			else
-				minetest.chat_send_all("<" .. name .. "> " .. message)
+				minetest.chat_send_all(minetest.format_chat_message(name, message))
+			end
+
+			if discord then
+				discord.send = od
 			end
 		end
 

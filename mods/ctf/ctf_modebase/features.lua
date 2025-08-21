@@ -146,7 +146,9 @@ function ctf_modebase.map_chosen(map, ...)
 				position = { x = 0.5, y = 0.5 },
 				alignment = { x = "center", y = "up" },
 				text_scale = 2,
-				text = S("Loading Map") .. ": " .. map.name .. "...",
+				text = HumanReadable(ctf_modebase.current_mode) ..
+						" (" .. (ctf_modebase.current_mode_matches_played+1) .. "/" .. ctf_modebase.current_mode_matches .. ")\n\n" ..
+						S("Loading Map") .. ": " .. map.name,
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
@@ -212,21 +214,18 @@ ctf_modebase.features = function(rankings, recent_rankings)
 			end
 		end
 
-		minetest.log(
-			"ACTION",
-			string.format(
-				"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, "
-					.. "reward_given_to_enemy = %f },",
-				math.max(1, math.round(kd * 7 * flag_multiplier)),
-				match_rank.kills or 1,
-				match_rank.kill_assists or 0,
-				match_rank.deaths or 1,
-				match_rank.score or 0,
-				match_rank.hp_healed or 0,
-				match_rank.flag_attempts or 0,
-				match_rank.reward_given_to_enemy or 0
-			)
-		)
+		-- minetest.log("ACTION", string.format(
+		-- 	"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, " ..
+		-- 			"reward_given_to_enemy = %f },",
+		-- 	math.max(1, math.round(kd * 7 * flag_multiplier)),
+		-- 	match_rank.kills or 1,
+		-- 	match_rank.kill_assists or 0,
+		-- 	match_rank.deaths or 1,
+		-- 	match_rank.score or 0,
+		-- 	match_rank.hp_healed or 0,
+		-- 	match_rank.flag_attempts or 0,
+		-- 	match_rank.reward_given_to_enemy or 0
+		-- ))
 
 		return math.max(1, math.round(kd * 7 * flag_multiplier))
 	end

@@ -15,6 +15,8 @@ minetest.register_craftitem("ctf_ranged:ammo", {
 	inventory_image = "ctf_ranged_ammo.png",
 })
 
+local hit_sent = {}
+local rico_sent = nil
 local function process_ray(ray, user, look_dir, def)
 	local hitpoint = ray:hit_object_or_node({
 		node = function(ndef)
@@ -38,6 +40,26 @@ local function process_ray(ray, user, look_dir, def)
 						minetest.dig_node(hitpoint.under)
 					end
 				end
+				if def.type ~= "shotgun" then
+					minetest.add_particlespawner({
+						amount = 10,
+						time = 0.03,
+						minpos = hitpoint.intersection_point,
+						maxpos = hitpoint.intersection_point,
+						minvel = {x=-4, y=2, z=-4},
+						maxvel = {x=4, y=3, z=4},
+						minacc = {x=0, y=-15, z=0},
+						maxacc = {x=0, y=-15, z=0},
+						minexptime = 0.1,
+						maxexptime = 0.3,
+						minsize = 1,
+						maxsize = 2,
+						node = {name = nodedef.name},
+						collisiondetection = true,
+						collision_removal = false,
+						glow = 3
+					})
+				end
 			else
 				if nodedef.walkable and nodedef.pointable then
 					minetest.add_particle({
@@ -49,27 +71,55 @@ local function process_ray(ray, user, look_dir, def)
 						collisiondetection = false,
 						texture = "ctf_ranged_bullethole.png",
 					})
+					if def.type ~= "shotgun" then
+						minetest.add_particlespawner({
+							amount = 10,
+							time = 0.03,
+							minpos = hitpoint.intersection_point,
+							maxpos = hitpoint.intersection_point,
+							minvel = {x=-4, y=2, z=-4},
+							maxvel = {x=4, y=3, z=4},
+							minacc = {x=0, y=-15, z=0},
+							maxacc = {x=0, y=-15, z=0},
+							minexptime = 0.2,
+							maxexptime = 0.4,
+							minsize = 1,
+							maxsize = 1,
+							node = {name = nodedef.name},
+							collisiondetection = true,
+							collision_removal = false,
+							glow = 14
+						})
+					end
 
-					minetest.sound_play("ctf_ranged_ricochet", {pos = hitpoint.intersection_point})
+					if not rico_sent or vector.distance(rico_sent, hitpoint.intersection_point) > 10 then
+						if not rico_sent then
+							minetest.after(0.2, function() rico_sent = nil end)
+						end
+						rico_sent = hitpoint.intersection_point
+
+						minetest.sound_play("ctf_ranged_ricochet", {gain = 2.4, pos = hitpoint.intersection_point})
+					end
 				elseif nodedef.groups.liquid then
-					minetest.add_particlespawner({
-						amount = 10,
-						time = 0.1,
-						minpos = hitpoint.intersection_point,
-						maxpos = hitpoint.intersection_point,
-						minvel = {x=look_dir.x * 3, y=4, z=-look_dir.z * 3},
-						maxvel = {x=look_dir.x * 4, y=6, z= look_dir.z * 4},
-						minacc = {x=0, y=-10, z=0},
-						maxacc = {x=0, y=-13, z=0},
-						minexptime = 1,
-						maxexptime = 1,
-						minsize = 0,
-						maxsize = 0,
-						collisiondetection = false,
-						glow = 3,
-						node = {name = nodedef.name},
-					})
-
+					if def.type ~= "shotgun" then
+						minetest.add_particlespawner({
+							amount = 10,
+							time = 0.1,
+							minpos = hitpoint.intersection_point,
+							maxpos = hitpoint.intersection_point,
+							minvel = {x=look_dir.x * 3, y=4, z=-look_dir.z * 3},
+							maxvel = {x=look_dir.x * 4, y=6, z= look_dir.z * 4},
+							minacc = {x=0, y=-10, z=0},
+							maxacc = {x=0, y=-13, z=0},
+							minexptime = 1,
+							maxexptime = 1,
+							minsize = 0,
+							maxsize = 0,
+							node = {name = nodedef.name},
+							collisiondetection = false,
+							glow = 3,
+						})
+					end
 					if def.liquid_travel_dist then
 						process_ray(rawf.bulletcast(
 							def.bullet, hitpoint.intersection_point,
@@ -79,10 +129,19 @@ local function process_ray(ray, user, look_dir, def)
 				end
 			end
 		elseif hitpoint.type == "object" then
+			local name = user:get_player_name()
 			hitpoint.ref:punch(user, def.fire_interval or 0.1, {
 				full_punch_interval = def.fire_interval or 0.1,
 				damage_groups = {ranged = 1, [def.type] = 1, fleshy = def.damage}
 			}, look_dir)
+
+			if not hit_sent[name] then
+				hit_sent[name] = true
+				minetest.after(0.6, function() hit_sent[name] = nil end)
+				minetest.sound_play("ctf_ranged_hit", {
+					to_player = name,
+				})
+			end
 		end
 	end
 end
@@ -191,9 +250,13 @@ function ctf_ranged.simple_register_gun(name, def)
 			local rays
 
 			if type(def.bullet) == "table" then
-				def.bullet.texture = "ctf_ranged_bullet.png"
+				def.bullet.texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255"
+				def.bullet.glow = 14
 			else
-				def.bullet = {texture = "ctf_ranged_bullet.png"}
+				def.bullet = {
+					texture = "ctf_ranged_bullet.png^[colorize:#FFDB4C:255",
+					glow = 14
+				}
 			end
 
 			if not def.bullet.spread then

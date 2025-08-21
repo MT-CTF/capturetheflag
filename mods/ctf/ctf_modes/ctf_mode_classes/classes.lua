@@ -238,7 +238,7 @@ ctf_ranged.simple_register_gun("ctf_mode_classes:ranged_rifle", {
 			return
 		end
 		if itemstack:get_wear() == 0 then
-			grenades.throw_grenade("grenades:frag", 24, user)
+			grenades.throw_grenade("ctf_grenades:frag", 24, user)
 
 			local step = math.floor(65534 / RANGED_COOLDOWN_TIME)
 			ctf_modebase.update_wear.start_update(user:get_player_name(), "ctf_mode_classes:ranged_rifle_loaded", step, true)

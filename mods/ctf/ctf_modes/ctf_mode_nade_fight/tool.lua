@@ -30,7 +30,7 @@ end
 
 local S = minetest.get_translator(minetest.get_current_modname())
 
-local fragdef_small = table.copy(minetest.registered_craftitems["grenades:frag"].grenade)
+local fragdef_small = table.copy(minetest.registered_craftitems["ctf_grenades:frag"].grenade)
 fragdef_small.description = S("Firecracker (Hurts anyone near blast)")
 fragdef_small.image = "ctf_mode_nade_fight_firecracker_grenade.png"
 fragdef_small.explode_radius = 4

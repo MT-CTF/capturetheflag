@@ -173,6 +173,7 @@ minetest.register_node("ctf_map:damage_cobble", {
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("placer", placer:get_player_name())
+		meta:mark_as_private("placer")
 	end
 })
 
@@ -187,20 +188,30 @@ minetest.register_node("ctf_map:reinforced_cobble", {
 		local placer_team = meta:get_string("placer_team")
 		local digger_team = ctf_teams.get(digger)
 		if placer_team ~= digger_team then
-			minetest.set_node(pos, {name = "ctf_map:reinforced_cobble_hardened"})
-			meta = minetest.get_meta(pos)
-			meta:set_string("placer_team", placer_team)
+			minetest.swap_node(pos, {name = "ctf_map:reinforced_cobble_hardened"})
 		end
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("placer_team", ctf_teams.get(placer))
+		meta:mark_as_private("placer_team")
 	end,
 	on_dig = function(pos, node, digger)
 		local meta = minetest.get_meta(pos)
 		meta:set_string("placer_team", "")
 		minetest.node_dig(pos, node, digger)
 	end
+})
+
+minetest.register_node("ctf_map:reinforced_glass", {
+	description = S("Reinforced Glass"),
+	tiles = {"default_glass.png^[colorize:#000:140^default_glass_detail.png", "default_glass_detail.png"},
+	groups = {cracky = 2},
+	sounds = default.node_sound_glass_defaults(),
+	drawtype = "glasslike_framed_optional",
+	use_texture_alpha = "clip",
+	paramtype = "light",
+	sunlight_propagates = true,
 })
 
 minetest.register_node("ctf_map:reinforced_cobble_hardened", {
@@ -215,9 +226,7 @@ minetest.register_node("ctf_map:reinforced_cobble_hardened", {
 		local placer_team = meta:get_string("placer_team")
 		local digger_team = ctf_teams.get(digger)
 		if placer_team == digger_team then
-			minetest.set_node(pos, {name = "ctf_map:reinforced_cobble"})
-			meta = minetest.get_meta(pos)
-			meta:set_string("placer_team", placer_team)
+			minetest.swap_node(pos, {name = "ctf_map:reinforced_cobble"})
 		end
 	end,
 	on_dig = function(pos, node, digger)

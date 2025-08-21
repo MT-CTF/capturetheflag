@@ -57,7 +57,6 @@ local fragdef = {
 		local player = minetest.get_player_by_name(name)
 		if not player then return end
 
-
 		local radius = def.explode_radius
 
 		minetest.add_particlespawner({
@@ -130,15 +129,7 @@ local fragdef = {
 	end,
 }
 
-grenades.register_grenade("grenades:frag", fragdef)
-
-local fragdef_sticky = table.copy(fragdef)
-fragdef_sticky.description = S("Sticky Frag grenade (Sticks to surfaces)")
-fragdef_sticky.image = "grenades_frag_sticky.png"
-fragdef_sticky.on_collide = function()
-	return
-end
-grenades.register_grenade("grenades:frag_sticky", fragdef_sticky)
+grenades.register_grenade("ctf_grenades:frag", fragdef)
 
 -- Smoke Grenade
 
@@ -146,7 +137,7 @@ local sounds = {}
 local SMOKE_GRENADE_TIME = 30
 
 local register_smoke_grenade = function(name, description, image, damage)
-	grenades.register_grenade("grenades:"..name, {
+	grenades.register_grenade("ctf_grenades:"..name, {
 		description = description,
 		image = image,
 		on_collide = function()
@@ -169,10 +160,10 @@ local register_smoke_grenade = function(name, description, image, damage)
 							if player:get_hp() <= 0 then
 								-- Drop the nade at its explode point if the thrower is dead
 								-- Fixes https://github.com/MT-CTF/capturetheflag/issues/1160
-								minetest.add_item(pos, ItemStack("grenades:"..name))
+								minetest.add_item(pos, ItemStack("ctf_grenades:"..name))
 							else
 								-- Add the nade back into the thrower's inventory
-								player:get_inventory():add_item("main", "grenades:"..name)
+								player:get_inventory():add_item("main", "ctf_grenades:"..name)
 							end
 							return
 						elseif damage and distance_from_flag <= 26 then
@@ -234,9 +225,9 @@ local register_smoke_grenade = function(name, description, image, damage)
 			local p = "grenades_smoke.png^["
 			local particletexture
 			if pteam and damage then
-				particletexture = p .. "colorize:" .. ctf_teams.team[pteam].color .. ":76^[noalpha"
+				particletexture = p .. "colorize:" .. ctf_teams.team[pteam].color .. ":76^[noalpha^[mask:grenades_smoke_mask.png"
 			else
-				particletexture = p .. "noalpha"
+				particletexture = p .. "noalpha^[mask:grenades_smoke_mask.png"
 			end
 
 			for i = 0, 5, 1 do
@@ -282,79 +273,6 @@ register_smoke_grenade(
 	"grenades_smoke_grenade.png^[multiply:#00ff00",
 	true
 )
-
--- Flashbang Grenade
-
---[[ local flash_huds = {}
-
-grenades.register_grenade("grenades:flashbang", {
-	description = "Flashbang grenade (Blinds all who look at blast)",
-	image = "grenades_flashbang.png",
-	clock = 4,
-	on_explode = function(def, obj, pos)
-		for _, v in ipairs(minetest.get_objects_inside_radius(pos, 20)) do
-			local hit = minetest.raycast(pos, v:get_pos(), true, true):next()
-
-			if hit and v:is_player() and v:get_hp() > 0 and not flash_huds[v:get_player_name()] and hit.type == "object" and
-			hit.ref:is_player() and hit.ref:get_player_name() == v:get_player_name() then
-				local playerdir = vector.round(v:get_look_dir())
-				local grenadedir = vector.round(vector.direction(v:get_pos(), pos))
-				local pname = v:get_player_name()
-
-				minetest.sound_play("glasslike_break", {
-					pos = pos,
-					gain = 1.0,
-					max_hear_distance = 32,
-				})
-
-				if math.acos(playerdir.x*grenadedir.x + playerdir.y*grenadedir.y + playerdir.z*grenadedir.z) <= math.pi/4 then
-					flash_huds[pname] = {}
-
-					for i = 0, 5, 1 do
-						local key = v:hud_add({
-							hud_elem_type = "image",
-							position = {x = 0, y = 0},
-							name = "flashbang hud "..pname,
-							scale = {x = -200, y = -200},
-							text = "default_cloud.png^[colorize:white:255^[opacity:"..tostring(255 - (i * 20)),
-							alignment = {x = 0, y = 0},
-							offset = {x = 0, y = 0}
-						})
-
-						flash_huds[pname][i+1] = key
-
-						minetest.after(2 * i, function()
-							if minetest.get_player_by_name(pname) then
-								minetest.get_player_by_name(pname):hud_remove(key)
-
-								if flash_huds[pname] then
-									table.remove(flash_huds[pname], 1)
-								end
-
-								if i == 5 then
-									flash_huds[pname] = nil
-								end
-							end
-						end)
-					end
-				end
-
-			end
-		end
-	end,
-})
-
-minetest.register_on_dieplayer(function(player)
-	local name = player:get_player_name()
-
-	if flash_huds[name] then
-		for _, v in ipairs(flash_huds[name]) do
-			player:hud_remove(v)
-		end
-
-		flash_huds[name] = nil
-	end
-end) ]]
 
 ctf_api.register_on_match_end(function()
 	for sound in pairs(sounds) do

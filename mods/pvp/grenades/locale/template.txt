@@ -1,7 +1,0 @@
-# textdomain: grenades
-
-Frag grenade (Kills anyone near blast)=
-Sticky Frag grenade (Sticks to surfaces)=
-You can't explode smoke grenades so close to a flag!=
-Smoke grenade (Generates smoke around blast site)=
-Poison grenade (Generates poisonous smoke around blast site)=

@@ -48,10 +48,14 @@ local function rank(name, mode_name, mode_data, pname)
 		)
 	end
 
-	for _, pair in pairs({{"kills", "deaths"}, {"score", "kills"}}) do
+	for label, pair in pairs({
+		{"kills", "deaths"},
+		{"score", "kills"},
+		["Attempts/Capture"] = {"flag_attempts", "flag_captures"}
+	}) do
 		return_str = string.format("%s%s: %s,\n\t",
 			return_str,
-			minetest.colorize("#63d437", HumanReadable(pair[1].."/"..pair[2])),
+			minetest.colorize("#63d437", (type(tonumber(label)) == "number") and HumanReadable(pair[1].."/"..pair[2]) or label),
 			minetest.colorize("#ffea00", 0.1 * math.round(10 * (
 						(prank[pair[1]] or 0   ) /
 				math.max(prank[pair[2]] or 0, 1)
