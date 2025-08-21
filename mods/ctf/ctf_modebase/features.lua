@@ -204,18 +204,18 @@ local function calculate_killscore(player)
 		end
 	end
 
-	minetest.log("ACTION", string.format(
-		"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, " ..
-				"reward_given_to_enemy = %f },",
-		math.max(1, math.round(kd * 7 * flag_multiplier)),
-		match_rank.kills or 1,
-		match_rank.kill_assists or 0,
-		match_rank.deaths or 1,
-		match_rank.score or 0,
-		match_rank.hp_healed or 0,
-		match_rank.flag_attempts or 0,
-		match_rank.reward_given_to_enemy or 0
-	))
+	-- minetest.log("ACTION", string.format(
+	-- 	"[KILLDEBUG] { og = %f, kills = %d, assists = %f, deaths = %d, score = %f, hp_healed = %f, attempts = %d, " ..
+	-- 			"reward_given_to_enemy = %f },",
+	-- 	math.max(1, math.round(kd * 7 * flag_multiplier)),
+	-- 	match_rank.kills or 1,
+	-- 	match_rank.kill_assists or 0,
+	-- 	match_rank.deaths or 1,
+	-- 	match_rank.score or 0,
+	-- 	match_rank.hp_healed or 0,
+	-- 	match_rank.flag_attempts or 0,
+	-- 	match_rank.reward_given_to_enemy or 0
+	-- ))
 
 	return math.max(1, math.round(kd * 7 * flag_multiplier))
 end
