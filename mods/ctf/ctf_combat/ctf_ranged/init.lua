@@ -137,9 +137,10 @@ local function process_ray(ray, user, look_dir, def)
 
 			if not hit_sent[name] then
 				hit_sent[name] = true
-				minetest.after(0.6, function() hit_sent[name] = nil end)
+				minetest.after(0.2, function() hit_sent[name] = nil end)
 				minetest.sound_play("ctf_ranged_hit", {
 					to_player = name,
+					gain = 0.6
 				})
 			end
 		end
