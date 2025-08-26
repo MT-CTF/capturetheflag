@@ -676,28 +676,25 @@ return {
 			player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
 		end
 
-		local one_third     = math.ceil(0.34 * total_players)
+		local allowed_players_diff = (total_players / 10) + 1
 
 		-- Allocate player to remembered team unless teams are imbalanced
 		if rem_team and not ctf_modebase.flag_captured[rem_team] and
-		(worst_kd.kills <= total_players or actual_kd_diff <= 0.8) and players_diff <= one_third then
+		(worst_kd.kills <= total_players or actual_kd_diff <= 0.8) and players_diff <= (allowed_players_diff + 1) then
 			return rem_team
 		end
 
 		local pkd = (player_rankings.kills or 0) / (player_rankings.deaths or 1)
 
-		local one_fourth     = math.ceil(0.25 * total_players)
 		local avg = (kd_diff + actual_kd_diff) / 2
-		local pcount_diff_limit = (
-			(players_diff <= math.min(one_fourth, 1)) or
-			(pkd >= 1.8 and players_diff <= math.min(one_third, 2))
-		)
 		if best_kd.kills + worst_kd.kills >= 30 then
 			avg = actual_kd_diff
 		end
 
-		local result = pcount_diff_limit and ((best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
-				(pkd >= math.min(1, kd_diff/2) and avg >= 0.4))
+		local result = (players_diff <= allowed_players_diff) and (
+			(best_kd.kills + worst_kd.kills >= 30 and best_kd.t == best_players.t) or
+			(pkd >= math.min(1, kd_diff/2) and avg >= 0.4)
+		)
 
 		if players_diff == 0 or result then
 			return worst_kd.t
@@ -803,19 +800,19 @@ return {
 
 			capture_reward = capture_reward + math.min(score, 800)
 
-			minetest.log("action", string.format(
-				"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, "..
-				"player_attempts = %d, time = %d, winteam_score = %d, \"%s\"},",
-				team_score / score,
-				team_score,
-				score,
-				#ctf_teams.get_connected_players(),
-				ctf_teams.online_players[lost_team].count,
-				player_scores[pname].flag_attempts or 0,
-				os.time() - ctf_map.start_time,
-				team_scores[pteam].score or 0,
-				many_teams and "many teams" or "2 teams"
-			))
+			-- minetest.log("action", string.format(
+			-- 	"[CAPDEBUG] div: %.1f {team_score = %d, capture_score = %d, connected_players = %d, lost_team_count = %d, "..
+			-- 	"player_attempts = %d, time = %d, winteam_score = %d, \"%s\"},",
+			-- 	team_score / score,
+			-- 	team_score,
+			-- 	score,
+			-- 	#ctf_teams.get_connected_players(),
+			-- 	ctf_teams.online_players[lost_team].count,
+			-- 	player_scores[pname].flag_attempts or 0,
+			-- 	os.time() - ctf_map.start_time,
+			-- 	team_scores[pteam].score or 0,
+			-- 	many_teams and "many teams" or "2 teams"
+			-- ))
 		end
 
 		local text = string.format(" has captured the flag and got %d points", capture_reward)
