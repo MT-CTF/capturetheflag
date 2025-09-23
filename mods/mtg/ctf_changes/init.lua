@@ -1,6 +1,6 @@
 local COOLDOWN = ctf_core.init_cooldowns()
 
-local DISALLOW_MOD_ABMS = {"default", "fire", "flowers", "tnt"}
+local DISALLOW_MOD_ABMS = { "default", "fire", "flowers", "tnt" }
 
 local node_fall_damage_factors = {
 	["default:snowblock"] = -14, -- From a height of 13 blocks you take 5 damage
@@ -8,9 +8,9 @@ local node_fall_damage_factors = {
 }
 
 local disabled_ores = {
-	["default:stone_with_copper"] = "default:stone"          ,
-	["default:stone_with_gold"  ] = "default:stone"          ,
-	["default:stone_with_tin"   ] = "default:stone_with_iron",
+	["default:stone_with_copper"] = "default:stone",
+	["default:stone_with_gold"] = "default:stone",
+	["default:stone_with_tin"] = "default:stone_with_iron",
 }
 
 for from, to in pairs(disabled_ores) do
@@ -18,11 +18,10 @@ for from, to in pairs(disabled_ores) do
 end
 
 minetest.override_chatcommand("clearinv", {
-	privs = {server = true},
+	privs = { server = true },
 })
 
 minetest.register_on_mods_loaded(function()
-
 	-- Remove Unneeded ABMs
 
 	local remove_list = {}
@@ -47,7 +46,7 @@ minetest.register_on_mods_loaded(function()
 	for name, def in pairs(minetest.registered_nodes) do
 		if def.groups then
 			def.groups.falling_node = nil
-			minetest.override_item(name, {groups = def.groups})
+			minetest.override_item(name, { groups = def.groups })
 		end
 
 		if name:find("fire:") and def.on_timer then
@@ -56,9 +55,9 @@ minetest.register_on_mods_loaded(function()
 	end
 
 	-- Set item type and tiers for give_initial_stuff
-	local tiers = {"wood", "stone", "steel", "mese", "diamond"}
-	local tool_categories = {"pickaxe", "shovel", "axe"}
-	local other_categories = {sword = "melee"}
+	local tiers = { "wood", "stone", "steel", "mese", "diamond" }
+	local tool_categories = { "pickaxe", "shovel", "axe" }
+	local other_categories = { sword = "melee" }
 	for name, def in pairs(minetest.registered_tools) do
 		local new_category = nil
 
@@ -84,7 +83,8 @@ minetest.register_on_mods_loaded(function()
 
 					if tier <= 2 then
 						def.tool_capabilities.full_punch_interval = 1
-						def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy + 1
+						def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy
+							+ 1
 					end
 
 					break
@@ -100,13 +100,17 @@ minetest.register_on_mods_loaded(function()
 	end
 
 	local drop_self = {
-		"default:leaves", "default:jungleleaves", "default:acacia_leaves",
-		"default:aspen_leaves", "default:bush_leaves", "default:blueberry_bush_leaves",
-		"default:acacia_bush_leaves"
+		"default:leaves",
+		"default:jungleleaves",
+		"default:acacia_leaves",
+		"default:aspen_leaves",
+		"default:bush_leaves",
+		"default:blueberry_bush_leaves",
+		"default:acacia_bush_leaves",
 	}
 
 	for _, name in pairs(drop_self) do
-		minetest.override_item(name, {drop = name})
+		minetest.override_item(name, { drop = name })
 	end
 end)
 
@@ -122,7 +126,7 @@ minetest.override_item("default:apple", {
 	stack_max = 60,
 	on_place = function()
 		return nil
-	end
+	end,
 })
 
 minetest.override_item("default:blueberries", {
@@ -138,7 +142,9 @@ minetest.override_item("default:blueberries", {
 
 local function furnace_on_destruct(pos)
 	local inv = minetest.get_inventory({ type = "node", pos = pos })
-	if not inv then return end
+	if not inv then
+		return
+	end
 	for _, list in pairs(inv:get_lists()) do
 		for _, item in ipairs(list) do
 			minetest.add_item(pos, item)
@@ -150,10 +156,10 @@ for _, name in pairs({
 	"doors:door_steel",
 	"xpanes:door_steel_bar",
 }) do
-	for _, variant in pairs({"_a", "_b", "_c", "_d"}) do
-		local old_on_construct = minetest.registered_nodes[name..variant].on_construct
+	for _, variant in pairs({ "_a", "_b", "_c", "_d" }) do
+		local old_on_construct = minetest.registered_nodes[name .. variant].on_construct
 
-		minetest.override_item(name..variant, {
+		minetest.override_item(name .. variant, {
 			on_construct = function(pos, ...)
 				minetest.after(0, function()
 					local meta = minetest.get_meta(pos)
@@ -163,7 +169,7 @@ for _, name in pairs({
 				end)
 
 				return old_on_construct and old_on_construct(pos, ...)
-			end
+			end,
 		})
 	end
 end
@@ -184,17 +190,21 @@ for _, name in pairs({
 			meta:set_string("infotext", "")
 
 			return ret or minetest.is_creative_enabled(placer:get_player_name())
-		end
+		end,
 	})
 end
 
 minetest.override_item("default:furnace", {
-	can_dig = function() return true end,
+	can_dig = function()
+		return true
+	end,
 	on_destruct = furnace_on_destruct,
 })
 
 minetest.override_item("default:furnace_active", {
-	can_dig = function() return true end,
+	can_dig = function()
+		return true
+	end,
 	on_destruct = furnace_on_destruct,
 })
 
@@ -209,11 +219,15 @@ minetest.register_craft({
 })
 
 minetest.override_item("default:chest", {
-	on_rightclick = function() return end,
+	on_rightclick = function()
+		return
+	end,
 })
 
 minetest.override_item("default:chest_locked", {
-	on_rightclick = function() return end,
+	on_rightclick = function()
+		return
+	end,
 	protected = false,
 })
 
