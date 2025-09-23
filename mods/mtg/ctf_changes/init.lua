@@ -240,3 +240,10 @@ minetest.register_on_mods_loaded(function()
 		})
 	end
 end)
+
+for pick in ipairs({ "wood", "stone", "steel", "bronze", "mese", "diamond" }) do
+	core.override_item(
+		"default:pick_" .. pick,
+		{ pointabilities = { node = SPIKES_POINTABILITIES } }
+	)
+end
