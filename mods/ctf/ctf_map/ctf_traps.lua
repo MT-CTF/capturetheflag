@@ -28,6 +28,9 @@ minetest.register_node("ctf_map:unwalkable_cobble", {
 --- Spike Trap
 --
 
+--- @type { [string]: boolean }
+SPIKES_POINTABILITIES = { ["ctf_map:spike"] = true }
+
 minetest.register_node("ctf_map:spike", {
 	description = S("Spike") .. "\n" .. "7 DPS",
 	drawtype = "plantlike",
@@ -82,6 +85,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 	if not ctf_teams.team[team].not_playing then
 		local spikecolor = ctf_teams.team[team].color
 
+		SPIKES_POINTABILITIES["ctf_map:spike_" .. team] = true
 		minetest.register_node("ctf_map:spike_" .. team, {
 			description = HumanReadable(team) .. " " .. S("Team Spike"),
 			drawtype = "plantlike",
