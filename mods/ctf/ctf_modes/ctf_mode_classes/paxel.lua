@@ -74,7 +74,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 	wield_image = "default_tool_bronzepick.png^default_tool_bronzeshovel.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
 	pointabilities = {
-		nodes = SPIKES_POINTABILITIES,
+		nodes = ctf_map.SPIKES_POINTABILITIES,
 	},
 	tool_capabilities = {
 		full_punch_interval = 1.0,

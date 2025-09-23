@@ -244,6 +244,6 @@ end)
 for pick in ipairs({ "wood", "stone", "steel", "bronze", "mese", "diamond" }) do
 	core.override_item(
 		"default:pick_" .. pick,
-		{ pointabilities = { node = SPIKES_POINTABILITIES } }
+		{ pointabilities = { node = ctf_map.SPIKES_POINTABILITIES } }
 	)
 end
