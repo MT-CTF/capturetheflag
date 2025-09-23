@@ -40,6 +40,7 @@ minetest.register_node("ctf_map:spike", {
 	walkable = false,
 	damage_per_second = 7,
 	groups = { cracky = 1, level = 2 },
+	pointable = false,
 	selection_box = {
 		type = "fixed",
 		fixed = { -0.5, -0.5, -0.5, 0.5, 0, 0.5 },
@@ -89,6 +90,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			use_texture_alpha = "clip",
 			paramtype = "light",
 			paramtype2 = "meshoptions",
+			pointable = false,
 			sunlight_propagates = true,
 			walkable = false,
 			damage_per_second = 7,
