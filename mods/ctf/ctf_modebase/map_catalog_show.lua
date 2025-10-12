@@ -44,17 +44,14 @@ local function show_catalog(pname, current_map)
 		y = y + 0.5
 	end
 
-	-- "maps/{current_map}/screenshot.png" is copied to "textures/{current_map}_screenshot.png"
 	local image_texture = current_map_meta.dirname .. "_screenshot.png"
-	if ctf_core.file_exists(string.format("%s/textures/%s", minetest.get_modpath("ctf_map"), image_texture)) then
-		formspec.elements.image = {
-			type = "image",
-			pos = {7, y},
-			size = {10, 6},
-			texture = image_texture,
-		}
-		y = y + 6.5
-	end
+	formspec.elements.image = {
+		type = "image",
+		pos = {7, y},
+		size = {10, 6},
+		texture = image_texture,
+	}
+	y = y + 6.5
 
 	if current_map_meta.hint and current_map_meta.hint ~= "" then
 		formspec.elements.hint = {
