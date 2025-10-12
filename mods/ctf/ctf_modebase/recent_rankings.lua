@@ -3,7 +3,53 @@ ctf_modebase.recent_rankings = function(rankings)
 local rankings_players = {}
 local rankings_teams = {}
 
+-- Used when ctf_core.settings.buffer_ranking_writes > 0
+local ranking_timer = nil
+
+-- Used when ctf_core.settings.buffer_ranking_writes > 0
+local write_queue = {}
+
+local function write_rankings()
+	assert(ctf_core.settings.buffer_ranking_writes ~= -1, "write_rankings() called when ctf_buffer_ranking_writes is -1")
+
+	minetest.log("action", "Writing recent_rankings to backend..")
+
+	if ctf_core.settings.buffer_ranking_writes == 0 then
+		write_queue = rankings_players
+	end
+
+	for player, stats in pairs(write_queue) do
+		local pstats = {}
+
+		for stat, amount in pairs(stats) do
+			if stat:sub(1, 1) ~= "_" and amount > 0 then
+				pstats[stat] = amount
+			end
+		end
+
+		rankings:add(player, pstats)
+	end
+
+	if ctf_core.settings.buffer_ranking_writes > 0 then
+		ranking_timer = nil
+		write_queue = {}
+	end
+end
+
+if ctf_core.settings.buffer_ranking_writes > -1 then
+	core.register_on_shutdown(function()
+		write_rankings()
+	end)
+end
+
 return {
+	get_last_updated = function()
+		if ranking_timer then
+			return os.clock() - ranking_timer
+		else
+			return 0
+		end
+	end,
 	add = function(player, amounts, no_hud)
 		player = PlayerName(player)
 
@@ -20,24 +66,46 @@ return {
 			rankings_players[player] = {}
 		end
 
+		if ctf_core.settings.buffer_ranking_writes > 0
+		and not write_queue[player] then
+			write_queue[player] = {}
+		end
+
 		local team = rankings_players[player]._team
 
 		for stat, amount in pairs(amounts) do
 			rankings_players[player][stat] = (rankings_players[player][stat] or 0) + amount
 
+			if ctf_core.settings.buffer_ranking_writes > 0 then
+				write_queue[player][stat] = (write_queue[player][stat] or 0) + amount
+			end
+
 			if team then
 				rankings_teams[team][stat] = (rankings_teams[team][stat] or 0) + amount
 				if stat == "score" then
-					rankings_players[player][team.."_"..stat] = (rankings_players[player][team.."_"..stat] or 0) + amount
+					rankings_players[player]["_"..team.."_"..stat] = (rankings_players[player]["_"..team.."_"..stat] or 0) + amount
 				end
 			end
 		end
 
-		rankings:add(player, amounts)
+		if ctf_core.settings.buffer_ranking_writes == -1 then
+			rankings:add(player, amounts)
+		elseif ctf_core.settings.buffer_ranking_writes > 0 then
+			if not ranking_timer then
+				ranking_timer = os.clock()
+			elseif os.clock() - ranking_timer >= ctf_core.settings.buffer_ranking_writes then
+				write_rankings()
+			end
+		end
 	end,
 	get = function(player)
 		player = PlayerName(player)
-		return rankings_players[player] or {}
+
+		if rankings_players[player] then
+			return table.copy(rankings_players[player])
+		else
+			return {}
+		end
 	end,
 	set_team = function(player, team)
 		player = PlayerName(player)
@@ -72,6 +140,10 @@ return {
 		end
 	end,
 	on_match_end = function()
+		if ctf_core.settings.buffer_ranking_writes > -1 then
+			write_rankings()
+		end
+
 		rankings_players = {}
 		rankings_teams = {}
 	end,

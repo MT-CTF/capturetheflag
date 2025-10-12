@@ -666,14 +666,14 @@ return {
 		local players_diff = best_players.s - worst_players.s
 
 		local rem_team = ctf_teams.get(player)
-		local player_rankings = recent_rankings.get(player) --[pteam.."_score"]
+		local player_rankings = recent_rankings.get(player) --["_"..pteam.."_score"]
 
 		if not rem_team or
-		math.max(player_rankings[rem_team.."_kills"] or 0, player_rankings[rem_team.."_deaths"] or 0) <= 6 then
+		math.max(player_rankings["_"..rem_team.."_kills"] or 0, player_rankings["_"..rem_team.."_deaths"] or 0) <= 6 then
 			player_rankings = rankings:get(player) or {}
 		else
-			player_rankings.kills  = player_rankings[rem_team.."_kills"]  or 0
-			player_rankings.deaths = player_rankings[rem_team.."_deaths"] or 1
+			player_rankings.kills  = player_rankings["_"..rem_team.."_kills"]  or 0
+			player_rankings.deaths = player_rankings["_"..rem_team.."_deaths"] or 1
 		end
 
 		local allowed_players_diff = (total_players / 10) + 1
@@ -834,7 +834,7 @@ return {
 		local healers = ctf_combat_mode.get_healers(pname)
 		for teammate in pairs(ctf_teams.online_players[pteam].players) do
 			if teammate ~= pname then
-				local teammate_value = (recent_rankings.get(teammate)[pteam.."_score"] or 0) / (team_score or 1)
+				local teammate_value = (recent_rankings.get(teammate)["_"..pteam.."_score"] or 0) / (team_score or 1)
 
 				if table.indexof(healers, teammate) ~= -1 then
 					teammate_value = teammate_value + ((#ctf_teams.get_connected_players() / 10) / #healers)

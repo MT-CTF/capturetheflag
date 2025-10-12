@@ -18,3 +18,9 @@ ctf_allow_parties (Allow Player Parties) bool false
 # Max party size in players
 # Parties smaller than this will still be blocked if they are larger than the team size of the match
 ctf_max_party_size (Max Party Size) int 4
+
+# Store ranking changes in a lua table (RAM) before writing them to the database/backend
+# -1: Write ranking changes directly to the configured ranking backend
+# 0: Store in RAM until the match ends
+# 1..600: Store in RAM for x seconds (checked whenever a rank changes), or until the match ends
+ctf_buffer_ranking_writes (Buffer Ranking Writes) int -1 -1 600
