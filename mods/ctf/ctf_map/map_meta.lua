@@ -193,7 +193,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			if core.features.dynamic_add_media_startup then
 				minetest.dynamic_add_media({
 					filename = dirname .. "_" .. e,
-					filepath = ctf_map.map_path[dirname] .. "/" .. e
+					filepath = ctf_map.map_path[dirname] .. "/" .. e,
+					client_cache = true,
 				}, not IS_RUNTIME and function() end or nil)
 			end
 		end
