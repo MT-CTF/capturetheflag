@@ -938,7 +938,7 @@ return {
 	get_chest_access = function(pname)
 		local rank = rankings:get(pname)
 		local player = minetest.get_player_by_name(pname)
-		local pro_chest = player and player:get_meta():get_int("ctf_rankings:pro_chest:"..
+		local pro_chest = player and ctf_core.meta_get_int(pname, "ctf_rankings:pro_chest:"..
 				(ctf_modebase.current_mode or "")) >= 1
 		local deny_pro = "You need to have more than 1.4 kills per death, "..
 		                 "5 captures, and at least 8,000 score to access the pro section."

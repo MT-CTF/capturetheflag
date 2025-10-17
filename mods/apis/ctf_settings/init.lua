@@ -33,13 +33,13 @@ end
 
 ---@param player ObjectRef
 function ctf_settings.set(player, setting, value)
-	player:get_meta():set_string("ctf_settings:"..setting, value)
+	ctf_core.meta_set_string(player:get_player_name(), "ctf_settings:"..setting, value)
 end
 
 ---@param player ObjectRef
 ---@return string Returns the player's chosen setting value, the default given at registration, or if both are unset: ""
 function ctf_settings.get(player, setting)
-	local value = player:get_meta():get_string("ctf_settings:"..setting)
+	local value = ctf_core.meta_get_string(player:get_player_name(), "ctf_settings:"..setting)
 	local info = ctf_settings.settings[setting]
 
 	return value == "" and (info and info.default) or value

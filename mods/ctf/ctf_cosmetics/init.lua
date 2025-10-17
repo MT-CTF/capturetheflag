@@ -40,7 +40,7 @@ function ctf_cosmetics.get_skin(player)
 end
 
 function ctf_cosmetics.get_clothing_texture(player, clothing)
-	local texture = PlayerObj(player):get_meta():get_string("ctf_cosmetics_"..clothing)
+	local texture = ctf_core.meta_get_string(PlayerName(player), "ctf_cosmetics_"..clothing)
 
 	if not texture or texture == "" then
 		return "ctf_cosmetics_"..clothing..".png"
@@ -67,11 +67,11 @@ function ctf_cosmetics.set_extra_clothing(player, extra_clothing)
 		current[clothing] = clothingcolor
 	end
 
-	return PlayerObj(player):get_meta():set_string("ctf_cosmetics:extra_clothing", minetest.serialize(current))
+	return ctf_core.meta_set_string(PlayerName(player), "ctf_cosmetics:extra_clothing", minetest.serialize(current))
 end
 
 function ctf_cosmetics.get_extra_clothing(player)
-	local meta = PlayerObj(player):get_meta():get_string("ctf_cosmetics:extra_clothing")
+	local meta = ctf_core.meta_get_string(PlayerName(player), "ctf_cosmetics:extra_clothing")
 
 	if meta == "" then
 		return {_unset = true}

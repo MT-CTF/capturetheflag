@@ -15,12 +15,12 @@ local function lim(val, min, max)
 end
 
 local function update_hud(player)
-	local meta = player:get_meta()
+	local pname = player:get_player_name()
 
-	if get_val(meta:get_string("chat_bg:enabled"), false) then
-		local opacity = get_val(meta:get_string("chat_bg:opacity"), 110)
-		local width   = get_val(meta:get_string("chat_bg:width"  ), 35 )
-		local height  = get_val(meta:get_string("chat_bg:height" ), 50 )
+	if get_val(ctf_core.meta_get_string(pname, "chat_bg:enabled"), false) then
+		local opacity = get_val(ctf_core.meta_get_string(pname, "chat_bg:opacity"), 110)
+		local width   = get_val(ctf_core.meta_get_string(pname, "chat_bg:width"  ), 35 )
+		local height  = get_val(ctf_core.meta_get_string(pname, "chat_bg:height" ), 50 )
 
 		if not hud:get(player, "chat_bg") then
 			hud:add(player, "chat_bg", {
@@ -52,14 +52,13 @@ local cmd = chatcmdbuilder.register("chat_bg", {
 cmd:sub("toggle", function(name)
 	local player = minetest.get_player_by_name(name)
 	if player then
-		local meta = player:get_meta()
-		local current = get_val(meta:get_string("chat_bg:enabled"), false)
+		local current = get_val(ctf_core.meta_get_string(name, "chat_bg:enabled"), false)
 
 		if current then
-			meta:set_string("chat_bg:enabled", "")
+			ctf_core.meta_set_string(name, "chat_bg:enabled", "")
 			hud:remove(player, "chat_bg")
 		else
-			meta:set_string("chat_bg:enabled", "yes")
+			ctf_core.meta_set_string(name, "chat_bg:enabled", "yes")
 			update_hud(player)
 		end
 
@@ -74,10 +73,8 @@ cmd:sub("set :setting :value:int", function(name, setting, value)
 	local player = minetest.get_player_by_name(name)
 
 	if player then
-		local meta = player:get_meta()
-
 		if setting == "opacity" or setting == "width" or setting == "height" then
-			meta:set_string("chat_bg:"..setting, value == 0 and "" or value)
+			ctf_core.meta_set_string(name, "chat_bg:"..setting, value == 0 and "" or value)
 
 			update_hud(player)
 

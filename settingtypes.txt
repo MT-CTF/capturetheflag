@@ -24,3 +24,9 @@ ctf_max_party_size (Max Party Size) int 4
 # 0: Store in RAM until the match ends
 # 1..600: Store in RAM for x seconds (checked whenever a rank changes), or until the match ends
 ctf_buffer_ranking_writes (Buffer Ranking Writes) int -1 -1 600
+
+# Store player metadata changes in a lua table (RAM) before writing them to player meta
+# Note: This may break third party mods that change CTF metadata when set to > 0
+# 0: Write player meta whenever it's changed
+# 1..600: Store in RAM for x seconds, or until the match ends/the player leaves
+ctf_meta_write_interval (Player Meta Write Interval) int 0 0 600

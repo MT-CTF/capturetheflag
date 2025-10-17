@@ -104,8 +104,8 @@ function ctf_modebase.player.save_initial_stuff_positions(player, soft)
 	if not ctf_modebase.current_mode then return end
 
 	local inv = player:get_inventory()
-	local meta = player:get_meta()
-	local ssp = meta:get_string("ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode)
+	local pname = player:get_player_name()
+	local ssp = ctf_core.meta_get_string(pname, "ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode)
 
 	if ssp == "" then
 		ssp = {}
@@ -129,7 +129,10 @@ function ctf_modebase.player.save_initial_stuff_positions(player, soft)
 		end
 	end
 
-	meta:set_string("ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode, minetest.serialize(ssp))
+	ctf_core.meta_set_string(
+		pname,
+		"ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode, minetest.serialize(ssp)
+	)
 end
 
 -- Changes made to this function should also be made to is_initial_stuff() above
@@ -152,7 +155,7 @@ function ctf_modebase.player.give_initial_stuff(player)
 	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
 
 	local inv = player:get_inventory()
-	local meta = player:get_meta()
+	local pname = player:get_player_name()
 
 	local item_level = {}
 	get_initial_stuff(player, function(item)
@@ -196,7 +199,8 @@ function ctf_modebase.player.give_initial_stuff(player)
 	-- Check for new items not yet in the order list
 	ctf_modebase.player.save_initial_stuff_positions(player, true)
 
-	local saved_stuff_positions = meta:get_string(
+	local saved_stuff_positions = ctf_core.meta_get_string(
+		pname,
 		"ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode
 	)
 

@@ -359,12 +359,12 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 })
 
 function classes.get_name(player)
-	local meta = player:get_meta()
+	local pname = player:get_player_name()
 
-	local cname = meta:get_string("class")
+	local cname = ctf_core.meta_get_string(pname, "class")
 	if not cname or not class_props[cname] then
 		cname = "knight"
-		meta:set_string("class", cname)
+		ctf_core.meta_set_string(pname, "class", cname)
 	end
 
 	return cname
@@ -404,7 +404,7 @@ function classes.set(player, classname)
 		return
 	end
 
-	player:get_meta():set_string("class", classname)
+	ctf_core.meta_set_string(player:get_player_name(), "class", classname)
 
 	ctf_modebase.update_wear.cancel_player_updates(player)
 

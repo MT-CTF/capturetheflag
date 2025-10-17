@@ -8,7 +8,7 @@ function ctf_rankings.update_league(player)
 	local league = cache[pname]
 
 	if not league then
-		league = player:get_meta():get_string("ctf_rankings:leagues")
+		league = ctf_core.meta_get_string(pname, "ctf_rankings:leagues")
 
 		if league ~= "" then
 			league = minetest.deserialize(league)
@@ -26,12 +26,11 @@ function ctf_rankings.update_league(player)
 end
 
 minetest.register_on_joinplayer(function(player)
-	local meta = player:get_meta()
 	local pname = player:get_player_name()
 	local leagues = {}
 
-	if meta:get_string("ctf_rankings:leagues") == "" or
-	ctf_rankings.current_reset > meta:get_int("ctf_rankings:last_reset") then
+	if ctf_core.meta_get_string(pname, "ctf_rankings:leagues") == "" or
+	ctf_rankings.current_reset > ctf_core.meta_get_int(pname, "ctf_rankings:last_reset") then
 		minetest.log("action", "[CTF_RANKINGS]: Getting league of player "..pname.." for the first time")
 
 		local data = mods:get_string("rank:"..pname)
@@ -54,16 +53,16 @@ minetest.register_on_joinplayer(function(player)
 
 				if rank._pro_chest then
 					if rank._pro_chest == true then
-						meta:set_int("ctf_rankings:pro_chest:"..mode, 1)
+						ctf_core.meta_set_int(pname, "ctf_rankings:pro_chest:"..mode, 1)
 					else
-						meta:set_int("ctf_rankings:pro_chest:"..mode, rank._pro_chest)
+						ctf_core.meta_set_int(pname, "ctf_rankings:pro_chest:"..mode, rank._pro_chest)
 					end
 				end
 			end
 
 			cache[pname] = leagues
-			meta:set_string("ctf_rankings:leagues", minetest.serialize(leagues))
-			meta:set_int("ctf_rankings:last_reset", ctf_rankings.current_reset)
+			ctf_core.meta_set_string(pname, "ctf_rankings:leagues", minetest.serialize(leagues))
+			ctf_core.meta_set_int(pname, "ctf_rankings:last_reset", ctf_rankings.current_reset)
 		end
 	end
 

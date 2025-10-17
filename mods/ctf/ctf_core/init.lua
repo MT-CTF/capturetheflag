@@ -3,7 +3,8 @@ ctf_core = {
 		-- server_mode = minetest.settings:get("ctf_server_mode") or "play",
 		server_mode = minetest.settings:get_bool("creative_mode", false) and "mapedit" or "play",
 		low_ram_mode = minetest.settings:get("ctf_low_ram_mode") == "true" or false,
-		buffer_ranking_writes = tonumber(minetest.settings:get("ctf_buffer_ranking_writes") or "-1")
+		buffer_ranking_writes = tonumber(minetest.settings:get("ctf_buffer_ranking_writes") or "-1"),
+		meta_write_interval = tonumber(minetest.settings:get("ctf_meta_write_interval") or "0"),
 	}
 }
 
@@ -27,5 +28,6 @@ end
 ctf_core.include_files(
 	"helpers.lua",
 	"privileges.lua",
-	"cooldowns.lua"
+	"cooldowns.lua",
+	"player_meta.lua"
 )
