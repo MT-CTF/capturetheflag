@@ -29,7 +29,7 @@ local function remove_entity_tag(player)
 	end
 end
 
-local function add_entity_tag(player, old_observers)
+local function add_entity_tag(player, old_observers, settings)
 	local pname = player:get_player_name()
 	local ppos = player:get_pos()
 
@@ -47,7 +47,7 @@ local function add_entity_tag(player, old_observers)
 	local ent3 = false
 
 	if not ent then
-		minetest.after(1, add_entity_tag, player, old_observers)
+		minetest.after(1, add_entity_tag, player, old_observers, settings)
 		return
 	end
 
@@ -56,7 +56,7 @@ local function add_entity_tag(player, old_observers)
 		ent2:set_observers(old_observers.nametag_entity or {})
 		ent2:set_properties({
 			nametag = pname,
-			nametag_color = "#EEFFFFDD",
+			nametag_color = (settings and settings.color) or "#EEFFFFDD",
 			nametag_bgcolor = "#0000002D"
 		})
 
@@ -65,7 +65,7 @@ local function add_entity_tag(player, old_observers)
 		ent3:set_properties({
 			collisionbox = { 0, 0, 0, 0, 0, 0 },
 			nametag = "V",
-			nametag_color = "#EEFFFFDD",
+			nametag_color = (settings and settings.color) or "#EEFFFFDD",
 			nametag_bgcolor = "#0000002D"
 		})
 	end
@@ -134,7 +134,7 @@ local function update(player, settings)
 			bgcolor = {a=0, r=0, g=0, b=0},
 		})
 	elseif settings.type == TYPE_ENTITY then
-		add_entity_tag(player, old_observers)
+		add_entity_tag(player, old_observers, settings)
 	end
 end
 
