@@ -1,10 +1,8 @@
 local function dist_to_flag(player)
 	local tname = ctf_teams.get(player)
-	if not tname then return math.huge end
+	if not tname or not ctf_map.current_map.teams[tname] then return math.huge end
 
-	if ctf_map.current_map.teams[tname] then
-		return player:get_pos():distance(ctf_map.current_map.teams[tname].flag_pos)
-	end
+	return player:get_pos():distance(ctf_map.current_map.teams[tname].flag_pos)
 end
 
 local timer = 0
