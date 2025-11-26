@@ -138,6 +138,34 @@ minetest.register_node("ctf_map:killnode", {
 	sounds = default.node_sound_glass_defaults(),
 })
 
+minetest.register_node("ctf_map:firefly", {
+	description = S("Indestructible Firefly"),
+	drawtype = "plantlike",
+	tiles = {{
+		name = "fireflies_firefly_animated.png",
+		animation = {
+			type = "vertical_frames",
+			aspect_w = 16,
+			aspect_h = 16,
+			length = 1.5
+		},
+	}},
+	inventory_image = "fireflies_firefly.png",
+	wield_image =  "fireflies_firefly.png",
+	waving = 1,
+	paramtype = "light",
+	sunlight_propagates = true,
+	buildable_to = false,
+	walkable = false,
+	pointable = pointable_compat,
+	selection_box = {
+		type = "fixed",
+		fixed = {-0.1, -0.1, -0.1, 0.1, 0.1, 0.1},
+	},
+	light_source = 6,
+	floodable = false,
+})
+
 local mod_prefixes = {
 	default = "";
 	stairs = "";
