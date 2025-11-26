@@ -157,7 +157,7 @@ minetest.register_node("ctf_map:firefly", {
 	sunlight_propagates = true,
 	buildable_to = false,
 	walkable = false,
-	pointable = pointable_compat,
+	pointable = true,
 	selection_box = {
 		type = "fixed",
 		fixed = {-0.1, -0.1, -0.1, 0.1, 0.1, 0.1},
