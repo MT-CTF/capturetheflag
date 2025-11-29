@@ -55,7 +55,12 @@ function ctf_map.register_maps_dir(path_to_folder)
 	end
 
 	for _, mapdir in pairs(minetest.get_dir_list(path_to_folder, true)) do
-		ctf_map.register_map(mapdir, path_to_folder)
+		for _, file in pairs(core.get_dir_list(path_to_folder..mapdir.."/", false)) do
+			if file == "map.conf" then
+				ctf_map.register_map(mapdir, path_to_folder)
+				break
+			end
+		end
 	end
 end
 
