@@ -1,5 +1,8 @@
 local redis = require("redis")
-local client = redis.connect("127.0.0.1", tonumber(minetest.settings:get("ctf_rankings_redis_server_port")) or 6379)
+local client = redis.connect(
+	minetest.settings:get("ctf_rankings_redis_server_host") or "127.0.0.1",
+	tonumber(minetest.settings:get("ctf_rankings_redis_server_port")) or 6379
+)
 assert(client:ping(), "Redis server not found!")
 
 local CHUNKING_TIMER = 30

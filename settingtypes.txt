@@ -4,6 +4,10 @@
 # - dummy: Don't store any rankings at all (Match summaries will still work)
 ctf_rankings_backend (Rankings Backend) enum default default,redis,dummy
 
+# Address of the redis server host
+# This setting is only used when ctf_rankings_backend = redis
+ctf_rankings_redis_server_host (Rankings Redis Server Host) string 127.0.0.1
+
 # Port the redis server is hosted on.
 # This setting is only used when ctf_rankings_backend = redis
 ctf_rankings_redis_server_port (Rankings Redis Server Port) int 6379
