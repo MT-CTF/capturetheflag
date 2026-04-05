@@ -17,15 +17,21 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 		end
 	file:close()
 
+	local hash = 0
 	local function interval()
 		if type(formspec) == "function" then
 			ctf_gui.show_formspec(player, formname, formspec(formcontext))
 		elseif formspec:match("^%s*return") then
 			local result, form = pcall((loadstring(formspec) or function() return function() end end)(), formcontext)
 
-			ctf_gui.show_formspec(player, formname,
-				result and form or "size[10,10]hypertext[0,0;10,10;err;"..minetest.formspec_escape(form or "").."]"
-			)
+			local new_hash = (result and form) and core.sha1(form) or -1
+
+			if new_hash == -1 or new_hash ~= hash then
+				hash = new_hash
+				ctf_gui.show_formspec(player, formname,
+					result and form or "size[10,10]hypertext[0,0;10,10;err;"..minetest.formspec_escape(form or "").."]"
+				)
+			end
 
 			slower_loop = not result
 		else
@@ -44,7 +50,7 @@ function ctf_gui.show_formspec_dev(player, formname, formspec, formcontext)
 
 			if type(formspec) == "function" or not formspec:match("^exit") then
 				interval()
-			else
+			elseif not formspec:match("^close") then
 				minetest.request_shutdown("Formspec dev requested shutdown", true)
 			end
 		end)

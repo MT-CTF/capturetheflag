@@ -187,119 +187,199 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		table.insert(special_rankings, string.rep(",", #modified_ranks+6))
 	end
 
-	local formspec = {
-		title = formdef.title or S("Summary"),
-		elements = {
-			rankings = {
-				type = "table",
-				pos = {0.1, 1 + (formdef.allow_sort and 1 or 0)},
-				size = {
-					math.max(
-						ctf_gui.FORM_SIZE.x - 0.2,
-						((1 + 8 + 16 + table.concat(rank_values, "  ,"):len())) * 0.3
-					),
-					(ctf_gui.FORM_SIZE.y - (formdef.allow_sort and 2 or 1)) - (ctf_gui.ELEM_SIZE.y + 3)
-				},
-				options = {
-					highlight = "#00000000",
-				},
-				columns = {
-					{type = "text", width = 1},
-					{type = "color"}, -- Player team color
-					{type = "text", width = 16}, -- Player name
-					"color", -- sortby text color
-					"text", -- sortby text
-					"color", -- Reset color
-					("text;"):rep(#modified_ranks):sub(1, -2),
-				},
-				rows = {
-					#special_rankings > 1 and table.concat(special_rankings, ",") or "",
-					"white", S("Player Name"),
-					"cyan", HumanReadable(sortby).."  ", "white",
-					HumanReadable(table.concat(modified_ranks, "  ,")),
-					table.concat(rankings, ",")
-				}
-			}
-		}
-	}
+	ctf_gui.show_formspec(name, "ctf_modebase:summary", function(ctx)
+		local winfo = core.get_player_window_information(ctx.pname)
 
-	if formdef.allow_sort then
-		formspec.elements.sorting = {
-			type = "dropdown",
-			items = rank_values,
-			default_idx = sort_by_idx,
-			give_idx = false,
-			pos = {x = 13, y = 1},
-			size = {x = ctf_gui.ELEM_SIZE.x + 1, y = ctf_gui.ELEM_SIZE.y},
-			func = function(playername, fields, field_name)
+		-- EDITOR: Fix crash
+		-- local S = function(x) return x end
+
+		-- EDITOR: Edit COUNT to control rank entries
+		-- local COUNT = 11
+		-- for i=1, COUNT - #ctx.rankings, 1 do
+		-- 	table.insert(ctx.rankings, 1, ctx.rankings[1])
+		-- end
+		-- for i=1, #ctx.rankings - COUNT, 1 do
+		-- 	table.remove(ctx.rankings, 1)
+		-- end
+
+		local TWO_START_COLS_LEN = 28
+		local tlen = ctx.sortby:len() + TWO_START_COLS_LEN
+
+		for _, str in pairs(ctx.modified_ranks) do
+			tlen = tlen + math.max(6, str:len()) + 0.333
+		end
+
+		-- target: 0.6555
+		local FORM_X = 18.7
+		local FORM_Y = 13.7
+
+		FORM_X = FORM_X > winfo.max_formspec_size.x and winfo.max_formspec_size.x or FORM_X
+		FORM_Y = FORM_Y > winfo.max_formspec_size.y and winfo.max_formspec_size.y or FORM_Y
+
+		local EDITOR_X = 1920
+		local EDITOR_Y = 1080
+
+		local SCALE_SIZE_X = 0.14 * (EDITOR_X / winfo.size.x) * (winfo.max_formspec_size.x / FORM_X)
+		local SCALE_SIZE_Y = 0.39 * (EDITOR_Y / winfo.size.y) * (winfo.max_formspec_size.y / FORM_Y)
+
+		local EXTRA_HEIGHT = (ctx.formdef.winner and 1 or 0) +
+				(ctx.formdef.game_stat and 1 or 0) +
+				(ctx.formdef.duration and 1 or 0)
+		local EXTRA_HEIGHT_INVERSE = 3 - EXTRA_HEIGHT
+		local EXTRA_HEADER = #ctx.rankings >= 20
+
+		local BOTH_BUTTONS = ctx.formdef.buttons.next and ctx.formdef.buttons.previous
+		local NEITHER_BUTTONS = not ctx.formdef.buttons.next and not ctx.formdef.buttons.previous
+		local FILL_FORM = 0
+
+		if NEITHER_BUTTONS then
+			FILL_FORM = 1.5
+		end
+
+		local out = {
+			"formspec_version[8]",
+			{"size[%.1f,%.1f;true]", FORM_X, FORM_Y},
+			"padding[0,0]",
+			{
+				"label[0.5,2;%s%s%s]",
+				(ctx.formdef.winner and (ctx.formdef.winner .. "\n") or ""),
+				(ctx.formdef.game_stat and (ctx.formdef.game_stat .. "\n") or ""),
+				(ctx.formdef.duration and (S("Duration") ..": ".. ctx.formdef.duration) or ""),
+			},
+			{"hypertext[0,0.2;%.1f,1.6;title;<center><big>", FORM_X},
+				core.formspec_escape((ctx.formdef.title or S("Summary")) .. (ctx.formdef.map and " - "..ctx.formdef.map or "")),
+			"</big></center>]",
+			{
+				"scroll_container[0.2,%.1f;%.1f,%.1f;formcontenty;vertical;0.1;0]",
+				1 + EXTRA_HEIGHT,
+				FORM_X - 0.8,
+				(FORM_Y - 6.3) + EXTRA_HEIGHT_INVERSE + FILL_FORM
+			},
+			{
+				"scroll_container[0,0;%.1f,%.1f;formcontentx;horizontal;0.1;0]",
+				FORM_X - 0.8,
+				math.max( -- SCROLL HEIGHT
+					(FORM_Y - 6.3) + EXTRA_HEIGHT_INVERSE,
+					(#ctx.rankings + #ctx.special_rankings) * SCALE_SIZE_Y
+				) + FILL_FORM,
+			},
+			"tableoptions[highlight=#00000000;border=false]",
+			string.format(
+				"tablecolumns[text,width=4;color;text,width=18;color;text,width=6;color;%s]",
+				("text,width=6;"):rep(#ctx.modified_ranks):sub(1, -2)
+			),
+			"style[rankings;font_size=14;font=mono]",
+			string.format(
+				"table[0,0;%.1f,%.1f;rankings;%s,%s%s;1]",
+				math.max(
+					FORM_X - 0.2,
+					tlen * SCALE_SIZE_X -- SCROLL WIDTH
+				),
+				--
+				-- Height of table, should always be big enough to fit all entries,
+				-- will get cut to size by scroll container
+				math.max(#ctx.rankings, FORM_Y),
+				#ctx.special_rankings > 1 and table.concat(ctx.special_rankings, ",") or "",
+				table.concat({
+					"white",
+					S("Player Name"),
+					"cyan", HumanReadable(ctx.sortby).."  ", "white",
+					HumanReadable(table.concat(ctx.modified_ranks, "  ,")),
+					table.concat(ctx.rankings, ","),
+				}, ","),
+				EXTRA_HEADER and table.concat({
+					",,white",
+					S("Player Name"),
+					"cyan", HumanReadable(ctx.sortby).."  ", "white",
+					HumanReadable(table.concat(ctx.modified_ranks, "  ,")),
+				}, ",") or ""
+				-- EDITOR: Measuring, remember to add 1 row to table's width calc, and a %s to format str
+				-- ,",++++,green,+++++1+++++++++2++,red,+++++++,green,3+++++++++4++++,+++++5+++++++++,6++++++,+++7+++++++++8,+++++++++9++++,++++10++,++++++11+++,+++++12++++++++13++++++++14++++++++15"
+			),
+			"scroll_container_end[]",
+			"scroll_container_end[]",
+			{
+				"scrollbar[%.1f,%.1f;0.4,%.1f;vertical;formcontenty;0]",
+				FORM_X - 0.5,
+				EXTRA_HEIGHT + 1,
+				(FORM_Y - 6.3) + EXTRA_HEIGHT_INVERSE + FILL_FORM
+			},
+			{
+				"scrollbar[0.2,%.1f;%.1f,0.4;horizontal;formcontentx;0]",
+				FORM_Y - 2.2 + FILL_FORM,
+				FORM_X - 0.7,
+			},
+		}
+
+		if ctx.formdef.allow_sort then
+			local x = FORM_X - (ctf_gui.ELEM_SIZE.x + 1.5)
+			local y = 1.8
+			table.insert(out, string.format(
+				"dropdown[%.1f,%.1f;%.1f,%.1f;sorting;%s;1;false]",
+				x, y + 0.2,
+				ctf_gui.ELEM_SIZE.x + 1,
+				ctf_gui.ELEM_SIZE.y,
+				table.concat(ctx.rank_values, ",")
+			))
+
+			table.insert(out, string.format(
+				"label[%.1f,%.1f;%s: ]",
+				x, y,
+				S("Sort players by")
+			))
+		end
+
+		local x_pos = FORM_X / 2 - 2.5
+
+		if BOTH_BUTTONS then x_pos = (FORM_X / 2 - 2.5) + 3 end
+
+		if ctx.formdef.buttons.next then
+			table.insert(out,  string.format(
+				"button[%.1f,%.1f;5,1;next;%s]",
+				x_pos,
+				FORM_Y - 1.3,
+				BOTH_BUTTONS and S("See Next") or S("See Current")
+			))
+		end
+
+		if BOTH_BUTTONS then x_pos = (FORM_X / 2 - 2.5) - 3 end
+
+		if ctx.formdef.buttons.previous then
+			table.insert(out, string.format(
+				"button[%.1f,%.1f;5,1;previous;%s]",
+				x_pos,
+				FORM_Y - 1.3,
+				S("See Previous")
+			))
+		end
+
+		return ctf_gui.list_to_formspec_str(out)
+	end,
+	{
+		formdef = formdef,
+		rank_values = rank_values,
+		rankings = rankings,
+		special_rankings = special_rankings,
+		modified_ranks = modified_ranks,
+		sortby = sortby,
+		pname = name,
+		_on_formspec_input = function(pname, context, fields)
+			if context.formdef.buttons.previous and fields.previous then
+				show_for_player(pname, true)
+			end
+
+			if context.formdef.buttons.next and fields.next then
+				show_for_player(pname, false)
+			end
+
+			if context.formdef.allow_sort then
 				if fields.sorting and sortby ~= fields.sorting and table.indexof(rank_values, fields.sorting) ~= -1 then
-					player_sort_by[playername] = fields.sorting
-					show_for_player(playername, formdef.buttons.next and true or false)
+					player_sort_by[pname] = fields.sorting
+					show_for_player(pname, context.formdef.buttons.next and true or false)
 				end
-			end,
-		}
-		formspec.elements.label = {
-			type = "label",
-			pos = {13, 0.5},
-			label = S("Sort players by")..": "
-		}
-	end
-
-	if formdef.buttons.next then
-		formspec.elements.next = {
-			type = "button",
-			label = S("See Current"),
-			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
-			func = function()
-				show_for_player(name, false)
-			end,
-		}
-	end
-
-	if formdef.buttons.previous then
-		formspec.elements.previous = {
-			type = "button",
-			label = S("See Previous"),
-			pos = {"center", ctf_gui.FORM_SIZE.y - (ctf_gui.ELEM_SIZE.y + 2.5)},
-			func = function()
-				show_for_player(name, true)
-			end,
-		}
-	end
-
-	if formdef.game_stat then
-		formspec.elements.game_stat = {
-			type = "label",
-			pos = {1, 0.5},
-			label = formdef.game_stat,
-		}
-	end
-
-	if formdef.winner then
-		formspec.elements.winner = {
-			type = "label",
-			pos = {5, 1.3},
-			label = formdef.winner,
-		}
-	end
-
-	if formdef.duration then
-		formspec.elements.duration = {
-			type = "label",
-			pos = {1, 1.3},
-			label = S("Duration") ..": ".. formdef.duration,
-		}
-	end
-
-	if formdef.map then
-		formspec.elements.map = {
-			type = "label",
-			pos = {7, 0.5},
-			label = S("Map") ..": ".. formdef.map,
-		}
-	end
-
-	ctf_gui.old_show_formspec(name, "ctf_modebase:summary", formspec)
+			end
+		end,
+	})
 
 	minetest.log("action", "[ctf_modebase.summary] Showed gui to "..dump(name))
 end

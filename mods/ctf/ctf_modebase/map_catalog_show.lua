@@ -11,152 +11,164 @@ local function show_catalog(pname, current_map)
 
 	local current_map_meta = ctf_modebase.map_catalog.maps[current_map]
 
-	local formspec = {
-		title = S("Maps catalog"),
-		elements = {
-			list = {
-				type = "table",
-				pos = {1, 1},
-				size = {5, ctf_gui.FORM_SIZE.y - 5},
-				columns = {
-					{type = "text"},
-				},
-				rows = ctf_modebase.map_catalog.map_names,
-				default_idx = current_map,
-				func = function(_, fields)
-					local evt = minetest.explode_table_event(fields.list)
-					if evt.type == "CHG" then
-						show_catalog(pname, evt.row)
-					end
-				end,
-			}
+	ctf_gui.show_formspec(pname, "ctf_modebase:catalog", function(ctx)
+		-- EDITOR: Fix crash
+		-- local S = function(x) return x end
+
+		local SIZE_X = 18.3
+		local SIZE_Y = 13.7
+
+		local COL1 = 1.0
+		local COL2 = 7.0
+
+		local PAST_HEADER = 0.7
+
+		local image_texture = ctx.current_map_meta.dirname .. "_screenshot.png"
+
+		local out = {
+			"formspec_version[4]",
+			{"size[%.1f,%.1f]", SIZE_X, SIZE_Y},
+
+			-- Header
+			{
+				"hypertext[0,0.3;%.1f,0.8;title;<center><big>%s</big></center>]",
+				SIZE_X,
+				S("Maps catalog")
+			},
+
+			-- Column 1
+			"tablecolumns[text]",
+			{
+				"table[%.1f,%.1f;4.99,8.0;list;%s;%d]",
+				COL1,
+				PAST_HEADER + 1,
+				ctx.map_names,
+				current_map
+			},
+			{"button[%.1f,%.1f;5.0,0.5;previous;<<]", COL1, PAST_HEADER + 0.5},
+			{"button[%.1f,%.1f;5.0,0.5;next;>>]", COL1, PAST_HEADER + 9},
+
+			-- Column 2
+			{
+				"hypertext[%.1f,1.1;%.1f,0.6;title;<style font=mono><big>%s</big></style>]",
+				COL2,
+				SIZE_X,
+				ctx.map_names[current_map]
+			},
+			{
+				"image[%.1f,2.2;10.0,6.0;%s]",
+				COL2,
+				image_texture,
+			},
+			{
+				"label[%.1f,1.9;%s: %s]",
+				COL2,
+				S("By"),
+				core.colorize("#cccccc", ctx.current_map_meta.author)
+			},
 		}
-	}
 
-	local y = 0.7
+		if minetest.check_player_privs(pname, {ctf_admin=true}) then
+			table.insert(out, {
+				"button[%.1f,%.1f;2.5,1.0;set_as_next_map;%s]",
+				COL1 + 2.5,
+				PAST_HEADER + 10,
+				S("Set as next map"),
+			})
+			table.insert(out, {
+				"button_exit[%.1f,%.1f;2.5,1.0;skip_to_map;%s]",
+				COL1,
+				PAST_HEADER + 10,
+				S("Skip to map"),
+			})
+		end
 
-	if current_map_meta.author and current_map_meta.author ~= "" then
-		formspec.elements.author = {
-			type = "label",
-			pos = {7, y},
-			label = S("By")..": "..minetest.colorize("#cccccc", current_map_meta.author),
-		}
-		y = y + 0.5
-	end
+		local info_idx = 8.8
+		if ctx.current_map_meta.game_modes and #ctx.current_map_meta.game_modes > 0 then
+			table.insert(out, {
+				"textarea[%.1f,%.1f;10.0,0.7;;%s;%s]",
+				COL2,
+				info_idx,
+				core.colorize("#ffff00",
+				S("GAME MODES")),
+				HumanReadable(ctx.current_map_meta.game_modes)
+			})
+			info_idx = info_idx + 1
+		end
 
-	local image_texture = current_map_meta.dirname .. "_screenshot.png"
-	formspec.elements.image = {
-		type = "image",
-		pos = {7, y},
-		size = {10, 6},
-		texture = image_texture,
-	}
-	y = y + 6.5
+		if ctx.current_map_meta.license and ctx.current_map_meta.license ~= "" then
+			table.insert(out, {
+				"textarea[%.1f,%.1f;10.0,1.0;;%s;%s]",
+				COL2,
+				info_idx,
+				core.colorize("#ffff00", S("LICENSE")..":"),
+				ctx.current_map_meta.license
+			})
+			info_idx = info_idx + 1.3
+		end
 
-	if current_map_meta.hint and current_map_meta.hint ~= "" then
-		formspec.elements.hint = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 1},
-			label = minetest.colorize("#ffff00", S("HINT")..":"),
-			read_only = true,
-			default = current_map_meta.hint,
-		}
-		y = y + 1.5
-	end
+		if ctx.current_map_meta.hint and ctx.current_map_meta.hint ~= "" then
+			table.insert(out, {
+				"textarea[%.1f,%.1f;10.0,1.0;;%s;%s]",
+				COL2,
+				info_idx,
+				core.colorize("#ffff00", S("HINT")..":"),
+				ctx.current_map_meta.hint,
+			})
+			info_idx = info_idx + 1.3
+		end
 
-	if current_map_meta.license and current_map_meta.license ~= "" then
-		formspec.elements.license = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 1},
-			label = minetest.colorize("#ffff00", S("LICENSE")..":"),
-			read_only = true,
-			default = current_map_meta.license,
-		}
-		y = y + 1.5
-	end
+		if ctx.current_map_meta.others and ctx.current_map_meta.others ~= "" then
+			table.insert(out, {
+				"textarea[%.1f,%.1f;10.0,1.0;;%s;%s]",
+				COL2,
+				info_idx,
+				core.colorize("#ffff00", S("MORE INFORMATION")..":"),
+				ctx.current_map_meta.others
+			})
+		end
 
-	if current_map_meta.game_modes and #current_map_meta.game_modes > 0 then
-		formspec.elements.game_modes = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 3},
-			label = minetest.colorize("#ffff00", S("GAME MODES")),
-			read_only = true,
-			default = HumanReadable(current_map_meta.game_modes),
-		}
-		y = y + 1.5
-	end
+		return ctf_gui.list_to_formspec_str(out)
+	end,
+	{
+		current_map_meta = current_map_meta,
+		map_names = ctf_modebase.map_catalog.map_names,
+		_on_formspec_input = function(playername, context, fields)
+			if minetest.check_player_privs(pname, {ctf_admin=true}) then
+				if fields.set_as_next_map then
+					local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
+					minetest.log("action", string.format("[ctf_admin] %s set next map to %s", playername, mapname))
+					core.chat_send_player(playername, "[Maps Catalog] Set the next map to " .. mapname)
+					ctf_modebase.map_on_next_match = mapname
+				end
 
-	if current_map_meta.others and current_map_meta.others ~= "" then
-		formspec.elements.others = {
-			type = "textarea",
-			pos = {7, y},
-			size = {10, 3},
-			label = minetest.colorize("#ffff00", S("MORE INFORMATION")),
-			read_only = true,
-			default = current_map_meta.others,
-		}
-	end
+				if fields.skip_to_map then
+					local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
+					minetest.log("action", string.format("[ctf_admin] %s skipped to new map %s", playername, mapname))
+					core.chat_send_player(playername, "[Maps Catalog] Skipping to map " .. mapname .. "...")
 
-	if current_map > 1 then
-		formspec.elements.previous = {
-			type = "button",
-			label = "<<",
-			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 11.8},
-			size = {5, 0.5},
-			func = function()
-				show_catalog(pname, current_map - 1)
-			end,
-		}
-	end
+					ctf_modebase.map_on_next_match = mapname
+					ctf_modebase.start_new_match()
+				end
+			end
 
-	if current_map < #ctf_modebase.map_catalog.maps then
-		formspec.elements.next = {
-			type = "button",
-			label = ">>",
-			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 3.3},
-			size = {5, 0.5},
-			func = function()
+			if fields.next and current_map < #ctf_modebase.map_catalog.maps then
 				show_catalog(pname, current_map + 1)
-			end,
-		}
-	end
-
-	if minetest.check_player_privs(pname, {ctf_admin=true}) then
-		formspec.elements.skip_to_map = {
-			type = "button",
-			exit = true,
-			label = S("Skip to map"),
-			pos = {1, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.2},
-			size = {2.5, 1},
-			func = function()
-				local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
-				minetest.log("action", string.format("[ctf_admin] %s skipped to new map %s", pname, mapname))
-
-				ctf_modebase.map_on_next_match = mapname
-				ctf_modebase.start_new_match()
 			end
-		}
-	end
 
-	if minetest.check_player_privs(pname, {ctf_admin=true}) then
-		formspec.elements.set_as_next_map = {
-			type = "button",
-			label = S("Set as next map"),
-			pos = {3.5, ctf_gui.FORM_SIZE.y - ctf_gui.ELEM_SIZE.y - 2.2},
-			size = {2.5, 1},
-			func = function()
-				local mapname = ctf_modebase.map_catalog.maps[current_map].dirname
-				minetest.log("action", string.format("[ctf_admin] %s set new map %s", pname, mapname))
-
-				ctf_modebase.map_on_next_match = mapname
+			if fields.previous and current_map > 1 then
+				show_catalog(pname, current_map - 1)
 			end
-		}
-	end
 
-	ctf_gui.old_show_formspec(pname, "ctf_map:catalog", formspec)
+			if fields.list then
+				local evt = minetest.explode_table_event(fields.list)
+
+				if evt.type == "CHG" and evt.row >= 1 and evt.row <= #ctf_modebase.map_catalog.maps then
+					show_catalog(pname, evt.row)
+				end
+			end
+		end,
+	})
 end
 
 minetest.register_chatcommand("maps", {

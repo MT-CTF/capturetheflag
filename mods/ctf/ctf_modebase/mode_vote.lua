@@ -49,48 +49,46 @@ local function show_modechoose_form(player)
 		return
 	end
 
-	local elements = {}
+	ctf_gui.show_formspec(player, "ctf_modebase:mode_select", function(ctx)
+		-- EDITOR: Fix crash
+		-- local S = function(x) return x end
 
-	local i = 0.2
-	local vote = 0
-	while vote <= MAX_ROUNDS do
-		local vote_num = vote
-		elements[string.format("vote_%d", vote_num)] = {
-			type = "button",
-			label = vote_num,
-			exit = true,
-			pos = {"center", i},
-			size = {1.4, 0.7},
-			func = function()
-				if votes then
-					player_vote(player, vote_num)
-				end
-			end,
+		local out = {
+			"formspec_version[4]",
+			"size[8.7,11.1]",
+			{
+				"hypertext[0.2,0.2;8,2.4;title;<center><big>%s: %s</big>\n%s\n%s</center>]",
+				S("Mode"),
+				HumanReadable(new_mode),
+				S("Please vote on how many matches you would like to play."),
+				S("You can change your default vote for this mode via the Settings tab (in your inventory)")
+			},
+			"button_exit[3.7,2.5;1.4,0.7;vote;0]",
+			"button_exit[3.7,3.5;1.4,0.7;vote;1]",
+			"button_exit[3.7,4.5;1.4,0.7;vote;2]",
+			"button_exit[3.7,5.5;1.4,0.7;vote;3]",
+			"button_exit[3.7,6.5;1.4,0.7;vote;4]",
+			"button_exit[3.7,7.5;1.4,0.7;vote;5]",
+			"button_exit[2.9,9.5;3.0,0.7;quit_button;Exit Game]",
 		}
 
-		vote = vote + 1
-		i = i + 1
-	end
+		return ctf_gui.list_to_formspec_str(out)
+	end, {
+		new_mode = new_mode,
+		_on_formspec_input = function(pname, context, fields)
+			if fields.quit_button then
+				minetest.kick_player(pname, S("You clicked 'Exit Game' in the mode vote formspec"))
+				return
+			end
 
-	i = i + 1.2
-	elements["quit_button"] = {
-		type = "button",
-		exit = true,
-		label = S("Exit Game"),
-		pos = {x = "center", y = i},
-		func = function(playername, fields, field_name)
-			minetest.kick_player(playername, S("You clicked 'Exit Game' in the mode vote formspec"))
-		end,
-	}
-	i = i + (ctf_gui.ELEM_SIZE.y - 0.2)
+			if fields.vote then
+				local vnum = tonumber(fields.vote)
 
-	ctf_gui.old_show_formspec(player, "ctf_modebase:mode_select", {
-		size = {x = 8, y = i + 3.5},
-		title = S("Mode")..": "..HumanReadable(new_mode),
-		description = S("Please vote on how many matches you would like to play.") ..
-			"\n" .. S("You can change your default vote for this mode via the Settings tab (in your inventory)"),
-		header_height = 2.4,
-		elements = elements,
+				if type(vnum) == "number" and vnum >= 0 and vnum <= 5 then
+					player_vote(player, vnum)
+				end
+			end
+		end
 	})
 end
 

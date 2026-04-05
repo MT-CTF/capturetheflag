@@ -51,7 +51,7 @@ ctf_modebase = {
 	end
 }
 
-ctf_gui.old_init()
+ctf_gui.init()
 
 local S = minetest.get_translator(minetest.get_current_modname())
 
