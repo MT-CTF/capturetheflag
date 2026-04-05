@@ -222,7 +222,7 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		local EDITOR_Y = 1080
 
 		if not winfo then
-			winfo = {size = {x = EDITOR_X, y = EDITOR_Y}, max_formspec_size = {28, 15}}
+			winfo = {size = {x = EDITOR_X, y = EDITOR_Y}, max_formspec_size = {x = 28, y = 15}}
 		end
 
 		local SCALE_SIZE_X = 0.14 * (EDITOR_X / winfo.size.x) * (winfo.max_formspec_size.x / FORM_X)
