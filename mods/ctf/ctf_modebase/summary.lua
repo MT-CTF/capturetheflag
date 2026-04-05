@@ -213,11 +213,17 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 		local FORM_X = 18.7
 		local FORM_Y = 13.7
 
-		FORM_X = FORM_X > winfo.max_formspec_size.x and winfo.max_formspec_size.x or FORM_X
-		FORM_Y = FORM_Y > winfo.max_formspec_size.y and winfo.max_formspec_size.y or FORM_Y
+		if winfo then
+			FORM_X = (FORM_X > winfo.max_formspec_size.x) and winfo.max_formspec_size.x or FORM_X
+			FORM_Y = (FORM_Y > winfo.max_formspec_size.y) and winfo.max_formspec_size.y or FORM_Y
+		end
 
 		local EDITOR_X = 1920
 		local EDITOR_Y = 1080
+
+		if not winfo then
+			winfo = {size = {x = EDITOR_X, y = EDITOR_Y}, max_formspec_size = {28, 15}}
+		end
 
 		local SCALE_SIZE_X = 0.14 * (EDITOR_X / winfo.size.x) * (winfo.max_formspec_size.x / FORM_X)
 		local SCALE_SIZE_Y = 0.39 * (EDITOR_Y / winfo.size.y) * (winfo.max_formspec_size.y / FORM_Y)
