@@ -144,9 +144,9 @@ minetest.register_chatcommand("mode", {
 			return false, "The game isn't running"
 		end
 
-		return true, S("The current mode is @1. Matches finished: @2/@3",
+		return true, S("The current mode is @1. Match @2/@3.",
 			HumanReadable(ctf_modebase.current_mode),
-			ctf_modebase.current_mode_matches_played-1,
+			ctf_modebase.current_mode_matches_played,
 			ctf_modebase.current_mode_matches
 		)
 	end
