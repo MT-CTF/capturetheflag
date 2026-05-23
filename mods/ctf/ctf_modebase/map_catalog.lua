@@ -11,8 +11,6 @@ local used_maps_idx = 1
 local map_repeat_interval
 
 local function init()
-	table.sort(ctf_map.registered_maps)
-
 	for i, dirname in ipairs(ctf_map.registered_maps) do
 		local map = ctf_map.load_map_meta(i, dirname)
 		if map.map_version and map.enabled then

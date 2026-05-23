@@ -30,6 +30,25 @@ local function calc_flag_center(map)
 	return flag_center
 end
 
+local MAX_MAP_SIZE = ctf_map.MAX_MAP_SIZE
+local function get_map_position(idx)
+	local ringpos = (math.sqrt(idx) - 1) / 2
+	local ring = math.ceil(ringpos)
+	local ringmaxnum = (2 * ring + 1)^2
+	local side = ringpos - (ring-1)
+
+	-- The math in these return statements can be simplified, contibutions welcome
+	if side == 0 or side > 0.75 then
+		return vector.new(ring - (ringmaxnum - (0 * 2*ring) - idx), 0, -ring) * MAX_MAP_SIZE
+	elseif side <= 0.25 then
+		return vector.new(ring, 0, ring - (ringmaxnum - (3 * 2*ring) - idx)) * MAX_MAP_SIZE
+	elseif side <= 0.5 then
+		return vector.new((ringmaxnum - (2 * 2*ring) - idx) - ring, 0, ring) * MAX_MAP_SIZE
+	else -- side <= 0.75
+		return vector.new(-ring, 0, (ringmaxnum - (1 * 2*ring) - idx) - ring) * MAX_MAP_SIZE
+	end
+end
+
 function ctf_map.load_map_meta(idx, dirname)
 	assert(ctf_map.map_path[dirname], "Map "..dirname.." not found")
 
@@ -40,7 +59,7 @@ function ctf_map.load_map_meta(idx, dirname)
 	minetest.log("info", "load_map_meta: Loading map meta from '" .. dirname .. "/map.conf'")
 
 	local map
-	local offset = vector.new(608 * idx, 0, 0) -- 608 is a multiple of 16, the size of a mapblock
+	local offset = get_map_position(idx)
 
 	if not meta:get("map_version") then
 		if not meta:get("r") then
@@ -53,12 +72,10 @@ function ctf_map.load_map_meta(idx, dirname)
 		local time_speed = meta:get("time_speed")
 		local initial_stuff = meta:get("initial_stuff")
 
-		offset.y = -maph / 2
+		local pos1 = offset - vector.new(mapr, 0, mapr)
+		local pos2 = offset + vector.new(mapr, maph, mapr)
 
-		local offset_to_new = vector.new(mapr, maph/2, mapr)
-
-		local pos1 = offset
-		local pos2 = vector.add(offset, vector.new(mapr * 2,  maph, mapr * 2))
+		local offset_to_new = -pos1
 
 		map = {
 			pos1          = pos1,

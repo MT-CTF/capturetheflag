@@ -13,6 +13,7 @@ ctf_map = {
 	DEFAULT_CHEST_AMOUNT = 42,
 	DEFAULT_START_TIME = 5900,
 	CHAT_COLOR = "orange",
+	MAX_MAP_SIZE = 16*38, -- 608 -- 16 is the size of a mapblock
 	maps_dir = minetest.get_modpath("ctf_map").."/maps/",
 	skyboxes = {"none"},
 	current_map = false,
@@ -46,6 +47,7 @@ function ctf_map.register_map(dirname, path_to_map)
 	assert(table.indexof(ctf_map.registered_maps, dirname) == -1, "Duplicate map detected: "..path_to_map)
 
 	table.insert(ctf_map.registered_maps, dirname)
+	table.sort(ctf_map.registered_maps)
 	ctf_map.map_path[dirname] = path_to_map .. dirname
 end
 
