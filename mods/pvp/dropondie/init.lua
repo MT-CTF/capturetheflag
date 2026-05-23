@@ -2,6 +2,8 @@ dropondie = {}
 
 local function drop_list(pos, inv, list, player)
 	for _, item in ipairs(inv:get_list(list)) do
+		if not item:get_name() then core.log(dump(item)) end
+
 		if minetest.registered_items[item:get_name()].stack_max == 1 then
 			local pname = player:get_player_name()
 			if pname ~= "" then
