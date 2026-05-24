@@ -20,6 +20,7 @@ function ctf_map.place_map(mapmeta, callback)
 
 		core.log("action", "Using readonly map file, deleting changes to map...")
 		core.delete_area(mapmeta.pos1, mapmeta.pos2)
+		minetest.after(5, core.fix_light, mapmeta.pos1, mapmeta.pos2)
 		minetest.log("action", string.format(
 			"Reset map %s in %.2fs", dirname, (minetest.get_us_time() - start_time) / 1e6
 		))
@@ -258,10 +259,12 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 
 		if #place_positions < a.amount then
 			minetest.log("error",
-				string.format("[MAP] Couldn't place %d of the %d chests needed to place in zone %d",
+				string.format("[MAP] Couldn't place %d of the %d chests needed to place in zone %d (%s - %s)",
 					a.amount - #place_positions,
 					a.amount,
-					i
+					i,
+					core.pos_to_string(pos1, 0),
+					core.pos_to_string(pos2, 0)
 				)
 			)
 		end
@@ -298,5 +301,5 @@ function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest
 	vm:set_data(data)
 	vm:set_param2_data(param2_data)
 	vm:update_liquids()
-	vm:write_to_map(false)
+	vm:write_to_map(true)
 end

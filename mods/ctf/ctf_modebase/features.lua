@@ -1,5 +1,5 @@
 local mapload_huds = mhud.init()
-local LOADING_SCREEN_TARGET_TIME = 7
+local LOADING_SCREEN_TARGET_TIME = 5
 local loading_screen_time
 
 local S = minetest.get_translator(minetest.get_current_modname())
@@ -121,33 +121,32 @@ function ctf_modebase.map_chosen(map, ...)
 				hud_elem_type = "image",
 				position = {x = 0.5, y = 0.5},
 				image_scale = -100,
-				z_index = 1000,
-				texture = "[combine:1x1^[invert:rgba^[opacity:1^[colorize:#141523:255"
+				z_index = 1001,
+				texture = "[combine:1x1^[invert:rgba^[colorize:#141523:255^[opacity:130"
 			})
 
 			mapload_huds:add(p, "map_image", {
 				hud_elem_type = "image",
 				position = {x = 0.5, y = 0.5},
 				image_scale = -100,
-				z_index = 1001,
-				texture = map.dirname.."_screenshot.png^[opacity:30",
+				z_index = 1000,
+				texture = map.dirname.."_screenshot.png^[contrast:-10:-80",
 			})
 
 			mapload_huds:add(p, "loading_text", {
 				hud_elem_type = "text",
-				position = {x = 0.5, y = 0.5},
+				position = {x = 0.5, y = 0.4},
 				alignment = {x = "center", y = "up"},
 				text_scale = 2,
-				text = HumanReadable(ctf_modebase.current_mode) ..
-						" (" .. (ctf_modebase.current_mode_matches_played+1) .. "/" .. ctf_modebase.current_mode_matches .. ")\n\n" ..
-						S("Loading Map") .. ": " .. map.name,
+				text = map.name .. ": " .. HumanReadable(ctf_modebase.current_mode) ..
+						" (" .. (ctf_modebase.current_mode_matches_played+1) .. "/" .. ctf_modebase.current_mode_matches .. ")",
 				color = 0x7ec5ff,
 				z_index = 1002,
 			})
 			mapload_huds:add(p, {
 				hud_elem_type = "text",
-				position = {x = 0.5, y = 0.75},
-				alignment = {x = "center", y = "center"},
+				position = {x = 0.5, y = 0.6},
+				alignment = {x = "center", y = "down"},
 				text = random_messages.get_random_message(),
 				color = 0xffffff,
 				z_index = 1002,
@@ -558,8 +557,6 @@ return {
 				end
 			end
 
-			minetest.delete_area(p1, p2)
-
 			delete_queue = {}
 		end
 
@@ -572,6 +569,12 @@ return {
 
 		if loading_screen_time then
 			local total_time = (minetest.get_us_time() - loading_screen_time) / 1e6
+
+			for _, p in pairs(ctf_teams.get_connected_players()) do
+				if mapload_huds:exists(p, "map_image") then
+					mapload_huds:clear(p, "map_image")
+				end
+			end
 
 			minetest.after(math.max(0, LOADING_SCREEN_TARGET_TIME - total_time), function()
 				mapload_huds:clear_all()

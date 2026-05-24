@@ -67,8 +67,8 @@ end
 
 local function dothenext(time, dir, func)
 	minetest.after(time, function()
-		local next = function(dir2)
-			dothenext(time, dir2, func)
+		local next = function(dir2, time2)
+			dothenext(time2 or time, dir2, func)
 		end
 
 		func(next, dir)
@@ -91,11 +91,6 @@ ctf_map.register_map_command("resave_all", function(name, params)
 
 
 		if map.enabled then
-			local center = map.pos2 - map.pos1
-			local offset = vector.new(ctf_map.MAX_MAP_SIZE/2, ctf_map.MAX_MAP_SIZE/2, ctf_map.MAX_MAP_SIZE/2)
-
-			core.delete_area(center - offset, center + offset)
-
 			ctf_map.place_map(map, function()
 				edit_map(name, map)
 
@@ -107,10 +102,16 @@ ctf_map.register_map_command("resave_all", function(name, params)
 					context[name].treasures = nil
 				end
 
-				ctf_map.save_map(context[name])
+				minetest.load_area(map.pos1, map.pos2)
+				minetest.after(2, minetest.fix_light, map.pos1, map.pos2)
+
+				if not params or params[1] ~= "nosave" then
+					ctf_map.save_map(context[name])
+				end
+
 				context[name] = nil
 
-				next(dir + 1)
+				next(dir + 1, 10)
 			end)
 		else
 			next(dir + 1)
