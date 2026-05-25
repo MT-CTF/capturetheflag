@@ -370,7 +370,7 @@ for idx, info in ipairs(grenade_list) do
 				pointed_def = minetest.registered_nodes[node.name]
 			end
 
-			if node and pointed_def.on_rightclick then
+			if node and pointed_def and pointed_def.on_rightclick then
 				return minetest.item_place(itemstack, user, pointed)
 			else
 				return swap_next_grenade(itemstack, user, pointed)
