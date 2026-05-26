@@ -9,6 +9,10 @@ local S = minetest.get_translator(minetest.get_current_modname())
 
 minetest.register_alias("mapgen_singlenode", "ctf_map:ignore")
 
+if ctf_core.settings.server_mode == "play" then
+	core.register_alias("worldedit:placeholder", "air")
+end
+
 ctf_map = {
 	DEFAULT_CHEST_AMOUNT = 42,
 	DEFAULT_START_TIME = 5900,
