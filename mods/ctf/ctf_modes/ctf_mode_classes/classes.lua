@@ -21,7 +21,6 @@ local class_props = {
 		disallowed_items = {
 			"ctf_ranged:rifle",
 			"ctf_ranged:smg",
-			"ctf_ranged:sniper_magnum",
 		},
 	},
 	support = {
@@ -39,7 +38,6 @@ local class_props = {
 			"ctf_ranged:smg",
 			"ctf_ranged:shotgun",
 			"ctf_melee:",
-			"ctf_ranged:sniper_magnum",
 		},
 		disallowed_items_markup = {
 			["ctf_melee:"] = "default_tool_steelsword.png^ctf_modebase_group.png",
@@ -122,12 +120,6 @@ end
 --- Knight Sword
 --
 
--- ctf_melee.register_sword("ctf_mode_classes:knight_sword", {
--- 	description = "Knight Sword",
--- 	inventory_image = "default_tool_bronzesword.png",
--- 	damage_groups = {fleshy = 5},
--- })
-
 local KNIGHT_COOLDOWN_TIME = 26
 local KNIGHT_USAGE_TIME = 8
 
@@ -150,9 +142,9 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 		S("(Sneak/Run) + Rightclick to use Rage ability (Lasts @1s, @2s cooldown)",
 		KNIGHT_USAGE_TIME, KNIGHT_COOLDOWN_TIME)
 	),
-	inventory_image = "default_tool_bronzesword.png",
+	inventory_image = "default_tool_mesesword.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
-	wield_image = "default_tool_bronzesword.png",
+	wield_image = "default_tool_mesesword.png",
 	damage_groups = {fleshy = 7},
 	full_punch_interval = 0.7,
 	rightclick_func = function(itemstack, user, pointed)
