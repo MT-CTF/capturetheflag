@@ -300,7 +300,8 @@ function ctf_modebase.summary.show_gui_sorted(name, rankings, special_rankings, 
 					HumanReadable(table.concat(ctx.modified_ranks, "  ,")),
 				}, ",") or ""
 				-- EDITOR: Measuring, remember to add 1 row to table's width calc, and a %s to format str
-				-- ,",++++,green,+++++1+++++++++2++,red,+++++++,green,3+++++++++4++++,+++++5+++++++++,6++++++,+++7+++++++++8,+++++++++9++++,++++10++,++++++11+++,+++++12++++++++13++++++++14++++++++15"
+				-- ,",++++,green,+++++1+++++++++2++,red,+++++++,green,3+++++++++4++++,+++++5+++++++++,6++++++,+++7+++++++++8,
+				--+++++++++9++++,++++10++,++++++11+++,+++++12++++++++13++++++++14++++++++15"
 			),
 			"scroll_container_end[]",
 			"scroll_container_end[]",
