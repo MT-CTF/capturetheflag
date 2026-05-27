@@ -38,7 +38,7 @@ ctf_settings.register("volumetric_lighting", {
 	end
 })
 
-local simplify_for_saved_stuff = function(iname)
+local simplify_item_name = function(iname)
 	if not iname or iname == "" then return iname end
 
 	local match
@@ -81,60 +81,6 @@ local simplify_for_saved_stuff = function(iname)
 	return iname
 end
 
-local function is_initial_stuff(player, i)
-	local mode = ctf_modebase:get_current_mode()
-	if mode and mode.stuff_provider then
-		for _, item in ipairs(mode.stuff_provider(player)) do
-			if ItemStack(item):get_name() == i then
-				return true
-			end
-		end
-	end
-
-	if ctf_map.current_map and ctf_map.current_map.initial_stuff then
-		for _, item in ipairs(ctf_map.current_map.initial_stuff) do
-			if ItemStack(item):get_name() == i then
-				return true
-			end
-		end
-	end
-end
-
-function ctf_modebase.player.save_initial_stuff_positions(player, soft)
-	if not ctf_modebase.current_mode then return end
-
-	local inv = player:get_inventory()
-	local pname = player:get_player_name()
-	local ssp = ctf_core.meta_get_string(pname, "ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode)
-
-	if ssp == "" then
-		ssp = {}
-	else
-		ssp = minetest.deserialize(ssp)
-	end
-
-	local done = {}
-	for i, s in pairs(inv:get_list("main")) do
-		local n = s:get_name()
-
-		if n ~= "" and is_initial_stuff(player, n) then
-			local k = simplify_for_saved_stuff(n:match("[^%s]*"))
-
-			if not soft or not ssp[k] then
-				if not done[k] or (i < ssp[k]) then
-					ssp[k] = i
-					done[k] = true
-				end
-			end
-		end
-	end
-
-	ctf_core.meta_set_string(
-		pname,
-		"ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode, minetest.serialize(ssp)
-	)
-end
-
 -- Changes made to this function should also be made to is_initial_stuff() above
 local function get_initial_stuff(player, f)
 	local mode = ctf_modebase:get_current_mode()
@@ -151,11 +97,79 @@ local function get_initial_stuff(player, f)
 	end
 end
 
-function ctf_modebase.player.give_initial_stuff(player)
+local initial_stuff_shown = {}
+local moved = {}
+
+local function handle_remaining_initial_stuff(player)
+	local inv = player:get_inventory()
+
+	if moved[player:get_player_name()] then
+		moved[player:get_player_name()] = nil
+		local last_added = 8
+		for _, stack in ipairs(inv:get_list("initial_stuff")) do
+			local added = false
+			for i=last_added+1, 32, 1 do
+				if inv:get_stack("main", i):is_empty() then
+					inv:set_stack("main", i, stack)
+					added = true
+					break
+				end
+			end
+
+			if not added then
+				inv:add_item("main", stack)
+			end
+		end
+	else
+		inv:set_list("main", inv:get_list("initial_stuff"))
+	end
+
+	inv:set_list("initial_stuff", {})
+	initial_stuff_shown[player:get_player_name()] = nil
+end
+
+local old_show_formspec = core.show_formspec
+function core.show_formspec(playername, formname, ...)
+	if initial_stuff_shown[playername] and formname ~= "ctf_modebase:initial_stuff" then
+		handle_remaining_initial_stuff(core.get_player_by_name(playername))
+	end
+
+	old_show_formspec(playername, formname, ...)
+end
+
+local old_ctfgui_show_formspec = ctf_gui.show_formspec
+function ctf_gui.show_formspec(player, formname, ...)
+	local playername = PlayerName(player)
+	if initial_stuff_shown[playername] and formname ~= "ctf_modebase:initial_stuff" then
+		handle_remaining_initial_stuff(core.get_player_by_name(playername))
+	end
+
+	old_ctfgui_show_formspec(player, formname, ...)
+end
+
+core.register_allow_player_inventory_action(function(player, action, inventory, inventory_info)
+	core.log(dump(action).."\n"..dump(inventory).."\n"..dump(inventory_info))
+	if inventory_info.to_list == "initial_stuff" then
+		return 0
+	elseif inventory_info.from_list == "initial_stuff" then
+		moved[player:get_player_name()] = true
+	end
+end)
+
+core.register_on_player_receive_fields(function(player, formname, fields)
+	if formname == "ctf_modebase:initial_stuff" and fields.quit then
+		handle_remaining_initial_stuff(player)
+	end
+end)
+
+function ctf_modebase.player.give_initial_stuff(player, cache_key)
 	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
 
 	local inv = player:get_inventory()
-	local pname = player:get_player_name()
+
+	inv:set_size("initial_stuff", 8*4)
+	inv:set_list("initial_stuff", inv:get_list("main"))
+	inv:set_list("main", {})
 
 	local item_level = {}
 	get_initial_stuff(player, function(item)
@@ -173,7 +187,7 @@ function ctf_modebase.player.give_initial_stuff(player)
 							if not item_level[itype].keep then
 								-- minetest.log(dump(item_level[itype].item:get_name()).." r< "..dump(item:get_name()))
 
-								inv:remove_item("main", item_level[itype].item)
+								inv:remove_item("initial_stuff", item_level[itype].item)
 							end
 
 							item_level[itype] = {level = ilevel, item = item, keep = keep}
@@ -192,59 +206,22 @@ function ctf_modebase.player.give_initial_stuff(player)
 			end
 		end
 
-		inv:remove_item("main", item)
-		inv:add_item("main", item)
+		inv:remove_item("initial_stuff", item)
+		inv:add_item("initial_stuff", item)
 	end)
 
-	-- Check for new items not yet in the order list
-	ctf_modebase.player.save_initial_stuff_positions(player, true)
-
-	local saved_stuff_positions = ctf_core.meta_get_string(
-		pname,
-		"ctf_modebase:player:initial_stuff_positions:"..ctf_modebase.current_mode
+	core.show_formspec(
+		player:get_player_name(),
+		"ctf_modebase:initial_stuff",
+		sfinv.make_formspec(
+			player,
+			{nav_titles={}},
+			"label[0,0;Items will be added to your inventory when form is closed]"..
+				"list[current_player;initial_stuff;0,1;8,4;]listring[]",
+			true
+		)
 	)
-
-	if saved_stuff_positions == "" then
-		saved_stuff_positions = {}
-	else
-		saved_stuff_positions = minetest.deserialize(saved_stuff_positions)
-	end
-
-	local new = {}
-	local tmp = {}
-	local current = inv:get_list("main")
-	for search, idx in pairs(saved_stuff_positions) do
-		for sidx, stack in ipairs(current) do
-			if stack then
-				local sname = simplify_for_saved_stuff(stack:get_name())
-
-				if sname ~= "" and sname:match(search) then
-					tmp[stack] = idx
-					current[sidx] = false
-				end
-			end
-		end
-	end
-
-	for stack, idx in pairs(tmp) do
-		if not new[idx] then
-			new[idx] = stack
-		end
-	end
-
-	for stack, idx in pairs(tmp) do
-		if new[idx] ~= stack then
-			table.insert(new, stack)
-		end
-	end
-
-	for _, stack in ipairs(current) do
-		if stack then
-			table.insert(new, stack)
-		end
-	end
-
-	inv:set_list("main", new)
+	initial_stuff_shown[player:get_player_name()] = true
 end
 
 if minetest.register_on_item_pickup then
@@ -263,7 +240,7 @@ if minetest.register_on_item_pickup then
 							local cprio = func(compare)
 
 							if cprio and cprio < priority then
-								local item, typ = simplify_for_saved_stuff(compare:get_name())
+								local item, typ = simplify_item_name(compare:get_name())
 								--minetest.log(dump(item)..dump(typ))
 								inv:set_stack("main", i, itemstack)
 
@@ -311,7 +288,7 @@ minetest.register_on_player_inventory_action(function(player, action, inv, inv_i
 						local cprio = func(compare)
 
 						if cprio and cprio < priority then
-							local item, typ = simplify_for_saved_stuff(compare:get_name())
+							local item, typ = simplify_item_name(compare:get_name())
 							--minetest.log(dump(item)..dump(typ))
 							inv:set_stack("main", i, inv_info.stack)
 

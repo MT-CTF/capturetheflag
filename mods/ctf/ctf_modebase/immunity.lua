@@ -1,4 +1,4 @@
-local RESPAWN_IMMUNITY_SECONDS = 4
+local RESPAWN_IMMUNITY_SECONDS = 6
 -- The value is a table if it's respawn immunity and false if it's a custom immunity
 local immune_players = {}
 

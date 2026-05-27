@@ -786,10 +786,6 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 #### `ctf_modebase.mode_vote.end_vote()`
 * ends vote, queue's a mode change.
 
-#### `ctf_modebase.player.save_initial_stuff_positions(player, soft)`
-* `player` *PlayerObj*: Player
-* `soft` ???
-
 #### `ctf_modebase.player.give_initial_stuff(player)`
 * `player` *PlayerObj*: Player
 
