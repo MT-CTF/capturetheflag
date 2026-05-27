@@ -130,12 +130,14 @@ local function process_ray(ray, user, look_dir, def)
 			end
 		elseif hitpoint.type == "object" then
 			local name = user:get_player_name()
+			local distance = user:get_pos():distance(hitpoint.ref:get_pos())
+
 			hitpoint.ref:punch(user, def.fire_interval or 0.1, {
 				full_punch_interval = def.fire_interval or 0.1,
 				damage_groups = {
 					ranged = 1,
 					[def.type] = 1,
-					fleshy = def.damage - math.max(0, math.round((def.min_range or 0)-distance))
+					fleshy = def.damage - math.max(0, math.round((def.min_range or 0) - distance))
 				}
 			}, look_dir)
 
@@ -189,10 +191,12 @@ end
 function ctf_ranged.simple_register_gun(name, def)
 	minetest.register_tool(rawf.also_register_loaded_tool(name, {
 		description = def.description ..
-				("\nDMG: %d | Shots/s: %0.1f | Mag: %d"):format(
+				("\nDMG: %d | Shots/s: %0.1f | Mag: %d\nMin/Max Range: %d/%d"):format(
 					def.damage * (def.bullet and def.bullet.amount or 1),
 					1 / def.fire_interval,
-					def.rounds
+					def.rounds,
+					def.min_range or 0,
+					def.range
 				),
 		inventory_image = def.texture .. "^[colorize:#F44:42",
 		ammo = def.ammo or "ctf_ranged:ammo",
@@ -220,13 +224,15 @@ function ctf_ranged.simple_register_gun(name, def)
 		end,
 	},
 	function(loaded_def)
-		loaded_def.description = def.description ..
-				("\nDMG: %d | Shots/s: %0.1f | Mag: %d"):format(
+		loaded_def.description = def.description .. " (Loaded)" ..
+				("\nDMG: %d | Shots/s: %0.1f | Mag: %d\nMin/Max Range: %d/%d"):format(
 					def.damage * (def.bullet and def.bullet.amount or 1),
 					1 / def.fire_interval,
-					def.rounds
-				) ..
-				" (Loaded)"
+					def.rounds,
+					def.min_range or 0,
+					def.range
+				)
+
 		loaded_def.inventory_image = def.texture
 		loaded_def.inventory_overlay = def.texture_overlay
 		loaded_def.wield_image = def.wield_texture or def.texture
@@ -418,6 +424,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	fire_sound = "ctf_ranged_sniper",
 	rounds = 25,
 	range = 300,
+	min_range = 16,
 	damage = 12,
 	fire_interval = 2,
 	liquid_travel_dist = 10,
@@ -438,6 +445,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	fire_sound = "ctf_ranged_sniper",
 	rounds = 20,
 	range = 400,
+	min_range = 20,
 	damage = 16,
 	fire_interval = 2,
 	liquid_travel_dist = 15,
