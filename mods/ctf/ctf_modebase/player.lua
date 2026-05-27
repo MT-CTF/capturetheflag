@@ -9,6 +9,13 @@ ctf_settings.register("auto_trash_stone_swords", {
 	default = "false"
 })
 
+ctf_settings.register("manual_initial_stuff_ordering", {
+	type = "bool",
+	label = S("Manual initial stuff ordering"),
+	description = S("Lets you manually choose the order of your items after respawning"),
+	default = "false"
+})
+
 ctf_settings.register("auto_trash_stone_tools", {
 	type = "bool",
 	label = S("Auto-trash stone tools when you pick up a better one"),
@@ -148,7 +155,6 @@ function ctf_gui.show_formspec(player, formname, ...)
 end
 
 core.register_allow_player_inventory_action(function(player, action, inventory, inventory_info)
-	core.log(dump(action).."\n"..dump(inventory).."\n"..dump(inventory_info))
 	if inventory_info.to_list == "initial_stuff" then
 		return 0
 	elseif inventory_info.from_list == "initial_stuff" then
@@ -162,14 +168,19 @@ core.register_on_player_receive_fields(function(player, formname, fields)
 	end
 end)
 
-function ctf_modebase.player.give_initial_stuff(player, cache_key)
-	minetest.log("action", "Giving initial stuff to player " .. player:get_player_name())
+function ctf_modebase.player.give_initial_stuff(player)
+	local pname = player:get_player_name()
+	minetest.log("action", "Giving initial stuff to player " .. pname)
 
 	local inv = player:get_inventory()
 
-	inv:set_size("initial_stuff", 8*4)
-	inv:set_list("initial_stuff", inv:get_list("main"))
-	inv:set_list("main", {})
+	local target_inv = "main"
+	if ctf_settings.get(player, "manual_initial_stuff_ordering") == "true" then
+		target_inv = "initial_stuff"
+		inv:set_size("initial_stuff", 8*4)
+		inv:set_list("initial_stuff", inv:get_list("main"))
+		inv:set_list("main", {})
+	end
 
 	local item_level = {}
 	get_initial_stuff(player, function(item)
@@ -187,7 +198,7 @@ function ctf_modebase.player.give_initial_stuff(player, cache_key)
 							if not item_level[itype].keep then
 								-- minetest.log(dump(item_level[itype].item:get_name()).." r< "..dump(item:get_name()))
 
-								inv:remove_item("initial_stuff", item_level[itype].item)
+								inv:remove_item(target_inv, item_level[itype].item)
 							end
 
 							item_level[itype] = {level = ilevel, item = item, keep = keep}
@@ -206,22 +217,24 @@ function ctf_modebase.player.give_initial_stuff(player, cache_key)
 			end
 		end
 
-		inv:remove_item("initial_stuff", item)
-		inv:add_item("initial_stuff", item)
+		inv:remove_item(target_inv, item)
+		inv:add_item(target_inv, item)
 	end)
 
-	core.show_formspec(
-		player:get_player_name(),
-		"ctf_modebase:initial_stuff",
-		sfinv.make_formspec(
-			player,
-			{nav_titles={}},
-			"label[0,0;Items will be added to your inventory when form is closed]"..
-				"list[current_player;initial_stuff;0,1;8,4;]listring[]",
-			true
+	if ctf_settings.get(player, "manual_initial_stuff_ordering") == "true" then
+		core.show_formspec(
+			pname,
+			"ctf_modebase:initial_stuff",
+			sfinv.make_formspec(
+				player,
+				{nav_titles={}},
+				"label[0,0;Items will be added to your inventory when form is closed]"..
+					"list[current_player;initial_stuff;0,1;8,4;]listring[]",
+				true
+			)
 		)
-	)
-	initial_stuff_shown[player:get_player_name()] = true
+		initial_stuff_shown[pname] = true
+	end
 end
 
 if minetest.register_on_item_pickup then
