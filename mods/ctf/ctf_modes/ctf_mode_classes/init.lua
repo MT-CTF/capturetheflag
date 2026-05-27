@@ -14,6 +14,7 @@ local features = ctf_modebase.features(rankings, recent_rankings)
 
 local classes = ctf_core.include_files(
 	"paxel.lua",
+	"hunter.lua",
 	"classes.lua"
 )
 

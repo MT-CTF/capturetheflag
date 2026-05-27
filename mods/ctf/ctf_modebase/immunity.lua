@@ -64,7 +64,9 @@ function ctf_modebase.give_immunity(player, respawn_timer)
 	})
 
 	if old == nil then
-		player_api.set_texture(player, 1, ctf_cosmetics.get_skin(player))
+		if player_api.players[pname] then
+			player_api.set_texture(player, 1, ctf_cosmetics.get_skin(player))
+		end
 		player:set_properties({pointable = false})
 		player:set_armor_groups({fleshy = 0})
 	end

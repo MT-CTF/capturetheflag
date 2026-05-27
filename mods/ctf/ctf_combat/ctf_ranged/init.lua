@@ -132,7 +132,11 @@ local function process_ray(ray, user, look_dir, def)
 			local name = user:get_player_name()
 			hitpoint.ref:punch(user, def.fire_interval or 0.1, {
 				full_punch_interval = def.fire_interval or 0.1,
-				damage_groups = {ranged = 1, [def.type] = 1, fleshy = def.damage}
+				damage_groups = {
+					ranged = 1,
+					[def.type] = 1,
+					fleshy = def.damage - math.max(0, math.round((def.min_range or 0)-distance))
+				}
 			}, look_dir)
 
 			if not hit_sent[name] then

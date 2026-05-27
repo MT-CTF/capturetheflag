@@ -3,11 +3,11 @@ ctf_gui.init()
 local cooldowns = ctf_core.init_cooldowns()
 local CLASS_SWITCH_COOLDOWN = 30
 
-local classes = {}
+classes = {}
 
 local S = minetest.get_translator(minetest.get_current_modname())
 
-local class_list = {"knight", "ranged", "support"}
+local class_list = {"knight", "ranged", "support", "hunter"}
 local class_props = {
 	knight = {
 		name = "Knight",
@@ -60,6 +60,20 @@ local class_props = {
 		disallowed_items_markup = {
 			["ctf_melee:"] = "default_tool_steelsword.png^ctf_modebase_group.png",
 		},
+	},
+	hunter = {
+		name = "Hunter [TESTING]",
+		color = "red",
+		description = S("Melee/ranged class that hunts down a random enemy player.\n"..
+				"Both the hunter and their target can see each other's positions, with a few seconds delay. "..
+				"The hunter's damage is buffed against their target, and nerfed against everyone else. "..
+				"They heal upon killing their target"),
+		items = {
+			"ctf_melee:sword_steel",
+			"ctf_ranged:pistol_loaded",
+			"ctf_mode_classes:hunter_token",
+		},
+		disallowed_items = {}
 	}
 }
 
@@ -399,10 +413,20 @@ function classes.update(player)
 	end
 end
 
+classes.registered_on_class_change = {}
+---@param func(player, class, oldclass)
+function classes.register_on_class_change(func)
+	table.insert(classes.registered_on_class_change, func)
+end
+
 function classes.set(player, classname)
-	if classname == classes.get_name(player) then
+	local oldclass = classes.get_name(player)
+
+	if classname == oldclass then
 		return
 	end
+
+	RunCallbacks(classes.registered_on_class_change, player, oldclass)
 
 	ctf_core.meta_set_string(player:get_player_name(), "class", classname)
 
@@ -460,7 +484,7 @@ function classes.show_class_formspec(player)
 	local pteam = ctf_teams.get(player)
 
 	ctf_gui.show_formspec(player, "ctf_mode_classes:class_form", function(context)
-		local form_x, form_y = 12, 10
+		local form_x, form_y = 14, 10
 		local pad = 0.3
 
 		local bw = 3
