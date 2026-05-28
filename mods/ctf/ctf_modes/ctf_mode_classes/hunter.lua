@@ -234,15 +234,15 @@ core.register_on_leaveplayer(function(player)
 
 	if hunting[playername] then
 		stop_hunt(playername, true)
-	else
-		for hunter, hunt in pairs(hunting) do
-			if hunt.hunting == playername then
-				hud_events.new(hunter, {
-					quick = true,
-					text = "Target left the game",
-				})
-				stop_hunt(hunter)
-			end
+	end
+
+	for hunter, hunt in pairs(hunting) do
+		if hunt.hunting == playername then
+			hud_events.new(hunter, {
+				quick = true,
+				text = "Target left the game",
+			})
+			stop_hunt(hunter)
 		end
 	end
 end)
@@ -262,11 +262,11 @@ return {
 		if hunting[hname] then
 			if hunting[hname].hunting == pname then
 				if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
-					return damage * math.round(1 + DAMAGE_BUFF)
+					return damage * (1 + DAMAGE_BUFF)
 				end
 			else
 				if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
-					return damage * math.round(1 - DAMAGE_NERF)
+					return damage * (1 - DAMAGE_NERF)
 				end
 			end
 		end
