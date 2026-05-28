@@ -145,7 +145,7 @@ ctf_melee.simple_register_sword("ctf_mode_classes:knight_sword", {
 	inventory_image = "default_tool_mesesword.png",
 	inventory_overlay = "ctf_modebase_special_item.png",
 	wield_image = "default_tool_mesesword.png",
-	damage_groups = {fleshy = 7},
+	damage_groups = {fleshy = 70},
 	full_punch_interval = 0.7,
 	rightclick_func = function(itemstack, user, pointed)
 		if ctf_settings.get(user, "ctf_mode_classes:simple_knight_activate") ~= "true" then
