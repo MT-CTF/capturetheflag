@@ -138,7 +138,7 @@ local function damage_cobble_dig(pos, node, digger)
 	if placerobj then
 		digger:punch(placerobj, 1, {
 			damage_groups = {
-				fleshy = 7,
+				fleshy = 70,
 				damage_cobble = 1,
 			}
 		})

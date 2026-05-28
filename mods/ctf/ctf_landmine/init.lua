@@ -117,7 +117,7 @@ local function landmine_explode(pos)
 					1,
 					{
 						damage_groups = {
-							fleshy = 15,
+							fleshy = 150,
 							landmine = 1
 						}
 					}

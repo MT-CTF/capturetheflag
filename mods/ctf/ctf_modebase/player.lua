@@ -418,6 +418,7 @@ if ctf_core.settings.server_mode ~= "mapedit" then
 end
 
 minetest.register_on_joinplayer(function(player)
+	player:set_properties({hp_max = (minetest.PLAYER_MAX_HP_DEFAULT * 10)})
 	player:set_hp(player:get_properties().hp_max)
 
 	local inv = player:get_inventory()

@@ -3,10 +3,10 @@ local hud = mhud.init()
 -- healing_players[pname] = {hp = hp_at_healing_start, after = minetest.after id}
 local healing_players = {}
 
-local REGEN_PER_SEC = 3 -- Amount of HP healed per second
+local REGEN_PER_SEC = 30 -- Amount of HP healed per second
 
 local MAX_WEAR = 65535
-local MEDKIT_CAPACITY = 50 -- Amount of HP a medkit can heal
+local MEDKIT_CAPACITY = 500 -- Amount of HP a medkit can heal
 local WEAR_PER_SEC = math.floor(MAX_WEAR / (MEDKIT_CAPACITY / REGEN_PER_SEC))
 
 local S = minetest.get_translator(minetest.get_current_modname())

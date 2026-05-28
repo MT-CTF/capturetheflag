@@ -47,7 +47,7 @@ local fragdef = {
 	description = S("Frag grenade (Kills anyone near blast)"),
 	image = "grenades_frag.png",
 	explode_radius = 10,
-	explode_damage = 26,
+	explode_damage = 260,
 	on_collide = function()
 		return true
 	end,
@@ -120,7 +120,7 @@ local fragdef = {
 						punch_interval = 1,
 						damage_groups = {
 							grenade = 1,
-							fleshy = def.explode_damage - ( (radius/3) * (target_head and headdist or footdist) )
+							fleshy = def.explode_damage - ( (radius/30) * (target_head and headdist or footdist) )
 						}
 					}, nil)
 				end
@@ -199,7 +199,7 @@ local register_smoke_grenade = function(name, description, image, damage)
 								if dname ~= pname and dteam ~= pteam then
 									target:punch(thrower, 1, {
 										damage_groups = {
-											fleshy = 2,
+											fleshy = 20,
 											grenade = 1,
 											poison_grenade = 1,
 										}

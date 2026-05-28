@@ -34,7 +34,7 @@ local fragdef_small = table.copy(minetest.registered_craftitems["ctf_grenades:fr
 fragdef_small.description = S("Firecracker (Hurts anyone near blast)")
 fragdef_small.image = "ctf_mode_nade_fight_firecracker_grenade.png"
 fragdef_small.explode_radius = 4
-fragdef_small.explode_damage = 16
+fragdef_small.explode_damage = 160
 fragdef_small.clock = 1.7
 
 local old_explode = fragdef_small.on_explode
@@ -160,7 +160,7 @@ grenades.register_grenade("ctf_mode_nade_fight:black_hole_grenade", {
 						v:punch(player, 1, {
 							punch_interval = 1,
 							damage_groups = {
-								fleshy = 2,
+								fleshy = 20,
 								grenade = 1,
 								black_hole_grenade = 1,
 							}
@@ -263,7 +263,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 				v:punch(player, 1, {
 					punch_interval = 1,
 					damage_groups = {
-						fleshy = 1,
+						fleshy = 10,
 						grenade = 1,
 						knockback_grenade = 1,
 					}

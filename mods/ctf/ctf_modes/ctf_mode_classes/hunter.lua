@@ -200,7 +200,7 @@ core.register_on_dieplayer(function(player, reason)
 		local hunter = reason.object
 		local hname = hunter:get_player_name()
 
-		if hunting[hname] and hunting[hname] == pname then
+		if hunting[hname] and hunting[hname].hunting == pname then
 			local hp_max = hunter:get_properties().hp_max
 			local hp = hunter:get_hp()
 			local amount_healed = math.min(hp + math.floor(hp_max * HEAL_AMOUNT), hp_max)

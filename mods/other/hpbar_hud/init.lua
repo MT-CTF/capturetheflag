@@ -2,11 +2,6 @@ local ids = {}
 
 local texture_res = 24 -- heart texture resolution
 
-local function calculate_offset(hearts)
-	return {x = - 264, y = -(48 + texture_res + 16)}
-end
-
-
 minetest.register_on_joinplayer(function(player)
 	player:hud_set_flags({healthbar = false}) -- Hide the builtin HP bar
 	-- Add own HP bar with the same visuals as the builtin one
@@ -19,7 +14,7 @@ minetest.register_on_joinplayer(function(player)
 		item = minetest.PLAYER_MAX_HP_DEFAULT,
 		direction = 0,
 		size = {x = texture_res, y = texture_res},
-		offset = calculate_offset(10),
+		offset = {x = - 264, y = -(48 + texture_res + 16)},
 	})
 end)
 
@@ -33,11 +28,9 @@ minetest.register_playerevent(function(player, eventname)
 	if not id then return end
 
 	if eventname == "health_changed" then
-		player:hud_change(id, "number", player:get_hp())
+		player:hud_change(id, "number", math.round(player:get_hp() / 10))
 	elseif eventname == "properties_changed" then
 		-- HP max has probably changed, update HP bar background size ("item") accordingly
-		local hp_max = player:get_properties().hp_max
-		player:hud_change(id, "item", hp_max)
-		player:hud_change(id, "offset", calculate_offset(hp_max / 2))
+		player:hud_change(id, "item", math.round(player:get_properties().hp_max / 10))
 	end
 end)

@@ -137,7 +137,7 @@ local function process_ray(ray, user, look_dir, def)
 				damage_groups = {
 					ranged = 1,
 					[def.type] = 1,
-					fleshy = def.damage - math.max(0, math.round((def.min_range or 0) - distance))
+					fleshy = def.damage - math.max(0, math.round((def.min_range or 0) - distance) * 10)
 				}
 			}, look_dir)
 
@@ -367,7 +367,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:pistol", {
 	fire_sound = "ctf_ranged_pistol",
 	rounds = 75,
 	range = 75,
-	damage = 2,
+	damage = 20,
 	automatic = true,
 	fire_interval = 0.6,
 	liquid_travel_dist = 2
@@ -380,7 +380,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:rifle", {
 	fire_sound = "ctf_ranged_rifle",
 	rounds = 40,
 	range = 150,
-	damage = 4,
+	damage = 40,
 	automatic = true,
 	fire_interval = 0.8,
 	liquid_travel_dist = 4,
@@ -397,7 +397,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:shotgun", {
 	},
 	rounds = 10,
 	range = 24,
-	damage = 1,
+	damage = 10,
 	fire_interval = 2,
 })
 
@@ -412,7 +412,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:smg", {
 	automatic = true,
 	rounds = 36,
 	range = 75,
-	damage = 1,
+	damage = 10,
 	fire_interval = 0.1,
 	liquid_travel_dist = 2,
 })
@@ -425,7 +425,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper", {
 	rounds = 25,
 	range = 300,
 	min_range = 16,
-	damage = 12,
+	damage = 120,
 	fire_interval = 2,
 	liquid_travel_dist = 10,
 	rightclick_func = function(itemstack, user, pointed, ...)
@@ -446,7 +446,7 @@ ctf_ranged.simple_register_gun("ctf_ranged:sniper_magnum", {
 	rounds = 20,
 	range = 400,
 	min_range = 20,
-	damage = 16,
+	damage = 160,
 	fire_interval = 2,
 	liquid_travel_dist = 15,
 	rightclick_func = function(itemstack, user, pointed, ...)

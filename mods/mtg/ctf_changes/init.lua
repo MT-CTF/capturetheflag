@@ -55,6 +55,12 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 
+	local toolcaps = core.registered_items[""].tool_capabilities
+	toolcaps.damage_groups.fleshy = toolcaps.damage_groups.fleshy * 10
+	core.override_item("", {
+		tool_capabilities = toolcaps
+	})
+
 	-- Set item type and tiers for give_initial_stuff
 	local tiers = {"wood", "stone", "steel", "mese", "diamond"}
 	local tool_categories = {"pickaxe", "shovel", "axe"}
@@ -78,13 +84,17 @@ minetest.register_on_mods_loaded(function()
 		end
 
 		if def.groups.tool or def.groups.sword then
+			if name:find("default:") then
+				def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy * 10
+			end
+
 			for tier, needle in pairs(tiers) do
 				if name:match(needle) then
 					def.groups.tier = tier
 
 					if tier <= 2 then
 						def.tool_capabilities.full_punch_interval = 1
-						def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy + 1
+						def.tool_capabilities.damage_groups.fleshy = def.tool_capabilities.damage_groups.fleshy + 10
 					end
 
 					break

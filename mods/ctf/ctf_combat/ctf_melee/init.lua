@@ -6,25 +6,25 @@ local sword_mats = {
 	stone = {
 		description = minetest.registered_tools["default:sword_stone"].description,
 		inventory_image = minetest.registered_tools["default:sword_stone"].inventory_image,
-		damage_groups = {fleshy = 4},
+		damage_groups = {fleshy = 40},
 		full_punch_interval = 1.0
 	},
 	steel = {
 		description = minetest.registered_tools["default:sword_steel"].description,
 		inventory_image = minetest.registered_tools["default:sword_steel"].inventory_image,
-		damage_groups = {fleshy = 6},
+		damage_groups = {fleshy = 60},
 		full_punch_interval = 0.8,
 	},
 	mese = {
 		description = minetest.registered_tools["default:sword_mese"].description,
 		inventory_image = minetest.registered_tools["default:sword_mese"].inventory_image,
-		damage_groups = {fleshy = 7},
+		damage_groups = {fleshy = 70},
 		full_punch_interval = 0.7,
 	},
 	diamond = {
 		description = minetest.registered_tools["default:sword_diamond"].description,
 		inventory_image = minetest.registered_tools["default:sword_diamond"].inventory_image,
-		damage_groups = {fleshy = 8},
+		damage_groups = {fleshy = 80},
 		full_punch_interval = 0.6,
 	}
 }

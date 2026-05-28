@@ -202,8 +202,8 @@ local function marker_func(name, param, specific_player, hpmarker)
 	end
 
 	if pointed and hpmarker == true then
-		local player_hpr = string.format("HP: %i/%i", player:get_hp(),
-		player:get_properties().hp_max)
+		local player_hpr = string.format("HP: %i/%i", player:get_hp()/10,
+		player:get_properties().hp_max/10)
 		message = string.format("m [%s]: ", name) .. player_hpr
 		if vector.distance(
 			pointed.under or pointed.ref:get_pos(),
@@ -219,8 +219,8 @@ local function marker_func(name, param, specific_player, hpmarker)
 			end
 		end
 		if param ~= "Look here!" then
-			message = string.format("[HP: %i/%i] %s", player:get_hp(),
-			player:get_properties().hp_max, param)
+			message = string.format("[HP: %i/%i] %s", player:get_hp()/10,
+			player:get_properties().hp_max/10, param)
 		end
 
 		-- If the player places a marker upon death, it will resort to the below

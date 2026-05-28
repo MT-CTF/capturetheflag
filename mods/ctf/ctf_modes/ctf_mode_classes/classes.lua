@@ -13,7 +13,7 @@ local class_props = {
 		name = "Knight",
 		color = "grey",
 		description = S("High HP class with a sword capable of short damage bursts"),
-		hp_max = 30,
+		hp_max = 300,
 		visual_size = vector.new(0.1, 0.05, 0.1),
 		items = {
 			"ctf_mode_classes:knight_sword",
@@ -390,7 +390,7 @@ function classes.update(player)
 	base_size = vector.new(base_size.x, base_size.y, base_size.z or base_size.x)
 
 	player:set_properties({
-		hp_max = class.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+		hp_max = class.hp_max or (minetest.PLAYER_MAX_HP_DEFAULT * 10),
 		visual_size = vector.add(base_size, class.visual_size or vector.new()) or base_size
 	})
 
@@ -514,7 +514,7 @@ function classes.show_class_formspec(player)
 				(form_x/2)+0.6 - pad,
 				form_y-2.4,
 				class_prop.description,
-				class_prop.hp_max or minetest.PLAYER_MAX_HP_DEFAULT,
+				class_prop.hp_max or (minetest.PLAYER_MAX_HP_DEFAULT * 10),
 				class_prop.physics and class_prop.physics.speed and
 						"<img name=sprint_stamina_icon.png width=20 float=left> "..class_prop.physics.speed.."x Speed\n" or "",
 				class_prop.items_markup,
@@ -653,7 +653,7 @@ function classes.finish()
 	for _, player in pairs(minetest.get_connected_players()) do
 		classes.reset_class_cooldowns()
 
-		player:set_properties({hp_max = minetest.PLAYER_MAX_HP_DEFAULT, visual_size = vector.new(1, 1, 1)})
+		player:set_properties({hp_max = (minetest.PLAYER_MAX_HP_DEFAULT * 10), visual_size = vector.new(1, 1, 1)})
 		physics.remove(player:get_player_name(), "ctf_mode_classes:class_physics")
 	end
 end

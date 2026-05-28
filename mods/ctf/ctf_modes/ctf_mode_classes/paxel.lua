@@ -80,7 +80,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 			crumbly = {times={[1]=1.50, [2]=0.90, [3]=0.40}, uses=0, maxlevel=2},
 			choppy = {times={[1]=2.50, [2]=1.40, [3]=1.00}, uses=0, maxlevel=2},
 		},
-		damage_groups = {fleshy=4},
+		damage_groups = {fleshy=40},
 		punch_attack_uses = 0,
 	},
 	groups = {pickaxe = 1, tier = 10},

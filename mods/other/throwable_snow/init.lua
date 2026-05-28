@@ -5,7 +5,7 @@ function throwable_snow.on_hit_player(thrower, player)
 	minetest.get_player_by_name(player):punch(
 		minetest.get_player_by_name(thrower),
 		2,
-		{ damage_groups = {snowball = 1, fleshy = 1} },
+		{ damage_groups = {snowball = 1, fleshy = 10} },
 		vector.new()
 	)
 
