@@ -125,7 +125,7 @@ minetest.override_item("default:apple", {
 		if not COOLDOWN:get(user) then
 			COOLDOWN:set(user, 0.3)
 
-			return minetest.item_eat(3)(itemstack, user, ...)
+			return minetest.item_eat(30)(itemstack, user, ...)
 		end
 	end,
 	after_place_node = nil,
@@ -140,10 +140,18 @@ minetest.override_item("default:blueberries", {
 		if not COOLDOWN:get(user) then
 			COOLDOWN:set(user, 0.3)
 
-			return minetest.item_eat(3)(itemstack, user, ...)
+			return minetest.item_eat(30)(itemstack, user, ...)
 		end
 	end,
 	stack_max = 60,
+})
+
+core.override_item("flowers:mushroom_red", {
+	on_use = minetest.item_eat(-50),
+})
+
+core.override_item("flowers:mushroom_brown", {
+	on_use = minetest.item_eat(10),
 })
 
 local function furnace_on_destruct(pos)
