@@ -256,19 +256,23 @@ return {
 		end
 	end,
 	damage_mod = function(player, hitter, tool_capabilities, damage)
-		local hname = hitter:get_player_name()
-		local pname = player:get_player_name()
+		if damage then
+			local hname = hitter:get_player_name()
+			local pname = player:get_player_name()
 
-		if hunting[hname] then
-			if hunting[hname].hunting == pname then
-				if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
-					return damage * (1 + DAMAGE_BUFF)
-				end
-			else
-				if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
-					return damage * (1 - DAMAGE_NERF)
+			if hunting[hname] then
+				if hunting[hname].hunting == pname then
+					if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
+						return damage * (1 + DAMAGE_BUFF)
+					end
+				else
+					if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
+						return damage * (1 - DAMAGE_NERF)
+					end
 				end
 			end
 		end
+
+		return damage
 	end
 }
