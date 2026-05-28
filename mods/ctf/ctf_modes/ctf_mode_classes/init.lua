@@ -12,11 +12,13 @@ local rankings = ctf_rankings:init(RANKLIST)
 local recent_rankings = ctf_modebase.recent_rankings(rankings)
 local features = ctf_modebase.features(rankings, recent_rankings)
 
-local classes = ctf_core.include_files(
+local hunter, classes = ctf_core.include_files(
 	"paxel.lua",
 	"hunter.lua",
 	"classes.lua"
 )
+
+classes.register_on_class_change(hunter.on_class_change)
 
 local old_bounty_reward_func = ctf_modebase.bounties.bounty_reward_func
 local old_get_next_bounty = ctf_modebase.bounties.get_next_bounty
@@ -150,7 +152,12 @@ ctf_modebase.register_mode("classes", {
 		classes.show_class_formspec(clicker)
 	end,
 	get_chest_access = features.get_chest_access,
-	on_punchplayer = features.on_punchplayer,
+	on_punchplayer = function(player, hitter, damage, time_from_last_punch, tool_capabilities, ...)
+		return hunter.damage_mod(
+			player, hitter, tool_capabilities,
+			features.on_punchplayer(player, hitter, damage, time_from_last_punch, tool_capabilities, ...)
+		)
+	end,
 	can_punchplayer = features.can_punchplayer,
 	on_healplayer = features.on_healplayer,
 	calculate_knockback = function(player, hitter, time_from_last_punch, tool_capabilities, dir, distance, damage)

@@ -6,14 +6,11 @@ local hunting = {
 	}
 	--]]
 }
-local killed = {
-	-- huntername,
-}
 
 local MIN_DIST_FROM_FLAG = 10
-local DAMAGE_BUFF = 0.15
-local DAMAGE_NERF = 0.3
-local HEAL_AMOUNT = 0.4
+local DAMAGE_BUFF = 0.4
+local DAMAGE_NERF = 0.51
+local HEAL_AMOUNT = 0.5
 local HUNT_TIME = 60
 local HUNT_DISTANCE = 100
 local MARKER_UPDATE_TIME = 4
@@ -31,7 +28,6 @@ local function stop_hunt(huntername, skip_item)
 	hunt_huds:remove(huntername)
 	hunt_huds:remove(hunting[huntername].hunting)
 
-	killed[hunting[huntername].hunting] = nil
 	hunting[huntername] = nil
 
 	if not skip_item then
@@ -197,61 +193,23 @@ core.register_globalstep(function(dtime)
 	end
 end)
 
-core.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-	if tool_capabilities.damage_groups.hunter_modded == 1 then return end
-
-	local hname = hitter:get_player_name()
-	local pname = player:get_player_name()
-
-	if hunting[hname] then
-		if hunting[hname].hunting == pname then
-			if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
-				tool_capabilities.damage_groups.fleshy = tool_capabilities.damage_groups.fleshy * math.floor(1 + DAMAGE_BUFF)
-				tool_capabilities.damage_groups.hunter_modded = 1
-
-				if player:get_hp() - (damage * (1 + DAMAGE_BUFF)) <= 1 then
-					killed[pname] = hname
-				end
-
-				player:punch(hitter, time_from_last_punch, tool_capabilities, dir)
-
-				return true
-			end
-		else
-			if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
-				tool_capabilities.damage_groups.fleshy = tool_capabilities.damage_groups.fleshy * math.floor(1 - DAMAGE_NERF)
-				tool_capabilities.damage_groups.hunter_modded = 1
-
-				player:punch(hitter, time_from_last_punch, tool_capabilities, dir)
-
-				return true
-			end
-		end
-	end
-end)
-
--- if target dies to hunter then heal to half health if below
 core.register_on_dieplayer(function(player, reason)
 	local pname = player:get_player_name()
 
-	if killed[pname] then
-		if reason and reason.from == "mod" and reason.type == "punch" then
-			local hunter = core.get_player_by_name(killed[pname])
-			local hp_max = hunter:get_properties().hp_max
-			local amount_healed = math.min(hunter:get_hp() + math.floor(hp_max * HEAL_AMOUNT), hp_max)
+	if reason and reason.type == "punch" and reason.object and reason.object:is_player() then
+		local hunter = reason.object
+		local hp_max = hunter:get_properties().hp_max
+		local amount_healed = math.min(hunter:get_hp() + math.floor(hp_max * HEAL_AMOUNT), hp_max)
 
-			stop_hunt(killed[pname])
+		stop_hunt(hunter:get_player_name())
 
-			hud_events.new(hunter, {
-				channel = 2,
-				text = "Target killed, +"..amount_healed.."hp",
-				color = 0x88FF88
-			})
+		hud_events.new(hunter, {
+			channel = 2,
+			text = "Target killed, +"..amount_healed.."hp",
+			color = 0x88FF88
+		})
 
-			hunter:set_hp(amount_healed)
-		end
-
-		killed[pname] = nil
+		hunter:set_hp(amount_healed)
 	end
 
 	if hunting[pname] then
@@ -288,12 +246,28 @@ core.register_on_leaveplayer(function(player)
 	end
 end)
 
-core.register_on_mods_loaded(function()
-	classes.register_on_class_change(function(player, class, oldclass)
+return {
+	on_class_change = function(player, class, oldclass)
 		local pname = PlayerName(player)
 
 		if oldclass == "hunter" and hunting[pname] then
 			stop_hunt(pname, true)
 		end
-	end)
-end)
+	end,
+	damage_mod = function(player, hitter, tool_capabilities, damage)
+		local hname = hitter:get_player_name()
+		local pname = player:get_player_name()
+
+		if hunting[hname] then
+			if hunting[hname].hunting == pname then
+				if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
+					return damage * math.round(1 + DAMAGE_BUFF)
+				end
+			else
+				if tool_capabilities.damage_groups.fleshy and not tool_capabilities.damage_groups.grenade then
+					return damage * math.round(1 - DAMAGE_NERF)
+				end
+			end
+		end
+	end
+}

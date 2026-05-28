@@ -3,7 +3,7 @@ ctf_gui.init()
 local cooldowns = ctf_core.init_cooldowns()
 local CLASS_SWITCH_COOLDOWN = 30
 
-classes = {}
+local classes = {}
 
 local S = minetest.get_translator(minetest.get_current_modname())
 

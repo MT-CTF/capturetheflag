@@ -88,7 +88,7 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	)
 
 	if real_damage then
-		player:set_hp(player:get_hp() - real_damage, {type="punch"})
+		player:set_hp(player:get_hp() - real_damage, {type="punch", object=hitter})
 	end
 
 	if error then
