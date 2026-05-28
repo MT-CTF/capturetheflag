@@ -153,9 +153,13 @@ ctf_modebase.register_mode("classes", {
 	end,
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = function(player, hitter, damage, time_from_last_punch, tool_capabilities, ...)
-		return hunter.damage_mod(
-			player, hitter, tool_capabilities,
-			features.on_punchplayer(player, hitter, damage, time_from_last_punch, tool_capabilities, ...)
+		return features.on_punchplayer(
+			player,
+			hitter,
+			hunter.damage_mod(player, hitter, tool_capabilities, damage),
+			time_from_last_punch,
+			tool_capabilities,
+			...
 		)
 	end,
 	can_punchplayer = features.can_punchplayer,

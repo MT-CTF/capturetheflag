@@ -198,19 +198,23 @@ core.register_on_dieplayer(function(player, reason)
 
 	if reason and reason.type == "punch" and reason.object and reason.object:is_player() then
 		local hunter = reason.object
-		local hp_max = hunter:get_properties().hp_max
-		local hp = hunter:get_hp()
-		local amount_healed = math.min(hp + math.floor(hp_max * HEAL_AMOUNT), hp_max)
+		local hname = hunter:get_player_name()
 
-		stop_hunt(hunter:get_player_name())
+		if hunting[hname] and hunting[hname] == pname then
+			local hp_max = hunter:get_properties().hp_max
+			local hp = hunter:get_hp()
+			local amount_healed = math.min(hp + math.floor(hp_max * HEAL_AMOUNT), hp_max)
 
-		hud_events.new(hunter, {
-			channel = 2,
-			text = "Target killed, +"..(amount_healed - hp).."hp",
-			color = 0x88FF88
-		})
+			stop_hunt(hname)
 
-		hunter:set_hp(amount_healed)
+			hud_events.new(hunter, {
+				channel = 2,
+				text = "Target killed, +"..(amount_healed - hp).."hp",
+				color = 0x88FF88
+			})
+
+			hunter:set_hp(amount_healed)
+		end
 	end
 
 	if hunting[pname] then
