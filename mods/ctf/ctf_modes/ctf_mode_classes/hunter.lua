@@ -209,7 +209,7 @@ core.register_on_dieplayer(function(player, reason)
 
 			hud_events.new(hunter, {
 				channel = 2,
-				text = "Target killed, +"..(amount_healed - hp).."hp",
+				text = string.format("Target killed, +%dhp", (amount_healed - hp)/10),
 				color = 0x88FF88
 			})
 
