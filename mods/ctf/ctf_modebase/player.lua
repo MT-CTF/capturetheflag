@@ -362,6 +362,14 @@ local function nil_to_default(x, default)
 	end
 end
 
+core.register_on_player_hpchange(function(player, hp_change, reason)
+	if reason.from == "engine" and reason.type == "fall" then
+		return hp_change * 10
+	end
+
+	return hp_change
+end, true)
+
 function ctf_modebase.player.update(player)
 	-- Set skyboxes, shadows and physics
 

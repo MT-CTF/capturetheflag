@@ -35,7 +35,7 @@ local function add_suffocation()
 			local marked_groups = def.groups
 			marked_groups.real_suffocation = 1
 			-- Let's hack the node!
-			minetest.override_item(itemstring, { drowning = suffocation_damage, groups = marked_groups })
+			minetest.override_item(itemstring, { drowning = suffocation_damage * 10, groups = marked_groups })
 			table.insert(suffocate_nodes, itemstring)
 		else
 			table.insert(no_suffocate_nodes, itemstring)
