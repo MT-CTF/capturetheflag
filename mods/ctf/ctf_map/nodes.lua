@@ -132,7 +132,7 @@ minetest.register_node("ctf_map:killnode", {
 	sunlight_propogates = true,
 	walkable = false,
 	pointable = ctf_core.settings.server_mode == "mapedit",
-	damage_per_second = 20,
+	damage_per_second = 200,
 	is_ground_content = false,
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults(),
@@ -230,7 +230,7 @@ for name, def in pairs(minetest.registered_nodes) do
 			new_def.drop = new_name
 		end
 		if ctf_core.settings.server_mode ~= "mapedit" and def.drawtype == "normal" and def.walkable ~= false then
-			new_def.damage_per_second = 100
+			new_def.damage_per_second = 1000
 		end
 		make_immortal(new_def)
 		table.insert(queue, {name = new_name, def = new_def})

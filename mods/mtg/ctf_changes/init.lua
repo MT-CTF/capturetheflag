@@ -42,7 +42,7 @@ minetest.register_on_mods_loaded(function()
 		removed = removed + 1
 	end
 
-	-- Unset falling group for all nodes
+	-- Unset falling group for all nodes, fix damage_per_second
 
 	for name, def in pairs(minetest.registered_nodes) do
 		if def.groups then
@@ -51,7 +51,11 @@ minetest.register_on_mods_loaded(function()
 		end
 
 		if name:find("fire:") and def.on_timer then
-			def.on_timer = nil
+			minetest.override_item(name, {on_timer = function() end})
+		end
+
+		if name:find("fire:") or name:find("default:lava") then
+			minetest.override_item(name, {damage_per_second = def.damage_per_second * 10})
 		end
 	end
 

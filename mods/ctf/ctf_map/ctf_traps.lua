@@ -38,7 +38,7 @@ minetest.register_node("ctf_map:spike", {
 	paramtype2 = "meshoptions",
 	sunlight_propagates = true,
 	walkable = false,
-	damage_per_second = 7,
+	damage_per_second = 70,
 	groups = {cracky=1, level=2},
 	selection_box = {
 		type = "fixed",
@@ -83,7 +83,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			paramtype2 = "meshoptions",
 			sunlight_propagates = true,
 			walkable = false,
-			damage_per_second = 7,
+			damage_per_second = 70,
 			groups = {cracky=1, level=2},
 			drop = "ctf_map:spike",
 			selection_box = {

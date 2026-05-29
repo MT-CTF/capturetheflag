@@ -24,7 +24,7 @@ minetest.register_node("poison_water:poisonous_water", {
     liquid_alternative_flowing = "poison_water:poisonous_water_flowing",
     liquid_alternative_source = "poison_water:poisonous_water",
     liquid_viscosity = 1,
-    damage_per_second = 2, -- Deals 1-2 HP damage per second
+    damage_per_second = 20, -- Deals 1-2 HP damage per second
     groups = {liquid = 3, puts_out_fire = 1},
     sounds = default.node_sound_water_defaults(),
     color = "#00FF00", -- Green tint
@@ -58,7 +58,7 @@ minetest.register_node("poison_water:poisonous_water_flowing", {
     liquid_alternative_flowing = "poison_water:poisonous_water_flowing",
     liquid_alternative_source = "poison_water:poisonous_water",
     liquid_viscosity = 1,
-    damage_per_second = 2, -- Deals 1-2 HP damage per second
+    damage_per_second = 20, -- Deals 1-2 HP damage per second
     groups = {liquid = 3, puts_out_fire = 1, not_in_creative_inventory = 1},
     sounds = default.node_sound_water_defaults(),
     color = "#00FF00", -- Green tint
