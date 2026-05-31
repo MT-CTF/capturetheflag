@@ -317,8 +317,8 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 	inventory_overlay = "ctf_modebase_special_item.png",
 	wield_image = "ctf_healing_bandage.png",
 	heal_percent = HEAL_PERCENT,
-	heal_min = 4 * 10,
-	heal_max = 5 * 10,
+	heal_min = 40,
+	heal_max = 50,
 	rightclick_func = function(itemstack, user, pointed)
 		if ctf_settings.get(user, "ctf_mode_classes:simple_support_activate") ~= "true" then
 		    local ctl = user:get_player_control()
