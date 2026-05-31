@@ -50,7 +50,7 @@ function ctf_healing.register_bandage(name, def)
 					return
 				end
 
-				local hp_add = math.random(def.heal_min or 3, def.heal_max or 4)
+				local hp_add = math.random(def.heal_min or 30, def.heal_max or 40)
 
 				if hp + hp_add > limit then
 					hp_add = limit - hp
