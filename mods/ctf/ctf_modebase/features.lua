@@ -1009,7 +1009,7 @@ return {
 		end
 
 		ctf_combat_mode.add_healer(patient, player, 60)
-		recent_rankings.add(player, {hp_healed = amount, score = score}, true)
+		recent_rankings.add(player, {hp_healed = math.round(amount / 10), score = score}, true)
 	end,
 	initial_stuff_item_levels = {
 		pick = function(item)
