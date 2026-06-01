@@ -1,3 +1,6 @@
+local S = minetest.get_translator(minetest.get_current_modname())
+
+
 local hunting = {
 	--[[
 	hunter = {
@@ -87,6 +90,15 @@ core.register_craftitem("ctf_mode_classes:hunter_token", {
 		if on_cooldown[username] then return end
 		on_cooldown[username] = true
 		minetest.after(1, function() on_cooldown[username] = nil end)
+
+		if not ctf_modebase.match_started then
+			hud_events.new(user, {
+				quick = true,
+				text = S("Can't use during build time"),
+				color = "warning",
+			})
+			return
+		end
 
 		local uteam = ctf_teams.get(user)
 		local targets = {}
