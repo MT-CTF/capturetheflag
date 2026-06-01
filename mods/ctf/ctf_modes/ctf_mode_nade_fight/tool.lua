@@ -263,7 +263,7 @@ grenades.register_grenade("ctf_mode_nade_fight:knockback_grenade", {
 				v:punch(player, 1, {
 					punch_interval = 1,
 					damage_groups = {
-						fleshy = 10,
+						fleshy = 1,
 						grenade = 1,
 						knockback_grenade = 1,
 					}
