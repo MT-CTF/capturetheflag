@@ -57,6 +57,10 @@ minetest.register_on_mods_loaded(function()
 		if name:find("fire:") or name:find("default:lava") then
 			minetest.override_item(name, {damage_per_second = def.damage_per_second * 10})
 		end
+
+		if name:find("default:") and def.drowning and def.drowning <= 10 then
+			minetest.override_item(name, {drowning = def.drowning * 10})
+		end
 	end
 
 	local toolcaps = core.registered_items[""].tool_capabilities
