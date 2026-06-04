@@ -514,7 +514,7 @@ function classes.show_class_formspec(player)
 				(form_x/2)+0.6 - pad,
 				form_y-2.4,
 				class_prop.description,
-				(class_prop.hp_max / 10) or minetest.PLAYER_MAX_HP_DEFAULT,
+				(class_prop.hp_max or (minetest.PLAYER_MAX_HP_DEFAULT * 10)) / 10,
 				class_prop.physics and class_prop.physics.speed and
 						"<img name=sprint_stamina_icon.png width=20 float=left> "..class_prop.physics.speed.."x Speed\n" or "",
 				class_prop.items_markup,
