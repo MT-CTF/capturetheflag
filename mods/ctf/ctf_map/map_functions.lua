@@ -14,26 +14,22 @@ end
 function ctf_map.place_map(mapmeta, callback)
 	local dirname = mapmeta.dirname
 	local schempath = ctf_map.map_path[dirname] .. "/map.mts"
+	local start_time = core.get_us_time()
 
 	if readonly_map and ctf_core.settings.server_mode == "play" then
-		local start_time = core.get_us_time()
-
 		core.log("action", "Using readonly map file, deleting changes to map...")
 		core.delete_area(mapmeta.pos1, mapmeta.pos2)
-		minetest.after(5, core.fix_light, mapmeta.pos1, mapmeta.pos2)
+
 		minetest.log("action", string.format(
 			"Reset map %s in %.2fs", dirname, (minetest.get_us_time() - start_time) / 1e6
 		))
 	else
 		local rotation = (mapmeta.rotation and mapmeta.rotation ~= "z") and "90" or "0"
 		local res = minetest.place_schematic(mapmeta.pos1, schempath, rotation, {["ctf_map:chest"] = "air"})
-		local start_time = core.get_us_time()
 
 		minetest.log("action", string.format(
 			"Placed map %s in %.2fs", dirname, (minetest.get_us_time() - start_time) / 1e6
 		))
-
-		minetest.fix_light(mapmeta.pos1, mapmeta.pos2)
 
 		assert(res, "Unable to place schematic, does the MTS file exist? Path: " .. schempath)
 	end
@@ -59,6 +55,16 @@ function ctf_map.place_map(mapmeta, callback)
 			end
 		end
 	end
+
+	core.emerge_area(mapmeta.pos1, mapmeta.pos2, function(blockpos, action, calls_remaining)
+		if calls_remaining <= 0 then
+			if not core.fix_light(mapmeta.pos1, mapmeta.pos2) then
+				core.log("action", "[CTF Map] Failed to fix lighting")
+			else
+				core.log("action", "[CTF Map] Fixed lighting")
+			end
+		end
+	end)
 
 	ctf_map.current_map = mapmeta
 
