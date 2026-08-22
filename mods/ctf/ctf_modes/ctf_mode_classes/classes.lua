@@ -60,7 +60,7 @@ local class_props = {
 		},
 	},
 	hunter = {
-		name = "Hunter [TESTING]",
+		name = "Hunter",
 		color = "red",
 		description = S("Melee/ranged class that hunts down a random enemy player.\n"..
 				"Both the hunter and their target can see each other's positions, with a few seconds delay. "..
