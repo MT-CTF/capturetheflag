@@ -47,7 +47,7 @@ local fragdef = {
 	description = S("Frag grenade (Kills anyone near blast)"),
 	image = "grenades_frag.png",
 	explode_radius = 10,
-	explode_damage = 260,
+	explode_damage = 200,
 	on_collide = function()
 		return true
 	end,
