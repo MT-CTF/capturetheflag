@@ -15,6 +15,8 @@ local mods = core.get_mod_storage()
 }
 --]]
 
+local BACKUP_PATH = core.get_worldpath() .. "/past_leaderboards/"
+
 ctf_rankings.current_reset = mods:get_int("_current_reset")
 ctf_rankings.do_reset = mods:get_int("_do_reset") == 1
 -- Resets taking place on the same month will overwrite each other
@@ -47,7 +49,11 @@ local function do_reset()
 			end
 		end
 
-		local savefile = io.open(core.get_worldpath().."/backup-"..mode.."-"..os.date("%Y").."-"..os.date("%m")..".json", "w")
+		if not core.path_exists(BACKUP_PATH) then
+			core.mkdir(BACKUP_PATH)
+		end
+
+		local savefile = io.open(BACKUP_PATH.."backup-"..mode.."-"..os.date("%Y").."-"..os.date("%m")..".json", "w")
 		savefile:write(core.write_json(output))
 		savefile:close()
 	end
