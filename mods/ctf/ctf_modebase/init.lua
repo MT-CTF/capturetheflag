@@ -115,7 +115,7 @@ minetest.register_on_mods_loaded(function()
 			player:set_nametag_attributes({color = {a = 0, r = 255, g = 255, b = 255}, text = ""})
 		end)
 	elseif ctf_core.settings.server_mode == "play" then
-		ctf_modebase.start_new_match()
+		ctf_modebase.start_new_match(0)
 	end
 
 	for _, name in pairs(ctf_modebase.modelist) do

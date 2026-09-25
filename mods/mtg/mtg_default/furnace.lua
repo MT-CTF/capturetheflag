@@ -397,7 +397,7 @@ minetest.register_node("default:furnace_active", apply_logger({
 		"default_furnace_side.png", "default_furnace_side.png",
 		"default_furnace_side.png",
 		{
-			image = "default_furnace_front_active.png",
+			name = "default_furnace_front_active.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",

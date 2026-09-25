@@ -162,15 +162,17 @@ function playertag.get_all()
 end
 
 minetest.register_entity("playertag:tag", {
-	visual = "sprite",
-	visual_size = {x=2.16, y=0.18, z=2.16}, --{x=1.44, y=0.12, z=1.44},
-	textures = {"blank.png"},
-	collisionbox = { 0, -0.2, 0, 0, -0.2, 0 },
-	physical = false,
-	makes_footstep_sound = false,
-	backface_culling = false,
-	static_save = false,
-	pointable = false,
+	initial_properties = {
+		visual = "sprite",
+		visual_size = {x=2.16, y=0.18, z=2.16}, --{x=1.44, y=0.12, z=1.44},
+		textures = {"blank.png"},
+		collisionbox = { 0, -0.2, 0, 0, -0.2, 0 },
+		physical = false,
+		makes_footstep_sound = false,
+		backface_culling = false,
+		static_save = false,
+		pointable = false,
+	},
 	on_punch = function() return true end,
 	on_deactivate = function(self, removal)
 		if not removal then

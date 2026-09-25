@@ -111,7 +111,7 @@ end
 
 function ctf_modebase.start_new_match(delay)
 	ctf_modebase.match_started = false
-	if delay and delay > 0 then
+	if delay and delay >= 0 then
 		minetest.after(delay, start_new_match)
 	else
 		start_new_match()

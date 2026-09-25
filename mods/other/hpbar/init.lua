@@ -4,14 +4,16 @@ local players = {}
 
 local HPBAR_SCALE = 0.023
 minetest.register_entity("hpbar:entity", {
-	visual = "sprite",
-	visual_size = {x = 58 * HPBAR_SCALE, y = 16 * HPBAR_SCALE}, -- texture is 58 x 16
-	textures = {"blank.png"},
-	physical = false,
-	makes_footstep_sound = false,
-	backface_culling = false,
-	static_save = false,
-	pointable = false,
+	initial_properties = {
+		visual = "sprite",
+		visual_size = {x = 58 * HPBAR_SCALE, y = 16 * HPBAR_SCALE}, -- texture is 58 x 16
+		textures = {"blank.png"},
+		physical = false,
+		makes_footstep_sound = false,
+		backface_culling = false,
+		static_save = false,
+		pointable = false,
+	},
 	on_punch = function() return true end,
 })
 

@@ -44,8 +44,7 @@ minetest.register_node("ctf_map:ind_glass_red", {
 	is_ground_content = false,
 	walkable = true,
 	buildable_to = false,
-	use_texture_alpha = false,
-	alpha = 0,
+	use_texture_alpha = "blend",
 	pointable = ctf_core.settings.server_mode == "mapedit",
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
@@ -62,8 +61,7 @@ minetest.register_node("ctf_map:ind_water", {
 	is_ground_content = false,
 	walkable = true,
 	buildable_to = false,
-	use_texture_alpha = false,
-	alpha = 0,
+	use_texture_alpha = "clip",
 	pointable = ctf_core.settings.server_mode == "mapedit",
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
@@ -80,8 +78,7 @@ minetest.register_node("ctf_map:ind_river_water", {
 	is_ground_content = false,
 	walkable = true,
 	buildable_to = false,
-	use_texture_alpha = false,
-	alpha = 0,
+	use_texture_alpha = "clip",
 	pointable = ctf_core.settings.server_mode == "mapedit",
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()
@@ -99,8 +96,7 @@ minetest.register_node("ctf_map:ind_poison_water", {
 	is_ground_content = false,
 	walkable = true,
 	buildable_to = false,
-	use_texture_alpha = false,
-	alpha = 0,
+	use_texture_alpha = "clip",
 	pointable = ctf_core.settings.server_mode == "mapedit",
 	groups = {immortal = 1},
 	sounds = default.node_sound_glass_defaults()

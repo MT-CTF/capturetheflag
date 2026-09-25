@@ -6,7 +6,7 @@ minetest.register_on_joinplayer(function(player)
 	player:hud_set_flags({healthbar = false}) -- Hide the builtin HP bar
 	-- Add own HP bar with the same visuals as the builtin one
 	ids[player:get_player_name()] = player:hud_add({
-		hud_elem_type = "statbar",
+		type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "heart.png",
 		text2 = "heart_gone.png",
