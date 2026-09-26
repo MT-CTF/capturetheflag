@@ -9,6 +9,23 @@ playertag = {
 	TYPE_ENTITY  = TYPE_ENTITY,
 }
 
+local function get_tag_mod(player)
+	local pteam = ctf_teams.get(player)
+
+	if not pteam or not ctf_teams.team[pteam] then
+		return ""
+	end
+	return "^[multiply:" .. ctf_teams.team[pteam].color
+end
+
+local function apply_tag_mod(player)
+	local tag = players[player:get_player_name()]
+
+	if tag and tag.entity and tag.entity.object and tag.entity.object:get_pos() then
+		tag.entity.object:set_texture_mod(get_tag_mod(player))
+	end
+end
+
 local function remove_entity_tag(player)
 	local tag = players[player:get_player_name()]
 	if tag then
@@ -86,6 +103,7 @@ local function add_entity_tag(player, old_observers, settings)
 		i = i + 11
 	end)
 	ent:set_properties({ textures={texture} })
+	ent:set_texture_mod(get_tag_mod(player))
 
 	-- Attach to player
 	ent:set_attach(player, "", ATTACH_POSITION, {x=0, y=0, z=0})
@@ -167,6 +185,7 @@ minetest.register_entity("playertag:tag", {
 		visual_size = {x=2.16, y=0.18, z=2.16}, --{x=1.44, y=0.12, z=1.44},
 		textures = {"blank.png"},
 		collisionbox = { 0, -0.2, 0, 0, -0.2, 0 },
+		glow = 4,
 		physical = false,
 		makes_footstep_sound = false,
 		backface_culling = false,
@@ -193,6 +212,10 @@ minetest.register_entity("playertag:tag", {
 core.register_on_dieplayer(function(player)
 	local name = player:get_player_name()
 
+	if players[name] and players[name].entity and players[name].entity.object then
+		players[name].entity.object:set_texture_mod("^[multiply:#616161")
+	end
+
 	if players[name] and players[name].nametag_entity and players[name].symbol_entity and
 	players[name].nametag_entity.object and players[name].symbol_entity.object then
 		players[name].nametag_entity.object:set_properties({
@@ -208,6 +231,8 @@ end)
 
 local function restore_nametags(player)
 	local name = player:get_player_name()
+
+	apply_tag_mod(player)
 
 	if players[name] and players[name].nametag_entity and players[name].symbol_entity and
 	players[name].nametag_entity.object and players[name].symbol_entity.object then
