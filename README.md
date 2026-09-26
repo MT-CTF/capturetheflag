@@ -78,6 +78,7 @@ Note that downloading from ContentDB will probably delete any existing CTF folde
 
 ## Contributing
 * Contributions are always welcome! Please read the [contribution guidelines](CONTRIBUTING.md) first.
+* Our AI policy follows the [Luanti AI policy](https://github.com/luanti-org/luanti/blob/master/doc/developing/ai_policy.md)
 
 ## License
 

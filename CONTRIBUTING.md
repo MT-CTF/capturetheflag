@@ -20,8 +20,12 @@ git clone --recursive https://github.com/MT-CTF/capturetheflag.git
 - If you don't want to use a CLI and want a more beginner-friendly GUI interface you could try using [Github Desktop](https://github.com/apps/desktop).
 
 # Getting Involved
+
 ### Report Issues
 If you encounter any problems you can report them on our GitHub issue tracker. In the case of problems like game crashes it would be really helpful if you provided game logs (debug.txt).
+
+### AI Policy
+Our AI policy follows the [Luanti AI policy](https://github.com/luanti-org/luanti/blob/master/doc/developing/ai_policy.md)
 
 ### Contribute
 The main programming language used is Lua, feel free to create patches and propose them by making a pull request on Github. You should look around on the GitHub Issue tracker for open issues or the `#suggestions-note` channel on Discord to implement new features in the game. When contributing from suggestions in the Discord server, please make sure the suggestion is not controversial, and has at least 10 stars (With 'X's subtracted).
