@@ -70,7 +70,13 @@ function ctf_modebase.map_catalog.select_map(filter, full_pool)
 end
 
 function ctf_modebase.map_catalog.select_map_for_mode(mode)
+	local player_count = #minetest.get_connected_players()
+
 	ctf_modebase.map_catalog.select_map(function(map)
+		if player_count < (map.min_players or 0) or (map.max_players and player_count > map.max_players) then
+			return false
+		end
+
 		return not map.game_modes or table.indexof(map.game_modes, mode) ~= -1
 	end)
 end

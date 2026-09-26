@@ -203,6 +203,21 @@ function ctf_map.load_map_meta(idx, dirname)
 		end
 	end
 
+	local min_players = tonumber(meta:get("min_players") or "")
+	if not min_players and ctf_core.settings.server_mode ~= "mapedit" then
+		local team_count = 0
+		if map.teams then
+			for _ in pairs(map.teams) do
+				team_count = team_count + 1
+			end
+		end
+
+		min_players = team_count > 2 and team_count * 2 or 0
+	end
+
+	map.min_players = min_players
+	map.max_players = tonumber(meta:get("max_players") or "")
+
 	map.flag_center = calc_flag_center(map)
 
 	for _, e in pairs(minetest.get_dir_list(ctf_map.map_path[dirname], false)) do
@@ -310,6 +325,16 @@ function ctf_map.save_map(mapmeta)
 	meta:set("barrier_area"  , minetest.serialize(barrier_area))
 	meta:set("game_modes"    , minetest.serialize(mapmeta.game_modes))
 	meta:set("enable_shadows", mapmeta.enable_shadows)
+
+	local min_players = tonumber(mapmeta.min_players or "")
+	if min_players then
+		meta:set("min_players", tostring(min_players))
+	end
+
+	local max_players = tonumber(mapmeta.max_players or "")
+	if max_players then
+		meta:set("max_players", tostring(max_players))
+	end
 
 	meta:write()
 

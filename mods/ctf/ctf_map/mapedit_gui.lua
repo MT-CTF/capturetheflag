@@ -461,6 +461,25 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 	}
 	ypos = ypos + 1.4
 
+	-- MAP PLAYER LIMITS
+	elements.min_players = {
+		type = "field", label = S("Min Players (empty = auto)"), pos = {0, ypos},
+		size = {4, 0.7}, default = context[player].min_players and tostring(context[player].min_players) or "",
+		func = function(pname, fields)
+			context[pname].min_players = tonumber(fields.min_players or "")
+		end,
+	}
+	ypos = ypos + 1.4
+
+	elements.max_players = {
+		type = "field", label = S("Max Players (empty = no limit)"), pos = {0, ypos},
+		size = {4, 0.7}, default = context[player].max_players and tostring(context[player].max_players) or "",
+		func = function(pname, fields)
+			context[pname].max_players = tonumber(fields.max_players or "")
+		end,
+	}
+	ypos = ypos + 1.4
+
 	-- TEAMS
 	local idx = ypos
 	for teamname, def in pairs(context[player].teams) do
