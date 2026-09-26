@@ -345,17 +345,17 @@ ctf_healing.register_bandage("ctf_mode_classes:support_bandage", {
 				return
 			end
 
-			ctf_modebase.give_immunity(user)
+			ctf_modebase.give_immunity(user, false, IMMUNITY_TIME)
 
 			local step = math.floor(65534 / IMMUNITY_TIME)
 			ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", step, false,
 			function()
-				ctf_modebase.remove_immunity(user)
+				ctf_modebase.remove_immunity(pname)
 				local dstep = math.floor(65534 / IMMUNITY_COOLDOWN)
 				ctf_modebase.update_wear.start_update(pname, "ctf_mode_classes:support_bandage", dstep, true)
 			end,
 			function()
-				ctf_modebase.remove_immunity(user)
+				ctf_modebase.remove_immunity(pname)
 			end)
 
 			itemstack:set_wear(1)

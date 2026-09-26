@@ -682,16 +682,18 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 * `player` *PlayerObj*: Player
 * returns *boolean*
 
-#### `ctf_modebase.give_immunity(player, respawn_timer)`
+#### `ctf_modebase.give_immunity(player, respawn_timer, hud_duration)`
 * `player` *PlayerObj*: Player
-* `respawn_timer` *integer*: Amount of time to give immunity to player
+* `respawn_timer` *integer or false/nil*: Amount of time to give immunity to player.
+  Pass `false`/`nil` for custom immunity (you will need to remove the immunity yourself).
+* `hud_duration` *integer, false or nil*: Controls how long the countdown/blue hud tint lasts for, is set to `respawn_timer` value by default. Pass `false` to disable the huds.
 
-#### `ctf_modebase.remove_immunity(player)`
-* `player` *PlayerObj*: Player
+#### `ctf_modebase.remove_immunity(pname)`
+* `pname` *string*: Player name
 
-#### `ctf_modebase.remove_respawn_immunity(player)`
+#### `ctf_modebase.remove_respawn_immunity(pname)`
 *  Remove immunity and return true if it's respawn immunity, return false otherwise.
-* `player` *PlayerObj*: Player
+* `pname` *string*: Player name
 * returns *boolean*
 
 #### `ctf_modebase.update_playertags(time)`
