@@ -105,6 +105,9 @@ ctf_modebase.register_mode("classes", {
 		table.insert_all(initial_stuff, {"default:pick_stone", "default:torch 15", "default:stick 5"})
 		return initial_stuff
 	end,
+	get_spawn_order_key = function(player)
+		return player:get_player_name() .. ":" .. classes.get_name(player)
+	end,
 	initial_stuff_item_levels = custom_item_levels,
 	is_restricted_item = classes.is_restricted_item,
 	on_mode_start = function()

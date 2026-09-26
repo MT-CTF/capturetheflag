@@ -6,51 +6,21 @@ Capture the Flag is a Luanti (formerly Minetest) game. The following API doc cov
 If you see a deficiency in the API, feel free to attempt to add the functionality in the engine and API, and to document it here. All mods are contained in the `/mods/` folder. If you are unsure of the implementation of the function, please search for the function in the repository. If you see that something is undocumented you're more than welcome to make a PR documenting it, try to fit it with the style of the rest of the document though.
 
 # List of all Mods.
-- api
-  - ctf_gui
-  - ctf_settings
-  - hud_events
-  - physics
-  - mhud
-  - rawf
-- mtg
-  - redef
-  - ctf_changes
-- pvp
-  - dropondie
-  - grenades
-- other
-  - afkkick
-  - chat_bg
-  - crafting
-  - darkness nerf
-  - email
-  - hpbar
-  - hpbar_hud
-  - lib_chatcmdbuilder
-  - playertag
-  - poison_water
-  - random_messages
-  - real suffocation
-  - select item
-  - skybox
-  - sprint
-  - throwable snow
-  - wield3d
-- ctf
-  - ctf_api
-  - ctf_chat
-  - ctf_combat
-  - ctf_core
-  - ctf_cosmetics
-  - ctf_landmine
-  - ctf_map
-  - ctf_modebase
-  - ctf_modes
-  - ctf_player
-  - ctf_rankings
-  - ctf_report
-  - ctf_teams
+
+Check for yourself :P
+```bash
+ls mods/*/
+```
+
+# System Explanations
+
+## Matches
+On match start, players are allocated to teams, their inventories are emptied, initial stuff is given via `ctf_modebase.player.give_initial_stuff()`, and they are teleported near their flag.
+Note: The 'give' always runs before the teleport. On respawn, `registered_on_respawnplayer` callbacks run first and the mode's `on_respawnplayer` teleports afterwards. Class switching in Classes mode triggers a 'give' with no teleport.
+
+With `manual_initial_stuff_ordering` enabled, the first give per mode (per class in Classes mode) shows the ordering formspec; the arrangement is cached in memory until mode end and later 'give's apply it silently. The cache is refreshed from the formspec on close or via the crafting inventory's save button, and the formspec reshows whenever a give contains items the cache doesn't know.
+
+**NOTE:** Since giving happens before teleporting, `player:get_pos()` inside give-time code returns the pre-teleport position. Use `minetest.after(0, ...)` for position-dependent code
 
 # api
 This folder contains a collection of mods with the main goal of providing an API
@@ -945,6 +915,7 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 And thats the end of the api docs. If anything is missing, or something needs to be updated, feel free to make a PR.
 
 <!--
-Docs for CTF by mrtechtroid.
+Docs for CTF
+Credit to mrtechtroid, LandarVargan.
 Released under CC BY-SA 4.0
 -->

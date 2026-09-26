@@ -205,11 +205,27 @@ if core.global_exists("sfinv") then
 			formspec = formspec .. "list[detached:crafting_trash;main;0,3.8;1,1;]" ..
 				"image[0.07,3.9;0.8,0.8;crafting_trash_icon.png]"
 
+			if ctf_settings.get(player, "manual_initial_stuff_ordering") == "true" then
+				formspec = formspec ..
+					"image_button[1,3.8;1,1;crafting_save_icon.png;save_inv_order;]" ..
+					"tooltip[save_inv_order;Saves the order of the items in your inventory" ..
+					"\n(Your saved order is used when you respawn, and lasts until the mode ends)]"
+			end
+
 			return sfinv.make_formspec(player, context, formspec, true)
 		end,
 		on_player_receive_fields = function(self, player, context, fields)
 			if crafting.result_select_on_receive_results(player, context, fields) then
 				sfinv.set_player_inventory_formspec(player)
+			end
+
+			if fields.save_inv_order and not cooldown:get(player) then
+				cooldown:set(player, 1)
+				ctf_modebase.player.save_initial_stuff_positions(player)
+
+				core.sound_play("crafting_save_sound", {
+					to_player = player:get_player_name(),
+				}, true)
 			end
 
 			return true

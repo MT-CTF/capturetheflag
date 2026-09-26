@@ -88,7 +88,123 @@ local simplify_item_name = function(iname)
 	return iname
 end
 
--- Changes made to this function should also be made to is_initial_stuff() above
+-- Changes made to get_initial_stuff() below should also be made to
+-- is_initial_stuff() here. Names are compared simplified so e.g. tool
+-- upgrades still match their cached positions.
+local function is_initial_stuff(player, iname)
+	local want = simplify_item_name(iname)
+	local mode = ctf_modebase:get_current_mode()
+	if mode and mode.stuff_provider then
+		for _, item in ipairs(mode.stuff_provider(player)) do
+			if simplify_item_name(ItemStack(item):get_name()) == want then
+				return true
+			end
+		end
+	end
+
+	if ctf_map.current_map and ctf_map.current_map.initial_stuff then
+		for _, item in ipairs(ctf_map.current_map.initial_stuff) do
+			if simplify_item_name(ItemStack(item):get_name()) == want then
+				return true
+			end
+		end
+	end
+end
+
+-- Local per-mode cache of spawn ordering: flat key -> { [name] = slot }.
+local spawn_order_cache = {}
+
+local function get_spawn_order_key(player)
+	local mode = ctf_modebase:get_current_mode()
+	if mode and mode.get_spawn_order_key then
+		return mode.get_spawn_order_key(player)
+	end
+	return player:get_player_name()
+end
+
+-- Saves the positions of the player's current main inventory as their spawn
+-- ordering for this mode. Only initial stuff items are recorded, using
+-- simplified names so e.g. tool upgrades still match.
+function ctf_modebase.player.save_initial_stuff_positions(player)
+	if not ctf_modebase.current_mode then return end
+
+	local ssp = {}
+	for i, stack in ipairs(player:get_inventory():get_list("main")) do
+		local n = stack:get_name()
+		if n ~= "" and is_initial_stuff(player, n) then
+			local k = simplify_item_name(n)
+			if not ssp[k] then
+				ssp[k] = i
+			end
+		end
+	end
+
+	spawn_order_cache[get_spawn_order_key(player)] = ssp
+end
+
+-- Arranges stacks using cached positions. The hotbar (slots 1-8) keeps its
+-- exact positions; everything else is appended in cached slot order.
+-- Only whole stacks are ever moved, never split. Returns the arranged
+-- list and whether any stack had no cached position.
+local function arrange_by_cache(stacks, ssp)
+	local hotbar = {}
+	local rest = {}
+	local has_new = false
+	for _, stack in ipairs(stacks) do
+		if not stack:is_empty() then
+			local idx = ssp and ssp[simplify_item_name(stack:get_name())]
+			if idx and idx >= 1 and idx <= 8 and not hotbar[idx] then
+				hotbar[idx] = stack
+			else
+				if not idx then
+					has_new = true
+				end
+				table.insert(rest, {stack = stack, order = idx or math.huge})
+			end
+		end
+	end
+
+	table.sort(rest, function(a, b)
+		if a.order ~= b.order then
+			return a.order < b.order
+		end
+		return a.stack:get_name() < b.stack:get_name()
+	end)
+
+	local arranged = {}
+	for i = 1, 8 do
+		arranged[i] = hotbar[i] or ItemStack("")
+	end
+	for _, entry in ipairs(rest) do
+		table.insert(arranged, entry.stack)
+	end
+
+	return arranged, has_new
+end
+
+-- Drops excess stacks at the player's feet on the next server step.
+-- Deferred because give_initial_stuff() runs before respawn/teleport
+-- positioning has finished, so get_pos() is stale when this is called.
+-- Only whole stacks are ever moved, never split.
+local function drop_excess(pname, arranged, size)
+	if #arranged <= size then return end
+	core.log("error", "[ctf_modebase] give_initial_stuff: "..
+		"more spawn stacks than inventory slots, dropping extras at feet")
+	local dropped = {}
+	while #arranged > size do
+		table.insert(dropped, 1, table.remove(arranged))
+	end
+	minetest.after(0, function()
+		local player = core.get_player_by_name(pname)
+		if not player then return end
+		local pos = player:get_pos()
+		for _, stack in ipairs(dropped) do
+			core.add_item(pos, stack)
+		end
+	end)
+end
+
+-- Changes made to is_initial_stuff() above should also be made to this function
 local function get_initial_stuff(player, f)
 	local mode = ctf_modebase:get_current_mode()
 	if mode and mode.stuff_provider then
@@ -133,6 +249,8 @@ local function handle_remaining_initial_stuff(player)
 
 	inv:set_list("initial_stuff", {})
 	initial_stuff_shown[player:get_player_name()] = nil
+
+	ctf_modebase.player.save_initial_stuff_positions(player)
 end
 
 local old_show_formspec = core.show_formspec
@@ -221,7 +339,40 @@ function ctf_modebase.player.give_initial_stuff(player)
 		inv:add_item(target_inv, item)
 	end)
 
-	if ctf_settings.get(player, "manual_initial_stuff_ordering") == "true" then
+	if target_inv == "initial_stuff" then
+		local ssp = spawn_order_cache[get_spawn_order_key(player)]
+
+		if ssp then
+			local initial, other = {}, {}
+			for _, stack in ipairs(inv:get_list("initial_stuff")) do
+				if not stack:is_empty() then
+					if is_initial_stuff(player, stack:get_name()) then
+						table.insert(initial, stack)
+					else
+						table.insert(other, stack)
+					end
+				end
+			end
+
+			local arranged, has_new = arrange_by_cache(initial, ssp)
+
+			for _, stack in ipairs(other) do
+				table.insert(arranged, stack)
+			end
+
+			if not has_new then
+				drop_excess(pname, arranged, inv:get_size("main"))
+				inv:set_list("main", arranged)
+				inv:set_list("initial_stuff", {})
+				return
+			end
+
+			-- New items the cache doesn't know: reshow the formspec
+			-- with the cached order applied so they can be placed
+			drop_excess(pname, arranged, inv:get_size("initial_stuff"))
+			inv:set_list("initial_stuff", arranged)
+		end
+
 		core.show_formspec(
 			pname,
 			"ctf_modebase:initial_stuff",
@@ -406,6 +557,10 @@ end
 function ctf_modebase.player.is_playing(player)
 	return true
 end
+
+ctf_api.register_on_mode_start(function()
+	spawn_order_cache = {}
+end)
 
 ctf_api.register_on_new_match(function()
 	for _, player in pairs(minetest.get_connected_players()) do
