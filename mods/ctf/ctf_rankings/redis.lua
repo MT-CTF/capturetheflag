@@ -5,7 +5,7 @@ local client = redis.connect(
 )
 assert(client:ping(), "Redis server not found!")
 
-local CHUNKING_TIMER = 30
+local CHUNKING_TIMER = 45
 
 return function(prefix, ranklist)
 	local DB_VERSION = client:get(prefix .. ":db_version") or 1
@@ -44,25 +44,25 @@ return {
 
 	op_all = op_all,
 
-	gtcache = nil,
+	gtcache = {},
 	get_top = function(self, rend, sortby, rstart, bypass_cache)
 		assert(not bypass_cache, "bypass_cache does not account for the :add() cache, please ask for this to be implemented")
 
-		if type(rstart) == "number" then
-			rstart = rstart - 1
-		end
+		local astart = type(rstart) == "number" and (rstart - 1) or 0
+		local aend = rend - 1
+		local key = (sortby or "") .. ":" .. astart .. ":" .. aend
 
-		if not self.gtcache or bypass_cache then
-			self.gtcache = client:zrevrange(self.prefix..sortby, rstart or 0, rend-1, {withscores = true})
+		if not self.gtcache[key] or bypass_cache then
+			self.gtcache[key] = client:zrevrange(self.prefix..sortby, astart, aend, {withscores = true})
 
-			if self.gtcache then
-				minetest.after(CHUNKING_TIMER, function()
-					self.gtcache = nil
+			if self.gtcache[key] then
+				core.after(CHUNKING_TIMER, function()
+					self.gtcache[key] = nil
 				end)
 			end
 		end
 
-		return table.copy(self.gtcache)
+		return table.copy(self.gtcache[key])
 	end,
 
 	gpcache = {},

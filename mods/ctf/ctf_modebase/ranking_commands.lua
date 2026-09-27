@@ -22,6 +22,18 @@ local function get_gamemode(param)
 	end
 end
 
+-- AI generated, probably learned it from https://love2d.org/forums/viewtopic.php?f=4&t=1802
+local function format_commas(n)
+	local sign = ""
+	n = math.round(n or 0)
+	if n < 0 then
+		sign = "-"
+		n = -n
+	end
+	local s = tostring(n):reverse():gsub("(%d%d%d)", "%1,"):reverse()
+	return sign .. s:gsub("^,", "")
+end
+
 local function rank(name, mode_name, mode_data, pname)
 	if not mode_name then
 		return false, mode_data
@@ -63,11 +75,35 @@ local function rank(name, mode_name, mode_data, pname)
 		)
 	end
 
-	return_str = string.format("%s%s: %s\n",
+	local place = mode_data.rankings:get_place(pname, "score")
+
+	return_str = string.format("%s%s: %s\n\t",
 		return_str,
 		minetest.colorize("#63d437", "Place"),
-		minetest.colorize("#ffea00", mode_data.rankings:get_place(pname, "score"))
+		minetest.colorize("#ffea00", place)
 	)
+
+	if place and place > 1 then
+		local above = mode_data.rankings:get_top(place - 1, "score", place - 1)
+		local next_pname = above[1][1]
+		local next_rank = mode_data.rankings:get(next_pname)
+		if next_rank and next_rank.score then
+			local needed = next_rank.score - (prank.score or 0)
+			if needed < 0 then
+				needed = 0
+			end
+			return_str = string.format("%s%s: ~%s\n",
+				return_str,
+				minetest.colorize("#63d437",
+					"Score to next rank (" .. next_pname .. ")"),
+				minetest.colorize("#ffea00", format_commas(needed))
+			)
+		else
+			minetest.log("warning", "[ctf_rankings] rank(): no stored rankings "..
+				"for leaderboard entry '" .. next_pname ..
+				"' in mode '" .. mode_name .. "'")
+		end
+	end
 
 	return true, return_str
 end

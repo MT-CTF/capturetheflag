@@ -1,6 +1,8 @@
-local top = ctf_core.include_files("top.lua"):new()
+local topfile = ctf_core.include_files("top.lua")
 
 return function(prefix, sorting_finished)
+
+local top = topfile:new()
 
 local modstorage = assert(minetest.get_mod_storage(), "Can only init rankings at runtime!")
 
@@ -79,7 +81,7 @@ return {
 
 		local out = {}
 		for i=(rstart or 1), #t do
-			out[i] = {t[i]}
+			table.insert(out, {t[i]})
 		end
 
 		return out
