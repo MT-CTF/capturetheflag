@@ -1,5 +1,6 @@
 unused_args = false
 std = "lua51"
+max_line_length = 120
 
 globals = {
 	"PlayerObj", "PlayerName", "HumanReadable", "RunCallbacks",
