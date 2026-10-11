@@ -150,10 +150,11 @@ local trap_def = {
 					return itemstack
 				end
 
-				minetest.chat_send_player(
-					clicker:get_player_name(),
-					"This is a trap chest!"
-				)
+				hud_events.new(clicker, {
+    				quick = true,
+    				text = "This is a trap chest!",
+    				color = "warning",
+				})
 
 				return itemstack
 			end
