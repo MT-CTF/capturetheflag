@@ -43,11 +43,13 @@ local function remove_trapchest(pos)
 end
 
 local function disarm_trapchest(pos, player)
-	local pname = player:get_player_name()
+    remove_trapchest(pos)
 
-	remove_trapchest(pos)
-
-	minetest.chat_send_player(pname, "Trap chest disarmed.")
+    hud_events.new(player, {
+        quick = true,
+        text = "Trap chest disarmed.",
+        color = "success",
+    })
 end
 
 local function damage_trap_opener(player, trap)
