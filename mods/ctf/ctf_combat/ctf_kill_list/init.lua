@@ -86,7 +86,8 @@ local function update_kill_list_hud(player)
 
 	if not hudupdate_queue[name] then
 		hudupdate_queue[name] = minetest.after(HUD_UPDATE_INTERVAL, function()
-			if minetest.get_player_by_name(name) then
+			player = minetest.get_player_by_name(name)
+			if player then
 				for i=1, HUD_LINES, 1 do
 					update_hud_line(player, i, kill_list[i])
 				end

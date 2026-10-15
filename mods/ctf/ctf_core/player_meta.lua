@@ -6,7 +6,8 @@ local write_timer = -1
 
 core.register_on_mods_loaded(function()
 	table.insert(core.registered_on_joinplayers, 1, function(player)
-		player_meta[player:get_player_name()] = (player:get_meta():to_table() or {fields = {}}).fields
+		local meta_table = player:get_meta():to_table()
+		player_meta[player:get_player_name()] = (meta_table and meta_table.fields) or {}
 	end)
 end)
 
