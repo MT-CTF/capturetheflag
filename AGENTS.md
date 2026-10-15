@@ -1,6 +1,12 @@
-# Capture the Flag Agent Guide
+# Capture the Flag — agent entrypoint
 
-The project-wide agent file will be in AI/AGENTS.md if the user has decided to create one for you.
-The user might also have put documentation in AI/, e.g for Luanti (lua_api.md) and Lua 5.1.
-If the user asks you to edit or create an AGENTS.md, they want you to edit/create the one in AI/ (Create the directory if it doesn't exist)
-AI/ is added to the .gitignore, keep that in mind when accessing it
+> STOP: agent guidance lives in `AI/AGENTS.md` — read and edit that file,
+> not this one. `AI/` is gitignored and never committed; this file is only
+> a boot pointer for fresh clones where `AI/` is absent.
+
+If `AI/AGENTS.md` exists, follow it and ignore the rest of this file.
+
+Bare-minimum boot (no `AI/` present):
+- Lua 5.1, tabs, `luacheck .` is the only CI check.
+- Use `core`, never `minetest`;
+- Lua errors crash the server.
