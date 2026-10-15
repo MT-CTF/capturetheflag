@@ -46,18 +46,113 @@ local function get_chest_access(name)
 	return current_mode.get_chest_access(name)
 end
 
+local function get_store_access(team, player)
+	local name = player:get_player_name()
+
+	if team ~= ctf_teams.get(name) then
+		hud_events.new(player, {
+			quick = true,
+			text = S("You're not on team") .. " " .. team,
+			color = "warning",
+		})
+		return nil
+	end
+
+	local reg_access, pro_access = get_chest_access(name)
+
+	if ctf_rankings.backend == "dummy" then
+		reg_access, pro_access = true, true
+	end
+
+	if reg_access ~= true then
+		return nil
+	end
+
+	return pro_access == true
+end
+
+local function award_enemy_return_score(pname, stack)
+	local dropped_by = stack:get_meta():get_string("dropped_by")
+	if dropped_by == "" or dropped_by == pname then
+		return
+	end
+
+	local dropteam = ctf_teams.get(dropped_by)
+	if not dropteam or ctf_teams.get(pname) == dropteam then
+		return
+	end
+
+	local dropinfo = core.get_player_information(dropped_by)
+	local pinfo = core.get_player_information(pname)
+	if not dropinfo or not pinfo or dropinfo.address == pinfo.address then
+		return
+	end
+
+	local mode = ctf_modebase:get_current_mode()
+	if not mode or not mode.recent_rankings then
+		return
+	end
+
+	local score = item_value[stack:get_name()] or 1
+	mode.recent_rankings.add(pname, { score = score }, false)
+end
+
+local function is_blacklisted(stack)
+	for _, itemstring in ipairs(blacklist) do
+		if stack:get_name():match(itemstring) then
+			return true
+		end
+	end
+
+	return false
+end
+
+-- Returns unstored count; excess goes back to the player (or drops at their feet).
+local function drain_helper_slot(chestinv, player, use_pro)
+	local item = chestinv:get_stack("helper", 1)
+
+	if item:is_empty() then
+		return 0
+	end
+
+	local mark = item:get_meta():get_string("dropped_by")
+	item:get_meta():set_string("dropped_by", "")
+
+	if use_pro and ctf_teams.is_allowed_in_team_chest("pro", item, player) then
+		item = chestinv:add_item("pro", item)
+	end
+
+	if not item:is_empty() and ctf_teams.is_allowed_in_team_chest("main", item, player) then
+		item = chestinv:add_item("main", item)
+	end
+
+	-- Check remaining stack after adding
+	if item:is_empty() then
+		chestinv:set_stack("helper", 1, item)
+
+		return 0
+	else
+		item:get_meta():set_string("dropped_by", mark)
+
+		local back = player:get_inventory():add_item("main", item)
+		if not back:is_empty() then
+			if core.add_item(player:get_pos(), back) ~= nil then
+				back = ItemStack("")
+			end
+		end
+
+		chestinv:set_stack("helper", 1, back)
+
+		return item:get_count()
+	end
+end
+
 function ctf_teams.is_allowed_in_team_chest(listname, stack, player)
 	if listname == "helper" then
 		return false
 	end
 
-	for _, itemstring in ipairs(blacklist) do
-		if stack:get_name():match(itemstring) then
-			return false
-		end
-	end
-
-	return true
+	return not is_blacklisted(stack)
 end
 
 for _, team in ipairs(ctf_teams.teamlist) do
@@ -104,7 +199,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			local inv = meta:get_inventory()
 			inv:set_size("main", 6 * 7)
 			inv:set_size("pro", 4 * 7)
-			inv:set_size("helper", 1 * 1)
+			inv:set_size("helper", 1)
 		end
 
 		function def.can_dig(pos, player)
@@ -158,6 +253,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			if pro_access == true then
 				formspec = formspec .. "list[" .. chestinv .. ";pro;6,0.3;4,7;]" ..
 					"listring[" .. chestinv ..";pro]" ..
+					"listring[current_player;main]" ..
 					"listring[" .. chestinv .. ";helper]" ..
 					"label[7,-0.2;" ..
 					minetest.formspec_escape(S("Pro players only")) .. "]"
@@ -197,18 +293,7 @@ for _, team in ipairs(ctf_teams.teamlist) do
 			end
 
 			if reg_access == true and (pro_access == true or from_list ~= "pro" and to_list ~= "pro") then
-				if to_list == "helper" then
-					-- handle move & overflow
-					local chestinv = minetest.get_inventory({type = "node", pos = pos})
-					local playerinv = player:get_inventory()
-					local stack = chestinv:get_stack(from_list, from_index)
-					local leftover = playerinv:add_item("main", stack)
-					local n_stack = stack
-					n_stack:set_count(stack:get_count() - leftover:get_count())
-					chestinv:remove_item("helper", stack)
-					chestinv:remove_item("pro", n_stack)
-					return 0
-				elseif from_list == "helper" then
+				if to_list == "helper" or from_list == "helper" then
 					return 0
 				else
 					return count
@@ -219,44 +304,33 @@ for _, team in ipairs(ctf_teams.teamlist) do
 		end
 
 		function def.allow_metadata_inventory_put(pos, listname, index, stack, player)
-			local name = player:get_player_name()
-
-			if team ~= ctf_teams.get(name) then
-				hud_events.new(player, {
-					quick = true,
-					text = S("You're not on team") .. " " .. team,
-					color = "warning",
-				})
+			local use_pro = get_store_access(team, player)
+			if use_pro == nil then
 				return 0
+			end
+
+			-- Shift-clicked
+			if listname == "helper" then
+				if is_blacklisted(stack) then
+					return 0
+				end
+
+				return stack:get_count()
 			end
 
 			if not ctf_teams.is_allowed_in_team_chest(listname, stack, player) then
 				return 0
 			end
 
-			local reg_access, pro_access = get_chest_access(name)
-
-			if ctf_rankings.backend == "dummy" then
-				reg_access, pro_access = true, true
-			end
-
-			if reg_access == true and (pro_access == true or listname ~= "pro") then
-				local chestinv = minetest.get_inventory({type = "node", pos = pos})
-				if chestinv:room_for_item("pro", stack) then
-					return stack:get_count()
-				else
-					-- handle overflow
-					local playerinv = player:get_inventory()
-					local leftovers = chestinv:add_item("pro", stack)
-					local leftover = chestinv:add_item("main", leftovers)
-					local n_stack = stack
-					n_stack:set_count(stack:get_count() - leftover:get_count())
-					playerinv:remove_item("main", n_stack)
-					return 0
-				end
-			else
+			if listname == "pro" and not use_pro then
 				return 0
 			end
+
+			local chestinv = core.get_inventory({type = "node", pos = pos})
+			if chestinv:room_for_item(listname, stack) then
+				return stack:get_count()
+			end
+			return 0
 		end
 
 		function def.allow_metadata_inventory_take(pos, listname, index, stack, player)
@@ -294,28 +368,39 @@ for _, team in ipairs(ctf_teams.teamlist) do
 
 
 	function def.on_metadata_inventory_put(pos, listname, index, stack, player)
+		local pname = player:get_player_name()
+		local inv = core.get_inventory({type = "node", pos = pos})
+
+		-- Handle shift-clicks
+		if listname == "helper" then
+			local use_pro = get_store_access(team, player)
+			if use_pro == nil then
+				return
+			end
+
+			local placed = stack:get_count() - drain_helper_slot(inv, player, use_pro)
+			if placed > 0 then
+				local done = ItemStack(stack)
+				done:set_count(placed)
+
+				core.log("action", string.format("%s puts %s to team chest at %s",
+					pname,
+					done:to_string(),
+					core.pos_to_string(pos)
+				))
+				award_enemy_return_score(pname, stack)
+			end
+
+			return
+		end
+
 		minetest.log("action", string.format("%s puts %s to team chest at %s",
-			player:get_player_name(),
+			pname,
 			stack:to_string(),
 			minetest.pos_to_string(pos)
 		))
-		local meta = stack:get_meta()
-		local dropped_by = meta:get_string("dropped_by")
-		local dropteam = ctf_teams.get(dropped_by)
-		local dropinfo = core.get_player_information(dropped_by)
-		local pname = player:get_player_name()
-		local pinfo = core.get_player_information(pname)
-		if dropped_by ~= pname and dropped_by ~= "" and
-		dropteam and ctf_teams.get(pname) ~= dropteam and dropinfo and pinfo and dropinfo.address ~= pinfo.address then
-			local cur_mode = ctf_modebase:get_current_mode()
-			if pname and cur_mode then
-				local score = item_value[stack:get_name()] or 1
 
-				cur_mode.recent_rankings.add(pname, { score = score }, false)
-			end
-		end
-		meta:set_string("dropped_by", "")
-		local inv = minetest.get_inventory({ type="node", pos=pos })
+		award_enemy_return_score(pname, stack)
 		local stack_ = inv:get_stack(listname,index)
 		stack_:get_meta():set_string("dropped_by", "")
 		inv:set_stack(listname, index, stack_)
@@ -326,6 +411,17 @@ for _, team in ipairs(ctf_teams.teamlist) do
 				player:get_player_name(),
 				stack:to_string(),
 				minetest.pos_to_string(pos)
+			))
+		end
+
+		function def.on_metadata_inventory_move(pos, from_list, from_index,
+				to_list, to_index, count, player)
+			core.log("action", string.format("%s moves %d from %s to %s in team chest at %s",
+				player:get_player_name(),
+				count,
+				from_list,
+				to_list,
+				core.pos_to_string(pos)
 			))
 		end
 
