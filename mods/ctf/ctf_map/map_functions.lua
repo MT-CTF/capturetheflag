@@ -283,6 +283,8 @@ local function place_trap_chests(mapmeta, pos1, pos2, data, param2_data)
 		return
 	end
 
+	local ID_TRAP_CHEST = minetest.get_content_id("ctf_trapchest:trapchest")
+
 	for i, a in pairs(mapmeta.trap_chests) do
 		local place_positions = get_place_positions(a, data, pos1, pos2)
 
