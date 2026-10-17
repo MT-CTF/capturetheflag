@@ -43,6 +43,8 @@ clear_landmines() -- Make sure values are initialized
 local remove_landmine = function(pos)
 	local hash = core.hash_node_position(vector.round(pos))
 
+	if not landmines[hash] then return end
+
 	landmine_areas:remove_area(landmines[hash].a)
 
 	landmines[hash] = nil
