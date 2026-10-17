@@ -442,7 +442,6 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 			end
 			recent_rankings.add(player, {deaths = 1}, true)
 		end
-			
 		if killer then
 			local killscore = calculate_killscore(player)
 			local total_enemy_reward = 0
