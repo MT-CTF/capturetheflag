@@ -149,25 +149,6 @@ function ctf_map.load_map_meta(idx, dirname)
 				amount = ctf_map.DEFAULT_CHEST_AMOUNT,
 			}
 		end
-		-- Read custom trap chest zones from config
-		i = 1
-		minetest.log("verbose", "Parsing trap chest zones of " .. map.name .. "...")
-		while meta:get("trap_chests." .. i .. ".from") do
-			local from = minetest.string_to_pos(meta:get("trap_chests." .. i .. ".from"))
-			local to = minetest.string_to_pos(meta:get("trap_chests." .. i .. ".to"))
-			assert(from and to, "Positions needed for trap chest zone " ..
-					i .. " in map " .. map.name)
-
-			from, to = vector.sort(from, to)
-
-			map.trap_chests[i] = {
-				pos1 = vector.add(offset, vector.add(from, offset_to_new)),
-				pos2 = vector.add(offset, vector.add(to, offset_to_new)),
-				amount = tonumber(meta:get("trap_chests." .. i .. ".n") or "1"),
-			}
-
-			i = i + 1
-		end
 	else
 		-- If new items are added also remember to change the table in mapedit_gui.lua
 		-- The version number should be updated if you change an item
