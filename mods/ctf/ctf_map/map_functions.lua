@@ -153,7 +153,6 @@ end
 
 
 local ID_CHEST = minetest.get_content_id("ctf_map:chest")
-local ID_TRAP_CHEST = minetest.get_content_id("ctf_trapchest:trapchest")
 local function get_place_positions(a, data, pos1, pos2)
 	if a.amount <= 0 then return {} end
 
