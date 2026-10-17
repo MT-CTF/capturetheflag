@@ -178,7 +178,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			phys_jump      = tonumber(meta:get("phys_jump")),
 			phys_gravity   = tonumber(meta:get("phys_gravity")),
 			chests         = minetest.deserialize(meta:get("chests")),
-			trap_chests    = minetest.deserialize(meta:get("trap_chests")),
+			trap_chests    = minetest.deserialize(meta:get("trap_chests")) or {},
 			teams          = minetest.deserialize(meta:get("teams")),
 			barrier_area   = minetest.deserialize(meta:get("barrier_area")),
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
