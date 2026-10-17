@@ -142,7 +142,7 @@ minetest.register_tool("ctf_mode_classes:support_paxel", {
 				ctf_mode_classes.start_paxel_cooldown(user, itemstack)
 				return itemstack
 			else
-				minetest.item_place(itemstack, user, pointed_thing)
+				return minetest.item_place(itemstack, user, pointed_thing)
 			end
 		end
 		return itemstack
