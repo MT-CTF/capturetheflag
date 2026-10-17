@@ -722,7 +722,7 @@ return {
 		local pteam = ctf_teams.get(player)
 		local tcolor = ctf_teams.team[pteam].color
 
-		ctf_modebase.remove_immunity(player)
+		ctf_modebase.remove_immunity(pname)
 		playertag.set(player, playertag.TYPE_BUILTIN, tcolor)
 
 		local text = " has taken the flag"
