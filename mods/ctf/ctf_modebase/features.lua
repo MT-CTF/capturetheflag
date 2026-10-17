@@ -501,7 +501,7 @@ local function can_punchplayer(player, hitter)
 	local pname, hname = player:get_player_name(), hitter:get_player_name()
 	local pteam, hteam = ctf_teams.get(player), ctf_teams.get(hitter)
 
-	if not ctf_modebase.remove_respawn_immunity(hitter) then
+	if not ctf_modebase.remove_respawn_immunity(hname) then
 		return false, S("You can't attack while immune")
 	end
 
