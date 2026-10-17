@@ -52,6 +52,47 @@ local function disarm_trapchest(pos, player)
     })
 end
 
+local function play_trapchest_explosion(pos)
+	minetest.add_particlespawner({
+		amount = 20,
+		time = 0.5,
+		minpos = vector.subtract(pos, 3),
+		maxpos = vector.add(pos, 3),
+		minvel = {x = 0, y = 5, z = 0},
+		maxvel = {x = 0, y = 7, z = 0},
+		minacc = {x = 0, y = 1, z = 0},
+		maxacc = {x = 0, y = 1, z = 0},
+		minexptime = 0.3,
+		maxexptime = 0.6,
+		minsize = 7,
+		maxsize = 10,
+		collisiondetection = true,
+		collision_removal = false,
+		vertical = false,
+		texture = "grenades_smoke.png",
+	})
+
+	minetest.add_particle({
+		pos = pos,
+		velocity = {x = 0, y = 0, z = 0},
+		acceleration = {x = 0, y = 0, z = 0},
+		expirationtime = 0.3,
+		size = 15,
+		collisiondetection = false,
+		collision_removal = false,
+		object_collision = false,
+		vertical = false,
+		texture = "grenades_boom.png",
+		glow = 10,
+	})
+
+	minetest.sound_play("grenades_explode", {
+		pos = pos,
+		gain = 1.0,
+		max_hear_distance = 64,
+	})
+end
+
 local function damage_trap_opener(player, trap)
 	local pname = player:get_player_name()
 
