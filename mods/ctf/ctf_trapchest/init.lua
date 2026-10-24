@@ -194,9 +194,9 @@ local trap_def = {
 				end
 
 				hud_events.new(clicker, {
-    				quick = true,
-    				text = "This is a trap chest!",
-    				color = "warning",
+					quick = true,
+					text = "This is a trap chest!",
+					color = "warning",
 				})
 
 				return itemstack
