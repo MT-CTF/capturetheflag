@@ -189,8 +189,8 @@ function ctf_map.load_map_meta(idx, dirname)
 			map.chests[id].pos1 = vector.add(offset, def.pos1)
 			map.chests[id].pos2 = vector.add(offset, def.pos2)
 		end
-		
-		for id, def in pairs(map.trap_chests or {}) do
+
+			for id, def in pairs(map.trap_chests or {}) do
 			map.trap_chests[id].pos1 = vector.add(offset, def.pos1)
 			map.trap_chests[id].pos2 = vector.add(offset, def.pos2)
 		end
