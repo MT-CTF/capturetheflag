@@ -1,3 +1,4 @@
+-- luacheck: globals ctf_mode_classes
 local pending_kills = {}
 local trapchest = {}
 
@@ -219,6 +220,7 @@ local trap_def = {
 		end
 		-- Anyone opening an armed trap without a usable Paxel triggers it.
 		remove_trapchest(pos)
+		play_trapchest_explosion(pos)
 		damage_trap_opener(clicker, trap)
 
 		return itemstack
