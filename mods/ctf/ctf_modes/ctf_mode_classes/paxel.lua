@@ -11,7 +11,6 @@ local PAXEL_COOLDOWN_TIME = 20
 
 local dig_timers = {}
 
--- luacheck: globals ctf_mode_classes
 ctf_mode_classes = ctf_mode_classes or {}
 
 function ctf_mode_classes.paxel_is_ready(itemstack)
