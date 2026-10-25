@@ -1,4 +1,3 @@
--- luacheck: globals ctf_mode_classes
 local pending_kills = {}
 local trapchest = {}
 
