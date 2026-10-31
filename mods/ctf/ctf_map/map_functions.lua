@@ -277,6 +277,35 @@ local function place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, tre
 	end
 end
 
+local function place_trap_chests(mapmeta, pos1, pos2, data, param2_data)
+	if not mapmeta.trap_chests or not minetest.registered_nodes["ctf_trapchest:trapchest"] then
+		return
+	end
+
+	local ID_TRAP_CHEST = minetest.get_content_id("ctf_trapchest:trapchest")
+
+	for i, a in pairs(mapmeta.trap_chests) do
+		local place_positions = get_place_positions(a, data, pos1, pos2)
+
+		for _, pos in ipairs(place_positions) do
+			data[pos.vi] = ID_TRAP_CHEST
+			param2_data[pos.vi] = 0
+		end
+
+		if #place_positions < a.amount then
+			minetest.log("error",
+				string.format("[MAP] Couldn't place %d of the %d trap chests needed in zone %d (%s - %s)",
+					a.amount - #place_positions,
+					a.amount,
+					i,
+					core.pos_to_string(pos1, 0),
+					core.pos_to_string(pos2, 0)
+				)
+			)
+		end
+	end
+end
+
 local function generate_barrier_data(pos1, pos2, data)
 	BARRIER_DATA = {}
 
@@ -299,6 +328,7 @@ function ctf_map.prepare_map_nodes(mapmeta, treasurefy_node_callback, team_chest
 
 	prepare_nodes(pos1, pos2, data, team_chest_items, blacklisted_nodes)
 	place_treasure_chests(mapmeta, pos1, pos2, data, param2_data, treasurefy_node_callback)
+	place_trap_chests(mapmeta, pos1, pos2, data, param2_data)
 
 	if not ctf_core.settings.low_ram_mode then
 		generate_barrier_data(pos1, pos2, data)

@@ -422,21 +422,32 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 				recent_rankings.add(player, {deaths = 1}, true)
 			end
 		else
-			if reason ~= "punch" or killer == player then
-				if reason == "punch" then
-					ctf_kill_list.add(player, player, weapon_image)
-					send_death_message(player, killer, weapon_image)
-				else
-					ctf_kill_list.add("", player, get_suicide_image(reason))
-					send_death_message(player, player, get_suicide_image(reason))
-				end
+    		if reason
+        			and reason.type == "set_hp"
+        			and reason.reason == "ctf_trapchest" then
+    			-- Trapchest deaths credit the trap placer.
+    			killer = reason.trap_player
+    			weapon_image = "ctf_kill_list_trapchest.png"
 
-				killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
-				comment = " (Suicide)"
-			end
-			recent_rankings.add(player, {deaths = 1}, true)
+    			-- Map-generated traps have no player to credit.
+   				 if not killer then
+        			ctf_kill_list.add("", player, weapon_image)
+    			end
+    		elseif reason ~= "punch" or killer == player then
+        		if reason == "punch" then
+            		ctf_kill_list.add(player, player, weapon_image)
+            		send_death_message(player, killer, weapon_image)
+        		else
+            		ctf_kill_list.add("", player, get_suicide_image(reason))
+            		send_death_message(player, player, get_suicide_image(reason))
+        		end
+
+        		killer, weapon_image = ctf_combat_mode.get_last_hitter(player)
+        		comment = " (Suicide)"
+    		end
+
+    		recent_rankings.add(player, {deaths = 1}, true)
 		end
-
 		if killer then
 			local killscore = calculate_killscore(player)
 			local total_enemy_reward = 0

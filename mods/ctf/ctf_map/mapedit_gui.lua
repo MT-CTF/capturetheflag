@@ -167,6 +167,7 @@ function ctf_map.show_map_editor(player)
 							phys_gravity  = 1,
 							--
 							chests        = {},
+							trap_chests   = {},
 							teams         = {},
 							--
 							game_modes    = {},
@@ -663,6 +664,81 @@ function ctf_map.show_map_save_form(player, scroll_pos)
 				size = {ctf_gui.ELEM_SIZE.y, ctf_gui.ELEM_SIZE.y},
 				func = function(pname, fields)
 					table.remove(context[pname].chests, id)
+					minetest.after(0.1, ctf_map.show_map_save_form, pname,
+							minetest.explode_scrollbar_event(fields.formcontent).value)
+				end,
+			}
+			idx = idx + 1
+		end
+	end
+	idx = idx + 1.5
+
+	-- TRAP CHEST ZONES
+	if not context[player].trap_chests then
+		context[player].trap_chests = {}
+	end
+
+	elements.addtrapchestzone = {
+		type = "button",
+		exit = true,
+		label = S("Add Trap Chest Zone"),
+		pos = {(5 - 0.2) - (ctf_gui.ELEM_SIZE.x / 2), idx},
+		func = function(pname, fields)
+			table.insert(context[pname].trap_chests, {
+				pos1 = vector.new(),
+				pos2 = vector.new(),
+				amount = 1,
+			})
+			minetest.after(0.1, ctf_map.show_map_save_form, pname,
+					minetest.explode_scrollbar_event(fields.formcontent).value)
+		end,
+	}
+	idx = idx + 1
+
+	if #context[player].trap_chests > 0 then
+		for id, def in pairs(context[player].trap_chests) do
+			elements["trapchestzone_"..id] = {
+				type = "button",
+				exit = true,
+				label = S("Trap Chest Zone").." "..id.." - "..minetest.pos_to_string(def.pos1, 0) ..
+						" - "..minetest.pos_to_string(def.pos2, 0),
+				pos = {0, idx},
+				size = {7, ctf_gui.ELEM_SIZE.y},
+				func = function(pname, fields)
+					if not context[pname].trap_chests[id] then return end
+
+					ctf_map.get_pos_from_player(pname, 2, function(name, new_positions)
+						context[pname].trap_chests[id].pos1 = new_positions[1]
+						context[pname].trap_chests[id].pos2 = new_positions[2]
+
+						minetest.after(0.1, ctf_map.show_map_save_form, pname,
+								minetest.explode_scrollbar_event(fields.formcontent).value)
+					end)
+				end,
+			}
+			elements["trapchestzone_amount_"..id] = {
+				type = "field",
+				label = S("Amount"),
+				pos = {7.2, idx},
+				size = {1, ctf_gui.ELEM_SIZE.y},
+				default = context[player].trap_chests[id].amount,
+				func = function(pname, fields)
+					if not context[pname].trap_chests[id] then return end
+
+					local newnum = tonumber(fields["trapchestzone_amount_"..id])
+					if newnum then
+						context[pname].trap_chests[id].amount = newnum
+					end
+				end,
+			}
+			elements["trapchestzone_remove_"..id] = {
+				type = "button",
+				exit = true,
+				label = "X",
+				pos = {8.4, idx},
+				size = {ctf_gui.ELEM_SIZE.y, ctf_gui.ELEM_SIZE.y},
+				func = function(pname, fields)
+					table.remove(context[pname].trap_chests, id)
 					minetest.after(0.1, ctf_map.show_map_save_form, pname,
 							minetest.explode_scrollbar_event(fields.formcontent).value)
 				end,

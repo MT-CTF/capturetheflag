@@ -100,6 +100,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			phys_jump     = tonumber(meta:get("phys_jump")),
 			phys_gravity  = tonumber(meta:get("phys_gravity")),
 			chests        = {},
+			trap_chests   = {},
 			teams         = {},
 			barrier_area  = {pos1 = pos1, pos2 = pos2},
 		}
@@ -177,6 +178,7 @@ function ctf_map.load_map_meta(idx, dirname)
 			phys_jump      = tonumber(meta:get("phys_jump")),
 			phys_gravity   = tonumber(meta:get("phys_gravity")),
 			chests         = minetest.deserialize(meta:get("chests")),
+			trap_chests    = minetest.deserialize(meta:get("trap_chests")) or {},
 			teams          = minetest.deserialize(meta:get("teams")),
 			barrier_area   = minetest.deserialize(meta:get("barrier_area")),
 			game_modes     = minetest.deserialize(meta:get("game_modes")),
@@ -186,6 +188,11 @@ function ctf_map.load_map_meta(idx, dirname)
 		for id, def in pairs(map.chests) do
 			map.chests[id].pos1 = vector.add(offset, def.pos1)
 			map.chests[id].pos2 = vector.add(offset, def.pos2)
+		end
+
+		for id, def in pairs(map.trap_chests or {}) do
+			map.trap_chests[id].pos1 = vector.add(offset, def.pos1)
+			map.trap_chests[id].pos2 = vector.add(offset, def.pos2)
 		end
 
 		for id, def in pairs(map.teams) do
@@ -275,6 +282,13 @@ function ctf_map.save_map(mapmeta)
 		mapmeta.chests[id].pos2 = vector.subtract(def.pos2, mapmeta.offset)
 	end
 
+	for id, def in pairs(mapmeta.trap_chests) do
+	    def.pos1, def.pos2 = vector.sort(def.pos1, def.pos2)
+
+	    mapmeta.trap_chests[id].pos1 = vector.subtract(def.pos1, mapmeta.offset)
+	    mapmeta.trap_chests[id].pos2 = vector.subtract(def.pos2, mapmeta.offset)
+    end
+
 	for id, def in pairs(mapmeta.teams) do
 		-- Remove team from the list if not enabled
 		if not def.enabled then
@@ -321,6 +335,7 @@ function ctf_map.save_map(mapmeta)
 	meta:set("phys_jump"     , mapmeta.phys_jump)
 	meta:set("phys_gravity"  , mapmeta.phys_gravity)
 	meta:set("chests"        , minetest.serialize(mapmeta.chests))
+	meta:set("trap_chests"   , minetest.serialize(mapmeta.trap_chests))
 	meta:set("teams"         , minetest.serialize(mapmeta.teams))
 	meta:set("barrier_area"  , minetest.serialize(barrier_area))
 	meta:set("game_modes"    , minetest.serialize(mapmeta.game_modes))
