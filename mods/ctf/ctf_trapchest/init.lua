@@ -103,36 +103,16 @@ local function damage_trap_opener(player, trap)
 	local hp_before = player:get_hp()
 
 	player:set_hp(hp_before - TRAP_DAMAGE, {
-		type = "set_hp",
-		reason = "ctf_trapchest",
-	})
+	type = "set_hp",
+	reason = "ctf_trapchest",
+	trap_player = trap and trap.player or nil,
+})
 
 	-- If the player survived, this trap did not kill them.
 	if player:get_hp() > 0 then
 		pending_kills[pname] = nil
 	end
 end
-
-minetest.register_on_dieplayer(function(player)
-	local pname = player:get_player_name()
-	local kill = pending_kills[pname]
-
-	if not kill then
-		return
-	end
-
-	pending_kills[pname] = nil
-
-	-- Player-placed traps credit the placer.
-	-- Map-generated traps have no placer, so the killer is blank.
-	if ctf_kill_list and ctf_kill_list.add then
-		ctf_kill_list.add(
-			kill.trap_player or "",
-			player,
-			TRAP_KILL_IMAGE
-		)
-	end
-end)
 
 minetest.register_on_leaveplayer(function(player)
 	pending_kills[player:get_player_name()] = nil
