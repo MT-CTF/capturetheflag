@@ -422,7 +422,19 @@ local function end_combat_mode(player, reason, killer, weapon_image)
 				recent_rankings.add(player, {deaths = 1}, true)
 			end
 		else
-			if reason ~= "punch" or killer == player then
+			if reason
+        			and reason.type == "set_hp"
+        			and reason.reason == "ctf_trapchest" then
+    			-- Trapchest deaths credit the trap placer.
+    			killer = reason.trap_player
+    			weapon_image = "ctf_kill_list_trapchest.png"
+
+    			-- Map-generated traps have no player to credit.
+   				 if not killer then
+        			ctf_kill_list.add("", player, weapon_image)
+    			end
+
+            elseif reason ~= "punch" or killer == player then
 				if reason == "punch" then
 					ctf_kill_list.add(player, player, weapon_image)
 					send_death_message(player, killer, weapon_image)
