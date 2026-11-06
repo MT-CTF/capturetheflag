@@ -49,12 +49,12 @@ function ctf_modebase.on_match_end()
 	current_mode.on_match_end()
 end
 
-function ctf_modebase.on_respawnplayer(player)
-	RunCallbacks(ctf_api.registered_on_respawnplayer, player)
+function ctf_modebase.on_respawnplayer(...)
+	RunCallbacks(ctf_api.registered_on_respawnplayer, ...)
 
 	local current_mode = ctf_modebase:get_current_mode()
 	if not current_mode then return end
-	current_mode.on_respawnplayer(player)
+	current_mode.on_respawnplayer(...)
 end
 
 minetest.register_on_leaveplayer(function(...)
@@ -118,8 +118,8 @@ function ctf_modebase.on_flag_rightclick(...)
 	end
 end
 
-function ctf_modebase.on_flag_capture(capturer, flagteams)
-	RunCallbacks(ctf_api.registered_on_flag_capture, capturer, flagteams)
+function ctf_modebase.on_flag_capture(...)
+	RunCallbacks(ctf_api.registered_on_flag_capture, ...)
 end
 
 ctf_teams.team_allocator = function(...)

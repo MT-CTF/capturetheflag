@@ -418,7 +418,7 @@ function classes.set(player, classname)
 		return
 	end
 
-	RunCallbacks(classes.registered_on_class_change, player, oldclass)
+	RunCallbacks(classes.registered_on_class_change, player, classname, oldclass)
 
 	ctf_core.meta_set_string(player:get_player_name(), "class", classname)
 

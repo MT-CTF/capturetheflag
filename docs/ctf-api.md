@@ -578,6 +578,7 @@ No APIs exposed in this mod.
 
 #### `ctf_teams.register_on_allocplayer(func)`
 * `func` *Function*: function to be executed after allocating a team to player.
+* Called as `func(player, new_team, old_team)`; `old_team` is `nil` on first allocation.
 
 ## ctf_rankings
 
@@ -719,9 +720,10 @@ Depending on the database used, such as `redis` or `modstorage/default` defines 
 * `player` *PlayerObj*: Player
 * `teamnames` *list(string)*: Team whose flag is being taken.
 
-#### `ctf_modebase.features.on_allocplayer(player, new_team)`
+#### `ctf_modebase.features.on_allocplayer(player, new_team, old_team)`
 * `player` *PlayerObj*: Player
-* `teamname` *string*: Team where player is being joined to.
+* `new_team` *string*: The team the player is being allocated to
+* `old_team` *string*: The player's previous team. `nil` on first allocation
 
 #### `ctf_modebase.features.on_leaveplayer(player)`
 * `player` *PlayerObj*: Player

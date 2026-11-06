@@ -1,6 +1,7 @@
 local S = minetest.get_translator(minetest.get_current_modname())
 
 
+-- Entries dropped on_leave
 local hunting = {
 	--[[
 	hunter = {
@@ -28,37 +29,69 @@ local function dist_from_flag(player)
 	return vector.distance(ctf_map.current_map.teams[tname].flag_pos, player:get_pos())
 end
 
-local function stop_hunt(huntername, skip_item)
-	hunt_huds:remove(huntername)
-	hunt_huds:remove(hunting[huntername].hunting)
+local function refresh_hunted_text(targetname)
+	local names = {}
+	for hunter, hunt in pairs(hunting) do
+		if hunt.hunting == targetname then
+			table.insert(names, hunter)
+		end
+	end
 
+	if #names == 0 then
+		hunt_huds:remove(targetname, "hunting_name")
+	else
+		hunt_huds:change(targetname, "hunting_name", {
+			text = "Hunted by: " .. table.concat(names, ", "),
+		})
+	end
+end
+
+local function stop_hunt(huntername, skip_item, skip_target)
+	local hunt = hunting[huntername]
+	if not hunt then return end
+
+	local targetname = hunt.hunting
 	hunting[huntername] = nil
 
+	hunt_huds:remove(huntername, "hunted_mark_" .. targetname)
+	hunt_huds:remove(huntername, "hunting")
+
+	if not skip_target then
+		hunt_huds:remove(targetname, "hunter_mark_" .. huntername)
+		refresh_hunted_text(targetname)
+	end
+
 	if not skip_item then
-		local hunter = core.get_player_by_name(huntername)
+		local inv = core.get_player_by_name(huntername):get_inventory()
 
-		local inv = hunter:get_inventory()
-		local main = inv:get_list("main")
-
-		for idx, item in pairs(main) do
-			if item and item:get_name() == "ctf_mode_classes:hunter_token_hunting" then
+		for idx, item in pairs(inv:get_list("main")) do
+			if item:get_name() == "ctf_mode_classes:hunter_token_hunting" then
 				inv:set_stack("main", idx, "ctf_mode_classes:hunter_token")
 			end
 		end
 	end
 end
 
+local function cancel_all_hunts()
+	for hunter in pairs(table.copy(hunting)) do
+		stop_hunt(hunter)
+	end
+end
+
 local function update_huds(hunter, hunted)
+	local hunter_pos = core.get_player_by_name(hunter):get_pos()
+	local hunted_pos = core.get_player_by_name(hunted):get_pos()
+
 	if not hunt_huds:exists(hunter, "hunted_mark_"..hunted) then
 		hunt_huds:add(hunter, "hunted_mark_"..hunted, {
 			type = "image_waypoint",
 			image_scale = 1,
 			texture = "ctf_ranged_rifle_crosshair.png",
-			world_pos = core.get_player_by_name(hunted):get_pos():add(vector.new(0, 1, 0)),
+			world_pos = hunted_pos:add(vector.new(0, 1, 0)),
 		})
 	else
 		hunt_huds:change(hunter, "hunted_mark_"..hunted, {
-			world_pos = core.get_player_by_name(hunted):get_pos():add(vector.new(0, 1, 0)),
+			world_pos = hunted_pos:add(vector.new(0, 1, 0)),
 		})
 	end
 
@@ -67,11 +100,11 @@ local function update_huds(hunter, hunted)
 			type = "image_waypoint",
 			image_scale = 2,
 			texture = "ctf_modebase_skull.png^[multiply:#FF1111",
-			world_pos = core.get_player_by_name(hunter):get_pos():add(vector.new(0, 1, 0)),
+			world_pos = hunter_pos:add(vector.new(0, 1, 0)),
 		})
 	else
 		hunt_huds:change(hunted, "hunter_mark_"..hunter, {
-			world_pos = core.get_player_by_name(hunter):get_pos():add(vector.new(0, 1, 0)),
+			world_pos = hunter_pos:add(vector.new(0, 1, 0)),
 		})
 	end
 end
@@ -176,7 +209,7 @@ core.register_globalstep(function(dtime)
 
 	time = 0
 
-	for hunter, hunt in pairs(hunting) do
+	for hunter, hunt in pairs(table.copy(hunting)) do
 		local huntedplayer = core.get_player_by_name(hunt.hunting)
 
 		if dist_from_flag(huntedplayer) <= MIN_DIST_FROM_FLAG then
@@ -236,7 +269,7 @@ core.register_on_dieplayer(function(player, reason)
 		stop_hunt(pname, true)
 	end
 
-	for hunter, hunt in pairs(hunting) do
+	for hunter, hunt in pairs(table.copy(hunting)) do
 		if hunt.hunting == pname then
 			hud_events.new(hunter, {
 				quick = true,
@@ -252,16 +285,20 @@ core.register_on_leaveplayer(function(player)
 	local playername = player:get_player_name()
 
 	if hunting[playername] then
-		stop_hunt(playername, true)
+		local targetname = hunting[playername].hunting
+		hunting[playername] = nil
+
+		hunt_huds:remove(targetname, "hunter_mark_" .. playername)
+		refresh_hunted_text(targetname)
 	end
 
-	for hunter, hunt in pairs(hunting) do
+	for hunter, hunt in pairs(table.copy(hunting)) do
 		if hunt.hunting == playername then
 			hud_events.new(hunter, {
 				quick = true,
 				text = "Target left the game",
 			})
-			stop_hunt(hunter)
+			stop_hunt(hunter, false, true)
 		end
 	end
 end)
@@ -272,8 +309,39 @@ return {
 
 		if oldclass == "hunter" and hunting[pname] then
 			stop_hunt(pname, true)
+			hud_events.new(pname, {
+				quick = true,
+				text = "Hunt cancelled",
+				color = "warning",
+			})
 		end
 	end,
+	on_allocplayer = function(player, new_team, old_team)
+		local pname = PlayerName(player)
+		if not old_team or old_team == new_team then return end
+
+		if hunting[pname] then
+			stop_hunt(pname)
+
+			hud_events.new(pname, {
+				quick = true,
+				text = "Hunt cancelled",
+				color = "warning",
+			})
+		end
+
+		for hunter, hunt in pairs(table.copy(hunting)) do
+			if hunt.hunting == pname then
+				hud_events.new(hunter, {
+					quick = true,
+					text = "Target changed team",
+					color = 0xFFFFFF,
+				})
+				stop_hunt(hunter)
+			end
+		end
+	end,
+	cancel_all_hunts = cancel_all_hunts,
 	damage_mod = function(player, hitter, tool_capabilities, damage)
 		if damage then
 			local hname = hitter:get_player_name()

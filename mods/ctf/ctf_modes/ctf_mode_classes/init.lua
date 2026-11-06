@@ -134,11 +134,16 @@ ctf_modebase.register_mode("classes", {
 
 		classes.reset_class_cooldowns()
 	end,
-	on_match_end = features.on_match_end,
+	on_match_end = function(...)
+		features.on_match_end(...)
+
+		hunter.cancel_all_hunts()
+	end,
 	team_allocator = features.team_allocator,
-	on_allocplayer = function(player, new_team)
+	on_allocplayer = function(player, ...)
+		hunter.on_allocplayer(player, ...)
 		classes.update(player)
-		features.on_allocplayer(player, new_team)
+		features.on_allocplayer(player, ...)
 	end,
 	on_leaveplayer = features.on_leaveplayer,
 	on_dieplayer = features.on_dieplayer,
@@ -151,8 +156,8 @@ ctf_modebase.register_mode("classes", {
 	on_flag_take = features.on_flag_take,
 	on_flag_drop = features.on_flag_drop,
 	on_flag_capture = features.on_flag_capture,
-	on_flag_rightclick = function(clicker)
-		classes.show_class_formspec(clicker)
+	on_flag_rightclick = function(...)
+		classes.show_class_formspec(...)
 	end,
 	get_chest_access = features.get_chest_access,
 	on_punchplayer = function(player, hitter, damage, time_from_last_punch, tool_capabilities, ...)
